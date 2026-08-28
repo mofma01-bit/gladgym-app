@@ -59,16 +59,18 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .req{color:var(--gold)}
 
 #main{flex:1;overflow-y:auto;overflow-x:hidden;padding:16px;display:flex;flex-direction:column;gap:13px}
-#foot{flex:none;border-top:1px solid #3a3a35;background:#1a1a18;padding:11px 14px;display:flex;gap:9px}
-#tabs{flex:none;border-top:1px solid #45443e;background:#1e1e1b;display:flex}
+#foot{flex:none;border-top:1px solid #3a3a35;background:#1a1a18;padding:11px 14px;display:flex;gap:9px;
+  box-shadow:0 -6px 16px rgba(0,0,0,.35)}
+#tabs{flex:none;background:var(--brown);border-top:1px solid #6b4436;display:flex;
+  box-shadow:0 -6px 16px rgba(0,0,0,.45)}
 #tabs button{flex:1;padding:12px 4px 14px;display:flex;flex-direction:column;align-items:center;gap:4px;
-  font-size:12.5px;font-weight:700;color:#9b958c;position:relative}
+  font-size:12.5px;font-weight:700;color:#d6c2b6;position:relative}
 #tabs button.on{color:var(--gold)}
 #tabs button.on::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
-  width:30px;height:3px;background:var(--gold);border-radius:0 0 3px 3px}
-#tabs button .ic{font-size:19px;line-height:1}
+  width:34px;height:3px;background:var(--gold);border-radius:0 0 3px 3px}
+#tabs button .ic{font-size:20px;line-height:1}
 #tabs button .bd{position:absolute;transform:translate(14px,-4px);width:9px;height:9px;
-  border-radius:50%;background:var(--teal);border:2px solid #1e1e1b}
+  border-radius:50%;background:var(--teal);border:2px solid var(--brown)}
 
 .lbl{font-size:13px;font-weight:500;color:var(--sub)}
 .h1{font-size:21px;font-weight:900;letter-spacing:-.03em;line-height:1.3}
@@ -573,7 +575,10 @@ function render(){
   }
   $('#top').innerHTML=v.top||''; $('#main').innerHTML=v.body||''; $('#foot').innerHTML=v.foot||'';
   $('#foot').style.display=v.foot?'flex':'none';
-  $('#tabs').innerHTML=v.tabs?tabBar():''; $('#tabs').style.display=v.tabs?'flex':'none';
+  const bare = (S.screen==='login'||S.screen==='boot'||S.screen==='err');
+  const showTabs = v.tabs || (S.who==='m' && !bare);
+  $('#tabs').innerHTML = showTabs ? tabBar() : '';
+  $('#tabs').style.display = showTabs ? 'flex' : 'none';
   const lw = live();
   if(lw && S.who!=='tr' && S.screen!=='workout' && S.screen!=='pick' && S.screen!=='login'){
     const b=document.createElement('button');
