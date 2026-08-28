@@ -588,7 +588,8 @@ function bar(title, right, back, sub){
   const bare = (S.screen==='login'||S.screen==='boot'||S.screen==='err');
   const logo = bare ? '' : `<button class="logo" data-act="switch">GLAD GYM</button>`;
   const canBack = !bare && (back || (S.stack && S.stack.length));
-  return (canBack?`<button class="back" data-act="back">‹</button>`:'') + logo
+  const act = back || 'back';
+  return (canBack?`<button class="back" data-act="${esc(act)}">‹</button>`:'') + logo
     + `<span class="ttl">${esc(title)}${sub?`<small>${esc(sub)}</small>`:''}</span>` + (right||'');
 }
 function tabBar(){
