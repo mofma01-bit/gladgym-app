@@ -209,6 +209,19 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
 .note b{color:var(--gold);font-weight:700}
 .hr{height:1px;background:var(--line);margin:3px 0}
 
+/* 방금 담긴 것 — 눈에 띄게 */
+@keyframes pop{0%{transform:scale(.97);opacity:.4}60%{transform:scale(1.01)}100%{transform:scale(1);opacity:1}}
+.card.just{border-color:var(--gold);background:var(--gold-dim);animation:pop .32s ease-out}
+.card.just .nm{color:var(--gold)}
+.card.done2{border-color:#3a5b66;background:var(--teal-dim)}
+.card.done2 .nm{color:var(--teal)}
+
+/* 운동 중 돌아가기 띠 */
+.backbar{background:var(--gold-dim);border:1px solid var(--gold-2);border-radius:12px;
+  padding:12px 14px;display:flex;align-items:center;gap:9px;width:100%;text-align:left}
+.backbar .l{font-size:14.5px;font-weight:700;color:var(--gold)}
+.backbar .r{margin-left:auto;font-size:13px;font-weight:500;color:var(--gold-2)}
+
 /* 스플래시 */
 #splash{position:absolute;inset:0;background:var(--dark);z-index:40;
   display:flex;flex-direction:column;align-items:center;justify-content:center;padding:34px;
@@ -478,7 +491,21 @@ function setShort(id,s){ return exOf(id).cardio ? `${s.reps}분` : `${kgfmt(s.kg
 
 let toastT=null;
 function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('on'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('on'),1700); }
-function go(sc, patch){ Object.assign(S, patch||{}); S.screen=sc; closeSheet(); render(); }
+function go(sc, patch){
+  if(S.screen && S.screen!==sc && S.screen!=='boot' && S.screen!=='err'){
+    S.stack = S.stack || [];
+    S.stack.push({ screen:S.screen, mid:S.mid, tmid:S.tmid, subj:S.subj, rid:S.rid,
+      wid:S.wid, redit:S.redit, twid:S.twid, tab:S.tab, pickPart:S.pickPart });
+    if(S.stack.length>30) S.stack.shift();
+  }
+  Object.assign(S, patch||{}); S.screen=sc; closeSheet(); render();
+}
+function goBack(){
+  const st = S.stack || [];
+  const prev = st.pop();
+  if(!prev){ closeSheet(); S.screen = (S.who==='tr') ? 't_members' : 'home'; render(); return; }
+  Object.assign(S, prev); closeSheet(); render();
+}
 
 let sheetRender=null;
 function openSheet(fn){ sheetRender=fn; $('#sheet').classList.add('open'); drawSheet(); }
@@ -544,13 +571,21 @@ function render(){
   $('#top').innerHTML=v.top||''; $('#main').innerHTML=v.body||''; $('#foot').innerHTML=v.foot||'';
   $('#foot').style.display=v.foot?'flex':'none';
   $('#tabs').innerHTML=v.tabs?tabBar():''; $('#tabs').style.display=v.tabs?'flex':'none';
+  const lw = live();
+  if(lw && S.who!=='tr' && S.screen!=='workout' && S.screen!=='pick' && S.screen!=='login'){
+    const b=document.createElement('button');
+    b.className='backbar'; b.setAttribute('data-act','go:workout');
+    b.innerHTML = `<span class="l">운동하는 중이에요</span><span class="r">돌아가기 ›</span>`;
+    $('#main').prepend(b);
+  }
   document.querySelectorAll('#main textarea[data-k],#main input[data-k]').forEach(t=>{ const d=S.draft&&S.draft[t.getAttribute('data-k')]; if(d) t.value=d; });
   $('#main').scrollTop = v.keepScroll ? $('#main').scrollTop : 0;
 }
 function bar(title, right, back, sub){
-  const logo = (S.screen==='login'||S.screen==='boot'||S.screen==='err')
-    ? '' : `<button class="logo" data-act="switch">GLAD GYM</button>`;
-  return (back?`<button class="back" data-act="${esc(back)}">‹</button>`:'') + logo
+  const bare = (S.screen==='login'||S.screen==='boot'||S.screen==='err');
+  const logo = bare ? '' : `<button class="logo" data-act="switch">GLAD GYM</button>`;
+  const canBack = !bare && (back || (S.stack && S.stack.length));
+  return (canBack?`<button class="back" data-act="back">‹</button>`:'') + logo
     + `<span class="ttl">${esc(title)}${sub?`<small>${esc(sub)}</small>`:''}</span>` + (right||'');
 }
 function tabBar(){
@@ -776,7 +811,7 @@ function vWorkout(){
       <button class="btn gold" data-act="rep">${e.cardio?'구간 ＋':'반복 ＋'}</button>
       <button class="btn ghost" data-act="undo" ${cur.sets.length<2?'disabled':''}>되돌리기</button></div>
     <div class="hr"></div><span class="lbl">오늘 종목</span>
-    ${w.items.map((it,i)=>`<button class="card rowc ${it.locked?'dim':''}" data-act="jump:${i}" style="padding:11px 13px">
+    ${w.items.map((it,i)=>`<button class="card rowc ${it.locked?'dim':''} ${S.just===VID(it.ex,it.va)?'just':''}" data-act="jump:${i}" style="padding:11px 13px">
       <div><div class="nm" style="font-size:14px">${it.locked?'🔒 ':''}${esc(exName(it.ex,it.va))}</div>
       <div class="sm">${it.locked?`${mmss(it.sec)} · ${it.sets.length}세트 마침`:(i===w.cur?'하는 중':`${it.sets.length}세트`)}</div></div>
       ${i===w.cur&&!it.locked?'<span class="pill">지금</span>':'<span class="rt">›</span>'}</button>`).join('')}
@@ -1377,7 +1412,7 @@ function tRedit(){
     <div class="hr"></div>
     <span class="lbl">종목 ${r.items.length}개</span>
     ${r.items.length? r.items.map((it,i)=>{ const e=exOf(it.ex);
-      return `<button class="card rowc" data-act="ritem:${r.id}:${i}"><div><div class="nm">${i+1}. ${esc(exName(it.ex,it.va))}</div>
+      return `<button class="card rowc ${S.just===VID(it.ex,it.va)?'just':''}" data-act="ritem:${r.id}:${i}"><div><div class="nm">${i+1}. ${esc(exName(it.ex,it.va))}</div>
         <div class="sm">${e.cardio?`${it.reps}분`:`${kgfmt(it.kg)}kg × ${it.reps}회 · ${it.sets}세트`}${it.rest?` · 휴식 ${it.rest}초`:''}</div></div>
         <span class="rt">고치기 ›</span></button>`; }).join('')
       : '<div class="empty">아직 종목이 없어요<br>아래에서 담아 주세요</div>'}
@@ -1388,21 +1423,27 @@ function tRedit(){
       <button class="btn ${t&&t.rid===r.id&&t.kind==='개인운동'?'gold':'sub'} sm" data-act="assign:${r.id}:개인운동">개인운동</button></div>
     <div class="note">지정하면 회원 홈에 <b>「오늘 · 수업 · 루틴 2」</b>처럼 뜹니다. 지정하지 않아도 회원이 직접 골라 시작할 수 있어요.</div>
     <div class="hr"></div>
-    <button class="btn ghost sm" data-act="rdel:${r.id}" style="color:var(--warn)">이 루틴 지우기</button>` };
+    <button class="btn ghost sm" data-act="rdel:${r.id}" style="color:var(--warn)">이 루틴 지우기</button>`,
+    foot: r.items.length ? `<button class="btn sub" data-act="raddex:${r.id}">＋ 종목 더</button>
+      <button class="btn main" data-act="rdone:${r.id}">이 루틴 다 됐어요</button>` : '' };
 }
 
 /* ── 루틴에 담을 종목 고르기 ── */
 function tPickEx(){
   const r=rOf(S.redit); if(!r) return tRoutines();
   const list = EX.filter(e=>e.p===S.pickPart);
-  return { top: bar('종목 담기', `<span class="sub">루틴 ${r.no}</span>`, 're:'+r.id), body:`
+  const cnt = k => r.items.filter(it=>VID(it.ex,it.va)===k).length;
+  return { top: bar('종목 담기', `<span class="sub">담은 ${r.items.length}개</span>`, 're:'+r.id), keepScroll:true, body:`
     <input class="search" type="text" data-filter="1" placeholder="종목 이름으로 찾기">
     <div class="chips">${PARTS.map(x=>`<button class="chip ${x===S.pickPart?'on':''}" data-act="rpart:${x}">${x}</button>`).join('')}</div>
-    ${list.map(e=>vars(e.id).map(v=>`<button class="card rowc" data-nm="${esc(e.n+' '+(v.n||''))}" data-act="raddv:${r.id}:${e.id}:${v.k}">
-      <div><div class="nm">${esc(e.n)}${v.n?` (${esc(v.n)})`:''}</div>
-      <div class="sm">${esc(e.e)}${v.desc?' · 설명 있음':''}</div></div>
-      <span class="rt">＋</span></button>`).join('')).join('')}
-    <div class="note">담고 나서 <b>세트·무게·휴식</b>을 고칠 수 있습니다.</div>` };
+    ${list.map(e=>vars(e.id).map(v=>{ const k=VID(e.id,v.k), n=cnt(k), just=(S.just===k);
+      return `<button class="card rowc ${just?'just':(n?'done2':'')}" data-nm="${esc(e.n+' '+(v.n||''))}" data-act="raddv:${r.id}:${e.id}:${v.k}">
+        <div><div class="nm">${esc(e.n)}${v.n?` (${esc(v.n)})`:''}</div>
+        <div class="sm">${esc(e.e)}${v.desc?' · 설명 있음':''}</div></div>
+        ${just?'<span class="pill">방금 담음</span>':(n?`<span class="pill t">담김 ${n>1?n:'✓'}</span>`:'<span class="rt">＋</span>')}</button>`;
+      }).join('')).join('')}
+    <div class="note">눌러서 <b>여러 개를 이어서</b> 담으세요. 다 담았으면 아래 버튼을 누릅니다.</div>`,
+    foot:`<button class="btn main" data-act="re:${r.id}">다 담았어요 · ${r.items.length}개 ›</button>` };
 }
 
 /* ── 루틴 종목 값 고치기 ── */
@@ -1469,7 +1510,8 @@ document.addEventListener('click', ev=>{
   switch(k){
     case 'kakao': toast('실제 연동은 다음 단계입니다'); return;
     case 'retry': S.screen='boot'; render(); start(); return;
-    case 'switch': S.who=null; go('login'); return;
+    case 'switch': S.stack=[]; S.who=null; go('login'); return;
+    case 'back': goBack(); return;
     case 'sub2': S.subj=rest[1]; go(rest[0]); return;
 
     /* 상담일지 · 운동계획 편집 */
@@ -1523,9 +1565,13 @@ document.addEventListener('click', ev=>{
     case 'raddex': S.redit=rest[0]; go('t_pickex'); return;
     case 'rpart': S.pickPart=rest[0]; render(); return;
     case 'raddv': { const [rid,ex,va]=rest, r=rOf(rid); if(!r) return;
-      const last=null;
       r.items.push({ ex, va, kg: exOf(ex).cardio?0:20, reps: exOf(ex).cardio?20:10, sets:3, rest:60 });
-      svRoutineItems(rid); toast(exName(ex,va)+' 담았어요'); go('t_redit'); return; }
+      svRoutineItems(rid);
+      S.just = VID(ex,va);
+      clearTimeout(S.justT);
+      S.justT = setTimeout(()=>{ S.just=null; if(S.screen==='t_pickex') render(); }, 2600);
+      toast(exName(ex,va)+' 담았어요 · ' + r.items.length + '개');
+      render(); return; }
     case 'ritem': sheetRitem(rest[0], +rest[1]); return;
     case 'rd2': { const [rid,i,f,dv]=rest, r=rOf(rid); if(!r) return;
       const it=r.items[+i]; if(!it) return;
@@ -1539,6 +1585,7 @@ document.addEventListener('click', ev=>{
       svRoutineItems(rid); closeSheet(); render(); return; }
     case 'rdelitem': { const [rid,i]=rest, r=rOf(rid); if(!r) return;
       r.items.splice(+i,1); svRoutineItems(rid); closeSheet(); toast('뺐어요'); render(); return; }
+    case 'rdone': { S.just=null; toast('루틴을 저장했어요'); go('t_routines'); return; }
     case 'rdel': { const rid=rest[0];
       D.routines = D.routines.filter(x=>x.id!==rid);
       Object.keys(D.today).forEach(m=>{ if(D.today[m].rid===rid) delete D.today[m]; });
@@ -1658,7 +1705,10 @@ document.addEventListener('click', ev=>{
       live().items.push({ ex, va, rest:60, locked:false, sec:0, startAt:Date.now(),
         sets:[ exOf(ex).cardio ? {kg:0, reps:last?last.reps:20, spd:(last&&last.spd)?last.spd:6.5, done:false}
                                : {kg:last?last.kg:20, reps:last?last.reps:10, done:false} ] });
-      live().cur=live().items.length-1; save(); toast(exName(ex,va)+' 추가했어요'); go('workout');
+      live().cur=live().items.length-1; save();
+      S.just = VID(ex,va); clearTimeout(S.justT);
+      S.justT = setTimeout(()=>{ S.just=null; render(); }, 2600);
+      toast(exName(ex,va)+' 추가했어요'); go('workout');
       svNewItem(live().items.length-1).then(()=>{
         const sw=D.workouts.find(x=>x.id===live().id);
         if(sw) sw.items.push({ _id:live().items[live().items.length-1]._id, ex, va, sec:0, locked:false, sets:[] });
