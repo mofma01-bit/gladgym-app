@@ -557,7 +557,12 @@ function liveOf(mid){
   return w;
 }
 function estMin(r){ let s=0; r.items.forEach(i=>{ s+=i.sets*(40+(i.rest||60)); }); return Math.round(s/60/5)*5; }
-function lastSet(ex,va){ for(const w of myWorkouts()){ const it=w.items.find(i=>i.ex===ex && (va===undefined||i.va===va)); if(it&&it.sets.length) return it.sets[it.sets.length-1]; } return null; }
+function workoutsOf(mid){ return D.workouts.filter(w=>w.mid===mid && w.done).slice().sort(byDateDesc); }
+function lastSet(ex,va,mid){
+  for(const w of workoutsOf(mid||S.mid)){
+    const it=w.items.find(i=>i.ex===ex && (va===undefined||i.va===va));
+    if(it&&it.sets.length) return it.sets[it.sets.length-1];
+  } return null; }
 function att(k){ S.att=S.att||{}; return S.att[k]||(S.att[k]={}); }
 
 setInterval(()=>{
@@ -683,7 +688,7 @@ function vNewMem(){
 
 /* ── 홈 ── */
 function vHome(){
-  const u=unreadOf(S.mid), t=D.today[S.mid], r=t?rOf(t.rid):null, ws=myWorkouts(), lw=live(), g=GOALS[S.mid]||{};
+  const u=unreadOf(S.mid), t=D.today[S.mid], r=t?rOf(t.rid):null, ws=myWorkouts(), lw=liveOf(S.mid), g=GOALS[S.mid]||{};
   return { top: bar('글래드짐', `<span class="sub">${esc(me().n)} 회원님</span>`), tabs:1, body:`
     <div class="card"><div class="sm">우리의 목표</div><div class="nm">${esc(g.goal)}</div>
       <div class="sm">운동 약속 · ${esc(g.work)}<br>식단 약속 · ${esc(g.diet)}</div></div>
@@ -778,16 +783,31 @@ function sheetPickVar(exid){
 }
 
 /* ── ★ 운동 중 ── */
-async function newLive(title, items, kind, rid){
+async function newLive(title, items, kind, rid, mid, by){
   const id='w'+Date.now();
-  D.live={ id, mid:S.mid, title, kind:kind||'개인운동', rid:rid||null, date:TODAY, startAt:Date.now(), items, cur:0 };
+  mid = mid || S.mid;
+  D.live={ id, mid, title, kind:kind||'개인운동', rid:rid||null, date:TODAY, startAt:Date.now(), items, cur:0, by:by||'회원' };
   save(); go('workout');
-  await sv(spost('workouts',[{ id, member_id:S.mid, on_date:TODAY, kind:D.live.kind,
+  await sv(spost('workouts',[{ id, member_id:mid, on_date:TODAY, kind:D.live.kind,
     routine_id:rid||null, title, dur:0, done:false }]), '운동 시작');
   for(let i=0;i<items.length;i++) await svNewItem(i);
-  D.workouts.unshift({ id, mid:S.mid, date:TODAY, kind:D.live.kind, rid:rid||null, title, dur:0, done:false,
+  D.workouts.unshift({ id, mid, date:TODAY, kind:D.live.kind, rid:rid||null, title, dur:0, done:false,
     items: items.map(it=>({ _id:it._id, ex:it.ex, va:it.va, sec:0, locked:false, sets:[] })) });
   save(); render();
+}
+/* 다른 기기에서 시작한 운동을 이 기기에서 이어받는다 */
+function adoptLive(mid){
+  if(D.live && D.live.mid===mid) return true;
+  const w = D.workouts.find(x=>!x.done && x.mid===mid);
+  if(!w || !w.items || !w.items.length) return false;
+  const i = w.items.findIndex(it=>!it.locked);
+  D.live = { id:w.id, mid:w.mid, title:w.title||'운동', kind:w.kind, rid:w.rid, date:w.date,
+    startAt: Date.now() - (Number(w.dur)||0)*1000, cur: i>=0?i:w.items.length-1,
+    items: w.items.map(it=>({ _id:it._id, ex:it.ex, va:it.va, rest:60, locked:it.locked,
+      sec:it.sec, startAt:Date.now(), sets:(it.sets||[]).map(x=>({kg:x.kg,reps:x.reps,spd:x.spd,done:true})) })) };
+  if(!D.live.items.length) { D.live=null; return false; }
+  if(D.live.items.every(it=>it.locked)) D.live.cur = D.live.items.length-1;
+  save(); return true;
 }
 async function svNewItem(i){
   const w=D.live; if(!w) return; const it=w.items[i]; if(!it || it._id) return;
@@ -823,14 +843,18 @@ function vWorkout(){
     body:`<div class="empty">종목을 담아 주세요</div>`,
     foot:`<button class="btn sub" data-act="go:pick">운동 추가</button><button class="btn ghost" data-act="askcancel">그만두기</button>` };
   const cur=w.items[w.cur]||w.items[0], e=exOf(cur.ex), v=varOf(cur.ex,cur.va);
+  const wmid = w.mid || S.mid, tr = (S.who==='tr');
   const openIdx=cur.sets.findIndex(s=>!s.done), times=partTimes(w);
-  const cms=cmOf(S.mid,cur.ex,cur.va), nw=cms.filter(c=>!c.read).length, dsc=descOf(S.mid,cur.ex,cur.va);
+  const cms=cmOf(wmid,cur.ex,cur.va), nw=cms.filter(c=>!c.read).length, dsc=descOf(wmid,cur.ex,cur.va);
   return {
     top: bar(e.n, `<span class="tm" id="tm">${mmss((Date.now()-w.startAt)/1000)}</span>`, 'go:home', v.n||''),
     keepScroll:true, body:`
     ${v.demo?`<div class="demo"><div class="fig"><div class="bar"></div><div class="bod"></div></div>
       <span class="cap">시범 영상 자리${v.n?` — ${esc(v.n)}`:''}</span></div>`:''}
-    <button class="fbbtn" data-act="exd:${cur.ex}:${cur.va}">
+    ${tr?`<button class="card teal" data-act="tlive:${wmid}">
+      <div class="nm t">${esc((MEMBERS.find(m=>m.id===wmid)||{}).n||'')} 회원 수업 기록 중</div>
+      <div class="sm">종목별로 코멘트를 남기려면 여기 ›</div></button>`:''}
+    <button class="fbbtn" data-act="exd:${cur.ex}:${cur.va}${tr?':'+wmid:''}">
       <span class="l">${nw?'새 코멘트가 있어요':'운동 설명 · 코멘트'}</span>
       ${nw?'<span class="pill t">NEW</span>':''}
       <span class="r">${dsc?'설명':'설명 없음'}${cms.length?` · 코멘트 ${cms.length}`:''} ›</span></button>
@@ -1471,6 +1495,10 @@ function tToday(){
   const todo = D.workouts.filter(w=>w.done && unseen(w)).sort(byDateDesc);
   const nm = id => (MEMBERS.find(x=>x.id===id)||{}).n || '?';
   return { top: bar('오늘', `<span class="sub">${TODAY.slice(5).replace('-','월 ')}일</span>`), body:`
+    <button class="card gold" data-act="pickmem">
+      <div class="nm g">오늘 수업 기록하기</div>
+      <div class="sm">회원을 고르고 루틴을 골라 바로 시작합니다</div></button>
+    <div class="hr"></div>
     ${live.length?`<span class="lbl">지금 운동 중</span>
       ${live.map(x=>`<button class="card teal" data-act="tlive:${x.m.id}">
         <div class="nm t">${esc(x.m.n)} · 운동 중</div>
@@ -1558,8 +1586,15 @@ function tMember(){
   return { top: bar(m.n, `<span class="sub">최근 ${ws.length}회</span>`, 'go:t_members'), body:`
     <div class="card"><div class="sm">우리의 목표</div><div class="nm">${esc(g.goal)}</div>
       <div class="sm">${esc(g.work)}</div></div>
-    ${liveOf(m.id)?`<button class="card teal" data-act="tlive:${m.id}">
-      <div class="nm t">지금 운동 중이에요</div><div class="sm">${esc(liveOf(m.id).title||'')} · 바로 코멘트 남기기 ›</div></button>`:''}
+    ${liveOf(m.id)?`<button class="card teal" data-act="tgo:${m.id}">
+        <div class="nm t">지금 운동 중이에요</div>
+        <div class="sm">${esc(liveOf(m.id).title||'')} · 이어서 기록하기 ›</div></button>
+      <button class="card rowc" data-act="tlive:${m.id}">
+        <div><div class="nm">종목별 코멘트 남기기</div><div class="sm">설명 고치기도 여기서</div></div>
+        <span class="rt">›</span></button>`
+     :`<button class="card gold" data-act="tstartask:${m.id}">
+        <div class="nm g">수업 시작</div>
+        <div class="sm">루틴을 골라 지금 기록을 시작합니다</div></button>`}
     <button class="card ${r?'gold':''}" data-act="go:t_routines">
       <div class="nm ${r?'g':''}">오늘 지정</div>
       <div class="sm">${r?`${esc(t.kind)} · 루틴 ${r.no} ${esc(r.n)}`:'아직 없어요 — 루틴에서 지정하세요'}</div></button>
@@ -1595,7 +1630,8 @@ function tLive(){
         <div class="sm">${it.sets.filter(s=>s.done).length?it.sets.filter(s=>s.done).map(x=>setShort(it.ex,x)).join(' · '):'아직 안 했어요'}
         ${sent.length?`<br>방금 코멘트 ${sent.length}개 보냄`:''}<br>설명 보기 · 코멘트 남기기 ›</div></button>`;
     }).join('')
-    + `<div class="note">회원이 <b>지금 하는 것</b>이 골드로 잡힙니다. 누르면 그 자리에서 설명을 고치거나 코멘트를 남길 수 있어요. 보낸 것은 회원 화면에 <b>NEW</b>로 뜹니다.</div>` };
+    + `<div class="note">회원이 <b>지금 하는 것</b>이 골드로 잡힙니다. 누르면 그 자리에서 설명을 고치거나 코멘트를 남길 수 있어요. 보낸 것은 회원 화면에 <b>NEW</b>로 뜹니다.</div>`,
+    foot:`<button class="btn main" data-act="tgo:${m.id}">내가 대신 기록하기</button>` };
 }
 function tWrite(){
   const w=D.workouts.find(x=>x.id===S.twid), m=MEMBERS.find(x=>x.id===w.mid);
@@ -1644,8 +1680,43 @@ function tRedit(){
     <div class="note">지정하면 회원 홈에 <b>「오늘 · 수업 · 루틴 2」</b>처럼 뜹니다. 지정하지 않아도 회원이 직접 골라 시작할 수 있어요.</div>
     <div class="hr"></div>
     <button class="btn ghost sm" data-act="rdel:${r.id}" style="color:var(--warn)">이 루틴 지우기</button>`,
-    foot: r.items.length ? `<button class="btn sub" data-act="raddex:${r.id}">＋ 종목 더</button>
-      <button class="btn main" data-act="rdone:${r.id}">이 루틴 다 됐어요</button>` : '' };
+    foot: r.items.length ? `<button class="btn sub" data-act="tstart:${r.mid}:${r.id}:수업">지금 이 루틴으로 수업</button>
+      <button class="btn main" data-act="rdone:${r.id}">다 됐어요</button>` : '' };
+}
+
+/* ── 트레이너: 수업 시작 ── */
+function sheetPickMember(){
+  openSheet(()=>`
+    <div class="h2">오늘 수업 <small>누구와 하시나요</small></div>
+    <input class="search" type="text" data-filter="1" placeholder="회원 이름으로 찾기">
+    ${MEMBERS.map(m=>{ const lv=liveOf(m.id);
+      return `<button class="card rowc ${lv?'teal':''}" data-nm="${esc(m.n)}" data-act="${lv?'tgo:'+m.id:'tstartask:'+m.id}">
+        <div><div class="nm ${lv?'t':''}">${esc(m.n)}</div>
+        <div class="sm">${lv?'진행 중 · 이어서 기록':(D.today[m.id]&&rOf(D.today[m.id].rid)?`오늘 지정 · 루틴 ${rOf(D.today[m.id].rid).no}`:'지정된 루틴 없음')}</div></div>
+        <span class="rt">${lv?'이어서 ›':'시작 ›'}</span></button>`; }).join('')
+      || '<div class="empty">회원이 없어요</div>'}
+    <button class="btn ghost sm" data-act="close">닫기</button>`);
+}
+
+function sheetStartSession(mid){
+  const m = MEMBERS.find(x=>x.id===mid) || {n:''};
+  const rs = myRoutines(mid), t = D.today[mid];
+  openSheet(()=>`
+    <div class="h2">${esc(m.n)} 회원 <small>무엇으로 시작할까요</small></div>
+    ${t && rOf(t.rid) ? `<button class="card gold" data-act="tstart:${mid}:${t.rid}:${t.kind}">
+      <div class="nm g">오늘 지정 · ${esc(t.kind)}</div>
+      <div class="sm">루틴 ${rOf(t.rid).no} · ${esc(rOf(t.rid).n)}</div></button>` : ''}
+    <span class="lbl">루틴에서 고르기</span>
+    ${rs.length ? rs.map(r=>`<button class="card rowc" data-act="tstart:${mid}:${r.id}:수업">
+      <div><div class="nm">루틴 ${r.no} · ${esc(r.n)}</div>
+      <div class="sm">${r.items.length}종목 · 예상 ${estMin(r)}분</div></div>
+      <span class="rt">시작 ›</span></button>`).join('') : '<div class="empty">만들어 둔 루틴이 없어요</div>'}
+    <div class="hr"></div>
+    <button class="card rowc" data-act="tstart:${mid}:0:수업">
+      <div><div class="nm">빈 운동으로 시작</div><div class="sm">종목을 그때그때 담습니다</div></div>
+      <span class="rt">＋</span></button>
+    <button class="btn ghost sm" data-act="close">닫기</button>
+    <div class="note">트레이너가 시작해도 <b>회원 기록으로</b> 남습니다. 회원 폰에서도 같은 운동이 보입니다.</div>`);
 }
 
 /* ── 루틴에 담을 종목 고르기 ── */
@@ -1735,6 +1806,18 @@ document.addEventListener('click', ev=>{
     case 'switch': S.stack=[]; S.who=null; go('login'); return;
     case 'back': goBack(); return;
     case 'ttab': S.ttab=rest[0]; go(rest[0]); return;
+    case 'pickmem': sheetPickMember(); return;
+    case 'tstartask': S.tmid=rest[0]; sheetStartSession(rest[0]); return;
+    case 'tstart': {
+      const [mid, rid, kind] = rest;
+      closeSheet(); S.tmid=mid; S.subj=mid;
+      if(rid && rid!=='0'){ const r=rOf(rid);
+        newLive(`루틴 ${r.no} · ${r.n}`, itemsFromRoutine(r), kind, r.id, mid, '트레이너'); }
+      else newLive('수업', [], kind, null, mid, '트레이너');
+      return; }
+    case 'tgo': { const mid=rest[0];
+      if(!adoptLive(mid)){ toast('진행 중인 운동이 없어요'); return; }
+      S.tmid=mid; S.subj=mid; go('workout'); return; }
     case 'sub2': S.subj=rest[1]; go(rest[0]); return;
 
     /* 상담일지 · 운동계획 편집 */
@@ -1848,7 +1931,7 @@ document.addEventListener('click', ev=>{
       if(rest[0]==='tr'){ S.who='tr'; S.ttab='t_today'; go('t_today'); }
       else { S.who='m'; S.mid=rest[0]; S.tab='home'; go('home'); } return;
     case 'reset': reset(); toast('처음 상태로 되돌렸습니다'); return;
-    case 'go': go(rest[0]); return;
+    case 'go': { if(rest[0]==='workout' && !D.live) adoptLive(S.mid); go(rest[0]); return; }
     case 'tab': S.tab=rest[0]; go(rest[0]); return;
     case 'close': S.editDesc=null; closeSheet(); return;
 
