@@ -563,7 +563,8 @@ function render(){
     workout:vWorkout,summary:vSummary,records:vRecords,record:vRecord,feedback:vFeedback,me:vMe,
     t_members:tMembers,t_member:tMember,t_live:tLive,t_write:tWrite,t_routines:tRoutines,t_redit:tRedit,t_ex:tEx,
     intake:vIntake, plan:vPlan, body:vBody, cycle:vCycle, qa:vQa, boot:vBoot, err:vErr,
-    newmem:vNewMem, intake_edit:vIntakeEdit, plan_edit:vPlanEdit, t_pickex:tPickEx};
+    newmem:vNewMem, intake_edit:vIntakeEdit, plan_edit:vPlanEdit, t_pickex:tPickEx,
+    t_today:tToday, t_feed:tFeed, t_tools:tTools};
   let v;
   try{ v=(V[S.screen]||vHome)(); }
   catch(err){
@@ -576,8 +577,8 @@ function render(){
   $('#top').innerHTML=v.top||''; $('#main').innerHTML=v.body||''; $('#foot').innerHTML=v.foot||'';
   $('#foot').style.display=v.foot?'flex':'none';
   const bare = (S.screen==='login'||S.screen==='boot'||S.screen==='err');
-  const showTabs = v.tabs || (S.who==='m' && !bare);
-  $('#tabs').innerHTML = showTabs ? tabBar() : '';
+  const showTabs = v.tabs || (!bare && (S.who==='m' || S.who==='tr'));
+  $('#tabs').innerHTML = showTabs ? (S.who==='tr' ? tabBarTr() : tabBar()) : '';
   $('#tabs').style.display = showTabs ? 'flex' : 'none';
   const lw = live();
   if(lw && S.who!=='tr' && S.screen!=='workout' && S.screen!=='pick' && S.screen!=='login'){
@@ -602,6 +603,18 @@ function tabBar(){
   const t=(id,ic,nm,bd)=>`<button data-act="tab:${id}" class="${S.tab===id?'on':''}">
     <span class="ic">${ic}${bd?'<span class="bd"></span>':''}</span><span>${nm}</span></button>`;
   return t('home','⌂','홈')+t('records','▤','기록')+t('feedback','✉','피드백',u>0)+t('me','◍','내 정보');
+}
+/* 코멘트를 아직 안 단 운동인가 */
+function unseen(w){
+  if(!w.done) return false;
+  return !D.cm.some(c => c.mid===w.mid && c.ts && String(c.ts).slice(0,10) >= w.date);
+}
+function todoCount(){ return D.workouts.filter(w=>w.done && unseen(w)).length; }
+function tabBarTr(){
+  const n = todoCount();
+  const t=(id,ic,nm,bd)=>`<button data-act="ttab:${id}" class="${S.ttab===id?'on':''}">
+    <span class="ic">${ic}${bd?'<span class="bd"></span>':''}</span><span>${nm}</span></button>`;
+  return t('t_today','◷','오늘')+t('t_members','⌸','회원')+t('t_feed','✎','피드백',n>0)+t('t_tools','⚑','자료');
 }
 
 /* ── 불러오는 중 · 오류 ── */
@@ -1316,28 +1329,92 @@ function vQa(){
 }
 
 /* ═══ 트레이너 ═══ */
+/* 오늘 */
+function tToday(){
+  const live = MEMBERS.map(m=>({m, w:liveOf(m.id)})).filter(x=>x.w);
+  const todayDone = D.workouts.filter(w=>w.done && w.date===TODAY).sort(byDateDesc);
+  const assigned = MEMBERS.map(m=>({m, t:D.today[m.id]})).filter(x=>x.t);
+  const todo = D.workouts.filter(w=>w.done && unseen(w)).sort(byDateDesc);
+  const nm = id => (MEMBERS.find(x=>x.id===id)||{}).n || '?';
+  return { top: bar('오늘', `<span class="sub">${TODAY.slice(5).replace('-','월 ')}일</span>`), body:`
+    ${live.length?`<span class="lbl">지금 운동 중</span>
+      ${live.map(x=>`<button class="card teal" data-act="tlive:${x.m.id}">
+        <div class="nm t">${esc(x.m.n)} · 운동 중</div>
+        <div class="sm">${esc((it=>it?exName(it.ex,it.va):'')(x.w.items[x.w.cur]||x.w.items[0]))} · 바로 코멘트 ›</div></button>`).join('')}`
+     :'<div class="card"><div class="nm">지금 운동 중인 회원이 없어요</div></div>'}
+    <div class="hr"></div>
+    <span class="lbl">오늘 지정한 루틴 · ${assigned.length}명</span>
+    ${assigned.length? assigned.map(x=>{ const r=rOf(x.t.rid);
+      return `<button class="card rowc" data-act="tm:${x.m.id}">
+        <div><div class="nm">${esc(x.m.n)}</div>
+        <div class="sm">${esc(x.t.kind)} · ${r?`루틴 ${r.no} ${esc(r.n)}`:'루틴 없음'}</div></div>
+        <span class="rt">›</span></button>`; }).join('')
+     : '<div class="empty">오늘 지정한 루틴이 없어요</div>'}
+    <div class="hr"></div>
+    <span class="lbl">오늘 끝낸 운동 · ${todayDone.length}건</span>
+    ${todayDone.length? todayDone.map(w=>`<button class="card rowc" data-act="tw:${w.id}">
+        <div><div class="nm">${esc(nm(w.mid))}</div>
+        <div class="sm">${esc(w.kind||'')} · ${w.items.length}종목 · ${durTxt(w.dur)}</div></div>
+        ${unseen(w)?'<span class="pill">코멘트 쓰기</span>':'<span class="pill q">봤음</span>'}</button>`).join('')
+     : '<div class="empty">아직 없어요</div>'}
+    ${todo.length?`<div class="hr"></div>
+      <span class="lbl">코멘트 안 단 기록 · ${todo.length}건</span>
+      <button class="card rowc" data-act="ttab:t_feed"><div><div class="nm">피드백 탭에서 몰아서 쓰기</div>
+        <div class="sm">가장 오래된 것부터 보여 드립니다</div></div><span class="rt">›</span></button>`:''}` };
+}
+
+/* 피드백 — 코멘트 쓸 곳 모아보기 */
+function tFeed(){
+  const nm = id => (MEMBERS.find(x=>x.id===id)||{}).n || '?';
+  const todo = D.workouts.filter(w=>w.done && unseen(w)).sort(byDateDesc);
+  const mine = D.cm.slice(0, 12);
+  return { top: bar('피드백', `<span class="sub">쓸 것 ${todo.length}건</span>`), body:`
+    <span class="lbl">코멘트를 아직 안 단 기록</span>
+    ${todo.length? todo.map(w=>`<button class="card rowc" data-act="tw:${w.id}">
+        <div><div class="nm">${esc(nm(w.mid))} · ${dateTxt(w.date)}</div>
+        <div class="sm">${esc(w.kind||'')} · ${w.items.map(i=>exOf(i.ex).n).slice(0,2).join(', ')}${w.items.length>2?' 외':''}</div></div>
+        <span class="pill">쓰기 ›</span></button>`).join('')
+     : '<div class="empty">다 쓰셨어요</div>'}
+    <div class="hr"></div>
+    <span class="lbl">최근 남긴 코멘트</span>
+    ${mine.length? mine.map(c=>`<button class="cm" style="text-align:left" data-act="exd:${c.ex}:${c.va}:${c.mid}">
+        <span class="who">${esc(nm(c.mid))} · ${esc(c.at)}</span>
+        <span class="ex" style="font-size:13.5px;font-weight:700;color:var(--gold)">${esc(exName(c.ex,c.va))}</span>
+        <span class="tx">${esc(c.tx.slice(0,60))}${c.tx.length>60?'…':''}</span></button>`).join('')
+     : '<div class="empty">아직 없어요</div>'}` };
+}
+
+/* 자료 */
+function tTools(){
+  return { top: bar('자료'), body:`
+    <button class="card rowc" data-act="go:t_routines"><div><div class="nm">루틴 만들기 · 지정</div>
+      <div class="sm">회원별 루틴 세트</div></div><span class="rt">›</span></button>
+    <button class="card rowc" data-act="go:t_ex"><div><div class="nm">종목 사전</div>
+      <div class="sm">${EX.length}종목 · 하는 법 ${EX.reduce((a,e)=>a+vars(e.id).length,0)}가지 · 기본 설명</div></div><span class="rt">›</span></button>
+    <button class="card rowc" data-act="qa"><div><div class="nm">자주 묻는 질문</div>
+      <div class="sm">플래너 Q&A ${QA.length}개</div></div><span class="rt">›</span></button>
+    <div class="hr"></div>
+    <button class="card rowc" data-act="newmem"><div><div class="nm">＋ 회원 새로 만들기</div>
+      <div class="sm">상담일지부터 처음부터</div></div><span class="rt">›</span></button>
+    <button class="card rowc" data-act="switch"><div><div class="nm">회원 화면으로 바꾸기</div>
+      <div class="sm">계정 고르는 화면으로</div></div><span class="rt">›</span></button>` };
+}
+
 function tMembers(){
   return { top: bar('회원 목록', `<span class="sub">담당 ${MEMBERS.length}명</span>`), body:
+    `<input class="search" type="text" data-filter="1" placeholder="회원 이름으로 찾기">` +
     MEMBERS.map(m=>{
       const ws=D.workouts.filter(w=>w.mid===m.id&&w.done).slice().sort(byDateDesc), last=ws[0];
       const lv=liveOf(m.id);
       const nofb=last && !D.cm.some(c=>c.mid===m.id && c.at==='방금');
-      return `<button class="card rowc" data-act="${lv?'tlive:'+m.id:'tm:'+m.id}">
+      return `<button class="card rowc" data-nm="${esc(m.n)}" data-act="${lv?'tlive:'+m.id:'tm:'+m.id}">
         <div><div class="nm">${esc(m.n)}</div>
         <div class="sm">${lv?`지금 운동 중 · ${esc((it0=>it0?exName(it0.ex,it0.va):'')(lv.items[lv.cur]||lv.items[0]))}`
           :(last?`${dateTxt(last.date)} · ${esc(last.kind||'')}`:'기록 없음')}</div></div>
         ${lv?'<span class="pill t">진행 중</span>'
           :(!last?'<span class="pill q">기록 없음</span>':(nofb?'<span class="pill">안 본 기록</span>':'<span class="pill q">봤음</span>'))}</button>`;
     }).join('')
-    + `<div class="hr"></div>
-       <button class="card rowc" data-act="go:t_routines"><div><div class="nm">루틴 만들기 · 지정</div>
-         <div class="sm">회원별 루틴 세트</div></div><span class="rt">›</span></button>
-       <button class="card rowc" data-act="go:t_ex"><div><div class="nm">종목 사전</div>
-         <div class="sm">${EX.length}종목 · 하는 법 ${EX.reduce((a,e)=>a+vars(e.id).length,0)}가지</div></div><span class="rt">›</span></button>
-       <button class="card rowc" data-act="qa"><div><div class="nm">자주 묻는 질문</div>
-         <div class="sm">플래너 Q&A ${QA.length}개</div></div><span class="rt">›</span></button>
-       <button class="card rowc" data-act="as:m1"><div><div class="nm">회원 화면으로 돌아가기</div>
-         <div class="sm">프로토타입 도구</div></div><span class="rt">›</span></button>` };
+    + `<button class="btn sub" data-act="newmem" style="margin-top:4px">＋ 회원 새로 만들기</button>` };
 }
 function tMember(){
   const m=MEMBERS.find(x=>x.id===S.tmid), ws=D.workouts.filter(w=>w.mid===m.id&&w.done).slice().sort(byDateDesc);
@@ -1521,6 +1598,7 @@ document.addEventListener('click', ev=>{
     case 'retry': S.screen='boot'; render(); start(); return;
     case 'switch': S.stack=[]; S.who=null; go('login'); return;
     case 'back': goBack(); return;
+    case 'ttab': S.ttab=rest[0]; go(rest[0]); return;
     case 'sub2': S.subj=rest[1]; go(rest[0]); return;
 
     /* 상담일지 · 운동계획 편집 */
@@ -1617,11 +1695,11 @@ document.addEventListener('click', ev=>{
           spost('intake',[{ member_id:id, data:intake }], {on:'member_id'}),
           spost('plans',[{ member_id:id, data:plan }], {on:'member_id'})
         ])), '회원 만들기');
-      S.who='tr'; S.tmid=id; S.subj=id; toast(name+' 회원을 만들었어요');
+      S.who='tr'; S.ttab='t_members'; S.tmid=id; S.subj=id; toast(name+' 회원을 만들었어요');
       go('t_member'); return;
     }
     case 'as':
-      if(rest[0]==='tr'){ S.who='tr'; go('t_members'); }
+      if(rest[0]==='tr'){ S.who='tr'; S.ttab='t_today'; go('t_today'); }
       else { S.who='m'; S.mid=rest[0]; S.tab='home'; go('home'); } return;
     case 'reset': reset(); toast('처음 상태로 되돌렸습니다'); return;
     case 'go': go(rest[0]); return;
