@@ -73,6 +73,32 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .req{color:var(--gold)}
 
 #main{flex:1;overflow-y:auto;overflow-x:hidden;padding:16px;display:flex;flex-direction:column;gap:13px}
+#main.lite{background:#fbf7f0;color:#2b231c}
+#main.lite .card{background:#fff;border-color:#e6ddcf}
+#main.lite .card .nm{color:#2b231c}
+#main.lite .card .sm{color:#7b6c5d}
+#main.lite .lbl{color:#7b6c5d}
+#main.lite .note{background:#fff;border-color:#e6ddcf;color:#7b6c5d}
+#main.lite .note b{color:#8a5a2b}
+#main.lite .hr{background:#e6ddcf}
+#main.lite .empty{color:#a0917f}
+#main.lite .chip{background:#fff;border-color:#e6ddcf;color:#7b6c5d}
+#main.lite .chip.on{background:#f6ead4;border-color:var(--gold-2);color:#8a5a2b}
+#main.lite textarea{background:#fff;border-color:#e6ddcf;color:#2b231c}
+#main.lite .search{background:#fff;border-color:#e6ddcf;color:#2b231c}
+
+.shot{width:100%;border-radius:12px;display:block;background:#0e0e0d}
+.mealgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mealcard{border:1px solid #e6ddcf;border-radius:12px;overflow:hidden;background:#fff;
+  display:flex;flex-direction:column}
+.mealcard img{width:100%;aspect-ratio:1;object-fit:cover;display:block}
+.mealcard .cap{padding:8px 10px;font-size:12.5px;font-weight:700;color:#2b231c}
+.mealcard .cap span{display:block;font-weight:500;color:#7b6c5d;font-size:11.5px}
+.shotbtn{width:100%;border:1px dashed var(--gold-2);border-radius:12px;background:#f6ead4;
+  padding:18px;display:flex;flex-direction:column;align-items:center;gap:5px;color:#8a5a2b}
+.shotbtn .ic{font-size:24px}
+.shotbtn .t{font-size:15px;font-weight:700}
+.shotbtn .s{font-size:12.5px;font-weight:500}
 #foot{flex:none;border-top:1px solid #3a3a35;background:#1a1a18;padding:11px 14px;display:flex;gap:9px;
   box-shadow:0 -6px 16px rgba(0,0,0,.35)}
 #tabs{flex:none;background:var(--brown);border-top:1px solid #6b4436;display:flex;
@@ -433,7 +459,7 @@ function mapWorkouts(wks, witems, wsets){
 }
 
 async function boot(){
-  const [exs, vrs, mems, rts, ritems, asg, wks, witems, wsets, cms, mdesc, intk, plns, bdy, cyc] = await Promise.all([
+  const [exs, vrs, mems, rts, ritems, asg, wks, witems, wsets, cms, mdesc, intk, plns, bdy, cyc, mls] = await Promise.all([
     sget('exercises?select=*&order=sort'),
     sget('variants?select=*&order=sort'),
     sget('members?select=*'),
@@ -449,6 +475,7 @@ async function boot(){
     sget('plans?select=*'),
     sget('body_checks?select=*'),
     sget('cycles?select=*'),
+    sget('meals?select=*&order=created_at.desc&limit=300'),
   ]);
 
   EX = exs.map(e => ({ id:e.id, n:e.name, p:e.part, e:e.equip, cardio: e.cardio ? 1 : 0,
@@ -469,6 +496,8 @@ async function boot(){
   GOALS = {}; plns.forEach(r => GOALS[r.member_id] = r.data || {});
   D.body = {}; bdy.forEach(r => D.body[r.member_id] = { date:r.on_date, checks:r.checks||{}, photos:r.photos||{}, memo:r.memo||'' });
   D.cycle = {}; cyc.forEach(r => D.cycle[r.member_id] = { on:r.enabled, last:r.last_start, len:r.cyc_len, period:r.period_len });
+  D.meals = (mls||[]).map(m => ({ id:m.id, mid:m.member_id, date:m.on_date, slot:m.slot,
+    path:m.path, memo:m.memo||'', note:m.trainer_note||'' }));
 
   loadLive();
   if(D.live && !D.workouts.some(w => w.id === D.live.id)) D.live = null;   // 서버에서 지워진 것
@@ -583,7 +612,7 @@ function render(){
     t_members:tMembers,t_member:tMember,t_live:tLive,t_write:tWrite,t_routines:tRoutines,t_redit:tRedit,t_ex:tEx,
     intake:vIntake, plan:vPlan, body:vBody, cycle:vCycle, qa:vQa, boot:vBoot, err:vErr,
     newmem:vNewMem, intake_edit:vIntakeEdit, plan_edit:vPlanEdit, t_pickex:tPickEx,
-    t_today:tToday, t_feed:tFeed, t_tools:tTools};
+    t_today:tToday, t_feed:tFeed, t_tools:tTools, diet:vDiet};
   let v;
   try{ v=(V[S.screen]||vHome)(); }
   catch(err){
@@ -593,6 +622,7 @@ function render(){
       <button class="btn main" data-act="tab:home">홈으로</button>
       <button class="btn ghost" data-act="retry">다시 불러오기</button>` };
   }
+  $('#main').className = v.lite ? 'lite' : '';
   $('#top').innerHTML=v.top||''; $('#main').innerHTML=v.body||''; $('#foot').innerHTML=v.foot||'';
   $('#foot').style.display=v.foot?'flex':'none';
   const bare = (S.screen==='login'||S.screen==='boot'||S.screen==='err');
@@ -621,7 +651,8 @@ function tabBar(){
   const u=unreadOf(S.mid);
   const t=(id,ic,nm,bd)=>`<button data-act="tab:${id}" class="${S.tab===id?'on':''}">
     <span class="ic">${ic}${bd?'<span class="bd"></span>':''}</span><span>${nm}</span></button>`;
-  return t('home','⌂','홈')+t('records','▤','기록')+t('feedback','✉','피드백',u>0)+t('me','◍','내 정보');
+  return t('home','⌂','홈')+t('records','▤','기록')+t('diet','◑','식단')
+       +t('feedback','✉','피드백',u>0)+t('me','◍','내 정보');
 }
 /* 코멘트를 아직 안 단 운동인가 */
 function unseen(w){
@@ -1092,6 +1123,136 @@ function vFeedback(){
       ${none.map(r=>`<button class="card rowc dim" data-act="exd:${r.ex}:${r.va}">
         <div><div class="nm">${esc(exName(r.ex,r.va))}</div><div class="sm">설명만 있어요</div></div>
         <span class="rt">›</span></button>`).join('')}`:''}` };
+}
+
+/* ── 식단 ── */
+const SLOTS = ['아침','점심','저녁','간식'];
+const mealURL = path => path ? (SB_URL + '/storage/v1/object/public/media/' + path) : '';
+function mealsOf(mid, date){ return (D.meals||[]).filter(m=>m.mid===mid && (!date || m.date===date)); }
+
+function vDiet(){
+  const mid = (S.who==='tr') ? (S.subj||S.tmid) : S.mid;
+  const tr = (S.who==='tr');
+  const day = S.dietDay || TODAY;
+  const list = mealsOf(mid, day).sort((a,b)=> SLOTS.indexOf(a.slot)-SLOTS.indexOf(b.slot));
+  const days = [...new Set(mealsOf(mid).map(m=>m.date))].sort().reverse().slice(0,7);
+  if(days.indexOf(day)<0) days.unshift(day);
+  return { top: bar('식단', `<span class="sub">${esc((MEMBERS.find(m=>m.id===mid)||{}).n||'')}</span>`, tr?'tm:'+mid:null),
+    tabs: !tr, lite:true, body:`
+    <div class="chips">${days.map(d=>`<button class="chip ${d===day?'on':''}" data-act="dday:${d}">${d===TODAY?'오늘':dateTxt(d)}</button>`).join('')}</div>
+    ${tr?'':`<button class="shotbtn" data-act="shot">
+      <span class="ic">▣</span><span class="t">식단 사진 찍기</span>
+      <span class="s">글래드짐 표시와 날짜·시간이 같이 찍힙니다</span></button>`}
+    ${list.length?`<div class="mealgrid">${list.map(m=>`
+      <button class="mealcard" data-act="meal:${m.id}">
+        <img src="${esc(mealURL(m.path))}" alt="">
+        <span class="cap">${esc(m.slot)}<span>${esc(m.memo||'')}${m.note?' · 코멘트 있음':''}</span></span>
+      </button>`).join('')}</div>`
+     : '<div class="empty">이 날은 올린 식단이 없어요</div>'}
+    <div class="note">사진은 <b>긴 변 1600px</b> 로 줄여 올라갑니다. 아래에 글래드짐 표시와 찍은 날짜·시간이 찍힙니다.</div>` };
+}
+
+function sheetMeal(id){
+  const m = (D.meals||[]).find(x=>x.id===id); if(!m) return;
+  const tr = (S.who==='tr');
+  openSheet(()=>`
+    <div class="h2">${esc(m.slot)} <small>${dateTxt(m.date)}</small></div>
+    <img class="shot" src="${esc(mealURL(m.path))}" alt="">
+    ${m.memo?`<div class="note">${esc(m.memo)}</div>`:''}
+    ${m.note?`<div class="cm"><span class="who">${esc(TRAINER)} 트레이너</span><span class="tx">${esc(m.note)}</span></div>`:''}
+    ${tr?`<span class="lbl">코멘트 남기기</span>
+      <textarea data-k="mn:${m.id}" placeholder="식단에 한마디">${esc(m.note||'')}</textarea>
+      <button class="btn main sm" data-act="mealnote:${m.id}">보내기</button>`:''}
+    ${!tr?`<button class="btn ghost sm" data-act="mealdel:${m.id}" style="color:var(--warn)">이 사진 지우기</button>`:''}
+    <button class="btn ghost sm" data-act="close">닫기</button>`);
+}
+
+/* 사진 찍기 → 글래드짐 프레임 → 올리기 */
+function shotPick(){
+  const inp = document.createElement('input');
+  inp.type='file'; inp.accept='image/*'; inp.setAttribute('capture','environment');
+  inp.style.display='none'; document.body.appendChild(inp);
+  inp.addEventListener('change', async () => {
+    const f = inp.files && inp.files[0];
+    inp.remove();
+    if(!f) return;
+    toast('사진을 다듬는 중이에요');
+    try{ const url = await stampPhoto(f); S.shot = url; sheetShot(); }
+    catch(e){ console.error(e); toast('사진을 읽지 못했어요'); }
+  });
+  inp.click();
+}
+
+function stampPhoto(file){
+  return new Promise((res, rej) => {
+    const img = new Image();
+    img.onload = () => {
+      const MAX = 1600;
+      let w = img.naturalWidth, h = img.naturalHeight;
+      const sc = Math.min(1, MAX/Math.max(w,h));
+      w = Math.round(w*sc); h = Math.round(h*sc);
+      const cv = document.createElement('canvas'); cv.width=w; cv.height=h;
+      const x = cv.getContext('2d');
+      x.drawImage(img, 0, 0, w, h);
+      /* 아래쪽 띠 */
+      const barH = Math.max(56, Math.round(h*0.09));
+      const gr = x.createLinearGradient(0, h-barH*1.6, 0, h);
+      gr.addColorStop(0,'rgba(10,10,9,0)'); gr.addColorStop(1,'rgba(10,10,9,.82)');
+      x.fillStyle = gr; x.fillRect(0, h-barH*1.6, w, barH*1.6);
+      const pad = Math.round(barH*0.42);
+      const s1 = Math.round(barH*0.40), s2 = Math.round(barH*0.28);
+      x.textBaseline='alphabetic';
+      x.font = `700 ${s1}px "Noto Sans KR",sans-serif`;
+      x.fillStyle = '#e6c487';
+      x.letterSpacing = Math.round(s1*0.18)+'px';
+      x.fillText('GLAD GYM', pad, h - pad - s2 - Math.round(barH*0.14));
+      x.letterSpacing = '0px';
+      const d = new Date();
+      const two = n => String(n).padStart(2,'0');
+      const stamp = `${d.getFullYear()}.${two(d.getMonth()+1)}.${two(d.getDate())}  ${two(d.getHours())}:${two(d.getMinutes())}`;
+      x.font = `500 ${s2}px "Noto Sans KR",sans-serif`;
+      x.fillStyle = '#fdfaf6';
+      x.fillText(stamp, pad, h - pad);
+      /* 오른쪽 아래 작은 표시 */
+      x.font = `500 ${Math.round(s2*0.85)}px "Noto Sans KR",sans-serif`;
+      x.fillStyle = 'rgba(253,250,246,.6)';
+      const tx = '구산역촌점';
+      x.fillText(tx, w - pad - x.measureText(tx).width, h - pad);
+      res(cv.toDataURL('image/jpeg', 0.82));
+    };
+    img.onerror = rej;
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+function sheetShot(){
+  if(!S.shotSlot) S.shotSlot = SLOTS[Math.min(3, Math.floor(new Date().getHours()/6))] || '점심';
+  openSheet(()=>`
+    <div class="h2">이렇게 올릴까요</div>
+    <img class="shot" src="${S.shot}" alt="">
+    <span class="lbl">언제 먹은 건가요</span>
+    <div class="chips">${SLOTS.map(x=>`<button class="chip ${S.shotSlot===x?'on':''}" data-act="slot:${x}">${x}</button>`).join('')}</div>
+    <textarea data-k="mmemo" placeholder="한마디 (안 적어도 됩니다)"></textarea>
+    <div style="display:flex;gap:9px">
+      <button class="btn main" data-act="shotup">올리기</button>
+      <button class="btn ghost" data-act="close">그만두기</button></div>`);
+}
+
+async function uploadMeal(){
+  const mid = S.mid, day = TODAY;
+  const memoEl = document.querySelector('[data-k="mmemo"]');
+  const memo = memoEl ? memoEl.value.trim() : '';
+  const id = 'meal'+Date.now();
+  const path = `meals/${mid}/${id}.jpg`;
+  const blob = await (await fetch(S.shot)).blob();
+  closeSheet(); toast('올리는 중이에요');
+  const r = await fetch(SB_URL+'/storage/v1/object/media/'+path, {
+    method:'POST', headers:{ apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'image/jpeg' }, body: blob });
+  if(!r.ok){ toast('사진을 못 올렸어요'); console.error(await r.text()); return; }
+  await sv(spost('meals',[{ id, member_id:mid, on_date:day, slot:S.shotSlot, path, memo }]), '식단 저장');
+  D.meals = D.meals || [];
+  D.meals.unshift({ id, mid, date:day, slot:S.shotSlot, path, memo, note:'' });
+  S.shot=null; S.dietDay=day; toast('올렸어요'); render();
 }
 
 /* ── 내 정보 ── */
@@ -1606,6 +1767,8 @@ function tMember(){
       <div class="sm">${D.intake[m.id]?'작성됨 — 눌러서 보기':'아직 없음'}</div></div><span class="rt">›</span></button>
     <button class="card rowc" data-act="tsub:plan:${m.id}"><div><div class="nm">운동계획</div>
       <div class="sm">${(g.now&&g.now.w)?`${g.now.w}kg → ${(g.to&&g.to.w)||'?'}kg`:'아직 없음'}</div></div><span class="rt">›</span></button>
+    <button class="card rowc" data-act="tsub:diet:${m.id}"><div><div class="nm">식단</div>
+      <div class="sm">${mealsOf(m.id).length?`${mealsOf(m.id).length}장 · 최근 ${dateTxt(mealsOf(m.id)[0].date)}`:'아직 없음'}</div></div><span class="rt">›</span></button>
     <button class="card rowc" data-act="tsub:body:${m.id}"><div><div class="nm">체형분석</div>
       <div class="sm">${(D.body&&D.body[m.id])?`${Object.keys(D.body[m.id].checks||{}).length}개 표시 · ${esc(D.body[m.id].date||'')}`:'아직 없음'}</div></div><span class="rt">›</span></button>
     ${(()=>{ const c=cycOf(m.id); if(!c||!c.on) return `<div class="card rowc dim"><div><div class="nm">생리주기</div>
@@ -1807,6 +1970,21 @@ document.addEventListener('click', ev=>{
     case 'back': goBack(); return;
     case 'ttab': S.ttab=rest[0]; go(rest[0]); return;
     case 'pickmem': sheetPickMember(); return;
+    case 'shot': shotPick(); return;
+    case 'slot': S.shotSlot=rest[0]; drawSheet(); return;
+    case 'shotup': uploadMeal(); return;
+    case 'dday': S.dietDay=rest[0]; render(); return;
+    case 'meal': sheetMeal(rest[0]); return;
+    case 'mealnote': { const id=rest[0], m=(D.meals||[]).find(x=>x.id===id); if(!m) return;
+      const el=document.querySelector('[data-k="mn:'+id+'"]'); const txt=el?el.value.trim():'';
+      m.note=txt;
+      sv(spatch('meals','id=eq.'+id,{ trainer_note:txt }), '식단 코멘트');
+      toast('보냈습니다'); drawSheet(); render(); return; }
+    case 'mealdel': { const id=rest[0], m=(D.meals||[]).find(x=>x.id===id); if(!m) return;
+      D.meals=D.meals.filter(x=>x.id!==id);
+      sv(sdel('meals','id=eq.'+id), '식단 지우기');
+      if(m.path) fetch(SB_URL+'/storage/v1/object/media/'+m.path,{method:'DELETE',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}}).catch(()=>{});
+      closeSheet(); toast('지웠어요'); render(); return; }
     case 'tstartask': S.tmid=rest[0]; sheetStartSession(rest[0]); return;
     case 'tstart': {
       const [mid, rid, kind] = rest;
@@ -2150,12 +2328,16 @@ let pollSig='';
 setInterval(async ()=>{
   if(document.hidden || S.screen==='boot' || S.screen==='err' || !MEMBERS.length) return;
   try{
-    const [cms, wks] = await Promise.all([
+    const [cms, wks, mls] = await Promise.all([
       sget('comments?select=*&order=created_at.desc&limit=300'),
-      sget('workouts?select=*&order=on_date.desc&limit=80')
+      sget('workouts?select=*&order=on_date.desc&limit=80'),
+      sget('meals?select=*&order=created_at.desc&limit=300')
     ]);
+    D.meals = (mls||[]).map(m => ({ id:m.id, mid:m.member_id, date:m.on_date, slot:m.slot,
+      path:m.path, memo:m.memo||'', note:m.trainer_note||'' }));
     const sig = cms.map(c=>c.id+(c.read_at?'1':'0')).join(',') + '|' +
-                wks.map(w=>w.id+(w.done?'1':'0')+w.dur).join(',');
+                wks.map(w=>w.id+(w.done?'1':'0')+w.dur).join(',') + '|' +
+                (mls||[]).map(m=>m.id+(m.trainer_note?'1':'0')).join(',');
     if(sig===pollSig) return;
     const first = !pollSig;
     pollSig=sig;
