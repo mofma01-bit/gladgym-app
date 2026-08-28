@@ -94,6 +94,11 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .mealcard img{width:100%;aspect-ratio:1;object-fit:cover;display:block}
 .mealcard .cap{padding:8px 10px;font-size:12.5px;font-weight:700;color:#2b231c}
 .mealcard .cap span{display:block;font-weight:500;color:#7b6c5d;font-size:11.5px}
+.mrow{display:flex;align-items:center;gap:11px;background:var(--dark-2);border:1px solid var(--line);
+  border-radius:12px;padding:10px;width:100%;text-align:left}
+.mrow img{width:58px;height:58px;border-radius:9px;object-fit:cover;flex:none;background:#0e0e0d}
+.mrow .nm{font-size:14px;font-weight:700}
+.mrow .sm{font-size:12.5px;font-weight:500;color:var(--sub)}
 .shotbtn{width:100%;border:1px dashed var(--gold-2);border-radius:12px;background:#f6ead4;
   padding:18px;display:flex;flex-direction:column;align-items:center;gap:5px;color:#8a5a2b}
 .shotbtn .ic{font-size:24px}
@@ -660,8 +665,10 @@ function unseen(w){
   return !D.cm.some(c => c.mid===w.mid && c.ts && String(c.ts).slice(0,10) >= w.date);
 }
 function todoCount(){ return D.workouts.filter(w=>w.done && unseen(w)).length; }
+function mealTodo(){ return (D.meals||[]).filter(m=>!m.note); }
+function trTodo(){ return todoCount() + mealTodo().length; }
 function tabBarTr(){
-  const n = todoCount();
+  const n = trTodo();
   const t=(id,ic,nm,bd)=>`<button data-act="ttab:${id}" class="${S.ttab===id?'on':''}">
     <span class="ic">${ic}${bd?'<span class="bd"></span>':''}</span><span>${nm}</span></button>`;
   return t('t_today','◷','오늘')+t('t_members','⌸','회원')+t('t_feed','✎','피드백',n>0)+t('t_tools','⚑','자료');
@@ -1680,6 +1687,16 @@ function tToday(){
         <div class="sm">${esc(w.kind||'')} · ${w.items.length}종목 · ${durTxt(w.dur)}</div></div>
         ${unseen(w)?'<span class="pill">코멘트 쓰기</span>':'<span class="pill q">봤음</span>'}</button>`).join('')
      : '<div class="empty">아직 없어요</div>'}
+    ${(()=>{ const md=(D.meals||[]).filter(m=>m.date===TODAY);
+      if(!md.length) return '';
+      const nm2 = id => (MEMBERS.find(x=>x.id===id)||{}).n || '?';
+      return `<div class="hr"></div><span class="lbl">오늘 올라온 식단 · ${md.length}장</span>
+        ${md.map(m=>`<button class="mrow" data-act="meal:${m.id}">
+          <img src="${esc(mealURL(m.path))}" alt="">
+          <div><div class="nm">${esc(nm2(m.mid))} · ${esc(m.slot)}</div>
+          <div class="sm">${esc(m.memo||'')}</div></div>
+          ${m.note?'<span class="pill q">봤음</span>':'<span class="pill">코멘트</span>'}</button>`).join('')}`;
+    })()}
     ${todo.length?`<div class="hr"></div>
       <span class="lbl">코멘트 안 단 기록 · ${todo.length}건</span>
       <button class="card rowc" data-act="ttab:t_feed"><div><div class="nm">피드백 탭에서 몰아서 쓰기</div>
@@ -1689,9 +1706,29 @@ function tToday(){
 /* 피드백 — 코멘트 쓸 곳 모아보기 */
 function tFeed(){
   const nm = id => (MEMBERS.find(x=>x.id===id)||{}).n || '?';
+  const mode = S.tfeed || 'ex';
+  const head = `<div class="chips">
+    <button class="chip ${mode==='ex'?'on':''}" data-act="tfm:ex">운동 ${todoCount()?'· '+todoCount():''}</button>
+    <button class="chip ${mode==='diet'?'on':''}" data-act="tfm:diet">식단 ${mealTodo().length?'· '+mealTodo().length:''}</button></div>`;
+
+  if(mode==='diet'){
+    const all = (D.meals||[]).slice().sort((a,b)=> a.date<b.date?1:a.date>b.date?-1:0);
+    const todoM = all.filter(m=>!m.note), doneM = all.filter(m=>m.note).slice(0,10);
+    const row = m => `<button class="mrow" data-act="meal:${m.id}">
+      <img src="${esc(mealURL(m.path))}" alt="">
+      <div><div class="nm">${esc(nm(m.mid))} · ${esc(m.slot)}</div>
+      <div class="sm">${dateTxt(m.date)}${m.memo?' · '+esc(m.memo.slice(0,14)):''}</div></div>
+      ${m.note?'<span class="pill q">봤음</span>':'<span class="pill">쓰기 ›</span>'}</button>`;
+    return { top: bar('피드백', `<span class="sub">식단 ${todoM.length}장</span>`), body: head + `
+      <span class="lbl">코멘트 안 단 식단 · ${todoM.length}장</span>
+      ${todoM.length? todoM.map(row).join('') : '<div class="empty">다 보셨어요</div>'}
+      ${doneM.length?`<div class="hr"></div><span class="lbl">코멘트 남긴 것</span>${doneM.map(row).join('')}`:''}
+      ${all.length?'':'<div class="note">회원이 식단 탭에서 사진을 올리면 여기에 모입니다.</div>'}` };
+  }
+
   const todo = D.workouts.filter(w=>w.done && unseen(w)).sort(byDateDesc);
   const mine = D.cm.slice(0, 12);
-  return { top: bar('피드백', `<span class="sub">쓸 것 ${todo.length}건</span>`), body:`
+  return { top: bar('피드백', `<span class="sub">쓸 것 ${todo.length}건</span>`), body: head + `
     <span class="lbl">코멘트를 아직 안 단 기록</span>
     ${todo.length? todo.map(w=>`<button class="card rowc" data-act="tw:${w.id}">
         <div><div class="nm">${esc(nm(w.mid))} · ${dateTxt(w.date)}</div>
@@ -1716,6 +1753,8 @@ function tTools(){
       <div class="sm">${EX.length}종목 · 하는 법 ${EX.reduce((a,e)=>a+vars(e.id).length,0)}가지 · 기본 설명</div></div><span class="rt">›</span></button>
     <button class="card rowc" data-act="qa"><div><div class="nm">자주 묻는 질문</div>
       <div class="sm">플래너 Q&A ${QA.length}개</div></div><span class="rt">›</span></button>
+    <button class="card rowc" data-act="tfm2:diet"><div><div class="nm">식단 모아보기</div>
+      <div class="sm">올라온 사진 ${(D.meals||[]).length}장 · 코멘트 안 단 것 ${mealTodo().length}장</div></div><span class="rt">›</span></button>
     <div class="hr"></div>
     <button class="card rowc" data-act="newmem"><div><div class="nm">＋ 회원 새로 만들기</div>
       <div class="sm">상담일지부터 처음부터</div></div><span class="rt">›</span></button>
@@ -1969,6 +2008,8 @@ document.addEventListener('click', ev=>{
     case 'switch': S.stack=[]; S.who=null; go('login'); return;
     case 'back': goBack(); return;
     case 'ttab': S.ttab=rest[0]; go(rest[0]); return;
+    case 'tfm': S.tfeed=rest[0]; render(); return;
+    case 'tfm2': S.tfeed=rest[0]; S.ttab='t_feed'; go('t_feed'); return;
     case 'pickmem': sheetPickMember(); return;
     case 'shot': shotPick(); return;
     case 'slot': S.shotSlot=rest[0]; drawSheet(); return;
