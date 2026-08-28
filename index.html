@@ -117,22 +117,29 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 #tabs button .bd{position:absolute;transform:translate(14px,-4px);width:9px;height:9px;
   border-radius:50%;background:var(--teal);border:2px solid var(--brown)}
 
-.lbl{font-size:13px;font-weight:500;color:var(--sub)}
+.lbl{font-size:13.5px;font-weight:700;color:#a9a29a;letter-spacing:-.01em;
+  display:flex;align-items:center;gap:8px;margin-top:9px}
+.lbl::before{content:'';width:3px;height:14px;border-radius:2px;background:#7a4d3c;flex:none}
+.lbl.plain{margin-top:0}
+.lbl.plain::before{display:none}
 .h1{font-size:21px;font-weight:900;letter-spacing:-.03em;line-height:1.3}
 .h2{font-size:16px;font-weight:700;letter-spacing:-.02em}
 .h2 small{font-weight:500;color:var(--sub);font-size:13px}
 
-.card{background:var(--dark-2);border:1px solid var(--line);border-radius:13px;padding:14px;
-  display:flex;flex-direction:column;gap:7px;text-align:left;width:100%}
+.card{background:#1f1f1c;border:1px solid #35342e;border-radius:13px;padding:14px 15px;
+  display:flex;flex-direction:column;gap:6px;text-align:left;width:100%}
+.card:active{background:#262622}
 .card.gold{border-color:var(--gold-2);background:var(--gold-dim)}
 .card.teal{border-color:#3a5b66;background:var(--teal-dim)}
 .card.dim{opacity:.45}
-.card .nm{font-size:15px;font-weight:700}
+.card.plan{border-left:3px solid #7a4d3c}
+.card .nm{font-size:15.5px;font-weight:700;letter-spacing:-.01em}
 .card .nm.g{color:var(--gold)}
 .card .nm.t{color:var(--teal)}
-.card .sm{font-size:13px;font-weight:500;color:var(--sub);line-height:1.65}
-.rowc{display:flex;align-items:center;gap:11px}
-.rowc .rt{margin-left:auto;text-align:right;font-size:13px;font-weight:500;color:var(--sub);flex:none}
+.card .sm{font-size:13px;font-weight:500;color:#8f8a83;line-height:1.6}
+.rowc{display:flex;flex-direction:row;align-items:center;gap:11px}
+.rowc > div{flex:1;min-width:0;text-align:left}
+.rowc .rt{margin-left:auto;text-align:right;font-size:13px;font-weight:600;color:#8f8a83;flex:none}
 
 .tile{background:var(--dark-2);border:1px solid var(--line);border-radius:13px;padding:15px;
   display:flex;flex-direction:column;gap:4px}
@@ -728,8 +735,10 @@ function vNewMem(){
 function vHome(){
   const u=unreadOf(S.mid), t=D.today[S.mid], r=t?rOf(t.rid):null, ws=myWorkouts(), lw=liveOf(S.mid), g=GOALS[S.mid]||{};
   return { top: bar('글래드짐', `<span class="sub">${esc(me().n)} 회원님</span>`), tabs:1, body:`
-    <div class="card"><div class="sm">우리의 목표</div><div class="nm">${esc(g.goal)}</div>
-      <div class="sm">운동 약속 · ${esc(g.work)}<br>식단 약속 · ${esc(g.diet)}</div></div>
+    <span class="lbl plain">우리의 목표</span>
+    <div class="card plan"><div class="nm">${esc(g.goal||'아직 안 정했어요')}</div>
+      <div class="sm">운동 약속 · ${esc(g.work||'—')}<br>식단 약속 · ${esc(g.diet||'—')}</div></div>
+    <span class="lbl">오늘</span>
     ${u>0?`<button class="cm" data-act="tab:feedback" style="text-align:left">
       <span class="who">${esc(D.cm.find(c=>!c.read&&c.mid===S.mid).tr)} 트레이너</span>
       <span class="tx">새 코멘트 ${u}개가 왔어요</span></button>`:''}
@@ -762,7 +771,7 @@ function recRow(w){
 function vRoutines(){
   const rs=myRoutines(S.mid), t=D.today[S.mid];
   return { top: bar('내 루틴', `<span class="sub">${rs.length}개</span>`, 'go:home'), body:
-    (rs.length? rs.map(r=>`<button class="card rowc ${t&&t.rid===r.id?'gold':''}" data-act="rt:${r.id}">
+    (rs.length? rs.map(r=>`<button class="card rowc ${t&&t.rid===r.id?'gold':'plan'}" data-act="rt:${r.id}">
       <div><div class="nm ${t&&t.rid===r.id?'g':''}">루틴 ${r.no} · ${esc(r.n)}</div>
       <div class="sm">${esc(r.purpose)}<br>${r.items.length}종목 · 예상 ${estMin(r)}분</div></div>
       ${t&&t.rid===r.id?`<span class="pill">오늘 ${esc(t.kind)}</span>`:'<span class="rt">›</span>'}</button>`).join('')
@@ -1273,18 +1282,18 @@ function vMe(){
     <div class="card rowc"><div><div class="nm">알림</div><div class="sm">코멘트가 오면 알려 드립니다</div></div><span class="rt">켬</span></div>
     <div class="card rowc"><div><div class="nm">화면 꺼짐 방지</div><div class="sm">운동 중에만 켭니다</div></div><span class="rt">켬</span></div>
     <div class="hr"></div><span class="lbl">내 기록장</span>
-    <button class="card rowc" data-act="sub:intake"><div><div class="nm">상담일지</div>
+    <button class="card rowc plan" data-act="sub:intake"><div><div class="nm">상담일지</div>
       <div class="sm">첫 상담 때 트레이너가 적은 내용</div></div><span class="rt">›</span></button>
-    <button class="card rowc" data-act="sub:plan"><div><div class="nm">운동계획</div>
+    <button class="card rowc plan" data-act="sub:plan"><div><div class="nm">운동계획</div>
       <div class="sm">목표 선언 · 맞춤 칼로리 · 다짐</div></div><span class="rt">›</span></button>
-    <button class="card rowc" data-act="sub:body"><div><div class="nm">체형분석</div>
+    <button class="card rowc plan" data-act="sub:body"><div><div class="nm">체형분석</div>
       <div class="sm">체크리스트 · AI 장비 사진 · 비포애프터</div></div><span class="rt">›</span></button>
     ${cycOf(S.mid)&&cycOf(S.mid).on
-      ? `<button class="card rowc" data-act="sub:cycle"><div><div class="nm">생리주기</div>
+      ? `<button class="card rowc plan" data-act="sub:cycle"><div><div class="nm">생리주기</div>
           <div class="sm">오늘 ${cycToday(cycOf(S.mid)).day}일차 · ${esc(cycToday(cycOf(S.mid)).ph)}</div></div><span class="rt">›</span></button>`
-      : `<button class="card rowc" data-act="sub:cycle"><div><div class="nm">생리주기</div>
+      : `<button class="card rowc plan" data-act="sub:cycle"><div><div class="nm">생리주기</div>
           <div class="sm">켜면 시기에 맞춰 운동을 조절합니다 — 선택이에요</div></div><span class="rt">›</span></button>`}
-    <button class="card rowc" data-act="sub:qa"><div><div class="nm">자주 묻는 질문</div>
+    <button class="card rowc plan" data-act="sub:qa"><div><div class="nm">자주 묻는 질문</div>
       <div class="sm">식사 · 유산소 · 빈도</div></div><span class="rt">›</span></button>
     <div class="hr"></div><span class="lbl">프로토타입 도구</span>
     <button class="card rowc" data-act="as:tr"><div><div class="nm">트레이너 화면 보기</div>
@@ -1802,13 +1811,13 @@ function tMember(){
       <div class="graph">${bench.map((v,i)=>`<i class="${i===bench.length-1?'g':''}" style="height:${Math.round(v/mx*100)}%"></i>`).join('')}</div>
       <div class="glbl">${bench.map(v=>`<span>${kgfmt(v)}</span>`).join('')}</div>`:''}
     <div class="hr"></div><span class="lbl">회원 자료</span>
-    <button class="card rowc" data-act="tsub:intake:${m.id}"><div><div class="nm">상담일지</div>
+    <button class="card rowc plan" data-act="tsub:intake:${m.id}"><div><div class="nm">상담일지</div>
       <div class="sm">${D.intake[m.id]?'작성됨 — 눌러서 보기':'아직 없음'}</div></div><span class="rt">›</span></button>
-    <button class="card rowc" data-act="tsub:plan:${m.id}"><div><div class="nm">운동계획</div>
+    <button class="card rowc plan" data-act="tsub:plan:${m.id}"><div><div class="nm">운동계획</div>
       <div class="sm">${(g.now&&g.now.w)?`${g.now.w}kg → ${(g.to&&g.to.w)||'?'}kg`:'아직 없음'}</div></div><span class="rt">›</span></button>
-    <button class="card rowc" data-act="tsub:diet:${m.id}"><div><div class="nm">식단</div>
+    <button class="card rowc plan" data-act="tsub:diet:${m.id}"><div><div class="nm">식단</div>
       <div class="sm">${mealsOf(m.id).length?`${mealsOf(m.id).length}장 · 최근 ${dateTxt(mealsOf(m.id)[0].date)}`:'아직 없음'}</div></div><span class="rt">›</span></button>
-    <button class="card rowc" data-act="tsub:body:${m.id}"><div><div class="nm">체형분석</div>
+    <button class="card rowc plan" data-act="tsub:body:${m.id}"><div><div class="nm">체형분석</div>
       <div class="sm">${(D.body&&D.body[m.id])?`${Object.keys(D.body[m.id].checks||{}).length}개 표시 · ${esc(D.body[m.id].date||'')}`:'아직 없음'}</div></div><span class="rt">›</span></button>
     ${(()=>{ const c=cycOf(m.id); if(!c||!c.on) return `<div class="card rowc dim"><div><div class="nm">생리주기</div>
         <div class="sm">회원님이 켜지 않았어요</div></div></div>`;
@@ -1848,7 +1857,7 @@ function tRoutines(){
   const mid=S.tmid||'m1', rs=myRoutines(mid), t=D.today[mid];
   return { top: bar('루틴', `<span class="sub">${MEMBERS.find(x=>x.id===mid).n}</span>`, 'go:t_members'), body:`
     <div class="chips">${MEMBERS.map(m=>`<button class="chip ${m.id===mid?'on':''}" data-act="rm:${m.id}">${esc(m.n)}</button>`).join('')}</div>
-    ${rs.map(r=>`<button class="card rowc ${t&&t.rid===r.id?'gold':''}" data-act="re:${r.id}">
+    ${rs.map(r=>`<button class="card rowc ${t&&t.rid===r.id?'gold':'plan'}" data-act="re:${r.id}">
       <div><div class="nm ${t&&t.rid===r.id?'g':''}">루틴 ${r.no} · ${esc(r.n)}</div>
       <div class="sm">${esc(r.purpose)}<br>${r.items.length}종목 · 예상 ${estMin(r)}분</div></div>
       ${t&&t.rid===r.id?`<span class="pill">오늘 ${esc(t.kind)}</span>`:'<span class="rt">›</span>'}</button>`).join('')}
