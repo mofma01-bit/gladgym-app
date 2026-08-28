@@ -888,7 +888,7 @@ function vWorkout(){
   if(!w.items.length) return {
     top: bar('운동 중', `<span class="tm" id="tm">${mmss((Date.now()-w.startAt)/1000)}</span>`, 'go:home'),
     body:`<div class="empty">종목을 담아 주세요</div>`,
-    foot:`<button class="btn sub" data-act="go:pick">운동 추가</button><button class="btn ghost" data-act="askcancel">그만두기</button>` };
+    foot:`<button class="btn sub" data-act="go:pick">운동 추가</button><button class="btn ghost" data-act="askcancel">기록 지우고 나가기</button>` };
   const cur=w.items[w.cur]||w.items[0], e=exOf(cur.ex), v=varOf(cur.ex,cur.va);
   const wmid = w.mid || S.mid, tr = (S.who==='tr');
   const openIdx=cur.sets.findIndex(s=>!s.done), times=partTimes(w);
@@ -917,16 +917,19 @@ function vWorkout(){
     <div style="display:flex;gap:9px">
       <button class="btn gold" data-act="rep">${e.cardio?'구간 ＋':'반복 ＋'}</button>
       <button class="btn ghost" data-act="undo" ${cur.sets.length<2?'disabled':''}>되돌리기</button></div>
-    <div class="hr"></div><span class="lbl">오늘 종목</span>
+    <div class="hr"></div><span class="lbl">오늘 한 운동</span>
     ${w.items.map((it,i)=>`<button class="card rowc ${it.locked?'dim':''} ${S.just===VID(it.ex,it.va)?'just':''}" data-act="jump:${i}" style="padding:11px 13px">
-      <div><div class="nm" style="font-size:14px">${it.locked?'🔒 ':''}${esc(exName(it.ex,it.va))}</div>
-      <div class="sm">${it.locked?`${mmss(it.sec)} · ${it.sets.length}세트 마침`:(i===w.cur?'하는 중':`${it.sets.length}세트`)}</div></div>
-      ${i===w.cur&&!it.locked?'<span class="pill">지금</span>':'<span class="rt">›</span>'}</button>`).join('')}
+      <div><div class="nm" style="font-size:14px">${esc(exName(it.ex,it.va))}</div>
+      <div class="sm">${it.locked?`${mmss(it.sec)} · ${it.sets.length}세트`:(i===w.cur?'하는 중':`${it.sets.length}세트 예정`)}</div></div>
+      ${i===w.cur&&!it.locked?'<span class="pill">지금</span>':(it.locked?'<span class="pill q">완료</span>':'<span class="rt">›</span>')}</button>`).join('')}
     <button class="btn sub" data-act="go:pick" style="margin-top:2px">운동 추가</button>
+    <button class="btn gold" data-act="askfin" style="margin-top:2px">오늘 운동 마치기</button>
     ${Object.keys(times).length?`<div class="note">${Object.entries(times).map(([k,val])=>`${k} ${durTxt(val)}`).join(' · ')} — <b>종목을 끝낼 때마다</b> 저절로 쌓입니다</div>`:''}
-    <button class="btn ghost" data-act="askcancel" style="margin-top:4px">이 운동 취소</button>`,
+    <button class="btn ghost" data-act="askcancel" style="margin-top:4px">기록 지우고 나가기</button>`,
     foot:`<button class="btn sub" data-act="rest">휴식 타이머</button>
-          <button class="btn main" data-act="fin">${cur.locked?'운동 끝내기':'종목 종료'}</button>` };
+          ${cur.locked
+            ? `<button class="btn gold" data-act="askfin">오늘 운동 마치기</button>`
+            : `<button class="btn main" data-act="fin">${esc(e.n)} 완료</button>`}` };
 }
 
 /* ── 설명 + 코멘트 ── */
@@ -1016,24 +1019,28 @@ function sheetFinish(){
   const items=w.items, sets=items.reduce((a,it)=>a+it.sets.filter(x=>x.done).length,0);
   const left=items.filter(it=>!it.locked && !it.sets.some(x=>x.done));
   openSheet(()=>`
-    <div class="h2">오늘 운동을 끝낼까요</div>
-    <p class="lbl" style="line-height:1.85">${items.length}종목 · <b style="color:var(--gold)">${sets}세트</b>를 기록합니다.<br>
-    ${left.length?`아직 안 한 종목이 <b style="color:var(--gold)">${left.length}개</b> 남아 있어요 — ${esc(left.map(it=>exOf(it.ex).n).join(', '))}`
-      :'담은 종목을 모두 마쳤어요.'}</p>
+    <div class="h2">오늘 운동을 마칠까요</div>
+    <p class="lbl plain" style="line-height:1.85;font-weight:500;color:var(--sub)">
+      한 운동 <b style="color:var(--gold)">${items.filter(it=>it.locked||it.sets.some(x=>x.done)).length}개</b>
+      · 세트 <b style="color:var(--gold)">${sets}개</b>를 기록합니다.<br>
+      ${left.length
+        ? `아직 안 한 운동이 <b style="color:var(--gold)">${left.length}개</b> 남아 있어요 — ${esc(left.map(it=>exOf(it.ex).n).join(', '))}<br>
+           <span style="color:#7d786f">마쳐도 남은 것은 안 한 것으로 넘어갑니다</span>`
+        : '담은 것을 모두 마쳤어요.'}</p>
     <div style="display:flex;gap:9px">
       <button class="btn sub" data-act="close">더 할래요</button>
-      <button class="btn main" data-act="dofin">끝내고 기록하기</button></div>
-    <div class="note">끝낸 뒤에도 <b>이어서 계속하기</b>로 되돌릴 수 있어요.</div>`);
+      <button class="btn gold" data-act="dofin">마치고 기록하기</button></div>
+    <div class="note">마친 뒤에도 <b>이어서 계속하기</b>로 되돌릴 수 있어요.</div>`);
 }
 
 function sheetCancel(){
   const w=live(), n=(w?w.items:[]).reduce((a,it)=>a+it.sets.filter(s=>s.done).length,0);
-  openSheet(()=>`<div class="h2">이 운동을 취소할까요</div>
+  openSheet(()=>`<div class="h2">기록을 지우고 나갈까요</div>
     <p class="lbl" style="line-height:1.8">${n?`지금까지 적은 <b style="color:var(--warn)">${n}세트</b>가 사라져요.`:'적은 기록이 없어서 그냥 닫혀요.'}<br>
     잠깐 다른 화면만 보실 거면 왼쪽 위 <b style="color:var(--gold)">‹</b> 를 누르세요. 운동은 그대로 남아 있어요.</p>
     <div style="display:flex;gap:9px">
       <button class="btn main" data-act="close">계속 운동하기</button>
-      <button class="btn ghost" data-act="cancel" style="color:var(--warn)">취소하기</button></div>`);
+      <button class="btn ghost" data-act="cancel" style="color:var(--warn)">지우고 나가기</button></div>`);
 }
 function sheetNewVar(exid){
   const e=exOf(exid);
@@ -1837,7 +1844,7 @@ function tLive(){
     keepScroll:true, body:
     lv.items.map((it,i)=>{ const sent=D.cm.filter(c=>c.mid===m.id&&c.ex===it.ex&&c.va===it.va&&c.at==='방금');
       return `<button class="card ${i===lv.cur?'gold':''}" data-act="exd:${it.ex}:${it.va}:${m.id}">
-        <div class="nm ${i===lv.cur?'g':''}">${it.locked?'🔒 ':''}${esc(exName(it.ex,it.va))}${i===lv.cur?' · 하는 중':''}</div>
+        <div class="nm ${i===lv.cur?'g':''}">${esc(exName(it.ex,it.va))}${i===lv.cur?' · 하는 중':''}</div>
         <div class="sm">${it.sets.filter(s=>s.done).length?it.sets.filter(s=>s.done).map(x=>setShort(it.ex,x)).join(' · '):'아직 안 했어요'}
         ${sent.length?`<br>방금 코멘트 ${sent.length}개 보냄`:''}<br>설명 보기 · 코멘트 남기기 ›</div></button>`;
     }).join('')
@@ -2291,6 +2298,7 @@ document.addEventListener('click', ev=>{
         save(); render();
       }
       sheetFinish(); return; }
+    case 'askfin': sheetFinish(); return;
     case 'dofin': closeSheet(); finish(); return;
     case 'trec': S.wid=rest[0]; go('record'); return;
     case 'resume': {
@@ -2336,7 +2344,7 @@ document.addEventListener('click', ev=>{
 });
 
 async function finish(){
-  const w=live(), done=w.items.filter(it=>it.sets.some(s=>s.done)||it.locked);
+  const w=live(), done=w.items.filter(it=>it.sets.some(s=>s.done));
   if(!done.length){
     await sv(sdel('workouts','id=eq.'+w.id), '운동 지우기');
     D.workouts=D.workouts.filter(x=>x.id!==w.id);
