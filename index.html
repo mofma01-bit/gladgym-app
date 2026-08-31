@@ -157,6 +157,10 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .fitem .k2{font-size:14px;font-weight:800;color:var(--gold);flex:none;font-variant-numeric:tabular-nums}
 .qbig{display:flex;align-items:center;justify-content:center;gap:10px}
 .qbig .v2{font-size:30px;font-weight:900;color:var(--gold);min-width:78px;text-align:center;font-variant-numeric:tabular-nums}
+.qbig .gin{width:104px;font-size:28px;font-weight:900;color:var(--gold);text-align:center;
+  background:var(--dark-3);border:1px solid var(--line);border-radius:12px;padding:6px 4px;
+  font-family:inherit;font-variant-numeric:tabular-nums}
+.qbig .gu{font-size:15px;font-weight:800;color:#8f8a83}
 .qbig button{width:44px;height:44px;border-radius:50%;background:var(--dark-3);border:1px solid var(--line);
   color:var(--cream);font-size:22px;font-weight:700;line-height:1;font-family:inherit}
 .shot2{display:flex;align-items:center;gap:14px;width:100%;text-align:left;flex:0 0 auto;
@@ -185,6 +189,13 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .mrow{display:flex;align-items:center;gap:11px;background:var(--dark-2);border:1px solid var(--line);
   border-radius:12px;padding:10px;width:100%;text-align:left}
 .mrow img{width:58px;height:58px;border-radius:9px;object-fit:cover;flex:none;background:#0e0e0d}
+.nopic{display:flex;align-items:center;justify-content:center;background:var(--dark-3);overflow:hidden}
+.nopic svg{width:68%;height:auto}
+.mrow .nopic{width:58px;height:58px;border-radius:9px;flex:none;border:1px solid var(--line)}
+.nopic.ph{width:100%;height:150px}
+.nopic.shot{width:100%;height:190px;border-radius:12px;border:1px solid var(--line)}
+.bcmp .cel .nopic{width:100%;aspect-ratio:3/4}
+.phstrip .pt .nopic{width:100%;height:106px}
 .mrow .nm{font-size:14px;font-weight:700}
 .mrow .sm{font-size:12.5px;font-weight:500;color:var(--sub)}
 .shotbtn{width:100%;border:1px dashed var(--gold-2);border-radius:12px;background:#f6ead4;
@@ -264,6 +275,40 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
   background:#0e0e0d;border:1px solid var(--line)}
 .phstrip .pt img{width:100%;height:106px;object-fit:cover;display:block}
 .phstrip .pt span{display:block;font-size:10.5px;font-weight:700;color:#8f8a83;padding:5px 2px;text-align:center}
+.lrbar{display:flex;height:34px;border-radius:9px;overflow:hidden;background:var(--dark-3);border:1px solid var(--line)}
+.lrbar span{display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;min-width:34px}
+.lrbar .l{background:var(--gold);color:#241d12}
+.lrbar .r{background:#4d7f96;color:#f2fafd}
+.lrbar .z{flex:1;color:#6f6a64;font-weight:600;font-size:12px}
+.blrow{display:grid;grid-template-columns:58px 1fr 1fr 1fr;gap:4px;align-items:baseline;
+  padding:9px 2px;border-top:1px solid var(--line)}
+.blrow:first-child{border-top:none}
+.blrow .d0{font-size:11.5px;font-weight:700;color:#8f8a83}
+.blrow .c{text-align:right;font-size:13.5px;font-weight:800;color:var(--cream);font-variant-numeric:tabular-nums}
+.blrow .c i{font-style:normal;font-size:10.5px;font-weight:700;margin-left:3px}
+.blrow .c i.up{color:#6fa07f}.blrow .c i.dn{color:var(--warn)}
+.blhd{display:grid;grid-template-columns:58px 1fr 1fr 1fr;gap:4px;padding:0 2px 6px}
+.blhd span{font-size:10.5px;font-weight:700;color:#75706a;text-align:right}
+.blhd span:first-child{text-align:left}
+.figbox{background:var(--dark-2);border:1px solid var(--line);border-radius:16px;padding:10px 8px 6px;flex:0 0 auto}
+.figls{display:flex;flex-direction:column;gap:0}
+.figls .fl{display:flex;gap:8px;align-items:baseline;padding:7px 2px;border-top:1px solid var(--line)}
+.figls .fl b{font-size:11px;font-weight:800;color:var(--gold-2);min-width:26px}
+.figls .fl span{font-size:13px;font-weight:600;color:var(--cream);flex:1}
+.figls .fl i{font-style:normal;font-size:12px;font-weight:700;color:#8f8a83}
+.mkwrap{position:relative;width:100%;aspect-ratio:3/4;border-radius:12px;overflow:hidden;background:#000;
+  border:1px solid var(--line)}
+.mkwrap img{width:100%;height:100%;object-fit:cover;display:block}
+.mkwrap .ov{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.sig{display:grid;grid-template-columns:1fr auto;gap:6px;align-items:center;
+  padding:9px 2px;border-top:1px solid var(--line)}
+.sig:first-child{border-top:none}
+.sig .t2{font-size:13px;font-weight:600;color:var(--cream)}
+.sig .t2 small{display:block;font-size:11px;font-weight:600;color:#75706a}
+.sig .b2{font-size:11.5px;font-weight:800;padding:4px 9px;border-radius:999px;white-space:nowrap}
+.sig .b2.ok{background:rgba(111,160,127,.16);color:#8fc4a2}
+.sig .b2.no{background:var(--gold-dim);color:var(--gold)}
+.sig .b2.nw{background:rgba(200,90,60,.15);color:var(--warn)}
 .setrow2{display:flex;align-items:center;gap:10px;width:100%;text-align:left;
   padding:11px 13px;border-radius:11px;background:var(--dark-3);border:1px solid var(--line);margin-top:7px}
 .setrow2.ed{border-color:#4d7f96;background:#1b2a31}
@@ -622,7 +667,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '70';
+const BUILD = '73';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -707,7 +752,7 @@ function mapWorkouts(wks, witems, wsets){
 }
 
 async function boot(){
-  const [exs, vrs, mems, rts, ritems, asg, wks, witems, wsets, cms, mdesc, intk, plns, bdy, cyc, mls, mits, aks, bphs] = await Promise.all([
+  const [exs, vrs, mems, rts, ritems, asg, wks, witems, wsets, cms, mdesc, intk, plns, bdy, cyc, mls, mits, aks, bphs, blgs, brds] = await Promise.all([
     sget('exercises?select=*&order=sort'),
     sget('variants?select=*&order=sort'),
     sget('members?select=*'),
@@ -727,6 +772,8 @@ async function boot(){
     sget('meal_items?select=*&order=sort').catch(()=>[]),
     sget('asks?select=*&order=created_at.desc&limit=200').catch(()=>[]),
     sget('body_photos?select=*&order=on_date').catch(()=>[]),
+    sget('body_logs?select=*&order=on_date').catch(()=>[]),
+    sget('body_rounds?select=*&order=on_date').catch(()=>[]),
   ]);
 
   EX = exs.map(e => ({ id:e.id, n:e.name, p:e.part, e:e.equip, cardio: e.cardio ? 1 : 0,
@@ -747,7 +794,13 @@ async function boot(){
   GOALS = {}; plns.forEach(r => GOALS[r.member_id] = r.data || {});
   D.body = {}; bdy.forEach(r => D.body[r.member_id] = { date:r.on_date, checks:r.checks||{}, photos:r.photos||{}, memo:r.memo||'' });
   D.bph = (bphs||[]).map(r => ({ id:r.id, mid:r.member_id, kind:r.kind||'body',
-    pose:r.pose||'정면', date:r.on_date, path:r.path, memo:r.memo||'' }));
+    pose:r.pose||'정면', date:r.on_date, path:r.path, memo:r.memo||'', marks:r.marks||null }));
+  D.blog = {}; (blgs||[]).forEach(r => (D.blog[r.member_id] = D.blog[r.member_id] || []).push({
+    id:r.id, mid:r.member_id, date:r.on_date, w:num0(r.w), m:num0(r.m), f:num0(r.f), fp:num0(r.fp), note:r.note||'' }));
+  Object.values(D.blog).forEach(a => a.sort((x,y)=> x.date<y.date?-1:1));
+  D.rounds = {}; (brds||[]).forEach(r => (D.rounds[r.member_id] = D.rounds[r.member_id] || []).push({
+    id:r.id, mid:r.member_id, date:r.on_date, checks:r.checks||{}, note:r.note||'' }));
+  Object.values(D.rounds).forEach(a => a.sort((x,y)=> x.date<y.date?-1:1));
   D.cycle = {}; cyc.forEach(r => D.cycle[r.member_id] = { on:r.enabled, last:r.last_start, len:r.cyc_len, period:r.period_len });
   D.meals = (mls||[]).map(m => ({ id:m.id, mid:m.member_id, date:m.on_date, slot:m.slot,
     seq:m.seq||0, at:m.at||'', path:m.path, memo:m.memo||'', note:m.trainer_note||'',
@@ -1748,7 +1801,7 @@ function vDays(){
         <div><span class="k">사진</span><span class="v">${ms.length}<small> 장</small></span></div>
       </div>
       ${ms.map(m=>`<button class="mrow" data-act="meal:${m.id}">
-        <img src="${esc(mealURL(m.path))}" alt="">
+        ${picImg(m.path)}
         <div><div class="nm">${esc(m.slot)}${m.kcal?` · ${m.kcal}kcal`:''}</div>
         <div class="sm">${esc(m.memo||'')}</div></div>
         ${m.note?'<span class="pill q">코멘트</span>':''}</button>`).join('')}`
@@ -2020,6 +2073,20 @@ function vFeedback(){
 /* ── 식단 ── */
 const SLOTS = ['아침','점심','저녁','간식'];
 const mealURL = path => path ? (SB_URL + '/storage/v1/object/public/media/' + path) : '';
+
+/* 사진이 없거나 서버에서 지워졌으면 샐러드 그림으로 갈음합니다 */
+function picFail(img){
+  const sp = document.createElement('span');
+  sp.className = 'nopic ' + (img.className||'');
+  if(img.dataset && img.dataset.act) sp.dataset.act = img.dataset.act;
+  sp.innerHTML = (img.classList.contains('shot') || img.classList.contains('ph')) ? SALAD : SALAD_MINI;
+  img.replaceWith(sp);
+}
+function picImg(path, cls, act, big){
+  const a = act ? ` data-act="${act}"` : '';
+  if(!path) return `<span class="nopic ${cls||''}"${a}>${big?SALAD:SALAD_MINI}</span>`;
+  return `<img class="${cls||''}" src="${esc(mealURL(path))}" alt=""${a} onerror="picFail(this)">`;
+}
 function mealsOf(mid, date){ return (D.meals||[]).filter(m=>m.mid===mid && (!date || m.date===date)); }
 /* 담긴 음식이 있으면 그 합, 없으면 직접 적은 값 */
 function mealSum(m){
@@ -2142,7 +2209,7 @@ function vDiet(){
         <div class="hd2"><span class="n">${i+1}번째 식사</span>
           <span class="t">${esc(m.at||'')}</span>
           <span class="k">${Math.round(t.kcal)||0} kcal</span></div>
-        ${m.path?`<img class="ph" src="${esc(mealURL(m.path))}" alt="" data-act="meal:${m.id}">`:''}
+        ${m.path?picImg(m.path,'ph','meal:'+m.id,1):''}
         ${(m.items||[]).map(x=>`<button class="frow2" data-act="fdel:${m.id}:${x.id}">
           <span class="fn2">${esc(x.name)}${x.brand?` <span style="color:#a0917f;font-weight:600">${esc(x.brand)}</span>`:''}</span>
           <span class="fq">${kgfmt(x.qty)}${x.unit?' × '+esc(x.unit):'인분'}</span>
@@ -2227,7 +2294,7 @@ function sheetMeal(id){
   const tr = (S.who==='tr');
   openSheet(()=>`
     <div class="h2">${esc(m.slot)} <small>${dateTxt(m.date)}</small></div>
-    <img class="shot" src="${esc(mealURL(m.path))}" alt="">
+    ${picImg(m.path,'shot','',1)}
     ${m.memo?`<div class="note">${esc(m.memo)}</div>`:''}
     <div class="grid2">
       <div class="fld"><span class="fn">칼로리</span><input class="search" type="text" inputmode="numeric" data-k="ek:${m.id}" value="${m.kcal||''}"></div>
@@ -2333,13 +2400,31 @@ function sheetFoodPick(mealId){
 
 /* 얼마나 먹었는지 */
 function sheetFoodQty(f){
-  S.fpPick = f; S.fpQty = 1;
+  S.fpPick = f; S.fpQty = 1; S.fpMode = (S.fpMode==='g' && Number(f.amount)>0) ? 'g' : 'unit';
   openSheet(()=>{
     const q = S.fpQty, k = f.kcal*q;
+    const amt = Number(f.amount)||0;                 /* 1인분이 몇 g인지 */
+    const gram = Math.round(amt * q);
+    const gMode = (S.fpMode==='g' && amt>0);
     return `
       <div class="h2">${esc(f.name)} <small>${f.brand?esc(f.brand):''}</small></div>
-      <div class="note">${esc(f.unit||'1인분')} ${f.amount?`(${kgfmt(f.amount)}g)`:''} 기준 · ${Math.round(f.kcal)}kcal</div>
+      <div class="note">${esc(f.unit||'1인분')} ${amt?`(${kgfmt(amt)}g)`:''} 기준 · ${Math.round(f.kcal)}kcal</div>
       <span class="lbl">얼마나 드셨나요</span>
+      ${amt ? `<div class="seg" style="margin-bottom:10px">
+        <button class="${gMode?'':'on'}" data-act="fmode:unit">${esc(f.unit||'1인분')} 기준</button>
+        <button class="${gMode?'on':''}" data-act="fmode:g">g 기준</button></div>` : ''}
+      ${gMode ? `
+      <div class="qbig">
+        <button data-act="fg:-">－</button>
+        <input class="gin" type="text" inputmode="numeric" data-k="fgram" value="${gram}">
+        <span class="gu">g</span>
+        <button data-act="fg:+">＋</button>
+      </div>
+      <div class="chips" style="justify-content:center">
+        ${[10,20,30,50,80,100,150,200,250,300].map(x=>`<button class="chip ${gram===x?'on':''}" data-act="fgs:${x}">${x}g</button>`).join('')}
+      </div>
+      <div class="note">＋－ 는 <b>5g</b>씩 움직입니다. 칸에 바로 적어도 됩니다.</div>`
+      : `
       <div class="qbig">
         <button data-act="fq:-">－</button>
         <span class="v2">${kgfmt(q)}</span>
@@ -2348,6 +2433,7 @@ function sheetFoodQty(f){
       <div class="chips" style="justify-content:center">
         ${[0.5,1,1.5,2,3].map(x=>`<button class="chip ${q===x?'on':''}" data-act="fq:${x}">${kgfmt(x)}${f.unit?' × '+esc(f.unit):'인분'}</button>`).join('')}
       </div>
+      ${amt?`<div class="note">지금 담는 양은 <b>${gram}g</b> 입니다.</div>`:''}`}
       <div class="calc" style="gap:9px">
         <div class="krow"><span class="k">칼로리</span><span class="v" style="color:var(--gold)">${Math.round(k)} kcal</span></div>
         <div class="krow"><span class="k">탄수 · 단백 · 지방</span><span class="v">${Math.round(f.carb*q)} · ${Math.round(f.protein*q)} · ${Math.round(f.fat*q)} g</span></div>
@@ -2355,6 +2441,15 @@ function sheetFoodQty(f){
       <button class="btn main" data-act="fput">이 식사에 담기</button>
       <button class="btn ghost sm" data-act="fadd:${S.fpMeal}">뒤로</button>`;
   });
+}
+
+/* g 칸에 적은 값을 인분으로 되돌립니다 */
+function readGram(){
+  const el = document.querySelector('[data-k="fgram"]');
+  const amt = Number(S.fpPick && S.fpPick.amount)||0;
+  if(!el || !amt) return;
+  const g2 = Math.max(1, nnum(el.value));
+  S.fpQty = Math.round((g2/amt)*1000)/1000;
 }
 
 /* 음식장에 없을 때 */
@@ -3013,10 +3108,300 @@ function bphOf(mid, kind, pose){
 }
 const mdTxt = d => d ? d.slice(5).replace('-','.') : '';
 
+const num0 = v => (v==null || v==='') ? 0 : Number(v);
+const dDiff = (a,b) => Math.round((new Date(a+'T00:00:00') - new Date(b+'T00:00:00')) / 86400000);
+
+/* 그 사진 찍은 날에 가장 가까운 몸 상태 */
+function logNear(mid, date){
+  const ls = (D.blog && D.blog[mid]) || []; if(!ls.length) return null;
+  let best = null, bd = 1e9;
+  ls.forEach(x => { const d = Math.abs(dDiff(x.date, date)); if(d < bd){ bd = d; best = x; } });
+  return bd <= 21 ? best : null;
+}
+
+/* ① 몸 그림 — 체크된 항목을 몸의 제자리에 찍습니다 (뒤에서 본 모습) */
+const BODY_MAP = {
+  c2:{y:25}, c1:{y:31}, c4:{y:37}, c3:{y:28,dx:10,lr:1},
+  s4:{y:42,dx:19,lr:1}, s1:{y:45,dx:17,both:1}, s2:{y:49,dx:17,lr:1},
+  s3:{y:53,dx:17,lr:1}, s5:{y:57,dx:18,lr:1}, s6:{y:61,dx:18,both:1},
+  t3:{y:66,dx:10,lr:1}, t1:{y:71}, t2:{y:77,dx:10,lr:1}, t4:{y:84},
+  l6:{y:97,dx:15,lr:1}, l1:{y:101}, l2:{y:105,dx:12,both:1}, l7:{y:108,dx:16,lr:1},
+  l5:{y:113,dx:9,both:1}, l3:{y:140,dx:10,both:1}, l4:{y:151,dx:11,both:1},
+  f1:{y:188,dx:10,both:1},
+};
+function bodyFig(checks){
+  const dots = [];
+  BODY_TESTS.forEach(t => {
+    const v = (checks||{})[t.k]; if(!v) return;
+    const m = BODY_MAP[t.k] || {y:100}, dx = m.dx || 0;
+    if(m.both){ dots.push([50-dx, m.y]); dots.push([50+dx, m.y]); }
+    else if(m.lr) dots.push([v==='a' ? 50-dx : 50+dx, m.y]);
+    else dots.push([50, m.y]);
+  });
+  return `<svg viewBox="0 0 100 214" style="height:286px;width:auto;display:block;margin:0 auto">
+    <g fill="#2b2723" stroke="#403931" stroke-width="0.8" stroke-linejoin="round">
+      <circle cx="50" cy="17" r="11"/>
+      <path d="M45.5 26 h9 v8 h-9 z"/>
+      <path d="M50 32 C40 32 33.5 37 31.5 47 L29.5 70 C29.5 82 32.5 92 36.5 102 L36.5 113 L63.5 113 L63.5 102 C67.5 92 70.5 82 70.5 70 L68.5 47 C66.5 37 60 32 50 32 Z"/>
+      <path d="M31.5 47 C25 50 22 60 21 72 L20 93 C20 97 23.5 97.5 24.5 94.5 L26.5 74 L32.5 55 Z"/>
+      <path d="M68.5 47 C75 50 78 60 79 72 L80 93 C80 97 76.5 97.5 75.5 94.5 L73.5 74 L67.5 55 Z"/>
+      <path d="M37 113 L36 146 L35.2 180 L34.5 192 L45 192 L45.4 180 L47 146 L48.6 113 Z"/>
+      <path d="M63 113 L64 146 L64.8 180 L65.5 192 L55 192 L54.6 180 L53 146 L51.4 113 Z"/>
+      <ellipse cx="39" cy="196" rx="6" ry="4"/><ellipse cx="61" cy="196" rx="6" ry="4"/>
+    </g>
+    <line x1="50" y1="8" x2="50" y2="206" stroke="#3b352f" stroke-width="0.6" stroke-dasharray="2 3"/>
+    <text x="8" y="10" font-size="8.5" font-weight="800" fill="#75706a">L 왼쪽</text>
+    <text x="66" y="10" font-size="8.5" font-weight="800" fill="#75706a">오른쪽 R</text>
+    ${dots.map(([x,y])=>`<circle cx="${x}" cy="${y}" r="6.6" fill="var(--gold)" opacity=".15"/>
+      <circle cx="${x}" cy="${y}" r="3.2" fill="var(--gold)"/>`).join('')}
+  </svg>`;
+}
+function figList(checks){
+  const on = BODY_TESTS.filter(t => (checks||{})[t.k]);
+  if(!on.length) return '<div class="empty">표시된 항목이 없어요</div>';
+  return `<div class="figls">${on.map(t=>{
+    const v = (checks||{})[t.k];
+    return `<div class="fl"><b>${esc(t.g)}</b><span>${esc(t.t)}</span><i>${esc(v==='a'?t.a:t.b)}</i></div>`;
+  }).join('')}</div>`;
+}
+
+/* ② 좌우 저울 */
+function lrScale(checks){
+  const items = BODY_TESTS.filter(t => t.a==='L' && t.b==='R');
+  const l = [], r = [];
+  items.forEach(t => { const v=(checks||{})[t.k];
+    if(v==='a') l.push(t.t); else if(v==='b') r.push(t.t); });
+  const n = l.length + r.length;
+  if(!n) return `<div class="empty">좌우를 묻는 항목(${items.length}개)에 표시된 것이 없어요</div>`;
+  const lp = Math.round(l.length/n*100);
+  const side = l.length === r.length ? '고른 편' : (l.length > r.length ? '왼쪽' : '오른쪽');
+  return `<div class="lrbar">
+      ${l.length?`<span class="l" style="width:${lp}%">L ${l.length}</span>`:''}
+      ${r.length?`<span class="r" style="width:${100-lp}%">R ${r.length}</span>`:''}
+    </div>
+    <div class="note">좌우를 묻는 ${items.length}개 가운데 <b>${n}개</b>가 표시됐고,
+      ${side==='고른 편' ? '<b>양쪽이 고릅니다.</b>' : `<b style="color:var(--gold)">${side}</b>으로 치우쳐 있습니다.`}
+      ${l.length?`<br><b>왼쪽</b> ${esc(l.join(' · '))}`:''}
+      ${r.length?`<br><b>오른쪽</b> ${esc(r.join(' · '))}`:''}</div>`;
+}
+
+/* ⑤ 몸 상태 이력 그래프 — 값이 붙어 있어도 보이게 아래위를 잘라 그립니다 */
+function lineChart2(pts, unit, dec){
+  const W=320, H=126, PL=12, PR=12, PT=28, PB=20;
+  const vs = pts.map(p=>p.v);
+  let mn = Math.min(...vs), mx = Math.max(...vs);
+  if(mx - mn < 0.0001){ mn -= 1; mx += 1; }
+  const pad = (mx-mn)*0.28; mn -= pad; mx += pad;
+  const x = i => PL + i*(W-PL-PR)/Math.max(1, pts.length-1);
+  const y = v => PT + (1 - (v-mn)/(mx-mn))*(H-PT-PB);
+  const d = pts.map((p,i)=> (i?'L':'M') + x(i).toFixed(1) + ' ' + y(p.v).toFixed(1)).join(' ');
+  const area = d + ` L ${x(pts.length-1).toFixed(1)} ${H-PB} L ${x(0).toFixed(1)} ${H-PB} Z`;
+  const f = v => (dec ? v.toFixed(dec) : String(Math.round(v)));
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="height:146px">
+    <path d="${area}" fill="var(--gold-dim)"/>
+    <path d="${d}" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    ${pts.map((p,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${y(p.v).toFixed(1)}" r="${i===pts.length-1?3.6:2.6}"
+        fill="${i===pts.length-1?'var(--gold)':'var(--gold-2)'}"/>
+      <text x="${x(i).toFixed(1)}" y="${Math.max(11,y(p.v)-8).toFixed(1)}" text-anchor="middle"
+        font-size="10" font-weight="700" fill="#c9c2b9">${f(p.v)}</text>
+      <text x="${x(i).toFixed(1)}" y="${H-6}" text-anchor="middle" font-size="9.5" font-weight="600"
+        fill="#75706a">${esc(p.label)}</text>`).join('')}
+  </svg><div class="sm" style="text-align:right;color:#75706a">단위 ${unit}</div>`;
+}
+
+const BL_M = { w:{n:'몸무게', u:'kg', d:1, good:-1}, m:{n:'근육량', u:'kg', d:1, good:1},
+  f:{n:'체지방량', u:'kg', d:1, good:-1}, fp:{n:'체지방률', u:'%', d:1, good:-1} };
+
+function blPane(mid){
+  const ls = (D.blog && D.blog[mid]) || [];
+  const key = S.blM || 'w';
+  const mt = BL_M[key];
+  const pts = ls.filter(x=>x[key]).map(x=>({ label: mdTxt(x.date), v: x[key] }));
+  const first = ls[0], last = ls[ls.length-1];
+  const dl = (k) => { if(!first || !last || first===last) return '';
+    const d = Math.round((last[k]-first[k])*10)/10;
+    if(!d) return '<i>그대로</i>';
+    const good = (BL_M[k].good > 0) === (d > 0);
+    return `<i class="${good?'up':'dn'}">${d>0?'▲':'▼'}${Math.abs(d)}</i>`; };
+  return `
+    <span class="lbl">몸 상태 · 인바디</span>
+    ${ls.length ? `
+    <div class="gbox">
+      <div class="seg" style="margin-bottom:10px">${['w','m','f','fp'].map(k=>
+        `<button class="${key===k?'on':''}" data-act="blm:${k}">${BL_M[k].n}</button>`).join('')}</div>
+      ${pts.length>1 ? lineChart2(pts, mt.u, mt.d)
+        : `<div class="empty">${mt.n} 기록이 한 번뿐이라 그래프가 안 나옵니다</div>`}
+    </div>
+    <div class="card" style="padding:8px 12px 10px">
+      <div class="blhd"><span>잰 날</span><span>몸무게</span><span>근육량</span><span>체지방률</span></div>
+      ${ls.slice().reverse().map(x=>`<div class="blrow">
+        <span class="d0">${mdTxt(x.date)}</span>
+        <span class="c">${x.w?kgfmt(x.w):'—'}</span>
+        <span class="c">${x.m?kgfmt(x.m):'—'}</span>
+        <span class="c">${x.fp?kgfmt(x.fp):'—'}</span></div>`).join('')}
+    </div>
+    ${(first && last && first!==last) ? `<div class="note">${esc(dateTxt(first.date))}부터 ${esc(dateTxt(last.date))}까지 —
+      몸무게 ${dl('w')} · 근육량 ${dl('m')} · 체지방률 ${dl('fp')}
+      <br><b style="color:var(--gold-2)">근육은 지키고 지방만 줄었는지</b>를 이 줄로 봅니다.</div>` : ''}
+    ` : '<div class="empty">아직 잰 기록이 없어요</div>'}
+    <button class="btn sub sm" data-act="bladd:${mid}">＋ 오늘 몸 상태 기록</button>`;
+}
+
+function sheetBlAdd(mid){
+  const ls = (D.blog && D.blog[mid]) || [], last = ls[ls.length-1] || {};
+  const cur = ls.find(x => x.date === (S.blDate || TODAY));
+  const g = GOALS[mid] || {};
+  const v = k => { const x = cur ? cur[k] : (k==='w' ? nnum(g.now && g.now.w) : (k==='fp' ? nnum(g.now && g.now.fp) : last[k]));
+    return x ? kgfmt(x) : ''; };
+  openSheet(()=>`
+    <div class="h2">몸 상태 기록 <small>${esc((MEMBERS.find(m=>m.id===mid)||{}).n||'')}</small></div>
+    <div class="fld"><span class="fn">잰 날</span>
+      <input class="search" type="date" data-k="bl:date" value="${S.blDate||TODAY}"></div>
+    <div class="grid2">
+      <div class="fld"><span class="fn">몸무게 kg</span>
+        <input class="search" type="text" inputmode="decimal" data-k="bl:w" value="${v('w')}"></div>
+      <div class="fld"><span class="fn">근육량 kg</span>
+        <input class="search" type="text" inputmode="decimal" data-k="bl:m" value="${v('m')}"></div>
+    </div>
+    <div class="grid2">
+      <div class="fld"><span class="fn">체지방량 kg</span>
+        <input class="search" type="text" inputmode="decimal" data-k="bl:f" value="${v('f')}"></div>
+      <div class="fld"><span class="fn">체지방률 %</span>
+        <input class="search" type="text" inputmode="decimal" data-k="bl:fp" value="${v('fp')}"></div>
+    </div>
+    <div class="note">몸무게만 적어도 됩니다. <b>같은 날에 또 적으면 덮어씁니다.</b>
+      가장 최근 기록은 <b>칼로리 계산</b>의 현재 몸무게로도 들어갑니다.</div>
+    <button class="btn blue sm" data-act="blgo:${mid}">저장</button>
+    ${cur?`<button class="btn ghost sm" data-act="bldel:${cur.id}" style="color:var(--warn)">이 날 기록 지우기</button>`:''}
+    <button class="btn ghost sm" data-act="close">그만두기</button>`);
+}
+
+async function blSave(mid){
+  const gv = k => { const el = document.querySelector('[data-k="bl:'+k+'"]'); return el ? el.value.trim() : ''; };
+  const date = gv('date') || TODAY;
+  const w = nnum(gv('w')), m2 = nnum(gv('m')), f2 = nnum(gv('f')), fp = nnum(gv('fp'));
+  if(!w && !m2 && !f2 && !fp){ toast('하나는 적어 주세요'); return; }
+  closeSheet();
+  D.blog = D.blog || {}; const ls = D.blog[mid] = D.blog[mid] || [];
+  let row = ls.find(x => x.date === date);
+  if(!row){ row = { id:'bl'+Date.now(), mid, date }; ls.push(row); }
+  Object.assign(row, { w, m:m2, f:f2, fp });
+  ls.sort((a,b)=> a.date<b.date?-1:1);
+  await sv(spost('body_logs', [{ id:row.id, member_id:mid, on_date:date, w:w||null, m:m2||null,
+    f:f2||null, fp:fp||null }], {on:'member_id,on_date'}), '몸 상태 저장');
+  /* 가장 최근 것이면 운동계획의 현재 몸 상태에도 넣습니다 */
+  if(ls[ls.length-1] === row){
+    const g = GOALS[mid] || (GOALS[mid] = {}); g.now = g.now || {};
+    if(w) g.now.w = String(w); if(m2) g.now.m = String(m2);
+    if(f2) g.now.f = String(f2); if(fp) g.now.fp = String(fp);
+    g.now.date = date;
+    sv(spost('plans', [{ member_id:mid, data:g, updated_at:new Date().toISOString() }], {on:'member_id'}), '운동계획 갱신');
+  }
+  toast('기록했어요'); render();
+}
+
+/* ③ 체형 회차 */
+function roundsOf(mid){ return (D.rounds && D.rounds[mid]) || []; }
+function curRound(mid){ const rs = roundsOf(mid); return rs[rs.length-1] || null; }
+function checksOf(mid){
+  const r = curRound(mid);
+  if(r) return r.checks || {};
+  return ((D.body && D.body[mid]) || {}).checks || {};
+}
+function roundPane(mid){
+  const rs = roundsOf(mid), tr = (S.who==='tr');
+  const cnt = rs.map(r => ({ label: mdTxt(r.date), v: Object.keys(r.checks||{}).length }));
+  const A = rs[0], B = rs[rs.length-1];
+  let sig = '';
+  if(rs.length > 1){
+    const gone = [], stay = [], came = [];
+    BODY_TESTS.forEach(t => {
+      const a = (A.checks||{})[t.k], b = (B.checks||{})[t.k];
+      if(a && !b) gone.push([t,a]); else if(a && b) stay.push([t,b]); else if(!a && b) came.push([t,b]);
+    });
+    const row = ([t,v], cls, lab) => `<div class="sig">
+      <span class="t2">${esc(t.t)}<small>${esc(t.g)} · ${esc(v==='a'?t.a:t.b)}</small></span>
+      <span class="b2 ${cls}">${lab}</span></div>`;
+    sig = `<div class="card" style="padding:6px 13px 8px">
+      ${gone.map(x=>row(x,'ok','풀렸어요')).join('')}
+      ${stay.map(x=>row(x,'no','그대로')).join('')}
+      ${came.map(x=>row(x,'nw','새로 생김')).join('')}
+      ${(!gone.length&&!stay.length&&!came.length)?'<div class="empty">달라진 것이 없어요</div>':''}</div>
+      <div class="note">${esc(dateTxt(A.date))}(${Object.keys(A.checks||{}).length}개) →
+        ${esc(dateTxt(B.date))}(${Object.keys(B.checks||{}).length}개) 견줌.
+        <b style="color:#8fc4a2">${gone.length}개 풀리고</b> ${came.length?`<b style="color:var(--warn)">${came.length}개 새로 생겼습니다.</b>`:'새로 생긴 것은 없습니다.'}</div>`;
+  }
+  return `
+    <span class="lbl">체형 회차 · ${rs.length}번</span>
+    ${rs.length>1 ? `<div class="gbox">${lineChart2(cnt,'개',0)}
+        <div class="sm" style="text-align:center;color:#75706a;margin-top:-6px">표시된 항목 수 — 내려갈수록 좋아진 것입니다</div></div>
+      ${sig}`
+      : `<div class="note">회차가 ${rs.length}번뿐입니다. <b>체형 재검사</b>를 한 번 더 하면
+          ${rs.length?'첫 검사와 견줘 무엇이 풀렸는지 보여 드립니다.':'그때부터 회차가 쌓입니다.'}</div>`}
+    ${tr?`<button class="btn sub sm" data-act="bnew:${mid}">＋ 체형 재검사 시작</button>`:''}`;
+}
+
+/* ④ 사진 위 기준선 */
+const MARKS = ['귀','어깨','골반','무릎','복사뼈'];
+function markSvg(pts){
+  if(!pts || !pts.length) return '';
+  const P = pts.map(q => [q.x*75, q.y*100]);
+  const d = P.map((q,i)=> (i?'L':'M') + q[0].toFixed(1) + ' ' + q[1].toFixed(1)).join(' ');
+  return `<svg class="ov" viewBox="0 0 75 100">
+    <line x1="${P[0][0].toFixed(1)}" y1="0" x2="${P[0][0].toFixed(1)}" y2="100"
+      stroke="#8bbdd2" stroke-width="0.45" stroke-dasharray="2 2" opacity=".85"/>
+    ${P.length>1?`<path d="${d}" fill="none" stroke="#e6c487" stroke-width="0.8" stroke-linejoin="round"/>`:''}
+    ${P.map(q=>`<circle cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="1.5"
+      fill="#e6c487" stroke="#241d12" stroke-width="0.4"/>`).join('')}
+  </svg>`;
+}
+function angV(a, b){
+  const dx = (b.x-a.x)*75, dy = (b.y-a.y)*100;
+  if(!dy) return null;
+  return Math.round(Math.abs(Math.atan2(dx, dy)) * 180/Math.PI * 10)/10;
+}
+function markTxt(pts){
+  if(!pts || pts.length < 2) return '';
+  const seg = [];
+  const put = (i,j,n) => { if(pts[i] && pts[j]){ const a = angV(pts[i], pts[j]); if(a!=null) seg.push(`${n} <b>${a}°</b>`); } };
+  put(0,1,'목(귀–어깨)'); put(1,2,'몸통(어깨–골반)'); put(2,4,'다리(골반–복사뼈)');
+  return seg.length ? `<div class="note">수직선에서 벗어난 각도 — ${seg.join(' · ')}
+    <br>측면 사진에서 <b>귀–어깨가 수직에 가까울수록</b> 목 부담이 적습니다.</div>` : '';
+}
+function markTap(ev, el){
+  const M = S.bpMark; if(!M) return;
+  if(M.pts.length >= MARKS.length){ toast('다섯 점을 다 찍었어요'); return; }
+  const r = el.getBoundingClientRect();
+  M.pts.push({ x: Math.max(0, Math.min(1, (ev.clientX - r.left)/r.width)),
+               y: Math.max(0, Math.min(1, (ev.clientY - r.top)/r.height)) });
+  drawSheet();
+}
+function sheetBpMark(id){
+  const x = (D.bph||[]).find(y=>y.id===id); if(!x) return;
+  S.bpMark = { id, pts: ((x.marks && x.marks.pts) || []).map(q=>({x:q.x, y:q.y})) };
+  openSheet(()=>{
+    const M = S.bpMark, n = M.pts.length;
+    return `<div class="h2">기준선 긋기 <small>${esc(dateTxt(x.date))} · ${esc(x.pose)}</small></div>
+      <div class="mkwrap" onclick="markTap(event,this)">
+        <img src="${esc(phURL(x.path))}" alt="" onerror="picFail(this)">
+        ${markSvg(M.pts)}</div>
+      <div class="note" style="text-align:center;font-size:13.5px">
+        ${n < MARKS.length ? `사진에서 <b style="color:var(--gold)">${MARKS[n]}</b> 를 눌러 주세요 <span style="color:#75706a">(${n+1}/${MARKS.length})</span>`
+          : '다 찍었습니다. 저장하시면 견주기 화면에도 같이 그려집니다.'}</div>
+      ${markTxt(M.pts)}
+      <div style="display:flex;gap:8px">
+        <button class="btn ghost sm" data-act="mkundo" ${n?'':'disabled'}>한 점 빼기</button>
+        <button class="btn ghost sm" data-act="mkclear" ${n?'':'disabled'}>모두 지우기</button></div>
+      <button class="btn blue sm" data-act="mksave">저장</button>
+      <button class="btn ghost sm" data-act="close">그만두기</button>`;
+  });
+}
+
 /* 체형분석 알맹이 — 분석 탭과 체형분석 화면이 같은 것을 씁니다 */
 function bodyPane(mid){
   const tr = (S.who==='tr');
-  const b = (D.body && D.body[mid]) || {checks:{}, photos:{}, memo:''};
+  const b0 = (D.body && D.body[mid]) || {checks:{}, photos:{}, memo:''};
+  const b = { checks: checksOf(mid), photos: b0.photos||{}, memo: b0.memo||'' };
   const pose = S.bpPose || '정면';
   const list = bphOf(mid, 'body', pose);
   const ds = [...new Set(list.map(x=>x.date))];
@@ -3031,9 +3416,12 @@ function bodyPane(mid){
     const x = d ? list.filter(y=>y.date===d)[0] : null;
     return `<div class="cel">
       <button class="hd2" data-act="bpsel:${side}"><b>${lab}</b><i>${d?mdTxt(d):'없음'} ▾</i></button>
-      ${x ? `<img src="${esc(phURL(x.path))}" alt="" data-act="bpview:${x.id}">`
+      ${x ? `<span class="mkwrap" style="display:block;border:none;border-radius:0" data-act="bpview:${x.id}">
+              <img src="${esc(phURL(x.path))}" alt="" onerror="picFail(this)">
+              ${markSvg(x.marks && x.marks.pts)}</span>`
           : '<div class="no2">이 날짜 사진이<br>아직 없어요</div>'}
-      <div class="ft2">${x ? esc(dateTxt(x.date)) : '—'}</div></div>`;
+      <div class="ft2">${x ? esc(dateTxt(x.date)) : '—'}${(()=>{ const g2 = x ? logNear(mid, x.date) : null;
+        return g2 ? `<br><span style="color:var(--gold)">${kgfmt(g2.w)}kg</span>${g2.fp?` · 체지방 ${kgfmt(g2.fp)}%`:''}` : ''; })()}</div></div>`;
   };
 
   return `
@@ -3046,20 +3434,35 @@ function bodyPane(mid){
             ? `날짜를 눌러 다른 날과 견줍니다. <b>${esc(pose)}</b> 사진이 <b>${ds.length}일치</b> 있어요.`
             : '사진이 하루치뿐입니다. 다음에 한 장 더 넣으면 나란히 견줍니다.'}</div>`
       : `<div class="empty">${esc(pose)} 사진이 아직 없어요</div>`}
-    ${tr?`<button class="btn blue sm" data-act="bpadd:body">＋ 몸 사진 넣기</button>`:''}
+    <button class="btn blue sm" data-act="bpadd:body">＋ 몸 사진 넣기</button>
+    ${tr?'':'<div class="note">집에서 찍으실 때는 <b>같은 자리 · 같은 옷 · 같은 밝기</b>로 찍어야 견주기 좋습니다.</div>'}
 
     <div class="hr"></div>
     <span class="lbl">AI 체형분석 장비 사진 · ${ai.length}장</span>
     ${ai.length
       ? `<div class="phstrip">${ai.slice().reverse().map(x=>`<button class="pt" data-act="bpview:${x.id}">
-          <img src="${esc(phURL(x.path))}" alt=""><span>${mdTxt(x.date)}</span></button>`).join('')}</div>`
+          <img src="${esc(phURL(x.path))}" alt="" onerror="picFail(this)"><span>${mdTxt(x.date)}</span></button>`).join('')}</div>`
       : '<div class="empty">아직 없어요</div>'}
     ${tr?`<button class="btn sub sm" data-act="bpadd:ai">＋ AI 사진 넣기</button>`:''}
 
     ${all.length ? `<div class="hr"></div>
       <span class="lbl">사진 모두 · ${all.length}장</span>
       <div class="phstrip">${all.slice().reverse().map(x=>`<button class="pt" data-act="bpview:${x.id}">
-        <img src="${esc(phURL(x.path))}" alt=""><span>${mdTxt(x.date)} ${esc(x.pose)}</span></button>`).join('')}</div>` : ''}
+        <img src="${esc(phURL(x.path))}" alt="" onerror="picFail(this)"><span>${mdTxt(x.date)} ${esc(x.pose)}</span></button>`).join('')}</div>` : ''}
+
+    <div class="hr"></div>
+    ${blPane(mid)}
+
+    <div class="hr"></div>
+    ${roundPane(mid)}
+
+    <div class="hr"></div>
+    <span class="lbl">체형 한눈에 · ${done}개 표시됨</span>
+    <div class="figbox">${bodyFig(b.checks)}</div>
+    ${figList(b.checks)}
+
+    <span class="lbl">좌우 균형</span>
+    ${lrScale(b.checks)}
 
     <div class="hr"></div>
     <span class="lbl">체크리스트 · ${done}개 표시됨</span>
@@ -3154,11 +3557,15 @@ async function bpUpload(){
 
 function sheetBpView(id){
   const x = (D.bph||[]).find(y=>y.id===id); if(!x) return;
-  const tr = (S.who==='tr');
+  const tr = (S.who==='tr'), own = tr || (x.kind !== 'ai');
   openSheet(()=>`
     <div class="h2">${esc(dateTxt(x.date))} <small>${x.kind==='ai'?'AI 체형분석':esc(x.pose)}</small></div>
-    <img class="shot" src="${esc(phURL(x.path))}" alt="">
-    ${tr?`<button class="btn ghost sm" data-act="bpdel:${x.id}" style="color:var(--warn)">이 사진 지우기</button>`:''}
+    ${(x.marks && x.marks.pts && x.marks.pts.length)
+      ? `<div class="mkwrap"><img src="${esc(phURL(x.path))}" alt="" onerror="picFail(this)">${markSvg(x.marks.pts)}</div>`
+        + markTxt(x.marks.pts)
+      : `<img class="shot" src="${esc(phURL(x.path))}" alt="" onerror="picFail(this)">`}
+    ${x.kind!=='ai'?`<button class="btn sub sm" data-act="bpmark:${x.id}">기준선 긋기</button>`:''}
+    ${own?`<button class="btn ghost sm" data-act="bpdel:${x.id}" style="color:var(--warn)">이 사진 지우기</button>`:''}
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 
@@ -3224,7 +3631,7 @@ function tToday(){
       const nm2 = id => (MEMBERS.find(x=>x.id===id)||{}).n || '?';
       return `<div class="hr"></div><span class="lbl">오늘 올라온 식단 · ${md.length}장</span>
         ${md.slice(0,6).map(m=>`<button class="mrow" data-act="meal:${m.id}">
-          <img src="${esc(mealURL(m.path))}" alt="">
+          ${picImg(m.path)}
           <div><div class="nm">${esc(nm2(m.mid))} · ${esc(m.slot)}</div>
           <div class="sm">${esc(m.memo||'')}</div></div>
           ${m.note?'<span class="pill q">봤음</span>':'<span class="pill">코멘트</span>'}</button>`).join('')}`;
@@ -3311,7 +3718,7 @@ function tMeals(){
   const since = addDays(TODAY, -13);
   const nw = ms.filter(x=>!x.note && x.date>=since);
   const row = x => `<button class="mrow" data-act="meal:${x.id}">
-    <img src="${esc(mealURL(x.path))}" alt="">
+    ${picImg(x.path)}
     <div><div class="nm">${dateTxt(x.date)} · ${esc(x.slot)}${x.kcal?` · ${x.kcal}kcal`:''}</div>
     <div class="sm">${esc(x.memo||'')}</div></div>
     ${x.note?'<span class="pill q">봤음</span>':'<span class="pill">쓰기 ›</span>'}</button>`;
@@ -3386,7 +3793,7 @@ function tMember(){
     <button class="card rowc plan" data-act="tsub:diet:${m.id}"><div><div class="nm">식단</div>
       <div class="sm">${mealsOf(m.id).length?`${mealsOf(m.id).length}장 · 최근 ${dateTxt(mealsOf(m.id)[0].date)}`:'아직 없음'}</div></div><span class="rt">›</span></button>
     <button class="card rowc plan" data-act="tsub:body:${m.id}"><div><div class="nm">체형분석</div>
-      <div class="sm">${(D.body&&D.body[m.id])?`${Object.keys(D.body[m.id].checks||{}).length}개 표시`:'아직 없음'} · 사진 ${((D.bph||[]).filter(x=>x.mid===m.id)).length}장</div></div><span class="rt">›</span></button>
+      <div class="sm">${Object.keys(checksOf(m.id)).length}개 표시 · ${roundsOf(m.id).length}회차 · 사진 ${((D.bph||[]).filter(x=>x.mid===m.id)).length}장</div></div><span class="rt">›</span></button>
     ${(()=>{ const c=cycOf(m.id); if(!c||!c.on) return `<div class="card rowc dim"><div><div class="nm">생리주기</div>
         <div class="sm">회원님이 켜지 않았어요</div></div></div>`;
       const ct=cycToday(c);
@@ -3782,7 +4189,23 @@ document.addEventListener('click', ev=>{
       else if(v==='-') S.fpQty = Math.max(0.5, Math.round((S.fpQty - 0.5)*10)/10);
       else S.fpQty = Number(v);
       drawSheet(); return; }
-    case 'fput': { putFood(); return; }
+    case 'fmode': {
+      const amt = Number(S.fpPick && S.fpPick.amount)||0;
+      if(rest[0]==='g' && !amt){ toast('이 음식은 g이 적혀 있지 않아요'); return; }
+      if(S.fpMode==='g' && rest[0]==='unit') readGram();
+      S.fpMode = rest[0]; drawSheet(); return; }
+    case 'fg': {
+      const amt = Number(S.fpPick.amount)||100;
+      readGram();
+      let g2 = Math.round(amt * S.fpQty);
+      g2 = (rest[0]==='+') ? g2 + 5 : Math.max(5, g2 - 5);
+      S.fpQty = Math.round((g2/amt)*1000)/1000;
+      drawSheet(); return; }
+    case 'fgs': {
+      const amt = Number(S.fpPick.amount)||100;
+      S.fpQty = Math.round((Number(rest[0])/amt)*1000)/1000;
+      drawSheet(); return; }
+    case 'fput': { if(S.fpMode==='g') readGram(); putFood(); return; }
     case 'fnewsave': {
       const g = k => { const el=document.querySelector('[data-k="nf:'+k+'"]'); return el? el.value.trim() : ''; };
       const name = g('name'); const kcal = nnum(g('kcal'));
@@ -4088,6 +4511,13 @@ document.addEventListener('click', ev=>{
     case 'sub': S.subj=S.mid; go(rest[0]); return;
     case 'tsub': S.subj=rest[1]; S.tmid=rest[1]; go(rest[0]); return;
     case 'anat': S.anaT = rest[0]; render(); return;
+    case 'blm': S.blM = rest[0]; render(); return;
+    case 'bladd': { S.blDate = TODAY; sheetBlAdd(rest[0]); return; }
+    case 'blgo': blSave(rest[0]); return;
+    case 'bldel': { const id = rest[0]; closeSheet();
+      Object.keys(D.blog||{}).forEach(k => D.blog[k] = D.blog[k].filter(x=>x.id!==id));
+      sv(sdel('body_logs','id=eq.'+id), '몸 상태 지우기');
+      toast('지웠어요'); render(); return; }
     case 'bppose': S.bpPose = rest[0]; S.bpL=null; S.bpR=null; render(); return;
     case 'bpsel': { const side = rest[0], mid = (S.screen==='body') ? subj() : anaMid();
       const pose = S.bpPose || '정면';
@@ -4131,18 +4561,55 @@ document.addEventListener('click', ev=>{
     case 'bmemogo': { const mid=rest[0];
       const el=document.querySelector('[data-k="bmemo"]'), v=el?el.value.trim():'';
       D.body=D.body||{}; const b=D.body[mid]||(D.body[mid]={date:TODAY,checks:{},photos:{},memo:''});
-      b.memo=v;
+      b.memo=v; b.checks = checksOf(mid);
       sv(spost('body_checks',[{ member_id:mid, on_date:b.date||TODAY, checks:b.checks||{},
         photos:b.photos||{}, memo:v, updated_at:new Date().toISOString() }], {on:'member_id'}), '메모 저장');
       closeSheet(); toast('저장했어요'); render(); return; }
 
     case 'bck': { const [mid,tk,v]=rest;
-      D.body=D.body||{}; const b=D.body[mid]||(D.body[mid]={date:'2026-08-28',checks:{},photos:{},memo:''});
-      b.checks=b.checks||{};
-      if(b.checks[tk]===v) delete b.checks[tk]; else b.checks[tk]=v;
-      sv(spost('body_checks',[{ member_id:mid, on_date:b.date||TODAY, checks:b.checks,
+      D.body=D.body||{}; const b=D.body[mid]||(D.body[mid]={date:TODAY,checks:{},photos:{},memo:''});
+      D.rounds=D.rounds||{}; const rs=D.rounds[mid]=D.rounds[mid]||[];
+      let r = rs[rs.length-1];
+      if(!r){ r = { id:'br'+Date.now(), mid, date:b.date||TODAY, checks:Object.assign({}, b.checks||{}), note:'' }; rs.push(r); }
+      r.checks = r.checks || {};
+      if(r.checks[tk]===v) delete r.checks[tk]; else r.checks[tk]=v;
+      b.checks = r.checks; b.date = r.date;
+      sv(spost('body_rounds',[{ id:r.id, member_id:mid, on_date:r.date, checks:r.checks, note:r.note||'' }],
+        {on:'member_id,on_date'}), '체형 회차 저장');
+      sv(spost('body_checks',[{ member_id:mid, on_date:r.date, checks:r.checks,
         photos:b.photos||{}, memo:b.memo||'', updated_at:new Date().toISOString() }], {on:'member_id'}), '체형분석 저장');
       render(); return; }
+    case 'bnew': { const mid=rest[0], rs=roundsOf(mid), last=rs[rs.length-1];
+      if(last && last.date===TODAY){ toast('오늘 회차가 이미 있어요'); return; }
+      openSheet(()=>`<div class="h2">체형 재검사를 시작할까요?</div>
+        <div class="note">오늘(${esc(dateTxt(TODAY))}) 날짜로 새 회차를 엽니다.
+          ${last?`지난 회차(${esc(dateTxt(last.date))})의 표시 <b>${Object.keys(last.checks||{}).length}개</b>를 그대로 가져오니,
+            <b>풀린 것만 눌러서 끄시면</b> 됩니다.`:'지금 표시한 것이 첫 회차로 들어갑니다.'}
+          <br>지난 회차는 <b>그대로 남습니다.</b></div>
+        <button class="btn blue" data-act="bnewgo:${mid}">시작하기</button>
+        <button class="btn ghost sm" data-act="close">그만두기</button>`);
+      return; }
+    case 'bnewgo': { const mid=rest[0]; closeSheet();
+      D.rounds=D.rounds||{}; const rs=D.rounds[mid]=D.rounds[mid]||[];
+      const last=rs[rs.length-1];
+      const r = { id:'br'+Date.now(), mid, date:TODAY,
+        checks: Object.assign({}, (last&&last.checks)||((D.body&&D.body[mid])||{}).checks||{}), note:'재검사' };
+      rs.push(r);
+      const b = (D.body&&D.body[mid])||(D.body[mid]={date:TODAY,checks:{},photos:{},memo:''});
+      b.checks = r.checks; b.date = TODAY;
+      sv(spost('body_rounds',[{ id:r.id, member_id:mid, on_date:r.date, checks:r.checks, note:r.note }],
+        {on:'member_id,on_date'}), '회차 만들기');
+      sv(spost('body_checks',[{ member_id:mid, on_date:TODAY, checks:r.checks,
+        photos:b.photos||{}, memo:b.memo||'', updated_at:new Date().toISOString() }], {on:'member_id'}), '체형분석 저장');
+      toast('새 회차를 열었어요 — 풀린 것을 눌러서 끄세요'); render(); return; }
+    case 'bpmark': closeSheet(); sheetBpMark(rest[0]); return;
+    case 'mkundo': { if(S.bpMark) S.bpMark.pts.pop(); drawSheet(); return; }
+    case 'mkclear': { if(S.bpMark) S.bpMark.pts = []; drawSheet(); return; }
+    case 'mksave': { const M=S.bpMark; if(!M) return;
+      const x=(D.bph||[]).find(y=>y.id===M.id); closeSheet(); S.bpMark=null; if(!x) return;
+      x.marks = M.pts.length ? { pts:M.pts } : null;
+      sv(spatch('body_photos','id=eq.'+x.id, { marks:x.marks }), '기준선 저장');
+      toast(M.pts.length?'기준선을 그었어요':'기준선을 지웠어요'); render(); return; }
     case 'cycon': { const mid=rest[0]; D.cycle=D.cycle||{};
       D.cycle[mid]={on:true, last:TODAY, len:28, period:5};
       svCycle(mid); toast('주기를 켰어요'); render(); return; }
