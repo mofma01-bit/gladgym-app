@@ -2017,35 +2017,20 @@ function vQa(){
 /* 오늘 */
 function tToday(){
   const live = MEMBERS.map(m=>({m, w:liveOf(m.id)})).filter(x=>x.w);
-  const todayDone = D.workouts.filter(w=>w.done && w.date===TODAY).sort(byDateDesc);
-  const assigned = MEMBERS.map(m=>({m, t:D.today[m.id]})).filter(x=>x.t);
   const todo = D.workouts.filter(w=>w.done && unseen(w)).sort(byDateDesc);
-  const nm = id => (MEMBERS.find(x=>x.id===id)||{}).n || '?';
   return { top: bar('오늘', `<span class="sub">${TODAY.slice(5).replace('-','월 ')}일</span>`), body:`
+    <span class="lbl">현재 기록 중인 수업</span>
+    ${live.length? live.map(x=>`<button class="card teal" data-act="tgo:${x.m.id}">
+        <div class="nm t">${esc(x.m.n)} · 기록 중</div>
+        <div class="sm">${esc((it=>it?exName(it.ex,it.va):'')(x.w.items[x.w.cur]||x.w.items[0]))} · 이어서 기록하기 ›</div></button>`).join('')
+     : '<div class="empty">지금 기록 중인 수업이 없어요</div>'}
+    <div class="hr"></div>
     <button class="card gold" data-act="pickmem">
       <div class="nm g">오늘 수업 기록하기</div>
-      <div class="sm">회원을 고르고 루틴을 골라 바로 시작합니다</div></button>
-    <div class="hr"></div>
-    ${live.length?`<span class="lbl">지금 운동 중</span>
-      ${live.map(x=>`<button class="card teal" data-act="tlive:${x.m.id}">
-        <div class="nm t">${esc(x.m.n)} · 운동 중</div>
-        <div class="sm">${esc((it=>it?exName(it.ex,it.va):'')(x.w.items[x.w.cur]||x.w.items[0]))} · 바로 코멘트 ›</div></button>`).join('')}`
-     :'<div class="card"><div class="nm">지금 운동 중인 회원이 없어요</div></div>'}
-    <div class="hr"></div>
-    <span class="lbl">오늘 지정한 루틴 · ${assigned.length}명</span>
-    ${assigned.length? assigned.map(x=>{ const r=rOf(x.t.rid);
-      return `<button class="card rowc" data-act="tm:${x.m.id}">
-        <div><div class="nm">${esc(x.m.n)}</div>
-        <div class="sm">${esc(x.t.kind)} · ${r?`루틴 ${r.no} ${esc(r.n)}`:'루틴 없음'}</div></div>
-        <span class="rt">›</span></button>`; }).join('')
-     : '<div class="empty">오늘 지정한 루틴이 없어요</div>'}
-    <div class="hr"></div>
-    <span class="lbl">오늘 끝낸 운동 · ${todayDone.length}건</span>
-    ${todayDone.length? todayDone.map(w=>`<button class="card rowc" data-act="tw:${w.id}">
-        <div><div class="nm">${esc(nm(w.mid))}</div>
-        <div class="sm">${esc(w.kind||'')} · ${w.items.length}종목 · ${durTxt(w.dur)}</div></div>
-        ${unseen(w)?'<span class="pill">코멘트 쓰기</span>':'<span class="pill q">봤음</span>'}</button>`).join('')
-     : '<div class="empty">아직 없어요</div>'}
+      <div class="sm">회원을 찾아 루틴을 골라 바로 시작합니다</div></button>
+    <button class="card plan" data-act="pickasg">
+      <div class="nm">루틴 지정하기</div>
+      <div class="sm">회원을 찾아 오늘 할 루틴을 미리 정해 둡니다</div></button>
     ${(()=>{ const md=(D.meals||[]).filter(m=>m.date===TODAY);
       if(!md.length) return '';
       const nm2 = id => (MEMBERS.find(x=>x.id===id)||{}).n || '?';
@@ -2259,6 +2244,20 @@ function sheetPickMember(){
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 
+function sheetPickAssign(){
+  openSheet(()=>`
+    <div class="h2">루틴 지정 <small>누구에게 정해 둘까요</small></div>
+    <input class="search" type="text" data-filter="1" placeholder="회원 이름으로 찾기">
+    ${MEMBERS.map(m=>{ const t=D.today[m.id], r=t?rOf(t.rid):null;
+      return `<button class="card rowc ${t?'gold':''}" data-nm="${esc(m.n)}" data-act="tassign:${m.id}">
+        <div><div class="nm ${t?'g':''}">${esc(m.n)}</div>
+        <div class="sm">${r?`오늘 ${esc(t.kind)} · 루틴 ${r.no} ${esc(r.n)}`:'아직 지정 안 함'}</div></div>
+        <span class="rt">${t?'바꾸기 ›':'지정 ›'}</span></button>`; }).join('')
+      || '<div class="empty">회원이 없어요</div>'}
+    <button class="btn ghost sm" data-act="close">닫기</button>
+    <div class="note">지정해 두면 회원 폰 홈에 <b>오늘 할 루틴</b>으로 뜹니다.</div>`);
+}
+
 function sheetStartSession(mid){
   const m = MEMBERS.find(x=>x.id===mid) || {n:''};
   const rs = myRoutines(mid), t = D.today[mid];
@@ -2378,6 +2377,8 @@ document.addEventListener('click', ev=>{
     case 'tfm': S.tfeed=rest[0]; render(); return;
     case 'tfm2': S.tfeed=rest[0]; S.ttab='t_feed'; go('t_feed'); return;
     case 'pickmem': sheetPickMember(); return;
+    case 'pickasg': sheetPickAssign(); return;
+    case 'tassign': S.tmid=rest[0]; closeSheet(); go('t_routines'); return;
     case 'shot': shotPick(); return;
     case 'slot': S.shotSlot=rest[0]; drawSheet(); return;
     case 'shotup': uploadMeal(); return;
