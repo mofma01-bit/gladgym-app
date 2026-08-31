@@ -599,7 +599,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '65';
+const BUILD = '66';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1760,6 +1760,72 @@ async function recSave(){
     }
   }
   save(); toast('고쳤습니다'); render();
+}
+
+/* ── 피드백 · 날짜로 보기 ── */
+function cmOnDay(mid, d){ return D.cm.filter(c => c.mid===mid && String(c.ts||'').slice(0,10) === d); }
+
+function fbStrip(mid){
+  const sel = S.fbDay || TODAY, wk = weekOf(sel);
+  return `<div class="wk">
+    <div class="wkhd">
+      <button data-act="fbmove:-1">‹</button>
+      <button class="d" data-act="fbcal">${dowTxt(sel)} <span style="color:var(--gold-2);font-size:12px">▾</span></button>
+      <button data-act="fbmove:1" ${sel>=TODAY?'style="opacity:.3"':''}>›</button>
+    </div>
+    <div class="wkd">${wk.map((d,i)=>{ const n = cmOnDay(mid,d).length;
+      return `<button data-act="fbd:${d}" class="${d===sel?'sel':''} ${d===TODAY?'tdy':''} ${d>TODAY?'fut':''}">
+        <span class="dn ${i===0?'sun':''}">${DOW[i]}</span>
+        <span class="dnum ${n?'has':''}">${+d.slice(8)}</span>
+        <span class="dot">${n?'●':''}</span></button>`; }).join('')}</div>
+  </div>`;
+}
+
+function sheetTfCal(){
+  openSheet(()=>{
+    const sel = S.tfDay || TODAY, base = S.tfMon || sel.slice(0,7);
+    const y = +base.slice(0,4), m = +base.slice(5,7);
+    const lead = new Date(y, m-1, 1).getDay(), last = new Date(y, m, 0).getDate();
+    const cntOf = d => D.workouts.filter(w=>w.done && w.date===d && w.items.some(i=>i.sets.length)).length;
+    let cells = '';
+    DOW.forEach(d => cells += `<div class="hd">${d}</div>`);
+    for(let i=0;i<lead;i++) cells += '<div class="pad"></div>';
+    for(let d=1; d<=last; d++){
+      const ds = y + '-' + String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+      const n = cntOf(ds);
+      cells += `<button class="cday ${ds===sel?'sel':''} ${n?'has':''} ${ds>TODAY?'fut':''}"
+        data-act="tfd:${ds}">${d}${n?`<i>${n}</i>`:''}</button>`;
+    }
+    return `<div class="h2">날짜 고르기 <small>수업 기록 있는 날에 표시</small></div>
+      <div class="wkhd"><button data-act="tfmon:-1">‹</button>
+        <span class="d">${y}년 ${m}월</span>
+        <button data-act="tfmon:1">›</button></div>
+      <div class="cal2">${cells}</div>
+      <button class="btn ghost sm" data-act="close">닫기</button>`;
+  });
+}
+
+function sheetFbCal(){
+  openSheet(()=>{
+    const sel = S.fbDay || TODAY, base = S.fbMon || sel.slice(0,7);
+    const y = +base.slice(0,4), m = +base.slice(5,7);
+    const lead = new Date(y, m-1, 1).getDay(), last = new Date(y, m, 0).getDate();
+    let cells = '';
+    DOW.forEach(d => cells += `<div class="hd">${d}</div>`);
+    for(let i=0;i<lead;i++) cells += '<div class="pad"></div>';
+    for(let d=1; d<=last; d++){
+      const ds = y + '-' + String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+      const n = cmOnDay(S.mid, ds).length;
+      cells += `<button class="cday ${ds===sel?'sel':''} ${n?'has':''} ${ds>TODAY?'fut':''}"
+        data-act="fbd:${ds}">${d}${n?`<i>${n}</i>`:''}</button>`;
+    }
+    return `<div class="h2">날짜 고르기 <small>코멘트 온 날에 표시</small></div>
+      <div class="wkhd"><button data-act="fbmon:-1">‹</button>
+        <span class="d">${y}년 ${m}월</span>
+        <button data-act="fbmon:1">›</button></div>
+      <div class="cal2">${cells}</div>
+      <button class="btn ghost sm" data-act="close">닫기</button>`;
+  });
 }
 
 /* ── 피드백 탭 — 최근 / 수업별 / 종목별 ── */
