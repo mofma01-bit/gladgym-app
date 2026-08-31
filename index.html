@@ -318,6 +318,11 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
   width:100%;text-align:left;border-radius:18px;padding:19px 18px 17px;min-height:152px;
   background:radial-gradient(125% 135% at 86% 6%, #6d4736 0%, #412921 44%, #23170f 100%);
   border:1px solid #6b4a38}
+.hero.blue{background:radial-gradient(125% 135% at 86% 6%, #3d6b7a 0%, #24444e 44%, #131f24 100%);
+  border-color:#3f6b78}
+.hero.blue .tag{color:var(--teal);border-color:#5d8896}
+.hero.blue .hs{color:#cfe3ea}
+.hero.blue .hgo{background:var(--teal);color:#12262d}
 .hero .tag{display:inline-block;font-size:11.5px;font-weight:700;color:var(--gold);
   border:1px solid var(--gold-2);border-radius:999px;padding:3px 11px}
 .hero .ht,.hero .hs{width:100%}
@@ -948,7 +953,7 @@ function render(){
     t_members:tMembers,t_member:tMember,t_live:tLive,t_write:tWrite,t_routines:tRoutines,t_redit:tRedit,t_ex:tEx,
     intake:vIntake, plan:vPlan, body:vBody, cycle:vCycle, qa:vQa, boot:vBoot, err:vErr,
     newmem:vNewMem, intake_edit:vIntakeEdit, plan_edit:vPlanEdit, t_pickex:tPickEx,
-    t_today:tToday, t_feed:tFeed, t_tools:tTools, diet:vDiet, days:vDays};
+    t_today:tToday, t_feed:tFeed, t_tools:tTools, diet:vDiet, days:vDays, t_meals:tMeals};
   let v;
   try{ v=(V[S.screen]||vHome)(); }
   catch(err){
@@ -1544,6 +1549,30 @@ function fbStrip(mid){
         <span class="dnum ${n?'has':''}">${+d.slice(8)}</span>
         <span class="dot">${n?'●':''}</span></button>`; }).join('')}</div>
   </div>`;
+}
+
+function sheetTfCal(){
+  openSheet(()=>{
+    const sel = S.tfDay || TODAY, base = S.tfMon || sel.slice(0,7);
+    const y = +base.slice(0,4), m = +base.slice(5,7);
+    const lead = new Date(y, m-1, 1).getDay(), last = new Date(y, m, 0).getDate();
+    const cntOf = d => D.workouts.filter(w=>w.done && w.date===d && w.items.some(i=>i.sets.length)).length;
+    let cells = '';
+    DOW.forEach(d => cells += `<div class="hd">${d}</div>`);
+    for(let i=0;i<lead;i++) cells += '<div class="pad"></div>';
+    for(let d=1; d<=last; d++){
+      const ds = y + '-' + String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+      const n = cntOf(ds);
+      cells += `<button class="cday ${ds===sel?'sel':''} ${n?'has':''} ${ds>TODAY?'fut':''}"
+        data-act="tfd:${ds}">${d}${n?`<i>${n}</i>`:''}</button>`;
+    }
+    return `<div class="h2">날짜 고르기 <small>수업 기록 있는 날에 표시</small></div>
+      <div class="wkhd"><button data-act="tfmon:-1">‹</button>
+        <span class="d">${y}년 ${m}월</span>
+        <button data-act="tfmon:1">›</button></div>
+      <div class="cal2">${cells}</div>
+      <button class="btn ghost sm" data-act="close">닫기</button>`;
+  });
 }
 
 function sheetFbCal(){
@@ -2474,12 +2503,16 @@ function tToday(){
         <div class="sm">${esc((it=>it?exName(it.ex,it.va):'')(x.w.items[x.w.cur]||x.w.items[0]))} · 이어서 기록하기 ›</div></button>`).join('')
      : '<div class="empty">지금 기록 중인 수업이 없어요</div>'}
     <div class="hr"></div>
-    <button class="card gold" data-act="pickmem">
-      <div class="nm g">오늘 수업 기록하기</div>
-      <div class="sm">회원을 찾아 루틴을 골라 바로 시작합니다</div></button>
-    <button class="card plan" data-act="pickasg">
-      <div class="nm">루틴 지정하기</div>
-      <div class="sm">회원을 찾아 오늘 할 루틴을 미리 정해 둡니다</div></button>
+    <button class="hero" data-act="pickmem">
+      <span class="tag">수업</span>
+      <div class="ht">오늘 수업 기록하기</div>
+      <div class="hs">회원을 찾아 루틴을 골라<br>지금 바로 기록을 시작합니다</div>
+      <span class="hgo">회원 찾기 ›</span></button>
+    <button class="hero blue" data-act="pickasg">
+      <span class="tag">개인운동</span>
+      <div class="ht">루틴 지정하기</div>
+      <div class="hs">회원을 찾아 오늘 할 루틴을<br>미리 정해 둡니다</div>
+      <span class="hgo">회원 찾기 ›</span></button>
     ${(()=>{ const md=(D.meals||[]).filter(m=>m.date===TODAY);
       if(!md.length) return '';
       const nm2 = id => (MEMBERS.find(x=>x.id===id)||{}).n || '?';
@@ -2500,41 +2533,77 @@ function tToday(){
 function tFeed(){
   const nm = id => (MEMBERS.find(x=>x.id===id)||{}).n || '?';
   const mode = S.tfeed || 'ex';
-  const head = `<div class="chips">
-    <button class="chip ${mode==='ex'?'on':''}" data-act="tfm:ex">운동 ${todoCount()?'· '+todoCount():''}</button>
-    <button class="chip ${mode==='diet'?'on':''}" data-act="tfm:diet">식단 ${mealTodo().length?'· '+mealTodo().length:''}</button></div>`;
+  const head = `<div class="seg">
+    <button class="${mode==='ex'?'on':''}" data-act="tfm:ex">운동${todoCount()?' '+todoCount():''}</button>
+    <button class="${mode==='diet'?'on':''}" data-act="tfm:diet">식단${mealTodo().length?' '+mealTodo().length:''}</button></div>`;
 
+  /* ── 식단 — 회원별로 묶어서 ── */
   if(mode==='diet'){
-    const all = (D.meals||[]).slice().sort((a,b)=> a.date<b.date?1:a.date>b.date?-1:0);
-    const todoM = all.filter(m=>!m.note), doneM = all.filter(m=>m.note).slice(0,10);
-    const row = m => `<button class="mrow" data-act="meal:${m.id}">
-      <img src="${esc(mealURL(m.path))}" alt="">
-      <div><div class="nm">${esc(nm(m.mid))} · ${esc(m.slot)}</div>
-      <div class="sm">${dateTxt(m.date)}${m.memo?' · '+esc(m.memo.slice(0,14)):''}</div></div>
-      ${m.note?'<span class="pill q">봤음</span>':'<span class="pill">쓰기 ›</span>'}</button>`;
-    return { top: bar('피드백', `<span class="sub">식단 ${todoM.length}장</span>`), body: head + `
-      <span class="lbl">코멘트 안 단 식단 · ${todoM.length}장</span>
-      ${todoM.length? todoM.map(row).join('') : '<div class="empty">다 보셨어요</div>'}
-      ${doneM.length?`<div class="hr"></div><span class="lbl">코멘트 남긴 것</span>${doneM.map(row).join('')}`:''}
-      ${all.length?'':'<div class="note">회원이 식단 탭에서 사진을 올리면 여기에 모입니다.</div>'}` };
+    const rows = MEMBERS.map(m=>{
+      const ms = (D.meals||[]).filter(x=>x.mid===m.id).slice().sort((a,b)=> a.date<b.date?1:a.date>b.date?-1:0);
+      return { m, ms, nw: ms.filter(x=>!x.note).length, last: ms[0] };
+    }).filter(r=>r.ms.length).sort((a,b)=> b.nw-a.nw || (a.last.date<b.last.date?1:-1));
+    return { top: bar('피드백', `<span class="sub">식단</span>`), body: head + `
+      <span class="lbl">최근 올린 회원</span>
+      ${rows.length ? rows.map(r=>`<button class="card rowc ${r.nw?'gold':''}" data-act="tmeals:${r.m.id}">
+          <div><div class="nm ${r.nw?'g':''}">${esc(r.m.n)} 회원${r.nw?` <span class="pill">new ${r.nw}</span>`:''}</div>
+          <div class="sm">최근 ${dateTxt(r.last.date)} · ${esc(r.last.slot)}${r.last.memo?' · '+esc(r.last.memo.slice(0,14)):''}
+            <br>모두 ${r.ms.length}장${r.nw?` · 코멘트 안 단 것 ${r.nw}장`:' · 다 보셨어요'}</div></div>
+          <span class="rt">›</span></button>`).join('')
+        : '<div class="empty">아직 올라온 식단이 없어요</div>'}
+      <div class="note">회원이 식단 탭에서 사진을 올리면 <b>여기 위로 올라오고 new 가 붙습니다.</b></div>` };
   }
 
-  const todo = D.workouts.filter(w=>w.done && unseen(w)).sort(byDateDesc);
-  const mine = D.cm.slice(0, 12);
-  return { top: bar('피드백', `<span class="sub">쓸 것 ${todo.length}건</span>`), body: head + `
-    <span class="lbl">코멘트를 아직 안 단 기록</span>
-    ${todo.length? todo.map(w=>`<button class="card rowc" data-act="tw:${w.id}">
+  /* ── 운동 — 날짜별로 그날 수업한 회원 ── */
+  const sel = S.tfDay || TODAY, wkd = weekOf(sel);
+  const dayWs = d => D.workouts.filter(w=>w.done && w.date===d && w.items.some(i=>i.sets.length))
+    .slice().sort((a,b)=> a.mid<b.mid?-1:1);
+  const list = dayWs(sel);
+  const todo = D.workouts.filter(w=>w.done && unseen(w) && w.items.some(i=>i.sets.length)).sort(byDateDesc);
+  return { top: bar('피드백', `<span class="sub">${dateTxt(sel)}</span>`), body: head + `
+    <div class="wk">
+      <div class="wkhd">
+        <button data-act="tfmove:-1">‹</button>
+        <button class="d" data-act="tfcal">${dowTxt(sel)} <span style="color:var(--gold-2);font-size:12px">▾</span></button>
+        <button data-act="tfmove:1" ${sel>=TODAY?'style="opacity:.3"':''}>›</button>
+      </div>
+      <div class="wkd">${wkd.map((d,i)=>{ const n=dayWs(d).length;
+        return `<button data-act="tfd:${d}" class="${d===sel?'sel':''} ${d===TODAY?'tdy':''} ${d>TODAY?'fut':''}">
+          <span class="dn ${i===0?'sun':''}">${DOW[i]}</span>
+          <span class="dnum ${n?'has':''}">${+d.slice(8)}</span>
+          <span class="dot">${n?n+'명':''}</span></button>`; }).join('')}</div>
+    </div>
+    <span class="lbl">${dateTxt(sel)} 수업 ${list.length?`· ${list.length}명`:''}</span>
+    ${list.length ? list.map(w=>{
+      const cn = w.items.reduce((a,i)=> a + cmOf(w.mid,i.ex,i.va).length, 0);
+      return `<button class="card rowc ${unseen(w)?'gold':''}" data-act="tw:${w.id}">
+        <div><div class="nm ${unseen(w)?'g':''}">${esc(nm(w.mid))} 회원</div>
+        <div class="sm">${esc(w.kind||'')}${w.title?' · '+esc(w.title):''} · ${durTxt(w.dur)}
+          <br>${w.items.filter(i=>i.sets.length).map(i=>esc(exName(i.ex,i.va))).slice(0,3).join(' · ')}${w.items.filter(i=>i.sets.length).length>3?' 외':''}</div></div>
+        <span class="pill${unseen(w)?'':' q'}">${unseen(w)?'코멘트 쓰기':`코멘트 ${cn}`} ›</span></button>`; }).join('')
+     : '<div class="empty">이 날은 기록된 수업이 없어요</div>'}
+    ${todo.length?`<div class="hr"></div>
+      <span class="lbl">아직 코멘트 안 단 기록 · ${todo.length}건</span>
+      ${todo.slice(0,8).map(w=>`<button class="card rowc" data-act="tw:${w.id}">
         <div><div class="nm">${esc(nm(w.mid))} · ${dateTxt(w.date)}</div>
-        <div class="sm">${esc(w.kind||'')} · ${w.items.map(i=>exOf(i.ex).n).slice(0,2).join(', ')}${w.items.length>2?' 외':''}</div></div>
-        <span class="pill">쓰기 ›</span></button>`).join('')
-     : '<div class="empty">다 쓰셨어요</div>'}
-    <div class="hr"></div>
-    <span class="lbl">최근 남긴 코멘트</span>
-    ${mine.length? mine.map(c=>`<button class="cm" style="text-align:left" data-act="exd:${c.ex}:${c.va}:${c.mid}">
-        <span class="who">${esc(nm(c.mid))} · ${esc(c.at)}</span>
-        <span class="ex" style="font-size:13.5px;font-weight:700;color:var(--gold)">${esc(exName(c.ex,c.va))}</span>
-        <span class="tx">${esc(c.tx.slice(0,60))}${c.tx.length>60?'…':''}</span></button>`).join('')
-     : '<div class="empty">아직 없어요</div>'}` };
+        <div class="sm">${esc(w.kind||'')} · ${w.items.filter(i=>i.sets.length).length}종목</div></div>
+        <span class="pill">쓰기 ›</span></button>`).join('')}`:''}` };
+}
+
+/* 회원 한 명의 식단 모아보기 */
+function tMeals(){
+  const mid = S.tmid, m = MEMBERS.find(x=>x.id===mid) || {n:''};
+  const ms = (D.meals||[]).filter(x=>x.mid===mid).slice().sort((a,b)=> a.date<b.date?1:a.date>b.date?-1:0);
+  const nw = ms.filter(x=>!x.note);
+  const row = x => `<button class="mrow" data-act="meal:${x.id}">
+    <img src="${esc(mealURL(x.path))}" alt="">
+    <div><div class="nm">${dateTxt(x.date)} · ${esc(x.slot)}${x.kcal?` · ${x.kcal}kcal`:''}</div>
+    <div class="sm">${esc(x.memo||'')}</div></div>
+    ${x.note?'<span class="pill q">봤음</span>':'<span class="pill">쓰기 ›</span>'}</button>`;
+  return { top: bar(esc(m.n)+' 식단', `<span class="sub">${ms.length}장</span>`, 'ttab:t_feed'), body:`
+    ${nw.length?`<span class="lbl">코멘트 안 단 것 · ${nw.length}장</span>${nw.map(row).join('')}<div class="hr"></div>`:''}
+    <span class="lbl">${nw.length?'코멘트 남긴 것':'모두'}</span>
+    ${(nw.length?ms.filter(x=>x.note):ms).map(row).join('') || '<div class="empty">없어요</div>'}` };
 }
 
 /* 자료 */
@@ -2630,12 +2699,23 @@ function tLive(){
 }
 function tWrite(){
   const w=D.workouts.find(x=>x.id===S.twid), m=MEMBERS.find(x=>x.id===w.mid);
-  return { top: bar('코멘트 남기기', `<span class="sub">${esc(m.n)}</span>`, 'tm:'+w.mid), body:
-    `<div class="note">${dateTxt(w.date)} · ${esc(w.kind||'')} — 종목을 누르면 설명과 코멘트가 열립니다</div>
-     <button class="btn ghost sm" data-act="trec:${w.id}">이 기록 고치기</button>`
-    + w.items.map(it=>`<button class="card" data-act="exd:${it.ex}:${it.va}:${m.id}">
-      <div class="nm">${esc(exName(it.ex,it.va))}</div>
-      <div class="sm">${it.sets.map(s=>setShort(it.ex,s)).join(' · ')} · 코멘트 ${cmOf(m.id,it.ex,it.va).length}개 ›</div></button>`).join('') };
+  const done = w.items.filter(it=>it.sets.length);
+  return { top: bar('코멘트 남기기', `<span class="sub">${esc(m.n)}</span>`, 'ttab:t_feed'), body:
+    `<div class="note">${dateTxt(w.date)} · ${esc(w.kind||'')}${w.title?' · '+esc(w.title):''} · ${durTxt(w.dur)}</div>
+     <span class="lbl">종목을 눌러 코멘트를 남기세요</span>`
+    + (done.length ? done.map(it=>{ const n = cmOf(m.id,it.ex,it.va).length;
+        return `<button class="card rowc" data-act="exd:${it.ex}:${it.va}:${m.id}">
+          <div><div class="nm">${esc(exName(it.ex,it.va))}</div>
+          <div class="sm">${it.sets.map(x=>setShort(it.ex,x)).join(' · ')}</div></div>
+          <span class="pill${n?' q':''}">${n?`코멘트 ${n}`:'코멘트 쓰기'} ›</span></button>`; }).join('')
+      : '<div class="empty">세트를 적은 종목이 없어요</div>')
+    + `<div class="note">여기서 남긴 코멘트는 <b>그 종목에</b> 붙습니다. 회원 화면의 피드백 탭과
+        다음에 그 종목을 할 때 바로 뜹니다.</div>
+       <div class="hr"></div>
+       <span class="lbl" style="opacity:.6">기록 자체가 잘못됐다면</span>
+       <button class="btn ghost sm" data-act="trec:${w.id}">무게·횟수 고치기</button>
+       <div class="note">고치기를 누르면 이 기록이 <b>진행 중 상태로 되돌아갑니다.</b>
+         코멘트만 남기실 거면 위 종목을 눌러 주세요.</div>` };
 }
 function tRoutines(){
   const mid=S.tmid||'m1', rs=myRoutines(mid), t=D.today[mid];
@@ -2996,6 +3076,19 @@ document.addEventListener('click', ev=>{
     case 'reset': reset(); toast('처음 상태로 되돌렸습니다'); return;
     case 'go': { if(rest[0]==='workout' && !D.live) adoptLive(S.mid); go(rest[0]); return; }
     case 'dpick': S.day = rest[0]; render(); return;
+    case 'tmeals': S.tmid = rest[0]; go('t_meals'); return;
+    case 'tfd': S.tfDay = rest[0]; closeSheet(); render(); return;
+    case 'tfcal': S.tfMon = (S.tfDay||TODAY).slice(0,7); sheetTfCal(); return;
+    case 'tfmove': {
+      const d = new Date((S.tfDay||TODAY)+'T00:00:00');
+      d.setDate(d.getDate() + Number(rest[0]));
+      const n = ymd(d); if(n > TODAY) return;
+      S.tfDay = n; render(); return; }
+    case 'tfmon': {
+      const b0 = S.tfMon || (S.tfDay||TODAY).slice(0,7);
+      const d = new Date(+b0.slice(0,4), +b0.slice(5,7)-1 + Number(rest[0]), 1);
+      S.tfMon = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+      drawSheet(); return; }
     case 'fbd': S.fbDay = rest[0]; S.fbMode='day'; closeSheet(); render(); return;
     case 'fbcal': S.fbMon = (S.fbDay||TODAY).slice(0,7); sheetFbCal(); return;
     case 'fbmove': {
