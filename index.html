@@ -783,22 +783,30 @@ function vHome(){
     ${u>0?`<button class="cm" data-act="tab:feedback" style="text-align:left">
       <span class="who">${esc(D.cm.find(c=>!c.read&&c.mid===S.mid).tr)} 트레이너</span>
       <span class="tx">새 코멘트 ${u}개가 왔어요</span></button>`:''}
-    ${lw?`<button class="card gold" data-act="go:workout">
-      <div class="nm g">운동하던 중이에요</div><div class="sm">${esc(lw.title)} · 이어서 하기</div></button>`:''}
+    ${lw
+      ? `<button class="card gold" data-act="go:workout">
+          <div class="nm g">운동기록 계속하기</div>
+          <div class="sm">${esc(lw.title)} · ${lw.items.filter(i=>i.locked).length}/${lw.items.length}종목 끝냄 · 이어서 ›</div></button>
+        <button class="card rowc" data-act="go:start">
+          <div><div class="nm">오늘 운동 기록하기</div>
+          <div class="sm">다른 운동을 새로 시작합니다</div></div><span class="rt">›</span></button>`
+      : r
+        ? `<button class="card gold" data-act="rt:${r.id}">
+            <div class="nm g">오늘 운동 기록하기</div>
+            <div class="sm">${esc(t.kind)} · 루틴 ${r.no} ${esc(r.n)}<br>${r.items.length}종목 · 예상 ${estMin(r)}분 · ${esc(t.by)}가 지정했어요</div></button>`
+        : `<button class="card gold" data-act="go:start">
+            <div class="nm g">오늘 운동 기록하기</div>
+            <div class="sm">지정된 루틴이 없어요 · 내 루틴에서 골라 시작합니다</div></button>`}
     ${(()=>{ const c=cycOf(S.mid); if(!c||!c.on) return '';
       const ct=cycToday(c);
       return `<button class="card" data-act="sub:cycle"><div class="nm">오늘 ${ct.day}일차 · ${esc(ct.ph)}</div>
         <div class="sm">${esc(ct.why)}</div></button>`; })()}
-    ${r?`<button class="card gold" data-act="rt:${r.id}">
-      <div class="nm g">오늘 · ${esc(t.kind)} · 루틴 ${r.no}</div>
-      <div class="sm">${esc(r.n)} · ${r.items.length}종목 · 예상 ${estMin(r)}분<br>${esc(t.by)}가 지정했어요</div></button>`
-    :`<div class="card"><div class="nm">오늘 지정된 루틴이 없어요</div><div class="sm">내 루틴에서 골라 시작할 수 있어요</div></div>`}
     <div class="grid2">
       <div class="tile"><span class="k">이번 주</span><span class="v">${ws.filter(w=>w.date>='2026-08-24').length}<small> 회</small></span></div>
       <div class="tile"><span class="k">이번 달</span><span class="v">${ws.length}<small> 회</small></span></div></div>
     <span class="lbl">최근 기록</span>
     ${ws.slice(0,3).map(recRow).join('') || '<div class="empty">아직 기록이 없어요</div>'}`,
-    foot:`<button class="btn main" data-act="go:start">운동 시작</button>` };
+    foot:`<button class="btn main" data-act="${lw?'go:workout':'go:start'}">${lw?'운동기록 계속하기':'오늘 운동 기록하기'}</button>` };
 }
 function recRow(w){
   const parts=[...new Set(w.items.map(i=>exOf(i.ex).p))].join(' · ');
