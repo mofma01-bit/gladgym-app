@@ -623,7 +623,8 @@ const byDateDesc = (a,b)=> a.date<b.date?1 : a.date>b.date?-1 : (a.id<b.id?1:-1)
 function myWorkouts(){ return D.workouts.filter(w=>w.mid===S.mid && w.done).slice().sort(byDateDesc); }
 function liveOf(mid){
   if(D.live && D.live.mid===mid) return D.live;
-  const w = D.workouts.find(x=>!x.done && x.mid===mid);
+  /* 오늘 것만 「기록 중」으로 본다 — 지난날 끝내지 않은 기록이 계속 떠 있지 않게 */
+  const w = D.workouts.find(x=>!x.done && x.mid===mid && x.date===TODAY);
   if(!w || !w.items || !w.items.length) return null;
   if(w.cur==null || w.cur<0 || w.cur>=w.items.length){
     const i = w.items.findIndex(it=>!it.locked);
@@ -894,7 +895,7 @@ async function newLive(title, items, kind, rid, mid, by){
 /* 다른 기기에서 시작한 운동을 이 기기에서 이어받는다 */
 function adoptLive(mid){
   if(D.live && D.live.mid===mid) return true;
-  const w = D.workouts.find(x=>!x.done && x.mid===mid);
+  const w = D.workouts.find(x=>!x.done && x.mid===mid && x.date===TODAY);
   if(!w || !w.items || !w.items.length) return false;
   const i = w.items.findIndex(it=>!it.locked);
   D.live = { id:w.id, mid:w.mid, title:w.title||'운동', kind:w.kind, rid:w.rid, date:w.date,
