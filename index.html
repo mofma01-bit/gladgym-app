@@ -307,6 +307,7 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
 .wkd>button.sel{background:var(--dark-3)}
 .wkd>button.sel .dn{color:var(--cream)}
 .wkd>button.tdy .num{color:var(--gold)}
+.wkd>button.fut{opacity:.28;pointer-events:none}
 .dsum{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-top:11px;
   background:var(--line);border-radius:11px;overflow:hidden}
 .dsum>div{background:var(--dark-2);padding:10px 4px;text-align:center}
@@ -583,13 +584,16 @@ async function boot(){
 }
 
 /* 어제까지의 안 끝낸 기록은 그날로 마감한다 — 「기록 중」으로 계속 떠 있지 않게 */
+const CAP_EX = 2*3600, CAP_W = 4*3600;
+const capSec = (n, cap) => Math.max(0, Math.min(Math.round(Number(n)||0), cap));
+
 function closeStale(){
   const old = D.workouts.filter(w => !w.done && w.date && w.date < TODAY);
   if(!old.length) return;
   old.forEach(w => {
     w.done = true;
-    w.items.forEach(it => { it.locked = true; });
-    const dur = Number(w.dur) || w.items.reduce((a,it)=> a + (Number(it.sec)||0), 0);
+    w.items.forEach(it => { it.locked = true; it.sec = capSec(it.sec, CAP_EX); });
+    const dur = capSec(Number(w.dur) || w.items.reduce((a,it)=> a + it.sec, 0), CAP_W);
     w.dur = dur;
     w.autoClosed = true;
     sv(spatch('workouts','id=eq.'+w.id, { done:true, dur }), '지난 기록 자동 종료');
@@ -715,7 +719,7 @@ function weekStrip(mid){
       <button data-act="dmove:1" ${sel>=TODAY?'style="opacity:.3"':''}>›</button>
     </div>
     <div class="wkd">${wk.map((d,i)=>{ const t=dayStat(mid,d);
-      return `<button data-act="dpick:${d}" class="${d===sel?'sel':''} ${d===TODAY?'tdy':''}">
+      return `<button data-act="dpick:${d}" class="${d===sel?'sel':''} ${d===TODAY?'tdy':''} ${d>TODAY?'fut':''}">
         <span class="dn ${i===0?'sun':''}">${DOW[i]}</span>
         ${ring(t.pw, t.pk)}
         <span class="num">${+d.slice(8)}</span></button>`; }).join('')}</div>
@@ -2864,7 +2868,8 @@ async function finish(){
     D.workouts=D.workouts.filter(x=>x.id!==w.id);
     D.live=null; save(); toast('기록할 세트가 없어요'); go('home'); return; }
   done.forEach(it=>{ if(!it.locked){ it.locked=true; it.sec=(it.sec||0)+(Date.now()-it.startAt)/1000; } });
-  const dur=Math.round((Date.now()-w.startAt)/1000);
+  w.items.forEach(it=>{ it.sec = capSec(it.sec, CAP_EX); });
+  const dur=capSec((Date.now()-w.startAt)/1000, CAP_W);
   for(let i=0;i<w.items.length;i++) await svItem(i);
   await sv(spatch('workouts','id=eq.'+w.id, { done:true, dur, kind:w.kind }), '운동 저장');
   const rec={ id:w.id, mid:w.mid, date:w.date||TODAY, kind:w.kind, rid:w.rid, title:w.title, dur, done:true,
