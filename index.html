@@ -584,7 +584,7 @@ function mapWorkouts(wks, witems, wsets){
 }
 
 async function boot(){
-  const [exs, vrs, mems, rts, ritems, asg, wks, witems, wsets, cms, mdesc, intk, plns, bdy, cyc, mls] = await Promise.all([
+  const [exs, vrs, mems, rts, ritems, asg, wks, witems, wsets, cms, mdesc, intk, plns, bdy, cyc, mls, aks] = await Promise.all([
     sget('exercises?select=*&order=sort'),
     sget('variants?select=*&order=sort'),
     sget('members?select=*'),
@@ -601,6 +601,7 @@ async function boot(){
     sget('body_checks?select=*'),
     sget('cycles?select=*'),
     sget('meals?select=*&order=created_at.desc&limit=300'),
+    sget('asks?select=*&order=created_at.desc&limit=200').catch(()=>[]),
   ]);
 
   EX = exs.map(e => ({ id:e.id, n:e.name, p:e.part, e:e.equip, cardio: e.cardio ? 1 : 0,
@@ -626,6 +627,9 @@ async function boot(){
     kcal:m.kcal||0, carb:m.carb||0, protein:m.protein||0, fat:m.fat||0 }));
 
   closeStale();                                                          // 날짜 지난 기록은 자동 종료
+  D.asks = (aks||[]).map(a => { const [ex,va] = splitV(a.variant_id);
+    return { id:a.id, mid:a.member_id, ex, va, wid:a.workout_id, note:a.note||'',
+      ts:a.created_at, done:!!a.done_at }; });
   loadLive();
   if(D.live && !D.workouts.some(w => w.id === D.live.id)) D.live = null;   // 서버에서 지워진 것
   S.mid = S.mid || (MEMBERS[0] && MEMBERS[0].id);
@@ -997,13 +1001,17 @@ function tabBar(){
        +t('feedback','✉','피드백',u>0)+t('me','◍','내 정보');
 }
 /* 코멘트를 아직 안 단 운동인가 */
+/* 그 수업의 종목 중 코멘트가 하나도 없는 것이 있으면 「쓸 것」 */
 function unseen(w){
   if(!w.done) return false;
-  return !D.cm.some(c => c.mid===w.mid && c.ts && String(c.ts).slice(0,10) >= w.date);
+  return w.items.some(it => it.sets.length && cmOf(w.mid, it.ex, it.va).length === 0);
 }
+function noCmItems(w){ return w.items.filter(it => it.sets.length && cmOf(w.mid, it.ex, it.va).length === 0); }
+function askOf(mid, ex, va){ return (D.asks||[]).filter(a => a.mid===mid && a.ex===ex && a.va===va && !a.done); }
+function openAsks(){ return (D.asks||[]).filter(a => !a.done); }
 function todoCount(){ return D.workouts.filter(w=>w.done && unseen(w)).length; }
 function mealTodo(){ return (D.meals||[]).filter(m=>!m.note); }
-function trTodo(){ return todoCount() + mealTodo().length; }
+function trTodo(){ return todoCount() + mealTodo().length + openAsks().length; }
 function tabBarTr(){
   const n = trTodo();
   const t=(id,ic,nm,bd)=>`<button data-act="ttab:${id}" class="${S.ttab===id?'on':''}">
@@ -1321,7 +1329,21 @@ function sheetExDesc(exid, vk, mid){
             ? `<div class="vbox on"><span class="play">॥</span><span class="cap">재생 중</span></div>`
             : `<button class="vbox" data-act="play:${c.id}"><span class="play">▶</span><span class="cap">영상 보기</span></button>`):''}
         </div>`:''}</div>`).join('') : '<div class="empty">아직 코멘트가 없어요</div>'}
+      ${!tr?(()=>{ const mine = askOf(mid, exid, vk);
+        return mine.length
+          ? `<div class="note" style="border-color:var(--gold-2)">
+              <b style="color:var(--gold)">코멘트를 요청해 두었어요</b>
+              <div>${esc(mine[0].note||'트레이너가 확인하면 여기에 코멘트가 올라옵니다.')}</div>
+              <button class="btn ghost sm" style="margin-top:8px" data-act="unask:${mine[0].id}">요청 취소</button></div>`
+          : `<div class="hr"></div>
+             <span class="lbl">이 종목 봐 달라고 요청하기</span>
+             <textarea data-k="ask:${K}" placeholder="어디가 궁금한지 한 줄 적어 주세요 (안 적어도 돼요)"></textarea>
+             <button class="btn sub sm" data-act="ask:${exid}:${vk}">코멘트 요청하기</button>`;
+      })():''}
       ${tr?`<div class="hr"></div>
+        ${askOf(mid, exid, vk).length?`<div class="note" style="border-color:var(--gold-2)">
+          <b style="color:var(--gold)">회원이 이 종목을 봐 달라고 했어요</b>
+          <div>${esc(askOf(mid, exid, vk)[0].note||'따로 적은 말은 없습니다.')}</div></div>`:''}
         <span class="lbl">코멘트 남기기 — 길이 제한 없어요</span>
         <textarea data-k="cm:${K}" placeholder="지금 본 것을 적으세요"></textarea>
         <div class="chips">
@@ -2534,7 +2556,7 @@ function tFeed(){
   const nm = id => (MEMBERS.find(x=>x.id===id)||{}).n || '?';
   const mode = S.tfeed || 'ex';
   const head = `<div class="seg">
-    <button class="${mode==='ex'?'on':''}" data-act="tfm:ex">운동${todoCount()?' '+todoCount():''}</button>
+    <button class="${mode==='ex'?'on':''}" data-act="tfm:ex">운동${(todoCount()+openAsks().length)?' '+(todoCount()+openAsks().length):''}</button>
     <button class="${mode==='diet'?'on':''}" data-act="tfm:diet">식단${mealTodo().length?' '+mealTodo().length:''}</button></div>`;
 
   /* ── 식단 — 회원별로 묶어서 ── */
@@ -2561,7 +2583,14 @@ function tFeed(){
     .slice().sort((a,b)=> a.mid<b.mid?-1:1);
   const list = dayWs(sel);
   const todo = D.workouts.filter(w=>w.done && unseen(w) && w.items.some(i=>i.sets.length)).sort(byDateDesc);
+  const asks = openAsks();
   return { top: bar('피드백', `<span class="sub">${dateTxt(sel)}</span>`), body: head + `
+    ${asks.length?`<span class="lbl">회원이 봐 달라고 한 것 · ${asks.length}건</span>
+      ${asks.map(a=>`<button class="card gold rowc" data-act="exd:${a.ex}:${a.va}:${a.mid}">
+        <div><div class="nm g">${esc(nm(a.mid))} 회원 · ${esc(exName(a.ex,a.va))}</div>
+        <div class="sm">${esc(a.note||'따로 적은 말은 없습니다')} · ${esc(agoTxt(a.ts))}</div></div>
+        <span class="pill">코멘트 쓰기 ›</span></button>`).join('')}
+      <div class="hr"></div>`:''}
     <div class="wk">
       <div class="wkhd">
         <button data-act="tfmove:-1">‹</button>
@@ -2576,18 +2605,18 @@ function tFeed(){
     </div>
     <span class="lbl">${dateTxt(sel)} 수업 ${list.length?`· ${list.length}명`:''}</span>
     ${list.length ? list.map(w=>{
-      const cn = w.items.reduce((a,i)=> a + cmOf(w.mid,i.ex,i.va).length, 0);
+      const miss = noCmItems(w).length;
       return `<button class="card rowc ${unseen(w)?'gold':''}" data-act="tw:${w.id}">
         <div><div class="nm ${unseen(w)?'g':''}">${esc(nm(w.mid))} 회원</div>
         <div class="sm">${esc(w.kind||'')}${w.title?' · '+esc(w.title):''} · ${durTxt(w.dur)}
           <br>${w.items.filter(i=>i.sets.length).map(i=>esc(exName(i.ex,i.va))).slice(0,3).join(' · ')}${w.items.filter(i=>i.sets.length).length>3?' 외':''}</div></div>
-        <span class="pill${unseen(w)?'':' q'}">${unseen(w)?'코멘트 쓰기':`코멘트 ${cn}`} ›</span></button>`; }).join('')
+        <span class="pill${unseen(w)?'':' q'}">${miss?`코멘트 없는 종목 ${miss}`:'다 남겼어요'} ›</span></button>`; }).join('')
      : '<div class="empty">이 날은 기록된 수업이 없어요</div>'}
     ${todo.length?`<div class="hr"></div>
       <span class="lbl">아직 코멘트 안 단 기록 · ${todo.length}건</span>
       ${todo.slice(0,8).map(w=>`<button class="card rowc" data-act="tw:${w.id}">
         <div><div class="nm">${esc(nm(w.mid))} · ${dateTxt(w.date)}</div>
-        <div class="sm">${esc(w.kind||'')} · ${w.items.filter(i=>i.sets.length).length}종목</div></div>
+        <div class="sm">${esc(w.kind||'')} · 코멘트 없는 종목 ${noCmItems(w).length}개</div></div>
         <span class="pill">쓰기 ›</span></button>`).join('')}`:''}` };
 }
 
@@ -2705,9 +2734,10 @@ function tWrite(){
   return { top: bar('코멘트 남기기', `<span class="sub">${esc(m.n)}</span>`, 'ttab:t_feed'), body:
     `<div class="note">${dateTxt(w.date)} · ${esc(w.kind||'')}${w.title?' · '+esc(w.title):''} · ${durTxt(w.dur)}</div>
      <span class="lbl">종목을 눌러 코멘트를 남기세요</span>`
-    + (done.length ? done.map(it=>{ const n = cmOf(m.id,it.ex,it.va).length;
-        return `<button class="card rowc" data-act="exd:${it.ex}:${it.va}:${m.id}">
-          <div><div class="nm">${esc(exName(it.ex,it.va))}</div>
+    + (done.length ? done.slice().sort((a,b)=> cmOf(m.id,a.ex,a.va).length - cmOf(m.id,b.ex,b.va).length).map(it=>{
+        const n = cmOf(m.id,it.ex,it.va).length, ak = askOf(m.id,it.ex,it.va).length;
+        return `<button class="card rowc ${n?'':'gold'}" data-act="exd:${it.ex}:${it.va}:${m.id}">
+          <div><div class="nm ${n?'':'g'}">${esc(exName(it.ex,it.va))}${ak?' <span class="pill">요청</span>':''}</div>
           <div class="sm">${it.sets.map(x=>setShort(it.ex,x)).join(' · ')}</div></div>
           <span class="pill${n?' q':''}">${n?`코멘트 ${n}`:'코멘트 쓰기'} ›</span></button>`; }).join('')
       : '<div class="empty">세트를 적은 종목이 없어요</div>')
@@ -3142,7 +3172,27 @@ document.addEventListener('click', ev=>{
       if(S.att) delete S.att[K]; if(S.draft) delete S.draft['cm:'+K]; if(ta) ta.value='';
       sv(spost('comments',[{ id:cid, member_id:mid, variant_id:VID(ex,va), trainer:TRAINER,
         body: tx||'영상 보고 자세 확인해 보세요', pics:A.pic?1:0, vids:A.vid?1:0 }]), '코멘트 보내기');
+      const open = askOf(mid, ex, va);
+      if(open.length){
+        open.forEach(a => a.done = true);
+        sv(spatch('asks','id=in.('+open.map(a=>a.id).join(',')+')', { done_at: new Date().toISOString() }), '요청 처리');
+      }
       toast('보냈습니다 · 회원 화면에 바로 떠요'); drawSheet(); return; }
+    case 'ask': {
+      const [ex,va]=rest, K=ex+'|'+va;
+      const ta=document.querySelector('textarea[data-k="ask:'+K+'"]');
+      const note=(ta&&ta.value||'').trim();
+      const id='ask'+Date.now();
+      const last=(D.workouts.find(w=>w.mid===S.mid && w.done && w.items.some(i=>i.ex===ex&&i.va===va))||{}).id||null;
+      D.asks=D.asks||[]; D.asks.unshift({ id, mid:S.mid, ex, va, wid:last, note, ts:new Date().toISOString(), done:false });
+      if(S.draft) delete S.draft['ask:'+K];
+      sv(spost('asks',[{ id, member_id:S.mid, variant_id:VID(ex,va), workout_id:last, note }]), '코멘트 요청');
+      toast('요청했습니다 · 트레이너에게 바로 떠요'); drawSheet(); return; }
+    case 'unask': {
+      const id=rest[0];
+      D.asks=(D.asks||[]).filter(a=>a.id!==id);
+      sv(sdel('asks','id=eq.'+id), '요청 취소');
+      toast('요청을 거뒀어요'); drawSheet(); return; }
     case 'play': S.vplay=rest[0]; drawSheet(); return;
     case 'fbm': S.fbMode=rest[0]; render(); return;
     case 'sub': S.subj=S.mid; go(rest[0]); return;
