@@ -652,7 +652,11 @@ setInterval(()=>{
 
 /* ═══ 그리기 ═══ */
 function render(){
-  document.querySelectorAll('#main textarea[data-k],#main input[data-k]').forEach(t=>{ S.draft=S.draft||{}; S.draft[t.getAttribute('data-k')]=t.value; });
+  /* 임시로 친 값은 같은 화면·같은 회원일 때만 이어 붙인다 (다른 회원에게 새어 나가지 않게) */
+  const dctx = S.screen + '|' + subj();
+  if(S.dctx === dctx)
+    document.querySelectorAll('#main textarea[data-k],#main input[data-k]').forEach(t=>{ S.draft=S.draft||{}; S.draft[t.getAttribute('data-k')]=t.value; });
+  else S.draft = {};
   const V={login:vLogin,home:vHome,routines:vRoutines,routine:vRoutine,start:vStart,pick:vPick,
     workout:vWorkout,summary:vSummary,records:vRecords,record:vRecord,feedback:vFeedback,me:vMe,
     t_members:tMembers,t_member:tMember,t_live:tLive,t_write:tWrite,t_routines:tRoutines,t_redit:tRedit,t_ex:tEx,
@@ -683,6 +687,7 @@ function render(){
     $('#main').prepend(b);
   }
   document.querySelectorAll('#main textarea[data-k],#main input[data-k]').forEach(t=>{ const d=S.draft&&S.draft[t.getAttribute('data-k')]; if(d) t.value=d; });
+  S.dctx = dctx;
   $('#main').scrollTop = v.keepScroll ? $('#main').scrollTop : 0;
 }
 function bar(title, right, back, sub){
