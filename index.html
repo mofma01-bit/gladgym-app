@@ -1740,7 +1740,8 @@ function calcSync(){
   const g = GOALS[subj()] || {}; g.calc = g.calc || {}; g.now = g.now || {}; g.to = g.to || {};
   const gv = k => { const el=document.querySelector('[data-k="'+k+'"]'); return el ? el.value.trim() : undefined; };
   ['age','height','bmr','kcal','freq','burn','rc','rp','rf','pkg','fkg'].forEach(k=>{ const v=gv('pc:'+k); if(v!==undefined) g.calc[k]=v; });
-  const nw = gv('plnow:w'); if(nw!==undefined) g.now.w = nw;
+  const nw = gv('plnow:w');  if(nw!==undefined) g.now.w  = nw;
+  const nf = gv('plnow:fp'); if(nf!==undefined) g.now.fp = nf;
   const tw = gv('plto:w');  if(tw!==undefined) g.to.w  = tw;
   const ae = document.activeElement, ak = (ae && box.contains(ae)) ? ae.getAttribute('data-k') : null;
   const pos = ak ? ae.selectionStart : null;
@@ -1754,6 +1755,7 @@ function vPlanEdit(){
   const mid=subj(), g=GOALS[mid]||(GOALS[mid]={});
   g.now=g.now||{}; g.to=g.to||{}; g.vows=g.vows||[]; g.promises=g.promises||[];
   const c=g.calc||(g.calc={});
+  if(!c.act) c.act = '가벼운활동';
   if(!c.sex||!c.age||!c.height){ const d=D.intake[mid]||{};
     c.sex=c.sex||d.sex||'여'; c.age=c.age||d.age||''; c.height=c.height||String(d.height||'').replace(/[^0-9.]/g,''); }
   const num=(w,k,n)=>`<div class="fld"><span class="fn">${n}</span>
@@ -1765,9 +1767,17 @@ function vPlanEdit(){
     <div class="fld"><span class="fn">운동 목적</span>
       <div class="chips">${['다이어트','근육증가','교정운동','건강','기타목적'].map(x=>
         `<button class="chip ${(g.purpose||[]).includes(x)?'on':''}" data-act="pickn:pg:purpose:${x}">${x}</button>`).join('')}</div></div>
-    <div class="hr"></div><span class="lbl">현재</span>
-    ${num('now','date','날짜')}<div class="grid2">${num('now','w','몸무게 kg')}${num('now','m','근육량 kg')}</div>
-    <div class="grid2">${num('now','f','체지방량 kg')}${num('now','fp','체지방률 %')}</div>
+    <div class="hr"></div><span class="lbl">현재 — 인바디에 찍힌 대로</span>
+    <div class="fld"><span class="fn">성별</span>
+      <div class="chips">${['여','남'].map(x=>`<button class="chip ${c.sex===x?'on':''}" data-act="pc1:sex:${x}">${x}</button>`).join('')}</div></div>
+    <div class="grid2">
+      <div class="fld"><span class="fn">키 cm</span>
+        <input class="search" type="text" inputmode="decimal" data-k="pc:height" value="${esc(c.height||'')}"></div>
+      ${num('now','w','몸무게 kg')}
+    </div>
+    <div class="grid2">${num('now','m','근육량 kg')}${num('now','f','체지방량 kg')}</div>
+    <div class="fld"><span class="fn">체지방률 % — 이게 있으면 기초대사량을 더 정확히 잡습니다</span>
+      <input class="search" type="text" inputmode="decimal" data-k="plnow:fp" value="${esc(g.now.fp!=null?g.now.fp:'')}"></div>
     <span class="lbl">목표</span>
     <div class="grid2">
       <div class="fld"><span class="fn">목표 기간</span>
@@ -1778,20 +1788,16 @@ function vPlanEdit(){
     <div id="godate">${goalLine(g)}</div>
     <div class="hr"></div>
     <span class="lbl">칼로리 계산기</span>
-    <div class="grid2">
-      <div class="fld"><span class="fn">나이</span><input class="search" type="text" data-k="pc:age" value="${esc(c.age||'')}"></div>
-      <div class="fld"><span class="fn">키 (cm)</span><input class="search" type="text" data-k="pc:height" value="${esc(c.height||'')}"></div>
-    </div>
-    <div class="fld"><span class="fn">성별</span>
-      <div class="chips">${['여','남'].map(x=>`<button class="chip ${c.sex===x?'on':''}" data-act="pc1:sex:${x}">${x}</button>`).join('')}</div></div>
     <div class="fld"><span class="fn">생활 활동량 — 운동은 아래에서 따로 셉니다</span>
       <div class="chips">${Object.keys(ACT).map(x=>`<button class="chip ${(c.act||'가벼운활동')===x?'on':''}" data-act="pc1:act:${x}">${esc(x)}</button>`).join('')}</div></div>
     <div class="fld"><span class="fn">주당 운동 횟수</span>
       <div class="chips">${[0,1,2,3,4,5,6,7].map(x=>`<button class="chip ${String(c.freq||0)===String(x)?'on':''}" data-act="pc1:freq:${x}">${x}회</button>`).join('')}</div></div>
     <div class="grid2">
       <div class="fld"><span class="fn">운동 1회 소모 (kcal)</span><input class="search" type="text" data-k="pc:burn" value="${esc(c.burn||'')}" placeholder="300"></div>
-      <div class="fld"><span class="fn">기초대사량 — 인바디 값</span><input class="search" type="text" data-k="pc:bmr" value="${esc(c.bmr||'')}" placeholder="비우면 자동"></div>
+      <div class="fld"><span class="fn">기초대사량 — 인바디 값</span><input class="search" type="text" inputmode="numeric" data-k="pc:bmr" value="${esc(c.bmr||'')}" placeholder="비우면 자동"></div>
     </div>
+    <div class="fld"><span class="fn">나이 — 체지방률을 모를 때만 씁니다</span>
+      <input class="search" type="text" inputmode="numeric" data-k="pc:age" value="${esc(c.age||'')}"></div>
     <div id="calcout">${calcBrief(g,1)}${calcHTML(g,1)}</div>
     <div class="fld"><span class="fn">스스로의 다짐 — 줄바꿈으로 여러 개</span>
       <textarea data-k="pg:vows">${esc((g.vows||[]).join('\n'))}</textarea></div>
@@ -2234,7 +2240,7 @@ function tEx(){
 /* ═══ 동작 ═══ */
 document.addEventListener('input', ev=>{
   const k = ev.target.getAttribute && ev.target.getAttribute('data-k');
-  if(k && (k.startsWith('pc:') || k==='plnow:w' || k==='plto:w')){ calcSync(); }
+  if(k && (k.startsWith('pc:') || k==='plnow:w' || k==='plnow:fp' || k==='plto:w')){ calcSync(); }
   if(k === 'plto:when'){
     const box=document.getElementById('godate');
     if(box) box.innerHTML = goalLine({ to:{ when: ev.target.value.trim() } });
@@ -2335,7 +2341,10 @@ document.addEventListener('click', ev=>{
       g.now=g.now||{}; g.to=g.to||{};
       const gv=k=>{ const el=document.querySelector('[data-k="'+k+'"]'); return el?el.value.trim():''; };
       ['goal','work','diet','kcal','ratio','wk','mo'].forEach(k=>{ g[k]=gv('pg:'+k); });
-      ['date','w','m','f','fp'].forEach(k=>{ g.now[k]=gv('plnow:'+k); });
+      const was = ['w','m','f','fp'].map(k=>String(g.now[k]==null?'':g.now[k]));
+      ['w','m','f','fp'].forEach(k=>{ g.now[k]=gv('plnow:'+k); });
+      const now2 = ['w','m','f','fp'].map(k=>String(g.now[k]==null?'':g.now[k]));
+      if(!g.now.date || was.join('|')!==now2.join('|')) g.now.date = TODAY;   /* 잰 날 */
       g.to.w = gv('plto:w');
       g.to.when = gv('plto:when');
       g.to.date = goalDate(g.to.when);
