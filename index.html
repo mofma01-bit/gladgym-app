@@ -1542,13 +1542,32 @@ const FAT_KCAL = 7700;   /* 지방 1kg */
 
 function nnum(v){ const n=parseFloat(String(v==null?'':v).replace(/[^0-9.\-]/g,'')); return isFinite(n)?n:0; }
 
+const FOODS = [
+  {n:'밥 한 공기', k:300}, {n:'닭가슴살 100g', k:140}, {n:'계란 1개', k:78},
+  {n:'고구마 중간 1개', k:130}, {n:'아몬드 20알', k:139}, {n:'바나나 1개', k:105},
+];
+function foodTxt(kcal){
+  if(!kcal || kcal<=0) return '';
+  const f = FOODS[0];
+  const n = Math.round(kcal / f.k * 10) / 10;
+  return `${f.n} ${n}개쯤`;
+}
+
 function calcOf(g){
   const c = g.calc || (g.calc = {});
   const w  = nnum(g.now && g.now.w), gw = nnum(g.to && g.to.w);
+  const fp = nnum(g.now && g.now.fp);                 /* 체지방률 % */
   const h  = nnum(c.height), age = nnum(c.age), male = (c.sex === '남');
-  let bmr  = nnum(c.bmr);
+  let bmr  = nnum(c.bmr), how = '인바디 값';
   const auto = !bmr;
-  if(auto && w && h && age) bmr = Math.round(10*w + 6.25*h - 5*age + (male ? 5 : -161));
+  if(auto && w && fp > 0 && fp < 60){                 /* 체지방률을 알면 이게 더 정확 */
+    const lbm = w * (1 - fp/100);
+    bmr = Math.round(370 + 21.6 * lbm);
+    how = '체지방률 기준';
+  } else if(auto && w && h && age){
+    bmr = Math.round(10*w + 6.25*h - 5*age + (male ? 5 : -161));
+    how = '키·몸무게 기준';
+  } else if(auto){ how = ''; }
   const k    = ACT[c.act] != null ? ACT[c.act] : 0.375;
   const actC = Math.round(bmr * k);
   const keep = bmr + actC;
@@ -1560,9 +1579,21 @@ function calcOf(g){
   if(kcalAuto) kcal = Math.max(male?1500:1200, Math.round((total - 500)/10)*10);
   const day  = total - kcal;
   const week = day*7, month = day*30;
-  const rc = nnum(c.rc)||50, rp = nnum(c.rp)||25, rf = nnum(c.rf)||25;
-  const kk = { c:Math.round(kcal*rc/100), p:Math.round(kcal*rp/100), f:Math.round(kcal*rf/100) };
-  const gg = { c:Math.round(kk.c/4), p:Math.round(kk.p/4), f:Math.round(kk.f/9) };
+  let rc = nnum(c.rc)||50, rp = nnum(c.rp)||25, rf = nnum(c.rf)||25;
+  let kk, gg;
+  if(c.macro === 'kg' && w){                 /* 체중 기준 — 단백질부터 잡는다 */
+    const pg = nnum(c.pkg) || 1.8, fg = nnum(c.fkg) || 0.9;
+    const P = Math.round(w * pg), F = Math.round(w * fg);
+    const kP = P*4, kF = F*9;
+    const kC = Math.max(0, kcal - kP - kF);
+    const C = Math.round(kC/4);
+    gg = { c:C, p:P, f:F };
+    kk = { c:Math.round(kC), p:kP, f:kF };
+    rc = kcal?Math.round(kC/kcal*100):0; rp = kcal?Math.round(kP/kcal*100):0; rf = kcal?Math.round(kF/kcal*100):0;
+  } else {
+    kk = { c:Math.round(kcal*rc/100), p:Math.round(kcal*rp/100), f:Math.round(kcal*rf/100) };
+    gg = { c:Math.round(kk.c/4), p:Math.round(kk.p/4), f:Math.round(kk.f/9) };
+  }
   const need = (w - gw) * FAT_KCAL;
   const days = (day>0 && need>0) ? Math.ceil(need/day) : null;
   const bmi = (w && h) ? Math.round(w / Math.pow(h/100,2) * 10)/10 : 0;
@@ -1577,9 +1608,23 @@ function calcOf(g){
   if(wkPct > 1) warn.push('한 주에 체중의 1%가 넘게 빠지는 속도입니다 — 조금 천천히 잡으시죠');
   if(perKg && perKg < 1.6) warn.push(`단백질이 체중 1kg당 ${perKg}g입니다 — 근육을 지키려면 1.6g 이상을 권합니다`);
   if(day <= 0 && kcal) warn.push('지금 설정으로는 살이 빠지지 않습니다 — 칼로리를 낮추거나 운동을 늘려 보세요');
-  return { w, gw, bmr, auto, k, actC, keep, exDay, total, kcal, kcalAuto, day, week, month,
+  return { w, gw, fp, bmr, auto, how, k, actC, keep, exDay, total, kcal, kcalAuto, day, week, month,
     wkKg: week/FAT_KCAL, moKg: month/FAT_KCAL, rc, rp, rf, kk, gg, need, days, freq, burn,
     bmi, bmiTo, perKg, water, wkPct, warn };
+}
+
+function calcBrief(g){
+  const r = calcOf(g);
+  if(!r.bmr) return '';
+  const kg = v => (Math.round(v*100)/100).toFixed(1);
+  return `<div class="calc" style="gap:12px">
+    <div class="crow" style="border:none;padding:0"><span class="ck" style="font-size:14px;font-weight:700;color:var(--cream)">회원님께 이렇게 설명합니다</span></div>
+    <div class="krow"><span class="k">① 하루에 쓰는 양</span><span class="v">${r.total.toLocaleString()} kcal</span></div>
+    <div class="krow"><span class="k">② 이만큼 드시면</span><span class="v" style="color:var(--gold)">${r.kcal.toLocaleString()} kcal</span></div>
+    <div class="krow"><span class="k">③ 한 달에</span><span class="v" style="color:var(--gold)">${kg(r.moKg)} kg</span></div>
+    <div class="note">차이 <b>${r.day>0?r.day:0}kcal</b> 는 ${esc(foodTxt(r.day>0?r.day:0))} 입니다.
+      하루 그만큼만 덜 드시면 한 달에 ${kg(r.moKg)}kg 이 빠집니다.</div>
+  </div>`;
 }
 
 function calcHTML(g){
@@ -1587,7 +1632,7 @@ function calcHTML(g){
   const kg = v => (Math.round(v*100)/100).toFixed(2);
   const per = r.days ? (r.days>=60 ? `약 ${Math.round(r.days/30)}개월` : `약 ${Math.ceil(r.days/7)}주`) : '—';
   return `<div class="calc">
-    <div class="crow"><span class="ck">기초대사량${r.auto?' (자동 계산)':' (인바디 값)'}</span>
+    <div class="crow"><span class="ck">기초대사량 <span style="color:var(--gold-2)">${esc(r.how||'')}</span></span>
       <span class="cv">${r.bmr||'—'}<span class="cs"> kcal</span></span></div>
     <div class="crow"><span class="ck">활동대사량 · ${esc(g.calc.act||'가벼운활동')} ×${r.k}</span>
       <span class="cv">${r.actC||'—'}<span class="cs"> kcal</span></span></div>
@@ -1596,9 +1641,9 @@ function calcHTML(g){
     ${r.exDay?`<div class="crow"><span class="ck">운동으로 더 쓰는 값 · 주 ${r.freq}회</span>
       <span class="cv">+${r.exDay}<span class="cs"> kcal / 하루평균</span></span></div>`:''}
     <div class="crow"><span class="ck">권장 섭취 칼로리${r.kcalAuto?' (자동 제안)':''}</span>
-      <span class="cv g">${r.kcal||'—'}<span class="cs"> kcal</span></span></div>
+      <span class="cv g">${r.kcal||'—'}<span class="cs"> kcal · ${esc(foodTxt(r.kcal))}</span></span></div>
     <div class="crow"><span class="ck">하루 감량치</span>
-      <span class="cv">${r.day>0?r.day:0}<span class="cs"> kcal</span></span></div>
+      <span class="cv">${r.day>0?r.day:0}<span class="cs"> kcal · ${esc(foodTxt(r.day>0?r.day:0))}</span></span></div>
     <div class="crow"><span class="ck">1주일 예상</span>
       <span class="cv">${r.week>0?r.week.toLocaleString():0}<span class="cs"> kcal · ${kg(r.wkKg)}kg</span></span></div>
     <div class="crow"><span class="ck">한 달 예상</span>
@@ -1628,10 +1673,10 @@ function calcSync(){
   if(!box) return;
   const g = GOALS[subj()] || {}; g.calc = g.calc || {}; g.now = g.now || {}; g.to = g.to || {};
   const gv = k => { const el=document.querySelector('[data-k="'+k+'"]'); return el ? el.value.trim() : undefined; };
-  ['age','height','bmr','kcal','freq','burn','rc','rp','rf'].forEach(k=>{ const v=gv('pc:'+k); if(v!==undefined) g.calc[k]=v; });
+  ['age','height','bmr','kcal','freq','burn','rc','rp','rf','pkg','fkg'].forEach(k=>{ const v=gv('pc:'+k); if(v!==undefined) g.calc[k]=v; });
   const nw = gv('plnow:w'); if(nw!==undefined) g.now.w = nw;
   const tw = gv('plto:w');  if(tw!==undefined) g.to.w  = tw;
-  box.innerHTML = calcHTML(g);
+  box.innerHTML = calcBrief(g) + calcHTML(g);
 }
 
 /* ── 운동계획 편집 ── */
@@ -1664,8 +1709,8 @@ function vPlanEdit(){
     </div>
     <div class="fld"><span class="fn">성별</span>
       <div class="chips">${['여','남'].map(x=>`<button class="chip ${c.sex===x?'on':''}" data-act="pc1:sex:${x}">${x}</button>`).join('')}</div></div>
-    <div class="fld"><span class="fn">활동량</span>
-      <div class="chips">${Object.keys(ACT).map(x=>`<button class="chip ${(c.act||'가벼운활동')===x?'on':''}" data-act="pc1:act:${x}">${esc(x)} ×${ACT[x]}</button>`).join('')}</div></div>
+    <div class="fld"><span class="fn">생활 활동량 — 운동은 아래에서 따로 셉니다</span>
+      <div class="chips">${Object.keys(ACT).map(x=>`<button class="chip ${(c.act||'가벼운활동')===x?'on':''}" data-act="pc1:act:${x}">${esc(x)}</button>`).join('')}</div></div>
     <div class="fld"><span class="fn">주당 운동 횟수</span>
       <div class="chips">${[0,1,2,3,4,5,6,7].map(x=>`<button class="chip ${String(c.freq||0)===String(x)?'on':''}" data-act="pc1:freq:${x}">${x}회</button>`).join('')}</div></div>
     <div class="grid2">
@@ -1674,12 +1719,23 @@ function vPlanEdit(){
     </div>
     <div class="fld"><span class="fn">권장 섭취 칼로리 — 비우면 자동으로 잡습니다</span>
       <input class="search" type="text" data-k="pc:kcal" value="${esc(c.kcal||'')}" placeholder="자동"></div>
-    <div class="grid2" style="grid-template-columns:1fr 1fr 1fr">
-      <div class="fld"><span class="fn">탄수 %</span><input class="search" type="text" data-k="pc:rc" value="${esc(c.rc||'')}" placeholder="50"></div>
-      <div class="fld"><span class="fn">단백 %</span><input class="search" type="text" data-k="pc:rp" value="${esc(c.rp||'')}" placeholder="25"></div>
-      <div class="fld"><span class="fn">지방 %</span><input class="search" type="text" data-k="pc:rf" value="${esc(c.rf||'')}" placeholder="25"></div>
-    </div>
-    <div id="calcout">${calcHTML(g)}</div>
+    <div class="fld"><span class="fn">탄단지 정하는 방식</span>
+      <div class="chips">
+        <button class="chip ${c.macro!=='kg'?'on':''}" data-act="pc1:macro:pct">비율로 (50/25/25)</button>
+        <button class="chip ${c.macro==='kg'?'on':''}" data-act="pc1:macro:kg">체중 기준 (권장)</button>
+      </div></div>
+    ${c.macro==='kg'
+      ? `<div class="grid2">
+          <div class="fld"><span class="fn">단백질 g/kg</span><input class="search" type="text" data-k="pc:pkg" value="${esc(c.pkg||'')}" placeholder="1.8"></div>
+          <div class="fld"><span class="fn">지방 g/kg</span><input class="search" type="text" data-k="pc:fkg" value="${esc(c.fkg||'')}" placeholder="0.9"></div>
+        </div>
+        <div class="note">단백질과 지방을 <b>몸무게로 먼저</b> 잡고 남은 것을 탄수로 채웁니다. 칼로리를 낮춰도 단백질이 안 깎여서 근육을 지킵니다.</div>`
+      : `<div class="grid2" style="grid-template-columns:1fr 1fr 1fr">
+          <div class="fld"><span class="fn">탄수 %</span><input class="search" type="text" data-k="pc:rc" value="${esc(c.rc||'')}" placeholder="50"></div>
+          <div class="fld"><span class="fn">단백 %</span><input class="search" type="text" data-k="pc:rp" value="${esc(c.rp||'')}" placeholder="25"></div>
+          <div class="fld"><span class="fn">지방 %</span><input class="search" type="text" data-k="pc:rf" value="${esc(c.rf||'')}" placeholder="25"></div>
+        </div>`}
+    <div id="calcout">${calcBrief(g)}${calcHTML(g)}</div>
     <div class="fld"><span class="fn">스스로의 다짐 — 줄바꿈으로 여러 개</span>
       <textarea data-k="pg:vows">${esc((g.vows||[]).join('\n'))}</textarea></div>
     <div class="fld"><span class="fn">회원님, 이건 꼭 약속해요</span>
@@ -1705,7 +1761,7 @@ function vPlan(){
       <div class="sm">${esc(g.now.date||'—')} → ${esc(g.to.date||'—')}</div>
       ${cmp('몸무게','w')}${cmp('근육량','m')}${cmp('체지방량','f')}${cmp('체지방률','fp')}</div>
     <span class="lbl">맞춤 칼로리 · 예상 감량치</span>
-    ${(g.calc && (g.now.w||g.calc.bmr)) ? calcHTML(g) : ''}
+    ${(g.calc && (g.now.w||g.calc.bmr)) ? calcBrief(g)+calcHTML(g) : ''}
     <span class="lbl" style="opacity:.6">직접 적어 둔 값</span>
     <div class="grid2">
       <div class="tile"><span class="k">하루 칼로리</span><span class="v">${g.kcal||'—'}<small> kcal</small></span></div>
@@ -2210,7 +2266,7 @@ document.addEventListener('click', ev=>{
       ['goal','work','diet','kcal','ratio','wk','mo'].forEach(k=>{ g[k]=gv('pg:'+k); });
       ['date','w','m','f','fp'].forEach(k=>{ g.now[k]=gv('plnow:'+k); g.to[k]=gv('plto:'+k); });
       g.calc = g.calc || {};
-      ['age','height','bmr','kcal','freq','burn','rc','rp','rf'].forEach(k=>{ const el=document.querySelector('[data-k="pc:'+k+'"]'); if(el) g.calc[k]=el.value.trim(); });
+      ['age','height','bmr','kcal','freq','burn','rc','rp','rf','pkg','fkg'].forEach(k=>{ const el=document.querySelector('[data-k="pc:'+k+'"]'); if(el) g.calc[k]=el.value.trim(); });
       const rr = calcOf(g);
       g.kcal = String(rr.kcal||''); g.ratio = `${rr.rc} / ${rr.rp} / ${rr.rf}`;
       g.wk = (Math.round(rr.wkKg*100)/100)+'kg'; g.mo = (Math.round(rr.moKg*100)/100)+'kg';
