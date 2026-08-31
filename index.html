@@ -1714,7 +1714,7 @@ function calcOf(g){
   else if(kcal && bmr && kcal < bmr) warn.push('권장 칼로리가 기초대사량보다 낮습니다 — 오래 끌면 근육이 빠집니다');
   if(wkPct > wkMax) warn.push(`한 주에 체중의 ${Math.round(wkPct*10)/10}%가 빠지는 속도입니다 (가이드 ${wkMax}%)`);
   if(dayNeed && dayNeed > total - floor)
-    warn.push(`이 날짜에 맞추려면 하루 ${dayNeed.toLocaleString()}kcal 를 줄여야 합니다 — 먹을 수 있는 양을 넘습니다`);
+    warn.push(`이 날짜에 맞추려면 하루 ${dayNeed.toLocaleString()}kcal 를 줄여야 하는데, 최소 섭취 ${floor.toLocaleString()}kcal 를 지키면 ${Math.max(0,total-floor).toLocaleString()}kcal 까지가 한계입니다`);
   if(perKg && perKg < 1.0) warn.push(`단백질이 체중 1kg당 ${perKg}g입니다 — 근육을 지키려면 1.2g 이상을 권합니다`);
   if(day <= 0 && kcal && gw && w > gw) warn.push('지금 설정으로는 살이 빠지지 않습니다 — 섭취를 낮추거나 활동량을 올려 보세요');
   const tough = !!(warn.length && safeDate && daysTo && safeDays > daysTo);
