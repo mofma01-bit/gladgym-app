@@ -192,6 +192,29 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .btn:active{opacity:.72}
 .btn[disabled]{opacity:.3}
 .btn.sm{padding:10px 8px;font-size:13.5px}
+/* 아래 큰 단추 — 숨 쉬듯 천천히 */
+@keyframes ggBreath{
+  0%,100%{ box-shadow:0 0 0 0 rgba(157,206,220,0), 0 2px 10px rgba(0,0,0,.35) }
+  50%    { box-shadow:0 0 0 7px rgba(157,206,220,.12), 0 6px 20px rgba(157,206,220,.28) }
+}
+@keyframes ggShine{ 0%{transform:translateX(-140%) skewX(-18deg)} 60%,100%{transform:translateX(320%) skewX(-18deg)} }
+@keyframes ggDot{ 0%,100%{opacity:.35;transform:scale(.82)} 50%{opacity:1;transform:scale(1)} }
+@keyframes ggUp{ from{opacity:0;transform:translateY(9px)} to{opacity:1;transform:translateY(0)} }
+.btn.go{position:relative;overflow:hidden}
+.btn.go::after{content:'';position:absolute;top:-30%;bottom:-30%;width:34%;pointer-events:none;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.42),transparent);
+  animation:ggShine 3.6s ease-in-out infinite}
+.btn.go.live::after{animation-duration:2.2s}
+.btn.go .gdot{width:8px;height:8px;border-radius:50%;background:currentColor;
+  animation:ggDot 1.2s ease-in-out infinite;flex:none}
+.btn.go.calm::after{display:none}
+#foot > .btn.go{animation:ggUp .42s ease-out both, ggBreath 2.8s ease-in-out .42s infinite}
+#foot > .btn.go.live{animation:ggUp .42s ease-out both, ggBreath 1.6s ease-in-out .42s infinite}
+#foot > .btn.go.calm{animation:ggUp .42s ease-out both}
+@media (prefers-reduced-motion:reduce){
+  #foot > .btn.go{animation:none!important}
+  .btn.go::after,.btn.go .gdot{animation:none!important;display:none}
+}
 
 .set{background:var(--dark-2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;
   display:flex;align-items:center;gap:8px;width:100%;text-align:left}
@@ -514,7 +537,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '54';
+const BUILD = '55';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1165,7 +1188,12 @@ function vHome(){
     <button class="card rowc plan" data-act="tab:records">
       <div><div class="nm">기록 분석</div>
       <div class="sm">증량 그래프 · 운동 균형 · 지난 기록</div></div><span class="rt">›</span></button>`,
-    foot:`<button class="btn main" data-act="${hero.act}">${hero.ht}</button>` };
+    foot:(()=>{
+      const doneToday = D.workouts.some(w=>w.mid===S.mid && w.done && w.date===TODAY && w.items.some(i=>i.sets.length));
+      const cls = 'btn main go' + (lw?' live':'') + (!lw && doneToday?' calm':'');
+      const txt = lw ? '운동기록 계속하기' : (doneToday ? '오늘 하나 더 기록하기' : hero.ht);
+      return `<button class="${cls}" data-act="${hero.act}">${lw?'<span class="gdot"></span>':''}${txt}</button>`;
+    })() };
 }
 function recRow(w){
   const parts=[...new Set(w.items.map(i=>exOf(i.ex).p))].join(' · ');
