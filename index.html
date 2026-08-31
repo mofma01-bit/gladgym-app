@@ -514,7 +514,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '53';
+const BUILD = '54';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -770,7 +770,8 @@ function dayStat(mid, date){
   const ms = (D.meals||[]).filter(m => m.mid===mid && m.date===date);
   const kcal = ms.reduce((a,m) => a + (Number(m.kcal)||0), 0);
   let goal = 0; try{ const rr = calcOf(GOALS[mid]||{}); goal = rr.bmr ? rr.kcal : 0; }catch(e){}
-  return { ws, dur, ex:exs.size, kcal, shots:ms.length, goal,
+  const vol = ws.reduce((a,w)=> a + totalKg(w), 0);
+  return { ws, dur, ex:exs.size, vol, kcal, shots:ms.length, goal,
     pw: Math.min(1, dur/(45*60)), pk: goal ? Math.min(1, kcal/goal) : 0 };
 }
 /* 두 겹 고리 — 바깥 운동 · 안쪽 식단 */
@@ -791,18 +792,25 @@ function dayDetail(mid, date){
     ? `<span class="lbl">${dateTxt(date)} 기록</span>
        <div class="empty">시작만 하고 세트를 적지 않은 기록 ${all.length}건</div>`
     : '';
-  return `<span class="lbl">${dateTxt(date)} 기록</span>` + ws.map(w => `
+  const dayVol = ws.reduce((a,w)=> a + totalKg(w), 0);
+  const dayCar = ws.reduce((a,w)=> a + w.items.reduce((b,it)=>
+    b + (exOf(it.ex)&&exOf(it.ex).cardio ? it.sets.reduce((c,x)=>c+(+x.reps||0),0) : 0), 0), 0);
+  return `<span class="lbl">${dateTxt(date)} 기록${dayVol?` · 총 ${dayVol.toLocaleString()}kg`:''}${dayCar?` · 유산소 ${dayCar}분`:''}</span>`
+   + ws.map(w => { const vol = totalKg(w); return `
     <button class="card" data-act="rec:${w.id}">
       <div class="dhd">
         <span class="t">${w.kind?esc(w.kind):'운동'}${w.rid&&rOf(w.rid)?` · 루틴 ${rOf(w.rid).no} ${esc(rOf(w.rid).n)}`:''}</span>
-        <span class="r">${durTxt(w.dur)} ›</span></div>
+        <span class="r">${vol?`${vol.toLocaleString()}kg · `:''}${durTxt(w.dur)} ›</span></div>
       ${w.items.filter(i => i.sets.length).map(it => `
         <div class="setrow">
           <span class="e">${esc(exName(it.ex,it.va))}</span>
           <span class="n">${it.sets.length}세트</span>
           <span class="s">${it.sets.map(x => setShort(it.ex,x)).join(' · ')}</span>
         </div>`).join('')}
-    </button>`).join('');
+      ${vol?`<div class="setrow" style="border-top:1px solid var(--gold-2)">
+        <span class="e" style="color:var(--sub)">이 운동 총 볼륨</span>
+        <span class="s" style="font-size:13.5px">${vol.toLocaleString()} kg</span></div>`:''}
+    </button>`; }).join('');
 }
 
 /* ── 분석 ── */
@@ -935,9 +943,10 @@ function weekStrip(mid){
         <span class="dn ${i===0?'sun':''}">${DOW[i]}</span>
         ${ring(t.pw, t.pk)}
         <span class="num">${+d.slice(8)}</span></button>`; }).join('')}</div>
-    <div class="dsum">
+    <div class="dsum" style="grid-template-columns:repeat(4,1fr)">
       <div><span class="k">운동시간</span><span class="v">${st.dur?Math.max(1,Math.round(st.dur/60)):0}<small> 분</small></span></div>
-      <div><span class="k">운동종목</span><span class="v">${st.ex}<small> 개</small></span></div>
+      <div><span class="k">종목</span><span class="v">${st.ex}<small> 개</small></span></div>
+      <div><span class="k">총 볼륨</span><span class="v">${st.vol ? (st.vol>=1000 ? (st.vol/1000).toFixed(1) : st.vol) : 0}<small> ${st.vol>=1000?'톤':'kg'}</small></span></div>
       <div><span class="k">식단</span><span class="v">${st.kcal?st.kcal.toLocaleString():(st.shots?'—':0)}<small> kcal</small></span></div>
     </div>
   </div>`;
