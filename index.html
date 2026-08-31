@@ -256,8 +256,16 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .btn.ghost{background:var(--dark-2);color:var(--sub);border:1px solid var(--line)}
 .btn.kakao{background:#FEE500;color:#1c1a17}
 .btn.blue{background:#4d7f96;color:#f2fafd}
-.seg.big2{padding:4px;margin-bottom:4px}
-.seg.big2 button{font-size:14.5px;font-weight:800;padding:11px 0;letter-spacing:-.02em}
+.anatab{display:grid;grid-template-columns:1fr 1fr;gap:9px;flex:0 0 auto;margin-bottom:3px}
+.anatab button{padding:14px 6px 13px;border-radius:14px;font-size:15.5px;font-weight:800;
+  letter-spacing:-.03em;border:1px solid var(--line);background:var(--dark-2);color:#8b8379;
+  display:flex;flex-direction:column;align-items:center;gap:5px;line-height:1}
+.anatab button .ic3{display:block;opacity:.55}
+.anatab button.on .ic3{opacity:1}
+.anatab button.ex.on{background:linear-gradient(140deg,#7d5f38 0%,#5e4128 100%);
+  border-color:#a2814f;color:#fdf3e3;box-shadow:0 4px 13px rgba(125,95,56,.4)}
+.anatab button.bd.on{background:linear-gradient(140deg,#4d7f96 0%,#35586a 100%);
+  border-color:#7fb0c6;color:#f2fafd;box-shadow:0 4px 13px rgba(77,127,150,.4)}
 .bcmp{display:grid;grid-template-columns:1fr 1fr;gap:7px;flex:0 0 auto}
 .bcmp .cel{background:#0e0e0d;border:1px solid var(--line);border-radius:12px;overflow:hidden;
   display:flex;flex-direction:column}
@@ -667,7 +675,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '74';
+const BUILD = '75';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1724,9 +1732,11 @@ function vRecords(){
   const unit = gm==='vol' ? 'kg' : gm==='kcal' ? 'kcal' : '분';
 
   const at = S.anaT || 'ex';
-  const head = `<div class="seg big2">
-    <button class="${at==='ex'?'on':''}" data-act="anat:ex">운동분석</button>
-    <button class="${at==='body'?'on':''}" data-act="anat:body">체형분석</button></div>`;
+  const head = `<div class="anatab">
+    <button class="ex ${at==='ex'?'on':''}" data-act="anat:ex">
+      <span class="ic3">${IC_DUMB}</span>운동분석</button>
+    <button class="bd ${at==='body'?'on':''}" data-act="anat:body">
+      <span class="ic3">${IC_BODY}</span>체형분석</button></div>`;
   const topbar = bar('분석', `<span class="sub">${S.who==='tr'?esc((MEMBERS.find(x=>x.id===mid)||{}).n||'')+' · ':''}${at==='body'?'체형':esc(per)}</span>`,
       S.who==='tr' ? 'tm:'+mid : null);
   const tabn = S.who==='tr' ? 0 : 1;
@@ -2228,6 +2238,13 @@ function vDiet(){
       <br>음식 정보 출처 · <b>식품영양성분 데이터베이스</b> (식품의약품안전처)</div>` };
 }
 
+const IC_DUMB = `<svg viewBox="0 0 28 20" width="26" height="19" aria-hidden="true" fill="none"
+  stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+  <path d="M3 6v8M7 3.5v13M21 3.5v13M25 6v8M7 10h14"/></svg>`;
+const IC_BODY = `<svg viewBox="0 0 20 22" width="19" height="21" aria-hidden="true" fill="none"
+  stroke="currentColor" stroke-width="2" stroke-linecap="round">
+  <circle cx="10" cy="3.4" r="2.6" fill="currentColor" stroke="none"/>
+  <path d="M10 7v7M4.5 9h11M6.5 20l3-6M13.5 20l-3-6"/></svg>`;
 const SALAD_MINI = `<svg viewBox="0 0 40 34" width="34" height="29" aria-hidden="true">
   <ellipse cx="14" cy="13" rx="7.5" ry="5" fill="#7f9463" transform="rotate(-18 14 13)"/>
   <ellipse cx="26" cy="12.5" rx="7" ry="4.6" fill="#9aae7f" transform="rotate(16 26 12.5)"/>
@@ -3121,14 +3138,17 @@ function logNear(mid, date){
 
 /* ① 몸 그림 — 체크된 항목을 몸의 제자리에 찍습니다 (뒤에서 본 모습) */
 const BODY_MAP = {
-  c2:{y:30}, c3:{y:33,dx:9,lr:1}, c1:{y:36}, c4:{y:39},
-  s4:{y:42,dx:19,lr:1}, s1:{y:45,dx:17,both:1}, s2:{y:49,dx:17,lr:1},
-  s3:{y:53,dx:17,lr:1}, s5:{y:57,dx:18,lr:1}, s6:{y:61,dx:18,both:1},
-  t3:{y:66,dx:10,lr:1}, t1:{y:71}, t2:{y:77,dx:10,lr:1}, t4:{y:84},
-  l6:{y:97,dx:15,lr:1}, l1:{y:101}, l2:{y:105,dx:12,both:1}, l7:{y:108,dx:16,lr:1},
-  l5:{y:113,dx:9,both:1}, l3:{y:140,dx:10,both:1}, l4:{y:151,dx:11,both:1},
-  f1:{y:188,dx:10,both:1},
+  c2:{y:21}, c3:{y:25,dx:7,lr:1}, c1:{y:29}, c4:{y:34},
+  s5:{y:36,dx:14,lr:1}, s4:{y:40,dx:14,lr:1}, s1:{y:44,dx:15,both:1},
+  s2:{y:48,dx:16,lr:1}, s3:{y:52,dx:17,lr:1}, s6:{y:63,dx:20,both:1},
+  t3:{y:47,dx:6,lr:1}, t1:{y:52}, t2:{y:60,dx:6,lr:1}, t4:{y:78},
+  l6:{y:90,dx:11,lr:1}, l1:{y:97}, l2:{y:97,dx:10,both:1}, l7:{y:104,dx:12,lr:1},
+  l5:{y:110,dx:8,both:1}, l3:{y:140,dx:11,both:1}, l4:{y:150,dx:12,both:1},
+  f1:{y:183,dx:12,both:1},
 };
+/* 관절 자리 — 뼈대와 점이 같은 자리를 쓰도록 한곳에 적어 둡니다 */
+const JOINTS = [[50,29],[36,40],[64,40],[50,52],[30,63],[70,63],[28,86],[72,86],
+  [50,78],[40,97],[60,97],[39,140],[61,140],[38,181],[62,181]];
 function bodyFig(checks){
   const dots = [];
   BODY_TESTS.forEach(t => {
@@ -3138,23 +3158,29 @@ function bodyFig(checks){
     else if(m.lr) dots.push([v==='a' ? 50-dx : 50+dx, m.y]);
     else dots.push([50, m.y]);
   });
-  return `<svg viewBox="0 0 100 214" style="height:286px;width:auto;display:block;margin:0 auto">
-    <g fill="#39332d" stroke="#544a40" stroke-width="0.8" stroke-linejoin="round">
-      <circle cx="50" cy="17" r="11"/>
-      <path d="M45.5 26 h9 v8 h-9 z"/>
-      <path d="M50 32 C40 32 33.5 37 31.5 47 L29.5 70 C29.5 82 32.5 92 36.5 102 L36.5 113 L63.5 113 L63.5 102 C67.5 92 70.5 82 70.5 70 L68.5 47 C66.5 37 60 32 50 32 Z"/>
-      <path d="M31.5 47 C25 50 22 60 21 72 L20 93 C20 97 23.5 97.5 24.5 94.5 L26.5 74 L32.5 55 Z"/>
-      <path d="M68.5 47 C75 50 78 60 79 72 L80 93 C80 97 76.5 97.5 75.5 94.5 L73.5 74 L67.5 55 Z"/>
-      <path d="M37 113 L36 146 L35.2 180 L34.5 192 L45 192 L45.4 180 L47 146 L48.6 113 Z"/>
-      <path d="M63 113 L64 146 L64.8 180 L65.5 192 L55 192 L54.6 180 L53 146 L51.4 113 Z"/>
-      <ellipse cx="39" cy="196" rx="6" ry="4"/><ellipse cx="61" cy="196" rx="6" ry="4"/>
+  return `<svg viewBox="0 0 100 200" style="height:300px;width:auto;display:block;margin:0 auto">
+    <line x1="50" y1="4" x2="50" y2="197" stroke="#37312b" stroke-width="0.7" stroke-dasharray="2.5 3.5"/>
+    <g stroke="#4b433a" stroke-width="6.4" stroke-linecap="round" fill="none">
+      <path d="M50 29 L50 97"/>
+      <path d="M36 40 L64 40"/>
+      <path d="M40 97 L60 97"/>
+      <path d="M36 40 L30 63 L28 86"/>
+      <path d="M64 40 L70 63 L72 86"/>
+      <path d="M40 97 L39 140 L38 181"/>
+      <path d="M60 97 L61 140 L62 181"/>
     </g>
-    <line x1="50" y1="8" x2="50" y2="206" stroke="#3b352f" stroke-width="0.6" stroke-dasharray="2 3"/>
-    <text x="8" y="10" font-size="8.5" font-weight="800" fill="#75706a">L 왼쪽</text>
-    <text x="66" y="10" font-size="8.5" font-weight="800" fill="#75706a">오른쪽 R</text>
-    ${dots.map(([x,y])=>`<circle cx="${x}" cy="${y}" r="6.6" fill="var(--gold)" opacity=".15"/>
-      <circle cx="${x}" cy="${y}" r="3.2" fill="var(--gold)"/>`).join('')}
-  </svg>`;
+    <g stroke="#4b433a" stroke-width="5" stroke-linecap="round" fill="none">
+      <path d="M38 181 L31 190"/><path d="M62 181 L69 190"/>
+      <path d="M28 86 L26 93"/><path d="M72 86 L74 93"/>
+    </g>
+    <circle cx="50" cy="15" r="9.6" fill="#332e29" stroke="#6a6055" stroke-width="1.7"/>
+    ${JOINTS.map(([x,y])=>`<circle cx="${x}" cy="${y}" r="4.6" fill="#6f6558" stroke="#928576" stroke-width="1"/>`).join('')}
+    <text x="6" y="9" font-size="8.5" font-weight="800" fill="#75706a">L 왼쪽</text>
+    <text x="68" y="9" font-size="8.5" font-weight="800" fill="#75706a">오른쪽 R</text>
+    ${dots.map(([x,y])=>`<circle cx="${x}" cy="${y}" r="8" fill="var(--gold)" opacity=".17"/>
+      <circle cx="${x}" cy="${y}" r="3.6" fill="var(--gold)" stroke="#241d12" stroke-width="0.7"/>`).join('')}
+  </svg>
+  <div class="sm" style="text-align:center;color:#75706a;margin-top:2px">뒤에서 본 관절 모형 — 체크리스트의 L / R 그대로입니다</div>`;
 }
 function figList(checks){
   const on = BODY_TESTS.filter(t => (checks||{})[t.k]);
