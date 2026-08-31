@@ -293,6 +293,35 @@ textarea{min-height:92px;resize:vertical}
 textarea.tall{min-height:170px}
 textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 
+.wk{background:var(--dark-2);border:1px solid var(--line);border-radius:16px;padding:11px 9px 13px}
+.wkhd{display:flex;align-items:center;justify-content:center;gap:4px;margin-bottom:10px}
+.wkhd .d{font-size:16px;font-weight:800;letter-spacing:-.02em;padding:6px 18px;border-radius:999px;
+  background:var(--dark-3);min-width:150px;text-align:center}
+.wkhd button{width:34px;height:34px;border-radius:50%;color:var(--sub);font-size:18px;line-height:1}
+.wkhd button:active{background:var(--dark-3)}
+.wkd{display:grid;grid-template-columns:repeat(7,1fr);gap:1px}
+.wkd>button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0 6px;border-radius:11px}
+.wkd .dn{font-size:11.5px;font-weight:700;color:#7d766e}
+.wkd .dn.sun{color:#c98b7a}
+.wkd .num{font-size:10.5px;font-weight:700;color:#67635d}
+.wkd>button.sel{background:var(--dark-3)}
+.wkd>button.sel .dn{color:var(--cream)}
+.wkd>button.tdy .num{color:var(--gold)}
+.dsum{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-top:11px;
+  background:var(--line);border-radius:11px;overflow:hidden}
+.dsum>div{background:var(--dark-2);padding:10px 4px;text-align:center}
+.dsum .k{display:block;font-size:11px;font-weight:600;color:#7d766e}
+.dsum .v{display:block;font-size:17px;font-weight:800;margin-top:1px;letter-spacing:-.02em}
+.dsum .v small{font-size:11px;font-weight:600;color:var(--sub)}
+.hero{display:block;width:100%;text-align:left;border-radius:18px;padding:19px 18px 17px;min-height:152px;
+  background:radial-gradient(125% 135% at 86% 6%, #6d4736 0%, #412921 44%, #23170f 100%);
+  border:1px solid #6b4a38}
+.hero .tag{display:inline-block;font-size:11.5px;font-weight:700;color:var(--gold);
+  border:1px solid var(--gold-2);border-radius:999px;padding:3px 11px}
+.hero .ht{font-size:23px;font-weight:900;letter-spacing:-.035em;margin-top:11px;line-height:1.24;color:#fff}
+.hero .hs{font-size:13.5px;font-weight:600;color:#e6d5c6;margin-top:6px;line-height:1.5}
+.hero .hgo{display:inline-block;margin-top:14px;background:var(--gold);color:#2a1c14;
+  font-size:13.5px;font-weight:800;border-radius:999px;padding:8px 16px}
 .empty{padding:30px 10px;text-align:center;color:#6d6a65;font-size:14px;font-weight:500;line-height:1.8}
 .note{background:var(--dark-2);border:1px solid var(--line);border-radius:12px;padding:12px 13px;
   font-size:12.5px;font-weight:500;color:var(--sub);line-height:1.75}
@@ -649,6 +678,55 @@ function liveOf(mid){
   }
   return w;
 }
+const DOW = ['일','월','화','수','목','금','토'];
+const dNew = d => new Date(d + 'T00:00:00');
+const dowTxt = d => (+d.slice(5,7))+'월 '+(+d.slice(8))+'일 ('+DOW[dNew(d).getDay()]+')';
+function weekOf(d0){
+  const d = dNew(d0); d.setDate(d.getDate() - d.getDay());
+  return Array.from({length:7}, (_,i) => { const x = new Date(d); x.setDate(d.getDate()+i); return ymd(x); });
+}
+/* 그날 한 줄 요약 — 운동시간 · 종목수 · 먹은 칼로리 */
+function dayStat(mid, date){
+  const ws = D.workouts.filter(w => w.mid===mid && w.date===date && w.done);
+  const dur = ws.reduce((a,w) => a + (Number(w.dur)||0), 0);
+  const exs = new Set(); ws.forEach(w => w.items.forEach(i => exs.add(i.ex)));
+  const ms = (D.meals||[]).filter(m => m.mid===mid && m.date===date);
+  const kcal = ms.reduce((a,m) => a + (Number(m.kcal)||0), 0);
+  let goal = 0; try{ const rr = calcOf(GOALS[mid]||{}); goal = rr.bmr ? rr.kcal : 0; }catch(e){}
+  return { ws, dur, ex:exs.size, kcal, shots:ms.length, goal,
+    pw: Math.min(1, dur/(45*60)), pk: goal ? Math.min(1, kcal/goal) : 0 };
+}
+/* 두 겹 고리 — 바깥 운동 · 안쪽 식단 */
+function ring(pw, pk){
+  const C1 = 2*Math.PI*15, C2 = 2*Math.PI*10;
+  const arc = (r,c,p,col) => `<circle cx="18" cy="18" r="${r}" fill="none" stroke="${col}" stroke-width="3.4"
+    stroke-linecap="round" stroke-dasharray="${(c*p).toFixed(1)} ${c.toFixed(1)}" transform="rotate(-90 18 18)"/>`;
+  return `<svg viewBox="0 0 36 36" width="34" height="34" aria-hidden="true">
+    <circle cx="18" cy="18" r="15" fill="none" stroke="#302f2b" stroke-width="3.4"/>
+    <circle cx="18" cy="18" r="10" fill="none" stroke="#302f2b" stroke-width="3.4"/>
+    ${pw>0?arc(15,C1,pw,'var(--gold)'):''}${pk>0?arc(10,C2,pk,'var(--teal)'):''}</svg>`;
+}
+function weekStrip(mid){
+  const sel = S.day || TODAY, wk = weekOf(sel), st = dayStat(mid, sel);
+  return `<div class="wk">
+    <div class="wkhd">
+      <button data-act="dmove:-1">‹</button>
+      <span class="d">${dowTxt(sel)}</span>
+      <button data-act="dmove:1" ${sel>=TODAY?'style="opacity:.3"':''}>›</button>
+    </div>
+    <div class="wkd">${wk.map((d,i)=>{ const t=dayStat(mid,d);
+      return `<button data-act="dpick:${d}" class="${d===sel?'sel':''} ${d===TODAY?'tdy':''}">
+        <span class="dn ${i===0?'sun':''}">${DOW[i]}</span>
+        ${ring(t.pw, t.pk)}
+        <span class="num">${+d.slice(8)}</span></button>`; }).join('')}</div>
+    <div class="dsum">
+      <div><span class="k">운동시간</span><span class="v">${st.dur?Math.max(1,Math.round(st.dur/60)):0}<small> 분</small></span></div>
+      <div><span class="k">운동종목</span><span class="v">${st.ex}<small> 개</small></span></div>
+      <div><span class="k">식단</span><span class="v">${st.kcal?st.kcal.toLocaleString():(st.shots?'—':0)}<small> kcal</small></span></div>
+    </div>
+  </div>`;
+}
+
 function estMin(r){ let s=0; r.items.forEach(i=>{ s+=i.sets*(40+(i.rest||60)); }); return Math.round(s/60/5)*5; }
 function workoutsOf(mid){ return D.workouts.filter(w=>w.mid===mid && w.done).slice().sort(byDateDesc); }
 function lastSet(ex,va,mid){
@@ -792,39 +870,63 @@ function vNewMem(){
 
 /* ── 홈 ── */
 function vHome(){
-  const u=unreadOf(S.mid), t=D.today[S.mid], r=t?rOf(t.rid):null, ws=myWorkouts(), lw=liveOf(S.mid), g=GOALS[S.mid]||{};
+  const u = unreadOf(S.mid), t = D.today[S.mid], r = t ? rOf(t.rid) : null;
+  const lw = liveOf(S.mid), g = GOALS[S.mid] || {};
+  const sel = S.day || TODAY, st = dayStat(S.mid, sel), past = sel !== TODAY;
+  const cy = (()=>{ const c=cycOf(S.mid); return (c&&c.on) ? cycToday(c) : null; })();
+
+  /* 오늘 무엇부터 하시나요 — 큰 박스 하나 */
+  const hero = lw
+    ? { act:'go:workout', tag:'기록 중', ht:'운동기록 계속하기',
+        hs:`${esc(lw.title)} · ${lw.items.filter(i=>i.locked).length}/${lw.items.length}종목 끝냄`, go:'이어서 하기' }
+    : r
+      ? { act:'rt:'+r.id, tag:'트레이너 지정', ht:'트레이너 지정루틴 하기',
+          hs:`${esc(t.kind)} · 루틴 ${r.no} ${esc(r.n)}<br>${r.items.length}종목 · 예상 ${estMin(r)}분 · ${esc(t.by)}가 지정했어요`,
+          go:'시작하기' }
+      : { act:'go:start', tag:'오늘', ht:'오늘 운동 기록하기',
+          hs:'지정된 루틴이 없어요<br>내 루틴에서 골라 시작합니다', go:'루틴 고르기' };
+
   return { top: bar('글래드짐', `<span class="sub">${esc(me().n)} 회원님</span>`), tabs:1, body:`
-    <span class="lbl plain">우리의 목표</span>
-    <div class="card plan"><div class="nm">${esc(g.goal||'아직 안 정했어요')}</div>
-      <div class="sm">운동 약속 · ${esc(g.work||'—')}<br>식단 약속 · ${esc(g.diet||'—')}</div></div>
-    <span class="lbl">오늘</span>
-    ${u>0?`<button class="cm" data-act="tab:feedback" style="text-align:left">
-      <span class="who">${esc(D.cm.find(c=>!c.read&&c.mid===S.mid).tr)} 트레이너</span>
-      <span class="tx">새 코멘트 ${u}개가 왔어요</span></button>`:''}
-    ${lw
-      ? `<button class="card gold" data-act="go:workout">
-          <div class="nm g">운동기록 계속하기</div>
-          <div class="sm">${esc(lw.title)} · ${lw.items.filter(i=>i.locked).length}/${lw.items.length}종목 끝냄 · 이어서 ›</div></button>
-        <button class="card rowc" data-act="go:start">
-          <div><div class="nm">오늘 운동 기록하기</div>
-          <div class="sm">다른 운동을 새로 시작합니다</div></div><span class="rt">›</span></button>`
-      : r
-        ? `<button class="card gold" data-act="rt:${r.id}">
-            <div class="nm g">오늘 운동 기록하기</div>
-            <div class="sm">${esc(t.kind)} · 루틴 ${r.no} ${esc(r.n)}<br>${r.items.length}종목 · 예상 ${estMin(r)}분 · ${esc(t.by)}가 지정했어요</div></button>`
-        : `<button class="card gold" data-act="go:start">
-            <div class="nm g">오늘 운동 기록하기</div>
-            <div class="sm">지정된 루틴이 없어요 · 내 루틴에서 골라 시작합니다</div></button>`}
-    ${(()=>{ const c=cycOf(S.mid); if(!c||!c.on) return '';
-      const ct=cycToday(c);
-      return `<button class="card" data-act="sub:cycle"><div class="nm">오늘 ${ct.day}일차 · ${esc(ct.ph)}</div>
-        <div class="sm">${esc(ct.why)}</div></button>`; })()}
-    <div class="grid2">
-      <div class="tile"><span class="k">이번 주</span><span class="v">${ws.filter(w=>w.date>='2026-08-24').length}<small> 회</small></span></div>
-      <div class="tile"><span class="k">이번 달</span><span class="v">${ws.length}<small> 회</small></span></div></div>
-    <span class="lbl">최근 기록</span>
-    ${ws.slice(0,3).map(recRow).join('') || '<div class="empty">아직 기록이 없어요</div>'}`,
-    foot:`<button class="btn main" data-act="${lw?'go:workout':'go:start'}">${lw?'운동기록 계속하기':'오늘 운동 기록하기'}</button>` };
+    ${weekStrip(S.mid)}
+    ${past
+      ? (st.ws.length
+          ? `<button class="card rowc" data-act="rec:${st.ws[0].id}">
+              <div><div class="nm">${dateTxt(sel)} 기록 보기</div>
+              <div class="sm">${st.ws.length}건 · ${st.ex}종목 · ${durTxt(st.dur)}</div></div>
+              <span class="rt">›</span></button>`
+          : `<div class="empty">이 날은 기록이 없어요</div>`)
+      : ''}
+
+    <button class="hero" data-act="${hero.act}">
+      <span class="tag">${hero.tag}</span>
+      <div class="ht">${hero.ht}</div>
+      <div class="hs">${hero.hs}</div>
+      <span class="hgo">${hero.go} ›</span></button>
+
+    ${lw && r ? `<button class="card rowc" data-act="rt:${r.id}">
+      <div><div class="nm">오늘 지정 · 루틴 ${r.no} ${esc(r.n)}</div>
+      <div class="sm">${esc(t.by)}가 지정했어요</div></div><span class="rt">›</span></button>` : ''}
+
+    ${(u>0 || cy) ? `<span class="lbl">오늘 챙길 것</span>` : ''}
+    ${u>0 ? `<button class="card gold rowc" data-act="tab:feedback">
+      <div><div class="nm g">새 코멘트 ${u}개</div>
+      <div class="sm">${esc((D.cm.find(c=>!c.read&&c.mid===S.mid)||{}).tr||'')} 트레이너가 남겼어요</div></div>
+      <span class="rt">›</span></button>` : ''}
+    ${cy ? `<button class="card rowc" data-act="sub:cycle">
+      <div><div class="nm">${cy.day}일차 · ${esc(cy.ph)}</div>
+      <div class="sm">${esc(cy.why)}</div></div><span class="rt">›</span></button>` : ''}
+
+    <span class="lbl">바로 가기</span>
+    <button class="card rowc plan" data-act="go:routines">
+      <div><div class="nm">내 루틴</div>
+      <div class="sm">${myRoutines(S.mid).length}개 · 골라서 바로 시작</div></div><span class="rt">›</span></button>
+    <button class="card rowc plan" data-act="sub:plan">
+      <div><div class="nm">운동계획</div>
+      <div class="sm">${esc(g.goal||'목표 · 칼로리 · 다짐')}</div></div><span class="rt">›</span></button>
+    <button class="card rowc plan" data-act="tab:records">
+      <div><div class="nm">지난 기록</div>
+      <div class="sm">이번 달 ${myWorkouts().length}회</div></div><span class="rt">›</span></button>`,
+    foot:`<button class="btn main" data-act="${hero.act}">${hero.ht}</button>` };
 }
 function recRow(w){
   const parts=[...new Set(w.items.map(i=>exOf(i.ex).p))].join(' · ');
@@ -2572,6 +2674,13 @@ document.addEventListener('click', ev=>{
       else { S.who='m'; S.mid=rest[0]; S.tab='home'; go('home'); } return;
     case 'reset': reset(); toast('처음 상태로 되돌렸습니다'); return;
     case 'go': { if(rest[0]==='workout' && !D.live) adoptLive(S.mid); go(rest[0]); return; }
+    case 'dpick': S.day = rest[0]; render(); return;
+    case 'dmove': {
+      const d = new Date((S.day||TODAY)+'T00:00:00');
+      d.setDate(d.getDate() + Number(rest[0]));
+      const n = ymd(d);
+      if(n > TODAY) return;                 /* 앞날은 안 봅니다 */
+      S.day = n; render(); return; }
     case 'tab': S.tab=rest[0]; go(rest[0]); return;
     case 'close': S.editDesc=null; closeSheet(); return;
 
