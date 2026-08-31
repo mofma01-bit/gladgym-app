@@ -1511,8 +1511,7 @@ function vIntake(){
   return { top: bar('상담일지', `<span class="sub">${esc(subjName())}</span>`, tr?'tm:'+mid:'tab:me'), body:`
     ${tr?`<button class="btn main" data-act="editintake:${mid}">상담일지 고치기</button>`:''}
     <div class="card">
-      ${row('생년월일', d.birth ? `${birthYmd(d.birth)||d.birth}${ageFrom(d.birth)?`  ·  만 ${ageFrom(d.birth)}세`:''}`
-              : (d.age?d.age+'세':''))}${row('신장', d.height)}${row('성별', d.sex)}
+      ${row('생년월일', d.birth ? `${birthYmd(d.birth)||d.birth}${ageFrom(d.birth)?`  ·  만 ${ageFrom(d.birth)}세`:''}` : '')}${row('신장', d.height)}${row('성별', d.sex)}
       ${row('직업', d.job)}${row('직업환경', d.jobenv)}${row('교대근무', d.shift)}</div>
     <span class="lbl">글래드짐을 알게 된 경로</span>
     <div class="card"><div class="chips">${(d.route||[]).map(x=>`<span class="chip on">${esc(x)}</span>`).join('')||'<span class="lbl">없음</span>'}</div></div>
@@ -1627,7 +1626,6 @@ function ageTag(c){
   const a = ageFrom(c && c.birth);
   if(a) return `<b style="color:var(--gold)">만 ${a}세</b>`;
   if(c && String(c.birth||'').trim()) return `<b style="color:var(--warn)">날짜를 다시 봐 주세요</b>`;
-  if(c && nnum(c.age)) return `<b style="color:var(--sub)">상담일지의 ${nnum(c.age)}세로 계산 중</b>`;
   return '';
 }
 
@@ -1635,7 +1633,7 @@ function calcOf(g){
   const c = g.calc || (g.calc = {});
   const w  = nnum(g.now && g.now.w), gw = nnum(g.to && g.to.w);
   const fp = nnum(g.now && g.now.fp);                 /* 체지방률 % */
-  const h  = nnum(c.height), age = ageFrom(c.birth) || nnum(c.age), male = (c.sex === '남');
+  const h  = nnum(c.height), age = ageFrom(c.birth), male = (c.sex === '남');
   let bmr  = nnum(c.bmr), how = '인바디 값';
   const auto = !bmr;
   if(auto && w && fp > 0 && fp < 60){                 /* 체지방률을 알면 이게 더 정확 */
@@ -1775,7 +1773,7 @@ function calcSync(){
   if(!box) return;
   const g = GOALS[subj()] || {}; g.calc = g.calc || {}; g.now = g.now || {}; g.to = g.to || {};
   const gv = k => { const el=document.querySelector('[data-k="'+k+'"]'); return el ? el.value.trim() : undefined; };
-  ['age','birth','height','bmr','kcal','freq','burn','rc','rp','rf','pkg','fkg'].forEach(k=>{ const v=gv('pc:'+k); if(v!==undefined) g.calc[k]=v; });
+  ['birth','height','bmr','kcal','freq','burn','rc','rp','rf','pkg','fkg'].forEach(k=>{ const v=gv('pc:'+k); if(v!==undefined) g.calc[k]=v; });
   const nw = gv('plnow:w');  if(nw!==undefined) g.now.w  = nw;
   const nf = gv('plnow:fp'); if(nf!==undefined) g.now.fp = nf;
   const tw = gv('plto:w');  if(tw!==undefined) g.to.w  = tw;
@@ -1791,7 +1789,7 @@ function intakeNote(mid){
   const d = D.intake[mid] || {};
   const has = k => String(d[k]||'').trim();
   const need = [];
-  if(!has('birth') && !has('age')) need.push('생년월일');
+  if(!has('birth')) need.push('생년월일');
   if(!has('height')) need.push('신장');
   if(!has('sex')) need.push('성별');
   if(!need.length) return `<div class="note" style="padding:8px 10px">상담일지에서 <b>생년월일 · 신장 · 성별</b>을 가져왔습니다.</div>`;
@@ -1810,7 +1808,6 @@ function vPlanEdit(){
   { const d=D.intake[mid]||{};
     c.sex    = c.sex    || d.sex || '';
     c.birth  = c.birth  || d.birth || '';
-    c.age    = c.age    || String(d.age||'').replace(/[^0-9.]/g,'');
     c.height = c.height || String(d.height||'').replace(/[^0-9.]/g,''); }
   const num=(w,k,n)=>`<div class="fld"><span class="fn">${n}</span>
     <input class="search" type="text" data-k="pl${w}:${k}" value="${esc(g[w][k]!=null?g[w][k]:'')}"></div>`;
@@ -2414,7 +2411,7 @@ document.addEventListener('click', ev=>{
       g.to.date = goalDate(g.to.when);
       ['m','f','fp'].forEach(k=>{ delete g.to[k]; });
       g.calc = g.calc || {};
-      ['age','birth','height','bmr','kcal','freq','burn','rc','rp','rf','pkg','fkg'].forEach(k=>{ const el=document.querySelector('[data-k="pc:'+k+'"]'); if(el) g.calc[k]=el.value.trim(); });
+      ['birth','height','bmr','kcal','freq','burn','rc','rp','rf','pkg','fkg'].forEach(k=>{ const el=document.querySelector('[data-k="pc:'+k+'"]'); if(el) g.calc[k]=el.value.trim(); });
       /* 상담일지에 비어 있으면 같이 채워 둔다 (있는 값은 덮어쓰지 않는다) */
       const ik = D.intake[mid] || (D.intake[mid] = {});
       let ikDirty = false;
