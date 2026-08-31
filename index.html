@@ -325,6 +325,26 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
 .hero .hs{font-size:13.5px;font-weight:600;color:#e6d5c6;margin-top:6px;line-height:1.5}
 .hero .hgo{display:inline-block;margin-top:14px;background:var(--gold);color:#2a1c14;
   font-size:13.5px;font-weight:800;border-radius:999px;padding:8px 16px}
+.seg{display:flex;background:var(--dark-3);border-radius:999px;padding:3px;gap:2px;flex:0 0 auto}
+.seg button{flex:1;padding:7px 4px;border-radius:999px;font-size:12.5px;font-weight:700;color:#8f8a83}
+.seg button.on{background:var(--cream);color:#1a1a18}
+.gbox{background:var(--dark-2);border:1px solid var(--line);border-radius:16px;padding:14px 12px 10px;flex:0 0 auto}
+.gbox svg{display:block;width:100%;height:auto}
+.gsum{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);
+  border-radius:13px;overflow:hidden;flex:0 0 auto}
+.gsum>div{background:var(--dark-2);padding:13px 5px;text-align:center}
+.gsum .k{display:block;font-size:11px;font-weight:600;color:#7d766e}
+.gsum .v{display:block;font-size:19px;font-weight:800;margin-top:2px;letter-spacing:-.03em;color:var(--gold)}
+.gsum .v small{font-size:11px;font-weight:600;color:var(--sub)}
+.trow{display:flex;align-items:baseline;gap:9px;padding:9px 2px;border-bottom:1px solid var(--line)}
+.trow:last-child{border-bottom:none}
+.trow .e{flex:1;min-width:0;font-size:13.5px;font-weight:600;color:#e9e3db;text-align:left}
+.trow .n{font-size:11px;font-weight:600;color:#6f6a64;flex:none}
+.trow .v{font-size:14px;font-weight:800;font-variant-numeric:tabular-nums;flex:none}
+.trow .d{font-size:12.5px;font-weight:800;flex:none;min-width:58px;text-align:right}
+.trow .d.up{color:var(--gold)}
+.trow .d.dn{color:var(--warn)}
+.trow .d.eq{color:#6f6a64}
 .dhd{display:flex;align-items:baseline;gap:9px;padding-bottom:8px}
 .dhd .t{flex:1;font-size:14px;font-weight:700;color:var(--cream);letter-spacing:-.02em}
 .dhd .r{font-size:12.5px;font-weight:600;color:#8f8a83}
@@ -742,6 +762,117 @@ function dayDetail(mid, date){
     </button>`).join('');
 }
 
+/* ── 분석 ── */
+const PARTG = { '상체':['가슴','어깨','등','팔'], '하체':['하체'], '복근':['복근'], '유산소':['유산소'], '기타':['기타'] };
+const PARTS8 = ['가슴','어깨','등','팔','하체','복근','유산소','기타'];
+const ANA_P = { '1주':7, '1달':30, '3달':90, '전체':3650 };
+
+function anaFrom(){ return addDays(TODAY, -(ANA_P[S.anaP||'1주'] - 1)); }
+function anaWs(mid, from){ return D.workouts.filter(w => w.mid===mid && w.done && w.date >= from)
+  .slice().sort((a,b)=> a.date < b.date ? -1 : a.date > b.date ? 1 : 0); }
+
+/* 그날 든 총 무게 · 세트 · 분 · 소모 추정 */
+function wStat(w, bw){
+  let vol = 0, sets = 0, cardioMin = 0;
+  w.items.forEach(it => { const e = exOf(it.ex); if(!e) return;
+    it.sets.forEach(x => { sets++;
+      if(e.cardio) cardioMin += (+x.reps || 0);
+      else vol += (+x.kg || 0) * (+x.reps || 0); }); });
+  const min = Math.round((Number(w.dur)||0)/60);
+  const wt = Math.max(0, min - cardioMin);
+  const kcal = Math.round((5.0*wt + 7.0*cardioMin) * 3.5 * (bw||65) / 200);
+  return { vol:Math.round(vol), sets, min, kcal };
+}
+function bwOf(mid){ const g = GOALS[mid]||{}; return nnum(g.now && g.now.w) || 65; }
+
+/* 기간을 7칸으로 나눈 꺾은선 */
+function anaSeries(mid, metric){
+  const days = ANA_P[S.anaP||'1주'], bw = bwOf(mid);
+  let from = anaFrom();
+  if(days > 365){ const all = D.workouts.filter(w=>w.mid===mid && w.done);
+    from = all.length ? all.map(w=>w.date).sort()[0] : TODAY; }
+  const total = Math.max(1, Math.round((dNew(TODAY) - dNew(from)) / 86400000) + 1);
+  const n = Math.min(7, total), span = Math.ceil(total / n);
+  const out = [];
+  for(let i = n-1; i >= 0; i--){
+    const end = addDays(TODAY, -i*span), st = addDays(end, -(span-1));
+    const ws = D.workouts.filter(w => w.mid===mid && w.done && w.date >= st && w.date <= end);
+    let v = 0;
+    ws.forEach(w => { const t = wStat(w, bw);
+      v += metric==='vol' ? t.vol : metric==='kcal' ? t.kcal : t.min; });
+    out.push({ label: span===1 ? DOW[dNew(end).getDay()] : (+end.slice(5,7))+'/'+(+end.slice(8)), v });
+  }
+  return out;
+}
+function lineChart(pts, unit){
+  const W = 320, H = 118, PL = 8, PR = 8, PT = 26, PB = 20;
+  const mx = Math.max(1, ...pts.map(p=>p.v));
+  const x = i => PL + i * (W-PL-PR) / Math.max(1, pts.length-1);
+  const y = v => PT + (1 - v/mx) * (H-PT-PB);
+  const d = pts.map((p,i)=> (i?'L':'M') + x(i).toFixed(1) + ' ' + y(p.v).toFixed(1)).join(' ');
+  const area = d + ` L ${x(pts.length-1).toFixed(1)} ${H-PB} L ${x(0).toFixed(1)} ${H-PB} Z`;
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="height:140px">
+    <path d="${area}" fill="var(--gold-dim)"/>
+    <path d="${d}" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    ${pts.map((p,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${y(p.v).toFixed(1)}" r="${i===pts.length-1?3.4:2.4}"
+        fill="${i===pts.length-1?'var(--gold)':'var(--gold-2)'}"/>
+      ${p.v?`<text x="${x(i).toFixed(1)}" y="${Math.max(11,y(p.v)-8).toFixed(1)}" text-anchor="middle"
+        font-size="9.5" font-weight="700" fill="#c9c2b9">${p.v.toLocaleString()}</text>`:''}
+      <text x="${x(i).toFixed(1)}" y="${H-6}" text-anchor="middle" font-size="9.5" font-weight="600"
+        fill="#75706a">${esc(p.label)}</text>`).join('')}
+  </svg><div class="sm" style="text-align:right;color:#75706a">단위 ${unit}</div>`;
+}
+
+/* 부위별 세트 수 → 팔각형 */
+function partSets(mid, from){
+  const o = {}; PARTS8.forEach(k => o[k] = 0);
+  anaWs(mid, from).forEach(w => w.items.forEach(it => {
+    const e = exOf(it.ex); if(!e) return;
+    const k = PARTS8.includes(e.p) ? e.p : '기타';
+    o[k] += it.sets.length; }));
+  return o;
+}
+function radar(o){
+  const n = PARTS8.length, R = 56, cx = 110, cy = 96;
+  const mx = Math.max(1, ...PARTS8.map(k=>o[k]));
+  const pt = (i, r) => { const a = -Math.PI/2 + i*2*Math.PI/n;
+    return [cx + Math.cos(a)*r, cy + Math.sin(a)*r]; };
+  const web = [1,.66,.33].map(f =>
+    `<polygon points="${PARTS8.map((_,i)=>pt(i,R*f).map(v=>v.toFixed(1)).join(',')).join(' ')}"
+      fill="none" stroke="#302f2b" stroke-width="1"/>`).join('');
+  const spokes = PARTS8.map((_,i)=>{ const [x,y]=pt(i,R);
+    return `<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#2a2926" stroke-width="1"/>`; }).join('');
+  const poly = PARTS8.map((k,i)=> pt(i, R * (o[k]/mx)).map(v=>v.toFixed(1)).join(',')).join(' ');
+  const labels = PARTS8.map((k,i)=>{ const [x,y]=pt(i, R+17);
+    const an = Math.abs(x-cx) < 6 ? 'middle' : (x > cx ? 'start' : 'end');
+    return `<text x="${x.toFixed(1)}" y="${(y+3).toFixed(1)}" text-anchor="${an}" font-size="10" font-weight="700"
+      fill="${o[k]===0?'#5f5b56':'#c9c2b9'}">${k}</text>
+      <text x="${x.toFixed(1)}" y="${(y+14).toFixed(1)}" text-anchor="${an}" font-size="9.5" font-weight="700"
+      fill="${o[k]===0?'#4d4a46':'var(--gold-2)'}">${o[k]}세트</text>`; }).join('');
+  return `<svg viewBox="0 0 220 200" style="height:210px">${web}${spokes}
+    <polygon points="${poly}" fill="rgba(230,196,135,.22)" stroke="var(--gold)" stroke-width="1.8"/>
+    ${PARTS8.map((k,i)=>{ const [x,y]=pt(i, R*(o[k]/mx));
+      return o[k] ? `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.6" fill="var(--gold)"/>` : ''; }).join('')}
+    ${labels}</svg>`;
+}
+
+/* 종목별 무게 변화 */
+function exTrend(mid, from, grp){
+  const map = {};
+  anaWs(mid, from).forEach(w => w.items.forEach(it => {
+    if(!it.sets.length) return;
+    const e = exOf(it.ex); if(!e) return;
+    if(grp !== '전체' && !(PARTG[grp]||[]).includes(e.p)) return;
+    const key = it.ex + ':' + it.va;
+    const best = e.cardio ? Math.max(...it.sets.map(x=>+x.reps||0)) : Math.max(...it.sets.map(x=>+x.kg||0));
+    (map[key] = map[key] || { ex:it.ex, va:it.va, cardio:e.cardio, rows:[] }).rows.push(best);
+  }));
+  return Object.values(map).map(m => {
+    const f = m.rows[0], l = m.rows[m.rows.length-1];
+    return Object.assign(m, { first:f, last:l, diff: Math.round((l-f)*10)/10, n:m.rows.length });
+  }).sort((a,b) => b.n - a.n || b.last - a.last);
+}
+
 function weekStrip(mid){
   const sel = S.day || TODAY, wk = weekOf(sel), st = dayStat(mid, sel);
   return `<div class="wk">
@@ -796,7 +927,7 @@ function render(){
     t_members:tMembers,t_member:tMember,t_live:tLive,t_write:tWrite,t_routines:tRoutines,t_redit:tRedit,t_ex:tEx,
     intake:vIntake, plan:vPlan, body:vBody, cycle:vCycle, qa:vQa, boot:vBoot, err:vErr,
     newmem:vNewMem, intake_edit:vIntakeEdit, plan_edit:vPlanEdit, t_pickex:tPickEx,
-    t_today:tToday, t_feed:tFeed, t_tools:tTools, diet:vDiet};
+    t_today:tToday, t_feed:tFeed, t_tools:tTools, diet:vDiet, days:vDays};
   let v;
   try{ v=(V[S.screen]||vHome)(); }
   catch(err){
@@ -1275,20 +1406,92 @@ function vSummary(){
           <button class="btn main" data-act="tab:home">홈으로</button>` };
 }
 function vRecords(){
-  const ws=myWorkouts(), days=new Set(ws.map(w=>+w.date.slice(8)));
-  let cells=''; ['월','화','수','목','금','토','일'].forEach(d=>cells+=`<div class="hd">${d}</div>`);
-  for(let i=0;i<5;i++) cells+='<div class="pad"></div>';
-  for(let d=1;d<=31;d++) cells+=`<div class="${days.has(d)?'on':''}">${d}</div>`;
-  const bench=ws.slice().reverse().map(w=>w.items.find(i=>i.ex==='bp')).filter(Boolean).map(it=>Math.max(...it.sets.map(s=>s.kg)));
-  const mx=Math.max(...bench,1);
-  return { top: bar('기록', `<span class="sub">2026년 8월</span>`), tabs:1, body:`
-    <div class="cal">${cells}</div><div class="hr"></div>
-    ${bench.length?`<span class="lbl">벤치프레스 증량 · 최근 ${bench.length}회</span>
-    <div class="graph">${bench.map((v,i)=>`<i class="${i===bench.length-1?'g':''}" style="height:${Math.round(v/mx*100)}%"></i>`).join('')}</div>
-    <div class="glbl">${bench.map(v=>`<span>${kgfmt(v)}</span>`).join('')}</div><div class="hr"></div>`:''}
-    <span class="lbl">지난 운동</span>
-    ${ws.map(recRow).join('') || '<div class="empty">아직 기록이 없어요</div>'}` };
+  const mid = S.mid, from = anaFrom(), bw = bwOf(mid);
+  const per = S.anaP || '1주', gm = S.anaG || 'vol', grp = S.anaB || '전체';
+  const ws = anaWs(mid, from);
+  const tot = ws.reduce((a,w) => { const t = wStat(w, bw);
+    return { vol:a.vol+t.vol, sets:a.sets+t.sets, min:a.min+t.min, kcal:a.kcal+t.kcal }; },
+    {vol:0, sets:0, min:0, kcal:0});
+  const ps = partSets(mid, from);
+  const lo = PARTS8.slice().sort((a,b)=> ps[a]-ps[b])[0];
+  const hi = PARTS8.slice().sort((a,b)=> ps[b]-ps[a])[0];
+  const tr = exTrend(mid, from, grp);
+  const unit = gm==='vol' ? 'kg' : gm==='kcal' ? 'kcal' : '분';
+
+  return { top: bar('분석', `<span class="sub">${esc(per)}</span>`), tabs:1, body:`
+    <button class="card rowc plan" data-act="go:days">
+      <div><div class="nm">지난 운동기록 보기</div>
+      <div class="sm">날짜별로 그날 한 운동 · 식단 · 칼로리</div></div><span class="rt">›</span></button>
+
+    <div class="seg">${Object.keys(ANA_P).map(k=>
+      `<button class="${per===k?'on':''}" data-act="anap:${k}">${k}</button>`).join('')}</div>
+
+    <div class="gsum">
+      <div><span class="k">운동 횟수</span><span class="v">${ws.length}<small> 회</small></span></div>
+      <div><span class="k">총 무게</span><span class="v">${(tot.vol/1000).toFixed(1)}<small> 톤</small></span></div>
+      <div><span class="k">총 시간</span><span class="v">${tot.min}<small> 분</small></span></div>
+    </div>
+
+    <span class="lbl">${esc(per)} 변화</span>
+    <div class="gbox">
+      <div class="seg" style="margin-bottom:10px">
+        <button class="${gm==='vol'?'on':''}" data-act="anag:vol">무게</button>
+        <button class="${gm==='kcal'?'on':''}" data-act="anag:kcal">칼로리</button>
+        <button class="${gm==='min'?'on':''}" data-act="anag:min">시간</button>
+      </div>
+      ${ws.length ? lineChart(anaSeries(mid, gm), unit)
+        : '<div class="empty">이 기간에 기록이 없어요</div>'}
+    </div>
+    ${gm==='kcal'?'<div class="note">칼로리는 운동 시간과 몸무게로 <b>어림한 값</b>입니다. 실제 소모량과는 차이가 있습니다.</div>':''}
+
+    <span class="lbl">운동 균형 · 부위별 세트</span>
+    <div class="gbox">
+      ${tot.sets ? radar(ps) : '<div class="empty">이 기간에 기록이 없어요</div>'}
+      ${tot.sets ? `<div class="note" style="margin-top:4px">가장 많이 한 곳은 <b style="color:var(--gold)">${hi} ${ps[hi]}세트</b>,
+        가장 적은 곳은 <b style="color:var(--warn)">${lo} ${ps[lo]}세트</b>입니다.</div>` : ''}
+    </div>
+
+    <span class="lbl">종목별 변화</span>
+    <div class="seg">${['전체'].concat(Object.keys(PARTG)).map(k=>
+      `<button class="${grp===k?'on':''}" data-act="anab:${k}">${k}</button>`).join('')}</div>
+    <div class="card" style="padding:6px 14px">
+      ${tr.length ? tr.map(t=>{
+        const u = t.cardio ? '분' : 'kg';
+        const cl = t.diff > 0 ? 'up' : t.diff < 0 ? 'dn' : 'eq';
+        const ar = t.n < 2 ? '처음' : t.diff > 0 ? `▲${kgfmt(t.diff)}` : t.diff < 0 ? `▼${kgfmt(-t.diff)}` : '그대로';
+        return `<div class="trow">
+          <span class="e">${esc(exName(t.ex,t.va))}</span>
+          <span class="n">${t.n}회</span>
+          <span class="v">${kgfmt(t.last)}<span style="font-size:11px;font-weight:600;color:#8f8a83">${u}</span></span>
+          <span class="d ${t.n<2?'eq':cl}">${ar}</span></div>`; }).join('')
+      : '<div class="empty">이 부위 기록이 없어요</div>'}
+    </div>
+    <div class="note">기간 안에서 <b>처음 한 날과 마지막 날</b>의 가장 무거운 세트를 견줍니다.</div>` };
 }
+
+/* ── 지난 운동기록 — 날짜로 보기 ── */
+function vDays(){
+  const mid = S.mid, sel = S.day || TODAY;
+  const ms = (D.meals||[]).filter(m => m.mid===mid && m.date===sel);
+  const kc = ms.reduce((a,m)=> a + (Number(m.kcal)||0), 0);
+  let goal = 0; try{ const rr = calcOf(GOALS[mid]||{}); goal = rr.bmr ? rr.kcal : 0; }catch(e){}
+  return { top: bar('지난 운동기록', `<span class="sub">${esc(me().n)} 회원님</span>`, 'tab:records'), body:`
+    ${weekStrip(mid)}
+    ${dayDetail(mid, sel) || '<div class="empty">이 날은 운동 기록이 없어요</div>'}
+    <span class="lbl">${dateTxt(sel)} 식단</span>
+    ${ms.length ? `<div class="gsum">
+        <div><span class="k">먹은 칼로리</span><span class="v">${kc?kc.toLocaleString():'—'}<small> kcal</small></span></div>
+        <div><span class="k">권장</span><span class="v">${goal?goal.toLocaleString():'—'}<small> kcal</small></span></div>
+        <div><span class="k">사진</span><span class="v">${ms.length}<small> 장</small></span></div>
+      </div>
+      ${ms.map(m=>`<button class="mrow" data-act="meal:${m.id}">
+        <img src="${esc(mealURL(m.path))}" alt="">
+        <div><div class="nm">${esc(m.slot)}${m.kcal?` · ${m.kcal}kcal`:''}</div>
+        <div class="sm">${esc(m.memo||'')}</div></div>
+        ${m.note?'<span class="pill q">코멘트</span>':''}</button>`).join('')}`
+     : '<div class="empty">이 날은 올린 식단이 없어요</div>'}` };
+}
+
 function vRecord(){
   const w=D.workouts.find(x=>x.id===S.wid); if(!w) return vRecords();
   const today = w.date==='2026-08-28';
@@ -2706,6 +2909,9 @@ document.addEventListener('click', ev=>{
     case 'reset': reset(); toast('처음 상태로 되돌렸습니다'); return;
     case 'go': { if(rest[0]==='workout' && !D.live) adoptLive(S.mid); go(rest[0]); return; }
     case 'dpick': S.day = rest[0]; render(); return;
+    case 'anap': S.anaP = rest[0]; render(); return;
+    case 'anag': S.anaG = rest[0]; render(); return;
+    case 'anab': S.anaB = rest[0]; render(); return;
     case 'dmove': {
       const d = new Date((S.day||TODAY)+'T00:00:00');
       d.setDate(d.getDate() + Number(rest[0]));
