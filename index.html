@@ -599,7 +599,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '63';
+const BUILD = '64';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1592,8 +1592,11 @@ function vSummary(){
     <div class="hr"></div>
     <button class="btn ghost" data-act="resume:${w.id}">이어서 계속하기</button>
     <div class="note">잘못 눌러 끝내셨나요? 여기서 <b>그대로 되돌려</b> 이어서 하실 수 있어요. 시간도 이어집니다.</div>`,
-    foot:`<button class="btn sub" data-act="tab:records">분석 보기</button>
-          <button class="btn main" data-act="tab:home">홈으로</button>` };
+    foot: S.who==='tr'
+      ? `<button class="btn sub" data-act="tw:${w.id}">코멘트 남기기</button>
+         <button class="btn main" data-act="tm:${w.mid}">회원 화면으로</button>`
+      : `<button class="btn sub" data-act="tab:records">분석 보기</button>
+         <button class="btn main" data-act="tab:home">홈으로</button>` };
 }
 function anaMid(){ return (S.who==='tr') ? (S.tmid || S.subj || S.mid) : S.mid; }
 function vRecords(){
@@ -3908,7 +3911,9 @@ document.addEventListener('click', ev=>{
     case 'cancel': { const id=live()&&live().id;
       D.live=null; save();
       if(id){ D.workouts=D.workouts.filter(x=>x.id!==id); sv(sdel('workouts','id=eq.'+id), '운동 지우기'); }
-      toast('운동을 취소했어요'); go('home'); return; }
+      toast('운동을 취소했어요');
+      if(S.who==='tr'){ go('t_member'); } else go('home');
+      return; }
 
     case 'tm': S.tmid=rest[0]; go('t_member'); return;
     case 'tlive': S.tmid=rest[0]; go('t_live'); return;
@@ -4019,7 +4024,9 @@ async function finish(){
   if(!done.length){
     await sv(sdel('workouts','id=eq.'+w.id), '운동 지우기');
     D.workouts=D.workouts.filter(x=>x.id!==w.id);
-    D.live=null; save(); toast('기록할 세트가 없어요'); go('home'); return; }
+    D.live=null; save(); toast('기록할 세트가 없어요');
+    if(S.who==='tr'){ S.tmid=w.mid; S.subj=w.mid; go('t_member'); } else go('home');
+    return; }
   done.forEach(it=>{ if(!it.locked){ it.locked=true; it.sec=(it.sec||0)+(it.startAt ? (Date.now()-it.startAt)/1000 : 0); } });
   w.items.forEach(it=>{ it.sec = capSec(it.sec, CAP_EX); });
   const dur=capSec(w.startAt ? (Date.now()-w.startAt)/1000
@@ -4031,7 +4038,9 @@ async function finish(){
       sec:Math.round(it.sec), sets: it.sets.filter(s=>s.done).map(s=>({kg:s.kg, reps:s.reps, spd:s.spd})) })) };
   const i0=D.workouts.findIndex(x=>x.id===w.id);
   if(i0>=0) D.workouts[i0]=rec; else D.workouts.unshift(rec);
-  D.live=null; save(); S.wid=rec.id; go('summary');
+  D.live=null; save(); S.wid=rec.id;
+  if(S.who==='tr'){ S.tmid=rec.mid; S.subj=rec.mid; }
+  go('summary');
 }
 
 function hideSplash(){
