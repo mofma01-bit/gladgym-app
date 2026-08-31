@@ -599,7 +599,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '66';
+const BUILD = '67';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -801,7 +801,9 @@ function go(sc, patch){
   if(S.screen && S.screen!==sc && S.screen!=='boot' && S.screen!=='err'){
     S.stack = S.stack || [];
     S.stack.push({ screen:S.screen, mid:S.mid, tmid:S.tmid, subj:S.subj, rid:S.rid,
-      wid:S.wid, redit:S.redit, twid:S.twid, tab:S.tab, pickPart:S.pickPart });
+      wid:S.wid, redit:S.redit, twid:S.twid, tab:S.tab, ttab:S.ttab, pickPart:S.pickPart,
+      day:S.day, dietDay:S.dietDay, fbDay:S.fbDay, fbMode:S.fbMode, fbPart:S.fbPart,
+      tfDay:S.tfDay, tfeed:S.tfeed, anaP:S.anaP, anaG:S.anaG, anaB:S.anaB, rgrp:S.rgrp });
     if(S.stack.length>30) S.stack.shift();
   }
   Object.assign(S, patch||{}); S.screen=sc; closeSheet(); render();
@@ -1120,8 +1122,10 @@ function render(){
 function bar(title, right, back, sub){
   const bare = (S.screen==='login'||S.screen==='boot'||S.screen==='err');
   const logo = bare ? '' : `<button class="logo" data-act="switch">GLAD GYM</button>`;
-  const canBack = !bare && (back || (S.stack && S.stack.length));
-  const act = back || 'back';
+  const hasHist = !!(S.stack && S.stack.length);
+  const force = (back === 'reccancel');            /* 수정 그만두기는 그대로 */
+  const act = force ? back : (hasHist ? 'back' : (back || ''));
+  const canBack = !bare && !!act;
   return (canBack?`<button class="back" data-act="${esc(act)}">‹</button>`:'') + logo
     + `<span class="ttl">${esc(title)}${sub?`<small>${esc(sub)}</small>`:''}</span>` + (right||'');
 }
