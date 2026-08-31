@@ -244,6 +244,13 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .btn.sub{background:var(--dark-3);color:var(--teal);border:1px solid var(--line)}
 .btn.ghost{background:var(--dark-2);color:var(--sub);border:1px solid var(--line)}
 .btn.kakao{background:#FEE500;color:#1c1a17}
+.btn.blue{background:#4d7f96;color:#f2fafd}
+.setrow2{display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+  padding:11px 13px;border-radius:11px;background:var(--dark-3);border:1px solid var(--line);margin-top:7px}
+.setrow2.ed{border-color:#4d7f96;background:#1b2a31}
+.setrow2 .no{font-size:12px;font-weight:700;color:#8f8a83;flex:none;min-width:38px}
+.setrow2 .vv{flex:1;font-size:15px;font-weight:800;color:var(--cream);font-variant-numeric:tabular-nums}
+.setrow2 .go2{font-size:12.5px;font-weight:700;color:#8bbdd2;flex:none}
 .btn:active{opacity:.72}
 .btn[disabled]{opacity:.3}
 .btn.sm{padding:10px 8px;font-size:13.5px}
@@ -592,7 +599,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '59';
+const BUILD = '60';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1673,84 +1680,80 @@ function vDays(){
      : '<div class="empty">이 날은 올린 식단이 없어요</div>'}` };
 }
 
+function recEditing(wid){ return S.recEdit && S.recEdit.wid === wid; }
+
 function vRecord(){
-  const w=D.workouts.find(x=>x.id===S.wid); if(!w) return vRecords();
-  const today = w.date==='2026-08-28';
+  const w = D.workouts.find(x=>x.id===S.wid); if(!w) return vRecords();
+  const today = (w.date === TODAY);
   const canEdit = (S.who==='tr') || (today && !live());
-  return { top: bar(dateTxt(w.date), `<span class="sub">${durTxt(w.dur)}</span>`, S.who==='tr'?'tw:'+w.id:'tab:records'), body:
-    `<div class="note">${w.kind?esc(w.kind):''}${w.rid&&rOf(w.rid)?` · 루틴 ${rOf(w.rid).no} ${esc(rOf(w.rid).n)}`:''}</div>`
-    + (canEdit?`<button class="btn ghost sm" data-act="resume:${w.id}">${S.who==='tr'?'기록 풀어서 고치기':'이어서 계속하기'}</button>`
-       + (S.who==='tr'&&!today?'<div class="note">지난 날짜입니다. <b>트레이너만</b> 고칠 수 있어요 — 고쳐도 날짜는 그대로 남습니다.</div>':'')
-       : `<div class="note">${today?'':'지난 날짜의 기록이라 '}<b>고칠 수 없어요.</b> 잘못된 것이 있으면 트레이너에게 말씀해 주세요.</div>`)
-    + w.items.map(it=>`<button class="card" data-act="exd:${it.ex}:${it.va}">
-      <div class="nm">${esc(exName(it.ex,it.va))}</div>
-      <div class="sm">${it.sets.map(s=>setTxt(it.ex,s)).join('  ·  ')}${cmOf(S.mid,it.ex,it.va).length?`<br>코멘트 ${cmOf(S.mid,it.ex,it.va).length}개 ›`:''}</div></button>`).join('') };
+  const ed = recEditing(w.id);
+  const items = ed ? S.recEdit.items : w.items;
+  const back = S.who==='tr' ? 'tw:'+w.id : 'tab:records';
+  return { top: bar(dateTxt(w.date), `<span class="sub">${ed?'수정 중':durTxt(w.dur)}</span>`, ed?'reccancel':back), body:
+    `<div class="note">${w.kind?esc(w.kind):''}${w.rid&&rOf(w.rid)?` · 루틴 ${rOf(w.rid).no} ${esc(rOf(w.rid).n)}`:''}
+      ${ed?'<br><b style="color:#8bbdd2">고칠 세트를 눌러 주세요. 다 되면 아래 「수정 완료」를 누릅니다.</b>':''}</div>`
+    + (!ed && !canEdit ? `<div class="note">${today?'':'지난 날짜의 기록이라 '}<b>고칠 수 없어요.</b> 잘못된 것이 있으면 트레이너에게 말씀해 주세요.</div>` : '')
+    + (!ed && canEdit && S.who==='tr' && !today ? '<div class="note">지난 날짜입니다. <b>트레이너만</b> 고칠 수 있어요 — 고쳐도 날짜는 그대로 남습니다.</div>' : '')
+    + items.map((it,i)=>`<div class="card">
+        <div class="rowc" style="align-items:baseline">
+          <div><div class="nm">${esc(exName(it.ex,it.va))}</div></div>
+          ${ed?'':`<button class="chip t" data-act="exd:${it.ex}:${it.va}${S.who==='tr'?':'+w.mid:''}">설명 · 코멘트 ${cmOf(S.who==='tr'?w.mid:S.mid,it.ex,it.va).length}</button>`}
+        </div>
+        ${ed
+          ? it.sets.map((st,j)=>`<button class="setrow2 ed" data-act="rset:${i}:${j}">
+              <span class="no">${j+1}세트</span>
+              <span class="vv">${setTxt(it.ex,st)}</span>
+              <span class="go2">고치기 ›</span></button>`).join('')
+            + `<button class="setrow2" data-act="raddset:${i}" style="justify-content:center">
+              <span class="go2">＋ 세트 추가</span></button>`
+          : `<div class="sm" style="margin-top:5px">${it.sets.map(st=>setTxt(it.ex,st)).join('  ·  ')||'세트 없음'}</div>`}
+      </div>`).join('')
+    + (ed?'<div class="note">여기서 고치는 것은 <b>기록뿐</b>입니다. 운동이 다시 시작되지 않습니다.</div>':''),
+    foot: ed
+      ? `<button class="btn ghost" data-act="reccancel">그만두기</button>
+         <button class="btn blue" data-act="recask">수정 완료</button>`
+      : (canEdit ? `<button class="btn blue go" data-act="recedit:${w.id}">기록 수정하기</button>` : '') };
 }
 
-/* ── 피드백 · 날짜로 보기 ── */
-function cmOnDay(mid, d){ return D.cm.filter(c => c.mid===mid && String(c.ts||'').slice(0,10) === d); }
-
-function fbStrip(mid){
-  const sel = S.fbDay || TODAY, wk = weekOf(sel);
-  return `<div class="wk">
-    <div class="wkhd">
-      <button data-act="fbmove:-1">‹</button>
-      <button class="d" data-act="fbcal">${dowTxt(sel)} <span style="color:var(--gold-2);font-size:12px">▾</span></button>
-      <button data-act="fbmove:1" ${sel>=TODAY?'style="opacity:.3"':''}>›</button>
+/* 세트 하나 고치기 */
+function sheetSetEdit(i, j){
+  const E = S.recEdit; if(!E) return;
+  const it = E.items[i], st = it.sets[j], e = exOf(it.ex);
+  openSheet(()=>`
+    <div class="h2">${esc(exName(it.ex,it.va))} <small>${j+1}세트</small></div>
+    <div class="grid2">
+      ${e.cardio ? `<div class="fld"><span class="fn">분</span>
+          <input class="search" type="text" inputmode="decimal" data-k="se:reps" value="${esc(st.reps)}"></div>
+        <div class="fld"><span class="fn">속도 km/h</span>
+          <input class="search" type="text" inputmode="decimal" data-k="se:spd" value="${esc(st.spd==null?'':st.spd)}"></div>`
+      : `<div class="fld"><span class="fn">무게 kg</span>
+          <input class="search" type="text" inputmode="decimal" data-k="se:kg" value="${esc(st.kg)}"></div>
+        <div class="fld"><span class="fn">횟수</span>
+          <input class="search" type="text" inputmode="numeric" data-k="se:reps" value="${esc(st.reps)}"></div>`}
     </div>
-    <div class="wkd">${wk.map((d,i)=>{ const n = cmOnDay(mid,d).length;
-      return `<button data-act="fbd:${d}" class="${d===sel?'sel':''} ${d===TODAY?'tdy':''} ${d>TODAY?'fut':''}">
-        <span class="dn ${i===0?'sun':''}">${DOW[i]}</span>
-        <span class="dnum ${n?'has':''}">${+d.slice(8)}</span>
-        <span class="dot">${n?'●':''}</span></button>`; }).join('')}</div>
-  </div>`;
+    <button class="btn blue sm" data-act="rsetsave:${i}:${j}">이 세트 고치기</button>
+    <button class="btn ghost sm" data-act="rsetdel:${i}:${j}" style="color:var(--warn)">이 세트 빼기</button>
+    <button class="btn ghost sm" data-act="close">그만두기</button>`);
 }
 
-function sheetTfCal(){
-  openSheet(()=>{
-    const sel = S.tfDay || TODAY, base = S.tfMon || sel.slice(0,7);
-    const y = +base.slice(0,4), m = +base.slice(5,7);
-    const lead = new Date(y, m-1, 1).getDay(), last = new Date(y, m, 0).getDate();
-    const cntOf = d => D.workouts.filter(w=>w.done && w.date===d && w.items.some(i=>i.sets.length)).length;
-    let cells = '';
-    DOW.forEach(d => cells += `<div class="hd">${d}</div>`);
-    for(let i=0;i<lead;i++) cells += '<div class="pad"></div>';
-    for(let d=1; d<=last; d++){
-      const ds = y + '-' + String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0');
-      const n = cntOf(ds);
-      cells += `<button class="cday ${ds===sel?'sel':''} ${n?'has':''} ${ds>TODAY?'fut':''}"
-        data-act="tfd:${ds}">${d}${n?`<i>${n}</i>`:''}</button>`;
+/* 고친 것 서버에 쓰기 */
+async function recSave(){
+  const E = S.recEdit; if(!E) return;
+  const w = D.workouts.find(x=>x.id===E.wid);
+  closeSheet(); S.recEdit = null;
+  if(!w) return;
+  toast('고치는 중이에요');
+  for(const it of E.items){
+    const src = w.items.find(x=>x._id===it._id) || {};
+    src.sets = it.sets.map(x=>({ kg:Number(x.kg)||0, reps:Number(x.reps)||0,
+      spd: x.spd==null||x.spd==='' ? undefined : Number(x.spd) }));
+    if(it._id){
+      await sv(sdel('workout_sets','item_id=eq.'+it._id), '세트 지우기');
+      if(src.sets.length) await sv(spost('workout_sets', src.sets.map((x,k)=>({
+        item_id: it._id, sort:k, kg:x.kg, reps:x.reps, spd: x.spd==null?null:x.spd, done:true }))), '세트 저장');
     }
-    return `<div class="h2">날짜 고르기 <small>수업 기록 있는 날에 표시</small></div>
-      <div class="wkhd"><button data-act="tfmon:-1">‹</button>
-        <span class="d">${y}년 ${m}월</span>
-        <button data-act="tfmon:1">›</button></div>
-      <div class="cal2">${cells}</div>
-      <button class="btn ghost sm" data-act="close">닫기</button>`;
-  });
-}
-
-function sheetFbCal(){
-  openSheet(()=>{
-    const sel = S.fbDay || TODAY, base = S.fbMon || sel.slice(0,7);
-    const y = +base.slice(0,4), m = +base.slice(5,7);
-    const lead = new Date(y, m-1, 1).getDay(), last = new Date(y, m, 0).getDate();
-    let cells = '';
-    DOW.forEach(d => cells += `<div class="hd">${d}</div>`);
-    for(let i=0;i<lead;i++) cells += '<div class="pad"></div>';
-    for(let d=1; d<=last; d++){
-      const ds = y + '-' + String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0');
-      const n = cmOnDay(S.mid, ds).length;
-      cells += `<button class="cday ${ds===sel?'sel':''} ${n?'has':''} ${ds>TODAY?'fut':''}"
-        data-act="fbd:${ds}">${d}${n?`<i>${n}</i>`:''}</button>`;
-    }
-    return `<div class="h2">날짜 고르기 <small>코멘트 온 날에 표시</small></div>
-      <div class="wkhd"><button data-act="fbmon:-1">‹</button>
-        <span class="d">${y}년 ${m}월</span>
-        <button data-act="fbmon:1">›</button></div>
-      <div class="cal2">${cells}</div>
-      <button class="btn ghost sm" data-act="close">닫기</button>`;
-  });
+  }
+  save(); toast('고쳤습니다'); render();
 }
 
 /* ── 피드백 탭 — 최근 / 수업별 / 종목별 ── */
@@ -3106,9 +3109,9 @@ function tWrite(){
         다음에 그 종목을 할 때 바로 뜹니다.</div>
        <div class="hr"></div>
        <span class="lbl" style="opacity:.6">기록 자체가 잘못됐다면</span>
-       <button class="btn ghost sm" data-act="trec:${w.id}">무게·횟수 고치기</button>
-       <div class="note">고치기를 누르면 이 기록이 <b>진행 중 상태로 되돌아갑니다.</b>
-         코멘트만 남기실 거면 위 종목을 눌러 주세요.</div>` };
+       <button class="btn blue sm" data-act="trec:${w.id}">무게·횟수 고치기</button>
+       <div class="note">기록 화면에서 <b>「기록 수정하기」</b>를 누르면 세트를 하나씩 고칠 수 있어요.
+         <b>운동이 다시 시작되지는 않습니다.</b></div>` };
 }
 function tRoutines(){
   const mid=S.tmid||'m1', all=myRoutines(mid), t=D.today[mid];
@@ -3855,6 +3858,38 @@ document.addEventListener('click', ev=>{
     case 'askfin': sheetFinish(); return;
     case 'dofin': closeSheet(); finish(); return;
     case 'trec': S.wid=rest[0]; go('record'); return;
+    case 'recedit': { const w=D.workouts.find(x=>x.id===rest[0]); if(!w) return;
+      S.recEdit = { wid:w.id, items: w.items.map(it=>({ _id:it._id, ex:it.ex, va:it.va,
+        sets: it.sets.map(x=>({ kg:x.kg, reps:x.reps, spd:x.spd })) })) };
+      S.wid = w.id; go('record'); return; }
+    case 'reccancel': { S.recEdit=null; closeSheet(); render(); return; }
+    case 'rset': sheetSetEdit(Number(rest[0]), Number(rest[1])); return;
+    case 'rsetsave': {
+      const [i,j] = rest.map(Number), it = S.recEdit.items[i], st = it.sets[j];
+      const g = k => { const el=document.querySelector('[data-k="se:'+k+'"]'); return el? el.value.trim() : ''; };
+      if(exOf(it.ex).cardio){ st.reps = nnum(g('reps')); st.spd = g('spd')===''? undefined : nnum(g('spd')); }
+      else { st.kg = nnum(g('kg')); st.reps = nnum(g('reps')); }
+      closeSheet(); toast('바꿨어요 · 아직 저장 전입니다'); render(); return; }
+    case 'rsetdel': {
+      const [i,j] = rest.map(Number);
+      S.recEdit.items[i].sets.splice(j,1);
+      closeSheet(); toast('뺐어요 · 아직 저장 전입니다'); render(); return; }
+    case 'raddset': {
+      const i = Number(rest[0]), it = S.recEdit.items[i];
+      const last = it.sets[it.sets.length-1] || { kg:0, reps:10 };
+      it.sets.push({ kg:last.kg, reps:last.reps, spd:last.spd });
+      render(); return; }
+    case 'recask': {
+      const E = S.recEdit; if(!E) return;
+      const n = E.items.reduce((a,it)=>a+it.sets.length, 0);
+      openSheet(()=>`<div class="h2">이대로 수정할까요?</div>
+        <div class="card">${E.items.map(it=>`<div class="frow"><span class="fk">${esc(exName(it.ex,it.va))}</span>
+          <span class="fv">${it.sets.map(x=>setTxt(it.ex,x)).join(' · ')||'세트 없음'}</span></div>`).join('')}</div>
+        <div class="note">세트 ${n}개로 바꿉니다. <b>운동이 다시 시작되지 않습니다</b> — 기록만 고칩니다.</div>
+        <button class="btn blue" data-act="recsavego">수정하기</button>
+        <button class="btn ghost sm" data-act="close">그만두기</button>`);
+      return; }
+    case 'recsavego': recSave(); return;
     case 'resume': {
       const i=D.workouts.findIndex(x=>x.id===rest[0]);
       if(i<0){ toast('되돌릴 수 없어요'); return; }
