@@ -1770,8 +1770,8 @@ function vPlanEdit(){
     <div class="grid2">${num('now','f','체지방량 kg')}${num('now','fp','체지방률 %')}</div>
     <span class="lbl">목표</span>
     <div class="grid2">
-      <div class="fld"><span class="fn">목표 기간 — 「3개월」 또는 「12월 2일」</span>
-        <input class="search" type="text" data-k="plto:when" value="${esc(g.to.when||g.to.date||'')}" placeholder="3개월"></div>
+      <div class="fld"><span class="fn">목표 기간</span>
+        <input class="search" type="text" data-k="plto:when" value="${esc(g.to.when||g.to.date||'')}" placeholder="3개월 · 12월2일"></div>
       <div class="fld"><span class="fn">희망 몸무게 kg</span>
         <input class="search" type="text" inputmode="decimal" data-k="plto:w" value="${esc(g.to.w!=null?g.to.w:'')}" placeholder="55"></div>
     </div>
@@ -1807,8 +1807,7 @@ function vPlan(){
   const unit = u => u==='fp' ? '%' : 'kg';
   const has=u=>g.to[u]!=null&&g.to[u]!=='';
   const cmp=(k,u)=>`<div class="frow"><span class="fk">${k}</span>
-    <span class="fv">${g.now[u]!=null&&g.now[u]!==''?g.now[u]+unit(u):'—'}${has(u)?`
-      <span style="color:#5f5c57">→</span> <b style="color:var(--gold)">${g.to[u]+unit(u)}</b>`:''}</span></div>`;
+    <span class="fv">${g.now[u]!=null&&g.now[u]!==''?g.now[u]+unit(u):'—'}${has(u)?` <span style="color:#5f5c57">→</span> <b style="color:var(--gold)">${g.to[u]+unit(u)}</b>`:''}</span></div>`;
   return { top: bar('운동계획', `<span class="sub">${esc(subjName())}</span>`, tr?'tm:'+mid:'tab:me'), body:`
     ${tr?`<button class="btn main" data-act="editplan:${mid}">계획 고치기 · 칼로리 계산</button>`:''}
     <span class="lbl">나의 운동 목적</span>
