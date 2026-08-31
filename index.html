@@ -64,15 +64,15 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .crow .cv{font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}
 .crow .cv.g{color:var(--gold);font-size:17px}
 .crow .cs{font-size:12px;font-weight:500;color:var(--sub)}
-.kedit{display:flex;align-items:center;gap:6px}
-.kedit .ku{font-size:12px;font-weight:500;color:var(--sub)}
-.kin{width:80px;background:var(--dark-3);border:1px solid var(--gold-2);border-radius:8px;
+.calc .kedit{display:flex;align-items:center;gap:5px;flex:0 0 auto}
+.calc .kedit .ku{font-size:12px;font-weight:500;color:var(--sub)}
+.calc input.kin{width:74px;background:var(--dark-3);border:1px solid var(--gold-2);border-radius:8px;
   padding:7px 8px;font-size:16px;font-weight:700;color:var(--gold);text-align:right;
   font-variant-numeric:tabular-nums;font-family:inherit}
-.kin::placeholder{color:var(--gold);opacity:.55;font-weight:700}
-.stp{width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:var(--dark-3);
-  color:var(--cream);font-size:17px;font-weight:700;line-height:1;font-family:inherit}
-.stp:active{background:var(--gold-2);color:#fff}
+.calc input.kin::placeholder{color:var(--gold);opacity:.6;font-weight:700}
+.calc .stp{width:31px;height:31px;flex:0 0 auto;border-radius:8px;border:1px solid var(--line);
+  background:var(--dark-3);color:var(--cream);font-size:17px;font-weight:700;line-height:1;font-family:inherit}
+.calc .stp:active{background:var(--gold-2);color:#fff}
 .mac{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .mac div{background:var(--dark-3);border:1px solid var(--line);border-radius:10px;padding:10px;
   display:flex;flex-direction:column;gap:2px;align-items:center}
@@ -1654,10 +1654,10 @@ function calcHTML(g, ed){
       <span class="cv">${r.bmr||'—'}<span class="cs"> kcal</span></span></div>
     <div class="crow"><span class="ck">유지 칼로리</span>
       <span class="cv">${r.total||'—'}<span class="cs"> kcal</span></span></div>
-    <div class="crow"><span class="ck">권장 섭취 칼로리${r.kcalAuto?' (자동 제안)':''}</span>
-      <span class="cv g">${r.kcal||'—'}<span class="cs"> kcal · ${esc(foodTxt(r.kcal))}</span></span></div>
-    <div class="crow"><span class="ck">하루 감량치</span>
-      <span class="cv">${r.day>0?r.day:0}<span class="cs"> kcal · ${esc(foodTxt(r.day>0?r.day:0))}</span></span></div>
+    <div class="crow"><span class="ck">권장 섭취 칼로리${r.kcalAuto?' · 자동':''}</span>
+      <span class="cv g">${r.kcal||'—'}<span class="cs"> kcal</span></span></div>
+    <div class="crow"><span class="ck">하루 감량치 <span style="color:var(--gold-2)">${esc(foodTxt(r.day>0?r.day:0))}</span></span>
+      <span class="cv">${r.day>0?r.day:0}<span class="cs"> kcal</span></span></div>
     <div class="crow"><span class="ck">주당 감량치</span>
       <span class="cv">${r.week>0?r.week.toLocaleString():0}<span class="cs"> kcal · ${kg(r.wkKg)}kg</span></span></div>
     <div class="crow"><span class="ck">한 달 예상</span>
