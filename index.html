@@ -516,7 +516,7 @@ const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0
 
 let netBad = 0;
 async function sget(q){
-  const r = await fetch(SB_URL + '/rest/v1/' + q, { headers: SB_H });
+  const r = await fetch(SB_URL + '/rest/v1/' + q, { headers: SB_H, cache: 'no-store' });
   if(!r.ok) throw new Error(await r.text());
   return r.json();
 }
@@ -627,6 +627,10 @@ async function boot(){
     kcal:m.kcal||0, carb:m.carb||0, protein:m.protein||0, fat:m.fat||0 }));
 
   closeStale();                                                          // 날짜 지난 기록은 자동 종료
+  if(wks.length && !witems.length){
+    console.warn('종목이 하나도 안 왔습니다 — 캐시 의심', wks.length, witems.length);
+    netBad++;
+  }
   D.asks = (aks||[]).map(a => { const [ex,va] = splitV(a.variant_id);
     return { id:a.id, mid:a.member_id, ex, va, wid:a.workout_id, note:a.note||'',
       ts:a.created_at, done:!!a.done_at }; });
