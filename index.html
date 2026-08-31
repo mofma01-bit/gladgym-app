@@ -70,6 +70,30 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .mac .n{font-size:12px;font-weight:500;color:var(--sub)}
 .mac .v{font-size:17px;font-weight:900;color:var(--gold)}
 .mac .u{font-size:11.5px;font-weight:500;color:var(--sub)}
+
+.bar{height:9px;border-radius:5px;background:#2f2f2a;overflow:hidden;display:flex}
+.bar i{display:block;height:100%;background:var(--gold);border-radius:5px}
+.bar i.over{background:var(--warn)}
+#main.lite .bar{background:#eadfcd}
+.kcard{background:#1f1f1c;border:1px solid #35342e;border-radius:13px;padding:15px;
+  display:flex;flex-direction:column;gap:10px}
+#main.lite .kcard{background:#fff;border-color:#e6ddcf}
+.kbig{display:flex;align-items:baseline;gap:8px}
+.kbig .v{font-size:29px;font-weight:900;letter-spacing:-.03em}
+.kbig .v.g{color:var(--gold)}
+.kbig .v.w{color:var(--warn)}
+.kbig .u{font-size:13px;font-weight:500;color:var(--sub)}
+#main.lite .kbig .v{color:#2b231c}
+#main.lite .kbig .v.g{color:#8a5a2b}
+#main.lite .kbig .u{color:#7b6c5d}
+.krow{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:500}
+.krow .k{color:var(--sub);flex:1}
+#main.lite .krow .k{color:#7b6c5d}
+.krow .v{font-weight:700;font-variant-numeric:tabular-nums}
+.m3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.m3 > div{display:flex;flex-direction:column;gap:5px}
+.m3 .t{font-size:12px;font-weight:600;color:var(--sub)}
+#main.lite .m3 .t{color:#7b6c5d}
 .req{color:var(--gold)}
 
 #main{flex:1;overflow-y:auto;overflow-x:hidden;padding:16px;display:flex;flex-direction:column;gap:13px}
@@ -509,7 +533,8 @@ async function boot(){
   D.body = {}; bdy.forEach(r => D.body[r.member_id] = { date:r.on_date, checks:r.checks||{}, photos:r.photos||{}, memo:r.memo||'' });
   D.cycle = {}; cyc.forEach(r => D.cycle[r.member_id] = { on:r.enabled, last:r.last_start, len:r.cyc_len, period:r.period_len });
   D.meals = (mls||[]).map(m => ({ id:m.id, mid:m.member_id, date:m.on_date, slot:m.slot,
-    path:m.path, memo:m.memo||'', note:m.trainer_note||'' }));
+    path:m.path, memo:m.memo||'', note:m.trainer_note||'',
+    kcal:m.kcal||0, carb:m.carb||0, protein:m.protein||0, fat:m.fat||0 }));
 
   loadLive();
   if(D.live && !D.workouts.some(w => w.id === D.live.id)) D.live = null;   // 서버에서 지워진 것
@@ -1153,6 +1178,64 @@ const SLOTS = ['아침','점심','저녁','간식'];
 const mealURL = path => path ? (SB_URL + '/storage/v1/object/public/media/' + path) : '';
 function mealsOf(mid, date){ return (D.meals||[]).filter(m=>m.mid===mid && (!date || m.date===date)); }
 
+/* 목표 대비 얼마나 채웠나 */
+function dietStat(mid, from, to){
+  const g = GOALS[mid] || {};
+  const r = calcOf(g);
+  const target = r.kcal || 0, dayLoss = r.day || 0;
+  const gm = { c:r.gg.c, p:r.gg.p, f:r.gg.f };
+  const rows = (D.meals||[]).filter(m => m.mid===mid && (!from || m.date>=from) && (!to || m.date<=to));
+  const byDay = {};
+  rows.forEach(m => { byDay[m.date] = (byDay[m.date]||0) + (Number(m.kcal)||0); });
+  const days = Object.keys(byDay);
+  let over = 0; days.forEach(d => { over += (byDay[d] - target); });
+  const eaten = rows.reduce((a,m)=>a+(Number(m.kcal)||0), 0);
+  const carb  = rows.reduce((a,m)=>a+(Number(m.carb)||0), 0);
+  const prot  = rows.reduce((a,m)=>a+(Number(m.protein)||0), 0);
+  const fat   = rows.reduce((a,m)=>a+(Number(m.fat)||0), 0);
+  const planLoss = dayLoss * days.length;
+  const realLoss = planLoss - over;
+  return { target, dayLoss, gm, days:days.length, eaten, carb, prot, fat, over,
+    planLoss, realLoss, planKg: planLoss/FAT_KCAL, realKg: realLoss/FAT_KCAL };
+}
+function weekStart(){ const d=new Date(); const w=(d.getDay()+6)%7; d.setDate(d.getDate()-w);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function monthStart(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-01'; }
+
+function kcalCard(mid, day){
+  const st = dietStat(mid, day, day);
+  if(!st.target) return `<div class="note">운동계획에서 <b>권장 칼로리</b>를 먼저 잡아 주세요. 잡으면 여기에 오늘 남은 칼로리가 나옵니다.</div>`;
+  const left = st.target - st.eaten, over = left < 0;
+  const pct = Math.min(100, Math.round(st.eaten / st.target * 100));
+  const mm = (nm, got, goal) => `<div><span class="t">${nm} ${got}/${goal}g</span>
+    <span class="bar"><i class="${got>goal?'over':''}" style="width:${Math.min(100, goal?Math.round(got/goal*100):0)}%"></i></span></div>`;
+  return `<div class="kcard">
+    <div class="kbig"><span class="v ${over?'w':'g'}">${over ? '+'+Math.abs(left).toLocaleString() : left.toLocaleString()}</span>
+      <span class="u">kcal ${over ? '초과' : '남음'}</span></div>
+    <span class="bar"><i class="${over?'over':''}" style="width:${pct}%"></i></span>
+    <div class="krow"><span class="k">먹은 칼로리</span><span class="v">${st.eaten.toLocaleString()} / ${st.target.toLocaleString()} kcal</span></div>
+    <div class="m3">
+      ${mm('탄수', st.carb, st.gm.c)}${mm('단백', st.prot, st.gm.p)}${mm('지방', st.fat, st.gm.f)}
+    </div></div>`;
+}
+
+function kcalSummary(mid){
+  const kg = v => (Math.round(v*100)/100).toFixed(2);
+  const box = (nm, st) => {
+    if(!st.days) return `<div class="krow"><span class="k">${nm}</span><span class="v" style="color:var(--sub)">기록 없음</span></div>`;
+    const over = st.over > 0;
+    return `<div class="krow"><span class="k">${nm} · ${st.days}일 기록</span>
+      <span class="v" style="color:${over?'var(--warn)':'var(--gold)'}">${over?'+':''}${Math.round(st.over).toLocaleString()} kcal</span></div>
+      <div class="krow"><span class="k" style="padding-left:10px">예상 감량</span>
+      <span class="v">${kg(st.realKg)}kg <span style="color:var(--sub);font-weight:500">(계획 ${kg(st.planKg)}kg)</span></span></div>`;
+  };
+  const w = dietStat(mid, weekStart(), TODAY), m = dietStat(mid, monthStart(), TODAY);
+  if(!w.target) return '';
+  return `<div class="kcard">
+    ${box('이번 주', w)}<div class="hr"></div>${box('이번 달', m)}
+    <div class="note">목표보다 <b>더 먹으면 +</b>, 덜 먹으면 −로 쌓입니다. 지방 1kg = 7,700kcal 로 환산했습니다.</div></div>`;
+}
+
 function vDiet(){
   const mid = (S.who==='tr') ? (S.subj||S.tmid) : S.mid;
   const tr = (S.who==='tr');
@@ -1163,15 +1246,19 @@ function vDiet(){
   return { top: bar('식단', `<span class="sub">${esc((MEMBERS.find(m=>m.id===mid)||{}).n||'')}</span>`, tr?'tm:'+mid:null),
     tabs: !tr, lite:true, body:`
     <div class="chips">${days.map(d=>`<button class="chip ${d===day?'on':''}" data-act="dday:${d}">${d===TODAY?'오늘':dateTxt(d)}</button>`).join('')}</div>
+    ${kcalCard(mid, day)}
     ${tr?'':`<button class="shotbtn" data-act="shot">
       <span class="ic">▣</span><span class="t">식단 사진 찍기</span>
       <span class="s">글래드짐 표시와 날짜·시간이 같이 찍힙니다</span></button>`}
     ${list.length?`<div class="mealgrid">${list.map(m=>`
       <button class="mealcard" data-act="meal:${m.id}">
         <img src="${esc(mealURL(m.path))}" alt="">
-        <span class="cap">${esc(m.slot)}<span>${esc(m.memo||'')}${m.note?' · 코멘트 있음':''}</span></span>
+        <span class="cap">${esc(m.slot)}${m.kcal?` · ${m.kcal}kcal`:''}<span>${esc(m.memo||'')}${m.note?' · 코멘트 있음':''}</span></span>
       </button>`).join('')}</div>`
      : '<div class="empty">이 날은 올린 식단이 없어요</div>'}
+    <div class="hr"></div>
+    <span class="lbl">쌓인 것</span>
+    ${kcalSummary(mid)}
     <div class="note">사진은 <b>긴 변 1600px</b> 로 줄여 올라갑니다. 아래에 글래드짐 표시와 찍은 날짜·시간이 찍힙니다.</div>` };
 }
 
@@ -1182,6 +1269,13 @@ function sheetMeal(id){
     <div class="h2">${esc(m.slot)} <small>${dateTxt(m.date)}</small></div>
     <img class="shot" src="${esc(mealURL(m.path))}" alt="">
     ${m.memo?`<div class="note">${esc(m.memo)}</div>`:''}
+    <div class="grid2">
+      <div class="fld"><span class="fn">칼로리</span><input class="search" type="text" inputmode="numeric" data-k="ek:${m.id}" value="${m.kcal||''}"></div>
+      <div class="fld"><span class="fn">탄수 g</span><input class="search" type="text" inputmode="numeric" data-k="ec:${m.id}" value="${m.carb||''}"></div>
+      <div class="fld"><span class="fn">단백 g</span><input class="search" type="text" inputmode="numeric" data-k="ep:${m.id}" value="${m.protein||''}"></div>
+      <div class="fld"><span class="fn">지방 g</span><input class="search" type="text" inputmode="numeric" data-k="ef:${m.id}" value="${m.fat||''}"></div>
+    </div>
+    <button class="btn sub sm" data-act="mealkcal:${m.id}">칼로리 저장</button>
     ${m.note?`<div class="cm"><span class="who">${esc(TRAINER)} 트레이너</span><span class="tx">${esc(m.note)}</span></div>`:''}
     ${tr?`<span class="lbl">코멘트 남기기</span>
       <textarea data-k="mn:${m.id}" placeholder="식단에 한마디">${esc(m.note||'')}</textarea>
@@ -1255,6 +1349,13 @@ function sheetShot(){
     <img class="shot" src="${S.shot}" alt="">
     <span class="lbl">언제 먹은 건가요</span>
     <div class="chips">${SLOTS.map(x=>`<button class="chip ${S.shotSlot===x?'on':''}" data-act="slot:${x}">${x}</button>`).join('')}</div>
+    <span class="lbl">칼로리와 탄단지 (아는 만큼만)</span>
+    <div class="grid2">
+      <div class="fld"><span class="fn">칼로리</span><input class="search" type="text" inputmode="numeric" data-k="mk" placeholder="예) 620"></div>
+      <div class="fld"><span class="fn">탄수 g</span><input class="search" type="text" inputmode="numeric" data-k="mc" placeholder=""></div>
+      <div class="fld"><span class="fn">단백 g</span><input class="search" type="text" inputmode="numeric" data-k="mp" placeholder=""></div>
+      <div class="fld"><span class="fn">지방 g</span><input class="search" type="text" inputmode="numeric" data-k="mf" placeholder=""></div>
+    </div>
     <textarea data-k="mmemo" placeholder="한마디 (안 적어도 됩니다)"></textarea>
     <div style="display:flex;gap:9px">
       <button class="btn main" data-act="shotup">올리기</button>
@@ -1263,6 +1364,8 @@ function sheetShot(){
 
 async function uploadMeal(){
   const mid = S.mid, day = TODAY;
+  const gv = k => { const el=document.querySelector('[data-k="'+k+'"]'); return el ? nnum(el.value) : 0; };
+  const kcal = gv('mk'), carb = gv('mc'), prot = gv('mp'), fat = gv('mf');
   const memoEl = document.querySelector('[data-k="mmemo"]');
   const memo = memoEl ? memoEl.value.trim() : '';
   const id = 'meal'+Date.now();
@@ -1272,9 +1375,12 @@ async function uploadMeal(){
   const r = await fetch(SB_URL+'/storage/v1/object/media/'+path, {
     method:'POST', headers:{ apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'image/jpeg' }, body: blob });
   if(!r.ok){ toast('사진을 못 올렸어요'); console.error(await r.text()); return; }
-  await sv(spost('meals',[{ id, member_id:mid, on_date:day, slot:S.shotSlot, path, memo }]), '식단 저장');
+  await sv(spost('meals',[{ id, member_id:mid, on_date:day, slot:S.shotSlot, path, memo,
+    kcal:kcal||null, carb:carb||null, protein:prot||null, fat:fat||null }]), '식단 저장');
   D.meals = D.meals || [];
-  D.meals.unshift({ id, mid, date:day, slot:S.shotSlot, path, memo, note:'' });
+  D.meals.unshift({ id, mid, date:day, slot:S.shotSlot, path, memo, note:'',
+    kcal, carb, protein:prot, fat });
+  if(S.draft){ ['mk','mc','mp','mf','mmemo'].forEach(k=>delete S.draft[k]); }
   S.shot=null; S.dietDay=day; toast('올렸어요'); render();
 }
 
@@ -1388,6 +1494,7 @@ function vIntake(){
   const mid=subj(), d=D.intake[mid]||{}, tr=(S.who==='tr');
   const row=(k,v)=>`<div class="frow"><span class="fk">${esc(k)}</span><span class="fv ${v?'':'none'}">${esc(v||'아직 안 적음')}</span></div>`;
   return { top: bar('상담일지', `<span class="sub">${esc(subjName())}</span>`, tr?'tm:'+mid:'tab:me'), body:`
+    ${tr?`<button class="btn main" data-act="editintake:${mid}">상담일지 고치기</button>`:''}
     <div class="card">
       ${row('나이', d.age?d.age+'세':'')}${row('신장', d.height)}${row('성별', d.sex)}
       ${row('직업', d.job)}${row('직업환경', d.jobenv)}${row('교대근무', d.shift)}</div>
@@ -1583,9 +1690,10 @@ function vPlan(){
     <span class="fv">${g.now[u]!=null&&g.now[u]!==''?g.now[u]+unit(u):'—'} <span style="color:#5f5c57">→</span>
     <b style="color:var(--gold)">${g.to[u]!=null&&g.to[u]!==''?g.to[u]+unit(u):'—'}</b></span></div>`;
   return { top: bar('운동계획', `<span class="sub">${esc(subjName())}</span>`, tr?'tm:'+mid:'tab:me'), body:`
+    ${tr?`<button class="btn main" data-act="editplan:${mid}">계획 고치기 · 칼로리 계산</button>`:''}
     <span class="lbl">나의 운동 목적</span>
     <div class="chips">${['다이어트','근육증가','교정운동','건강','기타목적'].map(x=>
-      `<span class="chip ${(g.purpose||[]).includes(x)?'on':''}">${x}</span>`).join('')}</div>
+      `<button class="chip ${(g.purpose||[]).includes(x)?'on':''}" ${tr?`data-act="editplan:${mid}"`:''}>${x}</button>`).join('')}</div>
     <span class="lbl">목표 선언 — 현재에서 미래로</span>
     <div class="card">
       <div class="sm">${esc(g.now.date||'—')} → ${esc(g.to.date||'—')}</div>
@@ -1602,7 +1710,7 @@ function vPlan(){
     <div class="card">${(g.vows||[]).map(v=>`<div class="frow"><span class="fk" style="min-width:20px;color:var(--gold)">✓</span><span class="fv">${esc(v)}</span></div>`).join('')}</div>
     <span class="lbl">회원님, 이건 꼭 약속해요</span>
     <div class="card">${(g.promises||[]).map(v=>`<div class="frow"><span class="fk" style="min-width:20px;color:var(--teal)">✓</span><span class="fv">${esc(v)}</span></div>`).join('')}</div>
-    ${tr?`<button class="btn sub" data-act="editplan:${mid}">고치기</button>`:''}` };
+` };
 }
 
 /* ── 체형분석 ── */
@@ -1785,7 +1893,7 @@ function tMembers(){
       const ws=D.workouts.filter(w=>w.mid===m.id&&w.done).slice().sort(byDateDesc), last=ws[0];
       const lv=liveOf(m.id);
       const nofb=last && !D.cm.some(c=>c.mid===m.id && c.at==='방금');
-      return `<button class="card rowc" data-nm="${esc(m.n)}" data-act="${lv?'tlive:'+m.id:'tm:'+m.id}">
+      return `<button class="card rowc" data-nm="${esc(m.n)}" data-act="tm:${m.id}">
         <div><div class="nm">${esc(m.n)}</div>
         <div class="sm">${lv?`지금 운동 중 · ${esc((it0=>it0?exName(it0.ex,it0.va):'')(lv.items[lv.cur]||lv.items[0]))}`
           :(last?`${dateTxt(last.date)} · ${esc(last.kind||'')}`:'기록 없음')}</div></div>
@@ -2032,6 +2140,11 @@ document.addEventListener('click', ev=>{
     case 'shotup': uploadMeal(); return;
     case 'dday': S.dietDay=rest[0]; render(); return;
     case 'meal': sheetMeal(rest[0]); return;
+    case 'mealkcal': { const id=rest[0], m=(D.meals||[]).find(x=>x.id===id); if(!m) return;
+      const gv=k=>{ const el=document.querySelector('[data-k="'+k+':'+id+'"]'); return el?nnum(el.value):0; };
+      m.kcal=gv('ek'); m.carb=gv('ec'); m.protein=gv('ep'); m.fat=gv('ef');
+      sv(spatch('meals','id=eq.'+id,{ kcal:m.kcal||null, carb:m.carb||null, protein:m.protein||null, fat:m.fat||null }), '칼로리 저장');
+      toast('저장했어요'); drawSheet(); render(); return; }
     case 'mealnote': { const id=rest[0], m=(D.meals||[]).find(x=>x.id===id); if(!m) return;
       const el=document.querySelector('[data-k="mn:'+id+'"]'); const txt=el?el.value.trim():'';
       m.note=txt;
@@ -2392,7 +2505,8 @@ setInterval(async ()=>{
       sget('meals?select=*&order=created_at.desc&limit=300')
     ]);
     D.meals = (mls||[]).map(m => ({ id:m.id, mid:m.member_id, date:m.on_date, slot:m.slot,
-      path:m.path, memo:m.memo||'', note:m.trainer_note||'' }));
+      path:m.path, memo:m.memo||'', note:m.trainer_note||'',
+    kcal:m.kcal||0, carb:m.carb||0, protein:m.protein||0, fat:m.fat||0 }));
     const sig = cms.map(c=>c.id+(c.read_at?'1':'0')).join(',') + '|' +
                 wks.map(w=>w.id+(w.done?'1':'0')+w.dur).join(',') + '|' +
                 (mls||[]).map(m=>m.id+(m.trainer_note?'1':'0')).join(',');
