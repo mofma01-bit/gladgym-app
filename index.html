@@ -599,7 +599,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '62';
+const BUILD = '63';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1067,7 +1067,7 @@ function att(k){ S.att=S.att||{}; return S.att[k]||(S.att[k]={}); }
 
 setInterval(()=>{
   const w=live();
-  if(w && (S.screen==='workout'||S.screen==='t_live')){ const el=$('#tm'); if(el) el.textContent=mmss((Date.now()-w.startAt)/1000); }
+  if(w && w.startAt && (S.screen==='workout'||S.screen==='t_live')){ const el=$('#tm'); if(el) el.textContent=mmss((Date.now()-w.startAt)/1000); }
   if(S.rest && S.rest.until){
     const left=(S.rest.until-Date.now())/1000;
     if(left<=0){ S.rest=null; closeSheet(); toast('쉬는 시간이 끝났어요'); render(); }
@@ -1335,7 +1335,10 @@ function sheetPickVar(exid){
 async function newLive(title, items, kind, rid, mid, by){
   const id='w'+Date.now();
   mid = mid || S.mid;
-  D.live={ id, mid, title, kind:kind||'개인운동', rid:rid||null, date:TODAY, startAt:Date.now(), items, cur:0, by:by||'회원' };
+  const kd = kind || '개인운동';
+  const t0 = (kd === '수업') ? null : Date.now();          /* 수업은 시계를 자동으로 켜지 않는다 */
+  D.live={ id, mid, title, kind:kd, rid:rid||null, date:TODAY, startAt:t0, items, cur:0, by:by||'회원' };
+  if(!t0) items.forEach(it=>{ it.startAt = null; });
   save(); go('workout');
   await sv(spost('workouts',[{ id, member_id:mid, on_date:TODAY, kind:D.live.kind,
     routine_id:rid||null, title, dur:0, done:false }]), '운동 시작');
@@ -1388,7 +1391,9 @@ function itemsFromRoutine(r){
 function vWorkout(){
   const w=live(); if(!w) return vHome();
   if(!w.items.length) return {
-    top: bar('운동 중', `<span class="tm" id="tm">${mmss((Date.now()-w.startAt)/1000)}</span>`, 'go:home'),
+    top: bar('운동 중', (w.startAt ? (w.startAt ? `<span class="tm" id="tm">${mmss((Date.now()-w.startAt)/1000)}</span>`
+      : `<button class="chip t" data-act="timego">시간 재기 ▶</button>`)
+      : `<button class="chip t" data-act="timego">시간 재기 ▶</button>`), 'go:home'),
     body:`<div class="empty">종목을 담아 주세요</div>`,
     foot:`<button class="btn sub" data-act="go:pick">운동 추가</button><button class="btn ghost" data-act="askcancel">기록 지우고 나가기</button>` };
   const cur=w.items[w.cur]||w.items[0], e=exOf(cur.ex), v=varOf(cur.ex,cur.va);
@@ -3079,7 +3084,8 @@ function tMember(){
 function tLive(){
   const lv=liveOf(S.tmid); if(!lv) return tMembers();
   const m=MEMBERS.find(x=>x.id===lv.mid);
-  return { top: bar(m.n+' · 수업 중', `<span class="tm" id="tm">${mmss((Date.now()-lv.startAt)/1000)}</span>`, 'tm:'+m.id),
+  return { top: bar(m.n+' · 수업 중', (lv.startAt ? `<span class="tm" id="tm">${mmss((Date.now()-lv.startAt)/1000)}</span>`
+      : `<button class="chip t" data-act="timego">시간 재기 ▶</button>`), 'tm:'+m.id),
     keepScroll:true, body:
     lv.items.map((it,i)=>{ const sent=D.cm.filter(c=>c.mid===m.id&&c.ex===it.ex&&c.va===it.va&&c.at==='방금');
       return `<button class="card ${i===lv.cur?'gold':''}" data-act="exd:${it.ex}:${it.va}:${m.id}">
@@ -3803,7 +3809,7 @@ document.addEventListener('click', ev=>{
     case 'add': { const [ex,va]=rest;
       if(!w) newLive('빈 운동', [], '개인운동');
       const last=lastSet(ex,va);
-      live().items.push({ ex, va, rest:60, locked:false, sec:0, startAt:Date.now(),
+      live().items.push({ ex, va, rest:60, locked:false, sec:0, startAt: live().startAt ? Date.now() : null,
         sets:[ exOf(ex).cardio ? {kg:0, reps:last?last.reps:20, spd:(last&&last.spd)?last.spd:6.5, done:false}
                                : {kg:last?last.kg:20, reps:last?last.reps:10, done:false} ] });
       live().cur=live().items.length-1; save();
@@ -3840,16 +3846,20 @@ document.addEventListener('click', ev=>{
     case 'fin': { const cur=w.items[w.cur];
       if(!cur.locked){
         cur.sets.forEach(s=>s.done=true); cur.locked=true;
-        cur.sec=(cur.sec||0)+(Date.now()-cur.startAt)/1000;
+        cur.sec=(cur.sec||0)+(cur.startAt ? (Date.now()-cur.startAt)/1000 : 0);
         const doneIdx=w.cur;
         const nxt=w.items.findIndex(it=>!it.locked);
         svItem(doneIdx);
-        if(nxt>=0){ w.cur=nxt; w.items[nxt].startAt=Date.now(); save(); toast('잠갔습니다 · 다음 종목'); render(); return; }
+        if(nxt>=0){ w.cur=nxt; w.items[nxt].startAt = w.startAt ? Date.now() : null; save(); toast('잠갔습니다 · 다음 종목'); render(); return; }
         save(); render();
       }
       sheetFinish(); return; }
     case 'askfin': sheetFinish(); return;
     case 'dofin': closeSheet(); finish(); return;
+    case 'timego': { const w=live(); if(!w) return;
+      w.startAt = Date.now();
+      const cur = w.items[w.cur]; if(cur && !cur.startAt) cur.startAt = Date.now();
+      save(); toast('시간을 재기 시작했어요'); render(); return; }
     case 'trec': S.wid=rest[0]; go('record'); return;
     case 'recedit': { const w=D.workouts.find(x=>x.id===rest[0]); if(!w) return;
       S.recEdit = { wid:w.id, items: w.items.map(it=>({ _id:it._id, ex:it.ex, va:it.va,
@@ -4010,9 +4020,10 @@ async function finish(){
     await sv(sdel('workouts','id=eq.'+w.id), '운동 지우기');
     D.workouts=D.workouts.filter(x=>x.id!==w.id);
     D.live=null; save(); toast('기록할 세트가 없어요'); go('home'); return; }
-  done.forEach(it=>{ if(!it.locked){ it.locked=true; it.sec=(it.sec||0)+(Date.now()-it.startAt)/1000; } });
+  done.forEach(it=>{ if(!it.locked){ it.locked=true; it.sec=(it.sec||0)+(it.startAt ? (Date.now()-it.startAt)/1000 : 0); } });
   w.items.forEach(it=>{ it.sec = capSec(it.sec, CAP_EX); });
-  const dur=capSec((Date.now()-w.startAt)/1000, CAP_W);
+  const dur=capSec(w.startAt ? (Date.now()-w.startAt)/1000
+    : w.items.reduce((a,it)=>a+(Number(it.sec)||0), 0), CAP_W);
   for(let i=0;i<w.items.length;i++) await svItem(i);
   await sv(spatch('workouts','id=eq.'+w.id, { done:true, dur, kind:w.kind }), '운동 저장');
   const rec={ id:w.id, mid:w.mid, date:w.date||TODAY, kind:w.kind, rid:w.rid, title:w.title, dur, done:true,
