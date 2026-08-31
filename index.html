@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap">
 
 <style>
-:root{
+:root{color-scheme:dark;
   --dark:#131312; --dark-2:#1c1c1a; --dark-3:#262623; --dark-4:#333330;
   --brown:#412921; --gold:#e6c487; --gold-2:#c9a96e; --gold-dim:#211c14;
   --teal:#9dcedc; --teal-dim:#16262b;
@@ -287,7 +287,7 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
   font-weight:700;flex:none;display:flex;align-items:center;justify-content:center}
 .step button:active{background:#45453f}
 
-textarea,input[type=text]{width:100%;background:var(--dark-3);border:1px solid var(--line);border-radius:12px;
+textarea,input[type=text],input[type=date]{width:100%;background:var(--dark-3);border:1px solid var(--line);border-radius:12px;
   padding:12px;color:var(--cream);font-family:inherit;font-size:14.5px;font-weight:500;line-height:1.8}
 textarea{min-height:92px;resize:vertical}
 textarea.tall{min-height:170px}
@@ -1554,6 +1554,15 @@ function vIntakeEdit(){
 
 /* ── 칼로리 계산기 (글래드짐 계산 시트 그대로) ── */
 const ACT = { '저활동':0.25, '가벼운활동':0.375, '보통의활동':0.555, '적극적인 활동':0.725, '매우 적극적인 활동':0.9 };
+const ACT_EX = {
+  '저활동':'하루 종일 앉아 계시고 따로 운동은 안 하심',
+  '가벼운활동':'주 1~3회 가볍게 운동',
+  '보통의활동':'주 3~5회 운동',
+  '적극적인 활동':'주 6~7회 운동, 또는 몸 쓰는 일',
+  '매우 적극적인 활동':'매일 강하게 · 하루 두 번 · 육체노동',
+};
+const DEF_WKMAX = 1;                     /* 주당 감량 상한 % — 고칠 수 있다 */
+const addDays = (ymd0, n) => { const d=new Date(ymd0+'T00:00:00'); d.setDate(d.getDate()+Math.round(n)); return ymd(d); };
 const FAT_KCAL = 7700;   /* 지방 1kg */
 
 function nnum(v){ const n=parseFloat(String(v==null?'':v).replace(/[^0-9.\-]/g,'')); return isFinite(n)?n:0; }
@@ -1598,11 +1607,11 @@ function dLeft(date){
   return Math.round((new Date(date+'T00:00:00') - new Date(TODAY+'T00:00:00'))/86400000);
 }
 function goalLine(g){
-  const d = goalDate((g.to&&g.to.when) || (g.to&&g.to.date) || '');
-  if(!d) return '<div class="note" style="padding:8px 10px">「3개월」 이나 「12월 2일」 처럼 적으면 날짜를 잡아 드립니다.</div>';
+  const d = (g.to && g.to.date) || '';
+  if(!d) return '<div class="note" style="padding:8px 10px">달력에서 목표 날짜를 골라 주세요. 그날까지 맞춰 섭취 칼로리를 잡아 드립니다.</div>';
   const n = dLeft(d);
-  return `<div class="note" style="padding:8px 10px">목표 날짜 <b style="color:var(--gold)">${d}</b>${
-    n===null?'':` · 오늘부터 <b>${n>=0?n+'일':'지난 날짜'}</b>`}</div>`;
+  return `<div class="note" style="padding:8px 10px">오늘부터 <b style="color:var(--gold)">${n>0?n+'일':(n===0?'오늘':'지난 날짜')}</b>
+    ${n>0?` · 약 ${Math.round(n/7)}주`:''}</div>`;
 }
 
 /* 「1992-03-15」 「1992.3.15」 「19920315」 「920315」 → 1992-03-15 */
@@ -1651,16 +1660,32 @@ function calcOf(g){
     bmr = Math.round(10*w + 6.25*h - 5*age + (male ? 5 : -161));
     how = '키·몸무게 기준';
   } else if(auto){ how = ''; }
-  const k    = ACT[c.act] != null ? ACT[c.act] : 0.375;
-  const actC = Math.round(bmr * k);
-  const keep = bmr + actC;
-  const freq = nnum(c.freq), burn = nnum(c.burn) || 300;
-  const exDay = Math.round(freq * burn / 7);
-  const total = keep + exDay;
+  const k     = ACT[c.act] != null ? ACT[c.act] : 0.375;
+  const actC  = Math.round(bmr * k);
+  const total = bmr + actC;             /* 활동량에 운동까지 들어 있다 */
+
+  /* 목표 날짜까지 남은 날 · 그날까지 맞추려면 하루 얼마를 덜 먹어야 하는지 */
+  const goal   = (g.to && g.to.date) || '';
+  const left   = dLeft(goal);
+  const daysTo = (left != null && left > 0) ? left : 0;
+  const need0  = (w && gw) ? (w - gw) * FAT_KCAL : 0;
+  const dayNeed = (daysTo && need0 > 0) ? Math.round(need0 / daysTo) : 0;
+
+  const floor = nnum(c.floor) || (male ? 1500 : 1200);
+  const wkMax = nnum(c.wkmax) || DEF_WKMAX;
+
   let kcal = nnum(c.kcal);
   const kcalAuto = !kcal;
-  if(kcalAuto) kcal = Math.max(male?1500:1200, Math.round((total - 500)/10)*10);
+  if(kcalAuto) kcal = dayNeed ? Math.max(floor, Math.floor((total - dayNeed)/10)*10)
+                              : Math.max(floor, Math.round((total - 500)/10)*10);
   const day  = total - kcal;
+
+  /* 안전하게 잡았을 때 언제쯤 닿는지 */
+  const dSafe = Math.max(0, Math.min(w ? w*(wkMax/100)*FAT_KCAL/7 : 0, total - floor));
+  const safeDays = (need0 > 0 && dSafe > 0) ? Math.ceil(need0/dSafe) : null;
+  const safeDate = safeDays ? addDays(TODAY, safeDays) : '';
+  const hitDays  = (need0 > 0 && day > 0) ? Math.ceil(need0/day) : null;
+  const hitDate  = hitDays ? addDays(TODAY, hitDays) : '';
   const week = day*7, month = day*30;
   let rc = nnum(c.rc)||50, rp = nnum(c.rp)||25, rf = nnum(c.rf)||25;
   let kk, gg;
@@ -1677,22 +1702,25 @@ function calcOf(g){
     kk = { c:Math.round(kcal*rc/100), p:Math.round(kcal*rp/100), f:Math.round(kcal*rf/100) };
     gg = { c:Math.round(kk.c/4), p:Math.round(kk.p/4), f:Math.round(kk.f/9) };
   }
-  const need = (w - gw) * FAT_KCAL;
-  const days = (day>0 && need>0) ? Math.ceil(need/day) : null;
+  const need = need0;
+  const days = hitDays;
   const bmi = (w && h) ? Math.round(w / Math.pow(h/100,2) * 10)/10 : 0;
   const bmiTo = (gw && h) ? Math.round(gw / Math.pow(h/100,2) * 10)/10 : 0;
   const perKg = w ? Math.round(gg.p / w * 10)/10 : 0;     /* 단백질 g/kg */
   const water = w ? Math.round(w*33/10)*10 : 0;           /* 물 ml */
   const wkPct = w ? (week/FAT_KCAL)/w*100 : 0;            /* 주당 감량 % */
-  const floor = male ? 1500 : 1200;
   const warn = [];
-  if(kcal && bmr && kcal < bmr) warn.push('권장 칼로리가 기초대사량보다 낮습니다 — 오래 끌면 근육이 빠집니다');
-  if(kcal && kcal < floor) warn.push(`${male?'남성':'여성'}은 하루 ${floor}kcal 아래로 내리지 않는 편이 좋습니다`);
-  if(wkPct > 1) warn.push('한 주에 체중의 1%가 넘게 빠지는 속도입니다 — 조금 천천히 잡으시죠');
+  if(kcal && kcal < floor) warn.push(`하루 ${floor}kcal 아래입니다 — 안전 가이드보다 낮게 잡으셨습니다`);
+  else if(kcal && bmr && kcal < bmr) warn.push('권장 칼로리가 기초대사량보다 낮습니다 — 오래 끌면 근육이 빠집니다');
+  if(wkPct > wkMax) warn.push(`한 주에 체중의 ${Math.round(wkPct*10)/10}%가 빠지는 속도입니다 (가이드 ${wkMax}%)`);
+  if(dayNeed && dayNeed > total - floor)
+    warn.push(`이 날짜에 맞추려면 하루 ${dayNeed.toLocaleString()}kcal 를 줄여야 합니다 — 먹을 수 있는 양을 넘습니다`);
   if(perKg && perKg < 1.0) warn.push(`단백질이 체중 1kg당 ${perKg}g입니다 — 근육을 지키려면 1.2g 이상을 권합니다`);
-  if(day <= 0 && kcal) warn.push('지금 설정으로는 살이 빠지지 않습니다 — 칼로리를 낮추거나 운동을 늘려 보세요');
-  return { w, gw, fp, bmr, auto, how, k, actC, keep, exDay, total, kcal, kcalAuto, day, week, month,
-    wkKg: week/FAT_KCAL, moKg: month/FAT_KCAL, rc, rp, rf, kk, gg, need, days, freq, burn,
+  if(day <= 0 && kcal && gw && w > gw) warn.push('지금 설정으로는 살이 빠지지 않습니다 — 섭취를 낮추거나 활동량을 올려 보세요');
+  const tough = !!(warn.length && safeDate && daysTo && safeDays > daysTo);
+  return { w, gw, fp, bmr, auto, how, k, actC, keep: total, total, kcal, kcalAuto, day, week, month,
+    wkKg: week/FAT_KCAL, moKg: month/FAT_KCAL, rc, rp, rf, kk, gg, need, days,
+    goal, daysTo, dayNeed, floor, wkMax, dSafe, safeDays, safeDate, hitDays, hitDate, tough,
     bmi, bmiTo, perKg, water, wkPct, warn };
 }
 
@@ -1712,6 +1740,9 @@ function calcBrief(g, ed){
           <span class="ku">kcal</span></span>`
       : `<span class="v" style="color:var(--gold)">${r.kcal.toLocaleString()} kcal</span>`}</div>
     <div class="krow"><span class="k">③ 한 달에</span><span class="v" style="color:var(--gold)">${kg(r.moKg)} kg</span></div>
+    ${r.goal && r.gw ? `<div class="krow"><span class="k">④ ${esc(r.goal)} 까지</span>
+      <span class="v" style="color:${r.hitDate && r.hitDate<=r.goal ? 'var(--gold)' : 'var(--warn)'}">${
+        !r.hitDate ? '안 빠짐' : (r.hitDate<=r.goal ? `${r.gw}kg 도착` : `${Math.round((r.w - (r.day*r.daysTo)/FAT_KCAL)*10)/10}kg 쯤`)}</span></div>` : ''}
     ${ed?`<div class="note" style="padding:8px 10px">숫자를 바꾸면 아래가 모두 따라 바뀝니다. 비우면 자동으로 잡습니다.</div>`:''}
     <div class="note">차이 <b>${r.day>0?r.day:0}kcal</b> 는 ${esc(foodTxt(r.day>0?r.day:0))} 입니다.
       하루 그만큼만 덜 드시면 한 달에 ${kg(r.moKg)}kg 이 빠집니다.</div>
@@ -1731,7 +1762,9 @@ function calcHTML(g, ed){
       <span class="cv">${r.bmr||'—'}<span class="cs"> kcal</span></span></div>
     <div class="crow"><span class="ck">유지 칼로리</span>
       <span class="cv">${r.total||'—'}<span class="cs"> kcal</span></span></div>
-    <div class="crow"><span class="ck">권장 섭취 칼로리${r.kcalAuto?' · 자동':''}</span>
+    ${r.dayNeed?`<div class="crow"><span class="ck">목표 날짜까지 <span style="color:var(--gold-2)">${r.daysTo}일</span> · 하루 줄여야 할 양</span>
+      <span class="cv">${r.dayNeed.toLocaleString()}<span class="cs"> kcal</span></span></div>`:''}
+    <div class="crow"><span class="ck">권장 섭취 칼로리${r.kcalAuto?(r.dayNeed?' · 목표 날짜 기준':' · 자동'):' · 직접 정함'}</span>
       <span class="cv g">${r.kcal||'—'}<span class="cs"> kcal</span></span></div>
     <div class="crow"><span class="ck">하루 감량치 <span style="color:var(--gold-2)">${esc(foodTxt(r.day>0?r.day:0))}</span></span>
       <span class="cv">${r.day>0?r.day:0}<span class="cs"> kcal</span></span></div>
@@ -1740,7 +1773,7 @@ function calcHTML(g, ed){
     <div class="crow"><span class="ck">한 달 예상</span>
       <span class="cv g">${r.month>0?Math.round(r.month).toLocaleString():0}<span class="cs"> kcal · ${kg(r.moKg)}kg</span></span></div>
     <div class="crow"><span class="ck">${r.w&&r.gw?`${r.w}kg → ${r.gw}kg 까지`:'목표 몸무게를 넣으면 기간이 나옵니다'}</span>
-      <span class="cv g">${per}</span></div>
+      <span class="cv g">${per}${r.hitDate?`<span class="cs"> · ${r.hitDate}</span>`:''}</span></div>
     <div class="mac">
       <div><span class="n">탄수화물 ${r.rc}%</span><span class="v">${r.gg.c}</span><span class="u">g · ${r.kk.c}kcal</span></div>
       <div><span class="n">단백질 ${r.rp}%</span><span class="v">${r.gg.p}</span><span class="u">g · ${r.kk.p}kcal</span></div>
@@ -1769,7 +1802,11 @@ function calcHTML(g, ed){
     ${r.water?`<div class="crow"><span class="ck">하루 물</span>
       <span class="cv">${(r.water/1000).toFixed(1)}<span class="cs"> L</span></span></div>`:''}
     ${r.warn.length?`<div class="note" style="border-color:var(--warn)">
-      ${r.warn.map(x=>`<div style="color:var(--warn);font-weight:700">· ${esc(x)}</div>`).join('')}</div>`:''}
+      ${r.warn.map(x=>`<div style="color:var(--warn);font-weight:700">· ${esc(x)}</div>`).join('')}
+      ${r.safeDate?`<div style="margin-top:7px">안전 가이드 안에서라면 <b style="color:var(--gold)">${r.safeDate}</b> 쯤이 여유롭습니다
+        ${r.daysTo?`(지금 목표는 ${r.daysTo}일, 가이드로는 ${r.safeDays}일)`:''}.</div>`:''}
+      <div style="margin-top:5px;opacity:.85">계산상의 숫자일 뿐 실제로 그만큼 빠지지는 않습니다.
+        필요하면 <b>그대로 진행하셔도 됩니다.</b></div></div>`:''}
     <div class="note">지방 1kg 을 빼려면 <b>7,700kcal</b> 를 써야 합니다. 위 숫자는 그 기준으로 잡은 값입니다.</div>
   </div>`;
 }
@@ -1780,10 +1817,11 @@ function calcSync(){
   if(!box) return;
   const g = GOALS[subj()] || {}; g.calc = g.calc || {}; g.now = g.now || {}; g.to = g.to || {};
   const gv = k => { const el=document.querySelector('[data-k="'+k+'"]'); return el ? el.value.trim() : undefined; };
-  ['birth','height','bmr','kcal','freq','burn','rc','rp','rf','pkg','fkg'].forEach(k=>{ const v=gv('pc:'+k); if(v!==undefined) g.calc[k]=v; });
+  ['birth','height','bmr','kcal','floor','wkmax','rc','rp','rf','pkg','fkg'].forEach(k=>{ const v=gv('pc:'+k); if(v!==undefined) g.calc[k]=v; });
   const nw = gv('plnow:w');  if(nw!==undefined) g.now.w  = nw;
   const nf = gv('plnow:fp'); if(nf!==undefined) g.now.fp = nf;
-  const tw = gv('plto:w');  if(tw!==undefined) g.to.w  = tw;
+  const tw = gv('plto:w');    if(tw!==undefined) g.to.w    = tw;
+  const td = gv('plto:date'); if(td!==undefined) g.to.date = td;
   const ae = document.activeElement, ak = (ae && box.contains(ae)) ? ae.getAttribute('data-k') : null;
   const pos = ak ? ae.selectionStart : null;
   box.innerHTML = calcBrief(g,1) + calcHTML(g,1);
@@ -1845,22 +1883,29 @@ function vPlanEdit(){
       체지방률까지 있으면 더 정확하게 잡습니다.</div>
     <span class="lbl">목표</span>
     <div class="grid2">
-      <div class="fld"><span class="fn">목표 기간</span>
-        <input class="search" type="text" data-k="plto:when" value="${esc(g.to.when||g.to.date||'')}" placeholder="3개월 · 12월2일"></div>
+      <div class="fld"><span class="fn">목표 날짜</span>
+        <input class="search" type="date" data-k="plto:date" min="${TODAY}" value="${esc(g.to.date||'')}"></div>
       <div class="fld"><span class="fn">희망 몸무게 kg</span>
         <input class="search" type="text" inputmode="decimal" data-k="plto:w" value="${esc(g.to.w!=null?g.to.w:'')}" placeholder="55"></div>
     </div>
     <div id="godate">${goalLine(g)}</div>
     <div class="hr"></div>
     <span class="lbl">칼로리 계산기</span>
-    <div class="fld"><span class="fn">생활 활동량 — 운동은 아래에서 따로 셉니다</span>
-      <div class="chips">${Object.keys(ACT).map(x=>`<button class="chip ${(c.act||'가벼운활동')===x?'on':''}" data-act="pc1:act:${x}">${esc(x)}</button>`).join('')}</div></div>
-    <div class="fld"><span class="fn">주당 운동 횟수</span>
-      <div class="chips">${[0,1,2,3,4,5,6,7].map(x=>`<button class="chip ${String(c.freq||0)===String(x)?'on':''}" data-act="pc1:freq:${x}">${x}회</button>`).join('')}</div></div>
+    <div class="fld"><span class="fn">활동량 — 운동까지 여기에 들어 있습니다</span>
+      <div class="chips" style="flex-direction:column;align-items:stretch">${Object.keys(ACT).map(x=>
+        `<button class="chip ${(c.act||'가벼운활동')===x?'on':''}" data-act="pc1:act:${x}"
+          style="text-align:left;padding:9px 12px"><b>${esc(x)}</b>
+          <span style="opacity:.75;font-weight:500"> · ${esc(ACT_EX[x])}</span></button>`).join('')}</div></div>
+    <div class="fld"><span class="fn">기초대사량 — 인바디 값</span>
+      <input class="search" type="text" inputmode="numeric" data-k="pc:bmr" value="${esc(c.bmr||'')}" placeholder="비우면 자동"></div>
+    <span class="lbl" style="opacity:.7">안전 가이드 — 넘으면 알려만 드립니다</span>
     <div class="grid2">
-      <div class="fld"><span class="fn">운동 1회 소모 (kcal)</span><input class="search" type="text" data-k="pc:burn" value="${esc(c.burn||'')}" placeholder="300"></div>
-      <div class="fld"><span class="fn">기초대사량 — 인바디 값</span><input class="search" type="text" inputmode="numeric" data-k="pc:bmr" value="${esc(c.bmr||'')}" placeholder="비우면 자동"></div>
+      <div class="fld"><span class="fn">최소 섭취 kcal</span>
+        <input class="search" type="text" inputmode="numeric" data-k="pc:floor" value="${esc(c.floor||'')}" placeholder="${c.sex==='남'?1500:1200}"></div>
+      <div class="fld"><span class="fn">주당 감량 상한 %</span>
+        <input class="search" type="text" inputmode="decimal" data-k="pc:wkmax" value="${esc(c.wkmax||'')}" placeholder="1"></div>
     </div>
+    <div class="note">이 선을 넘어도 <b>막지 않습니다.</b> 경고와 추천 날짜만 띄웁니다 — 필요하면 그대로 진행하세요.</div>
 
     <div id="calcout">${calcBrief(g,1)}${calcHTML(g,1)}</div>
     <div class="fld"><span class="fn">스스로의 다짐 — 줄바꿈으로 여러 개</span>
@@ -2304,14 +2349,14 @@ function tEx(){
 /* ═══ 동작 ═══ */
 document.addEventListener('input', ev=>{
   const k = ev.target.getAttribute && ev.target.getAttribute('data-k');
-  if(k && (k.startsWith('pc:') || k==='plnow:w' || k==='plnow:fp' || k==='plto:w')){ calcSync(); }
+  if(k && (k.startsWith('pc:') || k==='plnow:w' || k==='plnow:fp' || k==='plto:w' || k==='plto:date')){ calcSync(); }
   if(k === 'pc:birth'){
     const el=document.getElementById('agenow');
     if(el) el.innerHTML = ageTag({ birth: ev.target.value.trim() });
   }
-  if(k === 'plto:when'){
+  if(k === 'plto:date'){
     const box=document.getElementById('godate');
-    if(box) box.innerHTML = goalLine({ to:{ when: ev.target.value.trim() } });
+    if(box) box.innerHTML = goalLine({ to:{ date: ev.target.value.trim() } });
   }
   const f = ev.target.closest('[data-filter]');
   if(!f) return;
@@ -2414,11 +2459,10 @@ document.addEventListener('click', ev=>{
       const now2 = ['w','m','f','fp'].map(k=>String(g.now[k]==null?'':g.now[k]));
       if(!g.now.date || was.join('|')!==now2.join('|')) g.now.date = TODAY;   /* 잰 날 */
       g.to.w = gv('plto:w');
-      g.to.when = gv('plto:when');
-      g.to.date = goalDate(g.to.when);
-      ['m','f','fp'].forEach(k=>{ delete g.to[k]; });
+      g.to.date = gv('plto:date');
+      ['m','f','fp','when'].forEach(k=>{ delete g.to[k]; });
       g.calc = g.calc || {};
-      ['birth','height','bmr','kcal','freq','burn','rc','rp','rf','pkg','fkg'].forEach(k=>{ const el=document.querySelector('[data-k="pc:'+k+'"]'); if(el) g.calc[k]=el.value.trim(); });
+      ['birth','height','bmr','kcal','floor','wkmax','rc','rp','rf','pkg','fkg'].forEach(k=>{ const el=document.querySelector('[data-k="pc:'+k+'"]'); if(el) g.calc[k]=el.value.trim(); });
       /* 상담일지에 비어 있으면 같이 채워 둔다 (있는 값은 덮어쓰지 않는다) */
       const ik = D.intake[mid] || (D.intake[mid] = {});
       let ikDirty = false;
