@@ -1469,7 +1469,7 @@ const CYC_TIP = {
 
 /* ── 상담일지 · 운동계획 편집 서식 ── */
 const INTAKE_FIELDS = [
-  {k:'age',      n:'나이',        t:'text'},
+  {k:'birth',    n:'생년월일 — 1992-03-15',  t:'text'},
   {k:'height',   n:'신장',        t:'text'},
   {k:'sex',      n:'성별',        t:'one',  o:['여','남']},
   {k:'job',      n:'직업',        t:'text'},
@@ -1511,7 +1511,8 @@ function vIntake(){
   return { top: bar('상담일지', `<span class="sub">${esc(subjName())}</span>`, tr?'tm:'+mid:'tab:me'), body:`
     ${tr?`<button class="btn main" data-act="editintake:${mid}">상담일지 고치기</button>`:''}
     <div class="card">
-      ${row('나이', d.age?d.age+'세':'')}${row('신장', d.height)}${row('성별', d.sex)}
+      ${row('생년월일', d.birth ? `${birthYmd(d.birth)||d.birth}${ageFrom(d.birth)?`  ·  만 ${ageFrom(d.birth)}세`:''}`
+              : (d.age?d.age+'세':''))}${row('신장', d.height)}${row('성별', d.sex)}
       ${row('직업', d.job)}${row('직업환경', d.jobenv)}${row('교대근무', d.shift)}</div>
     <span class="lbl">글래드짐을 알게 된 경로</span>
     <div class="card"><div class="chips">${(d.route||[]).map(x=>`<span class="chip on">${esc(x)}</span>`).join('')||'<span class="lbl">없음</span>'}</div></div>
@@ -1598,11 +1599,43 @@ function goalLine(g){
     n===null?'':` · 오늘부터 <b>${n>=0?n+'일':'지난 날짜'}</b>`}</div>`;
 }
 
+/* 「1992-03-15」 「1992.3.15」 「19920315」 「920315」 → 1992-03-15 */
+function birthYmd(t){
+  const s0 = String(t||'').trim();
+  const cy = +TODAY.slice(2,4);
+  const ok = (y,m,d) => (y>=1900 && y<=+TODAY.slice(0,4) && m>=1 && m<=12 && d>=1 && d<=31)
+    ? y+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0') : '';
+  let m0;
+  if((m0 = s0.match(/^(\d{4})\D{1,2}(\d{1,2})\D{1,2}(\d{1,2})\D?$/))) return ok(+m0[1], +m0[2], +m0[3]);
+  if((m0 = s0.match(/^(\d{2})\D{1,2}(\d{1,2})\D{1,2}(\d{1,2})\D?$/))){
+    const yy = +m0[1]; return ok(yy<=cy?2000+yy:1900+yy, +m0[2], +m0[3]);
+  }
+  const n = s0.replace(/[^0-9]/g,'');
+  if(n.length === 8) return ok(+n.slice(0,4), +n.slice(4,6), +n.slice(6,8));
+  if(n.length === 6){ const yy = +n.slice(0,2); return ok(yy<=cy?2000+yy:1900+yy, +n.slice(2,4), +n.slice(4,6)); }
+  return '';
+}
+function ageFrom(t){
+  const d = birthYmd(t); if(!d) return 0;
+  const b = d.split('-').map(Number), n = TODAY.split('-').map(Number);
+  if(b[0] < 1900 || b[0] > n[0] || b[1] < 1 || b[1] > 12 || b[2] < 1 || b[2] > 31) return 0;
+  let a = n[0] - b[0];
+  if(n[1] < b[1] || (n[1] === b[1] && n[2] < b[2])) a--;
+  return (a >= 0 && a <= 120) ? a : 0;
+}
+function ageTag(c){
+  const a = ageFrom(c && c.birth);
+  if(a) return `<b style="color:var(--gold)">만 ${a}세</b>`;
+  if(c && String(c.birth||'').trim()) return `<b style="color:var(--warn)">날짜를 다시 봐 주세요</b>`;
+  if(c && nnum(c.age)) return `<b style="color:var(--sub)">상담일지의 ${nnum(c.age)}세로 계산 중</b>`;
+  return '';
+}
+
 function calcOf(g){
   const c = g.calc || (g.calc = {});
   const w  = nnum(g.now && g.now.w), gw = nnum(g.to && g.to.w);
   const fp = nnum(g.now && g.now.fp);                 /* 체지방률 % */
-  const h  = nnum(c.height), age = nnum(c.age), male = (c.sex === '남');
+  const h  = nnum(c.height), age = ageFrom(c.birth) || nnum(c.age), male = (c.sex === '남');
   let bmr  = nnum(c.bmr), how = '인바디 값';
   const auto = !bmr;
   if(auto && w && fp > 0 && fp < 60){                 /* 체지방률을 알면 이게 더 정확 */
@@ -1685,7 +1718,10 @@ function calcHTML(g, ed){
   const c = g.calc || {};
   const kg = v => (Math.round(v*100)/100).toFixed(2);
   const per = r.days ? (r.days>=60 ? `약 ${Math.round(r.days/30)}개월` : `약 ${Math.ceil(r.days/7)}주`) : '—';
+  const need = r.bmr ? '' : (!r.w ? '몸무게를 넣어 주세요.'
+    : '체지방률, 또는 생년월일과 키를 넣으면 기초대사량을 잡아 드립니다.');
   return `<div class="calc">
+    ${need?`<div class="note" style="border-color:var(--warn);color:var(--warn);font-weight:700">${need}</div>`:''}
     <div class="crow"><span class="ck">기초대사량 <span style="color:var(--gold-2)">${esc(r.how||'')}</span></span>
       <span class="cv">${r.bmr||'—'}<span class="cs"> kcal</span></span></div>
     <div class="crow"><span class="ck">유지 칼로리</span>
@@ -1739,7 +1775,7 @@ function calcSync(){
   if(!box) return;
   const g = GOALS[subj()] || {}; g.calc = g.calc || {}; g.now = g.now || {}; g.to = g.to || {};
   const gv = k => { const el=document.querySelector('[data-k="'+k+'"]'); return el ? el.value.trim() : undefined; };
-  ['age','height','bmr','kcal','freq','burn','rc','rp','rf','pkg','fkg'].forEach(k=>{ const v=gv('pc:'+k); if(v!==undefined) g.calc[k]=v; });
+  ['age','birth','height','bmr','kcal','freq','burn','rc','rp','rf','pkg','fkg'].forEach(k=>{ const v=gv('pc:'+k); if(v!==undefined) g.calc[k]=v; });
   const nw = gv('plnow:w');  if(nw!==undefined) g.now.w  = nw;
   const nf = gv('plnow:fp'); if(nf!==undefined) g.now.fp = nf;
   const tw = gv('plto:w');  if(tw!==undefined) g.to.w  = tw;
@@ -1750,14 +1786,32 @@ function calcSync(){
     if(el){ el.focus(); try{ el.setSelectionRange(pos,pos); }catch(e){} } }
 }
 
+/* 상담일지에서 가져왔는지 · 무엇이 비었는지 */
+function intakeNote(mid){
+  const d = D.intake[mid] || {};
+  const has = k => String(d[k]||'').trim();
+  const need = [];
+  if(!has('birth') && !has('age')) need.push('생년월일');
+  if(!has('height')) need.push('신장');
+  if(!has('sex')) need.push('성별');
+  if(!need.length) return `<div class="note" style="padding:8px 10px">상담일지에서 <b>생년월일 · 신장 · 성별</b>을 가져왔습니다.</div>`;
+  return `<div class="note" style="border-color:var(--warn);padding:9px 11px">
+    <div style="color:var(--warn);font-weight:700">상담일지에 ${need.join(' · ')}이(가) 비어 있습니다</div>
+    <div>여기 적으시면 <b>상담일지에도 같이 들어갑니다.</b></div>
+    <button class="btn ghost sm" data-act="editintake:${mid}" style="margin-top:8px">상담일지 열기 ›</button></div>`;
+}
+
 /* ── 운동계획 편집 ── */
 function vPlanEdit(){
   const mid=subj(), g=GOALS[mid]||(GOALS[mid]={});
   g.now=g.now||{}; g.to=g.to||{}; g.vows=g.vows||[]; g.promises=g.promises||[];
   const c=g.calc||(g.calc={});
   if(!c.act) c.act = '가벼운활동';
-  if(!c.sex||!c.age||!c.height){ const d=D.intake[mid]||{};
-    c.sex=c.sex||d.sex||'여'; c.age=c.age||d.age||''; c.height=c.height||String(d.height||'').replace(/[^0-9.]/g,''); }
+  { const d=D.intake[mid]||{};
+    c.sex    = c.sex    || d.sex || '';
+    c.birth  = c.birth  || d.birth || '';
+    c.age    = c.age    || String(d.age||'').replace(/[^0-9.]/g,'');
+    c.height = c.height || String(d.height||'').replace(/[^0-9.]/g,''); }
   const num=(w,k,n)=>`<div class="fld"><span class="fn">${n}</span>
     <input class="search" type="text" data-k="pl${w}:${k}" value="${esc(g[w][k]!=null?g[w][k]:'')}"></div>`;
   return { top: bar('운동계획 고치기', `<span class="sub">${esc(subjName())}</span>`, 'sub2:plan:'+mid), body:`
@@ -1767,17 +1821,24 @@ function vPlanEdit(){
     <div class="fld"><span class="fn">운동 목적</span>
       <div class="chips">${['다이어트','근육증가','교정운동','건강','기타목적'].map(x=>
         `<button class="chip ${(g.purpose||[]).includes(x)?'on':''}" data-act="pickn:pg:purpose:${x}">${x}</button>`).join('')}</div></div>
-    <div class="hr"></div><span class="lbl">현재 — 인바디에 찍힌 대로</span>
+    <div class="hr"></div><span class="lbl">현재 몸 상태</span>
+    ${intakeNote(mid)}
     <div class="fld"><span class="fn">성별</span>
       <div class="chips">${['여','남'].map(x=>`<button class="chip ${c.sex===x?'on':''}" data-act="pc1:sex:${x}">${x}</button>`).join('')}</div></div>
     <div class="grid2">
+      <div class="fld"><span class="fn">생년월일 <span id="agenow">${ageTag(c)}</span></span>
+        <input class="search" type="text" inputmode="numeric" data-k="pc:birth" value="${esc(c.birth||'')}" placeholder="1992-03-15"></div>
       <div class="fld"><span class="fn">키 cm</span>
         <input class="search" type="text" inputmode="decimal" data-k="pc:height" value="${esc(c.height||'')}"></div>
-      ${num('now','w','몸무게 kg')}
     </div>
-    <div class="grid2">${num('now','m','근육량 kg')}${num('now','f','체지방량 kg')}</div>
-    <div class="fld"><span class="fn">체지방률 % — 이게 있으면 기초대사량을 더 정확히 잡습니다</span>
-      <input class="search" type="text" inputmode="decimal" data-k="plnow:fp" value="${esc(g.now.fp!=null?g.now.fp:'')}"></div>
+    <span class="lbl" style="opacity:.7">인바디 — 하셨으면 적어 주세요</span>
+    <div class="grid2">${num('now','w','몸무게 kg')}${num('now','m','근육량 kg')}</div>
+    <div class="grid2">${num('now','f','체지방량 kg')}
+      <div class="fld"><span class="fn">체지방률 %</span>
+        <input class="search" type="text" inputmode="decimal" data-k="plnow:fp" value="${esc(g.now.fp!=null?g.now.fp:'')}"></div>
+    </div>
+    <div class="note">인바디를 안 하셨어도 <b>성별 · 생년월일 · 키 · 몸무게</b> 네 가지면 기초대사량을 추정합니다.
+      체지방률까지 있으면 더 정확하게 잡습니다.</div>
     <span class="lbl">목표</span>
     <div class="grid2">
       <div class="fld"><span class="fn">목표 기간</span>
@@ -1796,8 +1857,7 @@ function vPlanEdit(){
       <div class="fld"><span class="fn">운동 1회 소모 (kcal)</span><input class="search" type="text" data-k="pc:burn" value="${esc(c.burn||'')}" placeholder="300"></div>
       <div class="fld"><span class="fn">기초대사량 — 인바디 값</span><input class="search" type="text" inputmode="numeric" data-k="pc:bmr" value="${esc(c.bmr||'')}" placeholder="비우면 자동"></div>
     </div>
-    <div class="fld"><span class="fn">나이 — 체지방률을 모를 때만 씁니다</span>
-      <input class="search" type="text" inputmode="numeric" data-k="pc:age" value="${esc(c.age||'')}"></div>
+
     <div id="calcout">${calcBrief(g,1)}${calcHTML(g,1)}</div>
     <div class="fld"><span class="fn">스스로의 다짐 — 줄바꿈으로 여러 개</span>
       <textarea data-k="pg:vows">${esc((g.vows||[]).join('\n'))}</textarea></div>
@@ -2241,6 +2301,10 @@ function tEx(){
 document.addEventListener('input', ev=>{
   const k = ev.target.getAttribute && ev.target.getAttribute('data-k');
   if(k && (k.startsWith('pc:') || k==='plnow:w' || k==='plnow:fp' || k==='plto:w')){ calcSync(); }
+  if(k === 'pc:birth'){
+    const el=document.getElementById('agenow');
+    if(el) el.innerHTML = ageTag({ birth: ev.target.value.trim() });
+  }
   if(k === 'plto:when'){
     const box=document.getElementById('godate');
     if(box) box.innerHTML = goalLine({ to:{ when: ev.target.value.trim() } });
@@ -2350,7 +2414,14 @@ document.addEventListener('click', ev=>{
       g.to.date = goalDate(g.to.when);
       ['m','f','fp'].forEach(k=>{ delete g.to[k]; });
       g.calc = g.calc || {};
-      ['age','height','bmr','kcal','freq','burn','rc','rp','rf','pkg','fkg'].forEach(k=>{ const el=document.querySelector('[data-k="pc:'+k+'"]'); if(el) g.calc[k]=el.value.trim(); });
+      ['age','birth','height','bmr','kcal','freq','burn','rc','rp','rf','pkg','fkg'].forEach(k=>{ const el=document.querySelector('[data-k="pc:'+k+'"]'); if(el) g.calc[k]=el.value.trim(); });
+      /* 상담일지에 비어 있으면 같이 채워 둔다 (있는 값은 덮어쓰지 않는다) */
+      const ik = D.intake[mid] || (D.intake[mid] = {});
+      let ikDirty = false;
+      [['birth', g.calc.birth], ['height', g.calc.height], ['sex', g.calc.sex]].forEach(x=>{
+        if(x[1] && !String(ik[x[0]]||'').trim()){ ik[x[0]] = String(x[1]); ikDirty = true; }
+      });
+      if(ikDirty) sv(spost('intake',[{ member_id:mid, data:ik, updated_at:new Date().toISOString() }], {on:'member_id'}), '상담일지 채우기');
       const rr = calcOf(g);
       g.kcal = String(rr.kcal||''); g.ratio = `${rr.rc} / ${rr.rp} / ${rr.rf}`;
       g.wk = (Math.round(rr.wkKg*100)/100)+'kg'; g.mo = (Math.round(rr.moKg*100)/100)+'kg';
