@@ -514,7 +514,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '52';
+const BUILD = '53';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -3655,12 +3655,17 @@ setInterval(async ()=>{
     const first = !pollSig;
     pollSig=sig;
     D.cm = mapCm(cms);
-    const ids = wks.map(w=>"'"+w.id+"'").join(',');
+    const ids = wks.map(w=>'"'+w.id+'"').join(',');
     let witems=[], wsets=[];
     if(ids){
       witems = await sget('workout_items?select=*&workout_id=in.('+ids+')&order=sort');
       const iids = witems.map(i=>i.id).join(',');
       if(iids) wsets = await sget('workout_sets?select=*&item_id=in.('+iids+')&order=sort');
+    }
+    if(wks.length && !witems.length){
+      console.error('poll: 종목이 0건 — 덮어쓰지 않습니다');   /* 있던 기록을 지우느니 그대로 둔다 */
+      pollSig = '';
+      return;
     }
     D.workouts = mapWorkouts(wks, witems, wsets);
     if(D.live){
