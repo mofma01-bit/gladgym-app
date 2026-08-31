@@ -2784,11 +2784,34 @@ function tRedit(){
     <div style="display:flex;gap:9px">
       <button class="btn ${t&&t.rid===r.id&&t.kind==='수업'?'gold':'sub'} sm" data-act="assign:${r.id}:수업">수업</button>
       <button class="btn ${t&&t.rid===r.id&&t.kind==='개인운동'?'gold':'sub'} sm" data-act="assign:${r.id}:개인운동">개인운동</button></div>
-    <div class="note">지정하면 회원 홈에 <b>「오늘 · 수업 · 루틴 2」</b>처럼 뜹니다. 지정하지 않아도 회원이 직접 골라 시작할 수 있어요.</div>
+    <div class="note">누르면 <b>확인을 한 번 더</b> 받고 지정합니다. 지정된 것을 다시 누르면 <b>풀지</b> 물어봅니다.
+      지정하지 않아도 회원이 직접 골라 시작할 수 있어요.</div>
     <div class="hr"></div>
     <button class="btn ghost sm" data-act="rdel:${r.id}" style="color:var(--warn)">이 루틴 지우기</button>`,
     foot: r.items.length ? `<button class="btn sub" data-act="tstart:${r.mid}:${r.id}:수업">지금 이 루틴으로 수업</button>
       <button class="btn main" data-act="rdone:${r.id}">다 됐어요</button>` : '' };
+}
+
+/* 오늘 지정 — 누르면 확인, 이미 지정돼 있으면 풀지 물어본다 */
+function sheetAssign(rid, kind){
+  const r = rOf(rid); if(!r) return;
+  const m = MEMBERS.find(x=>x.id===r.mid) || {n:''};
+  openSheet(()=>{
+    const t = D.today[r.mid], on = !!(t && t.rid===r.id && t.kind===kind);
+    if(on) return `
+      <div class="h2">지정을 풀까요? <small>${esc(m.n)} 회원</small></div>
+      <div class="note">지금 <b>오늘 · ${esc(kind)} · 루틴 ${r.no} ${esc(r.n)}</b>으로 지정돼 있어요.
+        풀면 회원 홈에서 사라집니다. <b>이미 한 기록은 그대로 남습니다.</b></div>
+      <button class="btn main" data-act="assigno:${rid}:${kind}:off">지정 풀기</button>
+      <button class="btn ghost sm" data-act="close">그만두기</button>`;
+    return `
+      <div class="h2">오늘 ${esc(kind)}으로 지정할까요? <small>${esc(m.n)} 회원</small></div>
+      <div class="note">회원 홈 큰 칸에 <b>「트레이너 지정루틴 하기 · ${esc(kind)} · 루틴 ${r.no} ${esc(r.n)}」</b>로 뜹니다.
+        ${(t && !(t.rid===r.id && t.kind===kind)) ? `<br><b style="color:var(--warn)">지금 지정된
+          ${rOf(t.rid)?`루틴 ${rOf(t.rid).no} · ${esc(t.kind)}`:'다른 루틴'}은 이 루틴으로 바뀝니다.</b>` : ''}</div>
+      <button class="btn main" data-act="assigno:${rid}:${kind}:on">이 루틴으로 지정</button>
+      <button class="btn ghost sm" data-act="close">그만두기</button>`;
+  });
 }
 
 /* ── 트레이너: 수업 시작 ── */
@@ -3318,11 +3341,22 @@ document.addEventListener('click', ev=>{
     case 'tw': S.twid=rest[0]; go('t_write'); return;
     case 'rm': S.tmid=rest[0]; render(); return;
     case 're': S.redit=rest[0]; go('t_redit'); return;
-    case 'assign': { const r=rOf(rest[0]);
-      D.today[r.mid]={rid:r.id, kind:rest[1], by:'트레이너'};
-      sv(spost('assignments',[{ member_id:r.mid, on_date:TODAY, routine_id:r.id,
-        kind:rest[1], assigned_by:'트레이너' }], {on:'member_id,on_date'}), '지정 저장');
-      toast(`오늘 ${rest[1]}으로 지정했습니다`); render(); return; }
+    case 'assign': sheetAssign(rest[0], rest[1]); return;
+    case 'assigno': {
+      const r=rOf(rest[0]), kind=rest[1], on=(rest[2]==='on');
+      closeSheet();
+      if(!r) return;
+      if(on){
+        D.today[r.mid]={rid:r.id, kind, by:'트레이너'};
+        sv(spost('assignments',[{ member_id:r.mid, on_date:TODAY, routine_id:r.id,
+          kind, assigned_by:'트레이너' }], {on:'member_id,on_date'}), '지정 저장');
+        toast(`오늘 ${kind}으로 지정했습니다`);
+      } else {
+        delete D.today[r.mid];
+        sv(sdel('assignments','member_id=eq.'+r.mid+'&on_date=eq.'+TODAY), '지정 풀기');
+        toast('지정을 풀었습니다');
+      }
+      S.tmid = r.mid; go('t_routines'); return; }
     case 'unassign': { const mid=rest[0]; delete D.today[mid];
       sv(sdel('assignments','member_id=eq.'+mid+'&on_date=eq.'+TODAY), '지정 풀기');
       toast('지정을 풀었습니다'); render(); return; }
