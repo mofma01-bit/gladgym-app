@@ -545,11 +545,28 @@ async function boot(){
     path:m.path, memo:m.memo||'', note:m.trainer_note||'',
     kcal:m.kcal||0, carb:m.carb||0, protein:m.protein||0, fat:m.fat||0 }));
 
+  closeStale();                                                          // 날짜 지난 기록은 자동 종료
   loadLive();
   if(D.live && !D.workouts.some(w => w.id === D.live.id)) D.live = null;   // 서버에서 지워진 것
   S.mid = S.mid || (MEMBERS[0] && MEMBERS[0].id);
   S.tmid = S.tmid || S.mid;
   if(S.screen === 'boot') S.screen = 'login';
+}
+
+/* 어제까지의 안 끝낸 기록은 그날로 마감한다 — 「기록 중」으로 계속 떠 있지 않게 */
+function closeStale(){
+  const old = D.workouts.filter(w => !w.done && w.date && w.date < TODAY);
+  if(!old.length) return;
+  old.forEach(w => {
+    w.done = true;
+    w.items.forEach(it => { it.locked = true; });
+    const dur = Number(w.dur) || w.items.reduce((a,it)=> a + (Number(it.sec)||0), 0);
+    w.dur = dur;
+    w.autoClosed = true;
+    sv(spatch('workouts','id=eq.'+w.id, { done:true, dur }), '지난 기록 자동 종료');
+  });
+  if(D.live && old.some(w => w.id === D.live.id)) { D.live = null; save(); }
+  console.log('지난 기록 자동 종료', old.length, '건');
 }
 
 async function reset(){
