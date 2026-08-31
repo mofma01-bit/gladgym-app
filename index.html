@@ -654,7 +654,9 @@ setInterval(()=>{
 function render(){
   /* 임시로 친 값은 같은 화면·같은 회원일 때만 이어 붙인다 (다른 회원에게 새어 나가지 않게) */
   const dctx = S.screen + '|' + subj();
-  if(S.dctx === dctx)
+  const sameView = (S.dctx === dctx);
+  const keepAt = $('#main') ? $('#main').scrollTop : 0;   /* 칩을 눌러도 보던 자리에 머문다 */
+  if(sameView)
     document.querySelectorAll('#main textarea[data-k],#main input[data-k]').forEach(t=>{ S.draft=S.draft||{}; S.draft[t.getAttribute('data-k')]=t.value; });
   else S.draft = {};
   const V={login:vLogin,home:vHome,routines:vRoutines,routine:vRoutine,start:vStart,pick:vPick,
@@ -688,7 +690,7 @@ function render(){
   }
   document.querySelectorAll('#main textarea[data-k],#main input[data-k]').forEach(t=>{ const d=S.draft&&S.draft[t.getAttribute('data-k')]; if(d) t.value=d; });
   S.dctx = dctx;
-  $('#main').scrollTop = v.keepScroll ? $('#main').scrollTop : 0;
+  $('#main').scrollTop = (v.keepScroll || sameView) ? keepAt : 0;
 }
 function bar(title, right, back, sub){
   const bare = (S.screen==='login'||S.screen==='boot'||S.screen==='err');
