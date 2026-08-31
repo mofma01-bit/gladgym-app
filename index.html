@@ -675,7 +675,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '75';
+const BUILD = '76';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -3139,16 +3139,16 @@ function logNear(mid, date){
 /* ① 몸 그림 — 체크된 항목을 몸의 제자리에 찍습니다 (뒤에서 본 모습) */
 const BODY_MAP = {
   c2:{y:21}, c3:{y:25,dx:7,lr:1}, c1:{y:29}, c4:{y:34},
-  s5:{y:36,dx:14,lr:1}, s4:{y:40,dx:14,lr:1}, s1:{y:44,dx:15,both:1},
-  s2:{y:48,dx:16,lr:1}, s3:{y:52,dx:17,lr:1}, s6:{y:63,dx:20,both:1},
+  s5:{y:37,dx:16,lr:1}, s4:{y:41,dx:16,lr:1}, s1:{y:45,dx:17,both:1},
+  s2:{y:49,dx:19,lr:1}, s3:{y:54,dx:21,lr:1}, s6:{y:66,dx:24,both:1},
   t3:{y:47,dx:6,lr:1}, t1:{y:52}, t2:{y:60,dx:6,lr:1}, t4:{y:78},
-  l6:{y:90,dx:11,lr:1}, l1:{y:97}, l2:{y:97,dx:10,both:1}, l7:{y:104,dx:12,lr:1},
-  l5:{y:110,dx:8,both:1}, l3:{y:140,dx:11,both:1}, l4:{y:150,dx:12,both:1},
+  l6:{y:91,dx:12,lr:1}, l1:{y:98}, l2:{y:98,dx:9,both:1}, l7:{y:105,dx:13,lr:1},
+  l5:{y:111,dx:8,both:1}, l3:{y:140,dx:11,both:1}, l4:{y:150,dx:12,both:1},
   f1:{y:183,dx:12,both:1},
 };
 /* 관절 자리 — 뼈대와 점이 같은 자리를 쓰도록 한곳에 적어 둡니다 */
-const JOINTS = [[50,29],[36,40],[64,40],[50,52],[30,63],[70,63],[28,86],[72,86],
-  [50,78],[40,97],[60,97],[39,140],[61,140],[38,181],[62,181]];
+const JOINTS = [[50,29],[34,41],[66,41],[50,53],[26,66],[74,66],[22,90],[78,90],
+  [50,79],[41,98],[59,98],[39,140],[61,140],[38,181],[62,181]];
 function bodyFig(checks){
   const dots = [];
   BODY_TESTS.forEach(t => {
@@ -3158,29 +3158,29 @@ function bodyFig(checks){
     else if(m.lr) dots.push([v==='a' ? 50-dx : 50+dx, m.y]);
     else dots.push([50, m.y]);
   });
-  return `<svg viewBox="0 0 100 200" style="height:300px;width:auto;display:block;margin:0 auto">
+  return `<svg viewBox="0 0 100 200" style="height:334px;width:auto;display:block;margin:0 auto">
     <line x1="50" y1="4" x2="50" y2="197" stroke="#37312b" stroke-width="0.7" stroke-dasharray="2.5 3.5"/>
-    <g stroke="#4b433a" stroke-width="6.4" stroke-linecap="round" fill="none">
-      <path d="M50 29 L50 97"/>
-      <path d="M36 40 L64 40"/>
-      <path d="M40 97 L60 97"/>
-      <path d="M36 40 L30 63 L28 86"/>
-      <path d="M64 40 L70 63 L72 86"/>
-      <path d="M40 97 L39 140 L38 181"/>
-      <path d="M60 97 L61 140 L62 181"/>
+    <g stroke="#4e463c" stroke-width="7" stroke-linecap="round" fill="none">
+      <path d="M50 29 L50 98"/>
+      <path d="M34 41 L66 41"/>
+      <path d="M41 98 L59 98"/>
+      <path d="M34 41 L26 66 L22 90"/>
+      <path d="M66 41 L74 66 L78 90"/>
+      <path d="M41 98 L39 140 L38 181"/>
+      <path d="M59 98 L61 140 L62 181"/>
     </g>
-    <g stroke="#4b433a" stroke-width="5" stroke-linecap="round" fill="none">
-      <path d="M38 181 L31 190"/><path d="M62 181 L69 190"/>
-      <path d="M28 86 L26 93"/><path d="M72 86 L74 93"/>
+    <g stroke="#4e463c" stroke-width="5.4" stroke-linecap="round" fill="none">
+      <path d="M38 181 L30 190"/><path d="M62 181 L70 190"/>
+      <path d="M22 90 L19 98"/><path d="M78 90 L81 98"/>
     </g>
-    <circle cx="50" cy="15" r="9.6" fill="#332e29" stroke="#6a6055" stroke-width="1.7"/>
-    ${JOINTS.map(([x,y])=>`<circle cx="${x}" cy="${y}" r="4.6" fill="#6f6558" stroke="#928576" stroke-width="1"/>`).join('')}
-    <text x="6" y="9" font-size="8.5" font-weight="800" fill="#75706a">L 왼쪽</text>
-    <text x="68" y="9" font-size="8.5" font-weight="800" fill="#75706a">오른쪽 R</text>
-    ${dots.map(([x,y])=>`<circle cx="${x}" cy="${y}" r="8" fill="var(--gold)" opacity=".17"/>
-      <circle cx="${x}" cy="${y}" r="3.6" fill="var(--gold)" stroke="#241d12" stroke-width="0.7"/>`).join('')}
+    <circle cx="50" cy="14" r="10.6" fill="#332e29" stroke="#6e6459" stroke-width="1.8"/>
+    ${JOINTS.map(([x,y])=>`<circle cx="${x}" cy="${y}" r="5" fill="#746a5c" stroke="#9a8d7d" stroke-width="1.1"/>`).join('')}
+    <text x="4" y="9" font-size="8" font-weight="800" fill="#75706a">L 왼쪽</text>
+    <text x="70" y="9" font-size="8" font-weight="800" fill="#75706a">오른쪽 R</text>
+    ${dots.map(([x,y])=>`<circle cx="${x}" cy="${y}" r="8.4" fill="var(--gold)" opacity=".18"/>
+      <circle cx="${x}" cy="${y}" r="3.8" fill="var(--gold)" stroke="#241d12" stroke-width="0.8"/>`).join('')}
   </svg>
-  <div class="sm" style="text-align:center;color:#75706a;margin-top:2px">뒤에서 본 관절 모형 — 체크리스트의 L / R 그대로입니다</div>`;
+  <div class="sm" style="text-align:center;color:#75706a;margin-top:2px">뒤에서 본 관절 모형 · L / R 그대로</div>`;
 }
 function figList(checks){
   const on = BODY_TESTS.filter(t => (checks||{})[t.k]);
