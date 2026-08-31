@@ -2517,7 +2517,7 @@ function tToday(){
       if(!md.length) return '';
       const nm2 = id => (MEMBERS.find(x=>x.id===id)||{}).n || '?';
       return `<div class="hr"></div><span class="lbl">오늘 올라온 식단 · ${md.length}장</span>
-        ${md.map(m=>`<button class="mrow" data-act="meal:${m.id}">
+        ${md.slice(0,6).map(m=>`<button class="mrow" data-act="meal:${m.id}">
           <img src="${esc(mealURL(m.path))}" alt="">
           <div><div class="nm">${esc(nm2(m.mid))} · ${esc(m.slot)}</div>
           <div class="sm">${esc(m.memo||'')}</div></div>
@@ -2539,16 +2539,17 @@ function tFeed(){
 
   /* ── 식단 — 회원별로 묶어서 ── */
   if(mode==='diet'){
+    const since = addDays(TODAY, -13);
     const rows = MEMBERS.map(m=>{
       const ms = (D.meals||[]).filter(x=>x.mid===m.id).slice().sort((a,b)=> a.date<b.date?1:a.date>b.date?-1:0);
-      return { m, ms, nw: ms.filter(x=>!x.note).length, last: ms[0] };
+      return { m, ms, nw: ms.filter(x=>!x.note && x.date>=since).length, last: ms[0] };
     }).filter(r=>r.ms.length).sort((a,b)=> b.nw-a.nw || (a.last.date<b.last.date?1:-1));
     return { top: bar('피드백', `<span class="sub">식단</span>`), body: head + `
       <span class="lbl">최근 올린 회원</span>
       ${rows.length ? rows.map(r=>`<button class="card rowc ${r.nw?'gold':''}" data-act="tmeals:${r.m.id}">
           <div><div class="nm ${r.nw?'g':''}">${esc(r.m.n)} 회원${r.nw?` <span class="pill">new ${r.nw}</span>`:''}</div>
           <div class="sm">최근 ${dateTxt(r.last.date)} · ${esc(r.last.slot)}${r.last.memo?' · '+esc(r.last.memo.slice(0,14)):''}
-            <br>모두 ${r.ms.length}장${r.nw?` · 코멘트 안 단 것 ${r.nw}장`:' · 다 보셨어요'}</div></div>
+            <br>모두 ${r.ms.length}장${r.nw?` · 최근 2주에 코멘트 안 단 것 ${r.nw}장`:' · 최근 것은 다 보셨어요'}</div></div>
           <span class="rt">›</span></button>`).join('')
         : '<div class="empty">아직 올라온 식단이 없어요</div>'}
       <div class="note">회원이 식단 탭에서 사진을 올리면 <b>여기 위로 올라오고 new 가 붙습니다.</b></div>` };
@@ -2594,16 +2595,17 @@ function tFeed(){
 function tMeals(){
   const mid = S.tmid, m = MEMBERS.find(x=>x.id===mid) || {n:''};
   const ms = (D.meals||[]).filter(x=>x.mid===mid).slice().sort((a,b)=> a.date<b.date?1:a.date>b.date?-1:0);
-  const nw = ms.filter(x=>!x.note);
+  const since = addDays(TODAY, -13);
+  const nw = ms.filter(x=>!x.note && x.date>=since);
   const row = x => `<button class="mrow" data-act="meal:${x.id}">
     <img src="${esc(mealURL(x.path))}" alt="">
     <div><div class="nm">${dateTxt(x.date)} · ${esc(x.slot)}${x.kcal?` · ${x.kcal}kcal`:''}</div>
     <div class="sm">${esc(x.memo||'')}</div></div>
     ${x.note?'<span class="pill q">봤음</span>':'<span class="pill">쓰기 ›</span>'}</button>`;
   return { top: bar(esc(m.n)+' 식단', `<span class="sub">${ms.length}장</span>`, 'ttab:t_feed'), body:`
-    ${nw.length?`<span class="lbl">코멘트 안 단 것 · ${nw.length}장</span>${nw.map(row).join('')}<div class="hr"></div>`:''}
-    <span class="lbl">${nw.length?'코멘트 남긴 것':'모두'}</span>
-    ${(nw.length?ms.filter(x=>x.note):ms).map(row).join('') || '<div class="empty">없어요</div>'}` };
+    ${nw.length?`<span class="lbl">최근 2주 · 코멘트 안 단 것 ${nw.length}장</span>${nw.map(row).join('')}<div class="hr"></div>`:''}
+    <span class="lbl">지난 것 ${ms.length>40?'· 최근 40장':''}</span>
+    ${ms.filter(x=>nw.indexOf(x)<0).slice(0,40).map(row).join('') || '<div class="empty">없어요</div>'}` };
 }
 
 /* 자료 */
