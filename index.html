@@ -325,6 +325,21 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
 .hero .hs{font-size:13.5px;font-weight:600;color:#e6d5c6;margin-top:6px;line-height:1.5}
 .hero .hgo{display:inline-block;margin-top:14px;background:var(--gold);color:#2a1c14;
   font-size:13.5px;font-weight:800;border-radius:999px;padding:8px 16px}
+.wkd .dnum{font-size:14px;font-weight:800;color:#67635d;line-height:1.1}
+.wkd .dnum.has{color:var(--cream)}
+.wkd .dot{height:15px;font-size:10.5px;font-weight:800;color:var(--gold);line-height:15px}
+.wkd>button.sel .dnum{color:var(--cream)}
+.cal2{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal2 .hd{text-align:center;font-size:11.5px;font-weight:700;color:#7d766e;padding:3px 0}
+.cal2 .pad{height:38px}
+.cal2 .cday{position:relative;height:38px;border-radius:9px;background:var(--dark-3);
+  font-size:13.5px;font-weight:700;color:#8f8a83}
+.cal2 .cday.has{color:var(--cream);border:1px solid var(--gold-2)}
+.cal2 .cday.sel{background:var(--gold);color:#2a1c14}
+.cal2 .cday.fut{opacity:.25}
+.cal2 .cday i{position:absolute;right:3px;top:2px;font-style:normal;font-size:9.5px;
+  font-weight:800;color:var(--gold)}
+.cal2 .cday.sel i{color:#2a1c14}
 .seg{display:flex;background:var(--dark-3);border-radius:999px;padding:3px;gap:2px;flex:0 0 auto}
 .seg button{flex:1;padding:7px 4px;border-radius:999px;font-size:12.5px;font-weight:700;color:#8f8a83}
 .seg button.on{background:var(--cream);color:#1a1a18}
@@ -1506,7 +1521,49 @@ function vRecord(){
       <div class="sm">${it.sets.map(s=>setTxt(it.ex,s)).join('  ·  ')}${cmOf(S.mid,it.ex,it.va).length?`<br>코멘트 ${cmOf(S.mid,it.ex,it.va).length}개 ›`:''}</div></button>`).join('') };
 }
 
-/* ── 피드백 탭 — 최근 / 종목별 ── */
+/* ── 피드백 · 날짜로 보기 ── */
+function cmOnDay(mid, d){ return D.cm.filter(c => c.mid===mid && String(c.ts||'').slice(0,10) === d); }
+
+function fbStrip(mid){
+  const sel = S.fbDay || TODAY, wk = weekOf(sel);
+  return `<div class="wk">
+    <div class="wkhd">
+      <button data-act="fbmove:-1">‹</button>
+      <button class="d" data-act="fbcal">${dowTxt(sel)} <span style="color:var(--gold-2);font-size:12px">▾</span></button>
+      <button data-act="fbmove:1" ${sel>=TODAY?'style="opacity:.3"':''}>›</button>
+    </div>
+    <div class="wkd">${wk.map((d,i)=>{ const n = cmOnDay(mid,d).length;
+      return `<button data-act="fbd:${d}" class="${d===sel?'sel':''} ${d===TODAY?'tdy':''} ${d>TODAY?'fut':''}">
+        <span class="dn ${i===0?'sun':''}">${DOW[i]}</span>
+        <span class="dnum ${n?'has':''}">${+d.slice(8)}</span>
+        <span class="dot">${n?'●':''}</span></button>`; }).join('')}</div>
+  </div>`;
+}
+
+function sheetFbCal(){
+  openSheet(()=>{
+    const sel = S.fbDay || TODAY, base = S.fbMon || sel.slice(0,7);
+    const y = +base.slice(0,4), m = +base.slice(5,7);
+    const lead = new Date(y, m-1, 1).getDay(), last = new Date(y, m, 0).getDate();
+    let cells = '';
+    DOW.forEach(d => cells += `<div class="hd">${d}</div>`);
+    for(let i=0;i<lead;i++) cells += '<div class="pad"></div>';
+    for(let d=1; d<=last; d++){
+      const ds = y + '-' + String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+      const n = cmOnDay(S.mid, ds).length;
+      cells += `<button class="cday ${ds===sel?'sel':''} ${n?'has':''} ${ds>TODAY?'fut':''}"
+        data-act="fbd:${ds}">${d}${n?`<i>${n}</i>`:''}</button>`;
+    }
+    return `<div class="h2">날짜 고르기 <small>코멘트 온 날에 표시</small></div>
+      <div class="wkhd"><button data-act="fbmon:-1">‹</button>
+        <span class="d">${y}년 ${m}월</span>
+        <button data-act="fbmon:1">›</button></div>
+      <div class="cal2">${cells}</div>
+      <button class="btn ghost sm" data-act="close">닫기</button>`;
+  });
+}
+
+/* ── 피드백 탭 — 최근 / 수업별 / 종목별 ── */
 function vFeedback(){
   const cms=D.cm.filter(c=>c.mid===S.mid);
   const nw=cms.filter(c=>!c.read).length;
@@ -1514,7 +1571,31 @@ function vFeedback(){
   const mode = S.fbMode || 'recent';
   const head = `<div class="chips">
     <button class="chip ${mode==='recent'?'on':''}" data-act="fbm:recent">최근</button>
+    <button class="chip ${mode==='day'?'on':''}" data-act="fbm:day">최근 수업</button>
     <button class="chip ${mode==='part'?'on':''}" data-act="fbm:part">종목별</button></div>`;
+
+  if(mode==='day'){
+    const sel = S.fbDay || TODAY;
+    const list = cmOnDay(S.mid, sel).slice().sort((a,b)=> a.ts < b.ts ? 1 : -1);
+    const ws = D.workouts.filter(w => w.mid===S.mid && w.date===sel && w.done);
+    return { top: bar('피드백', `<span class="sub">${dateTxt(sel)}</span>`), tabs:1, body: head +
+      fbStrip(S.mid) + `
+      ${ws.length ? `<span class="lbl">그날 한 운동</span>
+        ${ws.map(w=>`<button class="card rowc" data-act="rec:${w.id}">
+          <div><div class="nm">${esc(w.kind||'운동')}${w.title?` · ${esc(w.title)}`:''}</div>
+          <div class="sm">${w.items.filter(i=>i.sets.length).map(i=>esc(exName(i.ex,i.va))).join(' · ')||'세트 없음'}</div></div>
+          <span class="rt">${durTxt(w.dur)} ›</span></button>`).join('')}`
+        : '<div class="empty">이 날은 운동 기록이 없어요</div>'}
+      <span class="lbl">그날 받은 코멘트 ${list.length?`· ${list.length}개`:''}</span>
+      ${list.length ? list.map(c=>`<button class="cm" style="text-align:left" data-act="exd:${c.ex}:${c.va}">
+          <span class="who">${esc(c.tr)} 트레이너</span>
+          <span class="ex" style="font-size:13.5px;font-weight:700;color:var(--gold)">${esc(exName(c.ex,c.va))}</span>
+          <span class="tx">${esc(c.tx)}</span>
+          ${(c.pics||c.vids)?`<span class="who">${c.pics?'사진 1장':''}${c.pics&&c.vids?' · ':''}${c.vids?'영상 1개':''} · 눌러서 보기 ›</span>`:''}
+        </button>`).join('')
+      : '<div class="empty">이 날 받은 코멘트가 없어요</div>'}
+      <div class="note">날짜를 눌러 넘기거나, 가운데 날짜를 눌러 <b>달력에서</b> 고르세요. 코멘트가 온 날에는 <b style="color:var(--gold)">●</b> 가 붙습니다.</div>` };
+  }
 
   if(mode==='recent'){
     return { top: bar('피드백', `<span class="sub">${cms.length}개</span>`), tabs:1, body: head +
@@ -2909,6 +2990,18 @@ document.addEventListener('click', ev=>{
     case 'reset': reset(); toast('처음 상태로 되돌렸습니다'); return;
     case 'go': { if(rest[0]==='workout' && !D.live) adoptLive(S.mid); go(rest[0]); return; }
     case 'dpick': S.day = rest[0]; render(); return;
+    case 'fbd': S.fbDay = rest[0]; S.fbMode='day'; closeSheet(); render(); return;
+    case 'fbcal': S.fbMon = (S.fbDay||TODAY).slice(0,7); sheetFbCal(); return;
+    case 'fbmove': {
+      const d = new Date((S.fbDay||TODAY)+'T00:00:00');
+      d.setDate(d.getDate() + Number(rest[0]));
+      const n = ymd(d); if(n > TODAY) return;
+      S.fbDay = n; render(); return; }
+    case 'fbmon': {
+      const b = S.fbMon || (S.fbDay||TODAY).slice(0,7);
+      const d = new Date(+b.slice(0,4), +b.slice(5,7)-1 + Number(rest[0]), 1);
+      S.fbMon = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+      drawSheet(); return; }
     case 'anap': S.anaP = rest[0]; render(); return;
     case 'anag': S.anaG = rest[0]; render(); return;
     case 'anab': S.anaB = rest[0]; render(); return;
