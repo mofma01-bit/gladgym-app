@@ -599,7 +599,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '67';
+const BUILD = '68';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1832,6 +1832,40 @@ function sheetFbCal(){
   });
 }
 
+/* 코멘트 요청 — 수업 날짜 고르기 */
+function wsOnDay(mid, d){ return D.workouts.filter(w=>w.mid===mid && w.done && w.date===d && w.items.some(i=>i.sets.length)); }
+function sheetAskCal(){
+  S.askMon = S.askMon || (S.fbDay||TODAY).slice(0,7);
+  openSheet(()=>{
+    const base = S.askMon, y = +base.slice(0,4), m = +base.slice(5,7);
+    const lead = new Date(y, m-1, 1).getDay(), last = new Date(y, m, 0).getDate();
+    let cells = '';
+    DOW.forEach(d => cells += `<div class="hd">${d}</div>`);
+    for(let i=0;i<lead;i++) cells += '<div class="pad"></div>';
+    for(let d=1; d<=last; d++){
+      const ds = y + '-' + String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+      const n = wsOnDay(S.mid, ds).reduce((a,w)=> a + w.items.filter(i=>i.sets.length).length, 0);
+      cells += `<button class="cday ${n?'has':''} ${(!n||ds>TODAY)?'fut':''}"
+        ${n&&ds<=TODAY?`data-act="askday:${ds}"`:''}>${d}${n?`<i>${n}</i>`:''}</button>`;
+    }
+    return `<div class="h2">어느 수업을 봐 달라고 할까요</div>
+      <div class="wkhd"><button data-act="askmon:-1">‹</button>
+        <span class="d">${y}년 ${m}월</span>
+        <button data-act="askmon:1">›</button></div>
+      <div class="cal2">${cells}</div>
+      <div class="note">테두리가 있는 날에 운동 기록이 있어요. 숫자는 그날 한 종목 수입니다.</div>
+      <button class="btn ghost sm" data-act="close">닫기</button>`;
+  });
+}
+/* 한 종목 요청 보내기 */
+function sheetAskFor(ex, va){
+  openSheet(()=>`
+    <div class="h2">${esc(exName(ex,va))} <small>코멘트 요청</small></div>
+    <textarea data-k="ask:${ex}|${va}" placeholder="어디가 궁금한지 한 줄 적어 주세요 (안 적어도 돼요)"></textarea>
+    <button class="btn blue" data-act="ask:${ex}:${va}:x">요청 보내기</button>
+    <button class="btn ghost sm" data-act="close">그만두기</button>`);
+}
+
 /* ── 피드백 탭 — 최근 / 수업별 / 종목별 ── */
 function vFeedback(){
   const cms=D.cm.filter(c=>c.mid===S.mid);
@@ -1843,11 +1877,28 @@ function vFeedback(){
     <button class="chip ${mode==='day'?'on':''}" data-act="fbm:day">최근 수업</button>
     <button class="chip ${mode==='part'?'on':''}" data-act="fbm:part">종목별</button></div>`;
 
+  if(mode==='ask'){
+    const sel = S.fbDay || TODAY;
+    const ws = wsOnDay(S.mid, sel);
+    const rows = [];
+    ws.forEach(w => w.items.filter(i=>i.sets.length).forEach(it => rows.push({ w, it })));
+    return { top: bar('코멘트 요청', `<span class="sub">${dateTxt(sel)}</span>`), tabs:1, body:
+      (rows.length ? `<span class="lbl">${dateTxt(sel)} · 봐 달라고 할 종목을 누르세요</span>`
+        + rows.map(({w,it})=>{ const on = askOf(S.mid,it.ex,it.va).length, n = cmOf(S.mid,it.ex,it.va).length;
+          return `<button class="card rowc ${on?'gold':''}" data-act="${on?`unask:${askOf(S.mid,it.ex,it.va)[0].id}`:`askfor:${it.ex}:${it.va}`}">
+            <div><div class="nm ${on?'g':''}">${esc(exName(it.ex,it.va))}</div>
+            <div class="sm">${it.sets.map(x=>setShort(it.ex,x)).join(' · ')}${n?` · 코멘트 ${n}개`:''}</div></div>
+            <span class="pill${on?'':' q'}">${on?'요청함 · 거두기':'코멘트 요청'}</span></button>`; }).join('')
+        : '<div class="empty">이 날은 기록된 종목이 없어요</div>'),
+      foot:`<button class="btn blue go" data-act="askpick">다른 날 고르기</button>` };
+  }
+
   if(mode==='day'){
     const sel = S.fbDay || TODAY;
     const list = cmOnDay(S.mid, sel).slice().sort((a,b)=> a.ts < b.ts ? 1 : -1);
     const ws = D.workouts.filter(w => w.mid===S.mid && w.date===sel && w.done);
-    return { top: bar('피드백', `<span class="sub">${dateTxt(sel)}</span>`), tabs:1, body: head +
+    return { top: bar('피드백', `<span class="sub">${dateTxt(sel)}</span>`), tabs:1,
+      foot:`<button class="btn blue go" data-act="askpick">코멘트 요청하기</button>`, body: head +
       fbStrip(S.mid) + `
       ${ws.length ? `<span class="lbl">그날 한 운동</span>
         ${ws.map(w=>`<button class="card rowc" data-act="rec:${w.id}">
@@ -1867,7 +1918,8 @@ function vFeedback(){
   }
 
   if(mode==='recent'){
-    return { top: bar('피드백', `<span class="sub">${cms.length}개</span>`), tabs:1, body: head +
+    return { top: bar('피드백', `<span class="sub">${cms.length}개</span>`), tabs:1,
+      foot:`<button class="btn blue go" data-act="askpick">코멘트 요청하기</button>`, body: head +
       (cms.length? cms.map(c=>`<button class="cm" style="text-align:left" data-act="exd:${c.ex}:${c.va}">
           <span class="who">${esc(c.tr)} 트레이너 · ${esc(c.at)}</span>
           <span class="ex" style="font-size:13.5px;font-weight:700;color:var(--gold)">${esc(exName(c.ex,c.va))}</span>
@@ -1888,7 +1940,8 @@ function vFeedback(){
   });
   rows.sort((a,b)=>b.n-a.n);
   const has=rows.filter(r=>r.n>0), none=rows.filter(r=>!r.n);
-  return { top: bar('피드백', `<span class="sub">${esc(part)}</span>`), tabs:1, body: head + `
+  return { top: bar('피드백', `<span class="sub">${esc(part)}</span>`), tabs:1,
+    foot:`<button class="btn blue go" data-act="askpick">코멘트 요청하기</button>`, body: head + `
     <div class="chips">${PARTS.map(p=>`<button class="chip ${p===part?'on':''}" data-act="fbp:${p}">${p}</button>`).join('')}</div>
     ${has.length? has.map(r=>`<button class="card rowc" data-act="exd:${r.ex}:${r.va}">
         <div><div class="nm">${esc(exName(r.ex,r.va))}</div>
@@ -3756,6 +3809,14 @@ document.addEventListener('click', ev=>{
       S.tfMon = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
       drawSheet(); return; }
     case 'fbd': S.fbDay = rest[0]; S.fbMode='day'; closeSheet(); render(); return;
+    case 'askpick': S.askMon = (S.fbDay||TODAY).slice(0,7); sheetAskCal(); return;
+    case 'askmon': {
+      const b0 = S.askMon || (S.fbDay||TODAY).slice(0,7);
+      const d = new Date(+b0.slice(0,4), +b0.slice(5,7)-1 + Number(rest[0]), 1);
+      S.askMon = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+      drawSheet(); return; }
+    case 'askday': { S.fbDay = rest[0]; S.fbMode='ask'; closeSheet(); render(); return; }
+    case 'askfor': sheetAskFor(rest[0], rest[1]); return;
     case 'fbcal': S.fbMon = (S.fbDay||TODAY).slice(0,7); sheetFbCal(); return;
     case 'fbmove': {
       const d = new Date((S.fbDay||TODAY)+'T00:00:00');
@@ -3821,12 +3882,16 @@ document.addEventListener('click', ev=>{
       D.asks=D.asks||[]; D.asks.unshift({ id, mid:S.mid, ex, va, wid:last, note, ts:new Date().toISOString(), done:false });
       if(S.draft) delete S.draft['ask:'+K];
       sv(spost('asks',[{ id, member_id:S.mid, variant_id:VID(ex,va), workout_id:last, note }]), '코멘트 요청');
-      toast('요청했습니다 · 트레이너에게 바로 떠요'); drawSheet(); return; }
+      toast('요청했습니다 · 트레이너에게 바로 떠요');
+      if(rest[2]==='x'){ closeSheet(); render(); } else drawSheet();
+      return; }
     case 'unask': {
       const id=rest[0];
       D.asks=(D.asks||[]).filter(a=>a.id!==id);
       sv(sdel('asks','id=eq.'+id), '요청 취소');
-      toast('요청을 거뒀어요'); drawSheet(); return; }
+      toast('요청을 거뒀어요');
+      if(S.fbMode==='ask'){ closeSheet(); render(); } else drawSheet();
+      return; }
     case 'play': S.vplay=rest[0]; drawSheet(); return;
     case 'fbm': S.fbMode=rest[0]; render(); return;
     case 'sub': S.subj=S.mid; go(rest[0]); return;
