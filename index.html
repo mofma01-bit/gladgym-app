@@ -547,7 +547,11 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
    벌마다 기본 설명과 시범 영상이 따로 붙는다.                        */
 let EX = [];
 const PARTS = ['가슴','등','어깨','하체','복근','팔','유산소','기타'];
-const exOf = id => EX.find(x=>x.id===id) || {id:'?',n:'?',p:'?',vars:[{k:'a',n:'',desc:''}]};
+const isMemo = ex => ex === 'memo';
+const exOf = id => (id==='memo' ? MEMO_EX : EX.find(x=>x.id===id))
+  || {id:'?',n:'?',p:'?',vars:[{k:'a',n:'',desc:''}]};
+const MEMO_EX = { id:'memo', n:'운동 메모', p:'기타', e:'자유 입력', cardio:0, memo:1,
+  vars:[{k:'a', n:'', desc:'', demo:0}] };
 
 let MEMBERS = [];
 let TRAINER = '양인수';
@@ -599,7 +603,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '68';
+const BUILD = '69';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -784,7 +788,9 @@ function vars(exid){
 }
 function varOf(exid, vk){ const vs=vars(exid); return vs.find(v=>v.k===vk) || vs[0]; }
 function hasVars(exid){ return vars(exid).length>1; }
-function exName(exid, vk){ const v=varOf(exid,vk); return exOf(exid).n + (v && v.n ? ` (${v.n})` : ''); }
+function exName(exid, vk){
+  if(isMemo(exid)) return String(vk||'운동 메모');
+  const v=varOf(exid,vk); return exOf(exid).n + (v && v.n ? ` (${v.n})` : ''); }
 function vaName(exid, vk){ const v=varOf(exid,vk); return v&&v.n ? v.n : ''; }
 const dkey = (mid,ex,va) => mid+':'+ex+':'+va;
 function descOf(mid,ex,va){ const k=dkey(mid,ex,va); return D.desc[k]!==undefined ? D.desc[k] : ((varOf(ex,va)||{}).desc||''); }
@@ -792,8 +798,10 @@ function isEdited(mid,ex,va){ return D.desc[dkey(mid,ex,va)]!==undefined; }
 function cmOf(mid,ex,va){ return D.cm.filter(c=>c.mid===mid && c.ex===ex && (va===undefined || c.va===va)); }
 function unreadOf(mid){ return D.cm.filter(c=>c.mid===mid && !c.read).length; }
 
-function setTxt(id,s){ return exOf(id).cardio ? `${s.reps}분`+(s.spd?` · ${s.spd}km/h`:'') : `${kgfmt(s.kg)}kg × ${s.reps}회`; }
-function setShort(id,s){ return exOf(id).cardio ? `${s.reps}분` : `${kgfmt(s.kg)}×${s.reps}`; }
+function setTxt(id,s){ if(isMemo(id)) return '기록함';
+  return exOf(id).cardio ? `${s.reps}분`+(s.spd?` · ${s.spd}km/h`:'') : `${kgfmt(s.kg)}kg × ${s.reps}회`; }
+function setShort(id,s){ if(isMemo(id)) return '메모';
+  return exOf(id).cardio ? `${s.reps}분` : `${kgfmt(s.kg)}×${s.reps}`; }
 
 let toastT=null;
 function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('on'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('on'),1700); }
@@ -831,7 +839,8 @@ const live = () => D.live;
 const me = () => MEMBERS.find(m=>m.id===S.mid);
 const myRoutines = mid => D.routines.filter(r=>r.mid===mid).sort((a,b)=>a.no-b.no);
 const rOf = id => D.routines.find(r=>r.id===id);
-function totalKg(w){ let s=0; (w.items||[]).forEach(it=>(it.sets||[]).forEach(x=>{ s+=(x.kg||0)*(x.reps||0); })); return s; }
+function totalKg(w){ let s=0; (w.items||[]).forEach(it=>{ if(isMemo(it.ex)) return;
+  (it.sets||[]).forEach(x=>{ s+=(x.kg||0)*(x.reps||0); }); }); return s; }
 function partTimes(w){ const m={}; (w.items||[]).forEach(it=>{ if(!(it.sec>0)) return; const p=exOf(it.ex).p; m[p]=(m[p]||0)+it.sec; }); return m; }
 const byDateDesc = (a,b)=> a.date<b.date?1 : a.date>b.date?-1 : (a.id<b.id?1:-1);
 function myWorkouts(){ return D.workouts.filter(w=>w.mid===S.mid && w.done).slice().sort(byDateDesc); }
@@ -916,7 +925,7 @@ function anaWs(mid, from){ return D.workouts.filter(w => w.mid===mid && w.done &
 /* 그날 든 총 무게 · 세트 · 분 · 소모 추정 */
 function wStat(w, bw){
   let vol = 0, sets = 0, cardioMin = 0;
-  w.items.forEach(it => { const e = exOf(it.ex); if(!e) return;
+  w.items.forEach(it => { const e = exOf(it.ex); if(!e || isMemo(it.ex)) return;
     it.sets.forEach(x => { sets++;
       if(e.cardio) cardioMin += (+x.reps || 0);
       else vol += (+x.kg || 0) * (+x.reps || 0); }); });
@@ -969,7 +978,7 @@ function lineChart(pts, unit){
 function partSets(mid, from){
   const o = {}; PARTS8.forEach(k => o[k] = 0);
   anaWs(mid, from).forEach(w => w.items.forEach(it => {
-    const e = exOf(it.ex); if(!e) return;
+    const e = exOf(it.ex); if(!e || isMemo(it.ex)) return;
     const k = PARTS8.includes(e.p) ? e.p : '기타';
     o[k] += it.sets.length; }));
   return o;
@@ -1002,7 +1011,7 @@ function radar(o){
 function exTrend(mid, from, grp){
   const map = {};
   anaWs(mid, '1900-01-01').forEach(w => w.items.forEach(it => {   /* 기간 밖 기록도 견줄 밑값으로 쓴다 */
-    if(!it.sets.length) return;
+    if(!it.sets.length || isMemo(it.ex)) return;
     const e = exOf(it.ex); if(!e) return;
     if(grp !== '전체' && !(PARTG[grp]||[]).includes(e.p)) return;
     const key = it.ex + ':' + it.va;
@@ -1315,14 +1324,30 @@ function vPick(){
   const list=EX.filter(e=>e.p===S.pickPart);
   return { top: bar('종목 고르기','', live()?'go:workout':'go:start'), body:`
     <div class="chips">${PARTS.map(p=>`<button class="chip ${p===S.pickPart?'on':''}" data-act="part:${p}">${p}</button>`).join('')}</div>
+    <button class="card rowc plan" data-act="memoadd">
+      <div><div class="nm">＋ 운동 메모</div>
+      <div class="sm">목록에 없는 것 — 팔로프 프레스, 기능성 트레이닝처럼<br>이름을 적어 넣습니다 · <b style="color:var(--gold-2)">볼륨에는 안 들어갑니다</b></div></div>
+      <span class="rt">›</span></button>
     ${list.map(e=>{ const vs=vars(e.id), n=cmOf(S.mid,e.id).length, last=lastSet(e.id);
       return `<button class="card rowc" data-act="${vs.length>1?'pickvar:'+e.id:'add:'+e.id+':'+vs[0].k}">
         <div><div class="nm">${esc(e.n)}</div>
         <div class="sm">${esc(e.e)}${last?` · 지난번 ${setTxt(e.id,last)}`:' · 기록 없음'}${n?` · 코멘트 ${n}`:''}
         ${vs.length>1?`<br><span style="color:var(--gold-2)">하는 법 ${vs.length}가지 — ${vs.map(v=>esc(v.n)).join(' · ')}</span>`:''}</div></div>
         <span class="rt">${vs.length>1?'›':'＋'}</span></button>`; }).join('')}
-    <div class="note">직접 입력 칸이 없습니다. 「벤치 / 벤치프레스 / BP」가 섞이면 증량 그래프가 끊기기 때문에 <b>목록에서만</b> 고릅니다.</div>` };
+    <div class="note">「벤치 / 벤치프레스 / BP」가 섞이면 증량 그래프가 끊겨서 <b>목록에서만</b> 고릅니다.
+      정형화되지 않은 운동은 위의 <b style="color:var(--gold-2)">운동 메모</b>로 적어 주세요.</div>` };
 }
+function sheetMemoAdd(){
+  openSheet(()=>`
+    <div class="h2">운동 메모 <small>이름을 적어 주세요</small></div>
+    <input class="search" type="text" data-k="memo:n" placeholder="예) 팔로프 프레스 · 케틀벨 스윙 · 밴드 워크">
+    <div class="chips">${['팔로프 프레스','케틀벨 스윙','밴드 워크','TRX','메디신볼','박스 점프','스텝업','데드버그']
+      .map(x=>`<button class="chip" data-act="memofill:${x}">${x}</button>`).join('')}</div>
+    <div class="note">여기 적은 것은 <b>기록으로 남지만</b> 무게·볼륨·증량 그래프에는 들어가지 않습니다.</div>
+    <button class="btn main sm" data-act="memogo">담기</button>
+    <button class="btn ghost sm" data-act="close">그만두기</button>`);
+}
+
 function sheetPickVar(exid){
   const e=exOf(exid);
   openSheet(()=>`<div class="h2">${esc(e.n)} <small>어떤 걸로 하시나요</small></div>
@@ -1412,12 +1437,15 @@ function vWorkout(){
     ${tr?`<button class="card teal" data-act="tlive:${wmid}">
       <div class="nm t">${esc((MEMBERS.find(m=>m.id===wmid)||{}).n||'')} 회원 수업 기록 중</div>
       <div class="sm">종목별로 코멘트를 남기려면 여기 ›</div></button>`:''}
-    <button class="fbbtn" data-act="exd:${cur.ex}:${cur.va}${tr?':'+wmid:''}">
+    ${isMemo(cur.ex)?'':`<button class="fbbtn" data-act="exd:${cur.ex}:${cur.va}${tr?':'+wmid:''}">
       <span class="l">${nw?'새 코멘트가 있어요':'운동 설명 · 코멘트'}</span>
       ${nw?'<span class="pill t">NEW</span>':''}
-      <span class="r">${dsc?'설명':'설명 없음'}${cms.length?` · 코멘트 ${cms.length}`:''} ›</span></button>
+      <span class="r">${dsc?'설명':'설명 없음'}${cms.length?` · 코멘트 ${cms.length}`:''} ›</span></button>`}
     <span class="lbl">${esc(e.p)} · ${w.cur+1}번째 종목 / 전체 ${w.items.length}</span>
-    ${cur.sets.map((s,i)=>`<button class="set ${s.done?'done':(i===openIdx?'now':'')}" data-act="edit:${i}">
+    ${isMemo(cur.ex)
+      ? `<div class="card"><div class="nm">${esc(exName(cur.ex,cur.va))}</div>
+          <div class="sm">기록으로만 남깁니다 — 무게·볼륨은 세지 않아요</div></div>`
+      : cur.sets.map((s,i)=>`<button class="set ${s.done?'done':(i===openIdx?'now':'')}" data-act="edit:${i}">
       <span class="i">${i+1}${e.cardio?'구간':'세트'}</span>
       ${e.cardio
         ? `<span class="n">${s.reps}</span><span class="u">분</span><span class="sl">/</span>
@@ -1425,14 +1453,17 @@ function vWorkout(){
         : `<span class="n">${kgfmt(s.kg)}</span><span class="u">kg</span><span class="sl">/</span>
            <span class="n" style="margin-left:0">${s.reps}</span><span class="u">회</span>`}
     </button>`).join('')}
-    <div style="display:flex;gap:9px">
+    ${isMemo(cur.ex) ? '' : `<div style="display:flex;gap:9px">
       <button class="btn gold" data-act="rep">${e.cardio?'구간 ＋':'반복 ＋'}</button>
-      <button class="btn ghost" data-act="undo" ${cur.sets.length<2?'disabled':''}>되돌리기</button></div>
+      <button class="btn ghost" data-act="undo" ${cur.sets.length<2?'disabled':''}>되돌리기</button></div>`}
     <div class="hr"></div><span class="lbl">오늘 한 운동</span>
-    ${w.items.map((it,i)=>`<button class="card rowc ${it.locked?'dim':''} ${S.just===VID(it.ex,it.va)?'just':''}" data-act="jump:${i}" style="padding:11px 13px">
-      <div><div class="nm" style="font-size:14px">${esc(exName(it.ex,it.va))}</div>
-      <div class="sm">${it.locked?`${mmss(it.sec)} · ${it.sets.length}세트`:(i===w.cur?'하는 중':`${it.sets.length}세트 예정`)}</div></div>
-      ${i===w.cur&&!it.locked?'<span class="pill">지금</span>':(it.locked?'<span class="pill q">완료</span>':'<span class="rt">›</span>')}</button>`).join('')}
+    ${w.items.map((it,i)=>`<div class="card rowc ${it.locked?'dim':''} ${S.just===VID(it.ex,it.va)?'just':''}" style="padding:9px 9px 9px 13px">
+      <button data-act="jump:${i}" style="flex:1;min-width:0;text-align:left">
+        <div class="nm" style="font-size:14px">${esc(exName(it.ex,it.va))}${isMemo(it.ex)?' <span class="pill q">메모</span>':''}</div>
+        <div class="sm">${it.locked?`${mmss(it.sec)} · ${isMemo(it.ex)?'메모':it.sets.length+'세트'}`
+          :(i===w.cur?'하는 중':(isMemo(it.ex)?'메모':`${it.sets.length}세트 예정`))}</div></button>
+      ${i===w.cur&&!it.locked?'<span class="pill">지금</span>':(it.locked?'<span class="pill q">완료</span>':'')}
+      <button class="chip" data-act="wdel:${i}" style="flex:none;padding:6px 10px">빼기</button></div>`).join('')}
     <button class="btn sub" data-act="go:pick" style="margin-top:2px">운동 추가</button>
     <button class="btn gold" data-act="askfin" style="margin-top:2px">오늘 운동 마치기</button>
     ${Object.keys(times).length?`<div class="note">${Object.entries(times).map(([k,val])=>`${k} ${durTxt(val)}`).join(' · ')} — <b>종목을 끝낼 때마다</b> 저절로 쌓입니다</div>`:''}
@@ -3959,6 +3990,42 @@ document.addEventListener('click', ev=>{
         if(sw) sw.items.push({ _id:live().items[live().items.length-1]._id, ex, va, sec:0, locked:false, sets:[] });
       });
       return; }
+    case 'memoadd': sheetMemoAdd(); return;
+    case 'memofill': { const el=document.querySelector('[data-k="memo:n"]');
+      if(el){ el.value = rest.join(':'); el.focus(); } return; }
+    case 'memogo': {
+      const el=document.querySelector('[data-k="memo:n"]');
+      const nm=(el&&el.value||'').trim().replace(/:/g,'·').slice(0,40);
+      if(!nm){ toast('이름을 적어 주세요'); return; }
+      closeSheet();
+      if(!live()) newLive('빈 운동', [], '개인운동');
+      live().items.push({ ex:'memo', va:nm, rest:60, locked:false, sec:0,
+        startAt: live().startAt ? Date.now() : null,
+        sets:[{ kg:0, reps:0, done:true }] });
+      live().cur = live().items.length-1; save();
+      if(S.draft) delete S.draft['memo:n'];
+      toast(nm+' 담았어요'); go('workout');
+      svNewItem(live().items.length-1).then(()=>{
+        const sw=D.workouts.find(x=>x.id===live().id);
+        if(sw) sw.items.push({ _id:live().items[live().items.length-1]._id, ex:'memo', va:nm, sec:0, locked:false, sets:[] });
+      });
+      return; }
+
+    case 'wdel': { const i=+rest[0], it=w&&w.items[i]; if(!it) return;
+      openSheet(()=>`<div class="h2">이 종목을 뺄까요? <small>${esc(exName(it.ex,it.va))}</small></div>
+        <div class="note">${it.sets.filter(x=>x.done).length?`적어 둔 <b>${it.sets.filter(x=>x.done).length}세트</b>도 함께 사라집니다.`:'아직 적은 것이 없습니다.'}</div>
+        <button class="btn main" data-act="wdelgo:${i}" style="background:var(--warn);color:#241310">빼기</button>
+        <button class="btn ghost sm" data-act="close">그만두기</button>`);
+      return; }
+    case 'wdelgo': { const i=+rest[0]; closeSheet();
+      const it = w && w.items[i]; if(!it) return;
+      if(it._id) sv(sdel('workout_items','id=eq.'+it._id), '종목 빼기');
+      w.items.splice(i,1);
+      const sw=D.workouts.find(x=>x.id===w.id);
+      if(sw) sw.items = sw.items.filter(x=>!it._id || x._id!==it._id);
+      if(w.cur >= w.items.length) w.cur = Math.max(0, w.items.length-1);
+      save(); toast('뺐어요'); render(); return; }
+
     case 'jump': { const i=+rest[0];
       if(w.items[i].locked){ toast('끝난 종목입니다. 고치려면 한 번 더'); w.items[i].locked=false; save(); }
       w.cur=i; save(); render(); return; }
