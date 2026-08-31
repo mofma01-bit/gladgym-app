@@ -599,7 +599,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '64';
+const BUILD = '65';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1391,8 +1391,7 @@ function itemsFromRoutine(r){
 function vWorkout(){
   const w=live(); if(!w) return vHome();
   if(!w.items.length) return {
-    top: bar('운동 중', (w.startAt ? (w.startAt ? `<span class="tm" id="tm">${mmss((Date.now()-w.startAt)/1000)}</span>`
-      : `<button class="chip t" data-act="timego">시간 재기 ▶</button>`)
+    top: bar('운동 중', (w.startAt ? `<span class="tm" id="tm">${mmss((Date.now()-w.startAt)/1000)}</span>`
       : `<button class="chip t" data-act="timego">시간 재기 ▶</button>`), 'go:home'),
     body:`<div class="empty">종목을 담아 주세요</div>`,
     foot:`<button class="btn sub" data-act="go:pick">운동 추가</button><button class="btn ghost" data-act="askcancel">기록 지우고 나가기</button>` };
@@ -1401,7 +1400,8 @@ function vWorkout(){
   const openIdx=cur.sets.findIndex(s=>!s.done), times=partTimes(w);
   const cms=cmOf(wmid,cur.ex,cur.va), nw=cms.filter(c=>!c.read).length, dsc=descOf(wmid,cur.ex,cur.va);
   return {
-    top: bar(e.n, `<span class="tm" id="tm">${mmss((Date.now()-w.startAt)/1000)}</span>`, 'go:home', v.n||''),
+    top: bar(e.n, (w.startAt ? `<span class="tm" id="tm">${mmss((Date.now()-w.startAt)/1000)}</span>`
+      : `<button class="chip t" data-act="timego">시간 재기 ▶</button>`), 'go:home', v.n||''),
     keepScroll:true, body:`
     ${v.demo?`<div class="demo"><div class="fig"><div class="bar"></div><div class="bod"></div></div>
       <span class="cap">시범 영상 자리${v.n?` — ${esc(v.n)}`:''}</span></div>`:''}
