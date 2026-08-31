@@ -667,7 +667,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '73';
+const BUILD = '74';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2416,7 +2416,7 @@ function sheetFoodQty(f){
       ${gMode ? `
       <div class="qbig">
         <button data-act="fg:-">－</button>
-        <input class="gin" type="text" inputmode="numeric" data-k="fgram" value="${gram}">
+        <input class="gin" id="fgram" type="text" inputmode="numeric" value="${gram}">
         <span class="gu">g</span>
         <button data-act="fg:+">＋</button>
       </div>
@@ -2445,7 +2445,7 @@ function sheetFoodQty(f){
 
 /* g 칸에 적은 값을 인분으로 되돌립니다 */
 function readGram(){
-  const el = document.querySelector('[data-k="fgram"]');
+  const el = document.getElementById('fgram');
   const amt = Number(S.fpPick && S.fpPick.amount)||0;
   if(!el || !amt) return;
   const g2 = Math.max(1, nnum(el.value));
@@ -3121,7 +3121,7 @@ function logNear(mid, date){
 
 /* ① 몸 그림 — 체크된 항목을 몸의 제자리에 찍습니다 (뒤에서 본 모습) */
 const BODY_MAP = {
-  c2:{y:25}, c1:{y:31}, c4:{y:37}, c3:{y:28,dx:10,lr:1},
+  c2:{y:30}, c3:{y:33,dx:9,lr:1}, c1:{y:36}, c4:{y:39},
   s4:{y:42,dx:19,lr:1}, s1:{y:45,dx:17,both:1}, s2:{y:49,dx:17,lr:1},
   s3:{y:53,dx:17,lr:1}, s5:{y:57,dx:18,lr:1}, s6:{y:61,dx:18,both:1},
   t3:{y:66,dx:10,lr:1}, t1:{y:71}, t2:{y:77,dx:10,lr:1}, t4:{y:84},
@@ -3139,7 +3139,7 @@ function bodyFig(checks){
     else dots.push([50, m.y]);
   });
   return `<svg viewBox="0 0 100 214" style="height:286px;width:auto;display:block;margin:0 auto">
-    <g fill="#2b2723" stroke="#403931" stroke-width="0.8" stroke-linejoin="round">
+    <g fill="#39332d" stroke="#544a40" stroke-width="0.8" stroke-linejoin="round">
       <circle cx="50" cy="17" r="11"/>
       <path d="M45.5 26 h9 v8 h-9 z"/>
       <path d="M50 32 C40 32 33.5 37 31.5 47 L29.5 70 C29.5 82 32.5 92 36.5 102 L36.5 113 L63.5 113 L63.5 102 C67.5 92 70.5 82 70.5 70 L68.5 47 C66.5 37 60 32 50 32 Z"/>
