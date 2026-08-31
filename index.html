@@ -599,7 +599,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '60';
+const BUILD = '62';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1690,10 +1690,8 @@ function vRecord(){
   const items = ed ? S.recEdit.items : w.items;
   const back = S.who==='tr' ? 'tw:'+w.id : 'tab:records';
   return { top: bar(dateTxt(w.date), `<span class="sub">${ed?'수정 중':durTxt(w.dur)}</span>`, ed?'reccancel':back), body:
-    `<div class="note">${w.kind?esc(w.kind):''}${w.rid&&rOf(w.rid)?` · 루틴 ${rOf(w.rid).no} ${esc(rOf(w.rid).n)}`:''}
-      ${ed?'<br><b style="color:#8bbdd2">고칠 세트를 눌러 주세요. 다 되면 아래 「수정 완료」를 누릅니다.</b>':''}</div>`
-    + (!ed && !canEdit ? `<div class="note">${today?'':'지난 날짜의 기록이라 '}<b>고칠 수 없어요.</b> 잘못된 것이 있으면 트레이너에게 말씀해 주세요.</div>` : '')
-    + (!ed && canEdit && S.who==='tr' && !today ? '<div class="note">지난 날짜입니다. <b>트레이너만</b> 고칠 수 있어요 — 고쳐도 날짜는 그대로 남습니다.</div>' : '')
+    `<div class="note">${w.kind?esc(w.kind):''}${w.rid&&rOf(w.rid)?` · 루틴 ${rOf(w.rid).no} ${esc(rOf(w.rid).n)}`:''}</div>`
+    + (!ed && !canEdit ? '<div class="note">지난 날짜라 <b>고칠 수 없어요.</b></div>' : '')
     + items.map((it,i)=>`<div class="card">
         <div class="rowc" style="align-items:baseline">
           <div><div class="nm">${esc(exName(it.ex,it.va))}</div></div>
@@ -1708,7 +1706,7 @@ function vRecord(){
               <span class="go2">＋ 세트 추가</span></button>`
           : `<div class="sm" style="margin-top:5px">${it.sets.map(st=>setTxt(it.ex,st)).join('  ·  ')||'세트 없음'}</div>`}
       </div>`).join('')
-    + (ed?'<div class="note">여기서 고치는 것은 <b>기록뿐</b>입니다. 운동이 다시 시작되지 않습니다.</div>':''),
+    ,
     foot: ed
       ? `<button class="btn ghost" data-act="reccancel">그만두기</button>
          <button class="btn blue" data-act="recask">수정 완료</button>`
@@ -3097,7 +3095,7 @@ function tWrite(){
   const done = w.items.filter(it=>it.sets.length);
   return { top: bar('코멘트 남기기', `<span class="sub">${esc(m.n)}</span>`, 'ttab:t_feed'), body:
     `<div class="note">${dateTxt(w.date)} · ${esc(w.kind||'')}${w.title?' · '+esc(w.title):''} · ${durTxt(w.dur)}</div>
-     <span class="lbl">종목을 눌러 코멘트를 남기세요</span>`
+     <span class="lbl">종목을 눌러 코멘트 남기기</span>`
     + (done.length ? done.slice().sort((a,b)=> cmOf(m.id,a.ex,a.va).length - cmOf(m.id,b.ex,b.va).length).map(it=>{
         const n = cmOf(m.id,it.ex,it.va).length, ak = askOf(m.id,it.ex,it.va).length;
         return `<button class="card rowc ${n?'':'gold'}" data-act="exd:${it.ex}:${it.va}:${m.id}">
@@ -3105,13 +3103,8 @@ function tWrite(){
           <div class="sm">${it.sets.map(x=>setShort(it.ex,x)).join(' · ')}</div></div>
           <span class="pill${n?' q':''}">${n?`코멘트 ${n}`:'코멘트 쓰기'} ›</span></button>`; }).join('')
       : '<div class="empty">세트를 적은 종목이 없어요</div>')
-    + `<div class="note">여기서 남긴 코멘트는 <b>그 종목에</b> 붙습니다. 회원 화면의 피드백 탭과
-        다음에 그 종목을 할 때 바로 뜹니다.</div>
-       <div class="hr"></div>
-       <span class="lbl" style="opacity:.6">기록 자체가 잘못됐다면</span>
-       <button class="btn blue sm" data-act="trec:${w.id}">무게·횟수 고치기</button>
-       <div class="note">기록 화면에서 <b>「기록 수정하기」</b>를 누르면 세트를 하나씩 고칠 수 있어요.
-         <b>운동이 다시 시작되지는 않습니다.</b></div>` };
+    ,
+    foot:`<button class="btn blue go" data-act="recedit:${w.id}">기록 수정하기</button>` };
 }
 function tRoutines(){
   const mid=S.tmid||'m1', all=myRoutines(mid), t=D.today[mid];
