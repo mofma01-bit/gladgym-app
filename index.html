@@ -1562,6 +1562,42 @@ function foodTxt(kcal){
   return `${f.n} ${n}개쯤`;
 }
 
+/* 「3개월」 「12주」 「90일」 「12월 2일」 「2026-12-02」 → 2026-12-02 */
+function ymd(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function goalDate(txt){
+  const t = String(txt||'').trim(); if(!t) return '';
+  const base = new Date(TODAY+'T00:00:00');   /* 언제나 오늘이 기준 */
+  let m;
+  if((m = t.match(/^(\d{4})\D{1,2}(\d{1,2})\D{1,2}(\d{1,2})\D?$/)))
+    return ymd(new Date(+m[1], +m[2]-1, +m[3]));
+  if((m = t.match(/^(\d{1,2})\s*월\s*(\d{1,2})\s*일?$/)) || (m = t.match(/^(\d{1,2})[-.\/](\d{1,2})$/))){
+    const y = base.getFullYear();
+    let d = new Date(y, +m[1]-1, +m[2]);
+    if(d < base) d = new Date(y+1, +m[1]-1, +m[2]);
+    return ymd(d);
+  }
+  if((m = t.match(/^(\d+)\s*일$/))){ const d=new Date(base); d.setDate(d.getDate()+ +m[1]); return ymd(d); }
+  if((m = t.match(/^(\d+)\s*주$/))){ const d=new Date(base); d.setDate(d.getDate()+ +m[1]*7); return ymd(d); }
+  if((m = t.match(/^(\d+)\s*(개월|달|월)?$/))){
+    const d=new Date(base), day=d.getDate();
+    d.setDate(1); d.setMonth(d.getMonth() + +m[1]);
+    const last=new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
+    d.setDate(Math.min(day,last)); return ymd(d);
+  }
+  return '';
+}
+function dLeft(date){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(date||'')) return null;
+  return Math.round((new Date(date+'T00:00:00') - new Date(TODAY+'T00:00:00'))/86400000);
+}
+function goalLine(g){
+  const d = goalDate((g.to&&g.to.when) || (g.to&&g.to.date) || '');
+  if(!d) return '<div class="note" style="padding:8px 10px">「3개월」 이나 「12월 2일」 처럼 적으면 날짜를 잡아 드립니다.</div>';
+  const n = dLeft(d);
+  return `<div class="note" style="padding:8px 10px">목표 날짜 <b style="color:var(--gold)">${d}</b>${
+    n===null?'':` · 오늘부터 <b>${n>=0?n+'일':'지난 날짜'}</b>`}</div>`;
+}
+
 function calcOf(g){
   const c = g.calc || (g.calc = {});
   const w  = nnum(g.now && g.now.w), gw = nnum(g.to && g.to.w);
@@ -1733,8 +1769,13 @@ function vPlanEdit(){
     ${num('now','date','날짜')}<div class="grid2">${num('now','w','몸무게 kg')}${num('now','m','근육량 kg')}</div>
     <div class="grid2">${num('now','f','체지방량 kg')}${num('now','fp','체지방률 %')}</div>
     <span class="lbl">목표</span>
-    ${num('to','date','날짜')}<div class="grid2">${num('to','w','몸무게 kg')}${num('to','m','근육량 kg')}</div>
-    <div class="grid2">${num('to','f','체지방량 kg')}${num('to','fp','체지방률 %')}</div>
+    <div class="grid2">
+      <div class="fld"><span class="fn">목표 기간 — 「3개월」 또는 「12월 2일」</span>
+        <input class="search" type="text" data-k="plto:when" value="${esc(g.to.when||g.to.date||'')}" placeholder="3개월"></div>
+      <div class="fld"><span class="fn">희망 몸무게 kg</span>
+        <input class="search" type="text" inputmode="decimal" data-k="plto:w" value="${esc(g.to.w!=null?g.to.w:'')}" placeholder="55"></div>
+    </div>
+    <div id="godate">${goalLine(g)}</div>
     <div class="hr"></div>
     <span class="lbl">칼로리 계산기</span>
     <div class="grid2">
@@ -1764,9 +1805,10 @@ function vPlan(){
   const mid=subj(), tr=(S.who==='tr');
   const g=GOALS[mid]||{}; g.now=g.now||{}; g.to=g.to||{};
   const unit = u => u==='fp' ? '%' : 'kg';
+  const has=u=>g.to[u]!=null&&g.to[u]!=='';
   const cmp=(k,u)=>`<div class="frow"><span class="fk">${k}</span>
-    <span class="fv">${g.now[u]!=null&&g.now[u]!==''?g.now[u]+unit(u):'—'} <span style="color:#5f5c57">→</span>
-    <b style="color:var(--gold)">${g.to[u]!=null&&g.to[u]!==''?g.to[u]+unit(u):'—'}</b></span></div>`;
+    <span class="fv">${g.now[u]!=null&&g.now[u]!==''?g.now[u]+unit(u):'—'}${has(u)?`
+      <span style="color:#5f5c57">→</span> <b style="color:var(--gold)">${g.to[u]+unit(u)}</b>`:''}</span></div>`;
   return { top: bar('운동계획', `<span class="sub">${esc(subjName())}</span>`, tr?'tm:'+mid:'tab:me'), body:`
     ${tr?`<button class="btn main" data-act="editplan:${mid}">계획 고치기 · 칼로리 계산</button>`:''}
     <span class="lbl">나의 운동 목적</span>
@@ -1774,7 +1816,8 @@ function vPlan(){
       `<button class="chip ${(g.purpose||[]).includes(x)?'on':''}" ${tr?`data-act="editplan:${mid}"`:''}>${x}</button>`).join('')}</div>
     <span class="lbl">목표 선언 — 현재에서 미래로</span>
     <div class="card">
-      <div class="sm">${esc(g.now.date||'—')} → ${esc(g.to.date||'—')}</div>
+      <div class="sm">${esc(g.now.date||'—')} → ${esc(g.to.date||'—')}${
+        (()=>{ const n=dLeft(g.to.date); return n!=null&&n>=0?` · ${n}일 남음`:''; })()}</div>
       ${cmp('몸무게','w')}${cmp('근육량','m')}${cmp('체지방량','f')}${cmp('체지방률','fp')}</div>
     <span class="lbl">맞춤 칼로리 · 예상 감량치</span>
     ${(g.calc && (g.now.w||g.calc.bmr)) ? calcBrief(g)+calcHTML(g) : ''}
@@ -2193,6 +2236,10 @@ function tEx(){
 document.addEventListener('input', ev=>{
   const k = ev.target.getAttribute && ev.target.getAttribute('data-k');
   if(k && (k.startsWith('pc:') || k==='plnow:w' || k==='plto:w')){ calcSync(); }
+  if(k === 'plto:when'){
+    const box=document.getElementById('godate');
+    if(box) box.innerHTML = goalLine({ to:{ when: ev.target.value.trim() } });
+  }
   const f = ev.target.closest('[data-filter]');
   if(!f) return;
   const q = (f.value||'').trim().toLowerCase();
@@ -2289,7 +2336,11 @@ document.addEventListener('click', ev=>{
       g.now=g.now||{}; g.to=g.to||{};
       const gv=k=>{ const el=document.querySelector('[data-k="'+k+'"]'); return el?el.value.trim():''; };
       ['goal','work','diet','kcal','ratio','wk','mo'].forEach(k=>{ g[k]=gv('pg:'+k); });
-      ['date','w','m','f','fp'].forEach(k=>{ g.now[k]=gv('plnow:'+k); g.to[k]=gv('plto:'+k); });
+      ['date','w','m','f','fp'].forEach(k=>{ g.now[k]=gv('plnow:'+k); });
+      g.to.w = gv('plto:w');
+      g.to.when = gv('plto:when');
+      g.to.date = goalDate(g.to.when);
+      ['m','f','fp'].forEach(k=>{ delete g.to[k]; });
       g.calc = g.calc || {};
       ['age','height','bmr','kcal','freq','burn','rc','rp','rf','pkg','fkg'].forEach(k=>{ const el=document.querySelector('[data-k="pc:'+k+'"]'); if(el) g.calc[k]=el.value.trim(); });
       const rr = calcOf(g);
