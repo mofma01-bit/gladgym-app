@@ -874,18 +874,24 @@ function radar(o){
 /* 종목별 무게 변화 */
 function exTrend(mid, from, grp){
   const map = {};
-  anaWs(mid, from).forEach(w => w.items.forEach(it => {
+  anaWs(mid, '1900-01-01').forEach(w => w.items.forEach(it => {   /* 기간 밖 기록도 견줄 밑값으로 쓴다 */
     if(!it.sets.length) return;
     const e = exOf(it.ex); if(!e) return;
     if(grp !== '전체' && !(PARTG[grp]||[]).includes(e.p)) return;
     const key = it.ex + ':' + it.va;
     const best = e.cardio ? Math.max(...it.sets.map(x=>+x.reps||0)) : Math.max(...it.sets.map(x=>+x.kg||0));
-    (map[key] = map[key] || { ex:it.ex, va:it.va, cardio:e.cardio, rows:[] }).rows.push(best);
+    (map[key] = map[key] || { ex:it.ex, va:it.va, cardio:e.cardio, all:[] }).all.push({ d:w.date, v:best });
   }));
   return Object.values(map).map(m => {
-    const f = m.rows[0], l = m.rows[m.rows.length-1];
-    return Object.assign(m, { first:f, last:l, diff: Math.round((l-f)*10)/10, n:m.rows.length });
-  }).sort((a,b) => b.n - a.n || b.last - a.last);
+    const inP = m.all.filter(x => x.d >= from);
+    if(!inP.length) return null;                       /* 이 기간엔 안 한 종목 */
+    const before = m.all.filter(x => x.d < from);
+    const base = inP.length > 1 ? inP[0] : (before.length ? before[before.length-1] : null);
+    const l = inP[inP.length-1].v;
+    return { ex:m.ex, va:m.va, cardio:m.cardio, n:inP.length, last:l,
+      first: base ? base.v : l, diff: base ? Math.round((l - base.v)*10)/10 : null,
+      prev: !!(base && inP.length === 1), since: base ? base.d : '' };
+  }).filter(Boolean).sort((a,b) => b.n - a.n || b.last - a.last);
 }
 
 function weekStrip(mid){
@@ -1473,15 +1479,15 @@ function vRecords(){
       ${tr.length ? tr.map(t=>{
         const u = t.cardio ? '분' : 'kg';
         const cl = t.diff > 0 ? 'up' : t.diff < 0 ? 'dn' : 'eq';
-        const ar = t.n < 2 ? '처음' : t.diff > 0 ? `▲${kgfmt(t.diff)}` : t.diff < 0 ? `▼${kgfmt(-t.diff)}` : '그대로';
+        const ar = t.diff === null ? '처음' : t.diff > 0 ? `▲${kgfmt(t.diff)}` : t.diff < 0 ? `▼${kgfmt(-t.diff)}` : '그대로';
         return `<div class="trow">
-          <span class="e">${esc(exName(t.ex,t.va))}</span>
+          <span class="e">${esc(exName(t.ex,t.va))}${t.prev?'<span style="font-size:10.5px;font-weight:600;color:#6f6a64"> 직전 대비</span>':''}</span>
           <span class="n">${t.n}회</span>
           <span class="v">${kgfmt(t.last)}<span style="font-size:11px;font-weight:600;color:#8f8a83">${u}</span></span>
-          <span class="d ${t.n<2?'eq':cl}">${ar}</span></div>`; }).join('')
+          <span class="d ${t.diff===null?'eq':cl}">${ar}</span></div>`; }).join('')
       : '<div class="empty">이 부위 기록이 없어요</div>'}
     </div>
-    <div class="note">기간 안에서 <b>처음 한 날과 마지막 날</b>의 가장 무거운 세트를 견줍니다.</div>` };
+    <div class="note">기간 안 <b>처음과 마지막</b>의 가장 무거운 세트를 견줍니다. 기간에 한 번만 했다면 <b>그 직전 기록</b>과 견줍니다.</div>` };
 }
 
 /* ── 지난 운동기록 — 날짜로 보기 ── */
