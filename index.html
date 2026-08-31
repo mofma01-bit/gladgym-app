@@ -592,7 +592,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '58';
+const BUILD = '59';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1837,7 +1837,7 @@ function mealSum(m){
 /* 그날 식사를 회차 순으로 */
 function mealsSeq(mid, date){
   return mealsOf(mid, date).slice().sort((a,b)=>
-    (a.seq||99) - (b.seq||99) || String(a.at||'').localeCompare(String(b.at||'')) || String(a.id).localeCompare(String(b.id)));
+    String(a.at||'').localeCompare(String(b.at||'')) || String(a.id).localeCompare(String(b.id)));
 }
 function nextSeq(mid, date){ return mealsOf(mid, date).length + 1; }
 const hhmm = () => { const d=new Date(); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); };
@@ -1944,13 +1944,13 @@ function vDiet(){
     </div>`}
     ${seqs.length? seqs.map((m,i)=>{ const t=mealSum(m);
       return `<div class="mealcd">
-        <div class="hd2"><span class="n">${(m.seq||i+1)}번째 식사</span>
+        <div class="hd2"><span class="n">${i+1}번째 식사</span>
           <span class="t">${esc(m.at||'')}</span>
           <span class="k">${Math.round(t.kcal)||0} kcal</span></div>
         ${m.path?`<img class="ph" src="${esc(mealURL(m.path))}" alt="" data-act="meal:${m.id}">`:''}
         ${(m.items||[]).map(x=>`<button class="frow2" data-act="fdel:${m.id}:${x.id}">
           <span class="fn2">${esc(x.name)}${x.brand?` <span style="color:#a0917f;font-weight:600">${esc(x.brand)}</span>`:''}</span>
-          <span class="fq">${kgfmt(x.qty)}${esc(x.unit||'')}</span>
+          <span class="fq">${kgfmt(x.qty)}${x.unit?' × '+esc(x.unit):'인분'}</span>
           <span class="fk">${Math.round(x.kcal)}</span></button>`).join('')}
         ${(!m.items||!m.items.length) && m.memo?`<div class="frow2"><span class="fn2">${esc(m.memo)}</span>
           <span class="fk">${Math.round(t.kcal)||''}</span></div>`:''}
@@ -2125,7 +2125,7 @@ function sheetFoodPick(mealId){
       </div>
       ${res===null && rec.length?`<span class="lbl">최근 먹은 것</span>
         ${rec.map(x=>`<button class="fitem" data-act="frec:${esc(x.name)}">
-          <span class="n2">${esc(x.name)}<small>${x.brand?esc(x.brand)+' · ':''}${kgfmt(x.qty)}${esc(x.unit||'')}</small></span>
+          <span class="n2">${esc(x.name)}<small>${x.brand?esc(x.brand)+' · ':''}${kgfmt(x.qty)}${x.unit?' × '+esc(x.unit):'인분'}</small></span>
           <span class="k2">${Math.round(x.kcal)}<span style="font-size:11px;font-weight:600;color:#8f8a83"> kcal</span></span></button>`).join('')}`:''}
       ${res===null && !rec.length?'<div class="note">이름을 적고 <b>찾기</b>를 누르세요. 없으면 <b>직접 넣기</b>로 새로 만듭니다.</div>':''}
       ${res==='loading'?'<div class="empty">찾는 중이에요…</div>':''}
@@ -2151,7 +2151,7 @@ function sheetFoodQty(f){
         <button data-act="fq:+">＋</button>
       </div>
       <div class="chips" style="justify-content:center">
-        ${[0.5,1,1.5,2,3].map(x=>`<button class="chip ${q===x?'on':''}" data-act="fq:${x}">${kgfmt(x)}${esc(f.unit||'')}</button>`).join('')}
+        ${[0.5,1,1.5,2,3].map(x=>`<button class="chip ${q===x?'on':''}" data-act="fq:${x}">${kgfmt(x)}${f.unit?' × '+esc(f.unit):'인분'}</button>`).join('')}
       </div>
       <div class="calc" style="gap:9px">
         <div class="krow"><span class="k">칼로리</span><span class="v" style="color:var(--gold)">${Math.round(k)} kcal</span></div>
@@ -3481,7 +3481,7 @@ document.addEventListener('click', ev=>{
       const m = (D.meals||[]).find(x=>x.id===mealId); if(!m) return;
       const it = (m.items||[]).find(x=>String(x.id)===String(itemId)); if(!it) return;
       openSheet(()=>`<div class="h2">뺄까요? <small>${esc(it.name)}</small></div>
-        <div class="note">${kgfmt(it.qty)}${esc(it.unit||'')} · ${Math.round(it.kcal)}kcal</div>
+        <div class="note">${kgfmt(it.qty)}${it.unit?' × '+esc(it.unit):'인분'} · ${Math.round(it.kcal)}kcal</div>
         <button class="btn main" data-act="fdelgo:${mealId}:${itemId}" style="background:var(--warn);color:#241310">빼기</button>
         <button class="btn ghost sm" data-act="close">그만두기</button>`);
       return; }
