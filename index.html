@@ -293,7 +293,7 @@ textarea{min-height:92px;resize:vertical}
 textarea.tall{min-height:170px}
 textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 
-.wk{background:var(--dark-2);border:1px solid var(--line);border-radius:16px;padding:11px 9px 13px}
+.wk{background:var(--dark-2);border:1px solid var(--line);border-radius:16px;padding:11px 9px 13px;flex:0 0 auto}
 .wkhd{display:flex;align-items:center;justify-content:center;gap:4px;margin-bottom:10px}
 .wkhd .d{font-size:16px;font-weight:800;letter-spacing:-.02em;padding:6px 18px;border-radius:999px;
   background:var(--dark-3);min-width:150px;text-align:center}
@@ -314,11 +314,13 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
 .dsum .k{display:block;font-size:11px;font-weight:600;color:#7d766e}
 .dsum .v{display:block;font-size:17px;font-weight:800;margin-top:1px;letter-spacing:-.02em}
 .dsum .v small{font-size:11px;font-weight:600;color:var(--sub)}
-.hero{display:block;width:100%;text-align:left;border-radius:18px;padding:19px 18px 17px;min-height:152px;
+.hero{display:flex;flex-direction:column;align-items:flex-start;flex:0 0 auto;
+  width:100%;text-align:left;border-radius:18px;padding:19px 18px 17px;min-height:152px;
   background:radial-gradient(125% 135% at 86% 6%, #6d4736 0%, #412921 44%, #23170f 100%);
   border:1px solid #6b4a38}
 .hero .tag{display:inline-block;font-size:11.5px;font-weight:700;color:var(--gold);
   border:1px solid var(--gold-2);border-radius:999px;padding:3px 11px}
+.hero .ht,.hero .hs{width:100%}
 .hero .ht{font-size:23px;font-weight:900;letter-spacing:-.035em;margin-top:11px;line-height:1.24;color:#fff}
 .hero .hs{font-size:13.5px;font-weight:600;color:#e6d5c6;margin-top:6px;line-height:1.5}
 .hero .hgo{display:inline-block;margin-top:14px;background:var(--gold);color:#2a1c14;
