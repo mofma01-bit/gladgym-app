@@ -1468,8 +1468,9 @@ function vSummary(){
     foot:`<button class="btn sub" data-act="tab:records">분석 보기</button>
           <button class="btn main" data-act="tab:home">홈으로</button>` };
 }
+function anaMid(){ return (S.who==='tr') ? (S.tmid || S.subj || S.mid) : S.mid; }
 function vRecords(){
-  const mid = S.mid, from = anaFrom(), bw = bwOf(mid);
+  const mid = anaMid(), from = anaFrom(), bw = bwOf(mid);
   const per = S.anaP || '1주', gm = S.anaG || 'vol', grp = S.anaB || '전체';
   const ws = anaWs(mid, from);
   const tot = ws.reduce((a,w) => { const t = wStat(w, bw);
@@ -1481,7 +1482,8 @@ function vRecords(){
   const tr = exTrend(mid, from, grp);
   const unit = gm==='vol' ? 'kg' : gm==='kcal' ? 'kcal' : '분';
 
-  return { top: bar('분석', `<span class="sub">${esc(per)}</span>`), tabs:1, body:`
+  return { top: bar('분석', `<span class="sub">${S.who==='tr'?esc((MEMBERS.find(x=>x.id===mid)||{}).n||'')+' · ':''}${esc(per)}</span>`,
+      S.who==='tr' ? 'tm:'+mid : null), tabs: S.who==='tr'?0:1, body:`
     <button class="card rowc plan" data-act="go:days">
       <div><div class="nm">지난 운동기록 보기</div>
       <div class="sm">날짜별로 그날 한 운동 · 식단 · 칼로리</div></div><span class="rt">›</span></button>
@@ -1534,11 +1536,12 @@ function vRecords(){
 
 /* ── 지난 운동기록 — 날짜로 보기 ── */
 function vDays(){
-  const mid = S.mid, sel = S.day || TODAY;
+  const mid = anaMid(), sel = S.day || TODAY;
   const ms = (D.meals||[]).filter(m => m.mid===mid && m.date===sel);
   const kc = ms.reduce((a,m)=> a + (Number(m.kcal)||0), 0);
   let goal = 0; try{ const rr = calcOf(GOALS[mid]||{}); goal = rr.bmr ? rr.kcal : 0; }catch(e){}
-  return { top: bar('지난 운동기록', `<span class="sub">${esc(me().n)} 회원님</span>`, 'tab:records'), body:`
+  return { top: bar('지난 운동기록', `<span class="sub">${esc((MEMBERS.find(x=>x.id===mid)||{}).n||'')}</span>`,
+      S.who==='tr'?'go:records':'tab:records'), body:`
     ${weekStrip(mid)}
     ${dayDetail(mid, sel) || '<div class="empty">이 날은 운동 기록이 없어요</div>'}
     <span class="lbl">${dateTxt(sel)} 식단</span>
@@ -2706,9 +2709,9 @@ function tMember(){
     <button class="card ${r?'gold':''}" data-act="go:t_routines">
       <div class="nm ${r?'g':''}">오늘 지정</div>
       <div class="sm">${r?`${esc(t.kind)} · 루틴 ${r.no} ${esc(r.n)}`:'아직 없어요 — 루틴에서 지정하세요'}</div></button>
-    ${bench.length?`<div class="hr"></div><span class="lbl">벤치프레스 증량</span>
-      <div class="graph">${bench.map((v,i)=>`<i class="${i===bench.length-1?'g':''}" style="height:${Math.round(v/mx*100)}%"></i>`).join('')}</div>
-      <div class="glbl">${bench.map(v=>`<span>${kgfmt(v)}</span>`).join('')}</div>`:''}
+    <button class="card rowc plan" data-act="tana:${m.id}">
+      <div><div class="nm">기록 분석</div>
+      <div class="sm">증량 그래프 · 운동 균형 · 종목별 변화 · 날짜별 기록</div></div><span class="rt">›</span></button>
     <div class="hr"></div><span class="lbl">회원 자료</span>
     <button class="card rowc plan" data-act="tsub:intake:${m.id}"><div><div class="nm">상담일지</div>
       <div class="sm">${D.intake[m.id]?'작성됨 — 눌러서 보기':'아직 없음'}</div></div><span class="rt">›</span></button>
@@ -2786,7 +2789,7 @@ function tRoutines(){
       || '<div class="empty">이 묶음에는 루틴이 없어요</div>'}
     <div style="display:flex;gap:9px">
       <button class="btn main sm" data-act="rblank">＋ 빈 루틴 만들기</button>
-      <button class="btn sub sm" data-act="rnew">루틴 복제</button></div>
+      <button class="btn sub sm" data-act="raddpick">루틴 추가하기</button></div>
     ${t?`<button class="btn ghost" data-act="unassign:${mid}">오늘 지정 풀기</button>`:''}
     <div class="note">위 칩은 <b>루틴 묶음</b>입니다 — 근지구력 · 파워 · 생리주기처럼 원하는 이름으로 만들어 쓰세요.
       회원은 오른쪽 위 이름을 눌러 바꿉니다.</div>` };
@@ -2804,7 +2807,59 @@ function sheetRmPick(){
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 
+/* 있는 루틴을 골라 담는다 — 상품 담듯이 */
+function sheetRAdd(){
+  const mid = S.tmid || 'm1';
+  const me2 = MEMBERS.find(x=>x.id===mid) || {n:''};
+  S.rcart = S.rcart || [];
+  openSheet(()=>{
+    const cart = S.rcart;
+    const mine = myRoutines(mid);
+    const others = MEMBERS.filter(m=>m.id!==mid)
+      .map(m=>({ m, rs: myRoutines(m.id) })).filter(x=>x.rs.length);
+    const row = (r, who) => {
+      const n = cart.filter(x=>x===r.id).length;
+      return `<div class="card rowc ${n?'gold':''}" data-nm="${esc(r.n+' '+(r.purpose||'')+' '+who)}">
+        <div><div class="nm ${n?'g':''}">${esc(r.n)}${n?` <span class="pill">${n}개 담김</span>`:''}</div>
+        <div class="sm">${who?esc(who)+' · ':''}${r.grp?esc(r.grp)+' · ':''}${r.items.length}종목 · 예상 ${estMin(r)}분</div></div>
+        ${n?`<button class="chip" data-act="rcart:-:${r.id}">－</button>`:''}
+        <button class="chip t" data-act="rcart:+:${r.id}">＋</button></div>`;
+    };
+    return `
+      <div class="h2">루틴 추가하기 <small>${esc(me2.n)} 회원에게</small></div>
+      <input class="search" type="text" data-filter="1" placeholder="루틴 이름으로 찾기">
+      ${cart.length?`<div class="note" style="border-color:var(--gold-2)">
+        <b style="color:var(--gold)">${cart.length}개 담김</b>
+        <div>${[...new Set(cart)].map(id=>{ const r=rOf(id);
+          return r?`${esc(r.n)}${cart.filter(x=>x===id).length>1?` ×${cart.filter(x=>x===id).length}`:''}`:''; }).join(' · ')}</div>
+        <div style="display:flex;gap:8px;margin-top:9px">
+          <button class="btn main sm" data-act="raddask">추가하기</button>
+          <button class="btn ghost sm" data-act="rcartclr">비우기</button></div></div>`:''}
+      ${mine.length?`<span class="lbl">이 회원 루틴 — 같은 것을 하나 더</span>
+        ${mine.map(r=>row(r,'')).join('')}`:''}
+      ${others.map(o=>`<span class="lbl">${esc(o.m.n)} 회원 루틴 — 가져오기</span>
+        ${o.rs.map(r=>row(r, o.m.n)).join('')}`).join('')}
+      <button class="btn ghost sm" data-act="close">닫기</button>
+      <div class="note">＋ 를 눌러 담고, <b>담은 뒤 추가하기</b>를 누르면 한 번 더 여쭤봅니다.
+        같은 루틴을 여러 번 담아도 됩니다.</div>`;
+  });
+}
+
 /* 묶음 만들기 · 이름 바꾸기 · 없애기 */
+function sheetRDel(rid){
+  const r = rOf(rid); if(!r) return;
+  const m = MEMBERS.find(x=>x.id===r.mid) || {n:''};
+  const t = D.today[r.mid];
+  openSheet(()=>`
+    <div class="h2">이 루틴을 지울까요? <small>${esc(m.n)} 회원</small></div>
+    <div class="card"><div class="nm">루틴 ${r.no} · ${esc(r.n)}</div>
+      <div class="sm">${r.grp?esc(r.grp)+' · ':''}${r.items.length}종목 · 예상 ${estMin(r)}분</div></div>
+    <div class="note">${t&&t.rid===r.id?'<b style="color:var(--warn)">오늘 지정된 루틴입니다 — 지정도 함께 풀립니다.</b><br>':''}
+      <b>되돌릴 수 없습니다.</b> 이 루틴으로 이미 한 운동 기록은 그대로 남습니다.</div>
+    <button class="btn main" data-act="rdelgo:${rid}" style="background:var(--warn);color:#241310">지우기</button>
+    <button class="btn ghost sm" data-act="close">그만두기</button>`);
+}
+
 function sheetGrpMan(){
   const mid = S.tmid||'m1'; S.grpRen = null;
   openSheet(()=>{
@@ -3177,7 +3232,8 @@ document.addEventListener('click', ev=>{
     case 'rdelitem': { const [rid,i]=rest, r=rOf(rid); if(!r) return;
       r.items.splice(+i,1); svRoutineItems(rid); closeSheet(); toast('뺐어요'); render(); return; }
     case 'rdone': { S.just=null; toast('루틴을 저장했어요'); go('t_routines'); return; }
-    case 'rdel': { const rid=rest[0];
+    case 'rdel': sheetRDel(rest[0]); return;
+    case 'rdelgo': { const rid=rest[0]; closeSheet();
       D.routines = D.routines.filter(x=>x.id!==rid);
       Object.keys(D.today).forEach(m=>{ if(D.today[m].rid===rid) delete D.today[m]; });
       sv(sdel('routines','id=eq.'+rid), '루틴 지우기');
@@ -3209,6 +3265,7 @@ document.addEventListener('click', ev=>{
     case 'go': { if(rest[0]==='workout' && !D.live) adoptLive(S.mid); go(rest[0]); return; }
     case 'dpick': S.day = rest[0]; render(); return;
     case 'tmeals': S.tmid = rest[0]; go('t_meals'); return;
+    case 'tana': S.tmid = rest[0]; S.subj = rest[0]; S.anaP = S.anaP||'1달'; go('records'); return;
     case 'tfd': S.tfDay = rest[0]; closeSheet(); render(); return;
     case 'tfcal': S.tfMon = (S.tfDay||TODAY).slice(0,7); sheetTfCal(); return;
     case 'tfmove': {
@@ -3418,6 +3475,43 @@ document.addEventListener('click', ev=>{
     case 'tw': S.twid=rest[0]; go('t_write'); return;
     case 'rm': S.tmid=rest[0]; S.rgrp='전체'; closeSheet(); go('t_routines'); return;
     case 're': S.redit=rest[0]; go('t_redit'); return;
+    case 'raddpick': S.rcart = []; sheetRAdd(); return;
+    case 'rcart': { const [op, rid] = rest;
+      S.rcart = S.rcart || [];
+      if(op === '+') S.rcart.push(rid);
+      else { const i = S.rcart.lastIndexOf(rid); if(i >= 0) S.rcart.splice(i,1); }
+      drawSheet(); return; }
+    case 'rcartclr': S.rcart = []; drawSheet(); return;
+    case 'raddask': {
+      const mid = S.tmid || 'm1', cart = S.rcart || [];
+      if(!cart.length){ toast('담은 루틴이 없어요'); return; }
+      const m = MEMBERS.find(x=>x.id===mid) || {n:''};
+      openSheet(()=>`
+        <div class="h2">루틴 ${cart.length}개를 추가할까요? <small>${esc(m.n)} 회원</small></div>
+        <div class="card">${[...new Set(cart)].map(id=>{ const r=rOf(id), n=cart.filter(x=>x===id).length;
+          return r?`<div class="frow"><span class="fk">${esc(r.n)}</span>
+            <span class="fv">${r.items.length}종목${n>1?` · ${n}개`:''}</span></div>`:''; }).join('')}</div>
+        <div class="note">고른 루틴을 <b>그대로 베껴</b> 새 루틴으로 만듭니다. 원래 루틴은 그대로 있습니다.</div>
+        <button class="btn main" data-act="raddgo">추가하기</button>
+        <button class="btn ghost sm" data-act="raddpick">뒤로</button>`);
+      return; }
+    case 'raddgo': {
+      const mid = S.tmid || 'm1', cart = (S.rcart||[]).slice();
+      closeSheet(); S.rcart = [];
+      if(!cart.length) return;
+      const g0 = (S.rgrp && S.rgrp!=='전체' && S.rgrp!=='묶음 없음') ? S.rgrp : '';
+      let no = myRoutines(mid).length;
+      cart.forEach((rid, k) => {
+        const src = rOf(rid); if(!src) return;
+        no++;
+        const id = 'r' + (Date.now() + k);
+        const items = JSON.parse(JSON.stringify(src.items));
+        D.routines.push({ id, mid, no, n:src.n, purpose:src.purpose||'', grp:g0||src.grp||'', items });
+        sv(spost('routines',[{ id, member_id:mid, no, name:src.n, purpose:src.purpose||'', grp:g0||src.grp||'' }])
+          .then(()=> items.length ? spost('routine_items', items.map((it,i)=>({ routine_id:id, sort:i,
+            variant_id:VID(it.ex,it.va), kg:it.kg, reps:it.reps, sets:it.sets, rest:it.rest }))) : null), '루틴 추가');
+      });
+      toast(`루틴 ${cart.length}개를 추가했어요`); go('t_routines'); return; }
     case 'rgrp': S.rgrp = rest.join(':'); render(); return;
     case 'rmpick': sheetRmPick(); return;
     case 'grpman': sheetGrpMan(); return;
