@@ -210,7 +210,7 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .btn.go.calm::after{display:none}
 #foot > .btn.go{animation:ggUp .42s ease-out both, ggBreath 2.8s ease-in-out .42s infinite}
 #foot > .btn.go.live{animation:ggUp .42s ease-out both, ggBreath 1.6s ease-in-out .42s infinite}
-#foot > .btn.go.calm{animation:ggUp .42s ease-out both}
+#foot > .btn.go.calm{animation:ggUp .42s ease-out both, ggBreath 4.6s ease-in-out .42s infinite}
 @media (prefers-reduced-motion:reduce){
   #foot > .btn.go{animation:none!important}
   .btn.go::after,.btn.go .gdot{animation:none!important;display:none}
@@ -537,7 +537,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '55';
+const BUILD = '56';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
