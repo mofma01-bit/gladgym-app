@@ -325,6 +325,14 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
 .hero .hs{font-size:13.5px;font-weight:600;color:#e6d5c6;margin-top:6px;line-height:1.5}
 .hero .hgo{display:inline-block;margin-top:14px;background:var(--gold);color:#2a1c14;
   font-size:13.5px;font-weight:800;border-radius:999px;padding:8px 16px}
+.dhd{display:flex;align-items:baseline;gap:9px;padding-bottom:8px}
+.dhd .t{flex:1;font-size:14px;font-weight:700;color:var(--cream);letter-spacing:-.02em}
+.dhd .r{font-size:12.5px;font-weight:600;color:#8f8a83}
+.setrow{display:flex;align-items:baseline;gap:10px;padding:6px 0;border-top:1px solid var(--line)}
+.setrow .e{flex:1;min-width:0;font-size:13px;font-weight:600;color:#e9e3db;text-align:left}
+.setrow .s{font-size:12.5px;font-weight:700;color:var(--gold-2);text-align:right;
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+.setrow .n{font-size:11.5px;font-weight:600;color:#7d766e;flex:none}
 .empty{padding:30px 10px;text-align:center;color:#6d6a65;font-size:14px;font-weight:500;line-height:1.8}
 .note{background:var(--dark-2);border:1px solid var(--line);border-radius:12px;padding:12px 13px;
   font-size:12.5px;font-weight:500;color:var(--sub);line-height:1.75}
@@ -712,6 +720,28 @@ function ring(pw, pk){
     <circle cx="18" cy="18" r="10" fill="none" stroke="#302f2b" stroke-width="3.4"/>
     ${pw>0?arc(15,C1,pw,'var(--gold)'):''}${pk>0?arc(10,C2,pk,'var(--teal)'):''}</svg>`;
 }
+/* 그날 무엇을 몇 kg 몇 세트 했는지 */
+function dayDetail(mid, date){
+  const all = D.workouts.filter(w => w.mid===mid && w.date===date && w.done);
+  const ws  = all.filter(w => w.items.some(i => i.sets.length));
+  if(!ws.length) return all.length
+    ? `<span class="lbl">${dateTxt(date)} 기록</span>
+       <div class="empty">시작만 하고 세트를 적지 않은 기록 ${all.length}건</div>`
+    : '';
+  return `<span class="lbl">${dateTxt(date)} 기록</span>` + ws.map(w => `
+    <button class="card" data-act="rec:${w.id}">
+      <div class="dhd">
+        <span class="t">${w.kind?esc(w.kind):'운동'}${w.rid&&rOf(w.rid)?` · 루틴 ${rOf(w.rid).no} ${esc(rOf(w.rid).n)}`:''}</span>
+        <span class="r">${durTxt(w.dur)} ›</span></div>
+      ${w.items.filter(i => i.sets.length).map(it => `
+        <div class="setrow">
+          <span class="e">${esc(exName(it.ex,it.va))}</span>
+          <span class="n">${it.sets.length}세트</span>
+          <span class="s">${it.sets.map(x => setShort(it.ex,x)).join(' · ')}</span>
+        </div>`).join('')}
+    </button>`).join('');
+}
+
 function weekStrip(mid){
   const sel = S.day || TODAY, wk = weekOf(sel), st = dayStat(mid, sel);
   return `<div class="wk">
@@ -895,13 +925,8 @@ function vHome(){
   return { top: bar('글래드짐', `<span class="sub">${esc(me().n)} 회원님</span>`), tabs:1, body:`
     ${weekStrip(S.mid)}
     ${past
-      ? (st.ws.length
-          ? `<button class="card rowc" data-act="rec:${st.ws[0].id}">
-              <div><div class="nm">${dateTxt(sel)} 기록 보기</div>
-              <div class="sm">${st.ws.length}건 · ${st.ex}종목 · ${durTxt(st.dur)}</div></div>
-              <span class="rt">›</span></button>`
-          : `<div class="empty">이 날은 기록이 없어요</div>`)
-      : ''}
+      ? (dayDetail(S.mid, sel) || `<div class="empty">이 날은 기록이 없어요</div>`)
+      : dayDetail(S.mid, sel)}
 
     <button class="hero" data-act="${hero.act}">
       <span class="tag">${hero.tag}</span>
