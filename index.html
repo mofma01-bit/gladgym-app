@@ -1184,18 +1184,21 @@ function dietStat(mid, from, to){
   const r = calcOf(g);
   const target = r.kcal || 0, dayLoss = r.day || 0;
   const gm = { c:r.gg.c, p:r.gg.p, f:r.gg.f };
+  const ready = (r.bmr > 0 && r.keep > 0 && r.kcal > 0);
   const rows = (D.meals||[]).filter(m => m.mid===mid && (!from || m.date>=from) && (!to || m.date<=to));
+  const withK = rows.filter(m => Number(m.kcal) > 0);
   const byDay = {};
-  rows.forEach(m => { byDay[m.date] = (byDay[m.date]||0) + (Number(m.kcal)||0); });
+  withK.forEach(m => { byDay[m.date] = (byDay[m.date]||0) + Number(m.kcal); });
   const days = Object.keys(byDay);
   let over = 0; days.forEach(d => { over += (byDay[d] - target); });
-  const eaten = rows.reduce((a,m)=>a+(Number(m.kcal)||0), 0);
+  const eaten = withK.reduce((a,m)=>a+Number(m.kcal), 0);
   const carb  = rows.reduce((a,m)=>a+(Number(m.carb)||0), 0);
   const prot  = rows.reduce((a,m)=>a+(Number(m.protein)||0), 0);
   const fat   = rows.reduce((a,m)=>a+(Number(m.fat)||0), 0);
+  const noK   = rows.length - withK.length;
   const planLoss = dayLoss * days.length;
   const realLoss = planLoss - over;
-  return { target, dayLoss, gm, days:days.length, eaten, carb, prot, fat, over,
+  return { ready, target, dayLoss, gm, days:days.length, eaten, carb, prot, fat, over, noK,
     planLoss, realLoss, planKg: planLoss/FAT_KCAL, realKg: realLoss/FAT_KCAL };
 }
 function weekStart(){ const d=new Date(); const w=(d.getDay()+6)%7; d.setDate(d.getDate()-w);
@@ -1204,7 +1207,9 @@ function monthStart(){ const d=new Date(); return d.getFullYear()+'-'+String(d.g
 
 function kcalCard(mid, day){
   const st = dietStat(mid, day, day);
-  if(!st.target) return `<div class="note">운동계획에서 <b>권장 칼로리</b>를 먼저 잡아 주세요. 잡으면 여기에 오늘 남은 칼로리가 나옵니다.</div>`;
+  if(!st.ready) return `<div class="note">운동계획에서 <b>인바디 값(기초대사량)과 활동량</b>을 먼저 넣어 주세요.
+    넣으면 여기에 <b>오늘 남은 칼로리</b>와 탄단지가 나옵니다.
+    ${S.who==='tr'?'<br>트레이너 → 회원 → 운동계획 → 계획 고치기':''}</div>`;
   const left = st.target - st.eaten, over = left < 0;
   const pct = Math.min(100, Math.round(st.eaten / st.target * 100));
   const mm = (nm, got, goal) => `<div><span class="t">${nm} ${got}/${goal}g</span>
@@ -1230,9 +1235,10 @@ function kcalSummary(mid){
       <span class="v">${kg(st.realKg)}kg <span style="color:var(--sub);font-weight:500">(계획 ${kg(st.planKg)}kg)</span></span></div>`;
   };
   const w = dietStat(mid, weekStart(), TODAY), m = dietStat(mid, monthStart(), TODAY);
-  if(!w.target) return '';
+  if(!w.ready) return '';
   return `<div class="kcard">
     ${box('이번 주', w)}<div class="hr"></div>${box('이번 달', m)}
+    ${m.noK?`<div class="krow"><span class="k">칼로리 안 적은 사진</span><span class="v" style="color:var(--sub)">${m.noK}장</span></div>`:''}
     <div class="note">목표보다 <b>더 먹으면 +</b>, 덜 먹으면 −로 쌓입니다. 지방 1kg = 7,700kcal 로 환산했습니다.</div></div>`;
 }
 
