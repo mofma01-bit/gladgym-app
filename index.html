@@ -119,6 +119,34 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 #main.lite .chip.on{background:#f6ead4;border-color:var(--gold-2);color:#8a5a2b}
 #main.lite textarea{background:#fff;border-color:#e6ddcf;color:#2b231c}
 #main.lite .search{background:#fff;border-color:#e6ddcf;color:#2b231c}
+#main.lite .wk{background:#fff;border-color:#e6ddcf}
+#main.lite .wkhd .d{background:#f6efe3;color:#2b231c}
+#main.lite .wkhd button{color:#8a7c6c}
+#main.lite .wkd .dn{color:#a0917f}
+#main.lite .wkd .dnum{color:#a0917f}
+#main.lite .wkd .dnum.has{color:#2b231c}
+#main.lite .wkd>button.sel{background:#f6efe3}
+#main.lite .wkd>button.sel .dn{color:#2b231c}
+#main.lite .dsum{background:#e6ddcf}
+#main.lite .dsum>div{background:#fff}
+#main.lite .dsum .k{color:#a0917f}
+#main.lite .dsum .v{color:#8a5a2b}
+#main.lite .dsum .v small{color:#a0917f}
+.shot2{display:flex;align-items:center;gap:14px;width:100%;text-align:left;flex:0 0 auto;
+  border-radius:18px;padding:16px 18px 34px;min-height:112px;position:relative;overflow:hidden;
+  background:linear-gradient(115deg,#f8efe0 0%,#f3e6d2 55%,#eddcc4 100%);border:1px solid #e0cfb4}
+.shot2 .pic{flex:none;display:flex;align-items:center;justify-content:center;
+  width:86px;height:70px;animation:sdBob 3.4s ease-in-out infinite}
+.shot2 .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.shot2 .tx b{font-size:18px;font-weight:900;letter-spacing:-.03em;color:#3a2a1e}
+.shot2 .tx i{font-style:normal;font-size:12.5px;font-weight:600;color:#8a7663;line-height:1.45}
+.shot2 .go{position:absolute;right:16px;bottom:13px;background:var(--brown);color:#f6ead4;
+  font-size:12.5px;font-weight:800;border-radius:999px;padding:6px 13px}
+.shot2::after{content:'';position:absolute;top:-30%;bottom:-30%;width:30%;pointer-events:none;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.65),transparent);
+  animation:ggShine 4.2s ease-in-out infinite}
+@keyframes sdBob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-5px) rotate(2deg)}}
+@media (prefers-reduced-motion:reduce){ .shot2::after,.shot2 .pic{animation:none} }
 
 .shot{width:100%;border-radius:12px;display:block;background:#0e0e0d}
 .mealgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -537,7 +565,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '56';
+const BUILD = '57';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1837,15 +1865,15 @@ function vDiet(){
   const tr = (S.who==='tr');
   const day = S.dietDay || TODAY;
   const list = mealsOf(mid, day).sort((a,b)=> SLOTS.indexOf(a.slot)-SLOTS.indexOf(b.slot));
-  const days = [...new Set(mealsOf(mid).map(m=>m.date))].sort().reverse().slice(0,7);
-  if(days.indexOf(day)<0) days.unshift(day);
   return { top: bar('식단', `<span class="sub">${esc((MEMBERS.find(m=>m.id===mid)||{}).n||'')}</span>`, tr?'tm:'+mid:null),
     tabs: !tr, lite:true, body:`
-    <div class="chips">${days.map(d=>`<button class="chip ${d===day?'on':''}" data-act="dday:${d}">${d===TODAY?'오늘':dateTxt(d)}</button>`).join('')}</div>
+    ${dietStrip(mid)}
     ${kcalCard(mid, day)}
-    ${tr?'':`<button class="shotbtn" data-act="shot">
-      <span class="ic">▣</span><span class="t">식단 사진 찍기</span>
-      <span class="s">글래드짐 표시와 날짜·시간이 같이 찍힙니다</span></button>`}
+    ${tr?'':`<button class="shot2" data-act="shot">
+      <span class="pic">${SALAD}</span>
+      <span class="tx"><b>식단 사진 찍기</b>
+        <i>글래드짐 표시와 날짜·시간이<br>같이 찍힙니다</i></span>
+      <span class="go">사진 찍기 ›</span></button>`}
     ${list.length?`<div class="mealgrid">${list.map(m=>`
       <button class="mealcard" data-act="meal:${m.id}">
         <img src="${esc(mealURL(m.path))}" alt="">
@@ -1856,6 +1884,55 @@ function vDiet(){
     <span class="lbl">쌓인 것</span>
     ${kcalSummary(mid)}
     <div class="note">사진은 <b>긴 변 1600px</b> 로 줄여 올라갑니다. 아래에 글래드짐 표시와 찍은 날짜·시간이 찍힙니다.</div>` };
+}
+
+const SALAD = `<svg viewBox="0 0 96 76" width="86" height="70" aria-hidden="true">
+  <ellipse cx="48" cy="67" rx="30" ry="5" fill="#000" opacity=".07"/>
+  <ellipse cx="33" cy="31" rx="16" ry="11" fill="#7f9463" transform="rotate(-18 33 31)"/>
+  <ellipse cx="63" cy="30" rx="15" ry="10" fill="#9aae7f" transform="rotate(16 63 30)"/>
+  <ellipse cx="48" cy="25" rx="13" ry="9.5" fill="#6d8455"/>
+  <circle cx="30" cy="35" r="6" fill="#c1573f"/>
+  <circle cx="68" cy="34" r="5" fill="#cf6a4d"/>
+  <circle cx="48" cy="34" r="7.5" fill="#fbf6ec"/>
+  <circle cx="48" cy="34" r="3.4" fill="#e6b95f"/>
+  <path d="M14 38 h68 a5 5 0 0 1 4.6 7 q-6 19 -38.6 19 T9.4 45 A5 5 0 0 1 14 38 z" fill="#4a2f24"/>
+  <path d="M14 38 h68 a5 5 0 0 1 4.6 7 H9.4 A5 5 0 0 1 14 38 z" fill="#5d3c2d"/>
+  <rect x="20" y="47" width="56" height="2.4" rx="1.2" fill="#6b4634" opacity=".45"/>
+</svg>`;
+
+function mealDayStat(mid, d){
+  const ms = mealsOf(mid, d);
+  const kcal = ms.reduce((a,m)=> a + (Number(m.kcal)||0), 0);
+  let goal = 0; try{ const rr = calcOf(GOALS[mid]||{}); goal = rr.bmr ? rr.kcal : 0; }catch(e){}
+  return { n: ms.length, kcal, goal, p: goal ? Math.min(1, kcal/goal) : 0 };
+}
+function dietStrip(mid){
+  const sel = S.dietDay || TODAY, wk = weekOf(sel), st = mealDayStat(mid, sel);
+  const ring2 = (p, has) => {
+    const C = 2*Math.PI*13;
+    return `<svg viewBox="0 0 36 36" width="32" height="32" aria-hidden="true">
+      <circle cx="18" cy="18" r="13" fill="none" stroke="${has?'#e2d6c1':'#ece3d4'}" stroke-width="3.6"/>
+      ${p>0?`<circle cx="18" cy="18" r="13" fill="none" stroke="var(--gold-2)" stroke-width="3.6"
+        stroke-linecap="round" stroke-dasharray="${(C*p).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 18 18)"/>`:''}
+      ${(has && p===0)?`<circle cx="18" cy="18" r="3.4" fill="var(--gold-2)"/>`:''}</svg>`;
+  };
+  return `<div class="wk">
+    <div class="wkhd">
+      <button data-act="dmove2:-1">‹</button>
+      <span class="d">${dowTxt(sel)}</span>
+      <button data-act="dmove2:1" ${sel>=TODAY?'style="opacity:.3"':''}>›</button>
+    </div>
+    <div class="wkd">${wk.map((d,i)=>{ const t = mealDayStat(mid,d);
+      return `<button data-act="dday:${d}" class="${d===sel?'sel':''} ${d===TODAY?'tdy':''} ${d>TODAY?'fut':''}">
+        <span class="dn ${i===0?'sun':''}">${DOW[i]}</span>
+        ${ring2(t.p, t.n>0)}
+        <span class="dnum ${t.n?'has':''}">${+d.slice(8)}</span></button>`; }).join('')}</div>
+    <div class="dsum">
+      <div><span class="k">올린 사진</span><span class="v">${st.n}<small> 장</small></span></div>
+      <div><span class="k">먹은 칼로리</span><span class="v">${st.kcal?st.kcal.toLocaleString():0}<small> kcal</small></span></div>
+      <div><span class="k">권장</span><span class="v">${st.goal?st.goal.toLocaleString():'—'}<small> kcal</small></span></div>
+    </div>
+  </div>`;
 }
 
 function sheetMeal(id){
@@ -3320,6 +3397,11 @@ document.addEventListener('click', ev=>{
     case 'reset': reset(); toast('처음 상태로 되돌렸습니다'); return;
     case 'go': { if(rest[0]==='workout' && !D.live) adoptLive(S.mid); go(rest[0]); return; }
     case 'dpick': S.day = rest[0]; render(); return;
+    case 'dmove2': {
+      const d = new Date((S.dietDay||TODAY)+'T00:00:00');
+      d.setDate(d.getDate() + Number(rest[0]));
+      const n = ymd(d); if(n > TODAY) return;
+      S.dietDay = n; render(); return; }
     case 'tmeals': S.tmid = rest[0]; go('t_meals'); return;
     case 'tana': S.tmid = rest[0]; S.subj = rest[0]; S.anaP = S.anaP||'1달'; go('records'); return;
     case 'tfd': S.tfDay = rest[0]; closeSheet(); render(); return;
