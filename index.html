@@ -388,6 +388,18 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
   overflow:hidden;text-overflow:ellipsis;max-width:100%;width:100%}
 .picked.bump{animation:pk .5s ease-out}
 
+/* 지금 하는 종목 · 완료 버튼 — 눈이 가도록 은은하게 */
+@keyframes nowGlow{0%,100%{box-shadow:0 0 0 0 rgba(157,206,220,.00)}
+  50%{box-shadow:0 0 0 3px rgba(157,206,220,.14)}}
+.card.now2{animation:nowGlow 2.6s ease-in-out infinite}
+@keyframes finPulse{0%,100%{box-shadow:0 0 0 0 rgba(157,206,220,.45)}
+  70%{box-shadow:0 0 0 9px rgba(157,206,220,0)}}
+.btn.main.fin{animation:finPulse 2.1s cubic-bezier(.4,0,.6,1) infinite}
+.btn.ic{display:flex;align-items:center;justify-content:center;gap:7px}
+.btn.ic svg{flex:none}
+@media (prefers-reduced-motion:reduce){
+  .card.now2,.btn.main.fin{animation:none}}
+
 /* 찾기 도구 — 종목 목록과 확실히 구분되게 갈색 판에 얹는다 */
 .ptools{background:#251b16;border:1px solid #503a2f;border-radius:16px;
   padding:11px;display:flex;flex-direction:column;gap:9px;margin-bottom:10px}
@@ -428,7 +440,7 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 
 .cm{background:var(--dark-2);border-left:3px solid var(--teal);border-radius:0 12px 12px 0;
   padding:13px 14px;display:flex;flex-direction:column;gap:8px}
-.cm .who{font-size:12.5px;font-weight:500;color:var(--teal)}
+.cm .who{font-size:12.5px;font-weight:500;color:var(--teal);display:flex;align-items:center;gap:8px}
 .cm .tx{font-size:14px;font-weight:500;color:#e0dbd4;line-height:1.8;white-space:pre-wrap}
 
 .fbbtn{width:100%;text-align:left;background:var(--dark-2);border:1px solid var(--line);
@@ -752,7 +764,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '87';
+const BUILD = '88';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1660,8 +1672,8 @@ function vWorkout(){
     <div class="exbig">${esc(e.n)}${v.n?`<small>${esc(v.n)}</small>`:''}</div>
     ${demoBox(e, v)}
     ${isMemo(cur.ex)?'':`<button class="fbbtn" data-act="exd:${cur.ex}:${cur.va}${tr?':'+wmid:''}">
-      <span class="l">${nw?'새 코멘트가 있어요':'운동 설명 · 코멘트'}</span>
-      ${nw?'<span class="pill t">NEW</span>':''}
+      <span class="l">${tr ? '코멘트 남기기' : (nw?'새 코멘트가 있어요':'운동 설명 · 코멘트')}</span>
+      ${(!tr&&nw)?'<span class="pill t">NEW</span>':''}
       <span class="r">${dsc?'설명':'설명 없음'}${cms.length?` · 코멘트 ${cms.length}`:''} ›</span></button>`}
     ${isMemo(cur.ex)
       ? `<div class="note">기록으로만 남깁니다 — 무게·볼륨은 세지 않아요</div>`
@@ -1707,10 +1719,14 @@ function vWorkout(){
     <button class="btn sub" data-act="go:pick" style="margin-top:2px">운동 추가</button>
     <button class="btn gold" data-act="askfin" style="margin-top:2px">오늘 운동 마치기</button>
     <button class="btn ghost" data-act="askcancel" style="margin-top:4px">기록 지우고 나가기</button>`,
-    foot:`<button class="btn sub" data-act="rest">휴식 타이머</button>
+    foot:`<button class="btn sub ic" data-act="rest">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="13" r="8"/><path d="M12 9.5V13l2.4 1.6"/><path d="M9 2h6"/><path d="M12 2v3"/>
+            </svg>휴식 타이머</button>
           ${cur.locked
             ? `<button class="btn gold" data-act="askfin">오늘 운동 마치기</button>`
-            : `<button class="btn main" data-act="fin">${esc(e.n)} 완료</button>`}` };
+            : `<button class="btn main fin" data-act="fin">${esc(e.n)} 완료</button>`}` };
 }
 
 /* ── 설명 + 코멘트 ── */
@@ -1737,7 +1753,9 @@ function sheetExDesc(exid, vk, mid){
       ${demoBox(exOf(exid), v)}
       <span class="lbl">코멘트 ${cms.length?`${cms.length}개`:''}</span>
       ${cms.length? cms.map(c=>`<div class="cm">
-        <span class="who">${esc(c.tr)} 트레이너 · ${esc(c.at)}</span>
+        <span class="who">${esc(c.tr)} 트레이너 · ${esc(c.at)}
+          ${tr?`<button class="chip" style="margin-left:auto;padding:3px 9px;font-size:11.5px"
+            data-act="delcm:${c.id}">지우기</button>`:''}</span>
         <span class="tx">${esc(c.tx)}</span>
         ${(c.pics||c.vids)?`<div class="media2">
           ${c.pics?'<div class="pbox"><span class="ic">▨</span><span>보낸 사진</span></div>':''}
@@ -4830,6 +4848,11 @@ document.addEventListener('click', ev=>{
         sv(spatch('asks','id=in.('+open.map(a=>a.id).join(',')+')', { done_at: new Date().toISOString() }), '요청 처리');
       }
       toast('보냈습니다 · 회원 화면에 바로 떠요'); drawSheet(); return; }
+    case 'delcm': { const cid=rest[0];
+      const i=D.cm.findIndex(c=>c.id===cid); if(i<0) return;
+      D.cm.splice(i,1);
+      sv(sdel('comments','id=eq.'+cid), '코멘트 지우기');
+      save(); toast('지웠습니다'); drawSheet(); render(); return; }
     case 'ask': {
       const [ex,va]=rest, K=ex+'|'+va;
       const ta=document.querySelector('textarea[data-k="ask:'+K+'"]');
