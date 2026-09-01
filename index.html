@@ -373,12 +373,13 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
   border-radius:0 0 14px 14px;padding:13px;margin:-9px 0 4px;
   display:flex;flex-direction:column;gap:9px}
 /* 직전 무게 — 접힌 한 줄이 기본, 누르면 3회분 펼침 */
-.prevb{background:#1c1c1a;border:1px solid var(--line);border-radius:11px;
-  padding:9px 11px;display:flex;flex-direction:column;gap:8px}
-.prevh{display:flex;align-items:center;gap:8px;width:100%;text-align:left}
-.prevh .pk{font-size:11.5px;font-weight:700;color:var(--sub);flex:none}
-.prevh .pv{font-size:14px;font-weight:800;letter-spacing:-.01em;color:var(--cream);
+.prevb{background:var(--gold-dim);border:1px solid #4a3d22;border-left:3px solid var(--gold);
+  border-radius:0 11px 11px 0;padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.prevh{display:flex;align-items:center;gap:9px;width:100%;text-align:left}
+.prevh .pk{font-size:11.5px;font-weight:800;color:var(--gold-2);flex:none;letter-spacing:.01em}
+.prevh .pv{font-size:14px;font-weight:800;letter-spacing:-.01em;color:#a89f92;
   font-variant-numeric:tabular-nums;flex:1;min-width:0}
+.prevh .pv b{color:var(--gold);font-size:17px;font-weight:800}
 .prevh .pv i{font-style:normal;color:#6f6a64;font-weight:600;margin:0 3px}
 .prevh .ar{font-size:12px;font-weight:800;flex:none}
 .prevh .ar.up{color:var(--gold)} .prevh .ar.down{color:var(--warn)}
@@ -389,8 +390,10 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .prevr .rd{font-size:11.5px;font-weight:700;color:var(--sub);width:70px;flex:none;line-height:1.35}
 .prevr .rs{font-size:12.5px;font-weight:700;color:#ded7cd;flex:1;min-width:0;
   font-variant-numeric:tabular-nums;line-height:1.4}
-.prevr .rb{font-size:11.5px;font-weight:800;color:var(--gold);background:var(--gold-dim);
-  border:1px solid #4a3d22;border-radius:8px;padding:5px 9px;flex:none}
+.prevr .rb{font-size:11.5px;font-weight:800;color:#241a0d;background:var(--gold);
+  border:0;border-radius:8px;padding:6px 10px;flex:none}
+.prevr{border-top:1px solid #4a3d2255}
+.prevr .rs{color:#cfc6b8}
 .exbig{font-size:21px;font-weight:800;letter-spacing:-.02em;color:var(--cream);line-height:1.25}
 .exbig small{display:block;font-size:13px;font-weight:500;color:var(--teal);margin-top:2px}
 .card.now2{border-color:#3a5b66;background:var(--teal-dim);border-radius:14px 14px 0 0;margin-bottom:0}
@@ -796,7 +799,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '95';
+const BUILD = '96';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1665,8 +1668,8 @@ function prevBox(e, cur, mid){
   const runs = lastRuns(cur.ex, cur.va, mid, 3);
   const 단위 = e.cardio ? '분' : 'kg';
   if(!runs.length) return `<div class="prevb"><div class="prevh">
-    <span class="pk">지난 기록</span>
-    <span class="pv" style="color:var(--sub);font-weight:600">처음 하는 종목이에요</span></div></div>`;
+    <span class="pk">직전기록</span>
+    <span class="pv" style="font-weight:600">처음 하는 종목이에요</span></div></div>`;
 
   const top = r => e.cardio ? Math.max(...r.sets.map(x=>+x.reps||0))
                             : Math.max(...r.sets.map(x=>+x.kg||0));
@@ -1681,8 +1684,9 @@ function prevBox(e, cur, mid){
   const 다름 = (지금!=null && 최근!=null && 지금!==최근);
 
   const 줄 = `<button class="prevh" data-act="prevopen">
-    <span class="pk">지난 ${runs.length}회</span>
-    <span class="pv">${값.map(x=>kgfmt(x)).join('<i>→</i>')}${단위}</span>
+    <span class="pk">직전기록</span>
+    <span class="pv">${값.map((x,i)=> i===값.length-1
+        ? `<b>${kgfmt(x)}${단위}</b>` : kgfmt(x)).join('<i>→</i>')}</span>
     ${화살?`<span class="ar ${방향}">${화살}</span>`:''}
     ${다름?`<span class="cv">지금 ${kgfmt(지금)}${단위}</span>`:''}
     <span class="cx">${S.prevOpen?'▴':'▾'}</span></button>`;
