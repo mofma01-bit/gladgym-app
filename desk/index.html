@@ -13,7 +13,7 @@
 body{background:var(--dark);color:var(--cream);
   font-family:Pretendard,-apple-system,"Segoe UI",system-ui,sans-serif;
   font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
-button,input,select{font-family:inherit;font-size:inherit;color:inherit}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
 button{background:none;border:0;cursor:pointer}
 
 .app{display:flex;min-height:100vh}
@@ -43,11 +43,14 @@ button{background:none;border:0;cursor:pointer}
 
 /* 본문 */
 .main{flex:1;min-width:0;display:flex;flex-direction:column}
-.top{display:flex;align-items:center;gap:14px;padding:18px 26px 14px;
+.top{display:flex;align-items:center;gap:12px;padding:18px 26px 14px;
   border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--dark);z-index:5}
 .top h1{font-size:19px;font-weight:800;letter-spacing:-.03em}
 .top .cnt{font-size:12.5px;font-weight:600;color:var(--sub)}
 .top .sp{margin-left:auto;display:flex;gap:9px;align-items:center}
+.back{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;
+  justify-content:center;color:var(--sub);font-size:17px;flex:none}
+.back:hover{background:var(--dark-3);color:var(--cream)}
 .srch{background:var(--dark-3);border:1px solid var(--line);border-radius:10px;
   padding:9px 13px;width:230px;outline:none}
 .srch::placeholder{color:#6f6a63}
@@ -59,6 +62,7 @@ button{background:none;border:0;cursor:pointer}
   font-size:12.5px;font-weight:600;color:var(--sub);background:var(--dark-2)}
 .chip:hover{color:var(--cream)}
 .chip.on{border-color:var(--gold-2);color:var(--gold);background:var(--gold-dim)}
+.chip.t{color:var(--teal);border-color:#3a5b66}
 
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:12px}
 .mcard{background:var(--dark-2);border:1px solid var(--line);border-radius:14px;
@@ -79,18 +83,68 @@ button{background:none;border:0;cursor:pointer}
 .tag.teal{background:var(--teal-dim);color:var(--teal)}
 .tag.warn{background:#2e1c18;color:var(--warn)}
 
-.empty{padding:60px 20px;text-align:center;color:var(--sub);font-weight:600}
+/* 회원 상세 — 두 칸 */
+.cols{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:1080px){.cols{grid-template-columns:1fr}}
+.sec{display:flex;flex-direction:column;gap:10px}
+.lbl{font-size:12px;font-weight:700;color:var(--sub);letter-spacing:.02em;
+  display:flex;align-items:center;gap:8px}
+.lbl .r{margin-left:auto;display:flex;gap:6px}
+.card{background:var(--dark-2);border:1px solid var(--line);border-radius:13px;
+  padding:13px 15px;text-align:left;width:100%}
+.card.click:hover{border-color:#4a4a44}
+.card .t1{font-size:14.5px;font-weight:700}
+.card .t2{font-size:12px;color:var(--sub);margin-top:3px}
+.card.gold{border-color:var(--gold-2);background:var(--gold-dim)}
+.card.gold .t1{color:var(--gold)}
+.rowc{display:flex;align-items:center;gap:11px}
+.rowc>div{flex:1;min-width:0}
+.rt{color:var(--sub);font-size:13px;flex:none}
+
+.btn{border-radius:10px;padding:10px 15px;font-weight:700;font-size:13px;text-align:center}
+.btn.main{background:var(--teal);color:#0d2027}
+.btn.gold{background:var(--gold);color:#2a1c14}
+.btn.sub{background:var(--dark-3);color:var(--teal);border:1px solid var(--line)}
+.btn.ghost{background:var(--dark-3);color:var(--sub);border:1px solid var(--line)}
+.btn.sm{padding:7px 12px;font-size:12.5px}
+.btn:disabled{opacity:.4;cursor:default}
+
+.fld{display:flex;flex-direction:column;gap:5px}
+.fld .fn{font-size:11.5px;font-weight:600;color:var(--sub)}
+.inp{background:var(--dark-3);border:1px solid var(--line);border-radius:9px;
+  padding:9px 12px;outline:none;width:100%}
+.inp:focus{border-color:var(--gold-2)}
+.num{width:70px;text-align:center;font-weight:800;font-variant-numeric:tabular-nums}
+
+/* 루틴 편집 종목 줄 — 이름이 잘리지 않게 두 줄로 */
+.item{background:var(--dark-2);border:1px solid var(--line);border-radius:11px;
+  padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.item .l1{display:flex;align-items:center;gap:9px}
+.item .l2{display:flex;align-items:center;gap:9px;padding-left:27px;flex-wrap:wrap}
+.item .no{font-size:12px;font-weight:800;color:var(--sub);min-width:18px;flex:none}
+.item .nm2{flex:1;min-width:0;font-size:13.5px;font-weight:700}
+.item .nm2 small{font-size:11.5px;font-weight:600;color:var(--gold-2);margin-left:5px}
+.item .set{display:flex;align-items:center;gap:5px;flex:none}
+.item .u{font-size:11px;color:var(--sub);font-weight:600}
+.item .num{width:60px}
+.ib{width:28px;height:28px;border-radius:7px;background:var(--dark-4);
+  font-size:13px;font-weight:800;color:var(--cream);flex:none}
+.ib:hover{background:#3a3a35}
+.ib:disabled{opacity:.3}
+
+.empty{padding:44px 20px;text-align:center;color:var(--sub);font-weight:600}
 .note{background:var(--dark-2);border:1px solid var(--line);border-left:3px solid var(--gold-2);
-  border-radius:0 11px 11px 0;padding:13px 15px;font-size:12.5px;color:var(--sub);line-height:1.7;margin-top:18px}
+  border-radius:0 11px 11px 0;padding:13px 15px;font-size:12.5px;color:var(--sub);line-height:1.7}
 .note b{color:var(--gold-2)}
 
-/* 서비스 선택 */
-.svc{position:fixed;inset:0;background:rgba(8,8,7,.72);display:none;
-  align-items:center;justify-content:center;z-index:50}
-.svc.on{display:flex}
-.svcbox{background:var(--dark-2);border:1px solid var(--line);border-radius:18px;
-  padding:22px;width:min(420px,92vw)}
-.svcbox h2{font-size:15px;font-weight:800;margin-bottom:16px}
+/* 팝업 */
+.pop{position:fixed;inset:0;background:rgba(8,8,7,.72);display:none;
+  align-items:center;justify-content:center;z-index:50;padding:20px}
+.pop.on{display:flex}
+.popbox{background:var(--dark-2);border:1px solid var(--line);border-radius:18px;
+  padding:20px;width:min(520px,94vw);max-height:86vh;overflow:auto;
+  display:flex;flex-direction:column;gap:11px}
+.popbox h2{font-size:16px;font-weight:800}
 .svcgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .svcitem{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 8px;
   border-radius:13px;border:1px solid var(--line);background:var(--dark-3);
@@ -101,35 +155,34 @@ button{background:none;border:0;cursor:pointer}
 .svcitem .nm2{font-size:12px;font-weight:700}
 .svcitem .sm2{font-size:10.5px;color:var(--sub)}
 
+#toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(14px);
+  background:var(--dark-4);border:1px solid var(--line);color:var(--cream);
+  padding:11px 18px;border-radius:11px;font-size:13px;font-weight:600;
+  opacity:0;pointer-events:none;transition:.18s;z-index:80}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
 @media (max-width:820px){
   .side{position:fixed;left:-216px;z-index:40;transition:left .2s}
-  .side.open{left:0}
   .top{padding:14px 16px 12px}
   .body{padding:16px}
-  .srch{width:150px}
+  .srch{width:140px}
 }
 </style></head><body>
 
 <div class="app">
-  <aside class="side" id="side">
+  <aside class="side">
     <div class="brand"><b>GLAD GYM</b><span>트레이너 데스크</span></div>
-
     <button class="nav on" data-v="members">
       <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       회원</button>
-    <button class="nav" data-v="routines">
-      <svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
-      루틴<span class="soon">준비 중</span></button>
     <button class="nav" data-v="comments">
       <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       코멘트<span class="soon">준비 중</span></button>
     <button class="nav" data-v="work">
       <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
       업무<span class="soon">준비 중</span></button>
-
     <div class="foot">
-      <div class="who"><div class="l">지금 보는 사람</div>
-        <select id="whosel"></select></div>
+      <div class="who"><div class="l">지금 보는 사람</div><select id="whosel"></select></div>
       <button class="svcbtn" id="svcopen">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
           <circle cx="5" cy="5" r="1.6"/><circle cx="12" cy="5" r="1.6"/><circle cx="19" cy="5" r="1.6"/>
@@ -140,67 +193,62 @@ button{background:none;border:0;cursor:pointer}
   </aside>
 
   <div class="main">
-    <div class="top">
-      <h1 id="title">회원</h1><span class="cnt" id="cnt"></span>
-      <div class="sp"><input class="srch" id="q" type="text" placeholder="회원 이름으로 찾기"></div>
-    </div>
+    <div class="top" id="top"></div>
     <div class="body" id="body"><div class="empty">불러오는 중…</div></div>
   </div>
 </div>
 
-<div class="svc" id="svc"><div class="svcbox">
-  <h2>서비스 선택</h2>
-  <div class="svcgrid">
-    <a class="svcitem" href="https://mofma01-bit.github.io/gladgym-app/" target="_blank" rel="noopener">
-      <span class="ic" style="background:var(--gold-dim);color:var(--gold)">▤</span>
-      <span class="nm2">회원 앱</span><span class="sm2">운동기록</span></a>
-    <button class="svcitem" style="opacity:.45;cursor:default">
-      <span class="ic" style="background:var(--dark-4);color:var(--sub)">▦</span>
-      <span class="nm2">관리 대시보드</span><span class="sm2">연결 예정</span></button>
-    <button class="svcitem" style="opacity:.45;cursor:default">
-      <span class="ic" style="background:var(--dark-4);color:var(--sub)">✎</span>
-      <span class="nm2">업무</span><span class="sm2">준비 중</span></button>
-  </div>
-</div></div>
+<div class="pop" id="pop"><div class="popbox" id="popbox"></div></div>
+<div id="toast"></div>
 
 <script>
 "use strict";
-const BUILD = '1';
+const BUILD = '3';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
+const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
 const $ = s => document.querySelector(s);
 const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c =>
   ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-const TODAY = (()=>{ const d=new Date(); const p=n=>String(n).padStart(2,'0');
+const TODAY = (()=>{ const d=new Date(), p=n=>String(n).padStart(2,'0');
   return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); })();
 
 async function sget(path){
-  const r = await fetch(SB_URL+'/rest/v1/'+path,
-    { headers:{ apikey:SB_KEY, Authorization:'Bearer '+SB_KEY }, cache:'no-store' });
+  const r = await fetch(SB_URL+'/rest/v1/'+path, { headers:HD, cache:'no-store' });
   if(!r.ok) throw new Error(path.split('?')[0]+' → '+r.status);
   return r.json();
 }
+async function ssend(path, method, body, pref){
+  const h = Object.assign({}, HD);
+  if(pref) h.Prefer = pref;
+  const r = await fetch(SB_URL+'/rest/v1/'+path,
+    { method, headers:h, body: body==null?undefined:JSON.stringify(body) });
+  if(!r.ok) throw new Error(method+' '+path.split('?')[0]+' → '+r.status);
+  const t = await r.text();
+  return t ? JSON.parse(t) : null;
+}
 
-const D = { m:[], w:[], r:[], c:[], a:[] };
-const S = { view:'members', who:'전체', q:'' };
+const D = { m:[], w:[], wi:[], ws:[], r:[], ri:[], c:[], a:[], ex:[], va:[] };
+const S = { view:'members', who:'전체', q:'', mid:null, rid:null, exq:'', part:'전체' };
+let toastT = null;
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('on');
+  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('on'), 1700); }
 
-const daysAgo = ymd => {
-  if(!ymd) return null;
-  const a=new Date(TODAY+'T00:00:00'), b=new Date(ymd+'T00:00:00');
-  return Math.round((a-b)/86400000);
-};
-const dayText = ymd => {
-  if(!ymd) return '기록 없음';
-  const n=daysAgo(ymd);
-  if(n===0) return '오늘';
-  if(n===1) return '어제';
-  if(n<7) return n+'일 전';
-  const p=ymd.split('-');
-  return (+p[1])+'월 '+(+p[2])+'일';
-};
+const daysAgo = ymd => { if(!ymd) return null;
+  return Math.round((new Date(TODAY+'T00:00:00') - new Date(ymd+'T00:00:00'))/86400000); };
+const dayText = ymd => { if(!ymd) return '기록 없음';
+  const n=daysAgo(ymd); if(n===0) return '오늘'; if(n===1) return '어제';
+  if(n<7) return n+'일 전'; const p=ymd.split('-'); return (+p[1])+'월 '+(+p[2])+'일'; };
 
-/* 회원 목록 */
+const exOf = id => D.ex.find(e=>e.id===id) || {id:id,name:'?',part:'?',equip:''};
+const vaOf = vid => D.va.find(v=>v.id===vid) || null;
+const vaName = vid => { const v=vaOf(vid); if(!v) return vid;
+  const e=exOf(v.ex_id); return e.name + (v.name ? ' ('+v.name+')' : ''); };
+const memOf = id => D.m.find(x=>x.id===id) || {name:''};
+const PARTS = ['전체','가슴','등','어깨','하체','복근','팔','유산소','기타'];
+
+/* ── 회원 목록 ── */
 function vMembers(){
   const q = S.q.trim().toLowerCase();
   const all = D.m.filter(x => (x.role||'member')==='member');
@@ -212,33 +260,24 @@ function vMembers(){
     const ws = D.w.filter(w => w.member_id===m.id && w.done)
                   .sort((a,b)=> a.on_date < b.on_date ? 1 : -1);
     const last = ws[0] ? ws[0].on_date : null;
-    return {
-      last, gap: daysAgo(last),
+    return { last, gap: daysAgo(last),
       week: ws.filter(w => daysAgo(w.on_date) < 7).length,
       routines: D.r.filter(r => r.member_id===m.id).length,
       newcm: D.c.filter(c => c.member_id===m.id && !c.read_at).length,
-      today: D.a.find(a => a.member_id===m.id) || null,
-    };
+      today: D.a.find(a => a.member_id===m.id) || null };
   };
   const rows = list.map(m => ({ m, i: info(m) }));
-  rows.sort((a,b)=>{
-    const A = a.i.gap===null ? 9999 : a.i.gap, B = b.i.gap===null ? 9999 : b.i.gap;
-    return B-A;
-  });
-
-  $('#cnt').textContent = rows.length + '명';
+  rows.sort((a,b)=>{ const A=a.i.gap===null?9999:a.i.gap, B=b.i.gap===null?9999:b.i.gap; return B-A; });
 
   const trs = [...new Set(all.map(x=>x.trainer).filter(Boolean))];
-  const chips = '<div class="chips">'
-    + '<button class="chip ' + (S.who==='전체'?'on':'') + '" data-who="전체">전체 ' + all.length + '</button>'
+  let h = '<div class="chips"><button class="chip ' + (S.who==='전체'?'on':'')
+    + '" data-who="전체">전체 ' + all.length + '</button>'
     + trs.map(t => '<button class="chip ' + (S.who===t?'on':'') + '" data-who="' + esc(t) + '">'
-        + esc(t) + ' ' + all.filter(x=>x.trainer===t).length + '</button>').join('')
-    + '</div>';
+        + esc(t) + ' ' + all.filter(x=>x.trainer===t).length + '</button>').join('') + '</div>';
 
-  if(!rows.length) return chips + '<div class="empty">해당하는 회원이 없어요</div>';
+  if(!rows.length) return h + '<div class="empty">해당하는 회원이 없어요</div>';
 
-  const cards = rows.map(function(o){
-    const m=o.m, i=o.i;
+  h += '<div class="grid">' + rows.map(function(o){ const m=o.m, i=o.i;
     return '<button class="mcard" data-m="' + esc(m.id) + '">'
       + '<div class="hd"><span class="nm">' + esc(m.name) + '</span>'
       + '<span class="tr">' + esc(m.trainer||'담당 없음') + '</span></div>'
@@ -251,35 +290,164 @@ function vMembers(){
       + (i.newcm ? '<span class="tag teal">새 코멘트 ' + i.newcm + '</span>' : '')
       + (i.gap!==null && i.gap>=7 ? '<span class="tag warn">' + i.gap + '일째 안 옴</span>' : '')
       + (i.gap===null ? '<span class="tag">기록 없음</span>' : '')
-      + '</div></button>';
-  }).join('');
-
-  return chips + '<div class="grid">' + cards + '</div>'
-    + '<div class="note"><b>안 온 지 오래된 회원이 위로</b> 옵니다. '
-    + '회원을 누르면 루틴·기록·코멘트를 보는 화면이 열립니다 — <b>다음 단계에서 만듭니다.</b></div>';
+      + '</div></button>'; }).join('') + '</div>';
+  return h;
 }
 
+/* ── 회원 상세 ── */
+function vMember(){
+  const m = memOf(S.mid);
+  const rs = D.r.filter(r=>r.member_id===S.mid).sort((a,b)=>a.no-b.no);
+  const ws = D.w.filter(w=>w.member_id===S.mid && w.done)
+                .sort((a,b)=> a.on_date < b.on_date ? 1 : -1).slice(0,10);
+  const today = D.a.find(a=>a.member_id===S.mid);
+
+  const 루틴 = rs.length ? rs.map(function(r){
+    const items = D.ri.filter(x=>x.routine_id===r.id);
+    const 지정 = today && today.routine_id===r.id;
+    return '<button class="card click rowc ' + (지정?'gold':'') + '" data-r="' + esc(r.id) + '">'
+      + '<div><div class="t1">루틴 ' + r.no + ' · ' + esc(r.name) + '</div>'
+      + '<div class="t2">' + (r.purpose?esc(r.purpose)+' · ':'') + items.length + '종목'
+      + (r.grp?' · '+esc(r.grp):'') + '</div></div>'
+      + (지정 ? '<span class="tag gold">오늘 지정</span>' : '<span class="rt">›</span>')
+      + '</button>'; }).join('')
+    : '<div class="empty">아직 루틴이 없어요</div>';
+
+  const 기록 = ws.length ? ws.map(function(w){
+    const its = D.wi.filter(x=>x.workout_id===w.id);
+    const nm = its.slice(0,3).map(x=>exOf((vaOf(x.variant_id)||{}).ex_id).name).join(', ');
+    return '<div class="card"><div class="t1">' + dayText(w.on_date) + ' · ' + esc(w.kind||'') + '</div>'
+      + '<div class="t2">' + its.length + '종목' + (nm?' — '+esc(nm):'')
+      + (its.length>3?' 외':'') + '</div></div>'; }).join('')
+    : '<div class="empty">아직 운동 기록이 없어요</div>';
+
+  return '<div class="cols">'
+    + '<div class="sec"><div class="lbl">루틴 ' + rs.length + '개'
+    + '<span class="r"><button class="btn sub sm" data-act="rnew">＋ 새 루틴</button></span></div>'
+    + 루틴 + '</div>'
+    + '<div class="sec"><div class="lbl">최근 운동</div>' + 기록
+    + '<div class="note" style="margin-top:6px">코멘트·식단·체형은 <b>다음 단계</b>에서 붙입니다.</div>'
+    + '</div></div>';
+}
+
+/* ── 루틴 편집 ── */
+function vRoutine(){
+  const r = D.r.find(x=>x.id===S.rid);
+  if(!r) return '<div class="empty">루틴을 찾을 수 없어요</div>';
+  const items = D.ri.filter(x=>x.routine_id===r.id).sort((a,b)=>a.sort-b.sort);
+
+  const 줄 = items.map(function(it,i){
+    const v = vaOf(it.variant_id) || {}, e = exOf(v.ex_id);
+    return '<div class="item">'
+      + '<div class="l1"><span class="no">' + (i+1) + '</span>'
+      + '<span class="nm2">' + esc(e.name)
+        + (v.name ? '<small>' + esc(v.name) + '</small>' : '') + '</span>'
+      + '<button class="ib" data-act="up" data-i="' + it.id + '"' + (i===0?' disabled':'') + '>▲</button>'
+      + '<button class="ib" data-act="down" data-i="' + it.id + '"' + (i===items.length-1?' disabled':'') + '>▼</button>'
+      + '<button class="ib" data-act="del" data-i="' + it.id + '">✕</button></div>'
+      + '<div class="l2">'
+      + '<span class="set"><input class="inp num" type="text" inputmode="decimal" data-f="kg" data-i="'
+        + it.id + '" value="' + (it.kg==null?'':it.kg) + '"><span class="u">kg</span></span>'
+      + '<span class="set"><input class="inp num" type="text" inputmode="numeric" data-f="reps" data-i="'
+        + it.id + '" value="' + (it.reps==null?'':it.reps) + '"><span class="u">회</span></span>'
+      + '<span class="set"><input class="inp num" type="text" inputmode="numeric" data-f="sets" data-i="'
+        + it.id + '" value="' + (it.sets==null?'':it.sets) + '"><span class="u">세트</span></span>'
+      + '<span class="set"><input class="inp num" type="text" inputmode="numeric" data-f="rest" data-i="'
+        + it.id + '" value="' + (it.rest==null?'':it.rest) + '"><span class="u">초 쉼</span></span>'
+      + '</div></div>'; }).join('');
+
+  return '<div class="cols">'
+    + '<div class="sec">'
+      + '<div class="lbl">종목 ' + items.length + '개'
+      + '<span class="r"><button class="btn sub sm" data-act="expick">＋ 종목 추가</button></span></div>'
+      + (items.length ? 줄 : '<div class="empty">종목을 담아 주세요</div>')
+    + '</div>'
+    + '<div class="sec">'
+      + '<div class="lbl">루틴 정보</div>'
+      + '<div class="card" style="display:flex;flex-direction:column;gap:11px">'
+      + '<div class="fld"><span class="fn">번호</span>'
+        + '<input class="inp" type="text" inputmode="numeric" data-r="no" value="' + r.no + '"></div>'
+      + '<div class="fld"><span class="fn">이름</span>'
+        + '<input class="inp" type="text" data-r="name" value="' + esc(r.name) + '"></div>'
+      + '<div class="fld"><span class="fn">방향성 · 목적</span>'
+        + '<input class="inp" type="text" data-r="purpose" value="' + esc(r.purpose||'') + '"></div>'
+      + '<div class="fld"><span class="fn">그룹</span>'
+        + '<input class="inp" type="text" data-r="grp" value="' + esc(r.grp||'') + '" placeholder="근지구력 · 파워 …"></div>'
+      + '<button class="btn main" data-act="rsave">저장하기</button>'
+      + '</div>'
+      + '<button class="btn gold" data-act="assign">오늘 이 루틴으로 지정</button>'
+      + '<button class="btn ghost" data-act="rdel">이 루틴 지우기</button>'
+    + '</div></div>';
+}
+
+/* ── 종목 고르기 팝업 ── */
+function popPick(){
+  const q = S.exq.trim().toLowerCase();
+  let list = D.ex.slice();
+  if(S.part!=='전체') list = list.filter(e=>e.part===S.part);
+  if(q) list = list.filter(e => (e.name+' '+e.part+' '+(e.equip||'')).toLowerCase().includes(q));
+  return '<h2>종목 추가</h2>'
+    + '<input class="inp" id="exq" type="text" placeholder="운동 이름으로 찾기" value="' + esc(S.exq) + '">'
+    + '<div class="chips" style="margin:0">' + PARTS.map(p =>
+        '<button class="chip ' + (S.part===p?'on':'') + '" data-part="' + p + '">' + p + '</button>').join('') + '</div>'
+    + '<div style="display:flex;flex-direction:column;gap:7px">'
+    + (list.length ? list.map(function(e){
+        const vs = D.va.filter(v=>v.ex_id===e.id).sort((a,b)=>a.sort-b.sort);
+        return vs.map(function(v){
+          return '<button class="card click rowc" data-add="' + esc(v.id) + '">'
+            + '<div><div class="t1">' + esc(e.name) + (v.name?' <span style="color:var(--gold-2);font-size:12px">'
+              + esc(v.name) + '</span>':'') + '</div>'
+            + '<div class="t2">' + esc(e.part) + ' · ' + esc(e.equip||'') + '</div></div>'
+            + '<span class="rt">＋</span></button>'; }).join(''); }).join('')
+      : '<div class="empty">찾는 종목이 없어요</div>')
+    + '</div><button class="btn ghost" data-act="popclose">닫기</button>';
+}
+
+/* ── 그리기 ── */
 function render(){
-  const b = $('#body');
-  if(S.view==='members'){ $('#title').textContent='회원'; b.innerHTML = vMembers(); }
-  else { $('#title').textContent='준비 중'; $('#cnt').textContent='';
-    b.innerHTML = '<div class="empty">아직 만들지 않았어요</div>'; }
+  const top = $('#top'), b = $('#body');
+  if(S.view==='members'){
+    const n = D.m.filter(x=>(x.role||'member')==='member').length;
+    top.innerHTML = '<h1>회원</h1><span class="cnt" id="cnt">' + n + '명</span>'
+      + '<div class="sp"><input class="srch" id="q" type="text" placeholder="회원 이름으로 찾기" value="'
+      + esc(S.q) + '"></div>';
+    b.innerHTML = vMembers();
+  } else if(S.view==='member'){
+    const m = memOf(S.mid);
+    top.innerHTML = '<button class="back" data-act="toList">‹</button><h1>' + esc(m.name) + '</h1>'
+      + '<span class="cnt">' + esc(m.trainer||'담당 없음') + '</span>';
+    b.innerHTML = vMember();
+  } else if(S.view==='routine'){
+    const r = D.r.find(x=>x.id===S.rid) || {no:'',name:''};
+    top.innerHTML = '<button class="back" data-act="toMember">‹</button><h1>루틴 ' + r.no + ' · '
+      + esc(r.name) + '</h1>';
+    b.innerHTML = vRoutine();
+  } else {
+    top.innerHTML = '<h1>준비 중</h1>';
+    b.innerHTML = '<div class="empty">아직 만들지 않았어요</div>';
+  }
 }
+function popOpen(html){ $('#popbox').innerHTML = html; $('#pop').classList.add('on'); }
+function popClose(){ $('#pop').classList.remove('on'); }
 
+/* ── 불러오기 ── */
 async function load(){
   try{
-    const got = await Promise.all([
+    const g = await Promise.all([
       sget('members?select=*&order=name'),
-      sget('workouts?select=id,member_id,on_date,done,title,kind&order=on_date.desc&limit=800'),
-      sget('routines?select=id,member_id,no,name'),
-      sget('comments?select=id,member_id,read_at&limit=800'),
+      sget('workouts?select=id,member_id,on_date,done,title,kind&order=on_date.desc&limit=600'),
+      sget('workout_items?select=id,workout_id,variant_id,sort&limit=3000'),
+      sget('routines?select=*'),
+      sget('routine_items?select=*&order=sort'),
+      sget('comments?select=id,member_id,variant_id,body,trainer,read_at,created_at&limit=600'),
       sget('assignments?select=member_id,on_date,routine_id,kind&on_date=eq.'+TODAY),
+      sget('exercises?select=*&order=part,sort'),
+      sget('variants?select=*&order=sort'),
     ]);
-    D.m=got[0]; D.w=got[1]; D.r=got[2]; D.c=got[3]; D.a=got[4];
+    D.m=g[0]; D.w=g[1]; D.wi=g[2]; D.r=g[3]; D.ri=g[4]; D.c=g[5]; D.a=g[6]; D.ex=g[7]; D.va=g[8];
     const trs = [...new Set(D.m.map(x=>x.trainer).filter(Boolean))];
-    $('#whosel').innerHTML = ['전체'].concat(trs)
-      .map(t => '<option value="' + esc(t) + '">'
-        + esc(t==='전체' ? '전체 보기' : t+' 트레이너') + '</option>').join('');
+    $('#whosel').innerHTML = ['전체'].concat(trs).map(t =>
+      '<option value="' + esc(t) + '">' + esc(t==='전체'?'전체 보기':t+' 트레이너') + '</option>').join('');
     $('#whosel').value = S.who;
     render();
   }catch(e){
@@ -288,25 +456,182 @@ async function load(){
   }
 }
 
-document.addEventListener('click', function(ev){
-  const nav = ev.target.closest('.nav');
+/* ── 저장 ── */
+async function saveItemField(id, f, v){
+  const it = D.ri.find(x=>x.id===id); if(!it) return;
+  it[f] = v;
+  const body = {}; body[f] = v;
+  try{ await ssend('routine_items?id=eq.'+id, 'PATCH', body); }
+  catch(e){ toast('저장 실패 — ' + e.message); }
+}
+async function reorder(rid){
+  const items = D.ri.filter(x=>x.routine_id===rid).sort((a,b)=>a.sort-b.sort);
+  for(let i=0;i<items.length;i++){
+    if(items[i].sort!==i){ items[i].sort=i;
+      try{ await ssend('routine_items?id=eq.'+items[i].id, 'PATCH', {sort:i}); }catch(e){} }
+  }
+}
+
+/* ── 눌림 ── */
+document.addEventListener('click', async function(ev){
+  const t = ev.target;
+
+  const nav = t.closest('.nav');
   if(nav){ S.view = nav.dataset.v;
     document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('on', b===nav));
     render(); return; }
-  const chip = ev.target.closest('[data-who]');
+
+  const chip = t.closest('[data-who]');
   if(chip){ S.who = chip.dataset.who; $('#whosel').value = S.who; render(); return; }
-  const card = ev.target.closest('[data-m]');
-  if(card){ const m = D.m.find(x=>x.id===card.dataset.m);
-    alert((m?m.name:'') + ' — 회원 상세 화면은 다음 단계에서 만듭니다'); return; }
-  if(ev.target.closest('#svcopen')){ $('#svc').classList.add('on'); return; }
-  if(ev.target.id==='svc'){ $('#svc').classList.remove('on'); return; }
+
+  const card = t.closest('[data-m]');
+  if(card){ S.mid = card.dataset.m; S.view='member'; render(); return; }
+
+  const rcard = t.closest('[data-r]:not(input)');
+  if(rcard && rcard.dataset.r){ S.rid = rcard.dataset.r; S.view='routine'; render(); return; }
+
+  const part = t.closest('[data-part]');
+  if(part){ S.part = part.dataset.part; popOpen(popPick()); return; }
+
+  const add = t.closest('[data-add]');
+  if(add){
+    const vid = add.dataset.add;
+    const items = D.ri.filter(x=>x.routine_id===S.rid);
+    try{
+      const made = await ssend('routine_items', 'POST',
+        [{ routine_id:S.rid, sort:items.length, variant_id:vid, kg:20, reps:10, sets:3, rest:60 }],
+        'return=representation');
+      D.ri.push(made[0]);
+      toast(vaName(vid) + ' 담았어요');
+      render();
+    }catch(e){ toast('추가 실패 — ' + e.message); }
+    return;
+  }
+
+  const act = t.closest('[data-act]');
+  if(!act) { if(t.id==='pop') popClose(); return; }
+  const a = act.dataset.act, id = +act.dataset.i;
+
+  if(a==='toList'){ S.view='members'; render(); return; }
+  if(a==='toMember'){ S.view='member'; render(); return; }
+  if(a==='popclose'){ popClose(); return; }
+  if(a==='expick'){ S.exq=''; S.part='전체'; popOpen(popPick()); return; }
+
+  if(a==='up' || a==='down'){
+    const items = D.ri.filter(x=>x.routine_id===S.rid).sort((a2,b)=>a2.sort-b.sort);
+    const i = items.findIndex(x=>x.id===id), j = i + (a==='up'?-1:1);
+    if(i<0 || j<0 || j>=items.length) return;
+    const s1 = items[i].sort; items[i].sort = items[j].sort; items[j].sort = s1;
+    render();
+    try{
+      await ssend('routine_items?id=eq.'+items[i].id, 'PATCH', {sort:items[i].sort});
+      await ssend('routine_items?id=eq.'+items[j].id, 'PATCH', {sort:items[j].sort});
+    }catch(e){ toast('순서 저장 실패'); }
+    return;
+  }
+  if(a==='del'){
+    const it = D.ri.find(x=>x.id===id); if(!it) return;
+    D.ri = D.ri.filter(x=>x.id!==id);
+    render();
+    try{ await ssend('routine_items?id=eq.'+id, 'DELETE'); await reorder(S.rid); }
+    catch(e){ toast('빼기 실패'); }
+    return;
+  }
+  if(a==='rsave'){
+    const r = D.r.find(x=>x.id===S.rid); if(!r) return;
+    const get = k => { const el=document.querySelector('[data-r="'+k+'"]'); return el?el.value.trim():''; };
+    const no = parseInt(get('no').replace(/[^0-9]/g,''),10);
+    if(!isNaN(no) && no>0){
+      const dup = D.r.find(x=>x.member_id===r.member_id && x.id!==r.id && x.no===no);
+      if(dup){ toast('루틴 ' + no + '번은 「' + dup.name + '」이 쓰고 있어요'); return; }
+      r.no = no;
+    }
+    r.name = get('name') || r.name;
+    r.purpose = get('purpose');
+    r.grp = get('grp');
+    try{
+      await ssend('routines?id=eq.'+r.id, 'PATCH',
+        { no:r.no, name:r.name, purpose:r.purpose, grp:r.grp });
+      toast('저장했습니다'); render();
+    }catch(e){ toast('저장 실패 — ' + e.message); }
+    return;
+  }
+  if(a==='rnew'){
+    const rs = D.r.filter(x=>x.member_id===S.mid);
+    const used = rs.map(x=>x.no); let no=1; while(used.includes(no)) no++;
+    const id2 = 'r'+Date.now();
+    try{
+      await ssend('routines', 'POST',
+        [{ id:id2, member_id:S.mid, no:no, name:'새 루틴 '+no, purpose:'', grp:'' }]);
+      D.r.push({ id:id2, member_id:S.mid, no:no, name:'새 루틴 '+no, purpose:'', grp:'' });
+      S.rid = id2; S.view='routine'; toast('새 루틴을 만들었어요'); render();
+    }catch(e){ toast('만들기 실패 — ' + e.message); }
+    return;
+  }
+  if(a==='rdel'){
+    const r = D.r.find(x=>x.id===S.rid); if(!r) return;
+    if(!confirm('루틴 ' + r.no + ' · ' + r.name + ' 을 지울까요? 되돌릴 수 없습니다.')) return;
+    try{
+      await ssend('routine_items?routine_id=eq.'+r.id, 'DELETE');
+      await ssend('routines?id=eq.'+r.id, 'DELETE');
+      D.ri = D.ri.filter(x=>x.routine_id!==r.id);
+      D.r = D.r.filter(x=>x.id!==r.id);
+      S.view='member'; toast('지웠습니다'); render();
+    }catch(e){ toast('지우기 실패 — ' + e.message); }
+    return;
+  }
+  if(a==='assign'){
+    const r = D.r.find(x=>x.id===S.rid); if(!r) return;
+    try{
+      await ssend('assignments', 'POST',
+        [{ member_id:r.member_id, on_date:TODAY, routine_id:r.id, kind:'수업', assigned_by:'트레이너' }],
+        'resolution=merge-duplicates');
+      D.a = D.a.filter(x=>x.member_id!==r.member_id);
+      D.a.push({ member_id:r.member_id, on_date:TODAY, routine_id:r.id, kind:'수업' });
+      toast('오늘 루틴으로 지정했습니다 · 회원 폰에 바로 떠요'); render();
+    }catch(e){ toast('지정 실패 — ' + e.message); }
+    return;
+  }
+  if(t.closest('#svcopen')){ return; }
 });
-$('#whosel').addEventListener('change', function(e){ S.who = e.target.value; render(); });
-$('#q').addEventListener('input', function(e){ S.q = e.target.value; render(); });
-document.addEventListener('keydown', function(e){
-  if(e.key==='Escape') $('#svc').classList.remove('on'); });
+
+/* 서비스 선택 */
+$('#svcopen').addEventListener('click', function(){
+  popOpen('<h2>서비스 선택</h2><div class="svcgrid">'
+    + '<a class="svcitem" href="https://mofma01-bit.github.io/gladgym-app/" target="_blank" rel="noopener">'
+    + '<span class="ic" style="background:var(--gold-dim);color:var(--gold)">▤</span>'
+    + '<span class="nm2">회원 앱</span><span class="sm2">운동기록</span></a>'
+    + '<button class="svcitem" style="opacity:.45;cursor:default">'
+    + '<span class="ic" style="background:var(--dark-4);color:var(--sub)">▦</span>'
+    + '<span class="nm2">관리 대시보드</span><span class="sm2">연결 예정</span></button>'
+    + '<button class="svcitem" style="opacity:.45;cursor:default">'
+    + '<span class="ic" style="background:var(--dark-4);color:var(--sub)">✎</span>'
+    + '<span class="nm2">업무</span><span class="sm2">준비 중</span></button>'
+    + '</div><button class="btn ghost" data-act="popclose">닫기</button>');
+});
+
+/* 입력 */
+document.addEventListener('input', function(ev){
+  const el = ev.target;
+  if(el.id==='q'){ S.q = el.value; $('#body').innerHTML = vMembers(); return; }
+  if(el.id==='exq'){ S.exq = el.value;
+    const box=$('#popbox'), pos=el.selectionStart;
+    box.innerHTML = popPick();
+    const n=box.querySelector('#exq'); if(n){ n.focus(); n.setSelectionRange(pos,pos); }
+    return; }
+  const f = el.dataset.f, i = +el.dataset.i;
+  if(f && i){
+    const v = parseFloat((el.value||'').replace(/[^0-9.]/g,''));
+    if(!isNaN(v)) saveItemField(i, f, f==='kg' ? Math.round(v*10)/10 : Math.round(v));
+    return;
+  }
+});
+$('#whosel').addEventListener('change', function(e){ S.who = e.target.value;
+  if(S.view==='members') render(); });
+document.addEventListener('keydown', function(e){ if(e.key==='Escape') popClose(); });
+$('#pop').addEventListener('click', function(e){ if(e.target.id==='pop') popClose(); });
 
 load();
-setInterval(load, 60000);
+setInterval(function(){ if(S.view==='members') load(); }, 60000);
 </script>
 </body></html>
