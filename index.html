@@ -379,6 +379,16 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .ordbtn{width:38px;height:38px;border-radius:10px;background:var(--dark-4);
   color:var(--cream);font-size:15px;font-weight:800;flex:none}
 .ordbtn:active{background:#45453f}
+
+/* 담은 종목 미리보기 — 사진첩 고르기처럼 아래에 계속 보인다 */
+.picked{flex:1.15;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:3px;
+  background:var(--teal-dim);border:1px solid #3a5b66;border-radius:12px;padding:8px 12px;text-align:left}
+.picked .c{font-size:12px;font-weight:800;color:var(--teal);display:flex;align-items:center;gap:5px}
+.picked .l{font-size:11.5px;font-weight:500;color:#8f8a83;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;max-width:100%;width:100%}
+.picked.bump{animation:pk .5s ease-out}
+@keyframes pk{0%{transform:scale(1)}30%{transform:scale(1.05)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.picked.bump{animation:none}}
 .step .v{cursor:pointer}
 .step .v.on{color:var(--gold)}
 .unitlbl{font-size:11.5px;font-weight:600;color:var(--sub);text-align:center;margin-top:-4px}
@@ -726,7 +736,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '85';
+const BUILD = '86';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1507,8 +1517,10 @@ function vPick(){
         <span class="rt">${vs.length>1?'›':'＋'}</span></button>`; }).join('')}
     <div class="note">「벤치 / 벤치프레스 / BP」가 섞이면 증량 그래프가 끊겨서 <b>목록에서만</b> 고릅니다.</div>`,
     foot: 담은
-      ? `<button class="btn ghost" data-act="clearpick">담은 것 비우기</button>
-         <button class="btn main" data-act="askstart">운동 시작 · ${담은}종목</button>`
+      ? `<button class="picked ${S.just?'bump':''}" data-act="askstart">
+           <span class="c">담은 종목 ${담은}개 ›</span>
+           <span class="l">${esc(w.items.map(it=>exName(it.ex,it.va)).join(' · '))}</span></button>
+         <button class="btn main" style="flex:1" data-act="askstart">운동 시작</button>`
       : `<button class="btn ghost" data-act="${(w&&w.begun)?'go:workout':'go:start'}">그만두기</button>` };
 }
 
@@ -1527,7 +1539,9 @@ function sheetStart(){
             :`<button class="chip" data-act="spdel:${i}" style="flex:none;padding:6px 10px">빼기</button>`}
       </div>`; }).join('')}
     <button class="btn main" data-act="startgo">시작하기</button>
-    <button class="btn ghost" data-act="close">더 담기</button>`; });
+    <div style="display:flex;gap:9px">
+      <button class="btn ghost" data-act="close">더 담기</button>
+      <button class="btn ghost" data-act="clearpick">전부 비우기</button></div>`; });
 }
 function sheetMemoAdd(){
   openSheet(()=>`
@@ -5070,7 +5084,7 @@ document.addEventListener('click', ev=>{
       S.sordIdx=null; save(); closeSheet(); go('workout'); return; }
     case 'clearpick': { if(!w) return;
       w.items.forEach(it=>{ if(it._id) sv(sdel('workout_items','id=eq.'+it._id), '종목 빼기'); });
-      w.items=[]; w.cur=0; save(); toast('비웠어요'); render(); return; }
+      w.items=[]; w.cur=0; save(); closeSheet(); toast('비웠어요'); render(); return; }
     case 'stepu': { const u=[2.5,1,0.5,5]; S.uKg=u[(u.indexOf(S.uKg||2.5)+1)%u.length]; drawSheet(); return; }
     case 'askcancel': sheetCancel(); return;
     /* 시범 그림 — 눌러서 멈추고 다시 눌러 움직이기 */
