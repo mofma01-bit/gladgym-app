@@ -771,7 +771,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '91';
+const BUILD = '92';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -4277,7 +4277,7 @@ function sheetGrpMan(){
         <button class="chip t" data-act="grpren:${g}">이름 바꾸기</button>
         <button class="chip" data-act="grpdel:${g}">없애기</button></div>`).join('')}
       <div class="hr"></div>`:''}
-    <span class="lbl">루틴 이름 만들기</span>
+    <span class="lbl">그룹 이름 만들기</span>
     <input class="search" type="text" data-k="grpnew" placeholder="예 · 근지구력, 황체기">
     <div class="chips">${GRP_SUGGEST.filter(x=>gs.indexOf(x)<0).map(x=>
       `<button class="chip" data-act="grpfill:${x}">${x}</button>`).join('')}</div>
