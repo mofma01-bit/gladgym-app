@@ -418,6 +418,13 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 @keyframes pk{0%{transform:scale(1)}30%{transform:scale(1.05)}100%{transform:scale(1)}}
 @media (prefers-reduced-motion:reduce){.picked.bump{animation:none}}
 .step .v{cursor:pointer}
+.step .vin{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;
+  background:#141412;border:1px solid var(--line);border-radius:10px;padding:6px 8px}
+.step .vin input{width:100%;min-width:0;background:none;border:none;outline:none;text-align:center;
+  font-size:24px;font-weight:900;color:var(--cream);letter-spacing:-.02em;font-variant-numeric:tabular-nums;
+  font-family:inherit;padding:2px 0}
+.step .vin small{font-size:13px;font-weight:500;color:var(--sub);flex:none}
+.step .vin:focus-within{border-color:var(--gold)}
 .step .v.on{color:var(--gold)}
 .unitlbl{font-size:11.5px;font-weight:600;color:var(--sub);text-align:center;margin-top:-4px}
 
@@ -764,7 +771,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '88';
+const BUILD = '89';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1800,24 +1807,40 @@ function sheetEdit(i){
   openSheet(()=>`
     <div class="h2">${esc(exName(cur.ex,cur.va))} · ${i+1}${e.cardio?'구간':'세트'}</div>
     ${e.cardio?`
-      <div class="step"><span class="k">시간</span><button data-act="d:reps:${i}:-1">−</button>
-        <span class="v">${s.reps}<small> 분</small></span><button data-act="d:reps:${i}:1">＋</button></div>
-      <div class="step"><span class="k">속도</span><button data-act="d:spd:${i}:-0.5">−</button>
-        <span class="v">${s.spd||0}<small> km/h</small></span><button data-act="d:spd:${i}:0.5">＋</button></div>`
-    :(()=>{ const u=S.uKg||2.5; return `
-      <div class="step"><span class="k">무게</span>
-        <button data-act="d:kg:${i}:${-u}" data-rep="1">−</button>
-        <button class="v ${u!==2.5?'on':''}" data-act="stepu">${kgfmt(s.kg)}<small> kg</small></button>
-        <button data-act="d:kg:${i}:${u}" data-rep="1">＋</button></div>
-      <div class="unitlbl">가운데를 누르면 ${u}kg 씩 — 화살표를 길게 누르면 빨리 바뀝니다</div>
+      <div class="step"><span class="k">시간</span><button data-act="d:reps:${i}:-1" data-rep="1">−</button>
+        <span class="vin"><input type="text" inputmode="numeric" data-k="setreps" data-i="${i}"
+          value="${s.reps}"><small>분</small></span>
+        <button data-act="d:reps:${i}:1" data-rep="1">＋</button></div>
+      <div class="step"><span class="k">속도</span><button data-act="d:spd:${i}:-0.5" data-rep="1">−</button>
+        <span class="vin"><input type="text" inputmode="decimal" data-k="setspd" data-i="${i}"
+          value="${s.spd||0}"><small>km/h</small></span>
+        <button data-act="d:spd:${i}:0.5" data-rep="1">＋</button></div>
+      <div class="unitlbl">숫자를 눌러 직접 적을 수 있어요 — ＋ － 를 길게 누르면 빨리 바뀝니다</div>`
+    :`<div class="step"><span class="k">무게</span>
+        <button data-act="d:kg:${i}:-2.5" data-rep="1">−</button>
+        <span class="vin"><input type="text" inputmode="decimal" data-k="setkg" data-i="${i}"
+          value="${kgfmt(s.kg)}"><small>kg</small></span>
+        <button data-act="d:kg:${i}:2.5" data-rep="1">＋</button></div>
       <div class="step"><span class="k">횟수</span>
         <button data-act="d:reps:${i}:-1" data-rep="1">−</button>
-        <span class="v">${s.reps}<small> 회</small></span>
-        <button data-act="d:reps:${i}:1" data-rep="1">＋</button></div>`; })()}
+        <span class="vin"><input type="text" inputmode="numeric" data-k="setreps" data-i="${i}"
+          value="${s.reps}"><small>회</small></span>
+        <button data-act="d:reps:${i}:1" data-rep="1">＋</button></div>
+      <div class="unitlbl">숫자를 눌러 직접 적을 수 있어요 — ＋ － 를 길게 누르면 빨리 바뀝니다</div>`}
     <div style="display:flex;gap:9px">
       ${s.done?`<button class="btn ghost" data-act="undone:${i}">완료 풀기</button>`
               :`<button class="btn gold" data-act="done:${i}">세트 완료</button>`}
       <button class="btn ghost" data-act="close">닫기</button></div>`);
+}
+/* 길게 누르는 동안에는 화면 전체를 다시 그리지 않고 숫자만 고친다 */
+function 숫자만갱신(){
+  const w=live(); if(!w) return;
+  const cur=w.items[w.cur]; if(!cur) return;
+  document.querySelectorAll('#sheet input[data-k^="set"]').forEach(el=>{
+    const st=cur.sets[+el.getAttribute('data-i')]; if(!st) return;
+    const k=el.getAttribute('data-k');
+    el.value = (k==='setkg') ? kgfmt(st.kg) : (k==='setspd' ? (st.spd||0) : st.reps);
+  });
 }
 function sheetLeave(nextTab){
   openSheet(()=>`
@@ -4437,6 +4460,19 @@ function tEx(){
 /* ═══ 동작 ═══ */
 document.addEventListener('input', ev=>{
   const k = ev.target.getAttribute && ev.target.getAttribute('data-k');
+  if(k === 'setkg' || k === 'setreps' || k === 'setspd'){   /* 세트 값 직접 적기 */
+    const w=live(); if(!w) return;
+    const cur=w.items[w.cur]; if(!cur) return;
+    const st=cur.sets[+ev.target.getAttribute('data-i')]; if(!st) return;
+    const v=parseFloat((ev.target.value||'').replace(/[^0-9.]/g,''));
+    if(!isNaN(v)){
+      if(k==='setkg') st.kg=Math.max(0, Math.round(v*10)/10);
+      else if(k==='setspd') st.spd=Math.max(0, Math.round(v*10)/10);
+      else st.reps=Math.max(1, Math.round(v));
+      save(); render();               /* 뒤 화면만 새로 그린다 — 입력칸은 그대로 */
+    }
+    return;
+  }
   if(k === 'exq'){                      /* 운동 이름으로 찾기 */
     const q=(ev.target.value||'').trim().toLowerCase();
     document.querySelectorAll('[data-exrow]').forEach(el=>{
@@ -4488,18 +4524,36 @@ document.addEventListener('pointercancel', ()=>{ figDrag = null; figMoved = fals
      data-hold : 길게 누르면 그 동작 한 번 (종목 순서 바꾸기)          */
 (function(){
   let 늦게=null, 반복=null, 눌린=null;
-  const 끝 = ()=>{ clearTimeout(늦게); clearInterval(반복); 늦게=반복=null; 눌린=null; };
+  const 끝 = ()=>{
+    clearTimeout(늦게); clearInterval(반복); 늦게=반복=null; 눌린=null;
+    if(S.repeating){ S.repeating=false; drawSheet(); render(); }   /* 손 떼면 제대로 다시 그린다 */
+  };
   const 눌림 = e=>{
     const el = e.target.closest('[data-rep],[data-hold]'); if(!el) return;
     눌린 = el;
+    const h = el.getAttribute('data-hold');
+    const a = el.getAttribute('data-act');
     늦게 = setTimeout(()=>{
-      const h = el.getAttribute('data-hold');
-      if(h){ if(navigator.vibrate) navigator.vibrate(18); 실행(h, el); }
-      else { 반복 = setInterval(()=>el.click(), 85); }
+      if(h){ if(navigator.vibrate) navigator.vibrate(18); 실행(h); return; }
+      if(!a) return;
+      if(navigator.vibrate) navigator.vibrate(10);
+      /* 화면을 다시 그리면 버튼이 바뀌므로, 버튼이 아니라 「동작」을 되풀이한다.
+         「시간」으로 몇 칸을 갈지 정한다 — 기기가 느려도 누른 만큼 움직인다.
+         처음 1초는 110ms 에 한 칸, 그 뒤로는 55ms 에 한 칸(두 배 빨리).       */
+      S.repeating = true;
+      const t0 = Date.now();
+      let 적용 = 0;
+      반복 = setInterval(()=>{
+        const 지난 = Date.now() - t0;
+        const 목표 = 지난 < 1000 ? Math.floor(지난/110)
+                                : 9 + Math.floor((지난-1000)/55);
+        let 남은 = Math.min(목표 - 적용, 40);          /* 한 번에 너무 많이 가지 않게 */
+        while(남은-- > 0){ 실행(a); 적용++; }
+      }, 55);
     }, h0(el));
   };
   const h0 = el => el.getAttribute('data-hold') ? 420 : 380;
-  const 실행 = (a, el)=>{
+  const 실행 = a=>{
     const b=document.createElement('button'); b.setAttribute('data-act',a);
     document.body.appendChild(b); b.click(); b.remove();
   };
@@ -5094,7 +5148,10 @@ document.addEventListener('click', ev=>{
       if(f==='kg') s.kg=Math.max(0, Math.round((s.kg+(+dv))*10)/10);
       else if(f==='spd') s.spd=Math.max(0, Math.round(((s.spd||0)+(+dv))*10)/10);
       else s.reps=Math.max(1, s.reps+(+dv));
-      save(); drawSheet(); render(); return; }
+      save();
+      if(S.repeating) 숫자만갱신();          /* 길게 누르는 중 — 숫자만 */
+      else { drawSheet(); render(); }
+      return; }
     case 'done': w.items[w.cur].sets[+rest[0]].done=true; save(); closeSheet(); render(); return;
     case 'undone': w.items[w.cur].sets[+rest[0]].done=false; save(); closeSheet(); render(); return;
     case 'rep': { const cur=w.items[w.cur], last=cur.sets[cur.sets.length-1];
