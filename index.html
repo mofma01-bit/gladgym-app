@@ -771,7 +771,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '89';
+const BUILD = '90';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1260,19 +1260,19 @@ function weekStrip(mid){
   </div>`;
 }
 
-/* 루틴 묶음 — 트레이너가 붙이는 이름 (생리주기 · 근지구력 · 파워 …) */
+/* 루틴 그룹 — 트레이너가 붙이는 이름 (생리주기 · 근지구력 · 파워 …) */
 const GRP_SUGGEST = ['근지구력','근비대','파워','컨디셔닝','재활·교정',
   '생리기','황체기','황금기','상체','하체','전신'];
 function grpsOf(mid){
   const o = [];
   myRoutines(mid).forEach(r => { const g = (r.grp||'').trim(); if(g && o.indexOf(g) < 0) o.push(g); });
-  ((S.newGrps||{})[mid]||[]).forEach(g => { if(o.indexOf(g) < 0) o.push(g); });   /* 아직 루틴이 없는 새 묶음 */
+  ((S.newGrps||{})[mid]||[]).forEach(g => { if(o.indexOf(g) < 0) o.push(g); });   /* 아직 루틴이 없는 새 그룹 */
   return o;
 }
 function setGrp(rid, g){
   const r = rOf(rid); if(!r) return;
   r.grp = g;
-  sv(spatch('routines','id=eq.'+rid, { grp: g }), '묶음 저장');
+  sv(spatch('routines','id=eq.'+rid, { grp: g }), '그룹 저장');
 }
 
 function estMin(r){ let s=0; r.items.forEach(i=>{ s+=i.sets*(40+(i.rest||60)); }); return Math.round(s/60/5)*5; }
@@ -4167,7 +4167,7 @@ function tWrite(){
 function tRoutines(){
   const mid=S.tmid||'m1', all=myRoutines(mid), t=D.today[mid];
   const gs = grpsOf(mid), sel = S.rgrp || '전체';
-  const rs = sel==='전체' ? all : sel==='묶음 없음' ? all.filter(r=>!(r.grp||'').trim())
+  const rs = sel==='전체' ? all : sel==='그룹 없음' ? all.filter(r=>!(r.grp||'').trim())
     : all.filter(r=>(r.grp||'').trim()===sel);
   const loose = all.filter(r=>!(r.grp||'').trim()).length;
   return { top: bar('루틴',
@@ -4176,19 +4176,19 @@ function tRoutines(){
     <div class="chips">
       <button class="chip ${sel==='전체'?'on':''}" data-act="rgrp:전체">전체 ${all.length}</button>
       ${gs.map(g=>`<button class="chip ${sel===g?'on':''}" data-act="rgrp:${g}">${esc(g)} ${all.filter(r=>(r.grp||'').trim()===g).length}</button>`).join('')}
-      ${loose&&gs.length?`<button class="chip ${sel==='묶음 없음'?'on':''}" data-act="rgrp:묶음 없음">묶음 없음 ${loose}</button>`:''}
-      <button class="chip t" data-act="grpman">＋ 묶음</button>
+      ${loose&&gs.length?`<button class="chip ${sel==='그룹 없음'?'on':''}" data-act="rgrp:그룹 없음">그룹 없음 ${loose}</button>`:''}
+      <button class="chip t" data-act="grpman">＋ 그룹</button>
     </div>
     ${rs.map(r=>`<button class="card rowc ${t&&t.rid===r.id?'gold':'plan'}" data-act="re:${r.id}">
       <div><div class="nm ${t&&t.rid===r.id?'g':''}">루틴 ${r.no} · ${esc(r.n)}</div>
       <div class="sm">${r.grp?`<span style="color:var(--gold-2)">${esc(r.grp)}</span> · `:''}${esc(r.purpose)}<br>${r.items.length}종목 · 예상 ${estMin(r)}분</div></div>
       ${t&&t.rid===r.id?`<span class="pill">오늘 ${esc(t.kind)}</span>`:'<span class="rt">›</span>'}</button>`).join('')
-      || '<div class="empty">이 묶음에는 루틴이 없어요</div>'}
+      || '<div class="empty">이 그룹에는 루틴이 없어요</div>'}
     <div style="display:flex;gap:9px">
       <button class="btn main sm" data-act="rblank">＋ 빈 루틴 만들기</button>
       <button class="btn sub sm" data-act="raddpick">루틴 추가하기</button></div>
     ${t?`<button class="btn ghost" data-act="unassign:${mid}">오늘 지정 풀기</button>`:''}
-    <div class="note">위 칩은 <b>루틴 묶음</b>입니다 — 근지구력 · 파워 · 생리주기처럼 원하는 이름으로 만들어 쓰세요.
+    <div class="note">위 칩은 <b>루틴 그룹</b>입니다 — 근지구력 · 파워 · 생리주기처럼 원하는 이름으로 만들어 쓰세요.
       회원은 오른쪽 위 이름을 눌러 바꿉니다.</div>` };
 }
 
@@ -4242,7 +4242,7 @@ function sheetRAdd(){
   });
 }
 
-/* 묶음 만들기 · 이름 바꾸기 · 없애기 */
+/* 그룹 만들기 · 이름 바꾸기 · 없애기 */
 function sheetRDel(rid){
   const r = rOf(rid); if(!r) return;
   const m = MEMBERS.find(x=>x.id===r.mid) || {n:''};
@@ -4262,25 +4262,25 @@ function sheetGrpMan(){
   openSheet(()=>{
     const gs = grpsOf(mid);
     if(S.grpRen) return `
-      <div class="h2">묶음 이름 바꾸기 <small>${esc(S.grpRen)}</small></div>
+      <div class="h2">그룹 이름 바꾸기 <small>${esc(S.grpRen)}</small></div>
       <input class="search" type="text" data-k="grprenv" value="${esc(S.grpRen)}">
-      <div class="note">이 묶음에 든 루틴 ${myRoutines(mid).filter(r=>(r.grp||'').trim()===S.grpRen).length}개가 함께 바뀝니다.</div>
+      <div class="note">이 그룹에 든 루틴 ${myRoutines(mid).filter(r=>(r.grp||'').trim()===S.grpRen).length}개가 함께 바뀝니다.</div>
       <button class="btn main sm" data-act="grprendo">바꾸기</button>
       <button class="btn ghost sm" data-act="grprencancel">그만두기</button>`;
     return `
-    <div class="h2">루틴 묶음 <small>${esc((MEMBERS.find(x=>x.id===mid)||{}).n||'')} 회원</small></div>
-    ${gs.length?`<span class="lbl">지금 있는 묶음</span>
+    <div class="h2">루틴 그룹 만들기 <small>${esc((MEMBERS.find(x=>x.id===mid)||{}).n||'')} 회원</small></div>
+    ${gs.length?`<span class="lbl">지금 있는 그룹</span>
       ${gs.map(g=>`<div class="card rowc">
         <div><div class="nm">${esc(g)}</div>
         <div class="sm">루틴 ${myRoutines(mid).filter(r=>(r.grp||'').trim()===g).length}개</div></div>
         <button class="chip t" data-act="grpren:${g}">이름 바꾸기</button>
         <button class="chip" data-act="grpdel:${g}">없애기</button></div>`).join('')}
       <div class="hr"></div>`:''}
-    <span class="lbl">새 묶음 만들기</span>
+    <span class="lbl">루틴 이름 만들기</span>
     <input class="search" type="text" data-k="grpnew" placeholder="예 · 근지구력, 황체기">
     <div class="chips">${GRP_SUGGEST.filter(x=>gs.indexOf(x)<0).map(x=>
       `<button class="chip" data-act="grpfill:${x}">${x}</button>`).join('')}</div>
-    <div class="note">묶음을 만든 뒤 <b>루틴을 열어 「묶음」에서 골라</b> 넣습니다.</div>
+    <div class="note">만들면 그 그룹으로 바로 넘어갑니다 — 거기서 <b>빈 루틴 만들기</b>나 <b>루틴 추가하기</b>로 채우세요.</div>
     <button class="btn main sm" data-act="grpadd">만들기</button>
     <button class="btn ghost sm" data-act="close">닫기</button>`;
   });
@@ -4289,15 +4289,17 @@ function tRedit(){
   const r=rOf(S.redit); if(!r) return tRoutines();
   const t=D.today[r.mid];
   return { top: bar(`루틴 ${r.no} · ${r.n}`, '', 'go:t_routines'), body:`
+    <div class="fld"><span class="fn">루틴 번호 — 목록에 「루틴 ○」로 나옵니다</span>
+      <input class="search" type="text" inputmode="numeric" data-k="rno:${r.id}" value="${r.no}"></div>
     <div class="fld"><span class="fn">루틴 이름</span>
       <input class="search" type="text" data-k="rn:${r.id}" value="${esc(r.n)}"></div>
     <div class="fld"><span class="fn">방향성 · 목적</span>
       <input class="search" type="text" data-k="rp:${r.id}" value="${esc(r.purpose||'')}"></div>
-    <div class="fld"><span class="fn">묶음 — 목록 위 칩으로 나뉩니다</span>
+    <div class="fld"><span class="fn">그룹 — 목록 위 칩으로 나뉩니다</span>
       <div class="chips">
         <button class="chip ${!(r.grp||'').trim()?'on':''}" data-act="rsetgrp:${r.id}:">없음</button>
         ${grpsOf(r.mid).map(g=>`<button class="chip ${(r.grp||'').trim()===g?'on':''}" data-act="rsetgrp:${r.id}:${g}">${esc(g)}</button>`).join('')}
-        <button class="chip t" data-act="grpman">＋ 묶음 만들기</button>
+        <button class="chip t" data-act="grpman">＋ 그룹 만들기</button>
       </div></div>
     <button class="btn ghost sm" data-act="rsavename:${r.id}">이름·목적 저장</button>
     <div class="hr"></div>
@@ -4749,16 +4751,25 @@ document.addEventListener('click', ev=>{
 
     /* 루틴 만들기 · 고치기 */
     case 'rblank': { const mid=S.tmid||'m1', rs=myRoutines(mid), id='r'+Date.now(), no=rs.length+1;
-      const g0 = (S.rgrp && S.rgrp!=='전체' && S.rgrp!=='묶음 없음') ? S.rgrp : '';
+      const g0 = (S.rgrp && S.rgrp!=='전체' && S.rgrp!=='그룹 없음') ? S.rgrp : '';
       D.routines.push({ id, mid, no, n:'새 루틴 '+no, purpose:'', grp:g0, items:[] });
       sv(spost('routines',[{ id, member_id:mid, no, name:'새 루틴 '+no, purpose:'', grp:g0 }]), '루틴 만들기');
       S.redit=id; toast('빈 루틴을 만들었어요'); go('t_redit'); return; }
     case 'rsavename': { const r=rOf(rest[0]); if(!r) return;
       const nEl=document.querySelector('[data-k="rn:'+r.id+'"]'), pEl=document.querySelector('[data-k="rp:'+r.id+'"]');
+      const oEl=document.querySelector('[data-k="rno:'+r.id+'"]');
       if(nEl) r.n=nEl.value.trim()||r.n;
       if(pEl) r.purpose=pEl.value.trim();
-      if(S.draft){ delete S.draft['rn:'+r.id]; delete S.draft['rp:'+r.id]; }
-      sv(spatch('routines','id=eq.'+r.id,{ name:r.n, purpose:r.purpose }), '루틴 저장');
+      if(oEl){
+        const v=parseInt((oEl.value||'').replace(/[^0-9]/g,''),10);
+        if(!isNaN(v) && v>0 && v<1000){
+          const 겹침 = myRoutines(r.mid).find(x=>x.id!==r.id && x.no===v);
+          if(겹침){ toast(`루틴 ${v}번은 「${겹침.n}」이 쓰고 있어요`); return; }
+          r.no=v;
+        }
+      }
+      if(S.draft){ delete S.draft['rn:'+r.id]; delete S.draft['rp:'+r.id]; delete S.draft['rno:'+r.id]; }
+      sv(spatch('routines','id=eq.'+r.id,{ name:r.n, purpose:r.purpose, no:r.no }), '루틴 저장');
       toast('저장했습니다'); render(); return; }
     case 'raddex': S.redit=rest[0]; go('t_pickex'); return;
     case 'rpart': S.pickPart=rest[0]; render(); return;
@@ -5290,31 +5301,46 @@ document.addEventListener('click', ev=>{
       const mid = S.tmid || 'm1', cart = (S.rcart||[]).slice();
       closeSheet(); S.rcart = [];
       if(!cart.length) return;
-      const g0 = (S.rgrp && S.rgrp!=='전체' && S.rgrp!=='묶음 없음') ? S.rgrp : '';
+      const g0 = (S.rgrp && S.rgrp!=='전체' && S.rgrp!=='그룹 없음') ? S.rgrp : '';
       let no = myRoutines(mid).length;
+      /* 이름이 그대로 딸려오면 목록에 같은 이름이 쌓인다 — 겹치면 뒤에 숫자를 붙인다 */
+      const 안겹치게 = base=>{
+        const 있는 = myRoutines(mid).map(r=>(r.n||'').trim());
+        if(있는.indexOf(base) < 0) return base;
+        let k=2; while(있는.indexOf(base+' '+k) >= 0) k++;
+        return base+' '+k;
+      };
+      let 마지막 = null;
       cart.forEach((rid, k) => {
         const src = rOf(rid); if(!src) return;
         no++;
         const id = 'r' + (Date.now() + k);
         const items = JSON.parse(JSON.stringify(src.items));
-        D.routines.push({ id, mid, no, n:src.n, purpose:src.purpose||'', grp:g0||src.grp||'', items });
-        sv(spost('routines',[{ id, member_id:mid, no, name:src.n, purpose:src.purpose||'', grp:g0||src.grp||'' }])
+        const nm = 안겹치게((src.n||'새 루틴').trim());
+        D.routines.push({ id, mid, no, n:nm, purpose:src.purpose||'', grp:g0||src.grp||'', items });
+        마지막 = id;
+        sv(spost('routines',[{ id, member_id:mid, no, name:nm, purpose:src.purpose||'', grp:g0||src.grp||'' }])
           .then(()=> items.length ? spost('routine_items', items.map((it,i)=>({ routine_id:id, sort:i,
             variant_id:VID(it.ex,it.va), kg:it.kg, reps:it.reps, sets:it.sets, rest:it.rest }))) : null), '루틴 추가');
       });
-      toast(`루틴 ${cart.length}개를 추가했어요`); go('t_routines'); return; }
+      save();
+      if(cart.length===1 && 마지막){        /* 하나만 가져왔으면 바로 이름 짓는 화면으로 */
+        S.redit=마지막; toast('가져왔어요 · 이름을 바꿔 주세요'); go('t_redit'); return; }
+      toast(`루틴 ${cart.length}개를 가져왔어요 · 이름을 바꿔 주세요`); go('t_routines'); return; }
     case 'rgrp': S.rgrp = rest.join(':'); render(); return;
     case 'rmpick': sheetRmPick(); return;
     case 'grpman': sheetGrpMan(); return;
     case 'grpfill': { const el=document.querySelector('[data-k="grpnew"]'); if(el){ el.value=rest.join(':'); el.focus(); } return; }
     case 'grpadd': {
       const el=document.querySelector('[data-k="grpnew"]'), g=(el&&el.value||'').trim();
-      if(!g){ toast('묶음 이름을 적어 주세요'); return; }
+      if(!g){ toast('그룹 이름을 적어 주세요'); return; }
       S.rgrpNew = S.rgrpNew || {}; S.rgrpNew[(S.tmid||'m1')] = g;
       S.newGrps = S.newGrps || {}; (S.newGrps[S.tmid||'m1'] = S.newGrps[S.tmid||'m1'] || []).push(g);
       if(el) el.value='';
-      toast(`「${g}」 묶음을 만들었어요 · 루틴을 열어 골라 넣으세요`);
-      drawSheet(); return; }
+      S.rgrp = g;                       /* 만든 그룹으로 바로 들어간다 */
+      closeSheet();
+      toast(`「${g}」 그룹을 만들었어요 · 여기에 루틴을 넣으세요`);
+      render(); return; }
     case 'grpren': S.grpRen = rest.join(':'); drawSheet(); return;
     case 'grprencancel': S.grpRen = null; drawSheet(); return;
     case 'grprendo': {
@@ -5331,9 +5357,9 @@ document.addEventListener('click', ev=>{
       const g = rest.join(':');
       myRoutines(S.tmid||'m1').filter(r=>(r.grp||'').trim()===g).forEach(r=>setGrp(r.id, ''));
       if(S.rgrp===g) S.rgrp='전체';
-      toast('묶음을 없앴어요 · 루틴은 그대로 있습니다'); drawSheet(); render(); return; }
+      toast('그룹을 없앴어요 · 루틴은 그대로 있습니다'); drawSheet(); render(); return; }
     case 'rsetgrp': { const rid=rest[0], g=rest.slice(1).join(':');
-      setGrp(rid, g); toast(g?`「${g}」 묶음으로`:'묶음에서 뺐어요'); render(); return; }
+      setGrp(rid, g); toast(g?`「${g}」 그룹으로`:'그룹에서 뺐어요'); render(); return; }
     case 'assign': sheetAssign(rest[0], rest[1]); return;
     case 'assigno': {
       const r=rOf(rest[0]), kind=rest[1], on=(rest[2]==='on');
