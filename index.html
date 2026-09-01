@@ -682,7 +682,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '77';
+const BUILD = '78';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -837,6 +837,7 @@ async function boot(){
   S.mid = S.mid || (MEMBERS[0] && MEMBERS[0].id);
   S.tmid = S.tmid || S.mid;
   if(S.screen === 'boot') S.screen = 'login';
+  if(!histOn) histInit();
 }
 
 /* 어제까지의 안 끝낸 기록은 그날로 마감한다 — 「기록 중」으로 계속 떠 있지 않게 */
@@ -908,11 +909,38 @@ function go(sc, patch){
   Object.assign(S, patch||{}); S.screen=sc; closeSheet(); render();
 }
 function goBack(){
+  if(histOn && S.stack && S.stack.length){ history.back(); return; }   /* popstate 가 받는다 */
+  popScreen();
+}
+function popScreen(){
   const st = S.stack || [];
   const prev = st.pop();
-  if(!prev){ closeSheet(); S.screen = (S.who==='tr') ? 't_members' : 'home'; render(); return; }
+  if(!prev){ closeSheet(); S.screen = rootScreen(); S.tab = rootScreen(); S.ttab = rootScreen(); render(); return; }
   Object.assign(S, prev); closeSheet(); render();
 }
+function rootScreen(){ return (S.who==='tr') ? 't_today' : 'home'; }
+/* 탭은 저마다 뿌리 — 탭을 바꾸면 되돌아갈 자취를 비운다 */
+function goRoot(sc){
+  if(S.screen === sc){ closeSheet(); render(); return; }
+  S.stack = []; S.screen = sc; closeSheet(); render();
+}
+
+/* ── 폰 뒤로 버튼 · 옆으로 밀기 ──
+   자취를 늘 한 칸 여유 있게 쌓아 두고, 뒤로가 눌리면 그 한 칸을 쓰고 다시 채웁니다.
+   그래서 앱 안 화면끼리만 오가고, 뿌리 화면에서 한 번 더 누를 때만 밖으로 나갑니다. */
+let histOn = false;
+function histArm(){ if(!histOn) return; try{ history.pushState({ gg:1 }, ''); }catch(e){} }
+function histInit(){ try{ history.replaceState({ gg:0 }, ''); histOn = true; histArm(); }catch(e){} }
+window.addEventListener('popstate', ()=>{
+  if(!histOn) return;
+  if(sheetRender){ closeSheet(); histArm(); return; }              /* 팝업이 열려 있으면 팝업만 닫는다 */
+  if(S.stack && S.stack.length){ popScreen(); histArm(); return; }  /* 직전 화면으로 */
+  const root = rootScreen();
+  if(S.who && S.screen !== root){                                   /* 탭 뿌리에서는 홈으로 */
+    S.tab = root; S.ttab = root; S.screen = root; closeSheet(); render(); histArm(); return;
+  }
+  /* 홈에서 한 번 더 누르면 앱 밖으로 나갑니다 */
+});
 
 let sheetRender=null;
 function openSheet(fn){ sheetRender=fn; $('#sheet').classList.add('open'); drawSheet(); }
@@ -4277,9 +4305,10 @@ document.addEventListener('input', ev=>{
 /* 관절 모형 — 좌우로 끌면 돌아갑니다 */
 let figDrag = null, figMoved = false;
 document.addEventListener('pointerdown', ev=>{
+  figMoved = false;                                   /* 어디를 누르든 먼저 푼다 */
   const box = ev.target.closest && ev.target.closest('#fig3d');
   if(!box) return;
-  figDrag = { x: ev.clientX, a: S.figA || 0 }; figMoved = false;
+  figDrag = { x: ev.clientX, a: S.figA || 0 };
 });
 document.addEventListener('pointermove', ev=>{
   if(!figDrag) return;
@@ -4300,7 +4329,7 @@ document.addEventListener('click', ev=>{
     case 'retry': S.screen='boot'; render(); start(); return;
     case 'switch': S.stack=[]; S.who=null; go('login'); return;
     case 'back': goBack(); return;
-    case 'ttab': S.ttab=rest[0]; go(rest[0]); return;
+    case 'ttab': S.ttab=rest[0]; goRoot(rest[0]); return;
     case 'tfm': S.tfeed=rest[0]; render(); return;
     case 'tfm2': S.tfeed=rest[0]; S.ttab='t_feed'; go('t_feed'); return;
     case 'pickmem': sheetPickMember(); return;
@@ -4594,7 +4623,7 @@ document.addEventListener('click', ev=>{
       const n = ymd(d);
       if(n > TODAY) return;                 /* 앞날은 안 봅니다 */
       S.day = n; render(); return; }
-    case 'tab': S.tab=rest[0]; go(rest[0]); return;
+    case 'tab': S.tab=rest[0]; goRoot(rest[0]); return;
     case 'close': S.editDesc=null; closeSheet(); return;
 
     case 'rt': S.rid=rest[0]; go('routine'); return;
