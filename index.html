@@ -682,7 +682,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '78';
+const BUILD = '79';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1733,7 +1733,7 @@ function sheetNewVar(exid){
 function vSummary(){
   const w=D.workouts.find(x=>x.id===S.wid); if(!w) return vHome();
   const times=partTimes(w), prev=myWorkouts().filter(x=>x.id!==w.id)[0], diff=prev?totalKg(w)-totalKg(prev):0;
-  return { top: bar('오늘 운동', `<span class="sub">${dateTxt(w.date)}</span>`), body:`
+  return { top: bar('오늘 운동', `<span class="sub">${dateTxt(w.date)}</span>`, S.who==='tr'?'ttab:t_today':'tab:home'), body:`
     <div class="tile"><span class="k">총 시간</span><span class="v g">${mmss(w.dur)}</span></div>
     <div class="grid2">${Object.entries(times).slice(0,4).map(([k,v])=>
       `<div class="tile"><span class="k">${esc(k)}</span><span class="v">${parseInt(durTxt(v))}<small> ${durTxt(v).slice(-1)}</small></span></div>`).join('')}</div>
