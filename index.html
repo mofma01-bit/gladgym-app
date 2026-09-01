@@ -387,6 +387,22 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .picked .l{font-size:11.5px;font-weight:500;color:#8f8a83;white-space:nowrap;
   overflow:hidden;text-overflow:ellipsis;max-width:100%;width:100%}
 .picked.bump{animation:pk .5s ease-out}
+
+/* 찾기 도구 — 종목 목록과 확실히 구분되게 갈색 판에 얹는다 */
+.ptools{background:#251b16;border:1px solid #503a2f;border-radius:16px;
+  padding:11px;display:flex;flex-direction:column;gap:9px;margin-bottom:10px}
+.ptools .search{background:#160f0d;border-color:#5c4238;color:var(--cream)}
+.ptools .search::placeholder{color:#8a7364}
+.pbtn{display:flex;align-items:center;gap:10px;background:#160f0d;border:1px solid #5c4238;
+  border-radius:12px;padding:11px 13px;text-align:left;width:100%}
+.pbtn .ic{width:30px;height:30px;border-radius:9px;background:#3b2a22;color:var(--gold);
+  display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;flex:none}
+.pbtn .tx{flex:1;min-width:0}
+.pbtn .tx b{display:block;font-size:14.5px;font-weight:700;color:var(--cream)}
+.pbtn .tx span{display:block;font-size:11.5px;font-weight:500;color:#a08d7e;margin-top:1px}
+.pbtn .ar{font-size:13px;color:#a08d7e;flex:none}
+.pbtn.etc .ic{background:var(--gold);color:#2a1d12}
+.ptools .chips{margin:0}
 @keyframes pk{0%{transform:scale(1)}30%{transform:scale(1.05)}100%{transform:scale(1)}}
 @media (prefers-reduced-motion:reduce){.picked.bump{animation:none}}
 .step .v{cursor:pointer}
@@ -736,7 +752,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '86';
+const BUILD = '87';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1496,17 +1512,19 @@ function vStart(){
 function vPick(){
   const w=live(), 담은=w?w.items.length:0;
   return { top: bar('종목 고르기','', (w&&w.begun)?'go:workout':'go:start'), body:`
-    <input class="search" type="text" data-k="exq" placeholder="운동 이름으로 찾기 — 예) 스쿼트, 로우">
-    <button class="card rowc" data-act="partopen" style="padding:11px 13px">
-      <div><div class="nm" style="font-size:15px">부위 고르기</div>
-      <div class="sm">지금 <b style="color:var(--gold-2)">${esc(S.pickPart)}</b></div></div>
-      <span class="rt">${S.pickOpen?'▲':'▼'}</span></button>
-    ${S.pickOpen?`<div class="chips">${PARTS.map(x=>`<button class="chip ${x===S.pickPart?'on':''}" data-act="part:${x}">${x}</button>`).join('')}</div>`:''}
-    <div id="pickhint">
-      <button class="card rowc plan" data-act="memoadd">
-        <div><div class="nm">＋ 운동 메모</div>
-        <div class="sm">목록에 없는 것 — 이름을 적어 넣습니다 · <b style="color:var(--gold-2)">볼륨에는 안 들어갑니다</b></div></div>
-        <span class="rt">›</span></button></div>
+    <div class="ptools">
+      <input class="search" type="text" data-k="exq" placeholder="운동 이름으로 찾기 — 예) 스쿼트, 로우">
+      <button class="pbtn" data-act="partopen">
+        <span class="ic">☰</span>
+        <span class="tx"><b>부위 고르기</b><span>지금 ${esc(S.pickPart)}</span></span>
+        <span class="ar">${S.pickOpen?'▲':'▼'}</span></button>
+      ${S.pickOpen?`<div class="chips">${PARTS.map(x=>`<button class="chip ${x===S.pickPart?'on':''}" data-act="part:${x}">${x}</button>`).join('')}</div>`:''}
+      <div id="pickhint">
+        <button class="pbtn etc" data-act="memoadd">
+          <span class="ic">＋</span>
+          <span class="tx"><b>기타운동 추가</b><span>기능성 운동 및 검색에 없는 것 · 볼륨에는 안 들어갑니다</span></span>
+          <span class="ar">›</span></button></div>
+    </div>
     ${EX.map(e=>{ const vs=vars(e.id), n=cmOf(S.mid,e.id).length, last=lastSet(e.id);
       return `<button class="card rowc" data-exrow="${esc(e.n+' '+e.p+' '+(e.e||''))}" data-part="${esc(e.p)}"
         style="${e.p===S.pickPart?'':'display:none'}"
@@ -1545,7 +1563,7 @@ function sheetStart(){
 }
 function sheetMemoAdd(){
   openSheet(()=>`
-    <div class="h2">운동 메모 <small>이름을 적어 주세요</small></div>
+    <div class="h2">기타운동 추가 <small>이름을 적어 주세요</small></div>
     <input class="search" type="text" data-k="memo:n" placeholder="예) 팔로프 프레스 · 케틀벨 스윙 · 밴드 워크">
     <div class="chips">${['팔로프 프레스','케틀벨 스윙','밴드 워크','TRX','메디신볼','박스 점프','스텝업','데드버그']
       .map(x=>`<button class="chip" data-act="memofill:${x}">${x}</button>`).join('')}</div>
@@ -1677,14 +1695,14 @@ function vWorkout(){
       <button data-act="jump:${i}" style="flex:1;min-width:0;text-align:left">
         <div class="nm" style="font-size:14px">${esc(exName(it.ex,it.va))}${isMemo(it.ex)?' <span class="pill q">메모</span>':''}</div>
         <div class="sm">${it.locked?`${mmss(it.sec)} · ${isMemo(it.ex)?'메모':it.sets.length+'세트'}`
-          :(on?'하는 중':(isMemo(it.ex)?'메모':`${it.sets.length}세트 예정`))}</div></button>
+          :(on?(S.fold?'접힘 — 누르면 펼쳐집니다':'하는 중'):(isMemo(it.ex)?'메모':`${it.sets.length}세트 예정`))}</div></button>
       ${mv
         ? `<button class="ordbtn" data-act="ordmv:${i}:-1" ${i===0?'disabled':''}>▲</button>
            <button class="ordbtn" data-act="ordmv:${i}:1" ${i===w.items.length-1?'disabled':''}>▼</button>
            <button class="chip t" data-act="ordend" style="flex:none;padding:6px 10px">놓기</button>`
         : `${on&&!it.locked?'<span class="pill t">지금</span>':(it.locked?'<span class="pill q">완료</span>':'')}
            <button class="chip" data-act="wdel:${i}" style="flex:none;padding:6px 10px">빼기</button>`}
-      </div>${on ? 펼침() : ''}`;
+      </div>${(on && !S.fold) ? 펼침() : ''}`;
     }).join('')}
     <button class="btn sub" data-act="go:pick" style="margin-top:2px">운동 추가</button>
     <button class="btn gold" data-act="askfin" style="margin-top:2px">오늘 운동 마치기</button>
@@ -5031,6 +5049,7 @@ document.addEventListener('click', ev=>{
 
     case 'jump': { const i=+rest[0];
       if(S.moveIdx!=null && S.moveIdx!==i) S.moveIdx=null;   /* 순서 바꾸다 다른 걸 누르면 나간다 */
+      S.fold = (i===w.cur) ? !S.fold : false;                /* 같은 걸 또 누르면 접는다 */
       w.cur=i; save(); render(); return; }
     /* 끝난 종목은 「재기록」을 눌러야 다시 적을 수 있다 */
     case 'redo': { const it=w.items[w.cur]; it.locked=false; it.startAt=Date.now();
@@ -5093,7 +5112,7 @@ document.addEventListener('click', ev=>{
     case 'rd': { if(S.rest.until) S.rest.until+=(+rest[0])*1000; else S.rest.sec=Math.max(10,S.rest.sec+(+rest[0])); drawSheet(); return; }
     case 'rgo': S.rest.until=Date.now()+S.rest.sec*1000; drawSheet(); return;
     case 'rskip': S.rest=null; closeSheet(); return;
-    case 'fin': { const cur=w.items[w.cur];
+    case 'fin': { S.fold=false; const cur=w.items[w.cur];
       if(!cur.locked){
         cur.sets.forEach(s=>s.done=true); cur.locked=true;
         cur.sec=(cur.sec||0)+(cur.startAt ? (Date.now()-cur.startAt)/1000 : 0);
