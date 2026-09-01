@@ -648,7 +648,7 @@ const MEMO_EX = { id:'memo', n:'운동 메모', p:'기타', e:'자유 입력', c
 
 /* ── 시범 그림 ── 시작 자세와 끝 자세 두 장을 번갈아 보여준다.
    그림이 아직 없는 벌은 예전 「자리」 표시를 그대로 둔다.            */
-const DEMOV = '2';   /* 시범 그림을 새로 올릴 때마다 하나씩 올린다 */
+const DEMOV = '3';   /* 시범 그림을 새로 올릴 때마다 하나씩 올린다 */
 const demoURL = p => SB_URL + '/storage/v1/object/public/media/' + p + '?v=' + DEMOV;
 const demoBox = (e, v) => v.du
   ? `<div class="demo2" data-act="demotoggle">
@@ -710,7 +710,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '81';
+const BUILD = '82';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
