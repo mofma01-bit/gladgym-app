@@ -720,6 +720,12 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
    벌마다 기본 설명과 시범 영상이 따로 붙는다.                        */
 let EX = [];
 const PARTS = ['가슴','등','어깨','하체','복근','팔','유산소','기타'];
+/* 다음 개인운동 추천 — 날짜 없이 두 자리 (먼저 / 나중) */
+const RECO1 = '9999-12-31';
+const RECO2 = '9999-12-30';
+const isReco = d => d===RECO1 || d===RECO2;
+function recosOf(mid){ return (D.reco && D.reco[mid]) ? D.reco[mid] : []; }
+
 const isMemo = ex => ex === 'memo';
 const exOf = id => (id==='memo' ? MEMO_EX : EX.find(x=>x.id===id))
   || {id:'?',n:'?',p:'?',vars:[{k:'a',n:'',desc:''}]};
@@ -790,7 +796,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '94';
+const BUILD = '95';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -910,6 +916,12 @@ async function boot(){
       return { ex, va, kg:Number(i.kg||0), reps:i.reps, sets:i.sets, rest:i.rest }; }) }));
 
   D.today = {}; asg.forEach(a => { if(a.on_date === TODAY) D.today[a.member_id] = { rid:a.routine_id, kind:a.kind, by:a.assigned_by }; });
+  /* 다음 개인운동 추천 — 먼저 추천된 것이 위 */
+  D.reco = {};
+  asg.filter(a=>isReco(a.on_date)).sort((a,b)=> a.on_date < b.on_date ? 1 : -1).forEach(a=>{
+    (D.reco[a.member_id] = D.reco[a.member_id] || [])
+      .push({ rid:a.routine_id, at:a.on_date, slot: a.on_date===RECO1 ? '먼저 추천' : '나중 추천' });
+  });
   D.workouts = mapWorkouts(wks, witems, wsets);
   D.cm = mapCm(cms);
   D.desc = {}; mdesc.forEach(m => { const [ex,va] = splitV(m.variant_id); D.desc[m.member_id+':'+ex+':'+va] = m.descr; });
@@ -1488,6 +1500,16 @@ function vHome(){
       <div><div class="nm">오늘 지정 · 루틴 ${r.no} ${esc(r.n)}</div>
       <div class="sm">${esc(t.by)}가 지정했어요</div></div><span class="rt">›</span></button>` : ''}
 
+    ${(()=>{ const rc=recosOf(S.mid).filter(x=>rOf(x.rid)); if(!rc.length) return '';
+      return `<span class="lbl">다음 개인운동 추천</span>`
+        + rc.map(x=>{ const r0=rOf(x.rid);
+          return `<button class="card gold rowc" data-act="rt:${r0.id}">
+            <div><div class="nm g">${esc(x.slot)} · 루틴 ${r0.no} ${esc(r0.n)}</div>
+            <div class="sm">${r0.purpose?esc(r0.purpose)+' · ':''}${r0.items.length}종목 · 예상 ${estMin(r0)}분</div></div>
+            <span class="rt">›</span></button>`; }).join('')
+        + `<div class="note">트레이너가 <b>다음 개인운동</b>에 하시라고 담아 둔 루틴이에요. 개인운동을 한 번 기록하면 사라집니다.</div>`;
+    })()}
+
     ${(u>0 || cy) ? `<span class="lbl">오늘 챙길 것</span>` : ''}
     ${u>0 ? `<button class="card gold rowc" data-act="tab:feedback">
       <div><div class="nm g">새 코멘트 ${u}개</div>
@@ -1526,10 +1548,11 @@ function recRow(w){
 function vRoutines(){
   const rs=myRoutines(S.mid), t=D.today[S.mid];
   return { top: bar('내 루틴', `<span class="sub">${rs.length}개</span>`, 'go:home'), body:
-    (rs.length? rs.map(r=>`<button class="card rowc ${t&&t.rid===r.id?'gold':'plan'}" data-act="rt:${r.id}">
-      <div><div class="nm ${t&&t.rid===r.id?'g':''}">루틴 ${r.no} · ${esc(r.n)}</div>
+    (rs.length? rs.map(r=>{ const rc=recosOf(S.mid).find(x=>x.rid===r.id);
+      return `<button class="card rowc ${(t&&t.rid===r.id)||rc?'gold':'plan'}" data-act="rt:${r.id}">
+      <div><div class="nm ${(t&&t.rid===r.id)||rc?'g':''}">루틴 ${r.no} · ${esc(r.n)}${rc?` <span class="pill">${esc(rc.slot)}</span>`:''}</div>
       <div class="sm">${esc(r.purpose)}<br>${r.items.length}종목 · 예상 ${estMin(r)}분</div></div>
-      ${t&&t.rid===r.id?`<span class="pill">오늘 ${esc(t.kind)}</span>`:'<span class="rt">›</span>'}</button>`).join('')
+      ${t&&t.rid===r.id?`<span class="pill">오늘 ${esc(t.kind)}</span>`:'<span class="rt">›</span>'}</button>`; }).join('')
     : '<div class="empty">아직 받은 루틴이 없어요</div>')
     + `<div class="note">루틴은 수업 전에 방향성에 맞춰 미리 짜 둡니다. <b>수업용과 혼자 할 때 쓰는 루틴</b>을 트레이너가 지정하거나, 직접 골라 시작할 수 있어요.</div>` };
 }
@@ -5496,6 +5519,12 @@ async function finish(){
       sec:Math.round(it.sec), sets: it.sets.filter(s=>s.done).map(s=>({kg:s.kg, reps:s.reps, spd:s.spd})) })) };
   const i0=D.workouts.findIndex(x=>x.id===w.id);
   if(i0>=0) D.workouts[i0]=rec; else D.workouts.unshift(rec);
+  /* 개인운동을 한 번 기록하면 그 회원의 추천은 다 쓴 것으로 본다 */
+  if((rec.kind||'') === '개인운동' && recosOf(rec.mid).length){
+    const 쓴것 = recosOf(rec.mid);
+    D.reco[rec.mid] = [];
+    for(const x of 쓴것) await sv(sdel('assignments','member_id=eq.'+rec.mid+'&on_date=eq.'+x.at), '추천 비우기');
+  }
   D.live=null; save(); S.wid=rec.id;
   if(S.who==='tr'){ S.tmid=rec.mid; S.subj=rec.mid; }
   go('summary');
