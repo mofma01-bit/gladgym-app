@@ -196,6 +196,36 @@ textarea.inp{min-height:76px;resize:vertical;line-height:1.6}
 .tb .n{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
 .tb tbody tr:hover{background:var(--dark-2)}
 
+/* 회원 표 */
+.mwrap{background:var(--dark-2);border:1px solid var(--line);border-radius:13px;overflow:hidden}
+.mtb{width:100%;border-collapse:collapse;font-size:13px}
+.mtb th{text-align:left;font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.02em;
+  padding:10px 12px;border-bottom:1px solid var(--line);background:#191917;white-space:nowrap}
+.mtb th.n,.mtb td.n{text-align:right;font-variant-numeric:tabular-nums}
+.mtb td{padding:11px 12px;border-bottom:1px solid #232320;vertical-align:middle}
+.mtb tbody tr:last-child td{border-bottom:0}
+.mtb tbody tr{cursor:pointer}
+.mtb tbody tr:hover{background:var(--dark-3)}
+.mtb .nm2{font-size:14px;font-weight:800;letter-spacing:-.01em}
+.mtb .sub3{font-size:11.5px;color:var(--sub);font-weight:600}
+.dot2{width:7px;height:7px;border-radius:50%;flex:none;display:inline-block;background:#4a463f}
+.dot2.gold{background:var(--gold);box-shadow:0 0 0 3px var(--gold-dim)}
+.dot2.teal{background:var(--teal);box-shadow:0 0 0 3px var(--teal-dim)}
+.dot2.warn{background:var(--warn);box-shadow:0 0 0 3px #2e1c18}
+.numbig{font-size:14px;font-weight:800}
+.numbig.zero{color:#5d5952;font-weight:600}
+.mtb .tag{font-size:10.5px;padding:2px 7px}
+
+/* 위 요약 띠 */
+.sumbar{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:13px}
+.sumit{flex:1;min-width:118px;background:var(--dark-2);border:1px solid var(--line);
+  border-radius:11px;padding:11px 13px;display:flex;flex-direction:column;gap:2px}
+.sumit .k2{font-size:11px;font-weight:700;color:var(--sub)}
+.sumit .v2{font-size:20px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.sumit.gold{border-color:#4a3d22} .sumit.gold .v2{color:var(--gold)}
+.sumit.teal{border-color:#2d4750} .sumit.teal .v2{color:var(--teal)}
+.sumit.warn{border-color:#4d2f27} .sumit.warn .v2{color:var(--warn)}
+
 /* 체형 체크 — 세 갈래 버튼 */
 /* 달력 */
 .cal{background:var(--dark-2);border:1px solid var(--line);border-radius:12px;padding:10px 11px}
@@ -352,7 +382,7 @@ textarea.inp{min-height:76px;resize:vertical;line-height:1.6}
 
 <script>
 "use strict";
-const BUILD = '11';
+const BUILD = '12';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -472,23 +502,49 @@ function vMembers(){
   const rows = list.map(m => ({ m, i: info(m) }));
   rows.sort((a,b)=>{ const A=a.i.gap===null?9999:a.i.gap, B=b.i.gap===null?9999:b.i.gap; return B-A; });
 
-  if(!rows.length) return '<div class="empty">해당하는 회원이 없어요</div>';
-  let h = '<div class="grid">' + rows.map(function(o){ const m=o.m, i=o.i;
-    return '<button class="mcard" data-m="' + esc(m.id) + '">'
-      + '<div class="hd"><span class="nm">' + esc(m.name) + '</span>'
-      + '<span class="tr">' + esc(m.trainer||'담당 없음') + '</span></div>'
-      + '<div class="rows">'
-      + '<div class="row"><span class="k">마지막</span><span class="v">' + dayText(i.last) + '</span></div>'
-      + '<div class="row"><span class="k">이번 주</span><span class="v">' + i.week + '번</span></div>'
-      + '<div class="row"><span class="k">루틴</span><span class="v">' + i.routines + '개</span></div>'
-      + '</div><div class="tags">'
-      + (i.today ? '<span class="tag gold">오늘 ' + esc(i.today.kind||'지정') + '</span>' : '')
-      + (i.ask ? '<span class="tag warn">코멘트 요청 ' + i.ask + '</span>' : '')
-      + (i.newcm ? '<span class="tag teal">안 읽은 코멘트 ' + i.newcm + '</span>' : '')
-      + (i.gap!==null && i.gap>=7 ? '<span class="tag warn">' + i.gap + '일째 안 옴</span>' : '')
-      + (i.gap===null ? '<span class="tag">기록 없음</span>' : '')
-      + '</div></button>'; }).join('') + '</div>';
-  return h;
+  /* 위 요약 띠 — 오늘 볼 것부터 */
+  const 오늘수 = rows.filter(o=>o.i.today).length;
+  const 요청수 = rows.reduce((a,o)=>a+o.i.ask, 0);
+  const 안읽음 = rows.reduce((a,o)=>a+o.i.newcm, 0);
+  const 뜸한수 = rows.filter(o=>o.i.gap!==null && o.i.gap>=14).length;
+  const 요약 = '<div class="sumbar">'
+    + '<div class="sumit"><span class="k2">회원</span><span class="v2">' + rows.length + '</span></div>'
+    + '<div class="sumit gold"><span class="k2">오늘 지정</span><span class="v2">' + 오늘수 + '</span></div>'
+    + '<div class="sumit warn"><span class="k2">코멘트 요청</span><span class="v2">' + 요청수 + '</span></div>'
+    + '<div class="sumit teal"><span class="k2">안 읽은 코멘트</span><span class="v2">' + 안읽음 + '</span></div>'
+    + '<div class="sumit warn"><span class="k2">2주 넘게 안 옴</span><span class="v2">' + 뜸한수 + '</span></div>'
+    + '</div>';
+
+  if(!rows.length) return 요약 + '<div class="empty">해당하는 회원이 없어요</div>';
+
+  const 상태 = i => i.today ? 'gold' : (i.gap===null ? '' : (i.gap>=14 ? 'warn' : (i.gap>=7 ? 'warn' : 'teal')));
+  const 표 = '<div class="mwrap"><table class="mtb"><thead><tr>'
+    + '<th style="width:26px"></th><th>이름</th><th>담당</th><th>마지막 운동</th>'
+    + '<th class="n">이번 주</th><th class="n">루틴</th><th>봐 주세요</th><th>오늘</th>'
+    + '</tr></thead><tbody>'
+    + rows.map(function(o){ const m=o.m, i=o.i;
+        return '<tr data-m="' + esc(m.id) + '">'
+        + '<td><span class="dot2 ' + 상태(i) + '"></span></td>'
+        + '<td><div class="nm2">' + esc(m.name) + '</div></td>'
+        + '<td><span class="sub3">' + esc(m.trainer||'담당 없음') + '</span></td>'
+        + '<td>' + (i.gap===null
+            ? '<span class="sub3">기록 없음</span>'
+            : '<span style="font-weight:700">' + dayText(i.last) + '</span>'
+              + (i.gap>=7 ? ' <span class="tag warn">' + i.gap + '일째</span>' : ''))
+          + '</td>'
+        + '<td class="n"><span class="numbig ' + (i.week?'':'zero') + '">' + i.week + '</span>'
+          + '<span class="sub3">번</span></td>'
+        + '<td class="n"><span class="numbig ' + (i.routines?'':'zero') + '">' + i.routines + '</span>'
+          + '<span class="sub3">개</span></td>'
+        + '<td>' + (i.ask ? '<span class="tag warn">요청 ' + i.ask + '</span> ' : '')
+          + (i.newcm ? '<span class="tag teal">안 읽음 ' + i.newcm + '</span>' : '')
+          + (!i.ask && !i.newcm ? '<span class="sub3">—</span>' : '') + '</td>'
+        + '<td>' + (i.today ? '<span class="tag gold">' + esc(i.today.kind||'지정') + '</span>'
+            : '<span class="sub3">—</span>') + '</td>'
+        + '</tr>'; }).join('')
+    + '</tbody></table></div>';
+
+  return 요약 + 표;
 }
 
 /* ── 회원 상세 · 루틴 ── */
