@@ -298,12 +298,19 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .blhd{display:grid;grid-template-columns:58px 1fr 1fr 1fr;gap:4px;padding:0 2px 6px}
 .blhd span{font-size:10.5px;font-weight:700;color:#75706a;text-align:right}
 .blhd span:first-child{text-align:left}
-.figbox{background:var(--dark-2);border:1px solid var(--line);border-radius:16px;padding:10px 8px 6px;flex:0 0 auto}
+.figbox{background:var(--dark-2);border:1px solid var(--line);border-radius:16px;padding:10px 8px 6px;flex:0 0 auto;
+  touch-action:pan-y;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+.figbox svg{display:block;margin:0 auto;cursor:grab}
+.figcap{text-align:center;font-size:12px;font-weight:700;color:#8f8a83;margin-top:3px}
+.figcap b{color:var(--gold)}
 .figls{display:flex;flex-direction:column;gap:0}
 .figls .fl{display:flex;gap:8px;align-items:baseline;padding:7px 2px;border-top:1px solid var(--line)}
 .figls .fl b{font-size:11px;font-weight:800;color:var(--gold-2);min-width:26px}
 .figls .fl span{font-size:13px;font-weight:600;color:var(--cream);flex:1}
 .figls .fl i{font-style:normal;font-size:12px;font-weight:700;color:#8f8a83}
+.figls .fl{border-radius:9px;transition:background .12s}
+.figls .fl.on{background:var(--gold-dim)}
+.figls .fl.on span{color:var(--gold)}
 .mkwrap{position:relative;width:100%;aspect-ratio:3/4;border-radius:12px;overflow:hidden;background:#000;
   border:1px solid var(--line)}
 .mkwrap img{width:100%;height:100%;object-fit:cover;display:block}
@@ -675,7 +682,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '76';
+const BUILD = '77';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -895,7 +902,7 @@ function go(sc, patch){
       wid:S.wid, redit:S.redit, twid:S.twid, tab:S.tab, ttab:S.ttab, pickPart:S.pickPart,
       day:S.day, dietDay:S.dietDay, fbDay:S.fbDay, fbMode:S.fbMode, fbPart:S.fbPart,
       tfDay:S.tfDay, tfeed:S.tfeed, anaP:S.anaP, anaG:S.anaG, anaB:S.anaB, rgrp:S.rgrp,
-      anaT:S.anaT, bpPose:S.bpPose, bpL:S.bpL, bpR:S.bpR });
+      anaT:S.anaT, bpPose:S.bpPose, bpL:S.bpL, bpR:S.bpR, figA:S.figA, figSel:S.figSel });
     if(S.stack.length>30) S.stack.shift();
   }
   Object.assign(S, patch||{}); S.screen=sc; closeSheet(); render();
@@ -3136,59 +3143,151 @@ function logNear(mid, date){
   return bd <= 21 ? best : null;
 }
 
-/* ① 몸 그림 — 체크된 항목을 몸의 제자리에 찍습니다 (뒤에서 본 모습) */
+/* ① 3차원 관절 모형 — 체크된 항목을 몸의 제자리(앞뒤까지)에 찍고, 돌려서 봅니다
+   좌표 = [좌우, 위아래, 앞뒤]. 앞뒤(z)가 + 면 배 쪽, − 면 등 쪽입니다. */
 const BODY_MAP = {
-  c2:{y:21}, c3:{y:25,dx:7,lr:1}, c1:{y:29}, c4:{y:34},
-  s5:{y:37,dx:16,lr:1}, s4:{y:41,dx:16,lr:1}, s1:{y:45,dx:17,both:1},
-  s2:{y:49,dx:19,lr:1}, s3:{y:54,dx:21,lr:1}, s6:{y:66,dx:24,both:1},
-  t3:{y:47,dx:6,lr:1}, t1:{y:52}, t2:{y:60,dx:6,lr:1}, t4:{y:78},
-  l6:{y:91,dx:12,lr:1}, l1:{y:98}, l2:{y:98,dx:9,both:1}, l7:{y:105,dx:13,lr:1},
-  l5:{y:111,dx:8,both:1}, l3:{y:140,dx:11,both:1}, l4:{y:150,dx:12,both:1},
-  f1:{y:183,dx:12,both:1},
+  c2:{y:23, z:3},                    c1:{y:31, z:3},
+  c3:{y:27, dx:7,  z:0,  lr:1},      c4:{y:35, zab:[5,-5]},
+  s5:{y:38, dx:15, z:7,  lr:1},      s4:{y:41, dx:16, z:6,  lr:1},
+  s1:{y:45, dx:16, z:-4, both:1},    s2:{y:48, dx:17, z:2,  lr:1},
+  s3:{y:52, dx:18, z:2,  lr:1},      s6:{y:60, dx:20, zab:[5,-5], both:1},
+  t3:{y:46, dx:7,  z:-4, lr:1},      t1:{y:55, zab:[-7,-1]},
+  t2:{y:62, dx:7,  z:-4, lr:1},      t4:{y:76, zab:[-4,3]},
+  l6:{y:92, dx:13, z:-3, lr:1},      l1:{y:96, zab:[7,-7]},
+  l2:{y:99, dx:9,  z:2,  both:1},    l7:{y:100,dx:14, z:-5, lr:1},
+  l5:{y:108,dx:8,  zab:[6,3], both:1},
+  l3:{y:140,dx:11, z:3,  both:1},    l4:{y:150,dx:12, z:2,  both:1},
+  f1:{y:184,dx:12, z:0,  both:1},
 };
-/* 관절 자리 — 뼈대와 점이 같은 자리를 쓰도록 한곳에 적어 둡니다 */
-const JOINTS = [[50,29],[34,41],[66,41],[50,53],[26,66],[74,66],[22,90],[78,90],
-  [50,79],[41,98],[59,98],[39,140],[61,140],[38,181],[62,181]];
-function bodyFig(checks){
-  const dots = [];
-  BODY_TESTS.forEach(t => {
-    const v = (checks||{})[t.k]; if(!v) return;
-    const m = BODY_MAP[t.k] || {y:100}, dx = m.dx || 0;
-    if(m.both){ dots.push([50-dx, m.y]); dots.push([50+dx, m.y]); }
-    else if(m.lr) dots.push([v==='a' ? 50-dx : 50+dx, m.y]);
-    else dots.push([50, m.y]);
+/* 관절 자리 [좌우, 위아래, 앞뒤] */
+const J3 = {
+  neck:[50,29,0], shL:[34,41,0], shR:[66,41,0], thx:[50,53,-4],
+  elL:[26,66,3], elR:[74,66,3], wrL:[22,90,4], wrR:[78,90,4], lum:[50,79,-2],
+  hipL:[41,98,0], hipR:[59,98,0], knL:[39,140,2], knR:[61,140,2],
+  anL:[38,181,-2], anR:[62,181,-2], toL:[37,190,9], toR:[63,190,9],
+};
+const BONES3 = [['neck','shL'],['neck','shR'],['shL','elL'],['elL','wrL'],
+  ['shR','elR'],['elR','wrR'],['hipL','hipR'],
+  ['hipL','knL'],['knL','anL'],['hipR','knR'],['knR','anR'],['anL','toL'],['anR','toR']];
+const HEAD3 = [50,14,1];
+
+/* 켜진 항목에 따라 척추 곡선이 실제로 휩니다 */
+function spine3(c){
+  c = c || {};
+  const P = [[30,2],[38,-1],[46,-4],[55,-5],[66,-4],[75,-1],[84,2],[92,0],[98,-1]];
+  const neck = (c.c1==='b' || c.c2==='a') ? 4 : (c.c1==='a' || c.c2==='b') ? -2 : 0;  /* 거북목 / 일자목 */
+  const thx  = c.t1==='a' ? -4 : c.t1==='b' ? 3 : 0;                                  /* 라운드백 / 플랫백 */
+  const lum  = c.l1==='a' ? 4 : c.l1==='b' ? -4 : 0;                                  /* 전방경사 / 후방경사 */
+  return P.map(([y,z]) => {
+    if(y <= 40) z += neck;
+    else if(y <= 66) z += thx;
+    else if(y <= 92) z += lum;
+    return [50, y, z];
   });
-  return `<svg viewBox="0 0 100 200" style="height:334px;width:auto;display:block;margin:0 auto">
-    <line x1="50" y1="4" x2="50" y2="197" stroke="#37312b" stroke-width="0.7" stroke-dasharray="2.5 3.5"/>
-    <g stroke="#4e463c" stroke-width="7" stroke-linecap="round" fill="none">
-      <path d="M50 29 L50 98"/>
-      <path d="M34 41 L66 41"/>
-      <path d="M41 98 L59 98"/>
-      <path d="M34 41 L26 66 L22 90"/>
-      <path d="M66 41 L74 66 L78 90"/>
-      <path d="M41 98 L39 140 L38 181"/>
-      <path d="M59 98 L61 140 L62 181"/>
-    </g>
-    <g stroke="#4e463c" stroke-width="5.4" stroke-linecap="round" fill="none">
-      <path d="M38 181 L30 190"/><path d="M62 181 L70 190"/>
-      <path d="M22 90 L19 98"/><path d="M78 90 L81 98"/>
-    </g>
-    <circle cx="50" cy="14" r="10.6" fill="#332e29" stroke="#6e6459" stroke-width="1.8"/>
-    ${JOINTS.map(([x,y])=>`<circle cx="${x}" cy="${y}" r="5" fill="#746a5c" stroke="#9a8d7d" stroke-width="1.1"/>`).join('')}
-    <text x="4" y="9" font-size="8" font-weight="800" fill="#75706a">L 왼쪽</text>
-    <text x="70" y="9" font-size="8" font-weight="800" fill="#75706a">오른쪽 R</text>
-    ${dots.map(([x,y])=>`<circle cx="${x}" cy="${y}" r="8.4" fill="var(--gold)" opacity=".18"/>
-      <circle cx="${x}" cy="${y}" r="3.8" fill="var(--gold)" stroke="#241d12" stroke-width="0.8"/>`).join('')}
-  </svg>
-  <div class="sm" style="text-align:center;color:#75706a;margin-top:2px">뒤에서 본 관절 모형 · L / R 그대로</div>`;
 }
+function ring3(y, rx, rz, n){
+  const a = [];
+  for(let i=0;i<n;i++){ const t = i/n*Math.PI*2; a.push([50+Math.cos(t)*rx, y, Math.sin(t)*rz]); }
+  a.push(a[0]); return a;
+}
+/* 항목 하나가 어디에 찍히는지 — [좌우, 위아래, 앞뒤] 목록 */
+function dotsOf(t, v){
+  const m = BODY_MAP[t.k] || {y:100};
+  const dx = m.dx || 0;
+  const z = m.zab ? (v==='a' ? m.zab[0] : m.zab[1]) : (m.z || 0);
+  if(m.both) return [[50-dx, m.y, z], [50+dx, m.y, z]];
+  if(m.lr)   return [[v==='a' ? 50-dx : 50+dx, m.y, z]];
+  return [[50, m.y, z]];
+}
+
+const FIG_F = 340;
+const figRot = (q, a) => { const dx=q[0]-50, dz=q[2], c=Math.cos(a), s2=Math.sin(a);
+  return [50 + dx*c + dz*s2, q[1], -dx*s2 + dz*c]; };
+const figPrj = q => { const k = FIG_F/(FIG_F - q[2]); return [50+(q[0]-50)*k, 102+(q[1]-102)*k, q[2], k]; };
+const figOp  = z => Math.max(0.28, Math.min(1, 0.42 + 0.58*(z+16)/32)).toFixed(2);
+
+function bodyFig(checks){
+  return `<div class="figbox" id="fig3d">${figInner(checks)}</div>`;
+}
+function figInner(checks){
+  const c = checks || {}, a = S.figA || 0;
+  const P = q => figPrj(figRot(q, a));
+  const line = (pts, w, col) => {
+    const d = pts.map((q,i)=>{ const p=P(q); return (i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1); }).join(' ');
+    const z = pts.reduce((t,q)=>t+figRot(q,a)[2], 0)/pts.length;
+    return `<path d="${d}" fill="none" stroke="${col||'#4e463c'}" stroke-width="${w}"
+      stroke-linecap="round" stroke-linejoin="round" opacity="${figOp(z)}"/>`;
+  };
+
+  /* 몸통 · 골반 테 — 돌릴 때 두께가 보이게 */
+  let g = '';
+  [ring3(45,15,10,16), ring3(71,13.5,9,16), ring3(98,11.5,8,16)].forEach(r => g += line(r, 1.4, '#443d35'));
+  const ct = ring3(45,15,10,16), cb = ring3(71,13.5,9,16);
+  for(let i=0;i<16;i+=4) g += line([ct[i], cb[i]], 1.2, '#443d35');
+  g += line(spine3(c), 3.4, '#5a5147');
+  BONES3.forEach(b => g += line([J3[b[0]], J3[b[1]]], 6.6));
+  g += line([J3.wrL,[19,98,5]], 5, '') + line([J3.wrR,[81,98,5]], 5, '');
+
+  /* 관절 */
+  const jt = Object.keys(J3).map(k=>P(J3[k])).sort((x,y)=>x[2]-y[2]);
+  let jg = jt.map(p=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="${(4.4*p[3]).toFixed(2)}"
+    fill="#746a5c" stroke="#9a8d7d" stroke-width="1" opacity="${figOp(p[2])}"/>`).join('');
+  const hp = P(HEAD3);
+  jg += `<circle cx="${hp[0].toFixed(1)}" cy="${hp[1].toFixed(1)}" r="${(10.4*hp[3]).toFixed(2)}"
+    fill="#332e29" stroke="#6e6459" stroke-width="1.7"/>`;
+
+  /* 켜진 항목 */
+  const marks = [];
+  BODY_TESTS.forEach(t => { const v = c[t.k]; if(!v) return;
+    dotsOf(t, v).forEach(q => marks.push({ p:P(q), k:t.k })); });
+  marks.sort((x,y)=>x.p[2]-y.p[2]);
+  const mg = marks.map(m => { const p = m.p, on = (S.figSel === m.k);
+    return `<g data-act="figk:${m.k}" style="cursor:pointer">
+      <circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="${(9*p[3]).toFixed(2)}" fill="transparent"/>
+      <circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="${((on?9.6:7.8)*p[3]).toFixed(2)}"
+        fill="var(--gold)" opacity="${on?'.3':'.17'}"/>
+      <circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="${((on?4.6:3.6)*p[3]).toFixed(2)}"
+        fill="var(--gold)" stroke="${on?'var(--cream)':'#241d12'}" stroke-width="0.8" opacity="${figOp(p[2])}"/>
+    </g>`; }).join('');
+
+  const deg = ((Math.round(a*180/Math.PI) % 360) + 360) % 360;
+  const face = deg<45||deg>=315 ? '앞' : deg<135 ? '오른쪽 옆' : deg<225 ? '뒤' : '왼쪽 옆';
+  const sel = S.figSel ? BODY_TESTS.find(t=>t.k===S.figSel) : null;
+
+  return `<div class="seg" style="margin-bottom:8px">${
+      [['앞',0],['오른쪽 옆',90],['뒤',180],['왼쪽 옆',270]].map(([n,d])=>
+      `<button class="${Math.abs(((deg-d)%360+360)%360)<8?'on':''}" data-act="figa:${d}">${n}</button>`).join('')}</div>
+    <svg viewBox="0 0 100 205" style="height:330px;width:auto">
+      <line x1="50" y1="4" x2="50" y2="202" stroke="#37312b" stroke-width="0.7" stroke-dasharray="2.5 3.5"/>
+      ${g}${jg}${mg}
+    </svg>
+    <div class="figcap">${sel ? `<b>${esc(sel.t)}</b> · ${esc(sel.g)}`
+      : `${esc(face)}에서 본 모습 · ${deg}도`}</div>
+    <div class="figcap" style="font-weight:600;color:#6f6a64;margin-top:1px">좌우로 끌어서 돌려 보세요</div>`;
+}
+function drawFig(){
+  const el = document.getElementById('fig3d'); if(!el) return;
+  el.innerHTML = figInner(checksOf(figMid()));
+}
+function figMid(){ return (S.screen === 'body') ? subj() : anaMid(); }
+/* 그 점이 가장 잘 보이는 쪽으로 돌립니다 */
+function figFace(k){
+  const t = BODY_TESTS.find(x=>x.k===k); if(!t) return;
+  const v = checksOf(figMid())[k]; if(!v) return;
+  const q = dotsOf(t, v)[0], dx = q[0]-50, dz = q[2];
+  if(Math.abs(dx) < 1 && Math.abs(dz) < 1) return;
+  S.figA = Math.atan2(-dx, dz);
+}
+
 function figList(checks){
   const on = BODY_TESTS.filter(t => (checks||{})[t.k]);
   if(!on.length) return '<div class="empty">표시된 항목이 없어요</div>';
   return `<div class="figls">${on.map(t=>{
     const v = (checks||{})[t.k];
-    return `<div class="fl"><b>${esc(t.g)}</b><span>${esc(t.t)}</span><i>${esc(v==='a'?t.a:t.b)}</i></div>`;
-  }).join('')}</div>`;
+    return `<div class="fl ${S.figSel===t.k?'on':''}" data-act="figk:${t.k}">
+      <b>${esc(t.g)}</b><span>${esc(t.t)}</span><i>${esc(v==='a'?t.a:t.b)}</i></div>`;
+  }).join('')}</div>
+  <div class="note">줄이나 점을 누르면 <b>그 자리가 잘 보이는 쪽으로</b> 모형이 돌아갑니다.</div>`;
 }
 
 /* ② 좌우 저울 */
@@ -3484,7 +3583,7 @@ function bodyPane(mid){
 
     <div class="hr"></div>
     <span class="lbl">체형 한눈에 · ${done}개 표시됨</span>
-    <div class="figbox">${bodyFig(b.checks)}</div>
+    ${bodyFig(b.checks)}
     ${figList(b.checks)}
 
     <span class="lbl">좌우 균형</span>
@@ -4175,6 +4274,24 @@ document.addEventListener('input', ev=>{
   });
 });
 
+/* 관절 모형 — 좌우로 끌면 돌아갑니다 */
+let figDrag = null, figMoved = false;
+document.addEventListener('pointerdown', ev=>{
+  const box = ev.target.closest && ev.target.closest('#fig3d');
+  if(!box) return;
+  figDrag = { x: ev.clientX, a: S.figA || 0 }; figMoved = false;
+});
+document.addEventListener('pointermove', ev=>{
+  if(!figDrag) return;
+  const d = ev.clientX - figDrag.x;
+  if(Math.abs(d) > 3) figMoved = true;
+  if(!figMoved) return;
+  S.figA = figDrag.a + d * 0.013;
+  drawFig();
+});
+document.addEventListener('pointerup', ()=>{ figDrag = null; });
+document.addEventListener('pointercancel', ()=>{ figDrag = null; figMoved = false; });
+
 document.addEventListener('click', ev=>{
   const el=ev.target.closest('[data-act]'); if(!el) return;
   const a=el.getAttribute('data-act'), [k,...rest]=a.split(':'), w=live();
@@ -4537,6 +4654,12 @@ document.addEventListener('click', ev=>{
     case 'sub': S.subj=S.mid; go(rest[0]); return;
     case 'tsub': S.subj=rest[1]; S.tmid=rest[1]; go(rest[0]); return;
     case 'anat': S.anaT = rest[0]; render(); return;
+    case 'figa': S.figA = Number(rest[0]) * Math.PI/180; S.figSel = null; drawFig(); return;
+    case 'figk': { if(figMoved) return;
+      const k = rest[0];
+      S.figSel = (S.figSel === k) ? null : k;
+      if(S.figSel) figFace(S.figSel);
+      render(); return; }
     case 'blm': S.blM = rest[0]; render(); return;
     case 'bladd': { S.blDate = TODAY; sheetBlAdd(rest[0]); return; }
     case 'blgo': blSave(rest[0]); return;
