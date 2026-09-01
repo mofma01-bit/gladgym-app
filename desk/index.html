@@ -228,22 +228,28 @@ textarea.inp{min-height:76px;resize:vertical;line-height:1.6}
 
 /* 체형 체크 — 세 갈래 버튼 */
 /* 달력 */
-.cal{background:var(--dark-2);border:1px solid var(--line);border-radius:12px;padding:10px 11px}
-.calhd{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-.calhd .m{font-size:12.5px;font-weight:800;flex:1}
-.calhd .ib{width:24px;height:24px;font-size:12px}
-.calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
-.calgrid .wd{font-size:10px;font-weight:700;color:var(--sub);text-align:center;padding:2px 0}
-.cd{height:27px;border-radius:7px;display:flex;flex-direction:row;align-items:center;
-  justify-content:center;gap:3px;font-size:11.5px;font-weight:700;color:#5d5952;
-  border:1px solid transparent}
-.cd.in{color:#ded7cd}
+.cal{background:var(--dark-2);border:1px solid var(--line);border-radius:11px;padding:8px 9px}
+.calhd{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.calhd .m{font-size:12px;font-weight:800;flex:1}
+.calhd .ib{width:21px;height:21px;font-size:11px}
+.calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px}
+.calgrid .wd{font-size:9.5px;font-weight:700;color:#605b54;text-align:center;padding:1px 0}
+.cd{height:23px;border-radius:6px;display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:#4f4b45;border:1px solid transparent;position:relative}
+.cd.in{color:#948e86}
 .cd:hover{background:var(--dark-3)}
-.cd.has{background:var(--dark-3);color:var(--cream)}
+.cd.has{color:var(--gold);font-weight:800}
 .cd.sel{border-color:var(--teal);background:var(--teal-dim);color:var(--teal)}
-.cd.today{border-color:var(--gold-2)}
-.cd .dt{width:4px;height:4px;border-radius:50%;background:var(--gold);flex:none}
-.cd .dt.as{background:var(--teal)}
+.cd.today{background:var(--dark-4);color:var(--cream)}
+.cd.today.has{color:var(--gold)}
+.cd .dt{display:none}
+
+/* 아래로 길게 — 스크롤로 다 본다 */
+.listbox{max-height:calc(100vh - 430px);min-height:200px;overflow-y:auto;
+  display:flex;flex-direction:column;gap:7px;padding-right:3px}
+.listbox::-webkit-scrollbar{width:7px}
+.listbox::-webkit-scrollbar-thumb{background:#34342f;border-radius:4px}
+.listbox::-webkit-scrollbar-track{background:transparent}
 
 /* 최근 7일 */
 .wk{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}
@@ -382,7 +388,7 @@ textarea.inp{min-height:76px;resize:vertical;line-height:1.6}
 
 <script>
 "use strict";
-const BUILD = '12';
+const BUILD = '13';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -658,8 +664,18 @@ function dayCal(있는날, sel, attr){
 function tabRecord(){
   const ws = D.w.filter(w=>w.member_id===S.mid)
                 .sort((a,b)=> a.on_date < b.on_date ? 1 : -1);
+  const sel0 = S.day || (ws[0] ? ws[0].id : null);
+  const 목록 = ws.length ? '<div class="listbox">' + ws.map(function(x){
+      const n = M.wi.filter(y=>y.workout_id===x.id).length;
+      return '<button class="card click rowc ' + (x.id===sel0?'teal':'') + '" data-day="' + esc(x.id) + '">'
+        + '<div><div class="t1">' + dateFull(x.on_date) + ' · ' + esc(x.kind||'') + '</div>'
+        + '<div class="t2">' + esc(x.title||'') + ' · ' + n + '종목' + (x.dur ? ' · ' + mmss(x.dur) : '') + '</div></div>'
+        + (x.done ? '<span class="tag">끝</span>' : '<span class="tag gold">하는 중</span>')
+        + '</button>'; }).join('') + '</div>'
+    : '<div class="empty">아직 운동 기록이 없어요</div>';
   const 왼쪽 = '<div class="lbl">최근 7일</div>' + weekStrip()
-    + '<div class="lbl" style="margin-top:10px">달력</div>' + calendar();
+    + '<div class="lbl" style="margin-top:9px">달력</div>' + calendar()
+    + '<div class="lbl" style="margin-top:11px">수업 · 개인운동 기록 ' + ws.length + '건</div>' + 목록;
 
   if(!ws.length) return '<div class="cols"><div class="sec">'
     + '<div class="empty">아직 운동 기록이 없어요</div></div>'
@@ -721,32 +737,33 @@ function tabComment(){
   const 있는날 = new Set(ws.map(w=>w.on_date));
   const day = S.cday || (ws[0] ? ws[0].on_date : TODAY);
   const 그날 = ws.filter(w=>w.on_date===day);
-  const sel = (S.cmw && 그날.some(x=>x.id===S.cmw)) ? S.cmw : (그날[0] ? 그날[0].id : null);
-  const w = 그날.find(x=>x.id===sel) || null;
+  const sel = (S.cmw && ws.some(x=>x.id===S.cmw)) ? S.cmw : (그날[0] ? 그날[0].id : (ws[0]?ws[0].id:null));
+  const w = ws.find(x=>x.id===sel) || null;
 
   const 요청 = asks.length ? '<div class="card gold" style="margin-bottom:10px">'
     + '<div class="t1">봐 달라는 요청 ' + asks.length + '건</div>'
     + asks.map(a=>'<div class="t2">' + esc(vaName(a.variant_id)) + ' — '
         + esc(a.note||'따로 적은 말은 없습니다') + '</div>').join('') + '</div>' : '';
 
-  /* 오른쪽 — 날짜 고르기 + 그 날 기록 */
-  const 그날목록 = 그날.length ? 그날.map(function(x){
+  /* 오른쪽 — 날짜 고르기 + 수업·개인운동 기록 전부 (최근 것이 위) */
+  const 전체목록 = ws.length ? '<div class="listbox">' + ws.map(function(x){
     const its = M.wi.filter(y=>y.workout_id===x.id);
     const n = D.c.filter(c=>c.member_id===S.mid
       && (c.workout_id===x.id || (!c.workout_id && (c.created_at||'').slice(0,10)===x.on_date))).length;
     return '<button class="card click rowc ' + (x.id===sel?'teal':'') + '" data-cmw="' + esc(x.id) + '">'
-      + '<div><div class="t1">' + esc(x.kind||'') + ' · ' + esc(x.title||'') + '</div>'
-      + '<div class="t2">' + its.length + '종목' + (n ? ' · 코멘트 ' + n : ' · 코멘트 없음') + '</div></div>'
-      + (x.done ? '<span class="tag">끝</span>' : '<span class="tag gold">하는 중</span>')
-      + '</button>'; }).join('')
-    : '<div class="empty">이 날은 기록이 없어요</div>';
+      + '<div><div class="t1">' + dateFull(x.on_date) + ' · ' + esc(x.kind||'') + '</div>'
+      + '<div class="t2">' + esc(x.title||'') + ' · ' + its.length + '종목</div></div>'
+      + (n ? '<span class="tag teal">' + n + '</span>'
+           : (x.done ? '<span class="tag">끝</span>' : '<span class="tag gold">하는 중</span>'))
+      + '</button>'; }).join('') + '</div>'
+    : '<div class="empty">아직 기록이 없어요</div>';
 
   const 오른쪽 = 요청
     + '<div class="lbl">최근 7일</div>' + dayWeek(있는날, day, 'cday')
-    + '<div class="lbl" style="margin-top:12px">달력 — 날을 누르면 그 날만 보여요</div>'
+    + '<div class="lbl" style="margin-top:9px">달력</div>'
     + dayCal(있는날, day, 'cday')
-    + '<div class="lbl" style="margin-top:14px">' + dateFull(day) + ' · 기록 ' + 그날.length + '건</div>'
-    + 그날목록;
+    + '<div class="lbl" style="margin-top:11px">수업 · 개인운동 기록 ' + ws.length + '건</div>'
+    + 전체목록;
 
   /* 왼쪽 — 고른 수업의 종목마다 코멘트 */
   let 왼쪽;
@@ -800,16 +817,17 @@ function tabMeal(){
   const 지 = ms.reduce((a,m)=>a+(m.fat||0),0);
 
   const 오른쪽 = '<div class="lbl">최근 7일</div>' + dayWeek(있는날, day, 'mday')
-    + '<div class="lbl" style="margin-top:12px">달력 — 날을 누르면 그 날만 보여요</div>'
+    + '<div class="lbl" style="margin-top:9px">달력</div>'
     + dayCal(있는날, day, 'mday')
-    + '<div class="lbl" style="margin-top:14px">기록이 있는 날 ' + days.length + '일</div>'
-    + (days.length ? days.slice(0,20).map(function(d){
+    + '<div class="lbl" style="margin-top:11px">식단 기록 ' + days.length + '일</div>'
+    + (days.length ? '<div class="listbox">' + days.map(function(d){
         const n = M.meals.filter(x=>x.on_date===d);
         const k = n.reduce((a,m)=>a+(m.kcal||0),0);
         return '<button class="card click rowc ' + (d===day?'teal':'') + '" data-mday="' + d + '">'
           + '<div><div class="t1">' + dateFull(d) + '</div>'
           + '<div class="t2">' + n.length + '끼' + (k ? ' · ' + k.toLocaleString() + 'kcal' : '') + '</div></div>'
-          + '</button>'; }).join('')
+          + (n.filter(x=>x.path).length ? '<span class="tag">사진 ' + n.filter(x=>x.path).length + '</span>' : '')
+          + '</button>'; }).join('') + '</div>'
       : '<div class="empty">아직 식단 기록이 없어요</div>');
 
   const 카드 = ms.length ? '<div class="mealgrid">' + ms.map(function(m){
@@ -1359,7 +1377,10 @@ document.addEventListener('click', async function(ev){
   if(md){ S.mday = md.dataset.mday; render(); return; }
 
   const cw = t.closest('[data-cmw]');
-  if(cw){ S.cmw = cw.dataset.cmw; S.cmopen = null; render(); return; }
+  if(cw){ S.cmw = cw.dataset.cmw; S.cmopen = null; S.cmprev = null;
+    const w0 = D.w.find(x=>x.id===S.cmw);
+    if(w0){ S.cday = w0.on_date; S.calMonth = w0.on_date.slice(0,7); }
+    render(); return; }
 
   const eb = t.closest('[data-edit]');
   if(eb){ const k = eb.dataset.edit; S.edit[k] = !S.edit[k];
