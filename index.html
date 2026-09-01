@@ -406,6 +406,20 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 @keyframes lift{0%,100%{transform:translateY(0)}50%{transform:translateY(26px)}}
 @media (prefers-reduced-motion:reduce){.demo .bar{animation:none}}
 
+.demo2{background:var(--dark-2);border:1px solid var(--line);border-radius:13px;height:252px;
+  position:relative;overflow:hidden;flex:none}
+.demo2 img{position:absolute;left:0;right:0;margin:0 auto;bottom:22px;height:calc(100% - 34px);
+  width:auto;max-width:96%;object-fit:contain;display:block}
+.demo2 img.a{animation:dmA 2.6s ease-in-out infinite}
+.demo2 img.b{animation:dmB 2.6s ease-in-out infinite}
+@keyframes dmA{0%,38%{opacity:1}46%,88%{opacity:0}96%,100%{opacity:1}}
+@keyframes dmB{0%,38%{opacity:0}46%,88%{opacity:1}96%,100%{opacity:0}}
+.demo2 .cap{position:absolute;left:0;right:0;bottom:7px;text-align:center;z-index:2;
+  font-size:11.5px;font-weight:500;color:var(--sub)}
+.demo2.off img{animation:none}
+.demo2.off img.b{opacity:0}
+@media (prefers-reduced-motion:reduce){.demo2 img{animation:none}.demo2 img.b{opacity:0}}
+
 .vbox{background:#0e0e0d;border:1px solid var(--line);border-radius:12px;height:120px;width:100%;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
 .vbox .play{width:42px;height:42px;border-radius:50%;background:var(--teal);color:#0d2027;
@@ -632,6 +646,19 @@ const exOf = id => (id==='memo' ? MEMO_EX : EX.find(x=>x.id===id))
 const MEMO_EX = { id:'memo', n:'운동 메모', p:'기타', e:'자유 입력', cardio:0, memo:1,
   vars:[{k:'a', n:'', desc:'', demo:0}] };
 
+/* ── 시범 그림 ── 시작 자세와 끝 자세 두 장을 번갈아 보여준다.
+   그림이 아직 없는 벌은 예전 「자리」 표시를 그대로 둔다.            */
+const demoURL = p => SB_URL + '/storage/v1/object/public/media/' + p;
+const demoBox = (e, v) => v.du
+  ? `<div class="demo2" data-act="demotoggle">
+      <img class="a" src="${demoURL(v.du + '_1.png')}" alt="시작 자세">
+      <img class="b" src="${demoURL(v.du + '_2.png')}" alt="끝 자세">
+      <span class="cap">시범 · ${esc(e.n)}${v.n ? ` — ${esc(v.n)}` : ''}</span></div>`
+  : (v.demo
+    ? `<div class="demo"><div class="fig"><div class="bar"></div><div class="bod"></div></div>
+      <span class="cap">시범 영상 자리${v.n ? ` — ${esc(v.n)}` : ''}</span></div>`
+    : '');
+
 let MEMBERS = [];
 let TRAINER = '양인수';
 
@@ -682,7 +709,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '79';
+const BUILD = '80';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -792,7 +819,7 @@ async function boot(){
   ]);
 
   EX = exs.map(e => ({ id:e.id, n:e.name, p:e.part, e:e.equip, cardio: e.cardio ? 1 : 0,
-    vars: vrs.filter(v => v.ex_id === e.id).map(v => ({ k:v.vkey, n:v.name||'', desc:v.descr||'', demo: v.demo?1:0 })) }));
+    vars: vrs.filter(v => v.ex_id === e.id).map(v => ({ k:v.vkey, n:v.name||'', desc:v.descr||'', demo: v.demo?1:0, du: v.demo_url||'' })) }));
   MEMBERS = mems.filter(m => m.role === 'member').map(m => ({ id:m.id, n:m.name, tr:m.trainer }));
   const t = mems.find(m => m.role === 'trainer'); if(t) TRAINER = t.name;
 
@@ -1551,8 +1578,7 @@ function vWorkout(){
     top: bar(e.n, (w.startAt ? `<span class="tm" id="tm">${mmss((Date.now()-w.startAt)/1000)}</span>`
       : `<button class="chip t" data-act="timego">시간 재기 ▶</button>`), 'go:home', v.n||''),
     keepScroll:true, body:`
-    ${v.demo?`<div class="demo"><div class="fig"><div class="bar"></div><div class="bod"></div></div>
-      <span class="cap">시범 영상 자리${v.n?` — ${esc(v.n)}`:''}</span></div>`:''}
+    ${demoBox(e, v)}
     ${tr?`<button class="card teal" data-act="tlive:${wmid}">
       <div class="nm t">${esc((MEMBERS.find(m=>m.id===wmid)||{}).n||'')} 회원 수업 기록 중</div>
       <div class="sm">종목별로 코멘트를 남기려면 여기 ›</div></button>`:''}
@@ -1614,7 +1640,7 @@ function sheetExDesc(exid, vk, mid){
         ${isEdited(mid,exid,vk)?'<span class="pill q">이 회원용</span>':'<span class="pill q">공통</span>'}
         ${tr?`<button class="chip t" style="margin-left:auto" data-act="editdesc:${exid}:${vk}">고치기</button>`:''}</div>
         <div class="tx">${dsc? esc(dsc) : '아직 설명이 없어요'+(tr?' — 고치기를 눌러 적어 주세요':'')}</div></div>
-      ${v.demo?`<div class="vbox"><span class="play">▶</span><span class="cap">시범 영상${v.n?` · ${esc(v.n)}`:''} — 직접 찍은 GIF</span></div>`:''}
+      ${demoBox(exOf(exid), v)}
       <span class="lbl">코멘트 ${cms.length?`${cms.length}개`:''}</span>
       ${cms.length? cms.map(c=>`<div class="cm">
         <span class="who">${esc(c.tr)} 트레이너 · ${esc(c.at)}</span>
@@ -4892,6 +4918,8 @@ document.addEventListener('click', ev=>{
       cur.sets.pop(); cur.sets[cur.sets.length-1].done=false; save(); toast('한 세트 되돌렸어요'); render(); return; }
     case 'rest': sheetRest(); return;
     case 'askcancel': sheetCancel(); return;
+    /* 시범 그림 — 눌러서 멈추고 다시 눌러 움직이기 */
+    case 'demotoggle': el.classList.toggle('off'); return;
     case 'rp': S.rest={sec:+rest[0], until:null}; drawSheet(); return;
     case 'rd': { if(S.rest.until) S.rest.until+=(+rest[0])*1000; else S.rest.sec=Math.max(10,S.rest.sec+(+rest[0])); drawSheet(); return; }
     case 'rgo': S.rest.until=Date.now()+S.rest.sec*1000; drawSheet(); return;
