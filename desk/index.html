@@ -153,6 +153,7 @@ img{max-width:100%;display:block}
 .btn.sm{padding:7px 12px;font-size:12.5px}
 .btn:disabled{opacity:.4;cursor:default}
 
+.hr2{height:1px;background:var(--line);margin:3px 0}
 .fld{display:flex;flex-direction:column;gap:5px}
 .fld .fn{font-size:11.5px;font-weight:600;color:var(--sub)}
 .inp,textarea.inp{background:var(--dark-3);border:1px solid var(--line);border-radius:9px;
@@ -388,7 +389,7 @@ textarea.inp{min-height:76px;resize:vertical;line-height:1.6}
 
 <script>
 "use strict";
-const BUILD = '13';
+const BUILD = '14';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -396,6 +397,11 @@ const $ = s => document.querySelector(s);
 const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c =>
   ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const media = p => p ? SB_URL+'/storage/v1/object/public/media/'+p : '';
+
+/* 다음 개인운동 추천 — 날짜 없이 두 자리로 담아 둔다 (먼저 / 나중) */
+const RECO1 = '9999-12-31';   /* 먼저 추천된 루틴 */
+const RECO2 = '9999-12-30';   /* 나중에 추천된 루틴 — 새로 추천하면 이 자리가 바뀐다 */
+const isReco = d => d===RECO1 || d===RECO2;
 
 const TODAY = (()=>{ const d=new Date(), p=n=>String(n).padStart(2,'0');
   return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); })();
@@ -1064,6 +1070,10 @@ function vRoutine(){
     + ['수업','개인운동'].map(k => '<button class="chip ' + (S.kind===k?'on':'') + '" data-kind="'
         + k + '">' + k + '</button>').join('') + '</div>'
     + '<button class="btn gold" data-act="assign">' + esc(S.kind) + '으로 지정하기</button>'
+    + '<div class="hr2"></div>'
+    + '<button class="btn sub" data-act="reco">다음 개인운동에 추천하기</button>'
+    + '<div class="t2" style="line-height:1.6">날짜를 안 정합니다. 회원이 <b>다음에 개인운동을 기록할 때</b> 앱 첫 화면에 뜨고,'
+    + ' 그 기록을 마치면 사라집니다. 최대 2개까지 — 새로 추천하면 <b>나중 자리</b>가 바뀝니다.</div>'
     + assignedList(r.member_id)
     + '</div>'
     + (canEdit('routine') ? '<button class="btn ghost" data-act="rdel">이 루틴 지우기</button>' : '')
@@ -1071,18 +1081,35 @@ function vRoutine(){
 }
 
 /* 이 회원에게 이미 지정된 날들 */
+function recosOf(mid){
+  const g = d => D.aAll.find(x=>x.member_id===mid && x.on_date===d) || null;
+  return [ {slot:'먼저 추천', at:RECO1, row:g(RECO1)}, {slot:'나중 추천', at:RECO2, row:g(RECO2)} ]
+         .filter(x=>x.row);
+}
 function assignedList(mid){
-  const rows = D.aAll.filter(x=>x.member_id===mid && x.on_date>=TODAY)
+  const recos = recosOf(mid);
+  const rows = D.aAll.filter(x=>x.member_id===mid && !isReco(x.on_date) && x.on_date>=TODAY)
     .sort((a,b)=> a.on_date < b.on_date ? -1 : 1);
-  if(!rows.length) return '<div class="t2">아직 지정한 날이 없어요.</div>';
-  return '<div class="lbl" style="margin-top:4px">지정해 둔 날</div>'
-    + rows.map(function(x){ const r0 = D.r.find(y=>y.id===x.routine_id);
-      return '<div class="card rowc" style="padding:9px 11px"><div>'
-        + '<div class="t1" style="font-size:13px">' + dateFull(x.on_date)
-        + (x.on_date===TODAY?' · 오늘':'') + '</div>'
-        + '<div class="t2">' + esc(x.kind||'') + (r0 ? ' · 루틴 ' + r0.no + ' ' + esc(r0.name) : '')
-        + '</div></div>'
-        + '<button class="ib" data-act="asdel" data-d="' + esc(x.on_date) + '">✕</button></div>'; }).join('');
+
+  const 추천 = '<div class="lbl" style="margin-top:8px">다음 개인운동 추천 ' + recos.length + '/2</div>'
+    + (recos.length ? recos.map(function(x){ const r0 = D.r.find(y=>y.id===x.row.routine_id);
+        return '<div class="card gold rowc" style="padding:9px 11px"><div>'
+          + '<div class="t1" style="font-size:13px">' + x.slot + '</div>'
+          + '<div class="t2">' + (r0 ? '루틴 ' + r0.no + ' · ' + esc(r0.name) : '루틴 없음') + '</div></div>'
+          + '<button class="ib" data-act="asdel" data-d="' + x.at + '">✕</button></div>'; }).join('')
+      : '<div class="t2">추천해 둔 루틴이 없어요.</div>');
+
+  const 날짜 = '<div class="lbl" style="margin-top:10px">날짜로 지정해 둔 날</div>'
+    + (rows.length ? rows.map(function(x){ const r0 = D.r.find(y=>y.id===x.routine_id);
+        return '<div class="card rowc" style="padding:9px 11px"><div>'
+          + '<div class="t1" style="font-size:13px">' + dateFull(x.on_date)
+          + (x.on_date===TODAY?' · 오늘':'') + '</div>'
+          + '<div class="t2">' + esc(x.kind||'') + (r0 ? ' · 루틴 ' + r0.no + ' ' + esc(r0.name) : '')
+          + '</div></div>'
+          + '<button class="ib" data-act="asdel" data-d="' + esc(x.on_date) + '">✕</button></div>'; }).join('')
+      : '<div class="t2">아직 지정한 날이 없어요.</div>');
+
+  return 추천 + 날짜;
 }
 
 /* ── 코멘트 모아보기 ── */
@@ -1705,6 +1732,27 @@ document.addEventListener('click', async function(ev){
       D.r = D.r.filter(x=>x.id!==r.id);
       S.view='member'; S.tab='routine'; toast('지웠습니다'); render();
     }catch(e){ toast('지우기 실패 — ' + e.message); }
+    return;
+  }
+  if(a==='reco'){
+    const r = D.r.find(x=>x.id===S.rid); if(!r) return;
+    const mid = r.member_id;
+    const 먼저 = D.aAll.find(x=>x.member_id===mid && x.on_date===RECO1);
+    const 나중 = D.aAll.find(x=>x.member_id===mid && x.on_date===RECO2);
+    if((먼저 && 먼저.routine_id===r.id) || (나중 && 나중.routine_id===r.id)){
+      toast('이미 추천해 둔 루틴이에요'); return; }
+    const 자리 = 먼저 ? RECO2 : RECO1;
+    const 밀림 = (자리===RECO2 && 나중) ? D.r.find(x=>x.id===나중.routine_id) : null;
+    try{
+      await ssend('assignments', 'POST',
+        [{ member_id:mid, on_date:자리, routine_id:r.id, kind:'개인운동', assigned_by:'트레이너' }],
+        'resolution=merge-duplicates');
+      D.aAll = D.aAll.filter(x=>!(x.member_id===mid && x.on_date===자리));
+      D.aAll.push({ member_id:mid, on_date:자리, routine_id:r.id, kind:'개인운동' });
+      toast(밀림 ? '나중 자리를 「' + 밀림.name + '」에서 바꿨어요'
+                 : (자리===RECO1 ? '먼저 추천으로 담았어요' : '나중 추천으로 담았어요'));
+      render();
+    }catch(e){ toast('추천 실패 — ' + e.message); }
     return;
   }
   if(a==='assign'){
