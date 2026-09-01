@@ -372,6 +372,25 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .opencard{background:var(--dark-2);border:1px solid #3a5b66;border-top:none;
   border-radius:0 0 14px 14px;padding:13px;margin:-9px 0 4px;
   display:flex;flex-direction:column;gap:9px}
+/* 직전 무게 — 접힌 한 줄이 기본, 누르면 3회분 펼침 */
+.prevb{background:#1c1c1a;border:1px solid var(--line);border-radius:11px;
+  padding:9px 11px;display:flex;flex-direction:column;gap:8px}
+.prevh{display:flex;align-items:center;gap:8px;width:100%;text-align:left}
+.prevh .pk{font-size:11.5px;font-weight:700;color:var(--sub);flex:none}
+.prevh .pv{font-size:14px;font-weight:800;letter-spacing:-.01em;color:var(--cream);
+  font-variant-numeric:tabular-nums;flex:1;min-width:0}
+.prevh .pv i{font-style:normal;color:#6f6a64;font-weight:600;margin:0 3px}
+.prevh .ar{font-size:12px;font-weight:800;flex:none}
+.prevh .ar.up{color:var(--gold)} .prevh .ar.down{color:var(--warn)}
+.prevh .cv{font-size:11px;font-weight:800;flex:none;padding:2px 7px;border-radius:6px;
+  background:#2e1c18;color:var(--warn)}
+.prevh .cx{font-size:12px;color:var(--sub);flex:none}
+.prevr{display:flex;align-items:center;gap:9px;padding:7px 0 0;border-top:1px solid #26262230}
+.prevr .rd{font-size:11.5px;font-weight:700;color:var(--sub);width:70px;flex:none;line-height:1.35}
+.prevr .rs{font-size:12.5px;font-weight:700;color:#ded7cd;flex:1;min-width:0;
+  font-variant-numeric:tabular-nums;line-height:1.4}
+.prevr .rb{font-size:11.5px;font-weight:800;color:var(--gold);background:var(--gold-dim);
+  border:1px solid #4a3d22;border-radius:8px;padding:5px 9px;flex:none}
 .exbig{font-size:21px;font-weight:800;letter-spacing:-.02em;color:var(--cream);line-height:1.25}
 .exbig small{display:block;font-size:13px;font-weight:500;color:var(--teal);margin-top:2px}
 .card.now2{border-color:#3a5b66;background:var(--teal-dim);border-radius:14px 14px 0 0;margin-bottom:0}
@@ -771,7 +790,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '93';
+const BUILD = '94';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1277,6 +1296,19 @@ function setGrp(rid, g){
 
 function estMin(r){ let s=0; r.items.forEach(i=>{ s+=i.sets*(40+(i.rest||60)); }); return Math.round(s/60/5)*5; }
 function workoutsOf(mid){ return D.workouts.filter(w=>w.mid===mid && w.done).slice().sort(byDateDesc); }
+/* 직전 몇 회 — 끝낸 운동에서 이 종목을 최근 순으로 (수업·개인운동 다) */
+function lastRuns(ex, va, mid, n){
+  const out=[];
+  for(const w of workoutsOf(mid||S.mid)){
+    const it=w.items.find(i=>i.ex===ex && (va===undefined||i.va===va));
+    if(it && it.sets.length){
+      const ss=it.sets.filter(x=>x.done);
+      if(ss.length) out.push({ date:w.date, kind:w.kind||'', sets:ss });
+    }
+    if(out.length >= (n||3)) break;
+  }
+  return out;
+}
 function lastSet(ex,va,mid){
   for(const w of workoutsOf(mid||S.mid)){
     const it=w.items.find(i=>i.ex===ex && (va===undefined||i.va===va));
@@ -1604,6 +1636,50 @@ function sheetPickVar(exid){
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 
+/* 직전 무게 상자 — 종목 카드 안에 한 줄로 붙는다 */
+function prevBox(e, cur, mid){
+  if(isMemo(cur.ex)) return '';
+  const runs = lastRuns(cur.ex, cur.va, mid, 3);
+  const 단위 = e.cardio ? '분' : 'kg';
+  if(!runs.length) return `<div class="prevb"><div class="prevh">
+    <span class="pk">지난 기록</span>
+    <span class="pv" style="color:var(--sub);font-weight:600">처음 하는 종목이에요</span></div></div>`;
+
+  const top = r => e.cardio ? Math.max(...r.sets.map(x=>+x.reps||0))
+                            : Math.max(...r.sets.map(x=>+x.kg||0));
+  const 값 = runs.map(top).reverse();                    /* 오래된 → 최근 */
+  const 최근 = 값[값.length-1], 이전 = 값.length>1 ? 값[값.length-2] : null;
+  const 방향 = 이전==null ? '' : (최근>이전 ? 'up' : (최근<이전 ? 'down' : ''));
+  const 화살 = 방향==='up' ? '↑' : (방향==='down' ? '↓' : '');
+
+  /* 지금 열려 있는 세트에 맞춰진 값과 견준다 */
+  const oi = cur.sets.findIndex(x=>!x.done);
+  const 지금 = oi>=0 ? (e.cardio ? +cur.sets[oi].reps : +cur.sets[oi].kg) : null;
+  const 다름 = (지금!=null && 최근!=null && 지금!==최근);
+
+  const 줄 = `<button class="prevh" data-act="prevopen">
+    <span class="pk">지난 ${runs.length}회</span>
+    <span class="pv">${값.map(x=>kgfmt(x)).join('<i>→</i>')}${단위}</span>
+    ${화살?`<span class="ar ${방향}">${화살}</span>`:''}
+    ${다름?`<span class="cv">지금 ${kgfmt(지금)}${단위}</span>`:''}
+    <span class="cx">${S.prevOpen?'▴':'▾'}</span></button>`;
+
+  if(!S.prevOpen) return `<div class="prevb">${줄}</div>`;
+
+  const 안 = runs.map(function(r){
+    const t = top(r);
+    const 세트 = r.sets.map(x=> e.cardio
+      ? `${x.reps}분${x.spd?`·${x.spd}`:''}`
+      : `${kgfmt(x.kg)}×${x.reps}`).join(' · ');
+    const rp = r.sets.find(x=> (e.cardio ? +x.reps : +x.kg) === t) || r.sets[0];
+    return `<div class="prevr">
+      <span class="rd">${mdTxt(r.date)}<br>${esc(r.kind)}</span>
+      <span class="rs">${세트}</span>
+      ${oi>=0?`<button class="rb" data-act="usekg:${e.cardio?0:kgfmt(t)}:${rp.reps||0}">이 무게로</button>`:''}
+    </div>`; }).join('');
+  return `<div class="prevb">${줄}${안}</div>`;
+}
+
 /* ── ★ 운동 중 ── */
 async function newLive(title, items, kind, rid, mid, by){
   const id='w'+Date.now();
@@ -1678,6 +1754,7 @@ function vWorkout(){
   /* 지금 하는 종목의 「펼쳐진 카드」 — 목록에서 그 종목 바로 아래에 붙는다 */
   const 펼침 = ()=>`<div class="opencard">
     <div class="exbig">${esc(e.n)}${v.n?`<small>${esc(v.n)}</small>`:''}</div>
+    ${prevBox(e, cur, wmid)}
     ${demoBox(e, v)}
     ${isMemo(cur.ex)?'':`<button class="fbbtn" data-act="exd:${cur.ex}:${cur.va}${tr?':'+wmid:''}">
       <span class="l">${tr ? '코멘트 남기기' : (nw?'새 코멘트가 있어요':'운동 설명 · 코멘트')}</span>
@@ -5136,7 +5213,7 @@ document.addEventListener('click', ev=>{
       if(w.cur >= w.items.length) w.cur = Math.max(0, w.items.length-1);
       save(); toast('뺐어요'); render(); return; }
 
-    case 'jump': { const i=+rest[0];
+    case 'jump': S.prevOpen=false; { const i=+rest[0];
       if(S.moveIdx!=null && S.moveIdx!==i) S.moveIdx=null;   /* 순서 바꾸다 다른 걸 누르면 나간다 */
       S.fold = (i===w.cur) ? !S.fold : false;                /* 같은 걸 또 누르면 접는다 */
       w.cur=i; save(); render(); return; }
@@ -5171,6 +5248,14 @@ document.addEventListener('click', ev=>{
       save(); render(); return; }
     case 'undo': { const cur=w.items[w.cur]; if(cur.sets.length<2) return;
       cur.sets.pop(); cur.sets[cur.sets.length-1].done=false; save(); toast('한 세트 되돌렸어요'); render(); return; }
+    case 'prevopen': S.prevOpen = !S.prevOpen; render(); return;
+    case 'usekg': {
+      const cur = w.items[w.cur], i = cur.sets.findIndex(x=>!x.done);
+      if(i<0){ toast('이미 다 끝낸 종목이에요'); return; }
+      const kg = +rest[0], reps = +rest[1];
+      if(exOf(cur.ex).cardio){ if(reps) cur.sets[i].reps = reps; }
+      else { cur.sets[i].kg = kg; if(reps) cur.sets[i].reps = reps; }
+      save(); toast('그 무게로 맞췄어요'); render(); return; }
     case 'rest': sheetRest(); return;
     /* 부위 칩 펼치기 */
     case 'partopen': S.pickOpen=!S.pickOpen; render(); return;
