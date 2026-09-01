@@ -132,7 +132,7 @@ img{max-width:100%;display:block}
 .sec{display:flex;flex-direction:column;gap:10px}
 .lbl{font-size:12px;font-weight:700;color:var(--sub);letter-spacing:.02em;
   display:flex;align-items:center;gap:8px}
-.lbl .r{margin-left:auto;display:flex;gap:6px}
+.lbl .r{margin-left:auto;display:flex;align-items:center;gap:6px}
 .card{background:var(--dark-2);border:1px solid var(--line);border-radius:13px;
   padding:13px 15px;text-align:left;width:100%}
 .card.click:hover{border-color:#4a4a44}
@@ -267,6 +267,33 @@ textarea.inp{min-height:76px;resize:vertical;line-height:1.6}
 .wkd.off{opacity:.45}
 .mealgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:12px}
 .mealph{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:var(--dark-3)}
+
+/* 체형 사진 */
+.bpcmp{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bpcell{background:var(--dark-2);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.bpcell .cap{display:flex;align-items:center;gap:7px;padding:8px 11px;font-size:11.5px;font-weight:700}
+.bpcell .cap .w{color:var(--sub);font-weight:600;margin-left:auto}
+.bpcell.b .cap{color:var(--sub)} .bpcell.a .cap{color:var(--gold)}
+.bpimg{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;background:var(--dark-3)}
+.bpnone{width:100%;aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;
+  background:var(--dark-3);color:#5d5952;font-size:12px;font-weight:700}
+.bpstrip{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.bpth{position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:var(--dark-3)}
+.bpth img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block}
+.bpth .d{position:absolute;left:0;right:0;bottom:0;padding:4px 6px;font-size:10.5px;font-weight:700;
+  background:linear-gradient(transparent,rgba(0,0,0,.8));color:#fff}
+.bpth .x{position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:6px;
+  background:rgba(20,20,18,.85);color:var(--warn);font-size:11px;font-weight:800;
+  display:flex;align-items:center;justify-content:center}
+.seg{display:flex;gap:5px}
+.seg button{flex:1;padding:7px 0;border-radius:9px;border:1px solid var(--line);
+  font-size:12px;font-weight:700;color:var(--sub);background:var(--dark-3)}
+.seg button.on{border-color:var(--gold-2);color:var(--gold);background:var(--gold-dim)}
+
+/* 회차 체크 알갱이 */
+.chk{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.chk span{font-size:11px;font-weight:700;padding:3px 8px;border-radius:7px;
+  background:#2e1c18;color:var(--warn);border:1px solid #4d2f27}
 .nophoto{width:100%;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;
   background:var(--dark-3);color:var(--sub);font-size:12px;font-weight:700}
 .prevbtn{font-size:11.5px;font-weight:700;color:var(--sub);padding:4px 0;text-align:left}
@@ -389,7 +416,7 @@ textarea.inp{min-height:76px;resize:vertical;line-height:1.6}
 
 <script>
 "use strict";
-const BUILD = '14';
+const BUILD = '15';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -458,10 +485,11 @@ const IKNAME = {
 };
 
 const D = { m:[], w:[], wi:[], r:[], ri:[], c:[], a:[], aAll:[], ex:[], va:[], asks:[] };
-const M = { wi:[], ws:[], meals:[], mi:[], bl:[], br:[], bc:null, plan:null, intake:null, cyc:null };
+const M = { wi:[], ws:[], meals:[], mi:[], bl:[], br:[], bc:null, plan:null, intake:null, cyc:null, bph:[] };
 const S = { view:'members', who:'전체', q:'', mid:null, rid:null, tab:'routine',
             exq:'', part:'전체', cmex:null, day:null, kind:'수업', asDate:null, calMonth:null,
             cmw:null, cmopen:null, cday:null, mday:null, cmprev:null,
+            bpPose:'정면', bpKind:'body',
             edit:{ record:false, routine:false, body:false, meal:false, plan:false, minfo:false } };
 /* 잠금 도우미 — 수정 버튼을 눌러야 입력칸이 열린다 */
 const canEdit = k => !!S.edit[k];
@@ -875,6 +903,48 @@ function tabMeal(){
     + 카드 + '</div>'
     + '<div class="sec">' + 오른쪽 + '</div></div>';
 }
+/* 사진 올리기 — 긴 변 1280px JPEG 로 줄여서 */
+async function bpUpload(file){
+  if(!file || !S.mid) return;
+  if(!/^image\//.test(file.type)){ toast('사진 파일만 넣을 수 있어요'); return; }
+  toast('사진을 줄이는 중이에요');
+  let blob;
+  try{ blob = await 줄이기(file); }catch(e){ toast('사진을 읽지 못했어요'); return; }
+  const kind = S.bpKind || 'body';
+  const pose = kind==='ai' ? '장비' : (S.bpPose || '정면');
+  const de = $('#bpdate');
+  const 날 = (de && de.value) || TODAY;
+  const id = 'bp' + Date.now();
+  const path = 'body/' + S.mid + '/' + id + '.jpg';
+  toast('올리는 중이에요');
+  try{
+    const r = await fetch(SB_URL+'/storage/v1/object/media/'+path, {
+      method:'POST',
+      headers:{ apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'image/jpeg' },
+      body: blob });
+    if(!r.ok) throw new Error(await r.text());
+    await ssend('body_photos', 'POST',
+      [{ id, member_id:S.mid, kind, pose, on_date:날, path, memo:'' }]);
+    M.bph = M.bph || [];
+    M.bph.push({ id, member_id:S.mid, kind, pose, on_date:날, path, memo:'' });
+    toast('넣었습니다'); render();
+  }catch(e){ toast('사진 올리기 실패 — ' + String(e.message||e).slice(0,60)); }
+}
+function 줄이기(file){
+  return new Promise(function(ok, no){
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = function(){
+      const 긴 = Math.max(img.width, img.height), 배 = 긴 > 1280 ? 1280/긴 : 1;
+      const c = document.createElement('canvas');
+      c.width = Math.round(img.width*배); c.height = Math.round(img.height*배);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      c.toBlob(b => b ? ok(b) : no(new Error('변환 실패')), 'image/jpeg', 0.85);
+    };
+    img.onerror = function(){ URL.revokeObjectURL(url); no(new Error('읽기 실패')); };
+    img.src = url;
+  });
+}
 function phBad(el){ const d = document.createElement('div');
   d.className='nophoto'; d.textContent='사진을 불러오지 못했어요';
   el.replaceWith(d); }
@@ -918,12 +988,22 @@ function tabBody(){
             + '</div></td></tr>'; }).join(''); }).join('')
     + '</tbody></table>';
 
-  const 회차 = br.length ? br.map(x=>'<div class="card"><div class="rowc"><div>'
-    + '<div class="t1">' + dateFull(x.on_date) + ' · 체크 ' + Object.keys(x.checks||{}).length + '개</div>'
-    + '<div class="t2">' + esc(x.note||'') + '</div></div>'
+  const 체크글 = ch => Object.keys(ch||{}).map(function(k){
+      const t = BODY_TESTS.find(y=>y.k===k); if(!t) return null;
+      const v = ch[k]; if(!v) return null;
+      return t.t + ' · ' + (v==='a' ? t.a : t.b);
+    }).filter(Boolean);
+
+  const 회차 = br.length ? br.map(function(x){ const cs = 체크글(x.checks);
+    return '<div class="card"><div class="rowc"><div>'
+    + '<div class="t1">' + dateFull(x.on_date) + ' · 걸린 것 ' + cs.length + '개</div>'
+    + (x.note ? '<div class="t2">' + esc(x.note) + '</div>' : '') + '</div>'
     + (canEdit('body')
       ? '<button class="ib" data-act="brload" data-b="' + esc(x.id) + '" title="이 회차를 지금 검사로 불러오기">↺</button>' : '')
-    + '</div></div>').join('')
+    + '</div>'
+    + (cs.length ? '<div class="chk">' + cs.map(t=>'<span>' + esc(t) + '</span>').join('') + '</div>'
+                 : '<div class="t2" style="margin-top:5px">걸린 항목 없이 모두 정상</div>')
+    + '</div>'; }).join('')
     : '<div class="empty">회차 기록이 없어요</div>';
 
   return '<div class="sec" style="margin-bottom:20px"><div class="lbl">인바디 ' + bl.length + '회'
@@ -941,8 +1021,60 @@ function tabBody(){
     + '<textarea class="inp" id="bcmemo" placeholder="눈에 띄는 것과 방향을 적어 주세요"' + dis('body') + '>'
     + esc((bc && bc.memo) || '') + '</textarea>'
     + (canEdit('body') ? '<button class="btn main sm" data-act="bcmemo">메모 저장</button>' : '') + '</div>'
-    + '</div><div class="sec"><div class="lbl">지난 회차 ' + br.length + '건</div>' + 회차 + '</div></div>';
+    + '</div><div class="sec">' + bodyPhotos()
+    + '<div class="lbl" style="margin-top:14px">지난 회차 ' + br.length + '건</div>' + 회차 + '</div></div>';
 }
+
+/* ── 체형 사진 — 비포 · 애프터 ── */
+const POSES = ['정면','측면','후면'];
+const media2 = p => p ? SB_URL + '/storage/v1/object/public/media/' + p : '';
+function bodyPhotos(){
+  const kind = S.bpKind || 'body';
+  const pose = S.bpPose || '정면';
+  const all = (M.bph||[]).filter(x=>x.kind===kind);
+  const list = (kind==='ai' ? all : all.filter(x=>x.pose===pose))
+    .slice().sort((a,b)=> a.on_date < b.on_date ? -1 : 1);
+  const 비포 = list[0] || null, 애프터 = list.length>1 ? list[list.length-1] : null;
+
+  const cell = (x, cls, label) => '<div class="bpcell ' + cls + '">'
+    + '<div class="cap">' + label + (x ? '<span class="w">' + dateFull(x.on_date) + '</span>' : '') + '</div>'
+    + (x ? '<a href="' + esc(media2(x.path)) + '" target="_blank" rel="noopener">'
+         + '<img class="bpimg" src="' + esc(media2(x.path)) + '" alt="" onerror="phBad(this)"></a>'
+         : '<div class="bpnone">사진 없음</div>') + '</div>';
+
+  const 견주기 = '<div class="bpcmp">'
+    + cell(비포, 'b', '비포') + cell(애프터, 'a', '애프터') + '</div>'
+    + (비포 && 애프터
+        ? '<div class="t2" style="margin-top:7px">' + dDiff(애프터.on_date, 비포.on_date) + '일 사이</div>'
+        : '<div class="t2" style="margin-top:7px">사진이 2장 이상이면 처음과 마지막을 나란히 놓습니다.</div>');
+
+  const 모두 = list.length ? '<div class="bpstrip">' + list.slice().reverse().map(x=>
+      '<div class="bpth"><a href="' + esc(media2(x.path)) + '" target="_blank" rel="noopener">'
+      + '<img src="' + esc(media2(x.path)) + '" alt="" loading="lazy" onerror="phBad(this)"></a>'
+      + '<span class="d">' + (x.on_date||'').slice(5).replace('-','.') + '</span>'
+      + (canEdit('body') ? '<button class="x" data-act="bpdel" data-b="' + esc(x.id) + '">✕</button>' : '')
+      + '</div>').join('') + '</div>'
+    : '<div class="empty">아직 사진이 없어요</div>';
+
+  return '<div class="lbl">체형 사진 ' + list.length + '장'
+    + '<span class="r">'
+    + (canEdit('body')
+        ? '<input class="inp" type="date" id="bpdate" value="' + TODAY
+          + '" style="width:140px;padding:5px 9px;font-size:12px" title="찍은 날짜">'
+          + '<button class="btn sub sm" data-act="bpadd">＋ 사진 넣기</button>' : '')
+    + editBtn('body') + '</span></div>'
+    + '<div class="seg" style="margin-bottom:9px">'
+    + [['body','체형 사진'],['ai','AI 장비 사진']].map(k=>'<button class="' + (kind===k[0]?'on':'')
+        + '" data-bpk="' + k[0] + '">' + k[1] + '</button>').join('') + '</div>'
+    + (kind==='ai' ? '' : '<div class="seg" style="margin-bottom:10px">'
+        + POSES.map(x=>'<button class="' + (pose===x?'on':'') + '" data-bpp="' + x + '">' + x + '</button>').join('')
+        + '</div>')
+    + 견주기
+    + '<div class="lbl" style="margin-top:12px">' + (kind==='ai'?'장비 사진':esc(pose) + ' 사진') + ' 모두</div>'
+    + 모두
+    + '<input type="file" id="bpfile" accept="image/*" style="display:none">';
+}
+const dDiff = (a,b) => Math.round((new Date(a+'T00:00:00') - new Date(b+'T00:00:00')) / 86400000);
 
 /* ── 회원 상세 · 정보 ── 보기 + 고치기 */
 function tabInfo(){
@@ -1117,25 +1249,74 @@ function vCmAll(){
   const mine = m => S.who==='전체' || (memOf(m).trainer||'')===S.who;
   const asks = D.asks.filter(a=>!a.done_at && mine(a.member_id));
   const cs = D.c.filter(c=>mine(c.member_id))
-    .sort((a,b)=> (a.created_at||'') < (b.created_at||'') ? 1 : -1).slice(0,40);
+    .sort((a,b)=> (a.created_at||'') < (b.created_at||'') ? 1 : -1);
 
-  const 요청 = asks.length ? asks.map(a=>'<button class="card click gold rowc" data-m="'
-    + esc(a.member_id) + '" data-tab="comment"><div>'
-    + '<div class="t1">' + esc(memOf(a.member_id).name) + ' — ' + esc(vaName(a.variant_id)) + '</div>'
-    + '<div class="t2">' + esc(a.note||'따로 적은 말은 없습니다') + '</div></div>'
-    + '<span class="rt">코멘트 달기 ›</span></button>').join('')
+  /* 회원별로 묶는다 */
+  const 회원들 = D.m.filter(x=>(x.role||'member')==='member' && mine(x.id));
+  const rows = 회원들.map(function(m){
+    const mine2 = cs.filter(c=>c.member_id===m.id);
+    return { m,
+      n: mine2.length,
+      unread: mine2.filter(c=>!c.read_at).length,
+      ask: asks.filter(a=>a.member_id===m.id).length,
+      last: mine2[0] || null };
+  }).sort((a,b)=> (b.ask-a.ask) || (b.unread-a.unread)
+      || ((b.last?b.last.created_at:'') < (a.last?a.last.created_at:'') ? -1 : 1));
+
+  const 요약 = '<div class="sumbar">'
+    + '<div class="sumit warn"><span class="k2">봐 달라는 요청</span><span class="v2">' + asks.length + '</span></div>'
+    + '<div class="sumit teal"><span class="k2">안 읽은 코멘트</span><span class="v2">'
+      + cs.filter(c=>!c.read_at).length + '</span></div>'
+    + '<div class="sumit"><span class="k2">전체 코멘트</span><span class="v2">' + cs.length + '</span></div>'
+    + '<div class="sumit gold"><span class="k2">코멘트 없는 회원</span><span class="v2">'
+      + rows.filter(x=>!x.n).length + '</span></div>'
+    + '</div>';
+
+  const 표 = '<div class="mwrap"><table class="mtb"><thead><tr>'
+    + '<th style="width:26px"></th><th>이름</th><th>담당</th><th>마지막 코멘트</th>'
+    + '<th class="n">코멘트</th><th class="n">안 읽음</th><th>요청</th>'
+    + '</tr></thead><tbody>'
+    + rows.map(function(o){ const m=o.m;
+        const 점 = o.ask ? 'warn' : (o.unread ? 'teal' : (o.n ? '' : ''));
+        return '<tr data-m="' + esc(m.id) + '" data-tab="comment">'
+        + '<td><span class="dot2 ' + 점 + '"></span></td>'
+        + '<td><div class="nm2">' + esc(m.name) + '</div></td>'
+        + '<td><span class="sub3">' + esc(m.trainer||'담당 없음') + '</span></td>'
+        + '<td>' + (o.last
+            ? '<div style="font-weight:700">' + dateFull((o.last.created_at||'').slice(0,10)) + '</div>'
+              + '<div class="sub3" style="max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'
+              + esc(vaName(o.last.variant_id)) + ' — ' + esc(o.last.body||'') + '</div>'
+            : '<span class="sub3">아직 없음</span>') + '</td>'
+        + '<td class="n"><span class="numbig ' + (o.n?'':'zero') + '">' + o.n + '</span></td>'
+        + '<td class="n">' + (o.unread ? '<span class="tag teal">' + o.unread + '</span>'
+            : '<span class="sub3">—</span>') + '</td>'
+        + '<td>' + (o.ask ? '<span class="tag warn">요청 ' + o.ask + '</span>'
+            : '<span class="sub3">—</span>') + '</td>'
+        + '</tr>'; }).join('')
+    + '</tbody></table></div>';
+
+  const 요청 = asks.length ? '<div class="listbox">' + asks.map(a=>'<button class="card click gold rowc" data-m="'
+      + esc(a.member_id) + '" data-tab="comment"><div>'
+      + '<div class="t1">' + esc(memOf(a.member_id).name) + ' — ' + esc(vaName(a.variant_id)) + '</div>'
+      + '<div class="t2">' + esc(a.note||'따로 적은 말은 없습니다') + '</div></div>'
+      + '<span class="rt">&rsaquo;</span></button>').join('') + '</div>'
     : '<div class="empty">지금은 요청이 없어요</div>';
 
-  const 최근 = cs.length ? cs.map(c=>'<div class="cm ' + (c.read_at?'':'new') + '">'
-    + '<div class="who2">' + esc(memOf(c.member_id).name) + ' · '
-    + dateFull((c.created_at||'').slice(0,10)) + (c.read_at?'':' · 아직 안 읽음')
-    + '<button class="del" data-act="cmdel" data-c="' + esc(c.id) + '">지우기</button></div>'
-    + '<div class="ex">' + esc(vaName(c.variant_id)) + '</div>'
-    + '<div class="tx">' + esc(c.body||'') + '</div></div>').join('')
+  const 최근 = cs.length ? '<div class="listbox">' + cs.slice(0,60).map(c=>'<div class="cm '
+      + (c.read_at?'':'new') + '">'
+      + '<div class="who2">' + esc(memOf(c.member_id).name) + ' · '
+      + dateFull((c.created_at||'').slice(0,10)) + (c.read_at?'':' · 아직 안 읽음')
+      + '<button class="del" data-act="cmdel" data-c="' + esc(c.id) + '">지우기</button></div>'
+      + '<div class="ex">' + esc(vaName(c.variant_id)) + '</div>'
+      + '<div class="tx">' + esc(c.body||'') + '</div></div>').join('') + '</div>'
     : '<div class="empty">아직 코멘트가 없어요</div>';
 
-  return '<div class="cols"><div class="sec"><div class="lbl">봐 달라는 요청 ' + asks.length + '건</div>'
-    + 요청 + '</div><div class="sec"><div class="lbl">최근 코멘트</div>' + 최근 + '</div></div>';
+  return 요약
+    + '<div class="cols">'
+    + '<div class="sec"><div class="lbl">회원별 코멘트 — 줄을 누르면 그 회원 코멘트로 갑니다</div>'
+    + 표 + '</div>'
+    + '<div class="sec"><div class="lbl">봐 달라는 요청 ' + asks.length + '건</div>' + 요청
+    + '<div class="lbl" style="margin-top:12px">최근 코멘트</div>' + 최근 + '</div></div>';
 }
 
 /* ── 오늘 ── */
@@ -1315,12 +1496,14 @@ async function loadMember(mid){
       sget('plans?select=*&member_id=eq.'+mid),
       sget('intake?select=*&member_id=eq.'+mid).catch(()=>[]),
       sget('cycles?select=*&member_id=eq.'+mid).catch(()=>[]),
+      sget('body_photos?select=*&member_id=eq.'+mid+'&order=on_date').catch(()=>[]),
     ]);
     const mealIds = g[0].map(x=>x.id);
     const mi = mealIds.length
       ? await sget('meal_items?select=*&meal_id=in.'+inList(mealIds)+'&limit=2000') : [];
     M.wi=wi; M.ws=wsets; M.meals=g[0]; M.mi=mi; M.bl=g[1]; M.br=g[2];
     M.bc=g[3][0]||null; M.plan=g[4][0]||null; M.intake=(g[5]||[])[0]||null; M.cyc=(g[6]||[])[0]||null;
+    M.bph=g[7]||[];
   }catch(e){ toast('회원 자료 일부를 못 불러왔어요'); }
   render();
 }
@@ -1371,7 +1554,7 @@ document.addEventListener('click', async function(ev){
     S.tab = card.dataset.tab || 'routine'; S.day=null; S.cmex=null; S.cmw=null; S.cmopen=null;
     S.cday=null; S.mday=null; S.cmprev=null; S.calMonth=null;
     S.edit = { record:false, routine:false, body:false, meal:false, plan:false, minfo:false };
-    M.wi=[];M.ws=[];M.meals=[];M.mi=[];M.bl=[];M.br=[];M.bc=null;M.plan=null;M.intake=null;M.cyc=null;
+    M.wi=[];M.ws=[];M.meals=[];M.mi=[];M.bl=[];M.br=[];M.bc=null;M.plan=null;M.intake=null;M.cyc=null;M.bph=[];
     render(); loadMember(S.mid); return; }
 
   const day = t.closest('[data-day]');
@@ -1397,6 +1580,11 @@ document.addEventListener('click', async function(ev){
       box.querySelectorAll('[data-kind]').forEach(b=>b.classList.toggle('on', b===kd));
     } else render();
     return; }
+
+  const bpk = t.closest('[data-bpk]');
+  if(bpk){ S.bpKind = bpk.dataset.bpk; render(); return; }
+  const bpp = t.closest('[data-bpp]');
+  if(bpp){ S.bpPose = bpp.dataset.bpp; render(); return; }
 
   const cd = t.closest('[data-cday]');
   if(cd){ S.cday = cd.dataset.cday; S.cmw = null; S.cmopen = null; S.cmprev = null; render(); return; }
@@ -1508,6 +1696,24 @@ document.addEventListener('click', async function(ev){
     toast('그 회차를 지금 검사로 불러왔어요'); render(); return;
   }
   /* 인바디 */
+  if(a==='bpadd'){
+    const f = $('#bpfile'); if(!f) return;
+    f.value = ''; f.onchange = () => bpUpload(f.files[0]);
+    f.click(); return;
+  }
+  if(a==='bpdel'){
+    const id = act.dataset.b;
+    const x = (M.bph||[]).find(y=>y.id===id); if(!x) return;
+    if(!confirm(dateFull(x.on_date) + ' 사진을 지울까요? 되돌릴 수 없습니다.')) return;
+    try{
+      await ssend('body_photos?id=eq.'+id, 'DELETE');
+      fetch(SB_URL+'/storage/v1/object/media/'+x.path,
+        { method:'DELETE', headers:{ apikey:SB_KEY, Authorization:'Bearer '+SB_KEY } }).catch(()=>{});
+      M.bph = M.bph.filter(y=>y.id!==id);
+      toast('지웠습니다'); render();
+    }catch(e){ toast('지우기 실패 — ' + e.message); }
+    return;
+  }
   if(a==='blnew'){
     const id = 'bl_' + S.mid + '_' + Date.now();
     try{
