@@ -193,6 +193,17 @@ textarea.inp{min-height:76px;resize:vertical;line-height:1.6}
 .tb .n{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
 .tb tbody tr:hover{background:var(--dark-2)}
 
+/* 체형 체크 — 세 갈래 버튼 */
+.tri{display:flex;gap:5px;flex-wrap:wrap}
+.tri button{padding:4px 10px;border-radius:7px;border:1px solid var(--line);
+  font-size:11.5px;font-weight:700;color:var(--sub);background:var(--dark-3)}
+.tri button:hover{color:var(--cream)}
+.tri button.on{border-color:var(--warn);color:var(--warn);background:#2e1c18}
+.tri button.on.ok{border-color:#3f5c46;color:#8fca9e;background:#16241a}
+.mini{width:64px;text-align:center;font-weight:700;font-variant-numeric:tabular-nums;
+  background:var(--dark-3);border:1px solid var(--line);border-radius:8px;padding:6px 4px;outline:none}
+.mini:focus{border-color:var(--gold-2)}
+
 .ph{border-radius:10px;border:1px solid var(--line);background:var(--dark-3);overflow:hidden}
 .phgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
 .phcap{font-size:11.5px;color:var(--sub);padding:7px 9px}
@@ -288,7 +299,7 @@ textarea.inp{min-height:76px;resize:vertical;line-height:1.6}
 
 <script>
 "use strict";
-const BUILD = '4';
+const BUILD = '5';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -530,28 +541,43 @@ function tabMeal(){
             + (m.memo ? '<div class="t2">' + esc(m.memo) + '</div>' : '')
             + (m.trainer_note ? '<div class="t2" style="color:var(--teal)">트레이너 — '
                 + esc(m.trainer_note) + '</div>' : '')
+            + '<div style="display:flex;gap:6px;margin-top:9px;flex-wrap:wrap">'
+            + '<span class="set"><input class="mini" data-ml="' + esc(m.id) + '" data-mf="kcal" value="'
+              + (m.kcal==null?'':m.kcal) + '"><span class="u" style="font-size:11px;color:var(--sub)">kcal</span></span>'
+            + '<span class="set"><input class="mini" data-ml="' + esc(m.id) + '" data-mf="carb" value="'
+              + (m.carb==null?'':m.carb) + '"><span class="u" style="font-size:11px;color:var(--sub)">탄</span></span>'
+            + '<span class="set"><input class="mini" data-ml="' + esc(m.id) + '" data-mf="protein" value="'
+              + (m.protein==null?'':m.protein) + '"><span class="u" style="font-size:11px;color:var(--sub)">단</span></span>'
+            + '<span class="set"><input class="mini" data-ml="' + esc(m.id) + '" data-mf="fat" value="'
+              + (m.fat==null?'':m.fat) + '"><span class="u" style="font-size:11px;color:var(--sub)">지</span></span>'
+            + '</div>'
             + '<div class="fld" style="margin-top:9px"><span class="fn">한마디 남기기</span>'
             + '<input class="inp" data-mn="' + esc(m.id) + '" value="' + esc(m.trainer_note||'')
             + '" placeholder="식단에 한마디"></div>'
             + '</div></div>'; }).join('') + '</div></div>'; }).join('');
 }
 
-/* ── 회원 상세 · 체형 ── */
+/* ── 회원 상세 · 체형 ── 보기 + 고치기 */
 function tabBody(){
   const bl = M.bl.slice().sort((a,b)=> a.on_date < b.on_date ? 1 : -1);
   const br = M.br.slice().sort((a,b)=> a.on_date < b.on_date ? 1 : -1);
   const bc = M.bc;
 
-  const 인바디 = bl.length ? '<table class="tb"><thead><tr><th>날짜</th>'
+  const 인바디 = '<table class="tb"><thead><tr><th>날짜</th>'
     + '<th class="n">몸무게</th><th class="n">근육</th><th class="n">체지방</th><th class="n">체지방률</th>'
-    + '<th>메모</th></tr></thead><tbody>'
-    + bl.map(x=>'<tr><td>' + dateFull(x.on_date) + '</td>'
-      + '<td class="n">' + (x.w==null?'—':x.w+'kg') + '</td>'
-      + '<td class="n">' + (x.m==null?'—':x.m+'kg') + '</td>'
-      + '<td class="n">' + (x.f==null?'—':x.f+'kg') + '</td>'
-      + '<td class="n">' + (x.fp==null?'—':x.fp+'%') + '</td>'
-      + '<td style="color:var(--sub)">' + esc(x.note||'') + '</td></tr>').join('')
-    + '</tbody></table>' : '<div class="empty">인바디 기록이 없어요</div>';
+    + '<th>메모</th><th></th></tr></thead><tbody>'
+    + (bl.length ? bl.map(x=>'<tr>'
+      + '<td><input class="mini" style="width:104px" data-bl="' + esc(x.id) + '" data-bf="on_date" value="'
+        + esc(x.on_date||'') + '"></td>'
+      + '<td class="n"><input class="mini" data-bl="' + esc(x.id) + '" data-bf="w" value="' + (x.w==null?'':x.w) + '"></td>'
+      + '<td class="n"><input class="mini" data-bl="' + esc(x.id) + '" data-bf="m" value="' + (x.m==null?'':x.m) + '"></td>'
+      + '<td class="n"><input class="mini" data-bl="' + esc(x.id) + '" data-bf="f" value="' + (x.f==null?'':x.f) + '"></td>'
+      + '<td class="n"><input class="mini" data-bl="' + esc(x.id) + '" data-bf="fp" value="' + (x.fp==null?'':x.fp) + '"></td>'
+      + '<td><input class="inp" style="padding:6px 9px" data-bl="' + esc(x.id) + '" data-bf="note" value="'
+        + esc(x.note||'') + '"></td>'
+      + '<td><button class="ib" data-act="bldel" data-b="' + esc(x.id) + '">✕</button></td></tr>').join('')
+      : '<tr><td colspan="7" style="color:var(--sub);padding:18px 10px">아직 인바디 기록이 없어요</td></tr>')
+    + '</tbody></table>';
 
   const 켜진 = (bc && bc.checks) || {};
   const 그룹 = [...new Set(BODY_TESTS.map(t=>t.g))];
@@ -561,41 +587,68 @@ function tabBody(){
           const v = 켜진[t.k];
           return '<tr><td style="color:var(--sub)">' + (i===0?esc(g):'') + '</td>'
             + '<td>' + esc(t.t) + '</td>'
-            + '<td>' + (v ? '<span class="tag warn">' + esc(v==='a'?t.a:t.b) + '</span>'
-                          : '<span style="color:#54514c">정상</span>') + '</td></tr>'; }).join(''); }).join('')
+            + '<td><div class="tri">'
+            + '<button class="' + (!v?'on ok':'') + '" data-chk="' + t.k + '" data-val="">정상</button>'
+            + '<button class="' + (v==='a'?'on':'') + '" data-chk="' + t.k + '" data-val="a">' + esc(t.a) + '</button>'
+            + '<button class="' + (v==='b'?'on':'') + '" data-chk="' + t.k + '" data-val="b">' + esc(t.b) + '</button>'
+            + '</div></td></tr>'; }).join(''); }).join('')
     + '</tbody></table>';
 
-  const 회차 = br.length ? br.map(x=>'<div class="card"><div class="t1">' + dateFull(x.on_date)
-    + ' · 체크 ' + Object.keys(x.checks||{}).length + '개</div>'
-    + '<div class="t2">' + esc(x.note||'') + '</div></div>').join('')
+  const 회차 = br.length ? br.map(x=>'<div class="card"><div class="rowc"><div>'
+    + '<div class="t1">' + dateFull(x.on_date) + ' · 체크 ' + Object.keys(x.checks||{}).length + '개</div>'
+    + '<div class="t2">' + esc(x.note||'') + '</div></div>'
+    + '<button class="ib" data-act="brload" data-b="' + esc(x.id) + '" title="이 회차를 지금 검사로 불러오기">↺</button>'
+    + '</div></div>').join('')
     : '<div class="empty">회차 기록이 없어요</div>';
 
-  return '<div class="sec" style="margin-bottom:20px"><div class="lbl">인바디 ' + bl.length + '회</div>'
+  return '<div class="sec" style="margin-bottom:20px"><div class="lbl">인바디 ' + bl.length + '회'
+    + '<span class="r"><button class="btn sub sm" data-act="blnew">＋ 기록 추가</button></span></div>'
     + '<div class="card" style="padding:4px 6px">' + 인바디 + '</div></div>'
     + '<div class="cols"><div class="sec"><div class="lbl">체형 검사'
-    + (bc && bc.on_date ? ' · ' + dateFull(bc.on_date) : '') + '</div>'
+    + (bc && bc.on_date ? ' · ' + dateFull(bc.on_date) : ' · 아직 없음')
+    + '<span class="r"><button class="btn sub sm" data-act="brsave">이 상태로 회차 남기기</button></span></div>'
     + '<div class="card" style="padding:4px 6px">' + 체형 + '</div>'
-    + (bc && bc.memo ? '<div class="note">' + esc(bc.memo) + '</div>' : '')
+    + '<div class="fld"><span class="fn">체형 메모</span>'
+    + '<textarea class="inp" id="bcmemo" placeholder="눈에 띄는 것과 방향을 적어 주세요">'
+    + esc((bc && bc.memo) || '') + '</textarea>'
+    + '<button class="btn main sm" data-act="bcmemo">메모 저장</button></div>'
     + '</div><div class="sec"><div class="lbl">지난 회차 ' + br.length + '건</div>' + 회차 + '</div></div>';
 }
 
-/* ── 회원 상세 · 정보 ── */
+/* ── 회원 상세 · 정보 ── 보기 + 고치기 */
 function tabInfo(){
   const m = memOf(S.mid);
-  const pl = M.plan && M.plan.data ? M.plan.data : null;
+  const pl = (M.plan && M.plan.data) ? M.plan.data : {};
+  const now = pl.now || {}, to = pl.to || {};
   const ik = M.intake && M.intake.data ? M.intake.data : null;
   const cy = M.cyc;
+  const trs = [...new Set(D.m.map(x=>x.trainer).filter(Boolean))];
 
-  const 계획 = pl ? '<div class="card" style="display:flex;flex-direction:column;gap:7px">'
-    + (pl.goal ? '<div class="row"><span class="k">목표</span><span class="v">' + esc(pl.goal) + '</span></div>' : '')
-    + (pl.now ? '<div class="row"><span class="k">지금</span><span class="v">'
-        + (pl.now.w||'—') + 'kg · 근육 ' + (pl.now.m||'—') + ' · 체지방 ' + (pl.now.fp||'—') + '%</span></div>' : '')
-    + (pl.to ? '<div class="row"><span class="k">목표치</span><span class="v">'
-        + (pl.to.w||'—') + 'kg · 체지방 ' + (pl.to.fp||'—') + '% · ' + esc(pl.to.date||'') + '</span></div>' : '')
-    + (pl.wk ? '<div class="row"><span class="k">주당</span><span class="v">' + esc(pl.wk) + '</span></div>' : '')
-    + (pl.mo ? '<div class="row"><span class="k">월간</span><span class="v">' + esc(pl.mo) + '</span></div>' : '')
-    + (pl.diet ? '<div class="row"><span class="k">식단</span><span class="v">' + esc(pl.diet) + '</span></div>' : '')
-    + '</div>' : '<div class="empty">운동계획이 없어요</div>';
+  const f = (k, label, v, ph) => '<div class="fld"><span class="fn">' + label + '</span>'
+    + '<input class="inp" data-pl="' + k + '" value="' + esc(v==null?'':v) + '"'
+    + (ph ? ' placeholder="' + ph + '"' : '') + '></div>';
+
+  const 계획 = '<div class="card" style="display:flex;flex-direction:column;gap:10px">'
+    + f('goal', '목표', pl.goal, '예 · 근육량 증가, 체형 교정')
+    + '<div class="cols3" style="gap:9px">'
+      + f('now.w', '지금 몸무게', now.w) + f('now.m', '지금 근육', now.m)
+      + f('now.fp', '지금 체지방률', now.fp) + '</div>'
+    + '<div class="cols3" style="gap:9px">'
+      + f('to.w', '목표 몸무게', to.w) + f('to.fp', '목표 체지방률', to.fp)
+      + f('to.date', '목표 날짜', to.date, '2026-12-02') + '</div>'
+    + '<div class="cols3" style="gap:9px">'
+      + f('wk', '주당', pl.wk, '0.4kg') + f('mo', '월간', pl.mo, '1.6kg')
+      + f('diet', '식단 방향', pl.diet) + '</div>'
+    + '<button class="btn main" data-act="plsave">운동계획 저장</button></div>';
+
+  const 담당 = '<div class="card" style="display:flex;flex-direction:column;gap:9px">'
+    + '<div class="fld"><span class="fn">담당 트레이너</span>'
+    + '<select class="inp" id="mtr">' + [''].concat(trs).map(t =>
+        '<option value="' + esc(t) + '"' + ((m.trainer||'')===t?' selected':'') + '>'
+        + esc(t || '담당 없음') + '</option>').join('') + '</select></div>'
+    + '<div class="fld"><span class="fn">이름</span>'
+    + '<input class="inp" id="mnm" value="' + esc(m.name||'') + '"></div>'
+    + '<button class="btn main sm" data-act="msave">회원 정보 저장</button></div>';
 
   const 문진 = ik ? '<div class="card" style="display:flex;flex-direction:column;gap:7px">'
     + Object.keys(ik).filter(k=>k!=='meals').map(function(k){
@@ -607,15 +660,15 @@ function tabInfo(){
           + '<span class="v">' + esc(값) + '</span></div>'; }).join('')
     + (ik.meals ? '<div class="row"><span class="k" style="min-width:64px">평소 식사</span><span class="v">'
         + Object.keys(ik.meals).map(k=>esc(k)+' '+esc(ik.meals[k])).join(' · ') + '</span></div>' : '')
-    + '</div>' : '<div class="empty">문진 자료가 없어요</div>';
+    + '</div>' : '<div class="empty">문진 자료가 없어요 — 회원이 앱에서 적습니다</div>';
 
   const 주기 = cy && cy.enabled ? '<div class="card"><div class="t1">생리주기 쓰는 중</div>'
     + '<div class="t2">마지막 시작 ' + dateFull(cy.last_start) + ' · 주기 ' + cy.cyc_len + '일 · 기간 '
     + cy.period_len + '일</div></div>' : '';
 
   return '<div class="cols"><div class="sec"><div class="lbl">운동계획</div>' + 계획 + 주기 + '</div>'
-    + '<div class="sec"><div class="lbl">상담 문진</div>' + 문진
-    + '<div class="note">회원 정보 · 담당 ' + esc(m.trainer||'없음') + '</div></div></div>';
+    + '<div class="sec"><div class="lbl">회원 정보</div>' + 담당
+    + '<div class="lbl" style="margin-top:8px">상담 문진 — 회원이 적은 것</div>' + 문진 + '</div></div>';
 }
 
 /* ── 루틴 편집 ── */
@@ -872,6 +925,17 @@ async function loadMember(mid){
 }
 
 /* ── 저장 ── */
+async function saveBodyCheck(patch){
+  const base = M.bc || { member_id:S.mid, on_date:TODAY, checks:{}, photos:{}, memo:'' };
+  const next = Object.assign({}, base, patch, { member_id:S.mid, on_date: base.on_date || TODAY });
+  try{
+    if(M.bc) await ssend('body_checks?member_id=eq.'+S.mid, 'PATCH',
+      { checks:next.checks, memo:next.memo, on_date:next.on_date });
+    else await ssend('body_checks', 'POST', [{ member_id:S.mid, on_date:next.on_date,
+      checks:next.checks, photos:next.photos||{}, memo:next.memo||'' }]);
+    M.bc = next;
+  }catch(e){ toast('체형 저장 실패 — ' + e.message); }
+}
 async function saveItemField(id, f, v){
   const it = D.ri.find(x=>x.id===id); if(!it) return;
   it[f] = v; const body = {}; body[f] = v;
@@ -912,6 +976,15 @@ document.addEventListener('click', async function(ev){
   if(rcard && rcard.tagName!=='INPUT' && rcard.dataset.r && rcard.dataset.r.indexOf('r')===0){
     S.rid = rcard.dataset.r; S.view='routine'; render(); return; }
 
+  const chk = t.closest('[data-chk]');
+  if(chk){
+    const k = chk.dataset.chk, v = chk.dataset.val;
+    const cur = Object.assign({}, (M.bc && M.bc.checks) || {});
+    if(v) cur[k] = v; else delete cur[k];
+    await saveBodyCheck({ checks: cur });
+    render(); return;
+  }
+
   const part = t.closest('[data-part]');
   if(part){ S.part = part.dataset.part; popOpen(popPick()); return; }
 
@@ -936,6 +1009,76 @@ document.addEventListener('click', async function(ev){
   if(a==='toMember'){ S.view='member'; render(); return; }
   if(a==='popclose'){ popClose(); return; }
   if(a==='expick'){ S.exq=''; S.part='전체'; popOpen(popPick()); return; }
+
+  /* 체형 — 검사 체크 */
+  if(a==='bcmemo'){
+    const el = $('#bcmemo'); if(!el) return;
+    await saveBodyCheck({ memo: el.value });
+    toast('메모를 저장했어요'); return;
+  }
+  if(a==='brsave'){
+    const bc = M.bc;
+    if(!bc || !bc.checks || !Object.keys(bc.checks).length){ toast('먼저 검사를 체크해 주세요'); return; }
+    const id = 'br_' + S.mid + '_' + Date.now();
+    try{
+      await ssend('body_rounds', 'POST', [{ id:id, member_id:S.mid, on_date:TODAY,
+        checks: bc.checks, note: bc.memo || '' }]);
+      M.br.push({ id:id, member_id:S.mid, on_date:TODAY, checks:bc.checks, note:bc.memo||'' });
+      toast('오늘 회차로 남겼습니다'); render();
+    }catch(e){ toast('저장 실패 — ' + e.message); }
+    return;
+  }
+  if(a==='brload'){
+    const r0 = M.br.find(x=>x.id===act.dataset.b); if(!r0) return;
+    await saveBodyCheck({ checks: r0.checks, memo: r0.note || '' });
+    toast('그 회차를 지금 검사로 불러왔어요'); render(); return;
+  }
+  /* 인바디 */
+  if(a==='blnew'){
+    const id = 'bl_' + S.mid + '_' + Date.now();
+    try{
+      await ssend('body_logs', 'POST', [{ id:id, member_id:S.mid, on_date:TODAY,
+        w:null, m:null, f:null, fp:null, note:'' }]);
+      M.bl.push({ id:id, member_id:S.mid, on_date:TODAY, w:null, m:null, f:null, fp:null, note:'' });
+      toast('줄을 하나 만들었어요 · 숫자를 적어 주세요'); render();
+    }catch(e){ toast('만들기 실패 — ' + e.message); }
+    return;
+  }
+  if(a==='bldel'){
+    const bid = act.dataset.b;
+    if(!confirm('이 인바디 기록을 지울까요?')) return;
+    try{ await ssend('body_logs?id=eq.'+bid, 'DELETE');
+      M.bl = M.bl.filter(x=>x.id!==bid); toast('지웠습니다'); render(); }
+    catch(e){ toast('지우기 실패 — ' + e.message); }
+    return;
+  }
+  /* 운동계획 */
+  if(a==='plsave'){
+    const g = k => { const el=document.querySelector('[data-pl="'+k+'"]'); return el?el.value.trim():''; };
+    const num = v => { const n=parseFloat(String(v).replace(/[^0-9.]/g,'')); return isNaN(n)?null:n; };
+    const data = Object.assign({}, (M.plan && M.plan.data) || {});
+    data.goal = g('goal'); data.wk = g('wk'); data.mo = g('mo'); data.diet = g('diet');
+    data.now = Object.assign({}, data.now||{}, { w:num(g('now.w')), m:num(g('now.m')), fp:num(g('now.fp')) });
+    data.to  = Object.assign({}, data.to||{},  { w:num(g('to.w')), fp:num(g('to.fp')), date:g('to.date') });
+    try{
+      if(M.plan) await ssend('plans?member_id=eq.'+S.mid, 'PATCH', { data:data });
+      else await ssend('plans', 'POST', [{ member_id:S.mid, data:data }]);
+      M.plan = { member_id:S.mid, data:data };
+      toast('운동계획을 저장했어요 · 회원 화면에 바로 떠요'); render();
+    }catch(e){ toast('저장 실패 — ' + e.message); }
+    return;
+  }
+  /* 회원 정보 */
+  if(a==='msave'){
+    const tr = $('#mtr') ? $('#mtr').value : '', nm = $('#mnm') ? $('#mnm').value.trim() : '';
+    const m = D.m.find(x=>x.id===S.mid); if(!m) return;
+    try{
+      await ssend('members?id=eq.'+S.mid, 'PATCH', { trainer:tr, name:nm||m.name });
+      m.trainer = tr; if(nm) m.name = nm;
+      toast('회원 정보를 저장했어요'); render();
+    }catch(e){ toast('저장 실패 — ' + e.message); }
+    return;
+  }
 
   if(a==='cmdel'){
     const cid = act.dataset.c;
@@ -1118,6 +1261,32 @@ document.addEventListener('input', function(ev){
       }catch(e){ toast('저장 실패'); }
     }, 700);
     return; }
+  if(el.dataset.bl){                       /* 인바디 줄 */
+    const id = el.dataset.bl, fld = el.dataset.bf, raw = el.value;
+    const row = M.bl.find(x=>x.id===id); if(!row) return;
+    let v;
+    if(fld==='note' || fld==='on_date') v = raw.trim();
+    else { const n = parseFloat(raw.replace(/[^0-9.]/g,'')); v = isNaN(n) ? null : n; }
+    row[fld] = v;
+    clearTimeout(mnT);
+    mnT = setTimeout(async function(){
+      const body = {}; body[fld] = v;
+      try{ await ssend('body_logs?id=eq.'+id, 'PATCH', body); }catch(e){ toast('저장 실패'); }
+    }, 600);
+    return;
+  }
+  if(el.dataset.ml){                       /* 식단 영양 */
+    const id = el.dataset.ml, fld = el.dataset.mf;
+    const n = parseFloat((el.value||'').replace(/[^0-9.]/g,''));
+    const v = isNaN(n) ? null : n;
+    const row = M.meals.find(x=>x.id===id); if(row) row[fld] = v;
+    clearTimeout(mnT);
+    mnT = setTimeout(async function(){
+      const body = {}; body[fld] = v;
+      try{ await ssend('meals?id=eq.'+id, 'PATCH', body); }catch(e){ toast('저장 실패'); }
+    }, 600);
+    return;
+  }
   const f = el.dataset.f, i = +el.dataset.i;
   if(f && i){
     const v = parseFloat((el.value||'').replace(/[^0-9.]/g,''));
