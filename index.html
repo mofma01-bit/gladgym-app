@@ -525,8 +525,20 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
   filter:saturate(.92)}
 
 /* ── 인체도 ── 어디를 안 했는지 한눈에 */
-.bwrap{display:flex;flex-direction:column;gap:11px;align-items:center;width:100%}
-.bsvg{width:100%;max-width:280px;height:auto;display:block}
+.bwrap{display:flex;flex-direction:column;gap:13px;align-items:center;width:100%}
+/* 앞·뒤 키를 같게 — 그림 폭 비(267:342)를 flex 로 준다 */
+.bpair{display:flex;gap:8px;justify-content:center;align-items:flex-end;width:100%}
+.bfig{position:relative;min-width:0}
+.bfig.fr{flex:0 1 267px}
+.bfig.bk{flex:0 1 342px}
+.bfig img{display:block;width:100%;height:auto}
+/* 덮개를 그림 실루엣으로 잘라 낸다 — 네모를 써도 몸 밖으로 안 나간다 */
+.bhit{position:absolute;left:0;top:0;width:100%;height:100%;
+  mix-blend-mode:overlay;pointer-events:none;
+  -webkit-mask-image:var(--m);mask-image:var(--m);
+  -webkit-mask-size:100% 100%;mask-size:100% 100%;
+  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}
+.bcap{display:block;text-align:center;font-size:11px;font-weight:700;color:#7d766e;margin-top:2px}
 .bchips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;width:100%}
 .bchip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;
   color:#6d6a65;background:var(--dark-3);border:1px solid var(--line);
@@ -596,6 +608,7 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
   position:absolute;top:13px;left:16px;z-index:3;font-size:10.5px;font-weight:800;
   letter-spacing:.1em;color:rgba(255,255,255,.6)}
 .hero2.tall{min-height:214px}
+.hero2.dimc{opacity:.55}
 .hero2.shot .art{display:none}
 .hero2.shot::after{
   background:linear-gradient(to top,rgba(6,6,5,.66) 2%,rgba(6,6,5,.22) 46%,
@@ -1415,7 +1428,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '136';
+const BUILD = '138';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1881,55 +1894,51 @@ function partSets(mid, from){
     o[k] += it.sets.length; }));
   return o;
 }
-/* ── 인체도 ── 부위별 세트 수를 몸에 칠한다.
-   앞/뒤 두 장. 등은 뒤에 있어서 앞모습만으로는 못 보여 준다.
-   유산소·기타는 몸에 자리가 없어 아래 칩으로 뺀다.
-   좌우는 거울로 뒤집어 쓴다 — 좌표를 두 번 쓰지 않는다.        */
+/* ── 인체도 ── 글래드 플래너 「체형분석 평가」의 근육 해부도를 그대로 쓴다.
+   그림 위에 부위 자리를 색으로 덮는다 (screen 이라 근육 결이 비친다).
+   좌표는 그림 크기 기준 — 앞 267×560 · 뒤 342×560.                   */
 const 몸부위 = ['가슴','어깨','등','팔','하체','복근'];
-const 몸꼴 = {
-  몸통: 'M30.5,35 Q46,30 61.5,35 L64,46 L61,60 Q59,66 59,74 L60,93 L32,93 L33,74 Q33,66 31,60 L28,46 Z',
-  팔:   'M28.2,40 Q21.8,42 19.8,49 L16,81 Q15.5,85.5 19,86.5 L24,87 Q27,86.5 27.2,82 L29.2,51 Z',
-  다리: 'M32.5,93 L45,93 L45,124 L44,150 Q44,156 38.5,156 Q33,156 33,150 L33.5,124 Z',
-  발:   'M32.6,153 L44.4,153 L44.4,158 Q44.4,161 40,161 L36,161 Q32.6,161 32.6,158 Z',
-  어깨: 'M28.4,40 Q26.2,32.6 34.4,32.6 L37,44 Q31.6,46.6 27.6,45 Z',
-  가슴: 'M33.5,36 L58.5,36 Q62,38 62.5,46 L60.5,56 Q54,60 46,60 Q38,60 31.5,56 L29.5,46 Q30,38 33.5,36 Z',
-  복근: 'M35,61 L57,61 L58,86 Q58,90.5 53.5,90.5 L38.5,90.5 Q34,90.5 34,86 Z',
-  등:   'M32.5,35 L59.5,35 Q63.5,37 64,46 L61,60 Q59,66 59,73 L33,73 Q33,66 31,60 L28,46 Q28.5,37 32.5,35 Z',
-  허리: 'M34.5,74.5 L57.5,74.5 L58,88 Q58,91 54,91 L38,91 Q34,91 34,88 Z',
+const 몸자리 = {
+  /* 네모로 잡아도 된다 — 덮개를 그림 실루엣으로 잘라 내므로 몸 밖으로 안 나간다.
+     세로 구간만 겹치지 않게 나눈다 (겹치면 색이 두 번 얹혀 진해진다).   */
+  앞: {   /* 그림 267 × 560 */
+    어깨: [[60, 36, 147, 42]],
+    가슴: [[60, 78, 147, 40]],
+    복근: [[60, 118, 147, 88]],
+    하체: [[38, 232, 191, 328]],
+    팔:   [[0, 68, 62, 190], [205, 68, 62, 190]],
+  },
+  뒤: {   /* 그림 342 × 560 */
+    어깨: [[108, 36, 126, 44]],
+    등:   [[108, 80, 126, 128]],
+    하체: [[92, 208, 158, 352]],
+    팔:   [[0, 68, 112, 194], [230, 68, 112, 194]],
+  },
 };
 function bodyMap(o){
   const mx = Math.max(1, ...몸부위.map(k => o[k] || 0));
-  /* 안 한 곳은 거의 안 보이게, 많이 한 곳은 진하게 */
-  const 칠 = k => { const v = o[k] || 0;
-    return v ? `rgba(240,211,160,${(0.20 + 0.72*(v/mx)).toFixed(3)})` : 'rgba(255,255,255,.05)'; };
-  const 선 = k => (o[k] ? 'rgba(240,211,160,.5)' : 'rgba(255,255,255,.11)');
-  const 몸 = (k, d) => `<path d="${d}" fill="${칠(k)}" stroke="${선(k)}" stroke-width=".9"
-    stroke-linejoin="round"/>`;
-  const 살 = 'rgba(255,255,255,.075)';
-  const 거울 = g => `<g transform="translate(92,0) scale(-1,1)">${g}</g>`;
-
-  /* 몸의 뼈대 — 부위를 하나도 안 했어도 사람으로 보이게 깔아 둔다 */
-  const 반쪽뼈대 = `<path d="${몸꼴.팔}" fill="${살}"/><path d="${몸꼴.다리}" fill="${살}"/>`
-                 + `<path d="${몸꼴.발}" fill="${살}"/>`;
-  const 뼈대 = `<circle cx="46" cy="14.5" r="10" fill="${살}"/>`
-             + `<rect x="41.8" y="21" width="8.4" height="15" rx="4" fill="${살}"/>`
-             + `<path d="${몸꼴.몸통}" fill="${살}"/>` + 반쪽뼈대 + 거울(반쪽뼈대);
-
-  const 반쪽 = 몸('어깨', 몸꼴.어깨) + 몸('팔', 몸꼴.팔) + 몸('하체', 몸꼴.다리);
-  const 앞 = 뼈대 + 몸('가슴', 몸꼴.가슴) + 몸('복근', 몸꼴.복근) + 반쪽 + 거울(반쪽)
-    + `<text x="46" y="170" text-anchor="middle" font-size="10.5" font-weight="700" fill="#7d766e">앞</text>`;
-  const 뒤 = 뼈대 + 몸('등', 몸꼴.등) + 몸('등', 몸꼴.허리) + 반쪽 + 거울(반쪽)
-    + `<text x="46" y="170" text-anchor="middle" font-size="10.5" font-weight="700" fill="#7d766e">뒤</text>`;
+  /* 안 한 곳은 안 칠한다. 많이 한 곳일수록 진하게 */
+  const 세기 = k => { const v = o[k] || 0; return v ? (0.34 + 0.62*(v/mx)) : 0; };
+  const 덮개 = (면, 넓이, 그림) => `<svg class="bhit" viewBox="0 0 ${넓이} 560" aria-hidden="true"
+      style="--m:url(img/${그림})">`
+    + Object.entries(몸자리[면]).map(([k, rs]) => { const a = 세기(k);
+        return a ? rs.map(r => `<rect x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}"
+          fill="rgba(226,166,58,${a.toFixed(3)})"/>`).join('') : ''; }).join('')
+    + `</svg>`;
 
   const 칩 = PARTS8.map(k => `<span class="bchip ${o[k]?'on':''}">
     <i style="background:${o[k] ? `rgba(240,211,160,${(0.32 + 0.68*Math.min(1,(o[k]||0)/mx)).toFixed(2)})` : 'rgba(255,255,255,.10)'}"></i>
     ${k}<b>${o[k]||0}</b></span>`).join('');
 
   return `<div class="bwrap">
-    <svg viewBox="0 0 196 176" class="bsvg">
-      <g>${앞}</g>
-      <g transform="translate(104,0)">${뒤}</g>
-    </svg>
+    <div class="bpair">
+      <div class="bfig fr">
+        <img src="img/body-front.webp" alt="앞모습" width="267" height="560">
+        ${덮개('앞', 267, 'body-front.webp')}<span class="bcap">앞</span></div>
+      <div class="bfig bk">
+        <img src="img/body-back.webp" alt="뒷모습" width="342" height="560">
+        ${덮개('뒤', 342, 'body-back.webp')}<span class="bcap">뒤</span></div>
+    </div>
     <div class="bchips">${칩}</div>
   </div>`;
 }
@@ -2312,11 +2321,17 @@ function vStart(){
       <span class="tt">내 루틴에서 고르기</span>
       <span class="dd">미리 짜 둔 루틴 중에서 직접 고릅니다</span></button>
 
-    ${ws[0]?`<button class="hero2 ${사진있나('again')}" data-act="again:${ws[0].id}"
-        style="${사진꾸밈('again','#3a2a20','#15110d')}">
-      <span class="art w6"></span>
-      <span class="tt">지난 운동 그대로</span>
-      <span class="dd">${dateTxt(ws[0].date)} · ${ws[0].items.map(i=>exOf(i.ex).n).slice(0,2).join(', ')}${ws[0].items.length>2?' 외':''}</span></button>`:''}
+    ${/* 지난 기록이 없어도 자리는 지킨다 — 카드가 통째로 사라지면 어디 갔나 싶다 */''}
+    ${ws[0]
+      ? `<button class="hero2 ${사진있나('again')}" data-act="again:${ws[0].id}"
+          style="${사진꾸밈('again','#3a2a20','#15110d')}">
+        <span class="art w6"></span>
+        <span class="tt">지난 운동 그대로</span>
+        <span class="dd">${dateTxt(ws[0].date)} · ${ws[0].items.map(i=>exOf(i.ex).n).slice(0,2).join(', ')}${ws[0].items.length>2?' 외':''}</span></button>`
+      : `<button class="hero2 dimc" data-act="noprev" style="--h1:#2b2a26;--h2:#141311">
+        <span class="art w6"></span>
+        <span class="tt">지난 운동 그대로</span>
+        <span class="dd">아직 지난 기록이 없어요 — 한 번 하고 나면 여기서 그대로 다시 할 수 있어요</span></button>`}
 
     <button class="hero2 ${사진있나('pickex')}" data-act="empty"
         style="${사진꾸밈('pickex','#4a3b1c','#17130b')}">
@@ -6861,6 +6876,7 @@ document.addEventListener('click', ev=>{
       sheetFinish(); return; }
     case 'askfin': sheetFinish(); return;
     case 'dofin': closeSheet(); finish(); return;
+    case 'noprev': toast('아직 지난 기록이 없어요'); return;
     case 'ootd': ootdPick(rest[0]); return;
     case 'ootdview': sheetOotdView(rest[0]); return;
     case 'orec': closeSheet(); S.wid = rest[0]; go('summary'); return;
