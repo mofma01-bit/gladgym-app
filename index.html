@@ -16,11 +16,12 @@
 
 <style>
 :root{color-scheme:dark;
-  --dark:#131312; --dark-2:#1c1c1a; --dark-3:#262623; --dark-4:#333330;
-  --brown:#412921; --gold:#e6c487; --gold-2:#c9a96e; --gold-dim:#211c14;
-  --teal:#9dcedc; --teal-dim:#16262b;
-  --cream:#fdfaf6; --sub:#b5aca2; --line:#2e2e2a;
-  --warn:#c98b7a; --stage:#0a0a09;
+  /* 바닥을 한 단씩 올렸다 — 어둡되 지하실처럼 눌리지 않게 */
+  --dark:#1e1e1b; --dark-2:#282824; --dark-3:#33332e; --dark-4:#41413b;
+  --brown:#5a3a2e; --gold:#f0d3a0; --gold-2:#d6b87e; --gold-dim:#332b1d;
+  --teal:#a9d8e6; --teal-dim:#1e343b;
+  --cream:#fffcf8; --sub:#c6bdb2; --line:#3c3b36;
+  --warn:#dda08d; --stage:#141412;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0}
@@ -40,7 +41,7 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
   #top{padding-top:calc(13px + env(safe-area-inset-top))}
 }
 
-#top{background:#0e0e0d;border-bottom:1px solid var(--line);padding:13px 16px;
+#top{background:#1a1a17;border-bottom:1px solid var(--line);padding:13px 16px;
   display:flex;align-items:center;gap:11px;flex:none;min-height:52px}
 #top .ttl{font-size:16px;font-weight:700;letter-spacing:-.02em;line-height:1.25}
 #top .ttl small{display:block;font-size:11.5px;font-weight:500;color:var(--gold-2);letter-spacing:0}
@@ -203,7 +204,7 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .shotbtn .ic{font-size:24px}
 .shotbtn .t{font-size:15px;font-weight:700}
 .shotbtn .s{font-size:12.5px;font-weight:500}
-#foot{flex:none;border-top:1px solid #3a3a35;background:#1a1a18;padding:11px 14px;display:flex;gap:9px;
+#foot{flex:none;border-top:1px solid #46453f;background:#242420;padding:11px 14px;display:flex;gap:9px;
   box-shadow:0 -6px 16px rgba(0,0,0,.35)}
 #tabs{flex:none;background:var(--brown);border-top:1px solid #6b4436;display:flex;
   box-shadow:0 -6px 16px rgba(0,0,0,.45)}
@@ -1015,7 +1016,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '106';
+const BUILD = '107';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
