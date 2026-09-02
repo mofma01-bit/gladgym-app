@@ -373,6 +373,60 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
   border-radius:0 0 14px 14px;padding:13px;margin:-9px 0 4px;
   display:flex;flex-direction:column;gap:9px}
 /* 직전 무게 — 접힌 한 줄이 기본, 누르면 3회분 펼침 */
+/* 준비운동 */
+.bigb{
+  background:var(--dark-2);border:1px solid var(--line);border-radius:16px;
+  padding:18px 16px;display:flex;align-items:center;gap:14px;width:100%;text-align:left}
+.bigb .ic{
+  width:48px;height:48px;border-radius:14px;flex:none;display:flex;align-items:center;
+  justify-content:center;font-size:22px;background:var(--gold-dim);
+  border:1px solid var(--gold-2);color:var(--gold)}
+.bigb .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.bigb .nm{font-size:17px;font-weight:800;letter-spacing:-.02em;line-height:1.3}
+.bigb .sm{font-size:12.5px;color:var(--sub);line-height:1.5}
+.bigb .ar{color:var(--sub);font-size:16px;flex:none}
+.bigb .cnt2{
+  font-size:12px;font-weight:800;color:var(--gold);flex:none;
+  background:var(--gold-dim);border:1px solid var(--gold-2);border-radius:999px;padding:4px 10px}
+
+.prephd{
+  background:var(--dark-2);border:1px solid var(--line);border-left:3px solid var(--gold);
+  border-radius:0 14px 14px 0;padding:14px 15px;display:flex;flex-direction:column;gap:3px}
+.prephd .ph1{font-size:18px;font-weight:800;letter-spacing:-.02em}
+.prephd .ph2{font-size:12.5px;color:var(--sub);line-height:1.55}
+.prephd .ph3{font-size:11.5px;font-weight:700;color:var(--gold-2);margin-top:3px}
+.prephd.t{border-left-color:var(--teal)}
+.prephd.t .ph3{color:var(--teal)}
+.bigb .ic.t{background:var(--teal-dim);border-color:#3a5b66;color:var(--teal)}
+.seg2{display:flex;gap:7px;margin-bottom:2px}
+.seg2 button{
+  flex:1;padding:11px 0;border-radius:12px;border:1px solid var(--line);
+  font-size:13.5px;font-weight:700;color:var(--sub);background:var(--dark-2)}
+.seg2 button.on{border-color:var(--gold-2);color:var(--gold);background:var(--gold-dim)}
+
+.prow{
+  background:var(--dark-2);border:1px solid var(--line);border-radius:13px;
+  padding:13px 14px;display:flex;gap:12px;align-items:flex-start}
+.prow.m{border-left:3px solid var(--teal);border-radius:0 13px 13px 0}
+.prow.s{border-left:3px solid var(--gold-2);border-radius:0 13px 13px 0}
+.prow .no{
+  width:24px;height:24px;border-radius:8px;flex:none;display:flex;align-items:center;
+  justify-content:center;font-size:12px;font-weight:800;background:var(--dark-3);
+  color:var(--sub);margin-top:1px}
+.prow .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.prow .nm{font-size:15px;font-weight:800;letter-spacing:-.01em;line-height:1.35;
+  display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.prow .tm{
+  font-size:11.5px;font-weight:800;color:var(--gold);background:var(--gold-dim);
+  border:1px solid var(--gold-2);border-radius:999px;padding:2px 9px;flex:none}
+.prow .sm{font-size:12.5px;color:var(--sub);line-height:1.65}
+.prow .kd{
+  font-size:10.5px;font-weight:700;color:var(--sub);letter-spacing:.04em}
+.prow.m .kd{color:var(--teal)}
+.prow.s .kd{color:var(--gold-2)}
+.prow.x{border-left:3px solid #4a4a44;border-radius:0 13px 13px 0}
+.prow.x .kd{color:var(--sub)}
+
 .vpick{gap:6px}
 .vpick .chip{padding:6px 12px;font-size:12.5px;font-weight:700}
 .prevb{background:var(--gold-dim);border:1px solid #4a3d22;border-left:3px solid var(--gold);
@@ -897,7 +951,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '100';
+const BUILD = '103';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -957,7 +1011,8 @@ function agoTxt(iso){
 
 /* ═══ 상태 ═══ */
 let D = { routines:[], desc:{}, addvars:{}, today:{}, workouts:[], cm:[], live:null, intake:{}, body:{}, cycle:{} };
-let S = { who:null, mid:null, screen:'boot', tab:'home', pickPart:'가슴', pickEq:'전체', tmid:null };
+let S = { who:null, mid:null, screen:'boot', tab:'home', pickPart:'가슴', pickEq:'전체', tmid:null,
+          prepKind:'sm', prepSet:'office', prepTab:'common', prepRid:null };
 
 const LIVEKEY = 'gladgym_live_v1';
 function save(){ try{ localStorage.setItem(LIVEKEY, JSON.stringify(D.live)); }catch(e){} }
@@ -1455,6 +1510,7 @@ function render(){
   else { S.draft = {}; S.exq = ''; }   /* 화면이 바뀌면 찾던 말도 비운다 */
   const V={login:vLogin,home:vHome,routines:vRoutines,routine:vRoutine,start:vStart,pick:vPick,
     workout:vWorkout,summary:vSummary,records:vRecords,record:vRecord,feedback:vFeedback,me:vMe,
+    prep:vPrep, prep2:vPrep2, prep3:vPrep3,
     t_members:tMembers,t_member:tMember,t_live:tLive,t_write:tWrite,t_routines:tRoutines,t_redit:tRedit,t_ex:tEx,
     intake:vIntake, plan:vPlan, body:vBody, cycle:vCycle, qa:vQa, boot:vBoot, err:vErr,
     newmem:vNewMem, intake_edit:vIntakeEdit, plan_edit:vPlanEdit, t_pickex:tPickEx,
@@ -1606,6 +1662,11 @@ function vHome(){
       <div><div class="nm">오늘 지정 · 루틴 ${r.no} ${esc(r.n)}</div>
       <div class="sm">${esc(t.by)}가 지정했어요</div></div><span class="rt">›</span></button>` : ''}
 
+    <button class="card rowc plan" data-act="go:prep">
+      <div><div class="nm">준비운동</div>
+      <div class="sm">스트레칭 · 셀프 마사지 · 둘 다 — 보고 따라 하기</div></div>
+      <span class="rt">›</span></button>
+
     ${(()=>{ const rc=recosOf(S.mid).filter(x=>rOf(x.rid)); if(!rc.length) return '';
       return `<span class="lbl">다음 개인운동 추천</span>`
         + rc.map(x=>{ const r0=rOf(x.rid);
@@ -1680,6 +1741,9 @@ function vStart(){
     ${r?`<button class="card teal" data-act="rt:${r.id}">
       <div class="nm t">트레이너 지정루틴 시작하기</div>
       <div class="sm">${esc(t.kind)} · 루틴 ${r.no} · ${esc(r.n)}<br>${r.items.length}종목 · 예상 ${estMin(r)}분 · ${esc(t.by||'트레이너')}가 지정했어요</div></button>`:''}
+    <button class="card teal" data-act="go:prep">
+      <div class="nm t">준비운동 먼저 하기</div>
+      <div class="sm">스트레칭 · 셀프 마사지 — 굳은 곳을 먼저 풀고 시작합니다</div></button>
     <button class="card gold" data-act="empty">
       <div class="nm g">＋ 운동 종목 추가하기</div>
       <div class="sm">종목을 골라 담고 내 마음대로 시작합니다</div></button>
@@ -1820,6 +1884,248 @@ function prevBox(e, cur, mid){
       ${oi>=0?`<button class="rb" data-act="usekg:${e.cardio?0:kgfmt(t)}:${rp.reps||0}">이 무게로</button>`:''}
     </div>`; }).join('');
   return `<div class="prevb">${줄}${안}</div>`;
+}
+
+
+/* ═══ 준비운동 ═══
+   스트레칭·셀프 마사지 사전. 시간은 초읽기를 하지 않고 「권장」만 적는다.
+   근거 — 정적 스트레칭 10~30초 유지(ACSM), 폼롤러 부위당 30~60초,
+          아픈 지점은 20~30초 눌러 유지. 뼈·관절·허리 위는 굴리지 않는다. */
+const ST = [
+ {i:'s01', n:'목 옆으로 늘이기',        t:'좌우 20초', d:'귀를 어깨 쪽으로 기울이고 반대 손은 바닥으로 내려 주세요'},
+ {i:'s02', n:'목 대각선으로 늘이기',    t:'좌우 20초', d:'코끝을 겨드랑이 쪽으로 비스듬히 숙여 뒷목 바깥을 늘입니다'},
+ {i:'s03', n:'턱 당기기',               t:'10회',      d:'뒤통수를 위로 밀며 턱을 목 쪽으로 2초씩. 고개는 숙이지 않습니다'},
+ {i:'s04', n:'문틀 가슴 늘이기',        t:'좌우 30초', d:'팔꿈치를 어깨 높이로 문틀에 대고 한 발 앞으로 나갑니다'},
+ {i:'s05', n:'뒤로 깍지 끼고 가슴 열기',t:'30초',      d:'등 뒤에서 깍지를 끼고 가슴은 위로, 어깨는 아래로 내립니다'},
+ {i:'s06', n:'팔 교차 어깨 뒤 늘이기',  t:'좌우 20초', d:'팔을 몸 앞으로 가로질러 반대 손으로 몸 쪽으로 당깁니다'},
+ {i:'s07', n:'삼두 늘이기',             t:'좌우 20초', d:'팔꿈치를 머리 뒤로 접고 반대 손으로 지그시 눌러 줍니다'},
+ {i:'s08', n:'손목 앞뒤 늘이기',        t:'좌우 15초', d:'손바닥을 위로·아래로 뒤집어 각각 당깁니다. 마우스 많이 쓴 날에'},
+ {i:'s09', n:'기둥 잡고 광배 늘이기',   t:'좌우 25초', d:'기둥을 잡고 엉덩이를 뒤로 빼며 겨드랑이 옆을 늘입니다'},
+ {i:'s10', n:'캣카우',                  t:'10회',      d:'네발기기에서 등을 둥글렸다 폈다. 숨에 맞춰 천천히'},
+ {i:'s11', n:'흉추 회전 (네발기기)',    t:'좌우 8회',  d:'한 손을 뒤통수에 대고 팔꿈치를 천장 쪽으로 열어 줍니다'},
+ {i:'s12', n:'스레드 더 니들',          t:'좌우 20초', d:'팔을 반대쪽 겨드랑이 밑으로 통과시켜 어깨를 바닥에 붙입니다'},
+ {i:'s13', n:'차일드 포즈',             t:'30초',      d:'무릎을 벌리고 엉덩이를 발뒤꿈치로, 팔은 앞으로 멀리 뻗습니다'},
+ {i:'s14', n:'옆구리 늘이기',           t:'좌우 20초', d:'한 팔을 머리 위로 넘겨 몸통을 옆으로 기울입니다'},
+ {i:'s15', n:'무릎 꿇고 고관절 앞 늘이기', t:'좌우 30초', d:'뒷다리 엉덩이에 힘을 주고 골반을 앞으로 밉니다. 허리를 젖히지 마세요'},
+ {i:'s16', n:'90/90 고관절',            t:'좌우 30초', d:'앞뒤 무릎을 90도로 앉아 상체를 앞 정강이 쪽으로 숙입니다'},
+ {i:'s17', n:'비둘기 자세',             t:'좌우 30초', d:'앞 정강이를 눕히고 상체를 천천히 앞으로 내립니다'},
+ {i:'s18', n:'누워서 4자 둔근 늘이기',  t:'좌우 30초', d:'4자로 다리를 얹고 아래쪽 허벅지를 가슴으로 당깁니다'},
+ {i:'s19', n:'선 자세 햄스트링 늘이기', t:'좌우 25초', d:'발뒤꿈치를 낮은 곳에 얹고 엉덩이를 뒤로 뺍니다. 등은 편 채로'},
+ {i:'s20', n:'개구리 스트레칭',         t:'40초',      d:'무릎을 넓게 벌리고 앞뒤로 천천히 흔들어 줍니다'},
+ {i:'s21', n:'옆으로 내전근 늘이기',    t:'좌우 25초', d:'한 다리를 펴고 반대쪽으로 체중을 옮겨 안쪽 허벅지를 늘입니다'},
+ {i:'s22', n:'선 자세 앞허벅지 늘이기', t:'좌우 25초', d:'발등을 잡고 무릎을 뒤로. 골반은 세우고 허리를 젖히지 않습니다'},
+ {i:'s23', n:'벽 짚고 종아리 늘이기',   t:'좌우 25초', d:'뒷발 뒤꿈치를 바닥에 붙이고 몸을 앞으로 밉니다'},
+ {i:'s24', n:'무릎 앞으로 밀기 (발목)', t:'좌우 10회', d:'뒤꿈치를 붙인 채 무릎을 발끝 너머로 밀었다 돌아옵니다'},
+ {i:'s25', n:'힙 서클 (네발기기)',      t:'좌우 8회',  d:'무릎으로 큰 원을 그리듯 고관절을 돌립니다'},
+ {i:'s26', n:'다리 앞뒤로 흔들기',      t:'좌우 12회', d:'기둥을 잡고 다리를 앞뒤로 크게 흔듭니다'},
+ {i:'s27', n:'월 슬라이드',             t:'10회',      d:'등을 벽에 붙이고 팔을 위아래로. 허리가 벽에서 뜨지 않게'},
+ {i:'s28', n:'브레이싱 호흡',           t:'8회',       d:'갈비뼈를 옆으로 벌리며 코로 들이쉬고, 길게 내쉽니다'},
+ {i:'s29', n:'다운독',                  t:'30초',      d:'엉덩이를 천장으로 올리고 뒤꿈치를 번갈아 눌러 줍니다'},
+ {i:'s30', n:'월드 그레이티스트 스트레치', t:'좌우 5회', d:'런지에서 팔꿈치를 바닥으로, 그다음 팔을 열어 위로 회전합니다'},
+ {i:'s31', n:'어깨 크게 돌리기',        t:'앞뒤 10회', d:'팔꿈치로 큰 원을 그리듯 어깨를 돌립니다'},
+ {i:'s32', n:'앉아서 상체 회전',        t:'좌우 8회',  d:'앉은 채로 가슴을 좌우로 크게 돌립니다. 골반은 고정'},
+];
+const MS = [
+ {i:'m01', n:'폼롤러 등 (흉추)',        t:'60초',      d:'날개뼈 아래에 가로로 놓고 위아래로. 허리까지 내려가지 마세요'},
+ {i:'m02', n:'폼롤러 흉추 펴기',        t:'40초',      d:'롤러 위에 등을 얹고 팔을 만세하며 등을 뒤로 젖힙니다'},
+ {i:'m03', n:'땅콩볼 척추 옆',          t:'40초',      d:'홈에 척추를 끼우고 양옆 근육만 눌러 줍니다. 뼈 위는 피하세요'},
+ {i:'m04', n:'땅콩볼 뒤통수 아래',      t:'40초',      d:'누워서 뒤통수 아래 홈에 목을 얹고 고개를 좌우로 천천히'},
+ {i:'m05', n:'볼 어깨 뒤 (벽)',         t:'좌우 40초', d:'벽에 볼을 대고 날개뼈 바깥쪽을 눌러 줍니다'},
+ {i:'m06', n:'볼 가슴 앞 (벽)',         t:'좌우 30초', d:'벽 모서리에 볼을 대고 쇄골 아래를 지그시. 말린 어깨의 원인입니다'},
+ {i:'m07', n:'폼롤러 광배',             t:'좌우 40초', d:'옆으로 누워 겨드랑이 아래에 놓고 앞뒤로 흔듭니다'},
+ {i:'m08', n:'볼 목·어깨 사이 (벽)',    t:'좌우 30초', d:'벽에 대고 목과 어깨 사이 봉긋한 곳을 위아래로'},
+ {i:'m09', n:'폼롤러 허벅지 앞',        t:'좌우 50초', d:'엎드려 골반부터 무릎 위까지. 무릎 관절은 넘지 마세요'},
+ {i:'m10', n:'폼롤러 허벅지 옆',        t:'좌우 45초', d:'옆으로 누워 골반~허벅지 중간까지 짧게. 체중을 다 싣지 마세요'},
+ {i:'m11', n:'폼롤러 허벅지 뒤',        t:'좌우 45초', d:'앉아서 엉덩이부터 무릎 위까지. 다리를 포개면 더 세집니다'},
+ {i:'m12', n:'폼롤러 둔근',             t:'좌우 45초', d:'4자로 앉아 한쪽 엉덩이에 체중을 싣고 앞뒤로 굴립니다'},
+ {i:'m13', n:'볼 엉덩이 깊은 곳',       t:'좌우 45초', d:'앉아서 볼을 엉덩이 아래에 두고, 아픈 곳에서 20~30초 멈춥니다'},
+ {i:'m14', n:'폼롤러 종아리',           t:'좌우 45초', d:'발목부터 무릎 아래까지, 발을 좌우로 돌려가며 굴립니다'},
+ {i:'m15', n:'폼롤러 내전근',           t:'좌우 40초', d:'엎드려 한 다리를 벌리고 안쪽 허벅지를 굴립니다'},
+ {i:'m16', n:'폼롤러 정강이 앞',        t:'좌우 30초', d:'네발기기에서 정강이 바깥쪽을 눌러 줍니다'},
+ {i:'m17', n:'볼 발바닥',               t:'좌우 40초', d:'서서 발바닥 아치를 앞뒤로 굴립니다. 발이 무너진 분께'},
+ {i:'m18', n:'폼롤러 팔뚝',             t:'좌우 30초', d:'팔뚝 안쪽을 굴립니다. 마우스·키보드 많이 쓴 날에'},
+ {i:'m19', n:'폼롤러 등 아래쪽',        t:'40초',      d:'갈비뼈 아래까지만. 허리(요추) 위로는 절대 굴리지 않습니다'},
+ {i:'m20', n:'볼 날개뼈 사이 (벽)',     t:'좌우 40초', d:'벽에 대고 날개뼈 안쪽을 위아래로 눌러 줍니다'},
+];
+const 사전 = {}; ST.concat(MS).forEach(x=>{ 사전[x.i]=x; });
+
+/* 추천 묶음 — 부위 무리마다 후보를 두고, 무리에서 하나씩 뽑아 섞는다.
+   그냥 돌리기만 하면 어떤 주에는 핵심 부위가 통째로 빠진다. */
+const PREPSET = [
+ { k:'office', n:'직장인을 위한 전신 풀기', ic:'◍',
+   sm:'하루 종일 앉아 있어 굳은 곳 — 목·가슴·등·고관절',
+   m:[ ['m01','m02','m03','m20'],
+       ['m04','m08','m05','m06'],
+       ['m09','m10','m19','m18','m12'] ],
+   s:[ ['s01','s02','s03','s04','s05','s06'],
+       ['s10','s11','s12','s13','s14','s32','s27'],
+       ['s15','s16','s28','s22','s18'] ] },
+ { k:'leg', n:'하체 운동 전 추천', ic:'◮',
+   sm:'고관절 · 햄스트링 · 발목을 먼저 엽니다',
+   m:[ ['m09','m10'],
+       ['m11','m12','m13'],
+       ['m14','m16','m17','m15'] ],
+   s:[ ['s15','s16','s25','s30'],
+       ['s19','s26','s22','s21'],
+       ['s23','s24','s29','s17','s18','s20'] ] },
+ { k:'chest', n:'가슴 운동 전 추천', ic:'◑',
+   sm:'가슴 앞과 어깨를 열고 등을 세웁니다',
+   m:[ ['m06','m05','m07'],
+       ['m01','m02','m03','m20'] ],
+   s:[ ['s04','s05','s06'],
+       ['s11','s12','s10','s27'],
+       ['s07','s31'] ] },
+ { k:'back', n:'등 운동 전 추천', ic:'◨',
+   sm:'광배와 흉추를 풀어 당길 자리를 만듭니다',
+   m:[ ['m07','m12','m19'],
+       ['m01','m02','m03','m20'] ],
+   s:[ ['s09','s13','s14'],
+       ['s10','s11','s12','s32'],
+       ['s18','s19'] ] },
+ { k:'shoulder', n:'어깨 운동 전 추천', ic:'◔',
+   sm:'목 · 어깨 뒤 · 흉추. 어깨는 등이 받쳐 줘야 안 아픕니다',
+   m:[ ['m05','m06','m08','m04'],
+       ['m01','m02','m20','m07'] ],
+   s:[ ['s01','s02','s06','s07'],
+       ['s04','s05','s31'],
+       ['s11','s12','s27'] ] },
+];
+const PREPKIND = [
+ { k:'s',  n:'스트레칭',          ic:'◇', sm:'늘이기만 — 4가지' },
+ { k:'m',  n:'셀프 마사지',       ic:'◉', sm:'폼롤러 · 땅콩볼로 풀기 — 4가지' },
+ { k:'sm', n:'스트레칭 + 마사지', ic:'◈', sm:'풀고 늘이기 — 5가지' },
+];
+
+/* 주마다 다른 조합 — 같은 주에는 늘 같게, 주가 바뀌면 바뀐다 */
+function 이번주(){
+  return Math.floor((new Date(TODAY+'T00:00:00') - new Date('2026-01-05T00:00:00')) / 604800000);
+}
+/* 무리에서 하나씩 돌아가며 뽑는다 — 어느 주에도 핵심 부위가 빠지지 않게 */
+function 뽑기(무리들, n, 자리){
+  const w = 이번주() + (자리||0), out = [];
+  let 회 = 0;
+  while(out.length < n && 회 < n*4){
+    const g = 무리들[회 % 무리들.length];
+    const c = g[(w + Math.floor(회 / 무리들.length)) % g.length];
+    if(out.indexOf(c) < 0) out.push(c);
+    회++;
+  }
+  return out;
+}
+function prepList(setKey, kind){
+  const st = PREPSET.find(x=>x.k===setKey) || PREPSET[0];
+  if(kind==='s') return 뽑기(st.s, 4, 0).map(i=>사전[i]);
+  if(kind==='m') return 뽑기(st.m, 4, 0).map(i=>사전[i]);
+  return 뽑기(st.m, 2, 0).map(i=>사전[i])
+    .concat(뽑기(st.s, 3, 1).map(i=>사전[i]));   /* 풀고 → 늘이기 */
+}
+
+/* ── 준비운동 · 갈래 고르기 ── */
+function vPrep(){
+  return { top: bar('준비운동','', 'go:home'), body:`
+    <div class="note">몸을 <b>풀고 늘이는</b> 것부터 하고 운동을 시작합니다. 시간을 재지 않아요 —
+      보고 그대로 따라 하시면 됩니다.</div>
+    ${PREPKIND.map(x=>`<button class="bigb" data-act="pk:${x.k}">
+      <span class="ic">${x.ic}</span>
+      <span class="tx"><span class="nm">${esc(x.n)}</span><span class="sm">${esc(x.sm)}</span></span>
+      <span class="ar">›</span></button>`).join('')}
+    <div class="note" style="margin-top:4px">
+      <b>뼈와 관절 위는 굴리지 않습니다.</b> 허리(요추)에 폼롤러를 직접 대지 마세요.
+      아프면 힘을 빼고, 아픈 자리는 20~30초 지그시 눌러 주세요.</div>` };
+}
+
+/* 트레이너가 지정한 준비운동 — 루틴에 grp='준비운동' 으로 담긴다 */
+function prepRoutines(mid){
+  return (D.routines||[]).filter(r => r.mid===(mid||S.mid) && /준비운동/.test(r.grp||''))
+    .sort((a,b)=>a.no-b.no);
+}
+function prepFromRoutine(r){
+  return (r.items||[]).map(function(it){
+    if(it.ex==='prep') return 사전[it.va] || null;          /* 준비운동 사전에서 담은 것 */
+    const e = exOf(it.ex), v = varOf(it.ex, it.va);
+    return { i:'x', n: exName(it.ex, it.va),
+      t: e.cardio ? (it.reps+'분') : (it.sets>1 ? it.reps+'회 · '+it.sets+'세트' : it.reps+'회'),
+      d: (v && v.desc) ? v.desc.replace(/\s+/g,' ').trim().slice(0,70) : '트레이너가 담아 둔 동작입니다' };
+  }).filter(Boolean);
+}
+
+/* ── 준비운동 · 묶음 고르기 ── 공통 추천 / 트레이너 지정 ── */
+function vPrep2(){
+  const kd = PREPKIND.find(x=>x.k===S.prepKind) || PREPKIND[0];
+  const tab = S.prepTab || 'common';
+  const rs = prepRoutines(S.mid);
+
+  const 세그 = `<div class="seg2">
+    <button class="${tab==='common'?'on':''}" data-act="pt:common">공통 추천</button>
+    <button class="${tab==='trainer'?'on':''}" data-act="pt:trainer">트레이너 지정${rs.length?` ${rs.length}`:''}</button>
+  </div>`;
+
+  const 공통 = PREPSET.map(x=>{ const n = prepList(x.k, S.prepKind).length;
+      return `<button class="bigb" data-act="ps:${x.k}">
+      <span class="ic">${x.ic}</span>
+      <span class="tx"><span class="nm">${esc(x.n)}</span><span class="sm">${esc(x.sm)}</span></span>
+      <span class="cnt2">${n}가지</span></button>`; }).join('')
+    + `<div class="note">묶음은 <b>주마다 바뀝니다.</b> 같은 주에는 같은 것이 나오고,
+      다음 주가 되면 다른 조합으로 섞입니다 — 몸이 한 가지에만 익숙해지지 않게.</div>`;
+
+  const 지정 = rs.length
+    ? rs.map(r=>`<button class="bigb" data-act="pr:${r.id}">
+        <span class="ic t">★</span>
+        <span class="tx"><span class="nm">${esc(r.n)}</span>
+          <span class="sm">${r.purpose?esc(r.purpose):'트레이너가 직접 짠 준비운동'}</span></span>
+        <span class="cnt2">${(r.items||[]).length}가지</span></button>`).join('')
+      + `<div class="note">트레이너가 회원님께 맞춰 직접 담아 둔 것입니다.
+          <b>공통 추천보다 이쪽을 먼저</b> 하세요.</div>`
+    : `<div class="empty">아직 지정받은 준비운동이 없어요</div>
+       <div class="note">트레이너가 준비운동을 짜서 지정하면 여기에 뜹니다.
+         그때까지는 <b>공통 추천</b>을 쓰시면 됩니다.</div>`;
+
+  return { top: bar('준비운동', `<span class="sub">${esc(kd.n)}</span>`, 'go:prep'), body:
+    세그 + (tab==='common' ? 공통 : 지정) };
+}
+
+/* ── 준비운동 · 목록 ── 초읽기 없이 보고 따라 하기만 */
+function vPrep3(){
+  const kd = PREPKIND.find(x=>x.k===S.prepKind) || PREPKIND[0];
+  const w = live();
+  let 이름, 밑말, 꼬리, list;
+
+  if(S.prepRid){                                  /* 트레이너 지정 */
+    const r = rOf(S.prepRid);
+    if(!r) return vPrep2();
+    이름 = r.n; 밑말 = r.purpose || '트레이너가 직접 짠 준비운동';
+    꼬리 = `${(r.items||[]).length}가지 · 트레이너 지정`;
+    list = prepFromRoutine(r);
+  } else {                                        /* 공통 추천 */
+    const st = PREPSET.find(x=>x.k===S.prepSet) || PREPSET[0];
+    이름 = st.n; 밑말 = st.sm;
+    list = prepList(st.k, kd.k);
+    꼬리 = `${list.length}가지 · ${esc(kd.n)} · ${이번주()%52+1}주차 조합`;
+  }
+
+  const 갈래 = x => !x.i || x.i[0]==='x' ? 'x' : x.i[0];      /* m 풀기 · s 늘이기 · x 트레이너가 담은 종목 */
+  const 갈래말 = { m:'풀기', s:'늘이기', x:'운동' };
+  return { top: bar('준비운동', `<span class="sub">${S.prepRid?'트레이너 지정':esc(kd.n)}</span>`, 'go:prep2'), body:`
+    <div class="prephd ${S.prepRid?'t':''}">
+      <div class="ph1">${esc(이름)}</div>
+      <div class="ph2">${esc(밑말)}</div>
+      <div class="ph3">${꼬리}</div>
+    </div>
+    ${list.length ? list.map((x,i)=>`<div class="prow ${갈래(x)}">
+      <span class="no">${i+1}</span>
+      <span class="tx">
+        <span class="nm">${esc(x.n)}<span class="tm">${esc(x.t)}</span></span>
+        <span class="sm">${esc(x.d)}</span>
+        <span class="kd">${갈래말[갈래(x)]}</span>
+      </span></div>`).join('') : '<div class="empty">담긴 동작이 없어요</div>'}
+    <div class="note">
+      늘이는 동작은 <b>아프지 않고 살짝 당기는</b> 정도까지만. 반동을 주지 마세요.<br>
+      푸는 동작은 <b>천천히</b>, 아픈 자리에서 멈춰 20~30초 눌러 줍니다. 뼈·관절 위는 피하세요.</div>`,
+    foot: w
+      ? `<button class="btn sub" data-act="go:home">홈으로</button>
+         <button class="btn main" style="flex:1" data-act="go:workout">운동으로 돌아가기</button>`
+      : `<button class="btn sub" data-act="go:home">홈으로</button>
+         <button class="btn main" style="flex:1" data-act="go:start">운동 시작하기</button>` };
 }
 
 /* ── ★ 운동 중 ── */
@@ -5417,6 +5723,10 @@ document.addEventListener('click', ev=>{
       const nm = vaName(cur.ex, vk);
       toast(nm ? nm + '으로 바꿨어요' : '기본으로 바꿨어요');
       render(); return; }
+    case 'pk': S.prepKind = rest[0]; S.prepRid = null; go('prep2'); return;
+    case 'pt': S.prepTab = rest[0]; render(); return;
+    case 'ps': S.prepSet = rest[0]; S.prepRid = null; go('prep3'); return;
+    case 'pr': S.prepRid = rest[0]; go('prep3'); return;
     case 'prevopen': S.prevOpen = !S.prevOpen; render(); return;
     case 'usekg': {
       const cur = w.items[w.cur], i = cur.sets.findIndex(x=>!x.done);
