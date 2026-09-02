@@ -799,7 +799,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '96';
+const BUILD = '97';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1067,12 +1067,17 @@ window.addEventListener('popstate', ()=>{
 
 let sheetRender=null;
 function openSheet(fn){ sheetRender=fn; $('#sheet').classList.add('open'); drawSheet(); }
+/* 세트 숫자칸(setkg·setreps·setspd)은 코드가 값을 바꾸므로 초안으로 되돌리지 않는다.
+   되돌리면 ＋ － 를 눌러도 팝업 숫자가 멈춘 것처럼 보인다. */
+const 초안칸 = t => !/^set/.test(t.getAttribute('data-k')||'');
 function drawSheet(){
   if(!sheetRender) return;
   const box=$('#sheetbox');
-  box.querySelectorAll('textarea[data-k],input[data-k]').forEach(t=>{ S.draft=S.draft||{}; S.draft[t.getAttribute('data-k')]=t.value; });
+  box.querySelectorAll('textarea[data-k],input[data-k]').forEach(t=>{
+    if(!초안칸(t)) return; S.draft=S.draft||{}; S.draft[t.getAttribute('data-k')]=t.value; });
   box.innerHTML='<div class="grip"></div>'+sheetRender();
-  box.querySelectorAll('textarea[data-k],input[data-k]').forEach(t=>{ const d=S.draft&&S.draft[t.getAttribute('data-k')]; if(d) t.value=d; });
+  box.querySelectorAll('textarea[data-k],input[data-k]').forEach(t=>{
+    if(!초안칸(t)) return; const d=S.draft&&S.draft[t.getAttribute('data-k')]; if(d) t.value=d; });
 }
 function closeSheet(){ sheetRender=null; $('#sheet').classList.remove('open'); $('#sheetbox').innerHTML=''; }
 $('#sheet').addEventListener('click', e=>{ if(e.target.id==='sheet') closeSheet(); });
