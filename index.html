@@ -1133,6 +1133,7 @@ const 합친이름 = [
   ['트라이셉스 푸시다운','로프푸시다운 리버스그립푸시다운 원암케이블푸시다운 로프익스텐션'],
   ['케이블 크로스오버','로우케이블플라이 하이케이블플라이 케이블인클라인플라이 원암케이블플라이 케이블플라이'],
   ['레그 프레스','와이드레그프레스 내로우레그프레스'],
+  ['V 스쿼트','핵스쿼트 hack squat 브이스쿼트 v스쿼트'],   /* 센터에는 V 스쿼트만 있다 */
 ];
 const 별칭이름 = 합친이름.concat([
   ['벤치프레스','bench press bp 벤프'], ['인클라인','incline 인클'], ['디클라인','decline 디클'],
@@ -1372,7 +1373,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '129';
+const BUILD = '130';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
