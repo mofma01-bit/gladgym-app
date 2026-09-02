@@ -1117,7 +1117,23 @@ const isReco = d => d===RECO1 || d===RECO2;
 function recosOf(mid){ return (D.reco && D.reco[mid]) ? D.reco[mid] : []; }
 
 /* ── 찾기 ── 띄어쓰기·영어·줄임말·다른 표기로도 걸리게 ── */
-const 별칭이름 = [
+/* 합쳐서 없어진 이름으로도 찾아지게 — 「친업」을 치면 풀업이 나온다 */
+const 합친이름 = [
+  ['풀업','친업 chinup'],
+  ['바벨 로우','언더그립바벨로우 언더그립로우'],
+  ['벤치프레스','리버스그립벤치프레스 리버스그립벤치'],
+  ['덤벨 컬','해머컬 해머 hammer curl'],
+  ['바벨 컬','리버스컬 reverse curl'],
+  ['케이블 컬','로프컬 로프해머컬 케이블로프컬 케이블스트레이트바컬 케이블리버스컬 하이케이블컬'],
+  ['케이블 레터럴 레이즈','원암케이블레터럴레이즈 한팔레터럴'],
+  ['랫풀다운','와이드랫풀다운 언더그립랫풀다운 클로즈그립랫풀다운 원암랫풀다운 와이드랫풀 언더그립랫풀'],
+  ['시티드 로우','롱풀 longpull long pull'],
+  ['시티드 케이블 로우','롱풀 longpull 원암케이블로우 와이드케이블로우'],
+  ['트라이셉스 푸시다운','로프푸시다운 리버스그립푸시다운 원암케이블푸시다운 로프익스텐션'],
+  ['케이블 크로스오버','로우케이블플라이 하이케이블플라이 케이블인클라인플라이 원암케이블플라이 케이블플라이'],
+  ['레그 프레스','와이드레그프레스 내로우레그프레스'],
+];
+const 별칭이름 = 합친이름.concat([
   ['벤치프레스','bench press bp 벤프'], ['인클라인','incline 인클'], ['디클라인','decline 디클'],
   ['체스트','chest'], ['플라이','fly flye 플라잉'], ['펙덱','pecdec 펙덱플라이'],
   ['푸시업','pushup push up 팔굽혀펴기 팔굽혀 푸쉬업'], ['딥스','dips dip'],
@@ -1164,7 +1180,7 @@ const 별칭이름 = [
   ['벨트 스쿼트','beltsquat 힙벨트'], ['랜드마인','landmine'],
   ['수직','vertical'], ['45도','45 degree'], ['내로우','narrow 좁게'], ['와이드','wide 넓게'],
   ['프레스','press'], ['머신','machine'],
-];
+]);
 const 별칭부위 = { '가슴':'chest 흉근', '등':'back 등근육', '어깨':'shoulder delt 삼각근',
   '하체':'leg legs 다리 허벅지 하지', '복근':'abs core 코어 배 복부',
   '팔':'arm arms 팔뚝', '유산소':'cardio 카디오 유산소', '기타':'etc 재활 이완' };
@@ -1355,7 +1371,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '127';
+const BUILD = '128';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
