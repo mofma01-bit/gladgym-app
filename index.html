@@ -403,7 +403,9 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .hero2.tall{height:150px}
 .hero2.shot .art{display:none}
 .hero2.shot::after{
-  background:linear-gradient(to top,rgba(6,6,5,.82) 4%,rgba(6,6,5,.30) 56%,rgba(6,6,5,.12))}
+  background:linear-gradient(to top,rgba(6,6,5,.66) 2%,rgba(6,6,5,.22) 46%,
+    rgba(6,6,5,.06) 64%,transparent)}
+.hero2.shot .tag2{background:rgba(20,18,15,.42);border-color:rgba(255,255,255,.30)}
 
 /* 무늬 — 사진이 없는 동안 카드를 살려 주는 장치 */
 .hero2 .art{position:absolute;inset:0;z-index:0;opacity:.5;pointer-events:none}
@@ -1016,7 +1018,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '107';
+const BUILD = '108';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
