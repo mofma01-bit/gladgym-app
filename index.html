@@ -400,6 +400,9 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
   position:absolute;top:13px;left:16px;z-index:3;font-size:10.5px;font-weight:800;
   letter-spacing:.1em;color:rgba(255,255,255,.6)}
 .hero2.tall{height:150px}
+.hero2.shot .art{display:none}
+.hero2.shot::after{
+  background:linear-gradient(to top,rgba(6,6,5,.82) 4%,rgba(6,6,5,.30) 56%,rgba(6,6,5,.12))}
 
 /* 무늬 — 사진이 없는 동안 카드를 살려 주는 장치 */
 .hero2 .art{position:absolute;inset:0;z-index:0;opacity:.5;pointer-events:none}
@@ -1012,7 +1015,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '105';
+const BUILD = '106';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2038,7 +2041,7 @@ const PREPSET = [
    s:[ ['s01','s02','s03','s04','s05','s06'],
        ['s10','s11','s12','s13','s14','s32','s27'],
        ['s15','s16','s28','s22','s18'] ] },
- { k:'leg', n:'하체 운동 전 추천', art:'r4', h1:'#23412f', h2:'#0f1613',
+ { k:'leg', n:'하체 운동 전 추천', art:'r4', h1:'#23412f', h2:'#0f1613', img:'img/card-leg.jpg',
    sm:'고관절 · 햄스트링 · 발목을 먼저 엽니다',
    m:[ ['m09','m10'],
        ['m11','m12','m13'],
@@ -2101,13 +2104,17 @@ function prepList(setKey, kind){
     .concat(뽑기(st.s, 3, 1).map(i=>사전[i]));   /* 풀고 → 늘이기 */
 }
 
+/* 카드 배경 — 사진이 있으면 얹고, 없으면 색·무늬만 */
+const 카드꾸밈 = x => '--h1:' + x.h1 + ';--h2:' + x.h2
+  + (x.img ? ';--img:url(' + x.img + ')' : '');
+
 /* ── 준비운동 · 갈래 고르기 ── */
 function vPrep(){
   return { top: bar('준비운동','', 'go:home'), body:`
     <div class="note">몸을 <b>풀고 늘이는</b> 것부터 하고 운동을 시작합니다. 시간을 재지 않아요 —
       보고 그대로 따라 하시면 됩니다.</div>
-    ${PREPKIND.map(x=>`<button class="hero2 tall" data-act="pk:${x.k}"
-        style="--h1:${x.h1};--h2:${x.h2}">
+    ${PREPKIND.map(x=>`<button class="hero2 tall ${x.img?'shot':''}" data-act="pk:${x.k}"
+        style="${카드꾸밈(x)}">
       <span class="art ${x.art}"></span>
       <span class="tt">${esc(x.n)}</span>
       <span class="dd">${esc(x.sm)}</span></button>`).join('')}
@@ -2144,7 +2151,7 @@ function vPrep2(){
   </div>`;
 
   const 공통 = PREPSET.map(x=>{ const n = prepList(x.k, S.prepKind).length;
-      return `<button class="hero2" data-act="ps:${x.k}" style="--h1:${x.h1};--h2:${x.h2}">
+      return `<button class="hero2 ${x.img?'shot':''}" data-act="ps:${x.k}" style="${카드꾸밈(x)}">
       <span class="art ${x.art}"></span>
       <span class="tag2">${n}가지</span>
       <span class="tt">${esc(x.n)}</span>
