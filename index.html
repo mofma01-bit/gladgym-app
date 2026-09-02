@@ -381,17 +381,11 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
   display:flex;flex-direction:column;gap:9px}
 /* 직전 무게 — 접힌 한 줄이 기본, 누르면 3회분 펼침 */
 /* 시범 그림이 아직 없는 자리 */
-.demop{display:flex;flex-direction:column;align-items:center;gap:8px;flex:none;
-  padding:24px 14px;border:1px dashed #4a473f;border-radius:14px;background:var(--dark-2)}
-.demop .dpi{width:48px;height:48px;border-radius:15px;flex:none;display:flex;
-  align-items:center;justify-content:center;
-  background:var(--dark-3);border:1px solid var(--line);color:#8b8379}
-.demop .dpt{font-size:13.5px;font-weight:700;color:#9a938a}
-.demop .dps{font-size:11.5px;font-weight:500;color:#6d6a65;text-align:center;line-height:1.6}
+.demop{display:flex;align-items:center;justify-content:center;flex:none;
+  aspect-ratio:16/10;border:1px dashed #4a473f;border-radius:14px;background:var(--dark-2)}
+.demop .dpt{font-size:14px;font-weight:700;color:#7d766e;letter-spacing:.02em}
 #main.lite .demop{background:#fff;border-color:#dfd2bd}
-#main.lite .demop .dpi{background:#f6efe3;border-color:#e6ddcf;color:#a89b8a}
-#main.lite .demop .dpt{color:#8a7f70}
-#main.lite .demop .dps{color:#a0917f}
+#main.lite .demop .dpt{color:#a89b8a}
 
 /* ── 프로필 ── 인스타처럼 */
 .pf{display:flex;flex-direction:column;align-items:center;gap:7px;flex:none;
@@ -1309,11 +1303,7 @@ const demoBox = (e, v) => v.du
       <img class="a" src="${demoURL(v.du + '_1.png')}" alt="시작 자세">
       <img class="b" src="${demoURL(v.du + '_2.png')}" alt="끝 자세">
       <span class="cap">시범 · ${esc(e.n)}${v.n ? ` — ${esc(v.n)}` : ''}</span></div>`
-  : `<div class="demop">
-      <span class="dpi">${svg('prep', 28)}</span>
-      <span class="dpt">시범 그림 준비 중이에요</span>
-      <span class="dps">${esc(e.n)}${v.n ? ` — ${esc(v.n)}` : ''}<br>궁금하면 트레이너에게 물어보세요</span>
-    </div>`;
+  : `<div class="demop"><span class="dpt">준비중</span></div>`;
 
 let MEMBERS = [];
 let TRAINER = '양인수';
@@ -1365,7 +1355,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '126';
+const BUILD = '127';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1569,9 +1559,15 @@ function vars(exid){
 }
 function varOf(exid, vk){ const vs=vars(exid); return vs.find(v=>v.k===vk) || vs[0]; }
 function hasVars(exid){ return vars(exid).length>1; }
+/* 이름은 「큰 종목」이 주인공이다.
+   기본으로 담긴 것은 종목 이름만, 기록하다가 세부를 고른 것만 괄호로 덧붙인다.
+   (랫풀다운 · 랫풀다운 (등 상부 타겟))                                    */
 function exName(exid, vk){
   if(isMemo(exid)) return String(vk||'운동 메모');
-  const v=varOf(exid,vk); return exOf(exid).n + (v && v.n ? ` (${v.n})` : ''); }
+  const e = exOf(exid), vs = vars(exid), v = varOf(exid, vk);
+  if(!v || !v.n) return e.n;
+  if(vs[0] && vs[0].k === v.k) return e.n;      /* 기본 자리는 이름을 안 붙인다 */
+  return e.n + ' (' + v.n + ')'; }
 function vaName(exid, vk){ const v=varOf(exid,vk); return v&&v.n ? v.n : ''; }
 const dkey = (mid,ex,va) => mid+':'+ex+':'+va;
 function descOf(mid,ex,va){ const k=dkey(mid,ex,va); return D.desc[k]!==undefined ? D.desc[k] : ((varOf(ex,va)||{}).desc||''); }
