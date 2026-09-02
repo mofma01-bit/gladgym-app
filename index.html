@@ -534,7 +534,7 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .bfig img{display:block;width:100%;height:auto}
 /* 덮개를 그림 실루엣으로 잘라 낸다 — 네모를 써도 몸 밖으로 안 나간다 */
 .bhit{position:absolute;left:0;top:0;width:100%;height:100%;
-  mix-blend-mode:overlay;pointer-events:none;
+  mix-blend-mode:hard-light;pointer-events:none;
   -webkit-mask-image:var(--m);mask-image:var(--m);
   -webkit-mask-size:100% 100%;mask-size:100% 100%;
   -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}
@@ -1443,7 +1443,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '140';
+const BUILD = '141';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1944,11 +1944,12 @@ const 몸자리 = {
 /* ── 부위 색 등급 ── 주당 몇 세트 했는지로 나눈다.
    근비대 연구가 흔히 말하는 「주당 10~20세트」를 가운데로 두었다.        */
 const 등급표 = [
-  { 키:'과사용', 최소:20, 색:'#d9534f', 글:'많이 함',   말:'여기서 더 늘려도 이득이 잘 안 붙어요' },
-  { 키:'적정',   최소:10, 색:'#e2a63a', 글:'적정',      말:'연구가 말하는 알맞은 양이에요' },
-  { 키:'부족',   최소:4,  색:'#5b9bd5', 글:'부족',      말:'조금 더 해도 돼요' },
-  { 키:'거의',   최소:0.1,색:'#5cb87a', 글:'거의 안 함',말:'많이 비었어요' },
-  { 키:'없음',   최소:0,  색:'#4a4842', 글:'안 함',      말:'한 번도 안 했어요' },
+  /* 색 : 칩·글씨에 쓰는 밝은 색 / 몸칠 : 해부도 위에 얹는 색 (hard-light 라 조금 어둡게) */
+  { 키:'과사용', 최소:20, 색:'#ef5350', 몸칠:'#c4413a', 글:'많이 함',   말:'여기서 더 늘려도 이득이 잘 안 붙어요' },
+  { 키:'적정',   최소:10, 색:'#e2a63a', 몸칠:'#c98f28', 글:'적정',      말:'연구가 말하는 알맞은 양이에요' },
+  { 키:'부족',   최소:4,  색:'#4da3e0', 몸칠:'#3d7fae', 글:'부족',      말:'조금 더 해도 돼요' },
+  { 키:'거의',   최소:0.1,색:'#5cc47f', 몸칠:'#4a9e63', 글:'거의 안 함',말:'많이 비었어요' },
+  { 키:'없음',   최소:0,  색:'#4a4842', 몸칠:'#4a4842', 글:'안 함',      말:'한 번도 안 했어요' },
 ];
 const 등급 = 주당 => 등급표.find(g => 주당 >= g.최소) || 등급표[등급표.length-1];
 
@@ -1956,6 +1957,7 @@ function bodyMap(o, 주수){
   const W = Math.max(1, 주수 || 1);
   const 주당 = k => (o[k] || 0) / W;
   const 색 = k => 등급(주당(k)).색;
+  const 몸칠 = k => 등급(주당(k)).몸칠;
   /* 같은 등급 안에서도 많이 한 쪽이 더 진하게 */
   const 세기 = k => { const v = 주당(k); if(!v) return 0;
     const g = 등급(v);
@@ -1966,7 +1968,7 @@ function bodyMap(o, 주수){
       style="--m:url(img/${그림})">`
     + Object.entries(몸자리[면]).map(([k, rs]) => { const a = 세기(k);
         return a ? rs.map(r => `<rect x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}"
-          fill="${색(k)}" opacity="${a.toFixed(3)}"/>`).join('') : ''; }).join('')
+          fill="${몸칠(k)}" opacity="${a.toFixed(3)}"/>`).join('') : ''; }).join('')
     + `</svg>`;
 
   const 칩 = PARTS8.map(k => { const g = 등급(주당(k));
