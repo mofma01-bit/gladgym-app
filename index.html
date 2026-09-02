@@ -378,7 +378,7 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
    나중에 --img 만 채우면 그대로 사진 카드가 된다.                    */
 .hero2{
   position:relative;overflow:hidden;width:100%;border-radius:18px;
-  min-height:204px;                       /* 고정 높이가 아니라 최소 높이 — 글씨가 잘리지 않게 */
+  min-height:188px;                       /* 고정 높이가 아니라 최소 높이 — 글씨가 잘리지 않게 */
   display:flex;flex-direction:column;justify-content:flex-end;
   padding:19px 20px;text-align:left;border:1px solid var(--line);
   background-image:var(--img,none),linear-gradient(128deg,var(--h1),var(--h2));
@@ -401,7 +401,7 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .hero2 .gl{
   position:absolute;top:13px;left:16px;z-index:3;font-size:10.5px;font-weight:800;
   letter-spacing:.1em;color:rgba(255,255,255,.6)}
-.hero2.tall{min-height:236px}
+.hero2.tall{min-height:214px}
 .hero2.shot .art{display:none}
 .hero2.shot::after{
   background:linear-gradient(to top,rgba(6,6,5,.66) 2%,rgba(6,6,5,.22) 46%,
@@ -751,6 +751,26 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
 .dhd{display:flex;align-items:baseline;gap:9px;padding-bottom:8px}
 .dhd .t{flex:1;font-size:14px;font-weight:700;color:var(--cream);letter-spacing:-.02em}
 .dhd .r{font-size:12.5px;font-weight:600;color:#8f8a83}
+/* 오늘 기록 — 접히는 카드 */
+.dhd2{width:100%;display:flex;align-items:center;gap:10px;padding:14px 15px;text-align:left}
+.dhd2 .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.dhd2 .t{font-size:14.5px;font-weight:700;color:var(--cream);letter-spacing:-.02em;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dhd2 .r{font-size:12px;font-weight:600;color:var(--sub)}
+.dhd2 .ar{font-size:13px;color:var(--sub);flex:none}
+.dbody{padding:0 15px 13px}
+.drow{padding:9px 0;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:3px;
+  width:100%;text-align:left}
+.drow .dl1{display:flex;align-items:baseline;gap:8px;width:100%}
+.drow .de{flex:1;min-width:0;font-size:13.5px;font-weight:700;color:#e9e3db;text-align:left}
+.drow .dn{font-size:11.5px;font-weight:600;color:#7d766e;flex:none}
+.drow .dn.g{color:var(--gold);font-size:13px;font-weight:800}
+.drow .dl2{font-size:12.5px;font-weight:700;color:var(--gold-2);line-height:1.6;
+  font-variant-numeric:tabular-nums;text-align:left}
+.drow.dtot{border-top:1px solid var(--gold-2)}
+.dmore{width:100%;margin-top:10px;padding:10px 0;border-radius:10px;background:var(--dark-3);
+  border:1px solid var(--line);font-size:12.5px;font-weight:700;color:var(--gold-2)}
+
 .setrow{display:flex;align-items:baseline;gap:10px;padding:6px 0;border-top:1px solid var(--line)}
 .setrow .e{flex:1;min-width:0;font-size:13px;font-weight:600;color:#e9e3db;text-align:left}
 .setrow .s{font-size:12.5px;font-weight:700;color:var(--gold-2);text-align:right;
@@ -1019,7 +1039,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '112';
+const BUILD = '113';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1080,7 +1100,7 @@ function agoTxt(iso){
 /* ═══ 상태 ═══ */
 let D = { routines:[], desc:{}, addvars:{}, today:{}, workouts:[], cm:[], live:null, intake:{}, body:{}, cycle:{} };
 let S = { who:null, mid:null, screen:'boot', tab:'home', pickPart:'가슴', pickEq:'전체', tmid:null,
-          prepKind:'sm', prepSet:'office', prepTab:'common', prepRid:null };
+          prepKind:'sm', prepSet:'office', prepTab:'common', prepRid:null, dayOpen:null };
 
 const LIVEKEY = 'gladgym_live_v1';
 function save(){ try{ localStorage.setItem(LIVEKEY, JSON.stringify(D.live)); }catch(e){} }
@@ -1366,21 +1386,30 @@ function dayDetail(mid, date){
   const dayCar = ws.reduce((a,w)=> a + w.items.reduce((b,it)=>
     b + (exOf(it.ex)&&exOf(it.ex).cardio ? it.sets.reduce((c,x)=>c+(+x.reps||0),0) : 0), 0), 0);
   return `<span class="lbl">${dateTxt(date)} 기록${dayVol?` · 총 ${dayVol.toLocaleString()}kg`:''}${dayCar?` · 유산소 ${dayCar}분`:''}</span>`
-   + ws.map(w => { const vol = totalKg(w); return `
-    <button class="card" data-act="rec:${w.id}">
-      <div class="dhd">
-        <span class="t">${w.kind?esc(w.kind):'운동'}${w.rid&&rOf(w.rid)?` · 루틴 ${rOf(w.rid).no} ${esc(rOf(w.rid).n)}`:''}</span>
-        <span class="r">${vol?`${vol.toLocaleString()}kg · `:''}${durTxt(w.dur)} ›</span></div>
-      ${w.items.filter(i => i.sets.length).map(it => `
-        <div class="setrow">
-          <span class="e">${esc(exName(it.ex,it.va))}</span>
-          <span class="n">${it.sets.length}세트</span>
-          <span class="s">${it.sets.map(x => setShort(it.ex,x)).join(' · ')}</span>
+   + ws.map(w => { const vol = totalKg(w);
+       const its = w.items.filter(i => i.sets.length);
+       const 열림 = S.dayOpen === w.id;
+       return `
+    <div class="card" style="padding:0;overflow:hidden;flex:none">
+      <button class="dhd2" data-act="dopen:${w.id}">
+        <span class="tx">
+          <span class="t">${w.kind?esc(w.kind):'운동'}${w.rid&&rOf(w.rid)?` · 루틴 ${rOf(w.rid).no} ${esc(rOf(w.rid).n)}`:''}</span>
+          <span class="r">${its.length}종목${vol?` · ${vol.toLocaleString()}kg`:''} · ${durTxt(w.dur)}</span>
+        </span>
+        <span class="ar">${열림?'▴':'▾'}</span></button>
+      ${열림 ? `<div class="dbody">
+        ${its.map(it => `
+        <div class="drow">
+          <div class="dl1"><span class="de">${esc(exName(it.ex,it.va))}</span>
+            <span class="dn">${it.sets.length}세트</span></div>
+          <div class="dl2">${it.sets.map(x => setShort(it.ex,x)).join(' · ')}</div>
         </div>`).join('')}
-      ${vol?`<div class="setrow" style="border-top:1px solid var(--gold-2)">
-        <span class="e" style="color:var(--sub)">이 운동 총 볼륨</span>
-        <span class="s" style="font-size:13.5px">${vol.toLocaleString()} kg</span></div>`:''}
-    </button>`; }).join('');
+        ${vol?`<div class="drow dtot"><div class="dl1">
+          <span class="de">이 운동 총 볼륨</span>
+          <span class="dn g">${vol.toLocaleString()} kg</span></div></div>`:''}
+        <button class="dmore" data-act="rec:${w.id}">기록 자세히 보기 ›</button>
+      </div>` : ''}
+    </div>`; }).join('');
 }
 
 /* ── 분석 ── */
@@ -5856,6 +5885,7 @@ document.addEventListener('click', ev=>{
     case 'pt': S.prepTab = rest[0]; render(); return;
     case 'ps': S.prepSet = rest[0]; S.prepRid = null; go('prep3'); return;
     case 'pr': S.prepRid = rest[0]; go('prep3'); return;
+    case 'dopen': S.dayOpen = (S.dayOpen===rest[0]) ? null : rest[0]; render(); return;
     case 'prevopen': S.prevOpen = !S.prevOpen; render(); return;
     case 'usekg': {
       const cur = w.items[w.cur], i = cur.sets.findIndex(x=>!x.done);
