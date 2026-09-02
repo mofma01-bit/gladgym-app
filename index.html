@@ -1389,7 +1389,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '131';
+const BUILD = '132';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2177,11 +2177,10 @@ function vHome(){
       <div><div class="nm">오늘 지정 · 루틴 ${r.no} ${esc(r.n)}</div>
       <div class="sm">${esc(t.by)}가 지정했어요</div></div><span class="rt">›</span></button>` : ''}
 
-    <button class="gocard gold2" data-act="go:prep">
-      <span class="gi">${svg('prep')}</span>
-      <span class="gt"><span class="nm">준비운동</span>
-        <span class="sm">스트레칭 · 셀프 마사지 · 둘 다 — 보고 따라 하기</span></span>
-      <span class="ga">›</span></button>
+    <button class="hero2 shot" data-act="go:prep"
+        style="--h1:#22424b;--h2:#101719;--img:url(img/card-both.jpg)">
+      <span class="tt">준비운동</span>
+      <span class="dd">스트레칭 · 셀프 마사지 — 굳은 곳을 먼저 풀고 시작합니다</span></button>
 
     ${(()=>{ const rc=recosOf(S.mid).filter(x=>rOf(x.rid)); if(!rc.length) return '';
       return `<span class="lbl">다음 개인운동 추천</span>`
