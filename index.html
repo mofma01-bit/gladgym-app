@@ -1127,8 +1127,9 @@ const 합친이름 = [
   ['케이블 컬','로프컬 로프해머컬 케이블로프컬 케이블스트레이트바컬 케이블리버스컬 하이케이블컬'],
   ['케이블 레터럴 레이즈','원암케이블레터럴레이즈 한팔레터럴'],
   ['랫풀다운','와이드랫풀다운 언더그립랫풀다운 클로즈그립랫풀다운 원암랫풀다운 와이드랫풀 언더그립랫풀'],
-  ['시티드 로우','롱풀 longpull long pull'],
-  ['시티드 케이블 로우','롱풀 longpull 원암케이블로우 와이드케이블로우'],
+  /* 기구사마다 이름이 달라 둘 다 둔다 — 시티드 로우[머신] · 롱풀[케이블] */
+  ['시티드 로우','롱풀 longpull long pull seated row 시티드로우머신'],
+  ['롱풀','longpull long pull 시티드케이블로우 seated cable row 케이블로우 원암케이블로우 와이드케이블로우'],
   ['트라이셉스 푸시다운','로프푸시다운 리버스그립푸시다운 원암케이블푸시다운 로프익스텐션'],
   ['케이블 크로스오버','로우케이블플라이 하이케이블플라이 케이블인클라인플라이 원암케이블플라이 케이블플라이'],
   ['레그 프레스','와이드레그프레스 내로우레그프레스'],
@@ -1371,7 +1372,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '128';
+const BUILD = '129';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
