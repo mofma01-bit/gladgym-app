@@ -377,6 +377,65 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
   border-radius:0 0 14px 14px;padding:13px;margin:-9px 0 4px;
   display:flex;flex-direction:column;gap:9px}
 /* 직전 무게 — 접힌 한 줄이 기본, 누르면 3회분 펼침 */
+/* 코멘트 — 대화처럼 */
+.cm.cm2{flex-direction:row;align-items:flex-start;gap:11px;text-align:left;
+  border:1px solid var(--line);border-radius:14px;padding:13px 14px}
+.cm.cm2.new{border-color:#3f5a63;background:linear-gradient(180deg,var(--teal-dim),var(--dark-2))}
+.cm2 .av{width:34px;height:34px;border-radius:50%;flex:none;display:flex;
+  align-items:center;justify-content:center;font-size:14px;font-weight:800;
+  background:#24383e;border:1px solid #3f5a63;color:var(--teal)}
+.cm2.new .av{background:#2b4650;border-color:#4d6d78}
+.cm2 .cbody{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.cm2 .ndot{width:6px;height:6px;border-radius:50%;background:var(--teal);flex:none}
+.cm2 .cex{display:flex;align-items:center;gap:6px;font-size:13.5px;font-weight:700;color:var(--gold)}
+.cm2 .cex i{width:7px;height:7px;border-radius:2px;flex:none}
+.cm2 .cmore{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--teal)}
+#main.lite .cm2{border-color:#e6ddcf}
+#main.lite .cm2 .av{background:#e8f0f4;border-color:#c3d7e0;color:#4a6b80}
+
+/* 회원권 타일 — 남은 기간 고리를 오른쪽에 */
+.mtile{flex-direction:row;align-items:center;justify-content:space-between;gap:12px}
+.mtile .mt1{display:flex;flex-direction:column;gap:4px;min-width:0}
+.dring{flex:none}
+
+/* 목표 진행 막대 */
+.gbar{height:7px;border-radius:99px;background:var(--dark-4);overflow:hidden;margin-top:11px}
+.gbar > span{display:block;height:100%;border-radius:99px;
+  background:linear-gradient(90deg,var(--gold-2),var(--gold))}
+.gbl{display:flex;justify-content:space-between;font-size:11.5px;font-weight:600;
+  color:var(--sub);margin-top:5px}
+.gbl b{color:var(--gold);font-weight:800}
+
+/* 켬/끔 스위치 */
+.sw{width:42px;height:24px;border-radius:99px;flex:none;position:relative;
+  background:var(--dark-4);border:1px solid var(--line);transition:background .18s ease}
+.sw i{position:absolute;top:2.5px;left:3px;width:17px;height:17px;border-radius:50%;
+  background:#8b847b;transition:transform .18s ease, background .18s ease}
+.sw.on{background:var(--gold-dim);border-color:var(--gold-2)}
+.sw.on i{transform:translateX(18px);background:var(--gold)}
+.gi.sm2{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;
+  justify-content:center;background:var(--dark-3);border:1px solid var(--line);
+  color:var(--gold-2);flex:none;margin-right:11px}
+
+/* 음식 줄 앞 그림 */
+.frow2 .fe{font-size:16px;line-height:1;flex:none;width:22px;text-align:center;
+  filter:saturate(.92)}
+
+/* ── 인체도 ── 어디를 안 했는지 한눈에 */
+.bwrap{display:flex;flex-direction:column;gap:11px;align-items:center;width:100%}
+.bsvg{width:100%;max-width:280px;height:auto;display:block}
+.bchips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;width:100%}
+.bchip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;
+  color:#6d6a65;background:var(--dark-3);border:1px solid var(--line);
+  border-radius:999px;padding:4px 10px 4px 6px}
+.bchip.on{color:#c9c2b9;border-color:#4d4a42}
+.bchip i{width:8px;height:8px;border-radius:50%;flex:none}
+.bchip b{font-weight:800;color:#5f5b56}
+.bchip.on b{color:var(--gold)}
+#main.lite .bchip{background:#f6efe3;border-color:#e6ddcf;color:#a0917f}
+#main.lite .bchip.on{color:#5a4a3a;border-color:#dfd2bd}
+#main.lite .bchip.on b{color:#8a5a2b}
+
 /* ── 칼로리 결론 카드 ── 가장 궁금한 넷만 위로 올린다 */
 .kres{border:1px solid var(--gold-2);border-radius:16px;overflow:hidden;
   background:linear-gradient(152deg,var(--gold-dim),#26221a);margin-bottom:4px}
@@ -1076,6 +1135,10 @@ const 아이콘 = {
   prep:   '<circle cx="12" cy="5.2" r="2.1"/><path d="M12 8v5.6"/>'
          +'<path d="M12 13.6l-3.2 5.6M12 13.6l3.2 5.6"/><path d="M6.8 10.4L12 8.4l5.2 2"/>',
   clock:  '<circle cx="12" cy="12" r="8"/><path d="M12 7.4V12l3.1 1.9"/>',
+  play:   '<circle cx="12" cy="12" r="8.2"/>'
+         +'<path d="M10.2 8.8l5.4 3.2-5.4 3.2z" fill="currentColor" stroke-width="1"/>',
+  pic:    '<rect x="3.8" y="5.4" width="16.4" height="13.2" rx="2.4"/>'
+         +'<circle cx="9" cy="10" r="1.6"/><path d="M4.6 16.4l4.6-4.2 3.6 3.2 3-2.6 3.6 3.2"/>',
   home:   '<path d="M4 10.6L12 4.2l8 6.4"/><path d="M6.2 9.8V19.4h11.6V9.8"/>'
          +'<path d="M10 19.4v-5h4v5"/>',
   bars:   '<rect x="4.6" y="4.6" width="14.8" height="14.8" rx="2.6"/>'
@@ -1203,7 +1266,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '118';
+const BUILD = '122';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1645,6 +1708,58 @@ function partSets(mid, from){
     const k = PARTS8.includes(e.p) ? e.p : '기타';
     o[k] += it.sets.length; }));
   return o;
+}
+/* ── 인체도 ── 부위별 세트 수를 몸에 칠한다.
+   앞/뒤 두 장. 등은 뒤에 있어서 앞모습만으로는 못 보여 준다.
+   유산소·기타는 몸에 자리가 없어 아래 칩으로 뺀다.
+   좌우는 거울로 뒤집어 쓴다 — 좌표를 두 번 쓰지 않는다.        */
+const 몸부위 = ['가슴','어깨','등','팔','하체','복근'];
+const 몸꼴 = {
+  몸통: 'M30.5,35 Q46,30 61.5,35 L64,46 L61,60 Q59,66 59,74 L60,93 L32,93 L33,74 Q33,66 31,60 L28,46 Z',
+  팔:   'M28.2,40 Q21.8,42 19.8,49 L16,81 Q15.5,85.5 19,86.5 L24,87 Q27,86.5 27.2,82 L29.2,51 Z',
+  다리: 'M32.5,93 L45,93 L45,124 L44,150 Q44,156 38.5,156 Q33,156 33,150 L33.5,124 Z',
+  발:   'M32.6,153 L44.4,153 L44.4,158 Q44.4,161 40,161 L36,161 Q32.6,161 32.6,158 Z',
+  어깨: 'M28.4,40 Q26.2,32.6 34.4,32.6 L37,44 Q31.6,46.6 27.6,45 Z',
+  가슴: 'M33.5,36 L58.5,36 Q62,38 62.5,46 L60.5,56 Q54,60 46,60 Q38,60 31.5,56 L29.5,46 Q30,38 33.5,36 Z',
+  복근: 'M35,61 L57,61 L58,86 Q58,90.5 53.5,90.5 L38.5,90.5 Q34,90.5 34,86 Z',
+  등:   'M32.5,35 L59.5,35 Q63.5,37 64,46 L61,60 Q59,66 59,73 L33,73 Q33,66 31,60 L28,46 Q28.5,37 32.5,35 Z',
+  허리: 'M34.5,74.5 L57.5,74.5 L58,88 Q58,91 54,91 L38,91 Q34,91 34,88 Z',
+};
+function bodyMap(o){
+  const mx = Math.max(1, ...몸부위.map(k => o[k] || 0));
+  /* 안 한 곳은 거의 안 보이게, 많이 한 곳은 진하게 */
+  const 칠 = k => { const v = o[k] || 0;
+    return v ? `rgba(240,211,160,${(0.20 + 0.72*(v/mx)).toFixed(3)})` : 'rgba(255,255,255,.05)'; };
+  const 선 = k => (o[k] ? 'rgba(240,211,160,.5)' : 'rgba(255,255,255,.11)');
+  const 몸 = (k, d) => `<path d="${d}" fill="${칠(k)}" stroke="${선(k)}" stroke-width=".9"
+    stroke-linejoin="round"/>`;
+  const 살 = 'rgba(255,255,255,.075)';
+  const 거울 = g => `<g transform="translate(92,0) scale(-1,1)">${g}</g>`;
+
+  /* 몸의 뼈대 — 부위를 하나도 안 했어도 사람으로 보이게 깔아 둔다 */
+  const 반쪽뼈대 = `<path d="${몸꼴.팔}" fill="${살}"/><path d="${몸꼴.다리}" fill="${살}"/>`
+                 + `<path d="${몸꼴.발}" fill="${살}"/>`;
+  const 뼈대 = `<circle cx="46" cy="14.5" r="10" fill="${살}"/>`
+             + `<rect x="41.8" y="21" width="8.4" height="15" rx="4" fill="${살}"/>`
+             + `<path d="${몸꼴.몸통}" fill="${살}"/>` + 반쪽뼈대 + 거울(반쪽뼈대);
+
+  const 반쪽 = 몸('어깨', 몸꼴.어깨) + 몸('팔', 몸꼴.팔) + 몸('하체', 몸꼴.다리);
+  const 앞 = 뼈대 + 몸('가슴', 몸꼴.가슴) + 몸('복근', 몸꼴.복근) + 반쪽 + 거울(반쪽)
+    + `<text x="46" y="170" text-anchor="middle" font-size="10.5" font-weight="700" fill="#7d766e">앞</text>`;
+  const 뒤 = 뼈대 + 몸('등', 몸꼴.등) + 몸('등', 몸꼴.허리) + 반쪽 + 거울(반쪽)
+    + `<text x="46" y="170" text-anchor="middle" font-size="10.5" font-weight="700" fill="#7d766e">뒤</text>`;
+
+  const 칩 = PARTS8.map(k => `<span class="bchip ${o[k]?'on':''}">
+    <i style="background:${o[k] ? `rgba(240,211,160,${(0.32 + 0.68*Math.min(1,(o[k]||0)/mx)).toFixed(2)})` : 'rgba(255,255,255,.10)'}"></i>
+    ${k}<b>${o[k]||0}</b></span>`).join('');
+
+  return `<div class="bwrap">
+    <svg viewBox="0 0 196 176" class="bsvg">
+      <g>${앞}</g>
+      <g transform="translate(104,0)">${뒤}</g>
+    </svg>
+    <div class="bchips">${칩}</div>
+  </div>`;
 }
 function radar(o){
   const n = PARTS8.length, R = 56, cx = 110, cy = 96;
@@ -2843,7 +2958,7 @@ function vRecords(){
 
     <span class="lbl">운동 균형 · 부위별 세트</span>
     <div class="gbox">
-      ${tot.sets ? radar(ps) : 빔('chart','이 기간에 기록이 없어요','위에서 기간을 넓혀 보세요')}
+      ${tot.sets ? bodyMap(ps) : 빔('chart','이 기간에 기록이 없어요','위에서 기간을 넓혀 보세요')}
       ${tot.sets ? `<div class="note" style="margin-top:4px">가장 많이 한 곳은 <b style="color:var(--gold)">${hi} ${ps[hi]}세트</b>,
         가장 적은 곳은 <b style="color:var(--warn)">${lo} ${ps[lo]}세트</b>입니다.</div>` : ''}
     </div>
@@ -2887,7 +3002,7 @@ function vDays(){
         <div><div class="nm">${esc(m.slot)}${m.kcal?` · ${m.kcal}kcal`:''}</div>
         <div class="sm">${esc(m.memo||'')}</div></div>
         ${m.note?'<span class="pill q">코멘트</span>':''}</button>`).join('')}`
-     : '<div class="empty">이 날은 올린 식단이 없어요</div>'}` };
+     : 빔('bowl','이 날은 올린 식단이 없어요')}` };
 }
 
 function recEditing(wid){ return S.recEdit && S.recEdit.wid === wid; }
@@ -3107,6 +3222,29 @@ function sheetAskFor(ex, va){
 }
 
 /* ── 피드백 탭 — 최근 / 수업별 / 종목별 ── */
+/* 부위마다 색을 하나씩 — 종목이 어디 운동인지 점으로 알려 준다 */
+const 부위색 = { '가슴':'#d98c7a', '어깨':'#e0b070', '등':'#7fa8c9', '팔':'#b39ad6',
+  '하체':'#86c19a', '복근':'#e2c96a', '유산소':'#8fd0d6', '기타':'#9a938a' };
+
+/* ── 코멘트 한 장 ── 트레이너 배지 + 말풍선. 안 읽은 것은 테두리로 알려 준다 */
+function cmCard(c, 날짜보이기){
+  const 이름 = (c.tr || '').trim();
+  const 첫자 = 이름 ? 이름.slice(0, 1) : '트';   /* 성 한 글자 — 「양인수」면 「양」 */
+  const p = (exOf(c.ex) || {}).p || '기타';
+  const 딸림 = (c.pics || c.vids)
+    ? `<span class="cmore">${c.vids?svg('play',13):svg('pic',13)}
+        ${c.pics?'사진 1장':''}${c.pics&&c.vids?' · ':''}${c.vids?'영상 1개':''} · 눌러서 보기 ›</span>` : '';
+  return `<button class="cm cm2 ${c.read?'':'new'}" data-act="exd:${c.ex}:${c.va}">
+    <span class="av">${esc(첫자)}</span>
+    <span class="cbody">
+      <span class="who">${esc(이름)} 트레이너${날짜보이기&&c.at?` · ${esc(c.at)}`:''}
+        ${c.read?'':'<b class="ndot"></b>'}</span>
+      <span class="cex"><i style="background:${부위색[p]||'#9a938a'}"></i>${esc(exName(c.ex,c.va))}</span>
+      <span class="tx">${esc(c.tx)}</span>
+      ${딸림}
+    </span></button>`;
+}
+
 function vFeedback(){
   const cms=D.cm.filter(c=>c.mid===S.mid);
   const nw=cms.filter(c=>!c.read).length;
@@ -3147,26 +3285,16 @@ function vFeedback(){
           <span class="rt">${durTxt(w.dur)} ›</span></button>`).join('')}`
         : '<div class="empty">이 날은 운동 기록이 없어요</div>'}
       <span class="lbl">그날 받은 코멘트 ${list.length?`· ${list.length}개`:''}</span>
-      ${list.length ? list.map(c=>`<button class="cm" style="text-align:left" data-act="exd:${c.ex}:${c.va}">
-          <span class="who">${esc(c.tr)} 트레이너</span>
-          <span class="ex" style="font-size:13.5px;font-weight:700;color:var(--gold)">${esc(exName(c.ex,c.va))}</span>
-          <span class="tx">${esc(c.tx)}</span>
-          ${(c.pics||c.vids)?`<span class="who">${c.pics?'사진 1장':''}${c.pics&&c.vids?' · ':''}${c.vids?'영상 1개':''} · 눌러서 보기 ›</span>`:''}
-        </button>`).join('')
-      : '<div class="empty">이 날 받은 코멘트가 없어요</div>'}
+      ${list.length ? list.map(c=>cmCard(c, 0)).join('')
+      : 빔('chat','이 날 받은 코멘트가 없어요')}
       <div class="note">날짜를 눌러 넘기거나, 가운데 날짜를 눌러 <b>달력에서</b> 고르세요. 코멘트가 온 날에는 <b style="color:var(--gold)">●</b> 가 붙습니다.</div>` };
   }
 
   if(mode==='recent'){
     return { top: bar('피드백', `<span class="sub">${cms.length}개</span>`), tabs:1,
       foot:`<button class="btn blue go" data-act="askpick">코멘트 요청하기</button>`, body: head +
-      (cms.length? cms.map(c=>`<button class="cm" style="text-align:left" data-act="exd:${c.ex}:${c.va}">
-          <span class="who">${esc(c.tr)} 트레이너 · ${esc(c.at)}</span>
-          <span class="ex" style="font-size:13.5px;font-weight:700;color:var(--gold)">${esc(exName(c.ex,c.va))}</span>
-          <span class="tx">${esc(c.tx)}</span>
-          ${(c.pics||c.vids)?`<span class="who">${c.pics?'사진 1장':''}${c.pics&&c.vids?' · ':''}${c.vids?'영상 1개':''} · 눌러서 보기 ›</span>`:''}
-        </button>`).join('')
-      : '<div class="empty">아직 받은 코멘트가 없어요</div>') };
+      (cms.length? cms.map(c=>cmCard(c, 1)).join('')
+      : 빔('chat','아직 받은 코멘트가 없어요','운동을 기록하면 트레이너가 봅니다')) };
   }
 
   /* 종목별 — 부위 → 종목(하는 법) */
@@ -3211,6 +3339,54 @@ function picImg(path, cls, act, big){
   if(!path) return `<span class="nopic ${cls||''}"${a}>${big?SALAD:SALAD_MINI}</span>`;
   return `<img class="${cls||''}" src="${esc(mealURL(path))}" alt=""${a} onerror="picFail(this)">`;
 }
+/* ── 음식 그림 ── 이름에서 찾아 붙인다. 위에 있는 것부터 먼저 맞춰 본다.
+   「닭가슴살」이 「살」보다 먼저 와야 하므로 순서가 곧 우선순위다.      */
+const 음식표 = [
+  ['🍗','닭가슴살|닭안심|닭다리|치킨|닭'],
+  ['🥩','소고기|한우|스테이크|등심|안심|차돌|불고기|육회|삼겹|목살|돼지|제육|수육|보쌈'],
+  ['🐟','연어|참치|고등어|생선|회|광어|우럭|명태|동태|대구|장어'],
+  ['🍤','새우|랍스터|가재'],
+  ['🦑','오징어|낙지|주꾸미|문어'],
+  ['🦐','게|꽃게|대게'],
+  ['🥚','계란|달걀|에그|오믈렛|수란'],
+  ['🥛','우유|두유|요거트|요구르트|치즈|버터|생크림|아이스크림|라떼'],
+  ['🍚','밥|쌀|현미|잡곡|곤약밥|주먹밥|덮밥|비빔밥|김밥'],
+  ['🍜','라면|국수|우동|쌀국수|파스타|스파게티|짜장|짬뽕|칼국수|냉면|막국수'],
+  ['🍞','빵|식빵|토스트|베이글|크로와상|바게트|샌드위치|버거|햄버거'],
+  ['🥔','고구마|감자|감자튀김|포테이토'],
+  ['🌽','옥수수|콘'],
+  ['🥗','샐러드|채소|야채|상추|양상추|시금치|브로콜리|나물'],
+  ['🍅','토마토|방울토마토'],
+  ['🥑','아보카도'],
+  ['🍌','바나나'],
+  ['🍎','사과|배|복숭아|자두'],
+  ['🍓','딸기|블루베리|베리|체리'],
+  ['🍇','포도|샤인머스캣'],
+  ['🍊','귤|오렌지|자몽|레몬|한라봉'],
+  ['🍉','수박|참외|멜론'],
+  ['🥝','키위|파인애플|망고'],
+  ['🌰','견과|아몬드|호두|땅콩|캐슈|밤'],
+  ['🫘','두부|콩|병아리콩|렌틸|낫또|된장|청국장'],
+  ['🍲','국|탕|찌개|전골|스프|수프|죽|카레|카레라이스'],
+  ['🥟','만두|교자|딤섬|튀김|전|부침개'],
+  ['🍕','피자'],
+  ['🌮','타코|부리또|랩'],
+  ['🍣','초밥|스시|롤'],
+  ['☕','커피|아메리카노|에스프레소|콜드브루'],
+  ['🧃','주스|음료|스무디|에이드|이온|게토레이'],
+  ['🥤','콜라|사이다|탄산|제로'],
+  ['🍺','맥주|소주|와인|막걸리|술|하이볼'],
+  ['💊','보충제|프로틴|단백질|웨이|비타민|영양제|아미노|BCAA|크레아틴'],
+  ['🍫','초콜릿|초코|과자|쿠키|케이크|빵집|디저트|사탕|젤리|아이스'],
+  ['🧂','소금|간장|소스|드레싱|기름|올리브유'],
+];
+const 음식찾기 = 음식표.map(x => [x[0], new RegExp(x[1])]);
+const 음식그림 = 이름 => {
+  const t = (이름 || '').replace(/\s/g, '');
+  for(const [e, re] of 음식찾기) if(re.test(t)) return e;
+  return '🍽️';
+};
+
 function mealsOf(mid, date){ return (D.meals||[]).filter(m=>m.mid===mid && (!date || m.date===date)); }
 /* 담긴 음식이 있으면 그 합, 없으면 직접 적은 값 */
 function mealSum(m){
@@ -3335,15 +3511,16 @@ function vDiet(){
           <span class="k">${Math.round(t.kcal)||0} kcal</span></div>
         ${m.path?picImg(m.path,'ph','meal:'+m.id,1):''}
         ${(m.items||[]).map(x=>`<button class="frow2" data-act="fdel:${m.id}:${x.id}">
+          <span class="fe">${음식그림(x.name)}</span>
           <span class="fn2">${esc(x.name)}${x.brand?` <span style="color:#a0917f;font-weight:600">${esc(x.brand)}</span>`:''}</span>
           <span class="fq">${kgfmt(x.qty)}${x.unit?' × '+esc(x.unit):'인분'}</span>
           <span class="fk">${Math.round(x.kcal)}</span></button>`).join('')}
-        ${(!m.items||!m.items.length) && m.memo?`<div class="frow2"><span class="fn2">${esc(m.memo)}</span>
+        ${(!m.items||!m.items.length) && m.memo?`<div class="frow2"><span class="fe">${음식그림(m.memo)}</span><span class="fn2">${esc(m.memo)}</span>
           <span class="fk">${Math.round(t.kcal)||''}</span></div>`:''}
         ${m.note?`<div class="frow2"><span class="fn2" style="color:#8a5a2b">트레이너 · ${esc(m.note)}</span></div>`:''}
         ${tr?'':`<button class="addf" data-act="fadd:${m.id}">＋ 이 식사에 음식 담기</button>`}
       </div>`; }).join('')
-     : '<div class="empty">이 날은 올린 식단이 없어요</div>'}
+     : 빔('bowl','이 날은 올린 식단이 없어요','사진을 찍거나 검색해서 담아 보세요')}
     ${tr||!seqs.length?'':`<button class="btn ghost sm" data-act="fadd:new">＋ 식사 추가하기</button>`}
     <div class="hr"></div>
     <span class="lbl">쌓인 것</span>
@@ -3688,30 +3865,59 @@ async function uploadMeal(){
   S.shot=null; S.dietDay=day; toast('올렸어요'); render();
 }
 
+/* ── 남은 기간 고리 ── 회원권이 얼마나 남았는지 한 바퀴로 */
+function dRing(남은, 전체){
+  const p = Math.max(0, Math.min(1, 남은 / (전체 || 1)));
+  const C = 2 * Math.PI * 21;
+  const 색 = 남은 <= 14 ? 'var(--warn)' : (남은 <= 30 ? 'var(--gold-2)' : 'var(--gold)');
+  return `<svg viewBox="0 0 52 52" width="52" height="52" class="dring">
+    <circle cx="26" cy="26" r="21" fill="none" stroke="var(--dark-4)" stroke-width="4.5"/>
+    <circle cx="26" cy="26" r="21" fill="none" stroke="${색}" stroke-width="4.5"
+      stroke-linecap="round" stroke-dasharray="${(C*p).toFixed(1)} ${C.toFixed(1)}"
+      transform="rotate(-90 26 26)"/>
+    <text x="26" y="30" text-anchor="middle" font-size="14" font-weight="800"
+      fill="${색}">${남은}</text></svg>`;
+}
+/* ── 켬/끔 스위치 ── 글자 대신 눈에 보이는 스위치 */
+const 스위치 = on => `<span class="sw ${on?'on':''}" aria-hidden="true"><i></i></span>`;
+
 /* ── 내 정보 ── */
 function vMe(){
   const g=GOALS[S.mid]||{};
+  const r = calcOf(g);
+  const 끝날 = '2026-10-14', 남은 = Math.max(0, Math.round((new Date(끝날+'T00:00:00') - new Date(TODAY+'T00:00:00'))/86400000));
+  /* 목표 몸무게까지 어디쯤 왔는지 */
+  const 시작 = Number(g.w0 || g.startW || 0) || (r.w ? r.w + 2 : 0);
+  const 진 = (r.w && r.gw && 시작 && 시작 !== r.gw)
+    ? Math.max(0, Math.min(1, (시작 - r.w) / (시작 - r.gw))) : 0;
   return { top: bar('내 정보', `<span class="sub">${esc(me().n)} 회원님</span>`), tabs:1, body:`
-    <div class="tile"><span class="k">회원권</span><span class="v">D-<span style="color:var(--gold)">47</span></span>
-      <span class="k">2026년 10월 14일까지</span></div>
-    <div class="card"><div class="sm">우리의 목표</div><div class="nm">${esc(g.goal)}</div></div>
-    <div class="card rowc"><div><div class="nm">담당 트레이너</div><div class="sm">${esc(me().tr)}</div></div></div>
-    <div class="card rowc"><div><div class="nm">알림</div><div class="sm">코멘트가 오면 알려 드립니다</div></div><span class="rt">켬</span></div>
-    <div class="card rowc"><div><div class="nm">화면 꺼짐 방지</div><div class="sm">운동 중에만 켭니다</div></div><span class="rt">켬</span></div>
+    <div class="tile mtile">
+      <div class="mt1"><span class="k">회원권</span>
+        <span class="v">D-<span style="color:var(--gold)">${남은}</span></span>
+        <span class="k">${끝날.slice(0,4)}년 ${+끝날.slice(5,7)}월 ${+끝날.slice(8)}일까지</span></div>
+      ${dRing(남은, 90)}
+    </div>
+    <div class="card">
+      <div class="sm">우리의 목표</div><div class="nm">${esc(g.goal)}</div>
+      ${r.w && r.gw ? `<div class="gbar"><span style="width:${(진*100).toFixed(1)}%"></span></div>
+        <div class="gbl"><b>${r.w}kg</b> 지금<span>목표 ${r.gw}kg</span></div>` : ''}
+    </div>
+    <div class="card rowc"><span class="gi sm2">${svg('user',18)}</span>
+      <div><div class="nm">담당 트레이너</div><div class="sm">${esc(me().tr)}</div></div></div>
+    <div class="card rowc"><div><div class="nm">알림</div><div class="sm">코멘트가 오면 알려 드립니다</div></div>${스위치(1)}</div>
+    <div class="card rowc"><div><div class="nm">화면 꺼짐 방지</div><div class="sm">운동 중에만 켭니다</div></div>${스위치(1)}</div>
     <div class="hr"></div><span class="lbl">내 기록장</span>
-    <button class="card rowc plan" data-act="sub:intake"><div><div class="nm">상담일지</div>
-      <div class="sm">첫 상담 때 트레이너가 적은 내용</div></div><span class="rt">›</span></button>
-    <button class="card rowc plan" data-act="sub:plan"><div><div class="nm">운동계획</div>
-      <div class="sm">목표 선언 · 맞춤 칼로리 · 다짐</div></div><span class="rt">›</span></button>
-    <button class="card rowc plan" data-act="sub:body"><div><div class="nm">체형분석</div>
-      <div class="sm">체크리스트 · AI 장비 사진 · 비포애프터</div></div><span class="rt">›</span></button>
-    ${cycOf(S.mid)&&cycOf(S.mid).on
-      ? `<button class="card rowc plan" data-act="sub:cycle"><div><div class="nm">생리주기</div>
-          <div class="sm">오늘 ${cycToday(cycOf(S.mid)).day}일차 · ${esc(cycToday(cycOf(S.mid)).ph)}</div></div><span class="rt">›</span></button>`
-      : `<button class="card rowc plan" data-act="sub:cycle"><div><div class="nm">생리주기</div>
-          <div class="sm">켜면 시기에 맞춰 운동을 조절합니다 — 선택이에요</div></div><span class="rt">›</span></button>`}
-    <button class="card rowc plan" data-act="sub:qa"><div><div class="nm">자주 묻는 질문</div>
-      <div class="sm">식사 · 유산소 · 빈도</div></div><span class="rt">›</span></button>
+    ${[['note','상담일지','첫 상담 때 트레이너가 적은 내용','sub:intake'],
+       ['plan','운동계획','목표 선언 · 맞춤 칼로리 · 다짐','sub:plan'],
+       ['chart','체형분석','체크리스트 · AI 장비 사진 · 비포애프터','sub:body'],
+       ['moon','생리주기', (cycOf(S.mid)&&cycOf(S.mid).on)
+          ? `오늘 ${cycToday(cycOf(S.mid)).day}일차 · ${esc(cycToday(cycOf(S.mid)).ph)}`
+          : '켜면 시기에 맞춰 운동을 조절합니다 — 선택이에요', 'sub:cycle'],
+       ['chat','자주 묻는 질문','식사 · 유산소 · 빈도','sub:qa']]
+      .map(x=>`<button class="gocard" data-act="${x[3]}">
+        <span class="gi">${svg(x[0])}</span>
+        <span class="gt"><span class="nm">${x[1]}</span><span class="sm">${x[2]}</span></span>
+        <span class="ga">›</span></button>`).join('')}
     <div class="hr"></div><span class="lbl">프로토타입 도구</span>
     <button class="card rowc" data-act="as:tr"><div><div class="nm">트레이너 화면 보기</div>
       <div class="sm">루틴 지정 · 코멘트 · 설명 고치기</div></div><span class="rt">›</span></button>
