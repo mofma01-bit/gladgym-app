@@ -1169,7 +1169,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '115';
+const BUILD = '116';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1984,17 +1984,6 @@ function vStart(){
       <span class="tt">트레이너 지정루틴 시작하기</span>
       <span class="dd">${esc(t.kind)} · 루틴 ${r.no} · ${esc(r.n)}</span></button>`:''}
 
-    <button class="hero2 ${사진있나('pickex')}" data-act="empty"
-        style="${사진꾸밈('pickex','#4a3b1c','#17130b')}">
-      <span class="art d1"></span>
-      <span class="tt">＋ 운동 종목 추가하기</span>
-      <span class="dd">종목을 골라 담고 내 마음대로 시작합니다</span></button>
-
-    <button class="hero2" data-act="go:prep" style="--h1:#22424b;--h2:#101719">
-      <span class="art s3"></span>
-      <span class="tt">준비운동 먼저 하기</span>
-      <span class="dd">스트레칭 · 셀프 마사지 — 굳은 곳을 먼저 풀고 시작합니다</span></button>
-
     <button class="hero2 ${사진있나('routines')}" data-act="go:routines"
         style="${사진꾸밈('routines','#33304a','#131217')}">
       <span class="art g5"></span>
@@ -2006,7 +1995,13 @@ function vStart(){
         style="${사진꾸밈('again','#3a2a20','#15110d')}">
       <span class="art w6"></span>
       <span class="tt">지난 운동 그대로</span>
-      <span class="dd">${dateTxt(ws[0].date)} · ${ws[0].items.map(i=>exOf(i.ex).n).slice(0,2).join(', ')}${ws[0].items.length>2?' 외':''}</span></button>`:''}` };
+      <span class="dd">${dateTxt(ws[0].date)} · ${ws[0].items.map(i=>exOf(i.ex).n).slice(0,2).join(', ')}${ws[0].items.length>2?' 외':''}</span></button>`:''}
+
+    <button class="hero2 ${사진있나('pickex')}" data-act="empty"
+        style="${사진꾸밈('pickex','#4a3b1c','#17130b')}">
+      <span class="art d1"></span>
+      <span class="tt">자유 운동 시작</span>
+      <span class="dd">원하는 종목을 골라 마음대로 시작합니다</span></button>` };
 }
 
 /* ── 종목 고르기 ── 담기만 하고, 「운동 시작」을 눌러야 진행 화면으로 간다 */
