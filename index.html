@@ -1025,6 +1025,8 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
 #main.lite .dtitle small{color:#a0917f}
 .dhd2{width:100%;display:flex;align-items:center;gap:10px;padding:14px 15px;text-align:left}
 .dhd2 + .dhd2{border-top:1px solid var(--line)}
+.dhd2.dtop .t{font-size:14.5px;font-weight:800}
+.dhd2.dtop .r{font-size:12px;line-height:1.5}
 .dhd2 .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
 .dhd2 .t{font-size:14.5px;font-weight:700;color:var(--cream);letter-spacing:-.02em;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -1413,7 +1415,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '135';
+const BUILD = '136';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1765,32 +1767,48 @@ function dayDetail(mid, date){
   const dayVol = ws.reduce((a,w)=> a + totalKg(w), 0);
   const dayCar = ws.reduce((a,w)=> a + w.items.reduce((b,it)=>
     b + (exOf(it.ex)&&exOf(it.ex).cardio ? it.sets.reduce((c,x)=>c+(+x.reps||0),0) : 0), 0), 0);
-  /* 제목과 목록을 한 카드에 담는다 — 예전엔 라벨과 카드가 따로라 같은 말이 두 번 나왔다 */
-  return `<div class="card" style="padding:0;overflow:hidden;flex:none">
-    <div class="dtitle">📋 최근 운동기록
-      <small>${dateTxt(date)}${dayVol?` · 총 ${Math.round(dayVol).toLocaleString()}kg`:''}${dayCar?` · 유산소 ${dayCar}분`:''}</small></div>`
-   + ws.map(w => { const vol = totalKg(w);
-       const its = w.items.filter(i => i.sets.length);
-       const 열림 = S.dayOpen === w.id;
-       return `
-      <button class="dhd2" data-act="dopen:${w.id}">
+  /* 제목과 운동 줄을 한 줄로 합친다 — 하루에 하나면 굳이 두 줄로 나눌 이유가 없다 */
+  const 아이콘 = w => (w.kind==='개인운동' ? '🏃' : '💪');
+  const 요약 = w => { const its = w.items.filter(i=>i.sets.length), vol = totalKg(w);
+    return `${아이콘(w)} ${w.kind?esc(w.kind):'운동'}${w.rid&&rOf(w.rid)?` · 루틴 ${rOf(w.rid).no} ${esc(rOf(w.rid).n)}`:''}`
+         + ` · ${its.length}종목${vol?` · ${Math.round(vol).toLocaleString()}kg`:''} · ${durTxt(w.dur)}`; };
+  const 속 = w => { const its = w.items.filter(i=>i.sets.length), vol = totalKg(w);
+    return `<div class="dbody">
+      ${its.map(it => `
+      <div class="drow">
+        <div class="dl1"><span class="de">${esc(exName(it.ex,it.va))}</span>
+          <span class="dn">${it.sets.length}세트</span></div>
+        <div class="dl2">${it.sets.map(x => setShort(it.ex,x)).join(' · ')}</div>
+      </div>`).join('')}
+      ${vol?`<div class="drow dtot"><div class="dl1">
+        <span class="de">이 운동 총 볼륨</span>
+        <span class="dn g">${Math.round(vol).toLocaleString()} kg</span></div></div>`:''}
+      <button class="dmore" data-act="rec:${w.id}">기록 자세히 보기 ›</button>
+    </div>`; };
+
+  /* 그날 운동이 하나면 — 제목 줄 하나로 끝낸다 */
+  if(ws.length === 1){
+    const w = ws[0], 열림 = S.dayOpen === w.id;
+    return `<div class="card" style="padding:0;overflow:hidden;flex:none">
+      <button class="dhd2 dtop" data-act="dopen:${w.id}">
         <span class="tx">
-          <span class="t">${w.kind==='개인운동'?'🏃':'💪'} ${w.kind?esc(w.kind):'운동'}${w.rid&&rOf(w.rid)?` · 루틴 ${rOf(w.rid).no} ${esc(rOf(w.rid).n)}`:''}</span>
-          <span class="r">${its.length}종목${vol?` · ${Math.round(vol).toLocaleString()}kg`:''} · ${durTxt(w.dur)}</span>
+          <span class="t">📋 최근 운동기록</span>
+          <span class="r">${dateTxt(date)} · ${요약(w)}</span>
         </span>
         <span class="ar">${열림?'▴':'▾'}</span></button>
-      ${열림 ? `<div class="dbody">
-        ${its.map(it => `
-        <div class="drow">
-          <div class="dl1"><span class="de">${esc(exName(it.ex,it.va))}</span>
-            <span class="dn">${it.sets.length}세트</span></div>
-          <div class="dl2">${it.sets.map(x => setShort(it.ex,x)).join(' · ')}</div>
-        </div>`).join('')}
-        ${vol?`<div class="drow dtot"><div class="dl1">
-          <span class="de">이 운동 총 볼륨</span>
-          <span class="dn g">${Math.round(vol).toLocaleString()} kg</span></div></div>`:''}
-        <button class="dmore" data-act="rec:${w.id}">기록 자세히 보기 ›</button>
-      </div>` : ''}`; }).join('') + '</div>';
+      ${열림 ? 속(w) : ''}</div>`;
+  }
+
+  /* 두 개 이상이면 제목 아래로 줄줄이 */
+  return `<div class="card" style="padding:0;overflow:hidden;flex:none">
+    <div class="dtitle">📋 최근 운동기록
+      <small>${dateTxt(date)} · ${ws.length}개${dayVol?` · 총 ${Math.round(dayVol).toLocaleString()}kg`:''}${dayCar?` · 유산소 ${dayCar}분`:''}</small></div>`
+   + ws.map(w => { const 열림 = S.dayOpen === w.id;
+       return `
+      <button class="dhd2" data-act="dopen:${w.id}">
+        <span class="tx"><span class="t">${요약(w)}</span></span>
+        <span class="ar">${열림?'▴':'▾'}</span></button>
+      ${열림 ? 속(w) : ''}`; }).join('') + '</div>';
 }
 
 /* ── 분석 ── */
