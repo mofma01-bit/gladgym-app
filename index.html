@@ -373,6 +373,8 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
   border-radius:0 0 14px 14px;padding:13px;margin:-9px 0 4px;
   display:flex;flex-direction:column;gap:9px}
 /* 직전 무게 — 접힌 한 줄이 기본, 누르면 3회분 펼침 */
+.vpick{gap:6px}
+.vpick .chip{padding:6px 12px;font-size:12.5px;font-weight:700}
 .prevb{background:var(--gold-dim);border:1px solid #4a3d22;border-left:3px solid var(--gold);
   border-radius:0 11px 11px 0;padding:10px 12px;display:flex;flex-direction:column;gap:8px}
 .prevh{display:flex;align-items:center;gap:9px;width:100%;text-align:left}
@@ -799,7 +801,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '97';
+const BUILD = '98';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1611,11 +1613,11 @@ function vPick(){
     ${EX.map(e=>{ const vs=vars(e.id), n=cmOf(S.mid,e.id).length, last=lastSet(e.id);
       return `<button class="card rowc" data-exrow="${esc(e.n+' '+e.p+' '+(e.e||''))}" data-part="${esc(e.p)}"
         style="${e.p===S.pickPart?'':'display:none'}"
-        data-act="${vs.length>1?'pickvar:'+e.id:'add:'+e.id+':'+vs[0].k}">
+        data-act="add:${e.id}:${vs[0].k}">
         <div><div class="nm">${esc(e.n)}</div>
         <div class="sm">${esc(e.e)}${last?` · 지난번 ${setTxt(e.id,last)}`:' · 기록 없음'}${n?` · 코멘트 ${n}`:''}
-        ${vs.length>1?`<br><span style="color:var(--gold-2)">하는 법 ${vs.length}가지 — ${vs.map(v=>esc(v.n)).join(' · ')}</span>`:''}</div></div>
-        <span class="rt">${vs.length>1?'›':'＋'}</span></button>`; }).join('')}
+        ${vs.length>1?`<br><span style="color:var(--gold-2)">하는 법 ${vs.length}가지 — 기록하면서 고릅니다</span>`:''}</div></div>
+        <span class="rt">＋</span></button>`; }).join('')}
     <div class="note">「벤치 / 벤치프레스 / BP」가 섞이면 증량 그래프가 끊겨서 <b>목록에서만</b> 고릅니다.</div>`,
     foot: 담은
       ? `<button class="picked ${S.just?'bump':''}" data-act="askstart">
@@ -1784,8 +1786,14 @@ function vWorkout(){
   const cms=cmOf(wmid,cur.ex,cur.va), nw=cms.filter(c=>!c.read).length, dsc=descOf(wmid,cur.ex,cur.va);
 
   /* 지금 하는 종목의 「펼쳐진 카드」 — 목록에서 그 종목 바로 아래에 붙는다 */
+  const 벌들 = isMemo(cur.ex) ? [] : vars(cur.ex);
+  const 벌고르기 = 벌들.length > 1
+    ? `<div class="chips vpick">${벌들.map(x=>`<button class="chip ${x.k===cur.va?'on':''}"
+        data-act="setvar:${x.k}">${esc(x.n || '기본')}</button>`).join('')}</div>` : '';
+
   const 펼침 = ()=>`<div class="opencard">
     <div class="exbig">${esc(e.n)}${v.n?`<small>${esc(v.n)}</small>`:''}</div>
+    ${벌고르기}
     ${prevBox(e, cur, wmid)}
     ${demoBox(e, v)}
     ${isMemo(cur.ex)?'':`<button class="fbbtn" data-act="exd:${cur.ex}:${cur.va}${tr?':'+wmid:''}">
@@ -5280,6 +5288,15 @@ document.addEventListener('click', ev=>{
       save(); render(); return; }
     case 'undo': { const cur=w.items[w.cur]; if(cur.sets.length<2) return;
       cur.sets.pop(); cur.sets[cur.sets.length-1].done=false; save(); toast('한 세트 되돌렸어요'); render(); return; }
+    case 'setvar': {
+      const cur = w.items[w.cur]; if(!cur) return;
+      const vk = rest[0]; if(cur.va === vk) return;
+      cur.va = vk; S.prevOpen = false; save();
+      if(cur._id) sv(spatch('workout_items','id=eq.'+cur._id,
+        { variant_id: VID(cur.ex, vk) }), '하는 법 바꾸기');
+      const nm = vaName(cur.ex, vk);
+      toast(nm ? nm + '으로 바꿨어요' : '기본으로 바꿨어요');
+      render(); return; }
     case 'prevopen': S.prevOpen = !S.prevOpen; render(); return;
     case 'usekg': {
       const cur = w.items[w.cur], i = cur.sets.findIndex(x=>!x.done);
