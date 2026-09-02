@@ -46,6 +46,9 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 #top .ttl{font-size:16px;font-weight:700;letter-spacing:-.02em;line-height:1.25}
 #top .ttl small{display:block;font-size:11.5px;font-weight:500;color:var(--gold-2);letter-spacing:0}
 #top .sub{font-size:13px;font-weight:500;color:var(--sub);margin-left:auto;text-align:right}
+#top .tbtn{margin-left:auto;flex:none;font-size:12.5px;font-weight:700;color:var(--gold-2);
+  border:1px solid var(--line);border-radius:8px;padding:6px 11px}
+#top .tbtn:active{background:var(--dark-3)}
 #top .tm{font-size:15px;font-weight:700;color:var(--gold);margin-left:auto}
 #top .back{font-size:20px;color:var(--sub);width:22px;flex:none;line-height:1}
 #top .logo{font-size:10.5px;letter-spacing:.2em;color:var(--gold-2);font-weight:700;
@@ -377,6 +380,45 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
   border-radius:0 0 14px 14px;padding:13px;margin:-9px 0 4px;
   display:flex;flex-direction:column;gap:9px}
 /* 직전 무게 — 접힌 한 줄이 기본, 누르면 3회분 펼침 */
+/* ── 프로필 ── 인스타처럼 */
+.pf{display:flex;flex-direction:column;align-items:center;gap:7px;flex:none;
+  padding:20px 16px 18px;border:1px solid var(--line);border-radius:18px;
+  background:radial-gradient(110% 80% at 50% 0%,#2c2823 0%,var(--dark-2) 70%)}
+.pfa{width:86px;height:86px;border-radius:50%;overflow:hidden;flex:none;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--dark-3);border:2px solid var(--gold-2);color:var(--gold)}
+.pfa img{width:100%;height:100%;object-fit:cover}
+.pfa b{font-size:34px;font-weight:800}
+.pfn{font-size:18px;font-weight:800;color:var(--cream);letter-spacing:-.02em}
+.pfb{font-size:12.5px;font-weight:500;color:var(--sub);text-align:center;line-height:1.6}
+.pfs{display:flex;width:100%;margin-top:9px;gap:1px;background:var(--line);
+  border-radius:12px;overflow:hidden}
+.pfs i{flex:1;background:var(--dark-3);padding:10px 4px;text-align:center;font-style:normal;
+  font-size:11px;font-weight:600;color:#8e867d;display:flex;flex-direction:column;gap:2px}
+.pfs i b{font-size:18px;font-weight:800;color:var(--gold);font-variant-numeric:tabular-nums}
+.pfs i b .cnt{font-style:normal}
+.pfstreak{font-size:12px;font-weight:700;color:var(--gold-2);margin-top:8px}
+.pfrow .gi.pfmini{overflow:hidden;padding:0}
+.pfrow .gi.pfmini img{width:100%;height:100%;object-fit:cover}
+
+/* 오운완 격자 */
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;flex:none}
+.pg{position:relative;aspect-ratio:4/5;overflow:hidden;border-radius:6px;background:var(--dark-3);
+  transition:transform .13s ease}
+.pg:active{transform:scale(.97)}
+.pg img{width:100%;height:100%;object-fit:cover;display:block}
+.pgd{position:absolute;left:0;right:0;bottom:0;padding:12px 6px 4px;
+  font-size:10px;font-weight:700;color:rgba(255,255,255,.9);text-align:left;
+  background:linear-gradient(to top,rgba(8,8,7,.72),transparent)}
+#main.lite .pf{background:#fff;border-color:#e6ddcf}
+#main.lite .pfn{color:#2b231c}
+#main.lite .pfs i{background:#f6efe3;color:#a0917f}
+#main.lite .pfs i b{color:#8a5a2b}
+
+/* 오운완 미리보기 — 세로 4:5 */
+.ootdimg{width:100%;border-radius:14px;aspect-ratio:4/5;object-fit:cover;
+  border:1px solid var(--line)}
+
 /* ── 운동 끝 ── 로고가 떠오르고 빛이 한 번 훑고 지나간다 */
 .fend{position:relative;overflow:hidden;flex:none;
   border:1px solid var(--gold-2);border-radius:18px;padding:26px 20px 22px;
@@ -1212,7 +1254,7 @@ const 아이콘 = {
 /* ── 숫자 ── 0에서 세어 올라간다. data-cnt 에 진짜 값을 담아 둔다 */
 const 수 = (v, 콤마) => {
   const n = Number(v) || 0;
-  const 글 = 콤마 ? n.toLocaleString() : String(n);
+  const 글 = 콤마 ? Math.round(n).toLocaleString() : String(n);
   return n ? '<i class="cnt" data-cnt="' + n + '"' + (콤마 ? ' data-comma="1"' : '')
              + '>' + 글 + '</i>' : 글;
 };
@@ -1309,7 +1351,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '123';
+const BUILD = '125';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1931,6 +1973,7 @@ function render(){
   else { S.draft = {}; S.exq = ''; }   /* 화면이 바뀌면 찾던 말도 비운다 */
   const V={login:vLogin,home:vHome,routines:vRoutines,routine:vRoutine,start:vStart,pick:vPick,
     workout:vWorkout,summary:vSummary,records:vRecords,record:vRecord,feedback:vFeedback,me:vMe,
+    profile:vProfile,
     prep:vPrep, prep2:vPrep2, prep3:vPrep3,
     t_members:tMembers,t_member:tMember,t_live:tLive,t_write:tWrite,t_routines:tRoutines,t_redit:tRedit,t_ex:tEx,
     intake:vIntake, plan:vPlan, body:vBody, cycle:vCycle, qa:vQa, boot:vBoot, err:vErr,
@@ -2951,6 +2994,9 @@ function vSummary(){
         `<i style="--pc:${부위색[k]||'#9a938a'}">${esc(k)} ${v}</i>`).join('')}</span>`:''}
       ${prev?`<span class="fdiff ${diff>=0?'up':'dn'}">지난 운동보다 ${diff>=0?'+':''}${Math.round(diff).toLocaleString()}kg</span>`:''}
     </div>
+    ${S.who==='tr' ? '' : `<button class="btn gold" data-act="ootd:${w.id}">📷 오운완 기록하기</button>
+    <div class="note" style="margin-top:-4px">사진을 찍으면 <b>오늘 한 종목·세트·총 무게</b>가 얹힌 한 장이 만들어집니다.
+      그대로 인스타에 올리거나 내 프로필에 남겨 두세요.</div>`}
 
     <div class="grid2">${Object.entries(times).slice(0,4).map(([k,v])=>
       `<div class="tile"><span class="k">${esc(k)}</span><span class="v">${parseInt(durTxt(v))}<small> ${durTxt(v).slice(-1)}</small></span></div>`).join('')}</div>
@@ -3681,6 +3727,176 @@ function sheetMeal(id){
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 
+/* ── 오운완 인증사진 ── 찍은 사진 위에 오늘 기록을 얹어 한 장으로 만든다.
+   인스타에 그대로 올리도록 세로 4:5(1080×1350)로 뽑는다.              */
+const OOTD_W = 1080, OOTD_H = 1350;
+function ootdDraw(img, w){
+  const cv = document.createElement('canvas');
+  cv.width = OOTD_W; cv.height = OOTD_H;
+  const x = cv.getContext('2d');
+
+  /* 1) 사진을 4:5 로 꽉 채워 자른다 */
+  const iw = img.naturalWidth, ih = img.naturalHeight;
+  const 비 = Math.max(OOTD_W/iw, OOTD_H/ih);
+  const dw = iw*비, dh = ih*비;
+  x.drawImage(img, (OOTD_W-dw)/2, (OOTD_H-dh)/2, dw, dh);
+
+  /* 2) 아래쪽을 어둡게 — 글씨가 읽히게 */
+  const g1 = x.createLinearGradient(0, OOTD_H*0.30, 0, OOTD_H);
+  g1.addColorStop(0,'rgba(8,8,7,0)'); g1.addColorStop(.45,'rgba(8,8,7,.62)');
+  g1.addColorStop(1,'rgba(8,8,7,.94)');
+  x.fillStyle = g1; x.fillRect(0, OOTD_H*0.30, OOTD_W, OOTD_H*0.70);
+  const g2 = x.createLinearGradient(0, 0, 0, 220);
+  g2.addColorStop(0,'rgba(8,8,7,.55)'); g2.addColorStop(1,'rgba(8,8,7,0)');
+  x.fillStyle = g2; x.fillRect(0, 0, OOTD_W, 220);
+
+  const 여백 = 74;
+  const 글 = (t, size, weight, color, 자간) => {
+    x.font = `${weight} ${size}px "Noto Sans KR",sans-serif`;
+    x.fillStyle = color;
+    try{ x.letterSpacing = (자간||0) + 'px'; }catch(e){}
+  };
+  x.textBaseline = 'alphabetic';
+
+  /* 3) 위쪽 로고 */
+  글('', 36, 800, '#f0d3a0', 7);
+  x.font = '800 36px "Noto Sans KR",sans-serif';
+  x.fillText('GLAD GYM', 여백, 108);
+  try{ x.letterSpacing = '0px'; }catch(e){}
+
+  /* 4) 아래에서 위로 쌓는다 */
+  let y = OOTD_H - 여백;
+
+  글('', 30, 500, 'rgba(253,250,246,.62)');
+  const 날 = (w.date||TODAY).replace(/-/g,'.');
+  x.fillText(날, 여백, y);
+  const 점 = '글래드짐 구산역촌점';
+  x.fillText(점, OOTD_W - 여백 - x.measureText(점).width, y);
+  y -= 34;
+  x.fillStyle = 'rgba(255,255,255,.16)';
+  x.fillRect(여백, y, OOTD_W - 여백*2, 2);
+  y -= 40;
+
+  /* 종목 × 세트 — 러닝 앱이 거리·심박을 보여 주듯, 웨이트는 이것이다 */
+  const 목록 = w.items.filter(it => it.sets.length)
+    .map(it => [exName(it.ex, it.va), it.sets.length]);
+  const 보일것 = 목록.slice(0, 6).reverse();
+  const 남은 = 목록.length - 보일것.length;
+  보일것.forEach(([n, c]) => {
+    글('', 34, 600, 'rgba(253,250,246,.90)');
+    let nm = n; while(x.measureText(nm).width > OOTD_W - 여백*2 - 150) nm = nm.slice(0, -1);
+    if(nm !== n) nm += '…';
+    x.fillText(nm, 여백, y);
+    글('', 34, 800, '#e6c487');
+    const c2 = c + '세트';
+    x.fillText(c2, OOTD_W - 여백 - x.measureText(c2).width, y);
+    y -= 52;
+  });
+  if(남은 > 0){
+    글('', 30, 500, 'rgba(253,250,246,.55)');
+    x.fillText('외 ' + 남은 + '종목', 여백, y); y -= 52;
+  }
+  y -= 10;
+  x.fillStyle = 'rgba(255,255,255,.16)';
+  x.fillRect(여백, y, OOTD_W - 여백*2, 2);
+  y -= 44;
+
+  /* 루틴 · 시간 · 종목수 */
+  const 줄 = [ w.kind || '운동', 목록.length + '종목',
+    목록.reduce((a,b)=>a+b[1],0) + '세트', Math.max(1, Math.round((w.dur||0)/60)) + '분' ].join('  ·  ');
+  글('', 36, 600, 'rgba(253,250,246,.86)');
+  x.fillText(줄, 여백, y);
+  y -= 118;
+
+  /* 총 볼륨 — 가장 크게 */
+  const vol = totalKg(w);
+  if(vol){
+    글('', 132, 800, '#f0d3a0', -3);
+    const v = Math.round(vol).toLocaleString();
+    x.fillText(v, 여백, y);
+    const vw = x.measureText(v).width;
+    try{ x.letterSpacing = '0px'; }catch(e){}
+    글('', 44, 700, '#e6c487');
+    x.fillText(' kg', 여백 + vw + 8, y);
+    y -= 128;                       /* 글자 크기(132)만큼 띄워야 안 겹친다 */
+    글('', 30, 700, 'rgba(253,250,246,.60)', 2);
+    x.fillText('오늘 든 무게', 여백, y);
+    try{ x.letterSpacing = '0px'; }catch(e){}
+  } else {
+    글('', 96, 800, '#f0d3a0', -2);
+    x.fillText('오운완', 여백, y);
+    try{ x.letterSpacing = '0px'; }catch(e){}
+  }
+  return cv.toDataURL('image/jpeg', 0.90);
+}
+
+function ootdPick(wid){
+  const w = D.workouts.find(z => z.id === wid); if(!w) return;
+  const inp = document.createElement('input');
+  inp.type='file'; inp.accept='image/*'; inp.setAttribute('capture','environment');
+  inp.style.display='none'; document.body.appendChild(inp);
+  inp.addEventListener('change', () => {
+    const f = inp.files && inp.files[0];
+    inp.remove(); if(!f) return;
+    toast('사진을 다듬는 중이에요');
+    const img = new Image();
+    img.onload = () => { try{
+      S.ootd = { wid, url: ootdDraw(img, w) };
+      URL.revokeObjectURL(img.src); sheetOotd();
+    }catch(e){ console.error(e); toast('사진을 만들지 못했어요'); } };
+    img.onerror = () => toast('사진을 읽지 못했어요');
+    img.src = URL.createObjectURL(f);
+  });
+  inp.click();
+}
+
+function sheetOotd(){
+  openSheet(()=>`
+    <div class="h2">오운완 <small>이대로 올라갑니다</small></div>
+    <img class="shot ootdimg" src="${S.ootd.url}" alt="">
+    <button class="btn main" data-act="ootdshare">이미지 저장 · 공유</button>
+    <button class="btn sub" data-act="ootdsave">내 프로필에 남기기</button>
+    <button class="btn ghost sm" data-act="ootdre:${S.ootd.wid}">다시 찍기</button>
+    <button class="btn ghost sm" data-act="close">닫기</button>`);
+}
+
+/* 폰이면 공유 시트를, 안 되면 그냥 내려받기 */
+async function ootdShare(){
+  if(!S.ootd) return;
+  const blob = await (await fetch(S.ootd.url)).blob();
+  const 이름 = '글래드짐_오운완_' + (S.ootd.wid||'') + '.jpg';
+  const file = new File([blob], 이름, { type:'image/jpeg' });
+  if(navigator.canShare && navigator.canShare({ files:[file] })){
+    try{ await navigator.share({ files:[file] }); return; }catch(e){ if(e.name==='AbortError') return; }
+  }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 이름;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
+  toast('사진첩에 저장했어요');
+}
+
+async function ootdSave(){
+  if(!S.ootd) return;
+  const w = D.workouts.find(z => z.id === S.ootd.wid);
+  const mid = w ? w.mid : S.mid;
+  const id = 'od' + Date.now();
+  const path = `ootd/${mid}/${id}.jpg`;
+  const blob = await (await fetch(S.ootd.url)).blob();
+  closeSheet(); toast('올리는 중이에요');
+  const r = await fetch(SB_URL+'/storage/v1/object/media/'+path, {
+    method:'POST', headers:{ apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'image/jpeg' }, body: blob });
+  if(!r.ok){ toast('사진을 못 올렸어요'); console.error(await r.text()); return; }
+  const 날 = (w && w.date) || TODAY;
+  await sv(spost('body_photos',[{ id, member_id:mid, kind:'ootd', pose:'오운완',
+    on_date:날, path, memo:S.ootd.wid||'' }]), '오운완 저장');
+  D.bph = D.bph || [];
+  D.bph.push({ id, mid, kind:'ootd', pose:'오운완', date:날, path, memo:S.ootd.wid||'' });
+  S.ootd = null; toast('프로필에 남겼어요'); render();
+}
+const ootdsOf = mid => (D.bph||[]).filter(x => x.mid===mid && x.kind==='ootd')
+  .slice().sort((a,b)=> a.date<b.date ? 1 : -1);
+
 /* 사진 찍기 → 글래드짐 프레임 → 올리기 */
 function shotPick(){
   const inp = document.createElement('input');
@@ -3943,6 +4159,107 @@ function dRing(남은, 전체){
 /* ── 켬/끔 스위치 ── 글자 대신 눈에 보이는 스위치 */
 const 스위치 = on => `<span class="sw ${on?'on':''}" aria-hidden="true"><i></i></span>`;
 
+/* ── 프로필 ── 인스타처럼 내 오운완이 쌓이는 곳.
+   프로필 정보는 운동계획(plans) 안에 같이 담는다 — 표를 새로 만들지 않는다. */
+const profOf = mid => (GOALS[mid] || {}).prof || {};
+async function profSave(mid, patch){
+  const g = GOALS[mid] = GOALS[mid] || {};
+  g.prof = Object.assign({}, g.prof || {}, patch);
+  await sv(spost('plans', [{ member_id:mid, data:g, updated_at:new Date().toISOString() }],
+    {on:'member_id'}), '프로필 저장');
+}
+/* 쌓인 것 세기 — 운동한 날 · 총 볼륨 · 오운완 장수 · 연속 */
+function profStat(mid){
+  const ws = D.workouts.filter(w => w.mid===mid && w.done && w.items.some(i=>i.sets.length));
+  const 날 = [...new Set(ws.map(w=>w.date))].sort();
+  const vol = ws.reduce((a,w)=> a + totalKg(w), 0);
+  /* 오늘(또는 어제)부터 거꾸로 며칠 이어졌나 */
+  let 연속 = 0;
+  const 있나 = new Set(날);
+  let d = new Date(TODAY+'T00:00:00');
+  if(!있나.has(ymd(d))) d.setDate(d.getDate()-1);
+  while(있나.has(ymd(d))){ 연속++; d.setDate(d.getDate()-1); }
+  return { 일수:날.length, vol, 오운완:ootdsOf(mid).length, 연속 };
+}
+function vProfile(){
+  const mid = (S.who==='tr') ? (S.tmid || S.mid) : S.mid;
+  const pf = profOf(mid), st = profStat(mid), 사진 = ootdsOf(mid);
+  const 나 = MEMBERS.find(m=>m.id===mid) || {};
+  const 첫자 = (나.n || '').slice(0,1) || '회';
+  const 내것 = (S.who !== 'tr');
+  return { top: bar('프로필', 내것?`<button class="tbtn" data-act="profedit">꾸미기</button>`:'',
+      S.who==='tr' ? 'tm:'+mid : 'tab:me'), tabs: 내것?1:0, body:`
+    <div class="pf">
+      <span class="pfa">${pf.avatar
+        ? `<img src="${esc(phURL(pf.avatar))}" alt="" onerror="picFail(this)">`
+        : `<b>${esc(첫자)}</b>`}</span>
+      <span class="pfn">${esc(나.n||'')}</span>
+      <span class="pfb">${pf.bio ? esc(pf.bio) : (내것 ? '한 줄 소개를 적어 보세요' : '')}</span>
+      <span class="pfs">
+        <i><b>${수(st.일수)}</b>운동한 날</i>
+        <i><b>${수(Math.round(st.vol/1000)*1||0)}</b>총 볼륨(톤)</i>
+        <i><b>${수(st.오운완)}</b>오운완</i>
+      </span>
+      ${st.연속>1?`<span class="pfstreak">🔥 ${st.연속}일 이어서 운동 중</span>`:''}
+    </div>
+
+    <span class="lbl">오운완 ${사진.length?`· ${사진.length}장`:''}</span>
+    ${사진.length
+      ? `<div class="pgrid">${사진.map(x=>`<button class="pg" data-act="ootdview:${x.id}">
+          <img src="${esc(phURL(x.path))}" alt="" loading="lazy" onerror="picFail(this)">
+          <span class="pgd">${(x.date||'').slice(5).replace('-','.')}</span></button>`).join('')}</div>`
+      : 빔('pic','아직 오운완이 없어요', 내것?'운동을 마치고 사진을 남겨 보세요':'')}` };
+}
+function sheetOotdView(id){
+  const x = (D.bph||[]).find(y=>y.id===id); if(!x) return;
+  const w = D.workouts.find(z=>z.id===x.memo);
+  openSheet(()=>`
+    <div class="h2">${esc(dateTxt(x.date))} <small>오운완</small></div>
+    <img class="shot ootdimg" src="${esc(phURL(x.path))}" alt="" onerror="picFail(this)">
+    ${w?`<button class="btn sub sm" data-act="orec:${w.id}">그날 기록 보기</button>`:''}
+    ${S.who==='tr'?'':`<button class="btn ghost sm" data-act="ootddel:${x.id}" style="color:var(--warn)">이 사진 지우기</button>`}
+    <button class="btn ghost sm" data-act="close">닫기</button>`);
+}
+function sheetProfEdit(){
+  const mid = S.mid, pf = profOf(mid);
+  openSheet(()=>`
+    <div class="h2">프로필 꾸미기</div>
+    <div class="fld"><span class="fn">한 줄 소개</span>
+      <input class="search" type="text" data-k="pf:bio" maxlength="40"
+        value="${esc(pf.bio||'')}" placeholder="예) 주 3회 · 하체 집중"></div>
+    <button class="btn sub sm" data-act="profpic">프로필 사진 바꾸기</button>
+    <button class="btn main" data-act="profok">저장</button>
+    <button class="btn ghost sm" data-act="close">닫기</button>`);
+}
+function profPick(){
+  const inp = document.createElement('input');
+  inp.type='file'; inp.accept='image/*';
+  inp.style.display='none'; document.body.appendChild(inp);
+  inp.addEventListener('change', async () => {
+    const f = inp.files && inp.files[0]; inp.remove(); if(!f) return;
+    toast('올리는 중이에요');
+    try{
+      const img = new Image();
+      await new Promise((r,j)=>{ img.onload=r; img.onerror=j; img.src=URL.createObjectURL(f); });
+      const N = 480, cv = document.createElement('canvas'); cv.width=N; cv.height=N;
+      const x = cv.getContext('2d');
+      const 비 = Math.max(N/img.naturalWidth, N/img.naturalHeight);
+      const dw = img.naturalWidth*비, dh = img.naturalHeight*비;
+      x.drawImage(img, (N-dw)/2, (N-dh)/2, dw, dh);
+      URL.revokeObjectURL(img.src);
+      const blob = await new Promise(r => cv.toBlob(r, 'image/jpeg', 0.88));
+      const path = `avatar/${S.mid}/${Date.now()}.jpg`;
+      const r2 = await fetch(SB_URL+'/storage/v1/object/media/'+path, {
+        method:'POST', headers:{ apikey:SB_KEY, Authorization:'Bearer '+SB_KEY,
+          'Content-Type':'image/jpeg' }, body: blob });
+      if(!r2.ok){ toast('사진을 못 올렸어요'); console.error(await r2.text()); return; }
+      await profSave(S.mid, { avatar: path });
+      toast('바꿨어요'); closeSheet(); render();
+    }catch(e){ console.error(e); toast('사진을 읽지 못했어요'); }
+  });
+  inp.click();
+}
+
 /* ── 내 정보 ── */
 function vMe(){
   const g=GOALS[S.mid]||{};
@@ -3953,6 +4270,15 @@ function vMe(){
   const 진 = (r.w && r.gw && 시작 && 시작 !== r.gw)
     ? Math.max(0, Math.min(1, (시작 - r.w) / (시작 - r.gw))) : 0;
   return { top: bar('내 정보', `<span class="sub">${esc(me().n)} 회원님</span>`), tabs:1, body:`
+    <button class="gocard pfrow" data-act="go:profile">
+      <span class="gi pfmini">${profOf(S.mid).avatar
+        ? `<img src="${esc(phURL(profOf(S.mid).avatar))}" alt="" onerror="picFail(this)">`
+        : svg('user')}</span>
+      <span class="gt"><span class="nm">${esc(me().n)} 님의 프로필</span>
+        <span class="sm">${(()=>{ const t=profStat(S.mid);
+          return `오운완 ${t.오운완}장 · 운동한 날 ${t.일수}일`; })()}</span></span>
+      <span class="ga">›</span></button>
+
     <div class="tile mtile">
       <div class="mt1"><span class="k">회원권</span>
         <span class="v">D-<span style="color:var(--gold)">${남은}</span></span>
@@ -6445,6 +6771,25 @@ document.addEventListener('click', ev=>{
       sheetFinish(); return; }
     case 'askfin': sheetFinish(); return;
     case 'dofin': closeSheet(); finish(); return;
+    case 'ootd': ootdPick(rest[0]); return;
+    case 'ootdview': sheetOotdView(rest[0]); return;
+    case 'orec': closeSheet(); S.wid = rest[0]; go('summary'); return;
+    case 'ootddel': {
+      const x = (D.bph||[]).find(y=>y.id===rest[0]); if(!x) return;
+      D.bph = D.bph.filter(y=>y.id!==x.id);
+      sv(sdel('body_photos','id=eq.'+x.id), '오운완 지우기');
+      fetch(SB_URL+'/storage/v1/object/media/'+x.path,
+        {method:'DELETE',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}}).catch(()=>{});
+      closeSheet(); toast('지웠어요'); render(); return; }
+    case 'profedit': sheetProfEdit(); return;
+    case 'profpic': profPick(); return;
+    case 'profok': {
+      const el = document.querySelector('[data-k="pf:bio"]');
+      profSave(S.mid, { bio: el ? el.value.trim() : '' });   /* 저장은 뒤에서 마저 */
+      closeSheet(); toast('저장했어요'); render(); return; }
+    case 'ootdre': closeSheet(); ootdPick(rest[0]); return;
+    case 'ootdshare': ootdShare(); return;
+    case 'ootdsave': ootdSave(); return;
     case 'timego': { const w=live(); if(!w) return;
       w.startAt = Date.now();
       const cur = w.items[w.cur]; if(cur && !cur.startAt) cur.startAt = Date.now();
