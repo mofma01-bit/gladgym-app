@@ -457,6 +457,7 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
   font-size:13px;font-weight:500;color:var(--sub)}
 .chip.on{border-color:var(--gold);color:var(--gold);background:var(--gold-dim)}
 .chip.t{color:var(--teal);border-color:#3a5b66}
+.eqlbl{font-size:11px;font-weight:700;color:var(--sub);margin:2px 0 -2px 2px}
 
 .pill{display:inline-flex;align-items:center;gap:5px;background:var(--gold-dim);color:var(--gold);
   border:1px solid var(--gold-2);border-radius:999px;padding:3px 10px;font-size:12.5px;font-weight:700;flex:none}
@@ -731,6 +732,88 @@ const RECO2 = '9999-12-30';
 const isReco = d => d===RECO1 || d===RECO2;
 function recosOf(mid){ return (D.reco && D.reco[mid]) ? D.reco[mid] : []; }
 
+/* ── 찾기 ── 띄어쓰기·영어·줄임말·다른 표기로도 걸리게 ── */
+const 별칭이름 = [
+  ['벤치프레스','bench press bp 벤프'], ['인클라인','incline 인클'], ['디클라인','decline 디클'],
+  ['체스트','chest'], ['플라이','fly flye 플라잉'], ['펙덱','pecdec 펙덱플라이'],
+  ['푸시업','pushup push up 팔굽혀펴기 팔굽혀 푸쉬업'], ['딥스','dips dip'],
+  ['풀오버','pullover'], ['크로스오버','crossover'],
+  ['랫풀다운','lat pulldown 렛풀다운 렛풀 랫풀'], ['풀다운','pulldown'],
+  ['풀업','pullup pull up 턱걸이'], ['친업','chinup 턱걸이'],
+  ['로우','row'], ['데드리프트','deadlift dl 데드'], ['슈러그','shrug 승모'],
+  ['페이스','face pull 페이스풀'], ['익스텐션','extension'],
+  ['오버헤드','overhead ohp'], ['밀리터리','military ohp'],
+  ['숄더','shoulder'], ['레터럴','lateral 사레레 측면'], ['프론트','front'],
+  ['리어','rear 후면'], ['델트','delt 삼각'], ['아놀드','arnold'], ['업라이트','upright'],
+  ['스쿼트','squat sq 스콰트 스쿳'], ['런지','lunge'],
+  ['레그 프레스','legpress lp'], ['레그 익스텐션','legextension le 대퇴사두'],
+  ['레그 컬','legcurl lc 햄스트링'], ['힙쓰러스트','hipthrust ht 힙트러스트'],
+  ['카프','calf 종아리'],
+  ['불가리안','bulgarian bss'], ['고블릿','goblet'], ['핵','hack'],
+  ['컬','curl'], ['트라이셉스','triceps 삼두'], ['푸시다운','pushdown 삼두'],
+  ['프리처','preacher'], ['해머','hammer'], ['킥백','kickback'],
+  ['스컬','skull crusher 스컬크러셔'], ['리스트','wrist 손목'],
+  ['크런치','crunch 윗몸 복근 코어'], ['싯업','situp 윗몸일으키기 복근'],
+  ['플랭크','plank 코어'], ['레그 레이즈','legraise 하복부'], ['레이즈','raise'],
+  ['러시안','russian'], ['우드찹','woodchop'], ['팔로프','pallof'],
+  ['마운틴','mountain climber'], ['버피','burpee'], ['할로우','hollow'],
+  ['데드버그','deadbug'], ['버드독','birddog'],
+  ['트레드밀','treadmill 러닝머신 런닝머신 달리기 걷기'], ['사이클','cycle bike 자전거'],
+  ['싸이클','cycle bike 자전거'], ['로잉','rowing'], ['일립티컬','elliptical'],
+  ['줄넘기','jumprope rope'], ['스텝밀','stepmill'], ['배틀로프','batttlerope 로프'],
+  ['폼롤러','foamroller 마사지 이완'], ['스트레칭','stretch 스트레치 이완'],
+  ['가동성','mobility 모빌리티'], ['터키시','turkish getup'],
+  ['클린','clean'], ['스내치','snatch'], ['스러스터','thruster'],
+  ['프레스','press'], ['머신','machine'],
+];
+const 별칭부위 = { '가슴':'chest 흉근', '등':'back 등근육', '어깨':'shoulder delt 삼각근',
+  '하체':'leg legs 다리 허벅지 하지', '복근':'abs core 코어 배 복부',
+  '팔':'arm arms 팔뚝', '유산소':'cardio 카디오 유산소', '기타':'etc 재활 이완' };
+const 별칭기구 = { '맨몸':'bodyweight 자중 홈트 기구없이', '바벨':'barbell bb',
+  '덤벨':'dumbbell db 아령', '케이블':'cable', '머신':'machine 기구',
+  '스미스':'smith 스미스머신', '밴드':'band 밴드', '케틀벨':'kettlebell kb',
+  '짐볼':'gymball swissball 볼', 'TRX':'trx 서스펜션', '메디신볼':'medicineball 볼',
+  '원판':'plate 플레이트', '폼롤러':'foamroller', '도구':'tool 소도구', '유산소':'cardio' };
+const 검색키 = t => (t||'').toLowerCase().replace(/[\s·()\-—_/,]/g,'');
+function exKey(e){
+  let t = e.n + ' ' + e.p + ' ' + (e.e||'');
+  for(const a of 별칭이름) if(t.indexOf(a[0])>=0) t += ' ' + a[1];
+  t += ' ' + (별칭부위[e.p]||'') + ' ' + (별칭기구[e.e]||'');
+  /* 같은 낱말이라도 부위에 따라 뜻이 다르다 — 레그 컬은 이두가 아니고, 덤벨 킥백은 둔근이 아니다 */
+  if(e.p==='팔'){
+    if(/컬/.test(e.n)) t += ' 이두 biceps 알통';
+    if(/트라이셉스|푸시다운|익스텐션|킥백|딥스|스컬|JM|클로즈그립/.test(e.n)) t += ' 삼두 triceps';
+    if(/리스트|파머스|악력|그립 스퀴즈/.test(e.n)) t += ' 전완 forearm 악력';
+  }
+  if(e.p==='하체'){
+    if(/힙|글루트|브릿지|쓰러스트|킥백|어브덕션|풀 스루|하이퍼|데드리프트|RDL/.test(e.n))
+      t += ' 엉덩이 둔근 glute 힙';
+    if(/레그 컬|햄스트링|노르딕|스티프|RDL|루마니안/.test(e.n)) t += ' 햄스트링 hamstring 뒤허벅지';
+    if(/익스텐션|스쿼트|런지|레그 프레스|핵|시시/.test(e.n)) t += ' 대퇴사두 quad 앞허벅지';
+    if(/어덕션|애덕터/.test(e.n)) t += ' 내전근 adductor 안쪽허벅지';
+  }
+  if(e.p==='등'){
+    if(/풀다운|풀업|친업|풀오버|스트레이트암/.test(e.n)) t += ' 광배 lat';
+    if(/슈러그/.test(e.n)) t += ' 승모 trap';
+    if(/페이스|리버스 플라이|Y 레이즈|T 레이즈/.test(e.n)) t += ' 후면 승모 능형근';
+  }
+  if(e.p==='어깨'){
+    if(/레터럴/.test(e.n)) t += ' 측면 중간삼각 사레레';
+    if(/프론트/.test(e.n)) t += ' 전면삼각';
+    if(/리어|리버스 플라이|델트 로우/.test(e.n)) t += ' 후면삼각 후삼';
+    if(/회전|큐반/.test(e.n)) t += ' 회전근개 rotatorcuff 재활';
+  }
+  if(e.p==='가슴'){
+    if(/인클라인/.test(e.n)) t += ' 윗가슴 상부';
+    if(/디클라인/.test(e.n)) t += ' 아랫가슴 하부';
+  }
+  if(e.p==='복근'){
+    if(/레그 레이즈|니 레이즈|리버스 크런치|니업|플러터|시저스/.test(e.n)) t += ' 하복부';
+    if(/사이드|우드찹|트위스트|팔로프|안티로테이션|벤드/.test(e.n)) t += ' 옆구리 복사근 oblique';
+  }
+  return 검색키(t);
+}
+
 const isMemo = ex => ex === 'memo';
 const exOf = id => (id==='memo' ? MEMO_EX : EX.find(x=>x.id===id))
   || {id:'?',n:'?',p:'?',vars:[{k:'a',n:'',desc:''}]};
@@ -801,7 +884,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '98';
+const BUILD = '99';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -861,7 +944,7 @@ function agoTxt(iso){
 
 /* ═══ 상태 ═══ */
 let D = { routines:[], desc:{}, addvars:{}, today:{}, workouts:[], cm:[], live:null, intake:{}, body:{}, cycle:{} };
-let S = { who:null, mid:null, screen:'boot', tab:'home', pickPart:'가슴', tmid:null };
+let S = { who:null, mid:null, screen:'boot', tab:'home', pickPart:'가슴', pickEq:'전체', tmid:null };
 
 const LIVEKEY = 'gladgym_live_v1';
 function save(){ try{ localStorage.setItem(LIVEKEY, JSON.stringify(D.live)); }catch(e){} }
@@ -1356,7 +1439,7 @@ function render(){
   const keepAt = $('#main') ? $('#main').scrollTop : 0;   /* 칩을 눌러도 보던 자리에 머문다 */
   if(sameView)
     document.querySelectorAll('#main textarea[data-k],#main input[data-k]').forEach(t=>{ S.draft=S.draft||{}; S.draft[t.getAttribute('data-k')]=t.value; });
-  else S.draft = {};
+  else { S.draft = {}; S.exq = ''; }   /* 화면이 바뀌면 찾던 말도 비운다 */
   const V={login:vLogin,home:vHome,routines:vRoutines,routine:vRoutine,start:vStart,pick:vPick,
     workout:vWorkout,summary:vSummary,records:vRecords,record:vRecord,feedback:vFeedback,me:vMe,
     t_members:tMembers,t_member:tMember,t_live:tLive,t_write:tWrite,t_routines:tRoutines,t_redit:tRedit,t_ex:tEx,
@@ -1594,16 +1677,26 @@ function vStart(){
 }
 
 /* ── 종목 고르기 ── 담기만 하고, 「운동 시작」을 눌러야 진행 화면으로 간다 */
+/* 지금 종목 사전에 실제로 있는 기구만 · 자주 쓰는 순서로 */
+const EQORDER = ['맨몸','바벨','덤벨','케이블','머신','스미스','밴드','케틀벨',
+                 '짐볼','TRX','메디신볼','원판','폼롤러','도구','유산소'];
+function EQS(){
+  const 있는 = new Set(EX.map(e=>e.e).filter(Boolean));
+  return ['전체'].concat(EQORDER.filter(x=>있는.has(x)),
+                         [...있는].filter(x=>EQORDER.indexOf(x)<0));
+}
 function vPick(){
   const w=live(), 담은=w?w.items.length:0;
   return { top: bar('종목 고르기','', (w&&w.begun)?'go:workout':'go:start'), body:`
     <div class="ptools">
-      <input class="search" type="text" data-k="exq" placeholder="운동 이름으로 찾기 — 예) 스쿼트, 로우">
+      <input class="search" type="text" data-k="exq" placeholder="찾기 — 스쿼트 · 레그컬 · bp · 코어 · 맨몸">
       <button class="pbtn" data-act="partopen">
         <span class="ic">☰</span>
-        <span class="tx"><b>부위 고르기</b><span>지금 ${esc(S.pickPart)}</span></span>
+        <span class="tx"><b>부위 · 기구 고르기</b><span>지금 ${esc(S.pickPart)}${S.pickEq==='전체'?'':' · '+esc(S.pickEq)}</span></span>
         <span class="ar">${S.pickOpen?'▲':'▼'}</span></button>
-      ${S.pickOpen?`<div class="chips">${PARTS.map(x=>`<button class="chip ${x===S.pickPart?'on':''}" data-act="part:${x}">${x}</button>`).join('')}</div>`:''}
+      ${S.pickOpen?`<div class="chips">${PARTS.map(x=>`<button class="chip ${x===S.pickPart?'on':''}" data-act="part:${x}">${x}</button>`).join('')}</div>
+        <div class="eqlbl">기구</div>
+        <div class="chips">${EQS().map(x=>`<button class="chip ${x===S.pickEq?'on t':''}" data-act="peq:${x}">${x}</button>`).join('')}</div>`:''}
       <div id="pickhint">
         <button class="pbtn etc" data-act="memoadd">
           <span class="ic">＋</span>
@@ -1611,14 +1704,16 @@ function vPick(){
           <span class="ar">›</span></button></div>
     </div>
     ${EX.map(e=>{ const vs=vars(e.id), n=cmOf(S.mid,e.id).length, last=lastSet(e.id);
-      return `<button class="card rowc" data-exrow="${esc(e.n+' '+e.p+' '+(e.e||''))}" data-part="${esc(e.p)}"
-        style="${e.p===S.pickPart?'':'display:none'}"
+      return `<button class="card rowc" data-exrow="${esc(exKey(e))}" data-part="${esc(e.p)}"
+        data-eq="${esc(e.e||'')}"
+        style="${(e.p===S.pickPart && (S.pickEq==='전체'||e.e===S.pickEq))?'':'display:none'}"
         data-act="add:${e.id}:${vs[0].k}">
         <div><div class="nm">${esc(e.n)}</div>
         <div class="sm">${esc(e.e)}${last?` · 지난번 ${setTxt(e.id,last)}`:' · 기록 없음'}${n?` · 코멘트 ${n}`:''}
         ${vs.length>1?`<br><span style="color:var(--gold-2)">하는 법 ${vs.length}가지 — 기록하면서 고릅니다</span>`:''}</div></div>
         <span class="rt">＋</span></button>`; }).join('')}
-    <div class="note">「벤치 / 벤치프레스 / BP」가 섞이면 증량 그래프가 끊겨서 <b>목록에서만</b> 고릅니다.</div>`,
+    <div class="note">「레그컬 · legcurl · 햄스트링」처럼 <b>붙여 써도, 영어로도, 다른 이름으로도</b> 찾아집니다.
+      찾는 게 없으면 위 「기타운동 추가」로 넣어 주세요.</div>`,
     foot: 담은
       ? `<button class="picked ${S.just?'bump':''}" data-act="askstart">
            <span class="c">담은 종목 ${담은}개 ›</span>
@@ -4577,6 +4672,22 @@ function tEx(){
     + `<div class="note">잡는 법이나 자극 부위가 달라 <b>따로 기록해야 하는 종목</b>만 나눕니다. 랫풀다운·시티드로우·하이로우·리니어로우·RDL이 그렇게 나뉘어 있습니다.</div>` };
 }
 
+/* 고르기 화면 — 찾는 말 · 부위 · 기구를 한꺼번에 걸러 보여준다 */
+function 칠하기(){
+  const q = 검색키(S.exq||'');
+  let 보임 = 0;
+  document.querySelectorAll('[data-exrow]').forEach(el=>{
+    const 기구맞음 = S.pickEq==='전체' || el.getAttribute('data-eq')===S.pickEq;
+    const 맞음 = q
+      ? ((el.getAttribute('data-exrow')||'').includes(q) && 기구맞음)
+      : (el.getAttribute('data-part')===S.pickPart && 기구맞음);
+    el.style.display = 맞음 ? '' : 'none';
+    if(맞음) 보임++;
+  });
+  const h=document.getElementById('pickhint'); if(h) h.style.display = q?'none':'';
+  const c=document.getElementById('pickcnt'); if(c) c.textContent = 보임 + '개';
+}
+
 /* ═══ 동작 ═══ */
 document.addEventListener('input', ev=>{
   const k = ev.target.getAttribute && ev.target.getAttribute('data-k');
@@ -4594,13 +4705,8 @@ document.addEventListener('input', ev=>{
     return;
   }
   if(k === 'exq'){                      /* 운동 이름으로 찾기 */
-    const q=(ev.target.value||'').trim().toLowerCase();
-    document.querySelectorAll('[data-exrow]').forEach(el=>{
-      const nm=(el.getAttribute('data-exrow')||'').toLowerCase();
-      el.style.display = q ? (nm.includes(q)?'':'none')
-                           : (el.getAttribute('data-part')===S.pickPart?'':'none');
-    });
-    const h=document.getElementById('pickhint'); if(h) h.style.display = q?'none':'';
+    S.exq = ev.target.value || '';
+    칠하기();
     return;
   }
   if(k && (k.startsWith('pc:') || k==='plnow:w' || k==='plnow:fp' || k==='plto:w' || k==='plto:date')){ calcSync(); }
@@ -5198,7 +5304,8 @@ document.addEventListener('click', ev=>{
         sets:[{kg:it.sets[0].kg, reps:it.sets[0].reps, spd:it.sets[0].spd, done:false}] })), '개인운동'); return; }
     case 'empty': newLive('빈 운동', [], '개인운동'); return;
 
-    case 'part': S.pickPart=rest[0]; render(); return;
+    case 'part': S.pickPart=rest[0]; render(); setTimeout(칠하기,0); return;
+    case 'peq': S.pickEq=rest[0]; render(); setTimeout(칠하기,0); return;
     case 'pickvar': sheetPickVar(rest[0]); return;
     case 'add': { const [ex,va]=rest;
       if(!w) newLive('빈 운동', [], '개인운동');
@@ -5307,7 +5414,7 @@ document.addEventListener('click', ev=>{
       save(); toast('그 무게로 맞췄어요'); render(); return; }
     case 'rest': sheetRest(); return;
     /* 부위 칩 펼치기 */
-    case 'partopen': S.pickOpen=!S.pickOpen; render(); return;
+    case 'partopen': S.pickOpen=!S.pickOpen; render(); setTimeout(칠하기,0); return;
     /* 담은 순서 확인 → 시작 */
     case 'askstart': S.sordIdx=null; sheetStart(); return;
     case 'sord': S.sordIdx=+rest[0]; drawSheet(); return;
