@@ -380,6 +380,19 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
   border-radius:0 0 14px 14px;padding:13px;margin:-9px 0 4px;
   display:flex;flex-direction:column;gap:9px}
 /* 직전 무게 — 접힌 한 줄이 기본, 누르면 3회분 펼침 */
+/* 시범 그림이 아직 없는 자리 */
+.demop{display:flex;flex-direction:column;align-items:center;gap:8px;flex:none;
+  padding:24px 14px;border:1px dashed #4a473f;border-radius:14px;background:var(--dark-2)}
+.demop .dpi{width:48px;height:48px;border-radius:15px;flex:none;display:flex;
+  align-items:center;justify-content:center;
+  background:var(--dark-3);border:1px solid var(--line);color:#8b8379}
+.demop .dpt{font-size:13.5px;font-weight:700;color:#9a938a}
+.demop .dps{font-size:11.5px;font-weight:500;color:#6d6a65;text-align:center;line-height:1.6}
+#main.lite .demop{background:#fff;border-color:#dfd2bd}
+#main.lite .demop .dpi{background:#f6efe3;border-color:#e6ddcf;color:#a89b8a}
+#main.lite .demop .dpt{color:#8a7f70}
+#main.lite .demop .dps{color:#a0917f}
+
 /* ── 프로필 ── 인스타처럼 */
 .pf{display:flex;flex-direction:column;align-items:center;gap:7px;flex:none;
   padding:20px 16px 18px;border:1px solid var(--line);border-radius:18px;
@@ -1296,10 +1309,11 @@ const demoBox = (e, v) => v.du
       <img class="a" src="${demoURL(v.du + '_1.png')}" alt="시작 자세">
       <img class="b" src="${demoURL(v.du + '_2.png')}" alt="끝 자세">
       <span class="cap">시범 · ${esc(e.n)}${v.n ? ` — ${esc(v.n)}` : ''}</span></div>`
-  : (v.demo
-    ? `<div class="demo"><div class="fig"><div class="bar"></div><div class="bod"></div></div>
-      <span class="cap">시범 영상 자리${v.n ? ` — ${esc(v.n)}` : ''}</span></div>`
-    : '');
+  : `<div class="demop">
+      <span class="dpi">${svg('prep', 28)}</span>
+      <span class="dpt">시범 그림 준비 중이에요</span>
+      <span class="dps">${esc(e.n)}${v.n ? ` — ${esc(v.n)}` : ''}<br>궁금하면 트레이너에게 물어보세요</span>
+    </div>`;
 
 let MEMBERS = [];
 let TRAINER = '양인수';
@@ -1351,7 +1365,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '125';
+const BUILD = '126';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
