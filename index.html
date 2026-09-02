@@ -380,6 +380,15 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
   border-radius:0 0 14px 14px;padding:13px;margin:-9px 0 4px;
   display:flex;flex-direction:column;gap:9px}
 /* 직전 무게 — 접힌 한 줄이 기본, 누르면 3회분 펼침 */
+/* 기구 사용법 영상 — 세로 9:16 */
+.demov{flex:none;display:flex;flex-direction:column;align-items:center;gap:8px;
+  background:var(--dark-2);border:1px solid var(--line);border-radius:14px;padding:12px}
+.demov video{width:100%;max-width:236px;aspect-ratio:9/16;border-radius:10px;
+  display:block;background:#000;object-fit:cover}
+.demov .dvc{font-size:12px;font-weight:600;color:var(--sub)}
+#main.lite .demov{background:#fff;border-color:#e6ddcf}
+#main.lite .demov .dvc{color:#a0917f}
+
 /* 시범 그림이 아직 없는 자리 */
 .demop{display:flex;align-items:center;justify-content:center;flex:none;
   aspect-ratio:16/10;border:1px dashed #4a473f;border-radius:14px;background:var(--dark-2)}
@@ -1316,7 +1325,14 @@ const MEMO_EX = { id:'memo', n:'운동 메모', p:'기타', e:'자유 입력', c
    그림이 아직 없는 벌은 예전 「자리」 표시를 그대로 둔다.            */
 const DEMOV = '4';   /* 시범 그림을 새로 올릴 때마다 하나씩 올린다 */
 const demoURL = p => SB_URL + '/storage/v1/object/public/media/' + p + '?v=' + DEMOV;
-const demoBox = (e, v) => v.du
+const demoBox = (e, v) => v.du && v.du.indexOf('vid/') === 0
+  /* 기구 사용법 영상 — 트레이너가 찍은 세로 영상. 눌러야 받아 온다 */
+  ? `<div class="demov">
+      <video src="${demoURL(v.du + '.mp4')}" poster="${demoURL(v.du + '.jpg')}"
+        controls playsinline preload="none" loop
+        controlsList="nodownload noremoteplayback" disablePictureInPicture></video>
+      <span class="dvc">기구 사용법 · ${esc(e.n)}</span></div>`
+  : v.du
   ? `<div class="demo2" data-act="demotoggle">
       <img class="a" src="${demoURL(v.du + '_1.png')}" alt="시작 자세">
       <img class="b" src="${demoURL(v.du + '_2.png')}" alt="끝 자세">
@@ -1373,7 +1389,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '130';
+const BUILD = '131';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
