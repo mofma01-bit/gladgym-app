@@ -416,7 +416,7 @@ textarea.inp{min-height:76px;resize:vertical;line-height:1.6}
 
 <script>
 "use strict";
-const BUILD = '16';
+const BUILD = '17';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -474,6 +474,97 @@ const BODY_TESTS = [
   {g:'발',k:'f1',t:'발 아치',a:'평발(회내)',b:'요족(회외)'},
 ];
 const PARTS = ['전체','가슴','등','어깨','하체','복근','팔','유산소','기타'];
+/* ── 찾기 ── 띄어쓰기·영어·줄임말·다른 표기로도 걸리게 ── */
+const 별칭이름 = [
+  ['벤치프레스','bench press bp 벤프'], ['인클라인','incline 인클'], ['디클라인','decline 디클'],
+  ['체스트','chest'], ['플라이','fly flye 플라잉'], ['펙덱','pecdec 펙덱플라이'],
+  ['푸시업','pushup push up 팔굽혀펴기 팔굽혀 푸쉬업'], ['딥스','dips dip'],
+  ['풀오버','pullover'], ['크로스오버','crossover'],
+  ['랫풀다운','lat pulldown 렛풀다운 렛풀 랫풀'], ['풀다운','pulldown'],
+  ['풀업','pullup pull up 턱걸이'], ['친업','chinup 턱걸이'],
+  ['로우','row'], ['데드리프트','deadlift dl 데드'], ['슈러그','shrug 승모'],
+  ['페이스','face pull 페이스풀'], ['익스텐션','extension'],
+  ['오버헤드','overhead ohp'], ['밀리터리','military ohp'],
+  ['숄더','shoulder'], ['레터럴','lateral 사레레 측면'], ['프론트','front'],
+  ['리어','rear 후면'], ['델트','delt 삼각'], ['아놀드','arnold'], ['업라이트','upright'],
+  ['스쿼트','squat sq 스콰트 스쿳'], ['런지','lunge'],
+  ['레그 프레스','legpress lp'], ['레그 익스텐션','legextension le 대퇴사두'],
+  ['레그 컬','legcurl lc 햄스트링'], ['힙쓰러스트','hipthrust ht 힙트러스트'],
+  ['카프','calf 종아리'],
+  ['불가리안','bulgarian bss'], ['고블릿','goblet'], ['핵','hack'],
+  ['컬','curl'], ['트라이셉스','triceps 삼두'], ['푸시다운','pushdown 삼두'],
+  ['프리처','preacher'], ['해머','hammer'], ['킥백','kickback'],
+  ['스컬','skull crusher 스컬크러셔'], ['리스트','wrist 손목'],
+  ['크런치','crunch 윗몸 복근 코어'], ['싯업','situp 윗몸일으키기 복근'],
+  ['플랭크','plank 코어'], ['레그 레이즈','legraise 하복부'], ['레이즈','raise'],
+  ['러시안','russian'], ['우드찹','woodchop'], ['팔로프','pallof'],
+  ['마운틴','mountain climber'], ['버피','burpee'], ['할로우','hollow'],
+  ['데드버그','deadbug'], ['버드독','birddog'],
+  ['트레드밀','treadmill 러닝머신 런닝머신 달리기 걷기'], ['사이클','cycle bike 자전거'],
+  ['싸이클','cycle bike 자전거'], ['로잉','rowing'], ['일립티컬','elliptical'],
+  ['줄넘기','jumprope rope'], ['스텝밀','stepmill'], ['배틀로프','batttlerope 로프'],
+  ['폼롤러','foamroller 마사지 이완'], ['스트레칭','stretch 스트레치 이완'],
+  ['가동성','mobility 모빌리티'], ['터키시','turkish getup'],
+  ['클린','clean'], ['스내치','snatch'], ['스러스터','thruster'],
+  ['프레스','press'], ['머신','machine'],
+];
+const 별칭부위 = { '가슴':'chest 흉근', '등':'back 등근육', '어깨':'shoulder delt 삼각근',
+  '하체':'leg legs 다리 허벅지 하지', '복근':'abs core 코어 배 복부',
+  '팔':'arm arms 팔뚝', '유산소':'cardio 카디오 유산소', '기타':'etc 재활 이완' };
+const 별칭기구 = { '맨몸':'bodyweight 자중 홈트 기구없이', '바벨':'barbell bb',
+  '덤벨':'dumbbell db 아령', '케이블':'cable', '머신':'machine 기구',
+  '스미스':'smith 스미스머신', '밴드':'band 밴드', '케틀벨':'kettlebell kb',
+  '짐볼':'gymball swissball 볼', 'TRX':'trx 서스펜션', '메디신볼':'medicineball 볼',
+  '원판':'plate 플레이트', '폼롤러':'foamroller', '도구':'tool 소도구', '유산소':'cardio' };
+const 검색키 = t => (t||'').toLowerCase().replace(/[\s·()\-—_/,]/g,'');
+function exKey(e){
+  let t = e.name + ' ' + e.part + ' ' + (e.equip||'');
+  for(const a of 별칭이름) if(t.indexOf(a[0])>=0) t += ' ' + a[1];
+  t += ' ' + (별칭부위[e.part]||'') + ' ' + (별칭기구[e.equip]||'');
+  /* 같은 낱말이라도 부위에 따라 뜻이 다르다 — 레그 컬은 이두가 아니고, 덤벨 킥백은 둔근이 아니다 */
+  if(e.part==='팔'){
+    if(/컬/.test(e.name)) t += ' 이두 biceps 알통';
+    if(/트라이셉스|푸시다운|익스텐션|킥백|딥스|스컬|JM|클로즈그립/.test(e.name)) t += ' 삼두 triceps';
+    if(/리스트|파머스|악력|그립 스퀴즈/.test(e.name)) t += ' 전완 forearm 악력';
+  }
+  if(e.part==='하체'){
+    if(/힙|글루트|브릿지|쓰러스트|킥백|어브덕션|풀 스루|하이퍼|데드리프트|RDL/.test(e.name))
+      t += ' 엉덩이 둔근 glute 힙';
+    if(/레그 컬|햄스트링|노르딕|스티프|RDL|루마니안/.test(e.name)) t += ' 햄스트링 hamstring 뒤허벅지';
+    if(/익스텐션|스쿼트|런지|레그 프레스|핵|시시/.test(e.name)) t += ' 대퇴사두 quad 앞허벅지';
+    if(/어덕션|애덕터/.test(e.name)) t += ' 내전근 adductor 안쪽허벅지';
+  }
+  if(e.part==='등'){
+    if(/풀다운|풀업|친업|풀오버|스트레이트암/.test(e.name)) t += ' 광배 lat';
+    if(/슈러그/.test(e.name)) t += ' 승모 trap';
+    if(/페이스|리버스 플라이|Y 레이즈|T 레이즈/.test(e.name)) t += ' 후면 승모 능형근';
+  }
+  if(e.part==='어깨'){
+    if(/레터럴/.test(e.name)) t += ' 측면 중간삼각 사레레';
+    if(/프론트/.test(e.name)) t += ' 전면삼각';
+    if(/리어|리버스 플라이|델트 로우/.test(e.name)) t += ' 후면삼각 후삼';
+    if(/회전|큐반/.test(e.name)) t += ' 회전근개 rotatorcuff 재활';
+  }
+  if(e.part==='가슴'){
+    if(/인클라인/.test(e.name)) t += ' 윗가슴 상부';
+    if(/디클라인/.test(e.name)) t += ' 아랫가슴 하부';
+  }
+  if(e.part==='복근'){
+    if(/레그 레이즈|니 레이즈|리버스 크런치|니업|플러터|시저스/.test(e.name)) t += ' 하복부';
+    if(/사이드|우드찹|트위스트|팔로프|안티로테이션|벤드/.test(e.name)) t += ' 옆구리 복사근 oblique';
+  }
+  return 검색키(t);
+}
+
+/* 지금 종목 사전에 실제로 있는 기구만 · 자주 쓰는 순서로 */
+const EQORDER = ['맨몸','바벨','덤벨','케이블','머신','스미스','밴드','케틀벨',
+                 '짐볼','TRX','메디신볼','원판','폼롤러','도구','유산소'];
+function EQS(){
+  const 있는 = new Set(D.ex.map(e=>e.equip).filter(Boolean));
+  return ['전체'].concat(EQORDER.filter(x=>있는.has(x)),
+                         [...있는].filter(x=>EQORDER.indexOf(x)<0));
+}
+
 /* 상담 문진 항목 이름 — 회원 앱에서 쓰는 열쇠를 한글로 */
 const IKNAME = {
   sex:'성별', birth:'생년월일', height:'키', job:'직업', jobenv:'근무 자세',
@@ -487,7 +578,7 @@ const IKNAME = {
 const D = { m:[], w:[], wi:[], r:[], ri:[], c:[], a:[], aAll:[], ex:[], va:[], asks:[] };
 const M = { wi:[], ws:[], meals:[], mi:[], bl:[], br:[], bc:null, plan:null, intake:null, cyc:null, bph:[] };
 const S = { view:'members', who:'전체', q:'', mid:null, rid:null, tab:'routine',
-            exq:'', part:'전체', cmex:null, day:null, kind:'수업', asDate:null, calMonth:null,
+            exq:'', part:'전체', eq:'전체', cmex:null, day:null, kind:'수업', asDate:null, calMonth:null,
             cmw:null, cmopen:null, cday:null, mday:null, cmprev:null,
             bpPose:'정면', bpKind:'body',
             edit:{ record:false, routine:false, body:false, meal:false, plan:false, minfo:false } };
@@ -1354,14 +1445,19 @@ function vToday(){
 
 /* ── 종목 고르기 팝업 ── */
 function popPick(){
-  const q = S.exq.trim().toLowerCase();
+  const q = 검색키(S.exq);
   let list = D.ex.slice();
-  if(S.part!=='전체') list = list.filter(e=>e.part===S.part);
-  if(q) list = list.filter(e => (e.name+' '+e.part+' '+(e.equip||'')).toLowerCase().includes(q));
-  return '<h2>종목 추가</h2>'
-    + '<input class="inp" id="exq" type="text" placeholder="운동 이름으로 찾기" value="' + esc(S.exq) + '">'
+  if(!q && S.part!=='전체') list = list.filter(e=>e.part===S.part);
+  if(S.eq!=='전체') list = list.filter(e=>(e.equip||'')===S.eq);
+  if(q) list = list.filter(e => exKey(e).includes(q));
+  return '<h2>종목 추가 <span style="font-size:12px;font-weight:600;color:var(--sub)">'
+    + list.length + '개</span></h2>'
+    + '<input class="inp" id="exq" type="text" value="' + esc(S.exq) + '"'
+    + ' placeholder="찾기 — 스쿼트 · 레그컬 · bp · 코어 · 햄스트링 · 맨몸">'
     + '<div class="chips" style="margin:0">' + PARTS.map(p =>
         '<button class="chip ' + (S.part===p?'on':'') + '" data-part="' + p + '">' + p + '</button>').join('') + '</div>'
+    + '<div class="chips" style="margin:0">' + EQS().map(p =>
+        '<button class="chip ' + (S.eq===p?'on':'') + '" data-eq="' + esc(p) + '">' + esc(p) + '</button>').join('') + '</div>'
     + '<div style="display:flex;flex-direction:column;gap:7px">'
     + (list.length ? list.map(function(e){
         const vs = D.va.filter(v=>v.ex_id===e.id).sort((a,b)=>a.sort-b.sort);
@@ -1648,6 +1744,8 @@ document.addEventListener('click', async function(ev){
 
   const part = t.closest('[data-part]');
   if(part){ S.part = part.dataset.part; popOpen(popPick()); return; }
+  const eqc = t.closest('[data-eq]');
+  if(eqc){ S.eq = eqc.dataset.eq; popOpen(popPick()); return; }
 
   const add = t.closest('[data-add]');
   if(add){
@@ -1669,7 +1767,7 @@ document.addEventListener('click', async function(ev){
   if(a==='toList'){ S.view='members'; render(); return; }
   if(a==='toMember'){ S.view='member'; render(); return; }
   if(a==='popclose'){ popClose(); return; }
-  if(a==='expick'){ S.exq=''; S.part='전체'; popOpen(popPick()); return; }
+  if(a==='expick'){ S.exq=''; S.part='전체'; S.eq='전체'; popOpen(popPick()); return; }
 
   /* 체형 — 검사 체크 */
   if(a==='bcmemo'){
