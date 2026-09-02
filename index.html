@@ -213,7 +213,10 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 #tabs button.on{color:var(--gold)}
 #tabs button.on::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
   width:34px;height:3px;background:var(--gold);border-radius:0 0 3px 3px}
-#tabs button .ic{font-size:20px;line-height:1}
+#tabs button .ic{font-size:20px;line-height:1;display:flex;align-items:center;justify-content:center;
+  height:22px;transition:transform .16s ease}
+#tabs button.on .ic{transform:translateY(-1px) scale(1.06)}
+#tabs button:active .ic{transform:scale(.9)}
 #tabs button .bd{position:absolute;transform:translate(14px,-4px);width:9px;height:9px;
   border-radius:50%;background:var(--teal);border:2px solid var(--brown)}
 
@@ -792,6 +795,22 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
   .card,.btn,.hero,.tile,.gocard{transition:none}
 }
 
+/* 세는 숫자 */
+.dsum .v .cnt{font-style:normal;font-variant-numeric:tabular-nums}
+.gocard .gi.tealic{color:var(--teal);border-color:#39515a;background:var(--teal-dim)}
+
+/* 빈 화면 — 글자만 두지 않는다 */
+.empty2{padding:34px 16px;text-align:center;
+  display:flex;flex-direction:column;align-items:center;gap:11px}
+.empty2 .ei{width:62px;height:62px;border-radius:20px;display:flex;flex:none;
+  align-items:center;justify-content:center;
+  background:var(--dark-3);border:1px solid var(--line);color:#8b8379}
+.empty2 .et{font-size:14.5px;font-weight:700;color:#9a938a;line-height:1.6}
+.empty2 .es{font-size:12.5px;font-weight:500;color:#6d6a65;line-height:1.6;margin-top:-4px}
+#main.lite .empty2 .ei{background:#f0e8db;border-color:#dfd2bd;color:#a89b8a}
+#main.lite .empty2 .et{color:#8a7f70}
+#main.lite .empty2 .es{color:#a89b8a}
+
 /* 오늘 기록 — 접히는 카드 */
 .dhd2{width:100%;display:flex;align-items:center;gap:10px;padding:14px 15px;text-align:left}
 .dhd2 .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
@@ -1023,9 +1042,59 @@ const 아이콘 = {
   prep:   '<circle cx="12" cy="5.2" r="2.1"/><path d="M12 8v5.6"/>'
          +'<path d="M12 13.6l-3.2 5.6M12 13.6l3.2 5.6"/><path d="M6.8 10.4L12 8.4l5.2 2"/>',
   clock:  '<circle cx="12" cy="12" r="8"/><path d="M12 7.4V12l3.1 1.9"/>',
+  home:   '<path d="M4 10.6L12 4.2l8 6.4"/><path d="M6.2 9.8V19.4h11.6V9.8"/>'
+         +'<path d="M10 19.4v-5h4v5"/>',
+  bars:   '<rect x="4.6" y="4.6" width="14.8" height="14.8" rx="2.6"/>'
+         +'<path d="M8.4 15.6v-3.2M12 15.6V9M15.6 15.6v-4.8"/>',
+  bowl:   '<path d="M3.8 11.6h16.4a8.2 8.2 0 0 1-16.4 0z"/>'
+         +'<path d="M9.4 8.8c0-1.4 2.2-1.4 2.2-2.9M13.6 9c0-1.1-1.7-1.3-1.7-2.5"/>',
+  mail:   '<rect x="3.6" y="5.6" width="16.8" height="12.8" rx="2.4"/>'
+         +'<path d="M4.6 7.6l7.4 5.2 7.4-5.2"/>',
+  user:   '<circle cx="12" cy="8.4" r="3.5"/>'
+         +'<path d="M5.4 19.6c.5-3.5 3.3-5.4 6.6-5.4s6.1 1.9 6.6 5.4"/>',
+  moon:   '<circle cx="12" cy="12" r="7.8"/>'
+         +'<path d="M12 4.2a7.8 7.8 0 0 0 0 15.6z" fill="currentColor" stroke="none"/>',
+  chat:   '<path d="M4.4 6.8a2.4 2.4 0 0 1 2.4-2.4h10.4a2.4 2.4 0 0 1 2.4 2.4v6.4'
+         +'a2.4 2.4 0 0 1-2.4 2.4H9.8l-4 3.2v-3.2h-1a1.4 1.4 0 0 1-.4-1z"/>'
+         +'<path d="M8 8.8h8M8 11.8h5"/>',
+  note:   '<path d="M6.4 3.8h8.2l4 4v12.4H6.4z"/><path d="M14.4 3.8v4.2h4.2"/>'
+         +'<path d="M9.2 12.6h6M9.2 15.8h3.8"/>',
+  flag:   '<path d="M6.4 20.4V4.2"/><path d="M6.4 5.2h11l-2.4 3.6 2.4 3.6h-11z"/>',
+  pen:    '<path d="M4.4 19.6l.9-3.6L15.6 5.7a1.9 1.9 0 0 1 2.7 2.7L8 18.7z"/>'
+         +'<path d="M14.2 7.1l2.7 2.7"/>',
+  grid:   '<rect x="4.2" y="4.2" width="6.4" height="6.4" rx="1.6"/>'
+         +'<rect x="13.4" y="4.2" width="6.4" height="6.4" rx="1.6"/>'
+         +'<rect x="4.2" y="13.4" width="6.4" height="6.4" rx="1.6"/>'
+         +'<rect x="13.4" y="13.4" width="6.4" height="6.4" rx="1.6"/>',
   spark:  '<path d="M12 4.2l1.7 4.4 4.4 1.7-4.4 1.7L12 16.4l-1.7-4.4L5.9 10.3l4.4-1.7z"/>'
          +'<path d="M18.4 15.6l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/>',
 };
+/* ── 숫자 ── 0에서 세어 올라간다. data-cnt 에 진짜 값을 담아 둔다 */
+const 수 = (v, 콤마) => {
+  const n = Number(v) || 0;
+  const 글 = 콤마 ? n.toLocaleString() : String(n);
+  return n ? '<i class="cnt" data-cnt="' + n + '"' + (콤마 ? ' data-comma="1"' : '')
+             + '>' + 글 + '</i>' : 글;
+};
+function 세어올리기(){
+  document.querySelectorAll('#main .cnt[data-cnt]').forEach(el => {
+    const 끝 = parseFloat(el.getAttribute('data-cnt')) || 0;
+    if(!끝) return;
+    const 자리 = (el.getAttribute('data-cnt').indexOf('.') >= 0) ? 1 : 0;
+    const 콤마 = el.hasAttribute('data-comma');
+    const 꾸밈 = v => 콤마 ? Math.round(v).toLocaleString() : v.toFixed(자리);
+    if(document.hidden){ el.textContent = 꾸밈(끝); return; }   /* 안 보이면 그냥 끝값 */
+    const t0 = Date.now(), 걸림 = 640;
+    /* 0 으로 먼저 덮지 않는다 — 타이머가 안 돌아도 제 값이 남아 있게 */
+    const 타 = setInterval(() => {
+      const 진 = Math.min(1, (Date.now() - t0) / 걸림);
+      el.textContent = 꾸밈(끝 * (1 - Math.pow(1 - 진, 3)));
+      if(진 >= 1) clearInterval(타);
+    }, 24);
+    /* 안전망 — 무슨 일이 있어도 제 값으로 끝낸다 (창이 가려져 타이머가 늦어져도) */
+    setTimeout(() => { clearInterval(타); el.textContent = 꾸밈(끝); }, 걸림 + 400);
+  });
+}
 const svg = (k, s2) => '<svg class="ic2" viewBox="0 0 24 24" width="' + (s2||20) + '" height="'
   + (s2||20) + '" fill="none" stroke="currentColor" stroke-width="1.7"'
   + ' stroke-linecap="round" stroke-linejoin="round">' + (아이콘[k]||'') + '</svg>';
@@ -1100,7 +1169,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '114';
+const BUILD = '115';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1604,10 +1673,10 @@ function weekStrip(mid){
         ${ring(t.pw, t.pk)}
         <span class="num">${+d.slice(8)}</span></button>`; }).join('')}</div>
     <div class="dsum" style="grid-template-columns:repeat(4,1fr)">
-      <div><span class="k">운동시간</span><span class="v">${st.dur?Math.max(1,Math.round(st.dur/60)):0}<small> 분</small></span></div>
-      <div><span class="k">종목</span><span class="v">${st.ex}<small> 개</small></span></div>
-      <div><span class="k">총 볼륨</span><span class="v">${st.vol ? (st.vol>=1000 ? (st.vol/1000).toFixed(1) : st.vol) : 0}<small> ${st.vol>=1000?'톤':'kg'}</small></span></div>
-      <div><span class="k">식단</span><span class="v">${st.kcal?st.kcal.toLocaleString():(st.shots?'—':0)}<small> kcal</small></span></div>
+      <div><span class="k">운동시간</span><span class="v">${수(st.dur?Math.max(1,Math.round(st.dur/60)):0)}<small> 분</small></span></div>
+      <div><span class="k">종목</span><span class="v">${수(st.ex)}<small> 개</small></span></div>
+      <div><span class="k">총 볼륨</span><span class="v">${수(st.vol ? (st.vol>=1000 ? +(st.vol/1000).toFixed(1) : st.vol) : 0)}<small> ${st.vol>=1000?'톤':'kg'}</small></span></div>
+      <div><span class="k">식단</span><span class="v">${st.kcal?수(st.kcal,1):(st.shots?'—':0)}<small> kcal</small></span></div>
     </div>
   </div>`;
 }
@@ -1684,6 +1753,8 @@ function render(){
       <button class="btn main" data-act="tab:home">홈으로</button>
       <button class="btn ghost" data-act="retry">다시 불러오기</button>` };
   }
+  /* 세는 숫자 — 값이 그대로면 다시 세지 않는다 (버튼 누를 때마다 들썩이지 않게) */
+  const 옛수 = [...$('#main').querySelectorAll('.cnt')].map(e=>e.getAttribute('data-cnt')).join(',');
   /* 화면이 바뀔 때만 떠오르는 움직임을 준다 — 같은 화면 안에서 다시 그릴 땐 가만히 */
   $('#main').className = (v.lite ? 'lite' : '') + (sameView ? '' : ' anim');
   $('#top').innerHTML=v.top||''; $('#main').innerHTML=v.body||''; $('#foot').innerHTML=v.foot||'';
@@ -1702,6 +1773,8 @@ function render(){
   document.querySelectorAll('#main textarea[data-k],#main input[data-k]').forEach(t=>{ const d=S.draft&&S.draft[t.getAttribute('data-k')]; if(d) t.value=d; });
   S.dctx = dctx;
   $('#main').scrollTop = (v.keepScroll || sameView) ? keepAt : 0;
+  const 새수 = [...$('#main').querySelectorAll('.cnt')].map(e=>e.getAttribute('data-cnt')).join(',');
+  if((!sameView || 옛수 !== 새수) && !matchMedia('(prefers-reduced-motion:reduce)').matches) 세어올리기();
 }
 function bar(title, right, back, sub){
   const bare = (S.screen==='login'||S.screen==='boot'||S.screen==='err');
@@ -1717,8 +1790,9 @@ function tabBar(){
   const u=unreadOf(S.mid);
   const t=(id,ic,nm,bd)=>`<button data-act="tab:${id}" class="${S.tab===id?'on':''}">
     <span class="ic">${ic}${bd?'<span class="bd"></span>':''}</span><span>${nm}</span></button>`;
-  return t('home','⌂','홈')+t('records','▤','분석')+t('diet','◑','식단')
-       +t('feedback','✉','피드백',u>0)+t('me','◍','내 정보');
+  return t('home',svg('home',22),'홈')+t('records',svg('bars',22),'분석')
+       +t('diet',svg('bowl',22),'식단')
+       +t('feedback',svg('mail',22),'피드백',u>0)+t('me',svg('user',22),'내 정보');
 }
 /* 코멘트를 아직 안 단 운동인가 */
 /* 그 수업의 종목 중 코멘트가 하나도 없는 것이 있으면 「쓸 것」 */
@@ -1736,7 +1810,8 @@ function tabBarTr(){
   const n = trTodo();
   const t=(id,ic,nm,bd)=>`<button data-act="ttab:${id}" class="${S.ttab===id?'on':''}">
     <span class="ic">${ic}${bd?'<span class="bd"></span>':''}</span><span>${nm}</span></button>`;
-  return t('t_today','◷','오늘')+t('t_members','⌸','회원')+t('t_feed','✎','피드백',n>0)+t('t_tools','⚑','자료');
+  return t('t_today',svg('clock',22),'오늘')+t('t_members',svg('grid',22),'회원')
+       +t('t_feed',svg('pen',22),'피드백',n>0)+t('t_tools',svg('flag',22),'자료');
 }
 
 /* ── 불러오는 중 · 오류 ── */
@@ -1810,7 +1885,7 @@ function vHome(){
   return { top: bar('글래드짐', `<span class="sub">${esc(me().n)} 회원님</span>`), tabs:1, body:`
     ${weekStrip(S.mid)}
     ${past
-      ? (dayDetail(S.mid, sel) || `<div class="empty">이 날은 기록이 없어요</div>`)
+      ? (dayDetail(S.mid, sel) || 빔('note','이 날은 기록이 없어요','운동을 시작하면 여기에 쌓입니다'))
       : dayDetail(S.mid, sel)}
 
     <button class="hero" data-act="${hero.act}">
@@ -1840,13 +1915,16 @@ function vHome(){
     })()}
 
     ${(u>0 || cy) ? `<span class="lbl">오늘 챙길 것</span>` : ''}
-    ${u>0 ? `<button class="card gold rowc" data-act="tab:feedback">
-      <div><div class="nm g">새 코멘트 ${u}개</div>
-      <div class="sm">${esc((D.cm.find(c=>!c.read&&c.mid===S.mid)||{}).tr||'')} 트레이너가 남겼어요</div></div>
-      <span class="rt">›</span></button>` : ''}
-    ${cy ? `<button class="card rowc" data-act="sub:cycle">
-      <div><div class="nm">${cy.day}일차 · ${esc(cy.ph)}</div>
-      <div class="sm">${esc(cy.why)}</div></div><span class="rt">›</span></button>` : ''}
+    ${u>0 ? `<button class="gocard gold2" data-act="tab:feedback">
+      <span class="gi">${svg('chat')}</span>
+      <span class="gt"><span class="nm">새 코멘트 ${u}개</span>
+        <span class="sm">${esc((D.cm.find(c=>!c.read&&c.mid===S.mid)||{}).tr||'')} 트레이너가 남겼어요</span></span>
+      <span class="ga">›</span></button>` : ''}
+    ${cy ? `<button class="gocard" data-act="sub:cycle">
+      <span class="gi tealic">${svg('moon')}</span>
+      <span class="gt"><span class="nm">${cy.day}일차 · ${esc(cy.ph)}</span>
+        <span class="sm">${esc(cy.why)}</span></span>
+      <span class="ga">›</span></button>` : ''}
 
     <span class="lbl">바로 가기</span>
     ${[['routine','내 루틴', myRoutines(S.mid).length+'개 · 골라서 바로 시작','go:routines'],
@@ -1880,7 +1958,7 @@ function vRoutines(){
       <div><div class="nm ${(t&&t.rid===r.id)||rc?'g':''}">루틴 ${r.no} · ${esc(r.n)}${rc?` <span class="pill">${esc(rc.slot)}</span>`:''}</div>
       <div class="sm">${esc(r.purpose)}<br>${r.items.length}종목 · 예상 ${estMin(r)}분</div></div>
       ${t&&t.rid===r.id?`<span class="pill">오늘 ${esc(t.kind)}</span>`:'<span class="rt">›</span>'}</button>`; }).join('')
-    : '<div class="empty">아직 받은 루틴이 없어요</div>')
+    : 빔('routine','아직 받은 루틴이 없어요','트레이너가 담아 두면 여기에 보여요'))
     + `<div class="note">루틴은 수업 전에 방향성에 맞춰 미리 짜 둡니다. <b>수업용과 혼자 할 때 쓰는 루틴</b>을 트레이너가 지정하거나, 직접 골라 시작할 수 있어요.</div>` };
 }
 function vRoutine(){
@@ -2225,6 +2303,10 @@ const PREPIMG = {
   both:'img/card-both.jpg',
 };
 /* 갈래가 sm(둘 다)이면 스트레칭 사진으로 */
+/* ── 빈 화면 ── 글자만 있으면 고장난 줄 안다. 그림을 같이 둔다 */
+const 빔 = (k, t, s2) => '<div class="empty2"><span class="ei">' + svg(k, 30) + '</span>'
+  + '<div class="et">' + t + '</div>' + (s2 ? '<div class="es">' + s2 + '</div>' : '') + '</div>';
+
 const 묶음사진 = setKey => PREPIMG[(S.prepKind==='m' ? 'm_' : 's_') + setKey] || '';
 const 갈래사진 = k => k==='s' ? PREPIMG.s_back : (k==='m' ? PREPIMG.m_back : PREPIMG.both);
 
@@ -2336,7 +2418,7 @@ function vPrep3(){
         <span class="nm">${esc(x.n)}<span class="tm">${esc(x.t)}</span></span>
         <span class="sm">${esc(x.d)}</span>
         <span class="kd">${갈래말[갈래(x)]}</span>
-      </span></div>`).join('') : '<div class="empty">담긴 동작이 없어요</div>'}
+      </span></div>`).join('') : 빔('prep','담긴 동작이 없어요')}
     <div class="note">
       늘이는 동작은 <b>아프지 않고 살짝 당기는</b> 정도까지만. 반동을 주지 마세요.<br>
       푸는 동작은 <b>천천히</b>, 아픈 자리에서 멈춰 20~30초 눌러 줍니다. 뼈·관절 위는 피하세요.</div>`,
@@ -2520,7 +2602,7 @@ function sheetExDesc(exid, vk, mid){
           ${c.vids?(S.vplay===c.id
             ? `<div class="vbox on"><span class="play">॥</span><span class="cap">재생 중</span></div>`
             : `<button class="vbox" data-act="play:${c.id}"><span class="play">▶</span><span class="cap">영상 보기</span></button>`):''}
-        </div>`:''}</div>`).join('') : '<div class="empty">아직 코멘트가 없어요</div>'}
+        </div>`:''}</div>`).join('') : 빔('chat','아직 코멘트가 없어요','이 종목을 기록하면 트레이너가 봅니다')}
       ${!tr?(()=>{ const mine = askOf(mid, exid, vk);
         return mine.length
           ? `<div class="note" style="border-color:var(--gold-2)">
@@ -2726,13 +2808,13 @@ function vRecords(){
         <button class="${gm==='min'?'on':''}" data-act="anag:min">시간</button>
       </div>
       ${ws.length ? lineChart(anaSeries(mid, gm), unit)
-        : '<div class="empty">이 기간에 기록이 없어요</div>'}
+        : 빔('chart','이 기간에 기록이 없어요','위에서 기간을 넓혀 보세요')}
     </div>
     ${gm==='kcal'?'<div class="note">칼로리는 운동 시간과 몸무게로 <b>어림한 값</b>입니다. 실제 소모량과는 차이가 있습니다.</div>':''}
 
     <span class="lbl">운동 균형 · 부위별 세트</span>
     <div class="gbox">
-      ${tot.sets ? radar(ps) : '<div class="empty">이 기간에 기록이 없어요</div>'}
+      ${tot.sets ? radar(ps) : 빔('chart','이 기간에 기록이 없어요','위에서 기간을 넓혀 보세요')}
       ${tot.sets ? `<div class="note" style="margin-top:4px">가장 많이 한 곳은 <b style="color:var(--gold)">${hi} ${ps[hi]}세트</b>,
         가장 적은 곳은 <b style="color:var(--warn)">${lo} ${ps[lo]}세트</b>입니다.</div>` : ''}
     </div>
