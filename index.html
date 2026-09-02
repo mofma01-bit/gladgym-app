@@ -377,9 +377,10 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 /* ── 큰 그림 카드 ── 사진이 들어올 자리를 미리 잡아 둔다.
    나중에 --img 만 채우면 그대로 사진 카드가 된다.                    */
 .hero2{
-  position:relative;overflow:hidden;width:100%;height:132px;border-radius:17px;
+  position:relative;overflow:hidden;width:100%;border-radius:18px;
+  min-height:172px;                       /* 고정 높이가 아니라 최소 높이 — 글씨가 잘리지 않게 */
   display:flex;flex-direction:column;justify-content:flex-end;
-  padding:15px 17px;text-align:left;border:1px solid var(--line);
+  padding:17px 19px;text-align:left;border:1px solid var(--line);
   background-image:var(--img,none),linear-gradient(128deg,var(--h1),var(--h2));
   background-size:cover;background-position:center;isolation:isolate}
 .hero2::after{
@@ -387,20 +388,20 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
   background:linear-gradient(to top,rgba(9,9,8,.72) 6%,rgba(9,9,8,.18) 58%,transparent)}
 .hero2:active{transform:scale(.985)}
 .hero2 .tt{
-  position:relative;z-index:3;font-size:20px;font-weight:800;letter-spacing:-.03em;
-  line-height:1.2;color:#fff;text-shadow:0 1px 12px rgba(0,0,0,.45)}
+  position:relative;z-index:3;font-size:22px;font-weight:800;letter-spacing:-.03em;
+  line-height:1.25;color:#fff;text-shadow:0 1px 14px rgba(0,0,0,.55)}
 .hero2 .dd{
-  position:relative;z-index:3;font-size:12px;font-weight:500;line-height:1.55;
-  color:rgba(255,255,255,.78);margin-top:4px;text-shadow:0 1px 10px rgba(0,0,0,.5)}
+  position:relative;z-index:3;font-size:12.5px;font-weight:500;line-height:1.6;
+  color:rgba(255,255,255,.84);margin-top:5px;text-shadow:0 1px 10px rgba(0,0,0,.6)}
 .hero2 .tag2{
-  position:absolute;top:13px;right:14px;z-index:3;font-size:11px;font-weight:800;
-  padding:4px 11px;border-radius:999px;color:#fff;
+  position:absolute;top:14px;right:15px;z-index:3;font-size:11.5px;font-weight:800;
+  padding:5px 12px;border-radius:999px;color:#fff;
   background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
   backdrop-filter:blur(6px)}
 .hero2 .gl{
   position:absolute;top:13px;left:16px;z-index:3;font-size:10.5px;font-weight:800;
   letter-spacing:.1em;color:rgba(255,255,255,.6)}
-.hero2.tall{height:150px}
+.hero2.tall{min-height:200px}
 .hero2.shot .art{display:none}
 .hero2.shot::after{
   background:linear-gradient(to top,rgba(6,6,5,.66) 2%,rgba(6,6,5,.22) 46%,
@@ -1018,7 +1019,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '108';
+const BUILD = '110';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1807,14 +1808,16 @@ function vRoutine(){
 function vStart(){
   const t=D.today[S.mid], r=t?rOf(t.rid):null, ws=myWorkouts();
   return { top: bar('운동 시작', `<span class="sub">${dateTxt(TODAY)}</span>`, 'go:home'), body:`
-    ${r?`<button class="hero2 tall" data-act="rt:${r.id}" style="--h1:#1f4048;--h2:#0e1517">
+    ${r?`<button class="hero2 tall ${사진있나('assigned')}" data-act="rt:${r.id}"
+        style="${사진꾸밈('assigned','#1f4048','#0e1517')}">
       <span class="art c2"></span>
       <span class="gl">${esc(t.by||'트레이너')}가 지정했어요</span>
       <span class="tag2">${r.items.length}종목 · ${estMin(r)}분</span>
       <span class="tt">트레이너 지정루틴 시작하기</span>
       <span class="dd">${esc(t.kind)} · 루틴 ${r.no} · ${esc(r.n)}</span></button>`:''}
 
-    <button class="hero2" data-act="empty" style="--h1:#4a3b1c;--h2:#17130b">
+    <button class="hero2 ${사진있나('pickex')}" data-act="empty"
+        style="${사진꾸밈('pickex','#4a3b1c','#17130b')}">
       <span class="art d1"></span>
       <span class="tt">＋ 운동 종목 추가하기</span>
       <span class="dd">종목을 골라 담고 내 마음대로 시작합니다</span></button>
@@ -1824,13 +1827,15 @@ function vStart(){
       <span class="tt">준비운동 먼저 하기</span>
       <span class="dd">스트레칭 · 셀프 마사지 — 굳은 곳을 먼저 풀고 시작합니다</span></button>
 
-    <button class="hero2" data-act="go:routines" style="--h1:#33304a;--h2:#131217">
+    <button class="hero2 ${사진있나('routines')}" data-act="go:routines"
+        style="${사진꾸밈('routines','#33304a','#131217')}">
       <span class="art g5"></span>
       <span class="tag2">${myRoutines(S.mid).length}개</span>
       <span class="tt">내 루틴에서 고르기</span>
       <span class="dd">미리 짜 둔 루틴 중에서 직접 고릅니다</span></button>
 
-    ${ws[0]?`<button class="hero2" data-act="again:${ws[0].id}" style="--h1:#3a2a20;--h2:#15110d">
+    ${ws[0]?`<button class="hero2 ${사진있나('again')}" data-act="again:${ws[0].id}"
+        style="${사진꾸밈('again','#3a2a20','#15110d')}">
       <span class="art w6"></span>
       <span class="tt">지난 운동 그대로</span>
       <span class="dd">${dateTxt(ws[0].date)} · ${ws[0].items.map(i=>exOf(i.ex).n).slice(0,2).join(', ')}${ws[0].items.length>2?' 외':''}</span></button>`:''}` };
@@ -2106,6 +2111,17 @@ function prepList(setKey, kind){
   return 뽑기(st.m, 2, 0).map(i=>사전[i])
     .concat(뽑기(st.s, 3, 1).map(i=>사전[i]));   /* 풀고 → 늘이기 */
 }
+
+/* 운동 시작 화면 카드 사진 — 파일이 생기는 대로 여기만 채우면 된다 */
+const CARDIMG = {
+  pickex:   'img/card-pickex.jpg',
+  routines: 'img/card-routines.jpg',
+  again:    'img/card-again.jpg',
+  assigned: 'img/card-assigned.jpg',
+};
+const 사진꾸밈 = (k, h1, h2) => '--h1:' + h1 + ';--h2:' + h2
+  + (CARDIMG[k] ? ';--img:url(' + CARDIMG[k] + ')' : '');
+const 사진있나 = k => CARDIMG[k] ? 'shot' : '';
 
 /* 카드 배경 — 사진이 있으면 얹고, 없으면 색·무늬만 */
 const 카드꾸밈 = x => '--h1:' + x.h1 + ';--h2:' + x.h2
