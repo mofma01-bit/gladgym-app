@@ -416,7 +416,7 @@ textarea.inp{min-height:76px;resize:vertical;line-height:1.6}
 
 <script>
 "use strict";
-const BUILD = '15';
+const BUILD = '16';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -1365,12 +1365,13 @@ function popPick(){
     + '<div style="display:flex;flex-direction:column;gap:7px">'
     + (list.length ? list.map(function(e){
         const vs = D.va.filter(v=>v.ex_id===e.id).sort((a,b)=>a.sort-b.sort);
-        return vs.map(function(v){
-          return '<button class="card click rowc" data-add="' + esc(v.id) + '">'
-            + '<div><div class="t1">' + esc(e.name) + (v.name?' <span style="color:var(--gold-2);font-size:12px">'
-              + esc(v.name) + '</span>':'') + '</div>'
-            + '<div class="t2">' + esc(e.part) + ' · ' + esc(e.equip||'') + '</div></div>'
-            + '<span class="rt">＋</span></button>'; }).join(''); }).join('')
+        const v0 = vs[0]; if(!v0) return '';
+        return '<button class="card click rowc" data-add="' + esc(v0.id) + '">'
+          + '<div><div class="t1">' + esc(e.name) + '</div>'
+          + '<div class="t2">' + esc(e.part) + ' · ' + esc(e.equip||'')
+          + (vs.length>1 ? ' · <span style="color:var(--gold-2)">하는 법 ' + vs.length
+              + '가지 — 기록에서 고릅니다</span>' : '') + '</div></div>'
+          + '<span class="rt">＋</span></button>'; }).join('')
       : '<div class="empty">찾는 종목이 없어요</div>')
     + '</div><button class="btn ghost" data-act="popclose">닫기</button>';
 }
