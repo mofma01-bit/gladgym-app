@@ -378,9 +378,9 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
    나중에 --img 만 채우면 그대로 사진 카드가 된다.                    */
 .hero2{
   position:relative;overflow:hidden;width:100%;border-radius:18px;
-  min-height:172px;                       /* 고정 높이가 아니라 최소 높이 — 글씨가 잘리지 않게 */
+  min-height:204px;                       /* 고정 높이가 아니라 최소 높이 — 글씨가 잘리지 않게 */
   display:flex;flex-direction:column;justify-content:flex-end;
-  padding:17px 19px;text-align:left;border:1px solid var(--line);
+  padding:19px 20px;text-align:left;border:1px solid var(--line);
   background-image:var(--img,none),linear-gradient(128deg,var(--h1),var(--h2));
   background-size:cover;background-position:center;isolation:isolate}
 .hero2::after{
@@ -388,7 +388,7 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
   background:linear-gradient(to top,rgba(9,9,8,.72) 6%,rgba(9,9,8,.18) 58%,transparent)}
 .hero2:active{transform:scale(.985)}
 .hero2 .tt{
-  position:relative;z-index:3;font-size:22px;font-weight:800;letter-spacing:-.03em;
+  position:relative;z-index:3;font-size:23px;font-weight:800;letter-spacing:-.03em;
   line-height:1.25;color:#fff;text-shadow:0 1px 14px rgba(0,0,0,.55)}
 .hero2 .dd{
   position:relative;z-index:3;font-size:12.5px;font-weight:500;line-height:1.6;
@@ -401,7 +401,7 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .hero2 .gl{
   position:absolute;top:13px;left:16px;z-index:3;font-size:10.5px;font-weight:800;
   letter-spacing:.1em;color:rgba(255,255,255,.6)}
-.hero2.tall{min-height:200px}
+.hero2.tall{min-height:236px}
 .hero2.shot .art{display:none}
 .hero2.shot::after{
   background:linear-gradient(to top,rgba(6,6,5,.66) 2%,rgba(6,6,5,.22) 46%,
@@ -1019,7 +1019,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '110';
+const BUILD = '111';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
