@@ -539,6 +539,21 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
   -webkit-mask-size:100% 100%;mask-size:100% 100%;
   -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}
 .bcap{display:block;text-align:center;font-size:11px;font-weight:700;color:#7d766e;margin-top:2px}
+/* 체형 한눈에 — 해부도 위에 찍는 표시 */
+.figbox2{display:flex;flex-direction:column;gap:10px;flex:none;
+  background:var(--dark-2);border:1px solid var(--line);border-radius:16px;padding:14px 12px}
+.bpin{position:absolute;left:0;top:0;width:100%;height:100%}
+.figpick{text-align:center;font-size:12.5px;font-weight:700;color:var(--cream);
+  background:var(--dark-3);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+.figpick span{display:block;font-size:11.5px;font-weight:600;color:var(--gold-2);margin-top:3px}
+.figpick.dim{color:#7d766e;font-weight:500}
+#main.lite .figbox2{background:#fff;border-color:#e6ddcf}
+#main.lite .figpick{background:#f6efe3;border-color:#e6ddcf;color:#2b231c}
+/* 색이 무슨 뜻인지 */
+.blegend{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;
+  font-size:11px;font-weight:600;color:#7d766e;width:100%}
+.blg{display:inline-flex;align-items:center;gap:4px}
+.blg i{width:8px;height:8px;border-radius:2px}
 .bchips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;width:100%}
 .bchip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;
   color:#6d6a65;background:var(--dark-3);border:1px solid var(--line);
@@ -1428,7 +1443,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '138';
+const BUILD = '140';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1828,6 +1843,17 @@ function dayDetail(mid, date){
 const PARTG = { '상체':['가슴','어깨','등','팔'], '하체':['하체'], '복근':['복근'], '유산소':['유산소'], '기타':['기타'] };
 const PARTS8 = ['가슴','어깨','등','팔','하체','복근','유산소','기타'];
 const ANA_P = { '1주':7, '1달':30, '3달':90, '전체':3650 };
+/* 부위 색은 「그 기간의 주당 평균 세트」로 잰다 — 최근 한 주가 아니라 평균이다.
+   1달을 고르면 한 달치를 4.3주로 나눈다. 「전체」는 첫 기록부터 오늘까지 실제 주 수로.  */
+const ANA_W = { '1주':1, '1달':30/7, '3달':90/7 };
+function anaWeeks(mid, per){
+  if(ANA_W[per]) return ANA_W[per];
+  const ds = D.workouts.filter(w => w.mid===mid && w.done && w.items.some(i=>i.sets.length))
+    .map(w => w.date).sort();
+  if(!ds.length) return 1;
+  const 날 = (new Date(TODAY+'T00:00:00') - new Date(ds[0]+'T00:00:00')) / 86400000;
+  return Math.max(1, (날 + 1) / 7);
+}
 
 function anaFrom(){ return addDays(TODAY, -(ANA_P[S.anaP||'1주'] - 1)); }
 function anaWs(mid, from){ return D.workouts.filter(w => w.mid===mid && w.done && w.date >= from)
@@ -1915,22 +1941,44 @@ const 몸자리 = {
     팔:   [[0, 68, 112, 194], [230, 68, 112, 194]],
   },
 };
-function bodyMap(o){
-  const mx = Math.max(1, ...몸부위.map(k => o[k] || 0));
-  /* 안 한 곳은 안 칠한다. 많이 한 곳일수록 진하게 */
-  const 세기 = k => { const v = o[k] || 0; return v ? (0.34 + 0.62*(v/mx)) : 0; };
+/* ── 부위 색 등급 ── 주당 몇 세트 했는지로 나눈다.
+   근비대 연구가 흔히 말하는 「주당 10~20세트」를 가운데로 두었다.        */
+const 등급표 = [
+  { 키:'과사용', 최소:20, 색:'#d9534f', 글:'많이 함',   말:'여기서 더 늘려도 이득이 잘 안 붙어요' },
+  { 키:'적정',   최소:10, 색:'#e2a63a', 글:'적정',      말:'연구가 말하는 알맞은 양이에요' },
+  { 키:'부족',   최소:4,  색:'#5b9bd5', 글:'부족',      말:'조금 더 해도 돼요' },
+  { 키:'거의',   최소:0.1,색:'#5cb87a', 글:'거의 안 함',말:'많이 비었어요' },
+  { 키:'없음',   최소:0,  색:'#4a4842', 글:'안 함',      말:'한 번도 안 했어요' },
+];
+const 등급 = 주당 => 등급표.find(g => 주당 >= g.최소) || 등급표[등급표.length-1];
+
+function bodyMap(o, 주수){
+  const W = Math.max(1, 주수 || 1);
+  const 주당 = k => (o[k] || 0) / W;
+  const 색 = k => 등급(주당(k)).색;
+  /* 같은 등급 안에서도 많이 한 쪽이 더 진하게 */
+  const 세기 = k => { const v = 주당(k); if(!v) return 0;
+    const g = 등급(v);
+    const 위 = 등급표[등급표.indexOf(g) - 1];
+    const 폭 = (위 ? 위.최소 : g.최소 * 2) - g.최소;
+    return 0.42 + 0.38 * Math.min(1, 폭 > 0 ? (v - g.최소) / 폭 : 1); };
   const 덮개 = (면, 넓이, 그림) => `<svg class="bhit" viewBox="0 0 ${넓이} 560" aria-hidden="true"
       style="--m:url(img/${그림})">`
     + Object.entries(몸자리[면]).map(([k, rs]) => { const a = 세기(k);
         return a ? rs.map(r => `<rect x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}"
-          fill="rgba(226,166,58,${a.toFixed(3)})"/>`).join('') : ''; }).join('')
+          fill="${색(k)}" opacity="${a.toFixed(3)}"/>`).join('') : ''; }).join('')
     + `</svg>`;
 
-  const 칩 = PARTS8.map(k => `<span class="bchip ${o[k]?'on':''}">
-    <i style="background:${o[k] ? `rgba(240,211,160,${(0.32 + 0.68*Math.min(1,(o[k]||0)/mx)).toFixed(2)})` : 'rgba(255,255,255,.10)'}"></i>
-    ${k}<b>${o[k]||0}</b></span>`).join('');
+  const 칩 = PARTS8.map(k => { const g = 등급(주당(k));
+    return `<span class="bchip ${o[k]?'on':''}">
+      <i style="background:${o[k] ? g.색 : 'rgba(255,255,255,.10)'}"></i>
+      ${k}<b>${o[k]||0}</b></span>`; }).join('');
+  /* 무슨 색이 무슨 뜻인지 */
+  const 범례 = 등급표.slice(0,4).map(g =>
+    `<span class="blg"><i style="background:${g.색}"></i>${g.글}</span>`).join('');
 
   return `<div class="bwrap">
+    <div class="blegend">주당 평균 세트 ${범례}</div>
     <div class="bpair">
       <div class="bfig fr">
         <img src="img/body-front.webp" alt="앞모습" width="267" height="560">
@@ -3169,9 +3217,12 @@ function vRecords(){
 
     <span class="lbl">운동 균형 · 부위별 세트</span>
     <div class="gbox">
-      ${tot.sets ? bodyMap(ps) : 빔('chart','이 기간에 기록이 없어요','위에서 기간을 넓혀 보세요')}
-      ${tot.sets ? `<div class="note" style="margin-top:4px">가장 많이 한 곳은 <b style="color:var(--gold)">${hi} ${ps[hi]}세트</b>,
-        가장 적은 곳은 <b style="color:var(--warn)">${lo} ${ps[lo]}세트</b>입니다.</div>` : ''}
+      ${tot.sets ? bodyMap(ps, anaWeeks(mid, per)) : 빔('chart','이 기간에 기록이 없어요','위에서 기간을 넓혀 보세요')}
+      ${tot.sets ? (()=>{ const W = anaWeeks(mid, per);
+        const g1 = 등급(ps[hi]/W), g2 = 등급(ps[lo]/W);
+        return `<div class="note" style="margin-top:4px">
+          <b style="color:${g1.색}">${hi} ${ps[hi]}세트</b> — 주당 평균 ${(ps[hi]/W).toFixed(1)}세트로 <b>${g1.글}</b>. ${g1.말}<br>
+          <b style="color:${g2.색}">${lo} ${ps[lo]}세트</b> — 주당 평균 ${(ps[lo]/W).toFixed(1)}세트로 <b>${g2.글}</b>. ${g2.말}</div>`; })() : ''}
     </div>
 
     <span class="lbl">종목별 변화</span>
@@ -5023,79 +5074,61 @@ const figRot = (q, a) => { const dx=q[0]-50, dz=q[2], c=Math.cos(a), s2=Math.sin
 const figPrj = q => { const k = FIG_F/(FIG_F - q[2]); return [50+(q[0]-50)*k, 102+(q[1]-102)*k, q[2], k]; };
 const figOp  = z => Math.max(0.28, Math.min(1, 0.42 + 0.58*(z+16)/32)).toFixed(2);
 
+/* ── 체형 한눈에 ── 플래너 해부도 위에 체크한 자리를 표시한다.
+   예전 3D 뼈대 인형을 대신한다 (돌려보기는 없앴다 — 플래너와 같은 그림으로).  */
+const 체형자리 = {
+  /* 그룹 : [어느 면, 가운데 x, y, 좌우로 벌릴 폭] — 앞 267×560 · 뒤 342×560 */
+  '목':   ['앞', 133,  52, 20],
+  '어깨': ['앞', 133,  96, 56],
+  '흉추': ['뒤', 171, 140, 46],
+  '다리': ['앞', 133, 360, 30],
+  '발':   ['앞', 133, 512, 30],
+};
+const 뒤로갈것 = { l6:1, l7:1 };          /* 중둔근은 뒷면에 찍는다 */
+const 뒷자리 = { '다리': [171, 360, 34] };
+
 function bodyFig(checks){
-  return `<div class="figbox" id="fig3d">${figInner(checks)}</div>`;
-}
-function figInner(checks){
-  const c = checks || {}, a = S.figA || 0;
-  const P = q => figPrj(figRot(q, a));
-  const line = (pts, w, col) => {
-    const d = pts.map((q,i)=>{ const p=P(q); return (i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1); }).join(' ');
-    const z = pts.reduce((t,q)=>t+figRot(q,a)[2], 0)/pts.length;
-    return `<path d="${d}" fill="none" stroke="${col||'#4e463c'}" stroke-width="${w}"
-      stroke-linecap="round" stroke-linejoin="round" opacity="${figOp(z)}"/>`;
-  };
-
-  /* 몸통 · 골반 테 — 돌릴 때 두께가 보이게 */
-  let g = '';
-  [ring3(45,15,10,16), ring3(71,13.5,9,16), ring3(98,11.5,8,16)].forEach(r => g += line(r, 1.4, '#443d35'));
-  const ct = ring3(45,15,10,16), cb = ring3(71,13.5,9,16);
-  for(let i=0;i<16;i+=4) g += line([ct[i], cb[i]], 1.2, '#443d35');
-  g += line(spine3(c), 3.4, '#5a5147');
-  BONES3.forEach(b => g += line([J3[b[0]], J3[b[1]]], 6.6));
-  g += line([J3.wrL,[19,98,5]], 5, '') + line([J3.wrR,[81,98,5]], 5, '');
-
-  /* 관절 */
-  const jt = Object.keys(J3).map(k=>P(J3[k])).sort((x,y)=>x[2]-y[2]);
-  let jg = jt.map(p=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="${(4.4*p[3]).toFixed(2)}"
-    fill="#746a5c" stroke="#9a8d7d" stroke-width="1" opacity="${figOp(p[2])}"/>`).join('');
-  const hp = P(HEAD3);
-  jg += `<circle cx="${hp[0].toFixed(1)}" cy="${hp[1].toFixed(1)}" r="${(10.4*hp[3]).toFixed(2)}"
-    fill="#332e29" stroke="#6e6459" stroke-width="1.7"/>`;
-
-  /* 켜진 항목 */
-  const marks = [];
-  BODY_TESTS.forEach(t => { const v = c[t.k]; if(!v) return;
-    dotsOf(t, v).forEach(q => marks.push({ p:P(q), k:t.k })); });
-  marks.sort((x,y)=>x.p[2]-y.p[2]);
-  const mg = marks.map(m => { const p = m.p, on = (S.figSel === m.k);
-    return `<g data-act="figk:${m.k}" style="cursor:pointer">
-      <circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="${(9*p[3]).toFixed(2)}" fill="transparent"/>
-      <circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="${((on?9.6:7.8)*p[3]).toFixed(2)}"
-        fill="var(--gold)" opacity="${on?'.3':'.17'}"/>
-      <circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="${((on?4.6:3.6)*p[3]).toFixed(2)}"
-        fill="var(--gold)" stroke="${on?'var(--cream)':'#241d12'}" stroke-width="0.8" opacity="${figOp(p[2])}"/>
-    </g>`; }).join('');
-
-  const deg = ((Math.round(a*180/Math.PI) % 360) + 360) % 360;
-  const face = deg<45||deg>=315 ? '앞' : deg<135 ? '오른쪽 옆' : deg<225 ? '뒤' : '왼쪽 옆';
-  const sel = S.figSel ? BODY_TESTS.find(t=>t.k===S.figSel) : null;
-
-  return `<div class="seg" style="margin-bottom:8px">${
-      [['앞',0],['오른쪽 옆',90],['뒤',180],['왼쪽 옆',270]].map(([n,d])=>
-      `<button class="${Math.abs(((deg-d)%360+360)%360)<8?'on':''}" data-act="figa:${d}">${n}</button>`).join('')}</div>
-    <svg viewBox="0 0 100 205" style="height:330px;width:auto">
-      <line x1="50" y1="4" x2="50" y2="202" stroke="#37312b" stroke-width="0.7" stroke-dasharray="2.5 3.5"/>
-      ${g}${jg}${mg}
+  const c = checks || {};
+  const 점 = { 앞: [], 뒤: [] };
+  BODY_TESTS.forEach(t => {
+    const v = c[t.k]; if(!v) return;
+    let [면, x, y, 폭] = 체형자리[t.g] || ['앞', 133, 300, 30];
+    if(뒤로갈것[t.k] && 뒷자리[t.g]) { 면 = '뒤'; [x, y, 폭] = 뒷자리[t.g]; }
+    /* 왼쪽/오른쪽을 고르는 항목이면 그 쪽으로 옮긴다 */
+    const 쪽 = (t.a === 'L' && t.b === 'R') ? (v === 'a' ? -1 : 1) : 0;
+    점[면].push({ k: t.k, t: t.t, x: x + 쪽*폭, y, 쪽 });
+  });
+  /* 같은 자리에 여럿이면 세로로 조금씩 벌린다 */
+  ['앞','뒤'].forEach(면 => {
+    const 뭉침 = {};
+    점[면].forEach(m => { const key = m.x + ':' + m.y;
+      뭉침[key] = (뭉침[key] || 0) + 1;
+      m.y += (뭉침[key] - 1) * 15; });
+  });
+  const 한면 = (면, 넓이, 그림) => `<div class="bfig ${면==='앞'?'fr':'bk'}">
+    <img src="img/body-${면==='앞'?'front':'back'}.webp" alt="${면}모습"
+      width="${넓이}" height="560">
+    <svg class="bpin" viewBox="0 0 ${넓이} 560">
+      ${점[면].map(m => { const on = (S.figSel === m.k);
+        return `<g data-act="figk:${m.k}" style="cursor:pointer">
+          <circle cx="${m.x}" cy="${m.y}" r="16" fill="transparent"/>
+          <circle cx="${m.x}" cy="${m.y}" r="${on?15:12}" fill="var(--gold)" opacity="${on?'.34':'.20'}"/>
+          <circle cx="${m.x}" cy="${m.y}" r="${on?7:5.5}" fill="var(--gold)"/>
+        </g>`; }).join('')}
     </svg>
-    <div class="figcap">${sel ? `<b>${esc(sel.t)}</b> · ${esc(sel.g)}`
-      : `${esc(face)}에서 본 모습 · ${deg}도`}</div>
-    <div class="figcap" style="font-weight:600;color:#6f6a64;margin-top:1px">좌우로 끌어서 돌려 보세요</div>`;
-}
-function drawFig(){
-  const el = document.getElementById('fig3d'); if(!el) return;
-  el.innerHTML = figInner(checksOf(figMid()));
-}
-function figMid(){ return (S.screen === 'body') ? subj() : anaMid(); }
-/* 그 점이 가장 잘 보이는 쪽으로 돌립니다 */
-function figFace(k){
-  const t = BODY_TESTS.find(x=>x.k===k); if(!t) return;
-  const v = checksOf(figMid())[k]; if(!v) return;
-  const q = dotsOf(t, v)[0], dx = q[0]-50, dz = q[2];
-  if(Math.abs(dx) < 1 && Math.abs(dz) < 1) return;
-  S.figA = Math.atan2(-dx, dz);
-}
+    <span class="bcap">${면}</span></div>`;
 
+  const 고른것 = S.figSel && BODY_TESTS.find(t => t.k === S.figSel);
+  return `<div class="figbox2">
+    <div class="bpair">${한면('앞',267)}${한면('뒤',342)}</div>
+    ${고른것
+      ? `<div class="figpick"><b>${esc(고른것.t)}</b>
+          <span>${esc(고른것.g)} · ${esc((c[고른것.k]==='a') ? 고른것.a : 고른것.b)}</span></div>`
+      : (점.앞.length + 점.뒤.length
+          ? `<div class="figpick dim">점을 누르면 어떤 항목인지 보여 드려요</div>`
+          : `<div class="figpick dim">아직 표시된 항목이 없어요</div>`)}
+  </div>`;
+}
 function figList(checks){
   const on = BODY_TESTS.filter(t => (checks||{})[t.k]);
   if(!on.length) return '<div class="empty">표시된 항목이 없어요</div>';
