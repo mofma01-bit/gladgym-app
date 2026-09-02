@@ -377,6 +377,35 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
   border-radius:0 0 14px 14px;padding:13px;margin:-9px 0 4px;
   display:flex;flex-direction:column;gap:9px}
 /* 직전 무게 — 접힌 한 줄이 기본, 누르면 3회분 펼침 */
+/* ── 칼로리 결론 카드 ── 가장 궁금한 넷만 위로 올린다 */
+.kcard{border:1px solid var(--gold-2);border-radius:16px;overflow:hidden;
+  background:linear-gradient(152deg,var(--gold-dim),#26221a);margin-bottom:4px}
+.kcard .kmain{padding:16px 16px 14px;text-align:center}
+.kcard .kl{display:block;font-size:12px;font-weight:700;color:var(--gold-2);letter-spacing:-.01em}
+.kcard .kb{display:block;font-size:40px;font-weight:800;color:var(--gold);letter-spacing:-.035em;
+  line-height:1.08;margin-top:4px;font-variant-numeric:tabular-nums}
+.kcard .kb small{font-size:15px;font-weight:700;margin-left:5px;color:var(--gold-2)}
+.kcard .kb .cnt{font-style:normal}
+.kcard .ks{display:block;font-size:12px;font-weight:500;color:#c0b6a8;margin-top:6px;line-height:1.55}
+.kcard .ks b{color:var(--cream);font-weight:800}
+.kcard .ksub{display:grid;grid-template-columns:1fr 1fr;gap:1px;
+  background:#4a422f;border-top:1px solid #4a422f}
+.kcard .ksub > div{background:#232019;padding:11px 13px;display:flex;flex-direction:column;gap:2px}
+.kcard .ksub .n{font-size:11px;font-weight:700;color:#9a9187}
+.kcard .ksub .v{font-size:17.5px;font-weight:800;color:var(--cream);letter-spacing:-.02em}
+.kcard .ksub .u{font-size:11px;font-weight:500;color:#8e867d;line-height:1.45}
+#main.lite .kcard{border-color:#d8b57a;background:linear-gradient(152deg,#fbf2e2,#f5ead6)}
+#main.lite .kcard .kl{color:#a8813f}
+#main.lite .kcard .kb{color:#8a5a2b}
+#main.lite .kcard .kb small{color:#a8813f}
+#main.lite .kcard .ks{color:#8a7f70}
+#main.lite .kcard .ks b{color:#3a2f24}
+#main.lite .kcard .ksub{background:#e6d8bd;border-top-color:#e6d8bd}
+#main.lite .kcard .ksub > div{background:#fffaf0}
+#main.lite .kcard .ksub .n{color:#a0917f}
+#main.lite .kcard .ksub .v{color:#2b231c}
+#main.lite .kcard .ksub .u{color:#a0917f}
+
 /* ── 큰 그림 카드 ── 사진이 들어올 자리를 미리 잡아 둔다.
    나중에 --img 만 채우면 그대로 사진 카드가 된다.                    */
 .hero2{
@@ -728,6 +757,11 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
 .cal2 .cday.has{color:var(--cream);border:1px solid var(--gold-2)}
 .cal2 .cday.sel{background:var(--gold);color:#2a1c14}
 .cal2 .cday.fut{opacity:.25}
+.cal2 .cday .cdot{position:absolute;left:50%;bottom:5px;transform:translateX(-50%);
+  width:4px;height:4px;border-radius:50%;background:var(--gold-2)}
+.cal2 .cday.sel .cdot{background:#2a1c14}
+.wkhd .d .cvv{color:var(--gold-2);font-size:12px;font-weight:700}
+#main.lite .wkhd .d .cvv{color:#b08a52}
 .cal2 .cday i{position:absolute;right:3px;top:2px;font-style:normal;font-size:9.5px;
   font-weight:800;color:var(--gold)}
 .cal2 .cday.sel i{color:#2a1c14}
@@ -1169,7 +1203,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '116';
+const BUILD = '117';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1664,7 +1698,7 @@ function weekStrip(mid){
   return `<div class="wk">
     <div class="wkhd">
       <button data-act="dmove:-1">‹</button>
-      <span class="d">${dowTxt(sel)}</span>
+      <button class="d" data-act="dcal">${dowTxt(sel)} <span class="cvv">▾</span></button>
       <button data-act="dmove:1" ${sel>=TODAY?'style="opacity:.3"':''}>›</button>
     </div>
     <div class="wkd">${wk.map((d,i)=>{ const t=dayStat(mid,d);
@@ -2996,6 +3030,48 @@ function sheetFbCal(){
   });
 }
 
+/* 홈 · 식단 — 가운데 날짜를 누르면 뜨는 달 달력 */
+function 달칸(base, sel, 표시, act){
+  const y = +base.slice(0,4), m = +base.slice(5,7);
+  const lead = new Date(y, m-1, 1).getDay(), last = new Date(y, m, 0).getDate();
+  let cells = '';
+  DOW.forEach(d => cells += `<div class="hd">${d}</div>`);
+  for(let i=0;i<lead;i++) cells += '<div class="pad"></div>';
+  for(let d=1; d<=last; d++){
+    const ds = y + '-' + String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    const 점 = 표시(ds);
+    cells += `<button class="cday ${ds===sel?'sel':''} ${점?'has':''} ${ds>TODAY?'fut':''}"
+      data-act="${act}:${ds}">${d}${점?'<b class="cdot"></b>':''}</button>`;
+  }
+  return { y, m, cells };
+}
+function sheetDayCal(){
+  openSheet(()=>{
+    const sel = S.day || TODAY;
+    const { y, m, cells } = 달칸(S.dayMon || sel.slice(0,7), sel,
+      ds => dayStat(S.mid, ds).ex > 0, 'dcalp');
+    return `<div class="h2">날짜 고르기 <small>운동한 날에 점</small></div>
+      <div class="wkhd"><button data-act="dmon:-1">‹</button>
+        <span class="d">${y}년 ${m}월</span>
+        <button data-act="dmon:1">›</button></div>
+      <div class="cal2">${cells}</div>
+      <button class="btn ghost sm" data-act="dcalp:${TODAY}">오늘로</button>`;
+  });
+}
+function sheetDietCal(){
+  openSheet(()=>{
+    const sel = S.dietDay || TODAY;
+    const { y, m, cells } = 달칸(S.dietMon || sel.slice(0,7), sel,
+      ds => mealDayStat(S.mid, ds).n > 0, 'dcalp2');
+    return `<div class="h2">날짜 고르기 <small>먹은 걸 올린 날에 점</small></div>
+      <div class="wkhd"><button data-act="dmon2:-1">‹</button>
+        <span class="d">${y}년 ${m}월</span>
+        <button data-act="dmon2:1">›</button></div>
+      <div class="cal2">${cells}</div>
+      <button class="btn ghost sm" data-act="dcalp2:${TODAY}">오늘로</button>`;
+  });
+}
+
 /* 코멘트 요청 — 수업 날짜 고르기 */
 function wsOnDay(mid, d){ return D.workouts.filter(w=>w.mid===mid && w.done && w.date===d && w.items.some(i=>i.sets.length)); }
 function sheetAskCal(){
@@ -3328,7 +3404,7 @@ function dietStrip(mid){
   return `<div class="wk">
     <div class="wkhd">
       <button data-act="dmove2:-1">‹</button>
-      <span class="d">${dowTxt(sel)}</span>
+      <button class="d" data-act="dcal2">${dowTxt(sel)} <span class="cvv">▾</span></button>
       <button data-act="dmove2:1" ${sel>=TODAY?'style="opacity:.3"':''}>›</button>
     </div>
     <div class="wkd">${wk.map((d,i)=>{ const t = mealDayStat(mid,d);
@@ -3964,22 +4040,35 @@ function calcHTML(g, ed){
     : '체지방률, 또는 생년월일과 키를 넣으면 기초대사량을 잡아 드립니다.');
   return `<div class="calc">
     ${need?`<div class="note" style="border-color:var(--warn);color:var(--warn);font-weight:700">${need}</div>`:''}
+    <div class="kcard">
+      <div class="kmain">
+        <span class="kl">하루 이만큼 드세요${r.kcalAuto?(r.dayNeed?' · 목표 날짜 기준':''):' · 직접 정함'}</span>
+        <span class="kb">${r.kcal?수(r.kcal,1):'—'}<small>kcal</small></span>
+        <span class="ks">${r.total && r.day>0
+          ? `유지 ${r.total.toLocaleString()} 에서 <b>${r.day}kcal</b> 줄인 값 — ${esc(foodTxt(r.day))}`
+          : (r.total ? `유지 칼로리 ${r.total.toLocaleString()}kcal 과 같습니다` : '몸무게와 활동량을 넣어 주세요')}</span>
+      </div>
+      <div class="ksub">
+        <div><span class="n">목표 날짜까지</span>
+          <span class="v">${r.daysTo?`${r.daysTo}일`:'—'}</span>
+          <span class="u">${r.dayNeed?`하루 ${r.dayNeed.toLocaleString()}kcal 줄이기`:'목표 날짜를 넣어 주세요'}</span></div>
+        <div><span class="n">이 속도로 가면</span>
+          <span class="v">${r.w&&r.gw?per:'—'}</span>
+          <span class="u">${r.w&&r.gw
+            ? `${r.w}kg → ${r.gw}kg${r.hitDate?` · ${r.hitDate}`:''}`
+            : '목표 몸무게를 넣어 주세요'}</span></div>
+      </div>
+    </div>
+
+    <span class="lbl plain">계산 근거</span>
     <div class="crow"><span class="ck">기초대사량 <span style="color:var(--gold-2)">${esc(r.how||'')}</span></span>
       <span class="cv">${r.bmr||'—'}<span class="cs"> kcal</span></span></div>
     <div class="crow"><span class="ck">유지 칼로리</span>
       <span class="cv">${r.total||'—'}<span class="cs"> kcal</span></span></div>
-    ${r.dayNeed?`<div class="crow"><span class="ck">목표 날짜까지 <span style="color:var(--gold-2)">${r.daysTo}일</span> · 하루 줄여야 할 양</span>
-      <span class="cv">${r.dayNeed.toLocaleString()}<span class="cs"> kcal</span></span></div>`:''}
-    <div class="crow"><span class="ck">권장 섭취 칼로리${r.kcalAuto?(r.dayNeed?' · 목표 날짜 기준':' · 자동'):' · 직접 정함'}</span>
-      <span class="cv g">${r.kcal||'—'}<span class="cs"> kcal</span></span></div>
-    <div class="crow"><span class="ck">하루 감량치 <span style="color:var(--gold-2)">${esc(foodTxt(r.day>0?r.day:0))}</span></span>
-      <span class="cv">${r.day>0?r.day:0}<span class="cs"> kcal</span></span></div>
     <div class="crow"><span class="ck">주당 감량치</span>
       <span class="cv">${r.week>0?r.week.toLocaleString():0}<span class="cs"> kcal · ${kg(r.wkKg)}kg</span></span></div>
     <div class="crow"><span class="ck">한 달 예상</span>
       <span class="cv g">${r.month>0?Math.round(r.month).toLocaleString():0}<span class="cs"> kcal · ${kg(r.moKg)}kg</span></span></div>
-    <div class="crow"><span class="ck">${r.w&&r.gw?`${r.w}kg → ${r.gw}kg 까지`:'목표 몸무게를 넣으면 기간이 나옵니다'}</span>
-      <span class="cv g">${per}${r.hitDate?`<span class="cs"> · ${r.hitDate}</span>`:''}</span></div>
     <div class="mac">
       <div><span class="n">탄수화물 ${r.rc}%</span><span class="v">${r.gg.c}</span><span class="u">g · ${r.kk.c}kcal</span></div>
       <div><span class="n">단백질 ${r.rp}%</span><span class="v">${r.gg.p}</span><span class="u">g · ${r.kk.p}kcal</span></div>
@@ -5708,6 +5797,16 @@ document.addEventListener('click', ev=>{
     case 'anap': S.anaP = rest[0]; render(); return;
     case 'anag': S.anaG = rest[0]; render(); return;
     case 'anab': S.anaB = rest[0]; render(); return;
+    case 'dcal':  S.dayMon  = (S.day||TODAY).slice(0,7);      sheetDayCal();  return;
+    case 'dcal2': S.dietMon = (S.dietDay||TODAY).slice(0,7);  sheetDietCal(); return;
+    case 'dcalp':  S.day     = rest[0]; closeSheet(); render(); return;
+    case 'dcalp2': S.dietDay = rest[0]; closeSheet(); render(); return;
+    case 'dmon': case 'dmon2': {
+      const 키 = a==='dmon' ? 'dayMon' : 'dietMon';
+      const b = S[키] || (a==='dmon' ? (S.day||TODAY) : (S.dietDay||TODAY)).slice(0,7);
+      const d = new Date(+b.slice(0,4), +b.slice(5,7)-1 + Number(rest[0]), 1);
+      S[키] = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+      drawSheet(); return; }
     case 'dmove': {
       const d = new Date((S.day||TODAY)+'T00:00:00');
       d.setDate(d.getDate() + Number(rest[0]));
