@@ -1019,7 +1019,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '111';
+const BUILD = '112';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2049,7 +2049,7 @@ const PREPSET = [
    s:[ ['s01','s02','s03','s04','s05','s06'],
        ['s10','s11','s12','s13','s14','s32','s27'],
        ['s15','s16','s28','s22','s18'] ] },
- { k:'leg', n:'하체 운동 전 추천', art:'r4', h1:'#23412f', h2:'#0f1613', img:'img/card-leg.jpg',
+ { k:'leg', n:'하체 운동 전 추천', art:'r4', h1:'#23412f', h2:'#0f1613',
    sm:'고관절 · 햄스트링 · 발목을 먼저 엽니다',
    m:[ ['m09','m10'],
        ['m11','m12','m13'],
@@ -2123,6 +2123,21 @@ const 사진꾸밈 = (k, h1, h2) => '--h1:' + h1 + ';--h2:' + h2
   + (CARDIMG[k] ? ';--img:url(' + CARDIMG[k] + ')' : '');
 const 사진있나 = k => CARDIMG[k] ? 'shot' : '';
 
+/* 준비운동 사진 — 갈래(스트레칭 s · 마사지 m)마다 사진이 다르다.
+   「둘 다」는 스트레칭 사진을 쓴다.                                  */
+const PREPIMG = {
+  s_office:'img/card-s_office.jpg', s_leg:'img/card-s_leg.jpg',
+  s_chest:'img/card-s_chest.jpg',   s_back:'img/card-s_back.jpg',
+  s_shoulder:'img/card-s_shoulder.jpg',
+  m_office:'img/card-m_office.jpg', m_leg:'img/card-m_leg.jpg',
+  m_chest:'img/card-m_chest.jpg',   m_back:'img/card-m_back.jpg',
+  m_shoulder:'img/card-m_shoulder.jpg',
+  both:'img/card-both.jpg',
+};
+/* 갈래가 sm(둘 다)이면 스트레칭 사진으로 */
+const 묶음사진 = setKey => PREPIMG[(S.prepKind==='m' ? 'm_' : 's_') + setKey] || '';
+const 갈래사진 = k => k==='s' ? PREPIMG.s_back : (k==='m' ? PREPIMG.m_back : PREPIMG.both);
+
 /* 카드 배경 — 사진이 있으면 얹고, 없으면 색·무늬만 */
 const 카드꾸밈 = x => '--h1:' + x.h1 + ';--h2:' + x.h2
   + (x.img ? ';--img:url(' + x.img + ')' : '');
@@ -2132,11 +2147,12 @@ function vPrep(){
   return { top: bar('준비운동','', 'go:home'), body:`
     <div class="note">몸을 <b>풀고 늘이는</b> 것부터 하고 운동을 시작합니다. 시간을 재지 않아요 —
       보고 그대로 따라 하시면 됩니다.</div>
-    ${PREPKIND.map(x=>`<button class="hero2 tall ${x.img?'shot':''}" data-act="pk:${x.k}"
-        style="${카드꾸밈(x)}">
+    ${PREPKIND.map(x=>{ const im=갈래사진(x.k); return `<button class="hero2 tall ${im?'shot':''}"
+        data-act="pk:${x.k}"
+        style="--h1:${x.h1};--h2:${x.h2}${im?';--img:url('+im+')':''}">
       <span class="art ${x.art}"></span>
       <span class="tt">${esc(x.n)}</span>
-      <span class="dd">${esc(x.sm)}</span></button>`).join('')}
+      <span class="dd">${esc(x.sm)}</span></button>`; }).join('')}
     <div class="note" style="margin-top:4px">
       <b>뼈와 관절 위는 굴리지 않습니다.</b> 허리(요추)에 폼롤러를 직접 대지 마세요.
       아프면 힘을 빼고, 아픈 자리는 20~30초 지그시 눌러 주세요.</div>` };
@@ -2170,7 +2186,9 @@ function vPrep2(){
   </div>`;
 
   const 공통 = PREPSET.map(x=>{ const n = prepList(x.k, S.prepKind).length;
-      return `<button class="hero2 ${x.img?'shot':''}" data-act="ps:${x.k}" style="${카드꾸밈(x)}">
+      const im = 묶음사진(x.k);
+      return `<button class="hero2 ${im?'shot':''}" data-act="ps:${x.k}"
+        style="--h1:${x.h1};--h2:${x.h2}${im?';--img:url('+im+')':''}">
       <span class="art ${x.art}"></span>
       <span class="tag2">${n}가지</span>
       <span class="tt">${esc(x.n)}</span>
