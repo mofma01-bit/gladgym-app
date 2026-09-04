@@ -815,28 +815,31 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .step .v.on{color:var(--gold)}
 .unitlbl{font-size:11.5px;font-weight:600;color:var(--sub);text-align:center;margin-top:-4px}
 
-/* ── 휴식 타이머 ── 세트와 종목 완료 사이. 도는 동안엔 숨 쉬듯 뛴다 */
-.restb{display:flex;align-items:center;gap:9px;width:100%;flex:none;
-  background:var(--gold-dim);border:1.5px solid #6a5730;border-radius:12px;padding:11px 13px}
-.restb .ri{display:flex;flex:none;color:var(--gold)}
-.restb .rtx{flex:1;min-width:0;text-align:left;font-size:14px;font-weight:800;color:var(--gold)}
-.restb .rvl{flex:none;font-size:14px;font-weight:800;color:#241a08;background:var(--gold);
-  border-radius:8px;padding:4px 10px;font-variant-numeric:tabular-nums}
-.restb:active{transform:scale(.99)}
-.restb.run{border-color:var(--gold);animation:쉼숨 1.5s ease-in-out infinite}
-@keyframes 쉼숨{0%,100%{box-shadow:0 0 0 0 rgba(240,211,160,.34)}
-  55%{box-shadow:0 0 0 7px rgba(240,211,160,0)}}
-@media (prefers-reduced-motion:reduce){.restb.run{animation:none}}
-#main.lite .restb{background:#f6efe3;border-color:#e6ddcf}
-#main.lite .restb .rtx{color:#8a6f3f}
+/* ── 휴식 타이머 ── 오른쪽 위, 운동 시간 옆. 도는 동안엔 금빛으로 차고 숨 쉰다 */
+#top .tmwrap{display:flex;align-items:center;gap:8px;flex:none;margin-left:auto}
+#top .tmwrap .tm{margin-left:0}
+#top .tmwrap .chip.t{padding:5px 10px;font-size:12px;font-weight:700}
+.restt{display:inline-flex;align-items:center;gap:5px;flex:none;
+  background:var(--gold-dim);border:1px solid #6a5730;border-radius:999px;padding:5px 10px 5px 8px;
+  color:var(--gold);white-space:nowrap}
+.restt i{font-style:normal;font-size:12.5px;font-weight:800;font-variant-numeric:tabular-nums;
+  letter-spacing:-.01em}
+.restt:active{transform:scale(.96)}
+.restt.run{background:var(--gold);border-color:var(--gold);color:#241a08;
+  animation:쉼숨 1.4s ease-in-out infinite}
+@keyframes 쉼숨{0%,100%{box-shadow:0 0 0 0 rgba(240,211,160,.42)}
+  60%{box-shadow:0 0 0 6px rgba(240,211,160,0)}}
+@media (prefers-reduced-motion:reduce){.restt.run{animation:none}}
 
 /* ── 자물쇠 ── 고정바 맨 오른쪽 */
-.lockb{flex:none;width:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+.lockb{flex:none;width:54px;display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:2px;border-radius:12px;background:var(--dark-3);border:1px solid var(--line);color:var(--sub)}
 .lockb i{font-style:normal;font-size:10.5px;font-weight:700;letter-spacing:.02em}
 .lockb.on{background:var(--gold);border-color:var(--gold);color:#241a08}
 .lockb:active{opacity:.72}
 #foot .btn.dim{opacity:.32}
+/* 좁은 폰에서 발판 글씨가 두 줄로 접히지 않게 */
+#foot .btn{font-size:14.5px;white-space:nowrap;padding-left:6px;padding-right:6px}
 #tabs.tlock{opacity:.34;pointer-events:none}
 .btn.ic .pl{font-size:17px;font-weight:800;color:var(--teal)}
 
@@ -1550,7 +1553,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '146';
+const BUILD = '147';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2248,9 +2251,7 @@ setInterval(()=>{
       /* 카드 안 휴식 버튼도 「쉬는 중」으로 바뀌고 숫자가 흐른다.
          시트를 어떻게 닫든(시작·닫기·건너뛰기) 여기서 맞춰지므로 손잡이마다 안 챙겨도 된다 */
       const rv=$('#restleft'); if(rv) rv.textContent=mmss(left);
-      const rb=$('.restb');
-      if(rb && !rb.classList.contains('run')){ rb.classList.add('run');
-        const rt=rb.querySelector('.rtx'); if(rt) rt.textContent='쉬는 중'; } }
+      const rb=$('.restt'); if(rb) rb.classList.add('run'); }
   }
 },250);
 
@@ -3025,28 +3026,35 @@ function itemsFromRoutine(r){
 function 발판(w){
   const 잠 = !!(w && w.lock);
   return `<button class="btn sub ic ${잠?'dim':''}" data-act="go:pick"><b class="pl">＋</b>운동 추가</button>
-    <button class="btn gold ${잠?'dim':''}" data-act="askfin">오늘 운동 마치기</button>
+    <button class="btn gold ${잠?'dim':''}" data-act="askfin">운동 마치기</button>
     <button class="lockb ${잠?'on':''}" aria-label="${잠?'화면 잠금 풀기':'화면 잠그기'}"
       data-act="${잠?'wlockhint':'wlock'}"${잠?' data-hold="wunlock"':''}>
       ${자물쇠(잠)}<i>${잠?'잠김':'잠금'}</i></button>`;
 }
-/* ── 휴식 타이머 ── 세트 사이에 가장 많이 누르는 것이라 눈에 띄게 둔다 */
-function 쉼버튼(cur){
+/* ── 휴식 타이머 ── 오른쪽 위, 운동 시간 바로 옆 (2026-09-04 대표 지시).
+   세트 사이에 계속 누르는 것이라 늘 같은 자리에 붙어 있어야 한다.       */
+function 쉼칩(w){
   const 도는중 = !!(S.rest && S.rest.until);
-  const 남음 = 도는중 ? Math.max(0,(S.rest.until-Date.now())/1000) : (cur.rest||60);
-  return `<button class="restb ${도는중?'run':''}" data-act="rest">
-    <span class="ri"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor"
-      stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="12" cy="13" r="8"/><path d="M12 9.5V13l2.4 1.6"/><path d="M9 2h6"/><path d="M12 2v3"/></svg></span>
-    <span class="rtx">${도는중?'쉬는 중':'휴식 타이머'}</span>
-    <span class="rvl" id="restleft">${도는중?mmss(남음):남음+'초'}</span></button>`;
+  const 기본 = (w && w.items && w.items[w.cur] && w.items[w.cur].rest) || 60;
+  const 남음 = 도는중 ? Math.max(0,(S.rest.until-Date.now())/1000) : 기본;
+  return `<button class="restt ${도는중?'run':''}" data-act="rest" aria-label="휴식 타이머">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+      stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="13" r="8"/><path d="M12 9.5V13l2.4 1.6"/><path d="M9 2h6"/><path d="M12 2v3"/></svg>
+    <i id="restleft">${도는중?mmss(남음):남음+'초'}</i></button>`;
+}
+/* 오른쪽 위 — 운동 시간과 휴식 타이머를 한 덩어리로 */
+function 윗시계(w){
+  return `<span class="tmwrap">
+    ${w.startAt ? `<span class="tm" id="tm">${mmss((Date.now()-w.startAt)/1000)}</span>`
+                : `<button class="chip t" data-act="timego">시간 재기 ▶</button>`}
+    ${쉼칩(w)}</span>`;
 }
 
 function vWorkout(){
   const w=live(); if(!w) return vHome();
   if(!w.items.length) return {
-    top: bar('운동 중', (w.startAt ? `<span class="tm" id="tm">${mmss((Date.now()-w.startAt)/1000)}</span>`
-      : `<button class="chip t" data-act="timego">시간 재기 ▶</button>`), 'go:home'),
+    top: bar('운동 중', 윗시계(w), 'go:home'),
     body:`<div class="empty">종목을 담아 주세요</div>
       <button class="dngr" data-act="askcancel">기록 지우고 나가기</button>`,
     foot: 발판(w) };
@@ -3088,14 +3096,11 @@ function vWorkout(){
       : (openIdx >= 0
         ? 세로입력(cur, e, openIdx)
         : `<button class="btn gold" data-act="rep">${e.cardio?'구간':'세트'} 하나 더 ＋</button>`))}
-    ${cur.locked ? '' : `
-      ${쉼버튼(cur)}
-      <button class="btn main fin" data-act="fin">${esc(e.n)} 완료</button>`}
+    ${cur.locked ? '' : `<button class="btn main fin" data-act="fin">${esc(e.n)} 완료</button>`}
   </div>`;
 
   return {
-    top: bar('운동 중', (w.startAt ? `<span class="tm" id="tm">${mmss((Date.now()-w.startAt)/1000)}</span>`
-      : `<button class="chip t" data-act="timego">시간 재기 ▶</button>`), 'askleave'),
+    top: bar('운동 중', 윗시계(w), 'askleave'),
     keepScroll:true, body:`
     ${tr?`<button class="card teal" data-act="tlive:${wmid}">
       <div class="nm t">${esc((MEMBERS.find(m=>m.id===wmid)||{}).n||'')} 회원 수업 기록 중</div>
