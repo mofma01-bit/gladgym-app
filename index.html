@@ -730,8 +730,22 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .prevh .ar.up{color:var(--gold)} .prevh .ar.down{color:var(--warn)}
 .prevh .cv{font-size:11px;font-weight:800;flex:none;padding:3px 8px;border-radius:6px;
   background:#2e1c18;color:var(--warn);order:2}
-.prevh .cx{font-size:11.5px;font-weight:700;color:var(--gold-2);flex:none;order:3;margin-left:auto;
-  padding:4px 9px;border-radius:8px;background:#3a3020;border:1px solid #55482f}
+/* 접고 펴는 표시 — 앱 어디서나 같은 모양 */
+.cx{display:inline-flex;align-items:center;gap:3px;font-size:11.5px;font-weight:700;
+  color:var(--gold-2);flex:none;padding:4px 9px;border-radius:8px;
+  background:#3a3020;border:1px solid #55482f;white-space:nowrap;line-height:1.25}
+#main.lite .cx{background:#f6efe3;border-color:#e6ddcf;color:#8a6f3f}
+.prevh .cx{order:3;margin-left:auto}
+.cx.off{color:#7d766e;background:var(--dark-3);border-color:var(--line)}
+.foldh.off{opacity:.72}
+/* 접었다 펴는 상자 — 제목 줄은 늘 보이고, 아래가 열린다 */
+.foldb{display:flex;flex-direction:column;gap:9px;flex:none}
+.foldh{display:flex;align-items:center;gap:8px;width:100%;text-align:left;
+  background:var(--dark-2);border:1px solid var(--line);border-radius:12px;padding:11px 12px}
+.foldh .fk{display:flex;flex:none;color:var(--gold-2)}
+.foldh .ft{flex:1;min-width:0;font-size:13.5px;font-weight:700;color:var(--cream)}
+#main.lite .foldh{background:#fff;border-color:#e6ddcf}
+#main.lite .foldh .ft{color:#2b231c}
 .prevb:active{transform:scale(.99)}
 .prevb.flat .prevh .cx{display:none}
 /* 목록 줄 — 여기를 누르면 접힌다 */
@@ -800,6 +814,51 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .step .vin:focus-within{border-color:var(--gold)}
 .step .v.on{color:var(--gold)}
 .unitlbl{font-size:11.5px;font-weight:600;color:var(--sub);text-align:center;margin-top:-4px}
+
+/* ── 세로 입력 기둥 ── 지금 하는 세트 */
+.vstep{display:grid;grid-template-columns:1fr 1fr 1.32fr;gap:8px;flex:none;align-items:stretch}
+.vstep.w3{grid-template-columns:1fr 1fr 1fr}
+.vstep.w3 .vdone{grid-column:1/-1;flex-direction:row;gap:8px;padding:13px}
+.vstep.w3 .vdone .vd1{font-size:17px}
+.vcol{display:flex;flex-direction:column;align-items:stretch;gap:5px;min-width:0}
+.varr{background:var(--dark-3);border:1px solid var(--line);border-radius:10px;
+  padding:9px 0;font-size:13px;font-weight:800;color:var(--gold-2);line-height:1}
+.varr:active{background:#453a26;color:var(--gold)}
+.vnum{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;
+  background:#141412;border:1px solid var(--line);border-radius:11px;padding:8px 4px;flex:1}
+.vnum input{width:100%;min-width:0;background:none;border:none;outline:none;text-align:center;
+  font-size:25px;font-weight:900;color:var(--cream);letter-spacing:-.03em;
+  font-variant-numeric:tabular-nums;font-family:inherit;padding:0}
+.vnum small{font-size:11px;font-weight:600;color:var(--sub);line-height:1.2}
+.vnum:focus-within{border-color:var(--gold);background:#1b1810}
+.vcap{font-size:11px;font-weight:700;color:#8b8379;text-align:center;letter-spacing:.02em}
+.vdone{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  background:var(--gold);color:#241a08;border:none;border-radius:12px;padding:8px 6px;
+  box-shadow:0 3px 0 #a8874a}
+.vdone:active{transform:translateY(2px);box-shadow:0 1px 0 #a8874a}
+.vdone .vd1{font-size:20px;font-weight:900;line-height:1}
+.vdone .vd2{font-size:14.5px;font-weight:800;letter-spacing:-.01em}
+.vdone .vd3{font-size:10.5px;font-weight:700;opacity:.66}
+.vsub{display:flex;align-items:center;gap:9px;flex:none;margin-top:-2px}
+.vsub .vh{font-size:10.5px;font-weight:600;color:#7d766e;line-height:1.45;flex:1;min-width:0}
+.vundo{flex:none;font-size:11.5px;font-weight:700;color:var(--sub);background:none;
+  border:none;border-bottom:1px solid #55524a;padding:0 1px 1px;border-radius:0}
+.vundo[disabled]{opacity:.3}
+
+/* ── 담는 자리 ── 점선이라 「여기에 더 넣는다」로 읽힌다 */
+.addbox{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
+  background:none;border:1.5px dashed #4f4c44;border-radius:13px;padding:14px 10px;
+  font-size:14.5px;font-weight:700;color:var(--sub);margin-top:4px}
+.addbox b{font-size:17px;font-weight:800;color:var(--teal)}
+.addbox:active{background:var(--dark-2)}
+/* ── 되돌릴 수 없는 것 ── 작게, 멀리 */
+.dngr{display:block;margin:12px auto 4px;background:none;border:none;padding:6px 10px;
+  font-size:12px;font-weight:600;color:#8b8379;text-decoration:underline;
+  text-underline-offset:3px;text-decoration-color:#55524a}
+#main.lite .varr{background:#f6efe3;border-color:#e6ddcf;color:#8a6f3f}
+#main.lite .vnum{background:#fff;border-color:#e6ddcf}
+#main.lite .vnum input{color:#2b231c}
+#main.lite .addbox{border-color:#dfd2bd}
 
 .chips{display:flex;gap:7px;flex-wrap:wrap}
 .chip{background:var(--dark-2);border:1px solid var(--line);border-radius:999px;padding:7px 13px;
@@ -1381,25 +1440,40 @@ const MEMO_EX = { id:'memo', n:'운동 메모', p:'기타', e:'자유 입력', c
    그림이 아직 없는 벌은 예전 「자리」 표시를 그대로 둔다.            */
 const DEMOV = '4';   /* 시범 그림을 새로 올릴 때마다 하나씩 올린다 */
 const demoURL = p => SB_URL + '/storage/v1/object/public/media/' + p + '?v=' + DEMOV;
-/* 접어둠=1 이면 버튼만 두고, 눌러야 편다. 운동 중 화면에서 쓴다 */
-const demoBox = (e, v, 접어둠) =>
-  (접어둠 && !S.demoOpen && v.du)
-  ? `<button class="fbbtn dmo" data-act="demoopen">
-      <span class="l">${svg('play',16)} 기구 사용법 ${v.du.indexOf('vid/')===0?'영상':'그림'}</span>
-      <span class="r">보기 ▾</span></button>`
-  : v.du && v.du.indexOf('vid/') === 0
+/* 접고 펴는 표시는 앱 어디서나 이 한 가지 모양으로 쓴다 (2026-09-04 통일).
+   예전에는 「보기 ▾」·「자세히 ▾」·「▾ 눌러서 펼치기」가 제각각이었고,
+   기구 사용법은 한 번 펴면 다시 접을 방법이 없었다.                        */
+const 접개 = 열림 => `<span class="cx">${열림 ? '접기 ▴' : '펼치기 ▾'}</span>`;
+
+/* 접어둠=1 이면 제목 줄만 두고, 눌러야 편다. 운동 중 화면에서 쓴다 */
+const demoBox = (e, v, 접어둠) => {
+  /* 아직 그림이 없는 종목 — 운동 중 화면에서는 큰 빈 상자 대신 한 줄로만 알린다 */
+  if(!v.du) return 접어둠
+    ? `<div class="foldb"><div class="foldh off">
+        <span class="fk">${svg('play',15)}</span>
+        <span class="ft">기구 사용법</span>
+        <span class="cx off">준비중</span></div></div>`
+    : `<div class="demop"><span class="dpt">준비중</span></div>`;
+  const 영상 = v.du.indexOf('vid/') === 0;
   /* 기구 사용법 영상 — 트레이너가 찍은 세로 영상. 눌러야 받아 온다 */
-  ? `<div class="demov">
-      <video src="${demoURL(v.du + '.mp4')}" poster="${demoURL(v.du + '.jpg')}"
-        controls playsinline preload="none" loop
-        controlsList="nodownload noremoteplayback" disablePictureInPicture></video>
-      <span class="dvc">기구 사용법 · ${esc(e.n)}</span></div>`
-  : v.du
-  ? `<div class="demo2" data-act="demotoggle">
-      <img class="a" src="${demoURL(v.du + '_1.png')}" alt="시작 자세">
-      <img class="b" src="${demoURL(v.du + '_2.png')}" alt="끝 자세">
-      <span class="cap">시범 · ${esc(e.n)}${v.n ? ` — ${esc(v.n)}` : ''}</span></div>`
-  : `<div class="demop"><span class="dpt">준비중</span></div>`;
+  const 몸 = 영상
+    ? `<div class="demov">
+        <video src="${demoURL(v.du + '.mp4')}" poster="${demoURL(v.du + '.jpg')}"
+          controls playsinline preload="none" loop
+          controlsList="nodownload noremoteplayback" disablePictureInPicture></video>
+        <span class="dvc">기구 사용법 · ${esc(e.n)}</span></div>`
+    : `<div class="demo2" data-act="demotoggle">
+        <img class="a" src="${demoURL(v.du + '_1.png')}" alt="시작 자세">
+        <img class="b" src="${demoURL(v.du + '_2.png')}" alt="끝 자세">
+        <span class="cap">시범 · ${esc(e.n)}${v.n ? ` — ${esc(v.n)}` : ''}</span></div>`;
+  if(!접어둠) return 몸;
+  return `<div class="foldb">
+    <button class="foldh" data-act="demoopen">
+      <span class="fk">${svg('play',15)}</span>
+      <span class="ft">기구 사용법 ${영상 ? '영상' : '그림'}</span>
+      ${접개(S.demoOpen)}</button>
+    ${S.demoOpen ? 몸 : ''}</div>`;
+};
 
 let MEMBERS = [];
 let TRAINER = '양인수';
@@ -1451,7 +1525,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '144';
+const BUILD = '145';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1767,6 +1841,10 @@ function 경사최대(ex){
 function partTimes(w){ const m={}; (w.items||[]).forEach(it=>{ if(!(it.sec>0)) return; const p=exOf(it.ex).p; m[p]=(m[p]||0)+it.sec; }); return m; }
 const byDateDesc = (a,b)=> a.date<b.date?1 : a.date>b.date?-1 : (a.id<b.id?1:-1);
 function myWorkouts(){ return D.workouts.filter(w=>w.mid===S.mid && w.done).slice().sort(byDateDesc); }
+/* 「담기만 하고 한 세트도 안 한 운동」은 지난 기록으로 치지 않는다.
+   이걸 걸러 내지 않아 「지난 운동 그대로」가 빈 배열을 받고 터졌다 (2026-09-04). */
+const 세트있나 = w => !!(w.items && w.items.some(i => i.sets && i.sets.length));
+function lastRealWorkouts(){ return myWorkouts().filter(세트있나); }
 function liveOf(mid){
   if(D.live && D.live.mid===mid) return D.live;
   /* 오늘 것만 「기록 중」으로 본다 — 지난날 끝내지 않은 기록이 계속 떠 있지 않게 */
@@ -2138,7 +2216,9 @@ function render(){
   const sameView = (S.dctx === dctx);
   const keepAt = $('#main') ? $('#main').scrollTop : 0;   /* 칩을 눌러도 보던 자리에 머문다 */
   if(sameView)
-    document.querySelectorAll('#main textarea[data-k],#main input[data-k]').forEach(t=>{ S.draft=S.draft||{}; S.draft[t.getAttribute('data-k')]=t.value; });
+    document.querySelectorAll('#main textarea[data-k],#main input[data-k]').forEach(t=>{
+      if(!초안칸(t)) return;                 /* 세트 값은 담아 두지 않는다 — 데이터가 원본이다 */
+      S.draft=S.draft||{}; S.draft[t.getAttribute('data-k')]=t.value; });
   else { S.draft = {}; S.exq = ''; }   /* 화면이 바뀌면 찾던 말도 비운다 */
   const V={login:vLogin,home:vHome,routines:vRoutines,routine:vRoutine,start:vStart,pick:vPick,
     workout:vWorkout,summary:vSummary,records:vRecords,record:vRecord,feedback:vFeedback,me:vMe,
@@ -2174,7 +2254,9 @@ function render(){
     b.innerHTML = `<span class="l">운동하는 중이에요</span><span class="r">돌아가기 ›</span>`;
     $('#main').prepend(b);
   }
-  document.querySelectorAll('#main textarea[data-k],#main input[data-k]').forEach(t=>{ const d=S.draft&&S.draft[t.getAttribute('data-k')]; if(d) t.value=d; });
+  document.querySelectorAll('#main textarea[data-k],#main input[data-k]').forEach(t=>{
+    if(!초안칸(t)) return;
+    const d=S.draft&&S.draft[t.getAttribute('data-k')]; if(d) t.value=d; });
   S.dctx = dctx;
   $('#main').scrollTop = (v.keepScroll || sameView) ? keepAt : 0;
   const 새수 = [...$('#main').querySelectorAll('.cnt')].map(e=>e.getAttribute('data-cnt')).join(',');
@@ -2377,7 +2459,7 @@ function vRoutine(){
 
 /* ── 운동 시작 ── */
 function vStart(){
-  const t=D.today[S.mid], r=t?rOf(t.rid):null, ws=myWorkouts();
+  const t=D.today[S.mid], r=t?rOf(t.rid):null, ws=lastRealWorkouts();
   return { top: bar('운동 시작', `<span class="sub">${dateTxt(TODAY)}</span>`, 'go:home'), body:`
     ${r?`<button class="hero2 tall ${사진있나('assigned')}" data-act="rt:${r.id}"
         style="${사진꾸밈('assigned','#1f4048','#0e1517')}">
@@ -2400,7 +2482,8 @@ function vStart(){
           style="${사진꾸밈('again','#3a2a20','#15110d')}">
         <span class="art w6"></span>
         <span class="tt">지난 운동 그대로</span>
-        <span class="dd">${dateTxt(ws[0].date)} · ${ws[0].items.map(i=>exOf(i.ex).n).slice(0,2).join(', ')}${ws[0].items.length>2?' 외':''}</span></button>`
+        <span class="dd">${dateTxt(ws[0].date)} · ${ws[0].items.filter(i=>i.sets&&i.sets.length)
+          .map(i=>exName(i.ex,i.va)).slice(0,2).join(', ')}${ws[0].items.length>2?' 외':''}</span></button>`
       : `<button class="hero2 dimc" data-act="noprev" style="--h1:#2b2a26;--h2:#141311">
         <span class="art w6"></span>
         <span class="tt">지난 운동 그대로</span>
@@ -2528,7 +2611,7 @@ function prevBox(e, cur, mid){
         ? `<b>${kgfmt(x)}${단위}</b>` : kgfmt(x)).join('<i>→</i>')}</span>
     ${화살?`<span class="ar ${방향}">${화살}</span>`:''}
     ${다름?`<span class="cv">지금 ${kgfmt(지금)}${단위}</span>`:''}
-    <span class="cx">${S.prevOpen?'접기 ▴':'자세히 ▾'}</span></button>`;
+    ${접개(S.prevOpen)}</button>`;
 
   if(!S.prevOpen) return `<div class="prevb">${줄}</div>`;
 
@@ -2921,7 +3004,8 @@ function vWorkout(){
       <span class="r">${dsc?'설명':'설명 없음'}${cms.length?` · 코멘트 ${cms.length}`:''} ›</span></button>`}
     ${isMemo(cur.ex)
       ? `<div class="note">기록으로만 남깁니다 — 무게·볼륨은 세지 않아요</div>`
-      : cur.sets.map((s,i)=>`<button class="set ${cur.locked?'lock':(s.done?'done':(i===openIdx?'now':''))}" data-act="edit:${i}">
+      : cur.sets.map((s,i)=> (!cur.locked && i===openIdx) ? '' :
+        `<button class="set ${cur.locked?'lock':(s.done?'done':(i===openIdx?'now':''))}" data-act="edit:${i}">
       <span class="i">${i+1}${e.cardio?'구간':'세트'}</span>
       ${e.cardio
         ? `<span class="n">${s.reps}</span><span class="u">분</span><span class="sl">/</span>
@@ -2933,9 +3017,9 @@ function vWorkout(){
     </button>`).join('')}
     ${isMemo(cur.ex) ? '' : (cur.locked
       ? `<button class="btn sub" data-act="redo">재기록</button>`
-      : `<div style="display:flex;gap:9px">
-          <button class="btn gold" data-act="rep">${e.cardio?'구간 ＋':'반복 ＋'}</button>
-          <button class="btn ghost" data-act="undo" ${cur.sets.length<2?'disabled':''}>되돌리기</button></div>`)}
+      : (openIdx >= 0
+        ? 세로입력(cur, e, openIdx)
+        : `<button class="btn gold" data-act="rep">${e.cardio?'구간':'세트'} 하나 더 ＋</button>`))}
   </div>`;
 
   return {
@@ -2953,8 +3037,7 @@ function vWorkout(){
       <button data-act="jump:${i}" style="flex:1;min-width:0;text-align:left">
         <div class="nm" style="font-size:14px">${esc(exName(it.ex,it.va))}${isMemo(it.ex)?' <span class="pill q">메모</span>':''}</div>
         <div class="sm">${it.locked?`${mmss(it.sec)} · ${isMemo(it.ex)?'메모':it.sets.length+'세트'}`
-          :(on?(S.fold?'<span class="tog">▾ 눌러서 펼치기</span>'
-                      :'하는 중 <span class="tog">▴ 눌러서 접기</span>')
+          :(on?(S.fold?접개(0):'하는 중 '+접개(1))
               :(isMemo(it.ex)?'메모':`${it.sets.length}세트 예정`))}</div></button>
       ${mv
         ? `<button class="ordbtn" data-act="ordmv:${i}:-1" ${i===0?'disabled':''}>▲</button>
@@ -2964,9 +3047,10 @@ function vWorkout(){
            <button class="chip" data-act="wdel:${i}" style="flex:none;padding:6px 10px">빼기</button>`}
       </div>${(on && !S.fold) ? 펼침() : ''}`;
     }).join('')}
-    <button class="btn sub" data-act="go:pick" style="margin-top:2px">운동 추가</button>
+    ${/* 급을 나눈다 — 담는 자리는 점선, 끝내기는 골드, 지우기는 작은 글씨 */''}
+    <button class="addbox" data-act="go:pick"><b>＋</b> 운동 추가</button>
     <button class="btn gold" data-act="askfin" style="margin-top:2px">오늘 운동 마치기</button>
-    <button class="btn ghost" data-act="askcancel" style="margin-top:4px">기록 지우고 나가기</button>`,
+    <button class="dngr" data-act="askcancel">기록 지우고 나가기</button>`,
     foot:`<button class="btn sub ic" data-act="rest">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
               stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -3042,6 +3126,37 @@ function sheetExDesc(exid, vk, mid){
   }
 }
 
+/* ── 세로 입력 기둥 ── 지금 하는 세트를 카드 안에서 바로 고친다 (2026-09-04).
+   예전에는 세트 줄을 눌러 팝업을 띄워야 했다 — 두 걸음이었고,
+   화면 전체가 똑같은 가로 막대라 무엇을 눌러야 할지 눈에 안 들어왔다.   */
+function 세로입력(cur, e, i){
+  const s = cur.sets[i] || {};
+  const 칸 = (라벨, f, k, 값, 단, 폭) => `<div class="vcol">
+    <button class="varr" data-act="d:${f}:${i}:${폭}" data-rep="1" aria-label="${라벨} 올리기">▲</button>
+    <span class="vnum"><input type="text" inputmode="decimal" data-k="${k}" data-i="${i}"
+        value="${값}" aria-label="${라벨}"><small>${단}</small></span>
+    <button class="varr" data-act="d:${f}:${i}:-${폭}" data-rep="1" aria-label="${라벨} 내리기">▼</button>
+    <span class="vcap">${라벨}</span></div>`;
+  const 칸들 = e.cardio
+    ? [ 칸('시간','reps','setreps',s.reps,'분',1),
+        칸('속도','spd','setspd',s.spd||0,'km/h',0.5) ]
+        .concat(경사최대(cur.ex) ? [ 칸('경사','kg','setkg',kgfmt(s.kg),'도',1) ] : [])
+    : [ 칸('무게','kg','setkg',kgfmt(s.kg),'kg',2.5),
+        칸('횟수','reps','setreps',s.reps,'회',1) ];
+  const 단위 = e.cardio ? '구간' : '세트';
+  return `<div class="vstep ${칸들.length > 2 ? 'w3' : ''}">
+      ${칸들.join('')}
+      <button class="vdone" data-act="rep">
+        <span class="vd1">✓</span>
+        <span class="vd2">${단위} 완료</span>
+        <span class="vd3">${i+1}${단위}째 · 다음</span></button>
+    </div>
+    <div class="vsub">
+      <span class="vh">숫자를 눌러 직접 적어도 되고, ▲▼ 를 길게 눌러도 됩니다</span>
+      <button class="vundo" data-act="undo" ${cur.sets.length<2?'disabled':''}>되돌리기</button>
+    </div>`;
+}
+
 /* ── 시트들 ── */
 function sheetEdit(i){
   const w=live(), cur=w.items[w.cur], s=cur.sets[i], e=exOf(cur.ex);
@@ -3083,7 +3198,7 @@ function sheetEdit(i){
 function 숫자만갱신(){
   const w=live(); if(!w) return;
   const cur=w.items[w.cur]; if(!cur) return;
-  document.querySelectorAll('#sheet input[data-k^="set"]').forEach(el=>{
+  document.querySelectorAll('#sheet input[data-k^="set"], #main input[data-k^="set"]').forEach(el=>{
     const st=cur.sets[+el.getAttribute('data-i')]; if(!st) return;
     const k=el.getAttribute('data-k');
     el.value = (k==='setkg') ? kgfmt(st.kg) : (k==='setspd' ? (st.spd||0) : st.reps);
@@ -6170,7 +6285,9 @@ document.addEventListener('input', ev=>{
         st.kg = Math.min(위, Math.max(0, Math.round(v*10)/10)); }
       else if(k==='setspd') st.spd=Math.max(0, Math.round(v*10)/10);
       else st.reps=Math.max(1, Math.round(v));
-      save(); render();               /* 뒤 화면만 새로 그린다 — 입력칸은 그대로 */
+      /* 카드 안 기둥에 적는 중이면 다시 그리지 않는다 — 그리면 치던 칸이 날아간다 */
+      save();
+      if(!ev.target.closest('.vstep')) render();   /* 기둥에 치는 중이면 그대로 둔다 */
     }
     return;
   }
@@ -6780,8 +6897,14 @@ document.addEventListener('click', ev=>{
     case 'startr': { const r=rOf(rest[0]), t=D.today[r.mid];
       newLive(`루틴 ${r.no} · ${r.n}`, itemsFromRoutine(r), (t&&t.rid===r.id)?t.kind:'개인운동', r.id); return; }
     case 'again': { const src=D.workouts.find(x=>x.id===rest[0]);
-      newLive('지난 운동 그대로', src.items.map(it=>({ ex:it.ex, va:it.va, rest:60, locked:false, sec:0, startAt:Date.now(),
-        sets:[{kg:it.sets[0].kg, reps:it.sets[0].reps, spd:it.sets[0].spd, done:false}] })), '개인운동'); return; }
+      if(!src){ toast('그 기록을 찾지 못했어요'); return; }
+      /* 세트가 남아 있는 종목만 가져온다 — 빈 종목이 섞이면 여기서 터진다 */
+      const 것들 = (src.items||[]).filter(it=>it.sets&&it.sets.length).map(it=>{
+        const f = it.sets[0];
+        return { ex:it.ex, va:it.va, rest:60, locked:false, sec:0, startAt:Date.now(),
+          sets:[{ kg:f.kg||0, reps:f.reps||(exOf(it.ex).cardio?20:10), spd:f.spd, done:false }] }; });
+      if(!것들.length){ toast('그날은 기록된 세트가 없어요'); return; }
+      newLive('지난 운동 그대로', 것들, '개인운동'); return; }
     case 'empty': newLive('빈 운동', [], '개인운동'); return;
 
     case 'part': S.pickPart=rest[0]; render(); setTimeout(칠하기,0); return;
