@@ -1579,7 +1579,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '151';
+const BUILD = '152';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -3882,6 +3882,32 @@ function 태그판(m, 다는중){
 /* 표시 안 하고 그냥 담긴 것 (사진 없이 검색으로 담은 것 포함) */
 const 자리없는것 = m => (m.items||[]).filter(x => !자리풀기(x.pos));
 
+/* ── 담은 음식 하나 고치기 ── 회원도 고칠 수 있다 (2026-09-04 대표 지시).
+   음식장에 똑같은 제품이 없어 비슷한 것으로 고른 뒤 숫자만 맞추는 일이 흔하다.  */
+function sheetItemEdit(mealId, itemId){
+  const m = (mealId==='draft') ? S.dm : (D.meals||[]).find(x=>x.id===mealId); if(!m) return;
+  const it = (m.items||[]).find(x=>String(x.id)===String(itemId)); if(!it) return;
+  /* 지난번에 치다 만 값이 남아 엉뚱하게 되살아나지 않게 비운다 */
+  if(S.draft) Object.keys(S.draft).forEach(k => { if(k.indexOf('ie:')===0) delete S.draft[k]; });
+  const 칸 = (라벨, k, 값) => `<div class="fld"><span class="fn">${라벨}</span>
+    <input class="search" type="text" inputmode="decimal" data-k="ie:${k}:${itemId}"
+      value="${esc(값===0?'':값)}"></div>`;
+  openSheet(()=>`
+    <div class="h2">${esc(it.name)} <small>${kgfmt(it.qty)}${it.unit?' × '+esc(it.unit):'인분'}</small></div>
+    <div class="fld"><span class="fn">이름</span>
+      <input class="search" type="text" data-k="ie:name:${itemId}" value="${esc(it.name)}"></div>
+    <div class="grid2">
+      ${칸('칼로리','kcal',it.kcal)}${칸('탄수 g','carb',it.carb)}
+      ${칸('단백 g','protein',it.protein)}${칸('지방 g','fat',it.fat)}
+    </div>
+    <div class="note">고른 음식 그대로 채워져 있습니다.
+      <b>똑같은 제품이 없으면</b> 포장에 적힌 값으로 고쳐 주세요.</div>
+    <button class="btn main" data-act="fsave:${mealId}:${itemId}">저장</button>
+    <div style="display:flex;gap:9px">
+      <button class="btn ghost sm" data-act="fdelgo:${mealId}:${itemId}" style="color:var(--warn)">빼기</button>
+      <button class="btn ghost sm" data-act="${mealId==='draft'?'tagback':'close'}">닫기</button></div>`);
+}
+
 function sheetTagPhoto(mealId){
   S.tagBack = mealId;
   openSheet(()=>{
@@ -3895,7 +3921,7 @@ function sheetTagPhoto(mealId){
       ${태그판(m, 1)}
       <div class="note">사진에서 <b>음식이 있는 자리를 눌러</b> 무엇인지 고르세요.
         고르면 <b>칼로리와 탄단지가 저절로 들어갑니다</b> — 숫자를 적을 필요가 없어요.
-        <br>태그를 다시 누르면 뺍니다.</div>
+        <br>태그를 누르면 <b>숫자를 고치거나 뺄 수 있어요.</b></div>
       ${밖.length?`<span class="lbl">태그 안 한 음식</span>
         ${밖.map(x=>`<button class="frow2" data-act="fdel:${m.id}:${x.id}">
           <span class="fe">${음식그림(x.name)}</span>
@@ -4207,14 +4233,17 @@ function sheetMeal(id){
         ${tr?'':(m.path
           ? `<button class="addf" data-act="tagedit:${m.id}">＋ 음식 태그하기</button>`
           : `<button class="addf" data-act="fadd:${m.id}">＋ 음식 담기</button>`)}`; })()}
-    ${tr?`<span class="lbl">숫자 고치기 <small>트레이너만</small></span>
+    ${(m.items&&m.items.length)
+      ? `<div class="note">칼로리와 탄단지는 <b>담은 음식에서 저절로 더해집니다.</b>
+          숫자를 고치려면 <b>음식을 눌러</b> 주세요.</div>`
+      : `<span class="lbl">칼로리와 탄단지</span>
       <div class="grid2">
         <div class="fld"><span class="fn">칼로리</span><input class="search" type="text" inputmode="numeric" data-k="ek:${m.id}" value="${m.kcal||''}"></div>
         <div class="fld"><span class="fn">탄수 g</span><input class="search" type="text" inputmode="numeric" data-k="ec:${m.id}" value="${m.carb||''}"></div>
         <div class="fld"><span class="fn">단백 g</span><input class="search" type="text" inputmode="numeric" data-k="ep:${m.id}" value="${m.protein||''}"></div>
         <div class="fld"><span class="fn">지방 g</span><input class="search" type="text" inputmode="numeric" data-k="ef:${m.id}" value="${m.fat||''}"></div>
       </div>
-      <button class="btn sub sm" data-act="mealkcal:${m.id}">칼로리 저장</button>`:''}
+      <button class="btn sub sm" data-act="mealkcal:${m.id}">저장</button>`}
     ${m.note?`<div class="cm"><span class="who">${esc(TRAINER)} 트레이너</span><span class="tx">${esc(m.note)}</span></div>`:''}
     ${tr?`<span class="lbl">코멘트 남기기</span>
       <textarea data-k="mn:${m.id}" placeholder="식단에 한마디">${esc(m.note||'')}</textarea>
@@ -6693,14 +6722,23 @@ document.addEventListener('click', ev=>{
       if(S.draft) ['name','brand','unit','kcal','amount','carb','protein','fat'].forEach(k=>delete S.draft['nf:'+k]);
       toast('음식장에 넣었어요');
       sheetFoodQty(f); return; }
-    case 'fdel': {
+    case 'fdel': sheetItemEdit(rest[0], rest[1]); return;
+    case 'fsave': {
       const [mealId, itemId] = rest;
       const m = (mealId==='draft') ? S.dm : (D.meals||[]).find(x=>x.id===mealId); if(!m) return;
       const it = (m.items||[]).find(x=>String(x.id)===String(itemId)); if(!it) return;
-      openSheet(()=>`<div class="h2">뺄까요? <small>${esc(it.name)}</small></div>
-        <div class="note">${kgfmt(it.qty)}${it.unit?' × '+esc(it.unit):'인분'} · ${Math.round(it.kcal)}kcal</div>
-        <button class="btn main" data-act="fdelgo:${mealId}:${itemId}" style="background:var(--warn);color:#241310">빼기</button>
-        <button class="btn ghost sm" data-act="close">그만두기</button>`);
+      const g = k => { const el = document.querySelector('[data-k="ie:'+k+':'+itemId+'"]');
+        return el ? el.value : null; };
+      const nm = (g('name')||'').trim();
+      if(nm) it.name = nm;
+      it.kcal = nnum(g('kcal')); it.carb = nnum(g('carb'));
+      it.protein = nnum(g('protein')); it.fat = nnum(g('fat'));
+      closeSheet(); toast('고쳤어요');
+      if(mealId === 'draft'){ sheetTagPhoto('draft'); return; }
+      sv(spatch('meal_items','id=eq.'+itemId,
+        { name:it.name, kcal:it.kcal, carb:it.carb, protein:it.protein, fat:it.fat }), '음식 고치기');
+      syncMealTotal(m); render();
+      if(S.tagBack === mealId) sheetTagPhoto(mealId);
       return; }
     case 'fdelgo': {
       const [mealId, itemId] = rest; closeSheet();
