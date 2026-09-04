@@ -1579,7 +1579,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '150';
+const BUILD = '151';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -3876,7 +3876,7 @@ function 태그판(m, 다는중){
     ${것.map(v=>`<b class="ftag ${v.p.x>56?'lft':''}" style="left:${v.p.x}%;top:${v.ly}%"
         ${다는중?`data-act="fdel:${m.id}:${v.x.id}"`:''}>${음식그림(v.x.name)} ${esc(v.x.name)}
       <em>${Math.round(v.x.kcal)}</em></b>`).join('')}
-    ${다는중 && !것.length ? `<span class="taghint">음식을 눌러 표시해 주세요</span>` : ''}
+    ${다는중 && !것.length ? `<span class="taghint">음식을 눌러 태그하세요</span>` : ''}
   </div>`;
 }
 /* 표시 안 하고 그냥 담긴 것 (사진 없이 검색으로 담은 것 포함) */
@@ -3891,21 +3891,22 @@ function sheetTagPhoto(mealId){
     if(!m) return `<div class="h2">사진을 찾지 못했어요</div>
       <button class="btn ghost sm" data-act="close">닫기</button>`;
     const t = mealSum(m), 밖 = 자리없는것(m);
-    return `<div class="h2">뭐가 뭔지 눌러 주세요${미리?'':` <small>${esc(m.slot)}</small>`}</div>
+    return `<div class="h2">음식 태그${미리?'':` <small>${esc(m.slot)}</small>`}</div>
       ${태그판(m, 1)}
-      <div class="note">사진에서 <b>음식이 있는 자리를 누르면</b> 무엇인지 고를 수 있어요.
-        표시한 것을 다시 누르면 뺍니다.</div>
-      ${밖.length?`<span class="lbl">사진에 표시 안 한 것</span>
+      <div class="note">사진에서 <b>음식이 있는 자리를 눌러</b> 무엇인지 고르세요.
+        고르면 <b>칼로리와 탄단지가 저절로 들어갑니다</b> — 숫자를 적을 필요가 없어요.
+        <br>태그를 다시 누르면 뺍니다.</div>
+      ${밖.length?`<span class="lbl">태그 안 한 음식</span>
         ${밖.map(x=>`<button class="frow2" data-act="fdel:${m.id}:${x.id}">
           <span class="fe">${음식그림(x.name)}</span>
           <span class="fn2">${esc(x.name)}</span>
           <span class="fk">${Math.round(x.kcal)}</span></button>`).join('')}`:''}
       ${t.kcal?`<div class="msum"><b>${Math.round(t.kcal)} kcal</b>
         <span>탄 ${Math.round(t.carb)}g · 단 ${Math.round(t.protein)}g · 지 ${Math.round(t.fat)}g</span></div>`:''}
-      <button class="btn sub sm" data-act="fadd:${m.id}">사진에 없는 것 담기</button>
+      <button class="btn sub sm" data-act="fadd:${m.id}">사진에 없는 음식 담기</button>
       ${미리
         ? `<button class="btn main" data-act="tagnext">다음 — 언제 먹었나요 ›</button>
-           <button class="btn ghost sm" data-act="shotcancel">이 사진 그만두기</button>`
+           <button class="btn ghost sm" data-act="shotcancel">그만두기</button>`
         : `<button class="btn main" data-act="tagdone">다 됐어요</button>`}`;
   });
 }
@@ -4101,7 +4102,7 @@ function vDiet(){
           <span class="fk">${Math.round(t.kcal)||''}</span></div>`:''}
         ${m.note?`<div class="frow2"><span class="fn2" style="color:#8a5a2b">트레이너 · ${esc(m.note)}</span></div>`:''}
         ${tr?'':(m.path
-          ? `<button class="addf" data-act="tagedit:${m.id}">＋ 사진에 뭐가 뭔지 표시하기</button>`
+          ? `<button class="addf" data-act="tagedit:${m.id}">＋ 음식 태그하기</button>`
           : `<button class="addf" data-act="fadd:${m.id}">＋ 이 식사에 음식 담기</button>`)}
       </div>`; }).join('')
      : 빔('bowl','이 날은 올린 식단이 없어요','사진을 찍거나 검색해서 담아 보세요')}
@@ -4191,7 +4192,7 @@ function sheetMeal(id){
     ${(()=>{ const t = mealSum(m), 것 = m.items || [];
       /* 회원은 「고르기」만 한다 — 숫자를 직접 치게 하지 않는다 (2026-09-04).
          음식을 고르면 칼로리·탄단지가 저절로 채워진다.                    */
-      return `<span class="lbl">무엇을 먹었나요</span>
+      return `<span class="lbl">음식 태그</span>
         ${것.length
           ? 것.map(x=>`<div class="frow2">
               <span class="fe">${음식그림(x.name)}</span>
@@ -4204,7 +4205,7 @@ function sheetMeal(id){
              ? `<div class="msum"><b>${Math.round(t.kcal)} kcal</b><span>음식은 아직 안 골랐어요</span></div>`
              : `<div class="note">아직 안 골랐어요. 아래에서 담으면 <b>칼로리가 저절로 채워집니다.</b></div>`)}
         ${tr?'':(m.path
-          ? `<button class="addf" data-act="tagedit:${m.id}">＋ 사진에 뭐가 뭔지 표시하기</button>`
+          ? `<button class="addf" data-act="tagedit:${m.id}">＋ 음식 태그하기</button>`
           : `<button class="addf" data-act="fadd:${m.id}">＋ 음식 담기</button>`)}`; })()}
     ${tr?`<span class="lbl">숫자 고치기 <small>트레이너만</small></span>
       <div class="grid2">
