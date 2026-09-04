@@ -815,6 +815,31 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .step .v.on{color:var(--gold)}
 .unitlbl{font-size:11.5px;font-weight:600;color:var(--sub);text-align:center;margin-top:-4px}
 
+/* ── 휴식 타이머 ── 세트와 종목 완료 사이. 도는 동안엔 숨 쉬듯 뛴다 */
+.restb{display:flex;align-items:center;gap:9px;width:100%;flex:none;
+  background:var(--gold-dim);border:1.5px solid #6a5730;border-radius:12px;padding:11px 13px}
+.restb .ri{display:flex;flex:none;color:var(--gold)}
+.restb .rtx{flex:1;min-width:0;text-align:left;font-size:14px;font-weight:800;color:var(--gold)}
+.restb .rvl{flex:none;font-size:14px;font-weight:800;color:#241a08;background:var(--gold);
+  border-radius:8px;padding:4px 10px;font-variant-numeric:tabular-nums}
+.restb:active{transform:scale(.99)}
+.restb.run{border-color:var(--gold);animation:쉼숨 1.5s ease-in-out infinite}
+@keyframes 쉼숨{0%,100%{box-shadow:0 0 0 0 rgba(240,211,160,.34)}
+  55%{box-shadow:0 0 0 7px rgba(240,211,160,0)}}
+@media (prefers-reduced-motion:reduce){.restb.run{animation:none}}
+#main.lite .restb{background:#f6efe3;border-color:#e6ddcf}
+#main.lite .restb .rtx{color:#8a6f3f}
+
+/* ── 자물쇠 ── 고정바 맨 오른쪽 */
+.lockb{flex:none;width:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;border-radius:12px;background:var(--dark-3);border:1px solid var(--line);color:var(--sub)}
+.lockb i{font-style:normal;font-size:10.5px;font-weight:700;letter-spacing:.02em}
+.lockb.on{background:var(--gold);border-color:var(--gold);color:#241a08}
+.lockb:active{opacity:.72}
+#foot .btn.dim{opacity:.32}
+#tabs.tlock{opacity:.34;pointer-events:none}
+.btn.ic .pl{font-size:17px;font-weight:800;color:var(--teal)}
+
 /* ── 세로 입력 기둥 ── 지금 하는 세트 */
 .vstep{display:grid;grid-template-columns:1fr 1fr 1.32fr;gap:8px;flex:none;align-items:stretch}
 .vstep.w3{grid-template-columns:1fr 1fr 1fr}
@@ -1525,7 +1550,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '145';
+const BUILD = '146';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2199,13 +2224,33 @@ function lastSet(ex,va,mid){
   } return null; }
 function att(k){ S.att=S.att||{}; return S.att[k]||(S.att[k]={}); }
 
+/* ── 운동 중 잠금 ── 주머니에 넣거나 손이 미끄러져도 화면이 안 바뀌게 (2026-09-04).
+   기록에 관한 건 다 되고, 「여기서 나가는 것」만 막는다.
+   잠금은 D.live 에 담아 두므로 앱을 다시 켜도 풀리지 않는다.        */
+const 잠겼나 = () => { const w = live(); return !!(w && w.lock); };
+const 잠금이막는것 = { go:1, tab:1, back:1, switch:1, ttab:1, tfm2:1,
+                       askleave:1, askfin:1, askcancel:1, dofin:1, cancel:1 };
+/* 자물쇠 그림 — 잠기면 고리가 내려온다 */
+const 자물쇠 = 잠김 => `<svg viewBox="0 0 24 24" width="21" height="21" fill="none"
+  stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="4" y="10.5" width="16" height="10.5" rx="2.4"/>
+  ${잠김 ? `<path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/>`
+         : `<path d="M8 10.5V7a4 4 0 0 1 7.9-.9"/>`}
+  <circle cx="12" cy="15.8" r="1.1" fill="currentColor" stroke="none"/></svg>`;
+
 setInterval(()=>{
   const w=live();
   if(w && w.startAt && (S.screen==='workout'||S.screen==='t_live')){ const el=$('#tm'); if(el) el.textContent=mmss((Date.now()-w.startAt)/1000); }
   if(S.rest && S.rest.until){
     const left=(S.rest.until-Date.now())/1000;
     if(left<=0){ S.rest=null; closeSheet(); toast('쉬는 시간이 끝났어요'); render(); }
-    else if(sheetRender) drawSheet();
+    else { if(sheetRender) drawSheet();
+      /* 카드 안 휴식 버튼도 「쉬는 중」으로 바뀌고 숫자가 흐른다.
+         시트를 어떻게 닫든(시작·닫기·건너뛰기) 여기서 맞춰지므로 손잡이마다 안 챙겨도 된다 */
+      const rv=$('#restleft'); if(rv) rv.textContent=mmss(left);
+      const rb=$('.restb');
+      if(rb && !rb.classList.contains('run')){ rb.classList.add('run');
+        const rt=rb.querySelector('.rtx'); if(rt) rt.textContent='쉬는 중'; } }
   }
 },250);
 
@@ -2247,6 +2292,7 @@ function render(){
   const showTabs = v.tabs || (!bare && (S.who==='m' || S.who==='tr'));
   $('#tabs').innerHTML = showTabs ? (S.who==='tr' ? tabBarTr() : tabBar()) : '';
   $('#tabs').style.display = showTabs ? 'flex' : 'none';
+  $('#tabs').classList.toggle('tlock', 잠겼나());
   const lw = live();
   if(lw && S.who!=='tr' && S.screen!=='workout' && S.screen!=='pick' && S.screen!=='login'){
     const b=document.createElement('button');
@@ -2975,13 +3021,35 @@ function itemsFromRoutine(r){
     sets:[{kg:it.kg, reps:it.reps, spd:exOf(it.ex).cardio?6.5:undefined, done:false}] }));
 }
 
+/* ── 운동 중 고정바 ── 담기 · 끝내기 · 자물쇠. 화면 어디에 있어도 자리가 같다 */
+function 발판(w){
+  const 잠 = !!(w && w.lock);
+  return `<button class="btn sub ic ${잠?'dim':''}" data-act="go:pick"><b class="pl">＋</b>운동 추가</button>
+    <button class="btn gold ${잠?'dim':''}" data-act="askfin">오늘 운동 마치기</button>
+    <button class="lockb ${잠?'on':''}" aria-label="${잠?'화면 잠금 풀기':'화면 잠그기'}"
+      data-act="${잠?'wlockhint':'wlock'}"${잠?' data-hold="wunlock"':''}>
+      ${자물쇠(잠)}<i>${잠?'잠김':'잠금'}</i></button>`;
+}
+/* ── 휴식 타이머 ── 세트 사이에 가장 많이 누르는 것이라 눈에 띄게 둔다 */
+function 쉼버튼(cur){
+  const 도는중 = !!(S.rest && S.rest.until);
+  const 남음 = 도는중 ? Math.max(0,(S.rest.until-Date.now())/1000) : (cur.rest||60);
+  return `<button class="restb ${도는중?'run':''}" data-act="rest">
+    <span class="ri"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor"
+      stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="13" r="8"/><path d="M12 9.5V13l2.4 1.6"/><path d="M9 2h6"/><path d="M12 2v3"/></svg></span>
+    <span class="rtx">${도는중?'쉬는 중':'휴식 타이머'}</span>
+    <span class="rvl" id="restleft">${도는중?mmss(남음):남음+'초'}</span></button>`;
+}
+
 function vWorkout(){
   const w=live(); if(!w) return vHome();
   if(!w.items.length) return {
     top: bar('운동 중', (w.startAt ? `<span class="tm" id="tm">${mmss((Date.now()-w.startAt)/1000)}</span>`
       : `<button class="chip t" data-act="timego">시간 재기 ▶</button>`), 'go:home'),
-    body:`<div class="empty">종목을 담아 주세요</div>`,
-    foot:`<button class="btn sub" data-act="go:pick">운동 추가</button><button class="btn ghost" data-act="askcancel">기록 지우고 나가기</button>` };
+    body:`<div class="empty">종목을 담아 주세요</div>
+      <button class="dngr" data-act="askcancel">기록 지우고 나가기</button>`,
+    foot: 발판(w) };
   const cur=w.items[w.cur]||w.items[0], e=exOf(cur.ex), v=varOf(cur.ex,cur.va);
   const wmid = w.mid || S.mid, tr = (S.who==='tr');
   const openIdx=cur.sets.findIndex(s=>!s.done);
@@ -3020,6 +3088,9 @@ function vWorkout(){
       : (openIdx >= 0
         ? 세로입력(cur, e, openIdx)
         : `<button class="btn gold" data-act="rep">${e.cardio?'구간':'세트'} 하나 더 ＋</button>`))}
+    ${cur.locked ? '' : `
+      ${쉼버튼(cur)}
+      <button class="btn main fin" data-act="fin">${esc(e.n)} 완료</button>`}
   </div>`;
 
   return {
@@ -3047,18 +3118,9 @@ function vWorkout(){
            <button class="chip" data-act="wdel:${i}" style="flex:none;padding:6px 10px">빼기</button>`}
       </div>${(on && !S.fold) ? 펼침() : ''}`;
     }).join('')}
-    ${/* 급을 나눈다 — 담는 자리는 점선, 끝내기는 골드, 지우기는 작은 글씨 */''}
-    <button class="addbox" data-act="go:pick"><b>＋</b> 운동 추가</button>
-    <button class="btn gold" data-act="askfin" style="margin-top:2px">오늘 운동 마치기</button>
+    ${/* 담고 끝내는 건 아래 고정바로 갔다. 여기엔 되돌릴 수 없는 것만 작게 남긴다 */''}
     <button class="dngr" data-act="askcancel">기록 지우고 나가기</button>`,
-    foot:`<button class="btn sub ic" data-act="rest">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="13" r="8"/><path d="M12 9.5V13l2.4 1.6"/><path d="M9 2h6"/><path d="M12 2v3"/>
-            </svg>휴식 타이머</button>
-          ${cur.locked
-            ? `<button class="btn gold" data-act="askfin">오늘 운동 마치기</button>`
-            : `<button class="btn main fin" data-act="fin">${esc(e.n)} 완료</button>`}` };
+    foot: 발판(w) };
 }
 
 /* ── 설명 + 코멘트 ── */
@@ -6339,7 +6401,7 @@ document.addEventListener('pointercancel', ()=>{ figDrag = null; figMoved = fals
   let 늦게=null, 반복=null, 눌린=null;
   const 끝 = ()=>{
     clearTimeout(늦게); clearInterval(반복); 늦게=반복=null; 눌린=null;
-    if(S.repeating){ S.repeating=false; drawSheet(); render(); }   /* 손 떼면 제대로 다시 그린다 */
+    if(S.repeating){ S.repeating=false; S.heldAt=Date.now(); drawSheet(); render(); }   /* 손 떼면 제대로 다시 그린다 */
   };
   const 눌림 = e=>{
     const el = e.target.closest('[data-rep],[data-hold]'); if(!el) return;
@@ -6347,7 +6409,7 @@ document.addEventListener('pointercancel', ()=>{ figDrag = null; figMoved = fals
     const h = el.getAttribute('data-hold');
     const a = el.getAttribute('data-act');
     늦게 = setTimeout(()=>{
-      if(h){ if(navigator.vibrate) navigator.vibrate(18); 실행(h); return; }
+      if(h){ if(navigator.vibrate) navigator.vibrate(18); 실행(h); S.heldAt=Date.now(); return; }
       if(!a) return;
       if(navigator.vibrate) navigator.vibrate(10);
       /* 화면을 다시 그리면 버튼이 바뀌므로, 버튼이 아니라 「동작」을 되풀이한다.
@@ -6368,6 +6430,7 @@ document.addEventListener('pointercancel', ()=>{ figDrag = null; figMoved = fals
   const h0 = el => el.getAttribute('data-hold') ? 420 : 380;
   const 실행 = a=>{
     const b=document.createElement('button'); b.setAttribute('data-act',a);
+    b.setAttribute('data-syn','1');        /* 우리가 만든 눌림 — 가로막지 않는다 */
     document.body.appendChild(b); b.click(); b.remove();
   };
   for(const ev of ['pointerdown']) document.addEventListener(ev, 눌림, {passive:true});
@@ -6377,7 +6440,13 @@ document.addEventListener('pointercancel', ()=>{ figDrag = null; figMoved = fals
 
 document.addEventListener('click', ev=>{
   const el=ev.target.closest('[data-act]'); if(!el) return;
+  /* 길게 눌러 끝낸 직후의 「따라오는 눌림」은 흘려보낸다 (풀자마자 다시 잠기지 않게) */
+  if(!el.hasAttribute('data-syn') && S.heldAt && Date.now()-S.heldAt < 600){ S.heldAt=0; return; }
   const a=el.getAttribute('data-act'), [k,...rest]=a.split(':'), w=live();
+  /* 「운동 중으로 돌아가기」만은 잠겨도 열어 둔다 — 자물쇠가 거기 있기 때문이다.
+     막아 두면 앱을 다시 켰을 때 홈에 갇힌다 (2026-09-04 확인). */
+  if(잠금이막는것[k] && 잠겼나() && !(k==='go' && rest[0]==='workout')){
+    toast('잠겨 있어요 — 자물쇠를 길게 누르면 풀립니다'); return; }
   switch(k){
     case 'kakao': toast('실제 연동은 다음 단계입니다'); return;
     case 'retry': S.screen='boot'; render(); start(); return;
@@ -6634,7 +6703,9 @@ document.addEventListener('click', ev=>{
     }
     case 'as':
       if(rest[0]==='tr'){ S.who='tr'; S.ttab='t_today'; go('t_today'); }
-      else { S.who='m'; S.mid=rest[0]; S.tab='home'; go('home'); } return;
+      else { S.who='m'; S.mid=rest[0]; S.tab='home';
+        /* 잠근 채로 앱을 껐다면 운동 화면으로 바로 되돌린다 */
+        if(D.live && D.live.mid===rest[0] && D.live.lock) go('workout'); else go('home'); } return;
     case 'reset': reset(); toast('처음 상태로 되돌렸습니다'); return;
     case 'go': { if(rest[0]==='workout' && !D.live) adoptLive(S.mid); go(rest[0]); return; }
     case 'dpick': S.day = rest[0]; render(); return;
@@ -7024,6 +7095,11 @@ document.addEventListener('click', ev=>{
       else { cur.sets[i].kg = kg; if(reps) cur.sets[i].reps = reps; }
       save(); toast('그 무게로 맞췄어요'); render(); return; }
     case 'rest': sheetRest(); return;
+    case 'wlock': { const lw=live(); if(!lw) return; lw.lock=true; save();
+      toast('잠갔어요 — 풀 때는 자물쇠를 길게 누르세요'); render(); return; }
+    case 'wunlock': { const lw=live(); if(!lw) return; lw.lock=false; save();
+      toast('잠금을 풀었어요'); render(); return; }
+    case 'wlockhint': toast('자물쇠를 길게 누르면 풀립니다'); return;
     /* 부위 칩 펼치기 */
     case 'partopen': S.pickOpen=!S.pickOpen; render(); setTimeout(칠하기,0); return;
     /* 담은 순서 확인 → 시작 */
