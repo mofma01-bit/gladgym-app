@@ -1579,7 +1579,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '149';
+const BUILD = '150';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -3867,8 +3867,11 @@ function 태그판(m, 다는중){
   /* 이름표가 서로 겹치지 않게 세로로 조금씩 밀어 둔다. 점은 실제 자리에 그대로 둔다 */
   let 앞 = -99;
   것.forEach(v => { v.ly = Math.min(96, Math.max(v.p.y, 앞 + 10)); 앞 = v.ly; });
+  const 그림 = (m.id === 'draft')
+    ? `<img class="tagph" src="${S.shot||''}" alt="">`         /* 아직 안 올린 사진 */
+    : picImg(m.path, 'tagph', 다는중?'':'meal:'+m.id, 1);
   return `<div class="tagwrap ${다는중?'on':''}" data-meal="${esc(m.id)}">
-    ${picImg(m.path, 'tagph', 다는중?'':'meal:'+m.id, 1)}
+    ${그림}
     ${것.map(v=>`<i class="tdot" style="left:${v.p.x}%;top:${v.p.y}%"></i>`).join('')}
     ${것.map(v=>`<b class="ftag ${v.p.x>56?'lft':''}" style="left:${v.p.x}%;top:${v.ly}%"
         ${다는중?`data-act="fdel:${m.id}:${v.x.id}"`:''}>${음식그림(v.x.name)} ${esc(v.x.name)}
@@ -3882,11 +3885,13 @@ const 자리없는것 = m => (m.items||[]).filter(x => !자리풀기(x.pos));
 function sheetTagPhoto(mealId){
   S.tagBack = mealId;
   openSheet(()=>{
-    const m = (D.meals||[]).find(x=>x.id===mealId);
+    const 미리 = (mealId === 'draft');
+    const m = 미리 ? (S.dm || (S.dm = { id:'draft', path:null, items:[] }))
+                   : (D.meals||[]).find(x=>x.id===mealId);
     if(!m) return `<div class="h2">사진을 찾지 못했어요</div>
       <button class="btn ghost sm" data-act="close">닫기</button>`;
     const t = mealSum(m), 밖 = 자리없는것(m);
-    return `<div class="h2">뭐가 뭔지 눌러 주세요 <small>${esc(m.slot)}</small></div>
+    return `<div class="h2">뭐가 뭔지 눌러 주세요${미리?'':` <small>${esc(m.slot)}</small>`}</div>
       ${태그판(m, 1)}
       <div class="note">사진에서 <b>음식이 있는 자리를 누르면</b> 무엇인지 고를 수 있어요.
         표시한 것을 다시 누르면 뺍니다.</div>
@@ -3898,7 +3903,10 @@ function sheetTagPhoto(mealId){
       ${t.kcal?`<div class="msum"><b>${Math.round(t.kcal)} kcal</b>
         <span>탄 ${Math.round(t.carb)}g · 단 ${Math.round(t.protein)}g · 지 ${Math.round(t.fat)}g</span></div>`:''}
       <button class="btn sub sm" data-act="fadd:${m.id}">사진에 없는 것 담기</button>
-      <button class="btn main" data-act="tagdone">다 됐어요</button>`;
+      ${미리
+        ? `<button class="btn main" data-act="tagnext">다음 — 언제 먹었나요 ›</button>
+           <button class="btn ghost sm" data-act="shotcancel">이 사진 그만두기</button>`
+        : `<button class="btn main" data-act="tagdone">다 됐어요</button>`}`;
   });
 }
 
@@ -4394,7 +4402,13 @@ function shotPick(){
     inp.remove();
     if(!f) return;
     toast('사진을 다듬는 중이에요');
-    try{ const url = await stampPhoto(f); S.shot = url; sheetShot(); }
+    try{ const url = await stampPhoto(f);
+      S.shot = url;
+      /* 찍자마자 뭐가 뭔지부터 고른다. 끼니·한마디는 그다음 (2026-09-04 대표 지시).
+         아직 서버에 안 올린 상태라 담은 것을 S.dm 에 들고 있다가 마지막에 한꺼번에 쓴다. */
+      S.dm = { id:'draft', path:null, items:[] };
+      S.tagXY = null; S.shotSlot = null;
+      sheetTagPhoto('draft'); }
     catch(e){ console.error(e); toast('사진을 읽지 못했어요'); }
   });
   inp.click();
@@ -4553,19 +4567,24 @@ function sheetFoodNew(){
     <button class="btn ghost sm" data-act="fadd:${S.fpMeal}">뒤로</button>`);
 }
 
+/* 마지막 걸음 — 언제 먹었는지와 한마디. 뭐가 뭔지는 앞에서 이미 골랐다 */
 function sheetShot(){
   if(!S.shotSlot) S.shotSlot = 지금끼니();     /* 끼니 짐작은 한 군데서만 한다 */
-  openSheet(()=>`
-    <div class="h2">이렇게 올릴까요</div>
-    <img class="shot" src="${S.shot}" alt="">
-    <span class="lbl">언제 먹은 건가요</span>
+  openSheet(()=>{
+    const m = S.dm || { id:'draft', path:null, items:[] };
+    const t = mealSum(m);
+    return `<div class="h2">언제 먹은 건가요</div>
+    ${태그판(m, 0)}
     <div class="chips">${SLOTS.map(x=>`<button class="chip ${S.shotSlot===x?'on':''}" data-act="slot:${x}">${x}</button>`).join('')}</div>
+    ${t.kcal?`<div class="msum"><b>${Math.round(t.kcal)} kcal</b>
+      <span>탄 ${Math.round(t.carb)}g · 단 ${Math.round(t.protein)}g · 지 ${Math.round(t.fat)}g</span></div>`
+      :`<div class="note">담은 음식이 없어요. <b>뒤로</b> 가서 사진을 눌러 고를 수 있습니다.</div>`}
     <textarea data-k="mmemo" placeholder="한마디 (안 적어도 됩니다)"></textarea>
-    <div class="note">올리고 나면 <b>사진 위에서 음식을 눌러</b> 뭐가 뭔지 표시합니다.
-      고르면 칼로리와 탄단지가 저절로 채워져요 — <b>숫자를 적을 필요가 없습니다.</b></div>
     <div style="display:flex;gap:9px">
       <button class="btn main" data-act="shotup">올리기</button>
-      <button class="btn ghost" data-act="close">그만두기</button></div>`);
+      <button class="btn ghost" data-act="tagback">뒤로</button></div>
+    <button class="btn ghost sm" data-act="shotcancel">그만두기</button>`;
+  });
 }
 
 function syncMealTotal(m){
@@ -4578,6 +4597,21 @@ function syncMealTotal(m){
 async function putFood(){
   const f = S.fpPick, q = S.fpQty || 1;
   if(!f) return;
+  const 자리 = S.tagXY ? 자리코드(S.tagXY.x, S.tagXY.y) : null;
+  S.tagXY = null;
+
+  /* 아직 안 올린 사진에 담는 중 — 서버에 쓰지 않고 들고만 있다가 「올리기」에서 한꺼번에 쓴다 */
+  if(S.fpMeal === 'draft'){
+    S.dm = S.dm || { id:'draft', path:null, items:[] };
+    S.dm.items.push({ id:'d'+Date.now()+Math.random().toString(36).slice(2,6), fid:f.id||null,
+      name:f.name, brand:f.brand||'', qty:q, unit:f.unit||'',
+      kcal:Math.round(f.kcal*q*10)/10, carb:Math.round(f.carb*q*10)/10,
+      protein:Math.round(f.protein*q*10)/10, fat:Math.round(f.fat*q*10)/10,
+      pos: (자리 != null) ? 자리 : S.dm.items.length });
+    if(f.id) sv(spatch('foods','id=eq.'+f.id, { uses:(Number(f.uses)||0)+1 }), '많이 고른 것');
+    closeSheet(); toast('담았어요'); sheetTagPhoto('draft'); return;
+  }
+
   let mealId = S.fpMeal, m = (D.meals||[]).find(x=>x.id===mealId);
   closeSheet();
   if(!m){                                   /* 새 식사 만들기 */
@@ -4593,8 +4627,8 @@ async function putFood(){
   const row = { meal_id:mealId, food_id:f.id||null, name:f.name, brand:f.brand||'',
     qty:q, unit:f.unit||'', kcal:Math.round(f.kcal*q*10)/10, carb:Math.round(f.carb*q*10)/10,
     protein:Math.round(f.protein*q*10)/10, fat:Math.round(f.fat*q*10)/10,
-    sort: S.tagXY ? 자리코드(S.tagXY.x, S.tagXY.y) : (m.items||[]).length };
-  const 이자리 = row.sort; S.tagXY = null;
+    sort: (자리 != null) ? 자리 : (m.items||[]).length };
+  const 이자리 = row.sort;
   const r = await spost('meal_items',[row],{ret:true}).catch(e=>{ console.error(e); return null; });
   m.items = m.items || [];
   m.items.push({ id:(r&&r[0]&&r[0].id)||('tmp'+Date.now()), fid:f.id, name:row.name, brand:row.brand,
@@ -4624,13 +4658,24 @@ async function uploadMeal(){
   const 끼니 = S.shotSlot || 지금끼니();
   await sv(spost('meals',[{ id, member_id:mid, on_date:day, slot:끼니, seq, at, path, memo,
     kcal:null, carb:null, protein:null, fat:null }]), '식단 저장');
-  D.meals = D.meals || [];
-  D.meals.unshift({ id, mid, date:day, slot:끼니, seq, at, path, memo, note:'',
-    kcal:0, carb:0, protein:0, fat:0, items:[] });
+  const 담은것 = (S.dm && S.dm.items) ? S.dm.items : [];
+  const 새것 = { id, mid, date:day, slot:끼니, seq, at, path, memo, note:'',
+    kcal:0, carb:0, protein:0, fat:0, items:[] };
+  D.meals = D.meals || []; D.meals.unshift(새것);
   if(S.draft) delete S.draft['mmemo'];
-  S.shot=null; S.dietDay=day; toast('올렸어요'); render();
-  /* 바로 「뭐가 뭔지 눌러 주세요」로 이어 준다 — 인스타 태그처럼 사진 위에 표시한다 */
-  sheetTagPhoto(id);
+  S.shot=null; S.dm=null; S.dietDay=day; toast('올렸어요'); render();
+
+  /* 앞에서 골라 둔 음식을 한꺼번에 쓴다 */
+  if(담은것.length){
+    const rows = 담은것.map(x=>({ meal_id:id, food_id:x.fid||null, name:x.name, brand:x.brand||'',
+      qty:x.qty, unit:x.unit||'', kcal:x.kcal, carb:x.carb, protein:x.protein, fat:x.fat, sort:x.pos }));
+    const r2 = await spost('meal_items', rows, {ret:true}).catch(e=>{ console.error(e); return null; });
+    새것.items = 담은것.map((x,i)=>({ id:(r2&&r2[i]&&r2[i].id)||x.id, fid:x.fid, name:x.name,
+      brand:x.brand, qty:x.qty, unit:x.unit, kcal:x.kcal, carb:x.carb,
+      protein:x.protein, fat:x.fat, pos:x.pos }));
+    syncMealTotal(새것);
+    render();
+  }
 }
 
 /* ── 남은 기간 고리 ── 회원권이 얼마나 남았는지 한 바퀴로 */
@@ -6649,7 +6694,7 @@ document.addEventListener('click', ev=>{
       sheetFoodQty(f); return; }
     case 'fdel': {
       const [mealId, itemId] = rest;
-      const m = (D.meals||[]).find(x=>x.id===mealId); if(!m) return;
+      const m = (mealId==='draft') ? S.dm : (D.meals||[]).find(x=>x.id===mealId); if(!m) return;
       const it = (m.items||[]).find(x=>String(x.id)===String(itemId)); if(!it) return;
       openSheet(()=>`<div class="h2">뺄까요? <small>${esc(it.name)}</small></div>
         <div class="note">${kgfmt(it.qty)}${it.unit?' × '+esc(it.unit):'인분'} · ${Math.round(it.kcal)}kcal</div>
@@ -6658,6 +6703,9 @@ document.addEventListener('click', ev=>{
       return; }
     case 'fdelgo': {
       const [mealId, itemId] = rest; closeSheet();
+      if(mealId === 'draft'){                       /* 아직 안 올린 것 — 들고 있던 데서만 뺀다 */
+        if(S.dm) S.dm.items = (S.dm.items||[]).filter(x=>String(x.id)!==String(itemId));
+        toast('뺐어요'); sheetTagPhoto('draft'); return; }
       const m = (D.meals||[]).find(x=>x.id===mealId); if(!m) return;
       m.items = (m.items||[]).filter(x=>String(x.id)!==String(itemId));
       sv(sdel('meal_items','id=eq.'+itemId), '음식 빼기');
@@ -6667,7 +6715,11 @@ document.addEventListener('click', ev=>{
       return; }
     case 'slot': S.shotSlot=rest[0]; drawSheet(); return;
     case 'shotup': uploadMeal(); return;
+    case 'tagback': sheetTagPhoto('draft'); return;
     case 'tagdone': S.tagBack=null; S.tagXY=null; closeSheet(); render(); return;
+    case 'tagnext': S.tagBack=null; S.tagXY=null; sheetShot(); return;
+    case 'shotcancel': S.shot=null; S.dm=null; S.tagBack=null; S.tagXY=null;
+      closeSheet(); toast('그만뒀어요'); return;
     case 'tagedit': sheetTagPhoto(rest[0]); return;
     case 'dday': S.dietDay=rest[0]; render(); return;
     case 'meal': sheetMeal(rest[0]); return;
