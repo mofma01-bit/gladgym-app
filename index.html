@@ -154,6 +154,11 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .frow2 .fn2{flex:1;min-width:0;font-size:13.5px;font-weight:600;color:#2b231c}
 .frow2 .fq{font-size:11.5px;font-weight:600;color:#a0917f;flex:none}
 .frow2 .fk{font-size:13px;font-weight:800;color:#8a5a2b;flex:none;font-variant-numeric:tabular-nums}
+/* 사진 시트 안 합계 줄 */
+.msum{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;flex:none;
+  background:var(--gold-dim);border:1px solid #4a3d22;border-radius:11px;padding:10px 12px}
+.msum b{font-size:17px;font-weight:800;color:var(--gold);font-variant-numeric:tabular-nums}
+.msum span{font-size:12px;font-weight:600;color:var(--sub)}
 .addf{width:100%;padding:11px 14px;border-top:1px dashed #e0d3bd;font-size:13px;font-weight:700;color:#8a5a2b;text-align:left}
 .fitem{display:flex;align-items:baseline;gap:9px;padding:11px 4px;border-bottom:1px solid var(--line);width:100%;text-align:left}
 .fitem .n2{flex:1;min-width:0;font-size:14px;font-weight:600;color:var(--cream)}
@@ -1553,7 +1558,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '147';
+const BUILD = '148';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -3803,6 +3808,11 @@ function vFeedback(){
 
 /* ── 식단 ── */
 const SLOTS = ['아침','점심','저녁','간식'];
+/* 지금 시각으로 끼니를 짐작한다 — 0~5시 아침, 6~11시 아침, 12~17시 점심, 18시~ 저녁 */
+function 지금끼니(){
+  const h = new Date().getHours();
+  return h < 11 ? '아침' : (h < 17 ? '점심' : '저녁');
+}
 const mealURL = path => path ? (SB_URL + '/storage/v1/object/public/media/' + path) : '';
 
 /* 사진이 없거나 서버에서 지워졌으면 샐러드 그림으로 갈음합니다 */
@@ -3885,9 +3895,15 @@ const hhmm = () => { const d=new Date(); return String(d.getHours()).padStart(2,
 /* 음식장에서 찾기 — 서버에 물어본다 */
 async function foodFind(q){
   const s0 = (q||'').trim();
-  if(!s0) return sget('foods?select=*&order=uses.desc&limit=24');
-  const esc2 = encodeURIComponent('%'+s0.replace(/[%,()]/g,' ')+'%');
-  return sget('foods?select=*&or=(name.ilike.'+esc2+',brand.ilike.'+esc2+')&order=uses.desc,id.asc&limit=40');
+  const 전부 = () => sget('foods?select=*&order=uses.desc&limit=24');
+  if(!s0) return 전부();
+  /* 「닭가슴살 (구이)」처럼 괄호·띄어쓰기가 섞여도 찾게 — 낱말로 쪼개 「다 들어간 것」을 고른다.
+     예전에는 괄호를 빈칸으로 바꿔 통째로 맞춰 보느라 「최근 먹은 것」을 눌러도 못 찾았다. */
+  const 낱말 = s0.replace(/[%(),*."']/g, ' ').split(/\s+/).filter(w => w).slice(0, 4);
+  if(!낱말.length) return 전부();
+  const 조각 = f => '(' + 낱말.map(w => f + '.ilike.*' + encodeURIComponent(w) + '*').join(',') + ')';
+  return sget('foods?select=*&or=(and' + 조각('name') + ',and' + 조각('brand') + ')'
+    + '&order=uses.desc,id.asc&limit=40');
 }
 /* 최근 먹은 음식 */
 function recentFoods(mid){
@@ -4083,13 +4099,30 @@ function sheetMeal(id){
     <div class="h2">${esc(m.slot)} <small>${dateTxt(m.date)}</small></div>
     ${picImg(m.path,'shot','',1)}
     ${m.memo?`<div class="note">${esc(m.memo)}</div>`:''}
-    <div class="grid2">
-      <div class="fld"><span class="fn">칼로리</span><input class="search" type="text" inputmode="numeric" data-k="ek:${m.id}" value="${m.kcal||''}"></div>
-      <div class="fld"><span class="fn">탄수 g</span><input class="search" type="text" inputmode="numeric" data-k="ec:${m.id}" value="${m.carb||''}"></div>
-      <div class="fld"><span class="fn">단백 g</span><input class="search" type="text" inputmode="numeric" data-k="ep:${m.id}" value="${m.protein||''}"></div>
-      <div class="fld"><span class="fn">지방 g</span><input class="search" type="text" inputmode="numeric" data-k="ef:${m.id}" value="${m.fat||''}"></div>
-    </div>
-    <button class="btn sub sm" data-act="mealkcal:${m.id}">칼로리 저장</button>
+    ${(()=>{ const t = mealSum(m), 것 = m.items || [];
+      /* 회원은 「고르기」만 한다 — 숫자를 직접 치게 하지 않는다 (2026-09-04).
+         음식을 고르면 칼로리·탄단지가 저절로 채워진다.                    */
+      return `<span class="lbl">무엇을 먹었나요</span>
+        ${것.length
+          ? 것.map(x=>`<div class="frow2">
+              <span class="fe">${음식그림(x.name)}</span>
+              <span class="fn2">${esc(x.name)}${x.brand?` <span style="color:#a0917f;font-weight:600">${esc(x.brand)}</span>`:''}</span>
+              <span class="fq">${kgfmt(x.qty)}${x.unit?' × '+esc(x.unit):'인분'}</span>
+              <span class="fk">${Math.round(x.kcal)}</span></div>`).join('')
+            + `<div class="msum"><b>${Math.round(t.kcal)} kcal</b>
+                <span>탄 ${Math.round(t.carb)}g · 단 ${Math.round(t.protein)}g · 지 ${Math.round(t.fat)}g</span></div>`
+          : (t.kcal
+             ? `<div class="msum"><b>${Math.round(t.kcal)} kcal</b><span>음식은 아직 안 골랐어요</span></div>`
+             : `<div class="note">아직 안 골랐어요. 아래에서 담으면 <b>칼로리가 저절로 채워집니다.</b></div>`)}
+        ${tr?'':`<button class="addf" data-act="fadd:${m.id}">＋ 음식 담기</button>`}`; })()}
+    ${tr?`<span class="lbl">숫자 고치기 <small>트레이너만</small></span>
+      <div class="grid2">
+        <div class="fld"><span class="fn">칼로리</span><input class="search" type="text" inputmode="numeric" data-k="ek:${m.id}" value="${m.kcal||''}"></div>
+        <div class="fld"><span class="fn">탄수 g</span><input class="search" type="text" inputmode="numeric" data-k="ec:${m.id}" value="${m.carb||''}"></div>
+        <div class="fld"><span class="fn">단백 g</span><input class="search" type="text" inputmode="numeric" data-k="ep:${m.id}" value="${m.protein||''}"></div>
+        <div class="fld"><span class="fn">지방 g</span><input class="search" type="text" inputmode="numeric" data-k="ef:${m.id}" value="${m.fat||''}"></div>
+      </div>
+      <button class="btn sub sm" data-act="mealkcal:${m.id}">칼로리 저장</button>`:''}
     ${m.note?`<div class="cm"><span class="who">${esc(TRAINER)} 트레이너</span><span class="tx">${esc(m.note)}</span></div>`:''}
     ${tr?`<span class="lbl">코멘트 남기기</span>
       <textarea data-k="mn:${m.id}" placeholder="식단에 한마디">${esc(m.note||'')}</textarea>
@@ -4438,20 +4471,15 @@ function sheetFoodNew(){
 }
 
 function sheetShot(){
-  if(!S.shotSlot) S.shotSlot = SLOTS[Math.min(3, Math.floor(new Date().getHours()/6))] || '점심';
+  if(!S.shotSlot) S.shotSlot = 지금끼니();     /* 끼니 짐작은 한 군데서만 한다 */
   openSheet(()=>`
     <div class="h2">이렇게 올릴까요</div>
     <img class="shot" src="${S.shot}" alt="">
     <span class="lbl">언제 먹은 건가요</span>
     <div class="chips">${SLOTS.map(x=>`<button class="chip ${S.shotSlot===x?'on':''}" data-act="slot:${x}">${x}</button>`).join('')}</div>
-    <span class="lbl">칼로리와 탄단지 (아는 만큼만)</span>
-    <div class="grid2">
-      <div class="fld"><span class="fn">칼로리</span><input class="search" type="text" inputmode="numeric" data-k="mk" placeholder="예) 620"></div>
-      <div class="fld"><span class="fn">탄수 g</span><input class="search" type="text" inputmode="numeric" data-k="mc" placeholder=""></div>
-      <div class="fld"><span class="fn">단백 g</span><input class="search" type="text" inputmode="numeric" data-k="mp" placeholder=""></div>
-      <div class="fld"><span class="fn">지방 g</span><input class="search" type="text" inputmode="numeric" data-k="mf" placeholder=""></div>
-    </div>
     <textarea data-k="mmemo" placeholder="한마디 (안 적어도 됩니다)"></textarea>
+    <div class="note">올리고 나면 <b>무엇을 먹었는지 고르는 화면</b>이 뜹니다.
+      고르면 칼로리와 탄단지가 저절로 채워져요 — <b>숫자를 적을 필요가 없습니다.</b></div>
     <div style="display:flex;gap:9px">
       <button class="btn main" data-act="shotup">올리기</button>
       <button class="btn ghost" data-act="close">그만두기</button></div>`);
@@ -4472,10 +4500,11 @@ async function putFood(){
   if(!m){                                   /* 새 식사 만들기 */
     mealId = 'meal'+Date.now();
     const seq = nextSeq(S.mid, S.dietDay || TODAY), at = hhmm();
-    m = { id:mealId, mid:S.mid, date:S.dietDay || TODAY, slot:'식사', seq, at,
+    const 끼니2 = 지금끼니();
+    m = { id:mealId, mid:S.mid, date:S.dietDay || TODAY, slot:끼니2, seq, at,
       path:null, memo:'', note:'', kcal:0, carb:0, protein:0, fat:0, items:[] };
     D.meals = D.meals || []; D.meals.unshift(m);
-    await sv(spost('meals',[{ id:mealId, member_id:m.mid, on_date:m.date, slot:'식사',
+    await sv(spost('meals',[{ id:mealId, member_id:m.mid, on_date:m.date, slot:끼니2,
       seq, at, path:null, memo:'' }]), '식사 만들기');
   }
   const row = { meal_id:mealId, food_id:f.id||null, name:f.name, brand:f.brand||'',
@@ -4493,8 +4522,6 @@ async function putFood(){
 
 async function uploadMeal(){
   const mid = S.mid, day = TODAY;
-  const gv = k => { const el=document.querySelector('[data-k="'+k+'"]'); return el ? nnum(el.value) : 0; };
-  const kcal = gv('mk'), carb = gv('mc'), prot = gv('mp'), fat = gv('mf');
   const memoEl = document.querySelector('[data-k="mmemo"]');
   const memo = memoEl ? memoEl.value.trim() : '';
   const id = 'meal'+Date.now();
@@ -4505,13 +4532,18 @@ async function uploadMeal(){
     method:'POST', headers:{ apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'image/jpeg' }, body: blob });
   if(!r.ok){ toast('사진을 못 올렸어요'); console.error(await r.text()); return; }
   const seq = nextSeq(mid, day), at = hhmm();
-  await sv(spost('meals',[{ id, member_id:mid, on_date:day, slot:'식사', seq, at, path, memo,
-    kcal:kcal||null, carb:carb||null, protein:prot||null, fat:fat||null }]), '식단 저장');
+  /* 고른 끼니(아침·점심·저녁·간식)를 그대로 담는다.
+     예전에는 무조건 '식사'로 넣어 회원이 고른 값이 버려졌다 (2026-09-04 고침). */
+  const 끼니 = S.shotSlot || 지금끼니();
+  await sv(spost('meals',[{ id, member_id:mid, on_date:day, slot:끼니, seq, at, path, memo,
+    kcal:null, carb:null, protein:null, fat:null }]), '식단 저장');
   D.meals = D.meals || [];
-  D.meals.unshift({ id, mid, date:day, slot:'식사', seq, at, path, memo, note:'',
-    kcal, carb, protein:prot, fat, items:[] });
-  if(S.draft){ ['mk','mc','mp','mf','mmemo'].forEach(k=>delete S.draft[k]); }
+  D.meals.unshift({ id, mid, date:day, slot:끼니, seq, at, path, memo, note:'',
+    kcal:0, carb:0, protein:0, fat:0, items:[] });
+  if(S.draft) delete S.draft['mmemo'];
   S.shot=null; S.dietDay=day; toast('올렸어요'); render();
+  /* 바로 「무엇을 먹었나요」로 이어 준다 — 숫자를 치게 하지 않는다 */
+  S.fpQ=''; S.fpRes=null; sheetFoodPick(id);
 }
 
 /* ── 남은 기간 고리 ── 회원권이 얼마나 남았는지 한 바퀴로 */
