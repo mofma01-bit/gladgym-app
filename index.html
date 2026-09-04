@@ -1217,9 +1217,17 @@ const 별칭이름 = 합친이름.concat([
   ['러시안','russian'], ['우드찹','woodchop'], ['팔로프','pallof'],
   ['마운틴','mountain climber'], ['버피','burpee'], ['할로우','hollow'],
   ['데드버그','deadbug'], ['버드독','birddog'],
-  ['트레드밀','treadmill 러닝머신 런닝머신 달리기 걷기'], ['사이클','cycle bike 자전거'],
-  ['싸이클','cycle bike 자전거'], ['로잉','rowing'], ['일립티컬','elliptical'],
-  ['줄넘기','jumprope rope'], ['스텝밀','stepmill'], ['배틀로프','batttlerope 로프'],
+  /* 센터 기구 — 렉스코 사이클·런닝머신 (2026-09-04 대표 확인) */
+  ['트레드밀','treadmill 러닝머신 런닝머신 달리기 걷기 렉스코 lexco'],
+  ['사이클','cycle bike 자전거 싸이클 렉스코 lexco'],
+  ['싸이클','cycle bike 자전거 사이클 렉스코 lexco'], ['로잉','rowing'], ['일립티컬','elliptical'],
+  ['줄넘기','jumprope rope'], ['배틀로프','batttlerope 로프'],
+  /* 센터 기구의 부르는 이름 — 회원은 「천국의계단」으로 찾는다 (2026-09-04 대표 확인).
+     마이마운틴은 천국의계단과 다른 기구다 — 경사 50도까지 올라가는 짧은 발판 머신 */
+  ['스텝밀','stepmill 천국의계단 천국계단 계단기구'],
+  ['스테어 클라이머','stairclimber 천국의계단 천국계단 계단기구'],
+  ['계단 오르기','천국의계단 천국계단'],
+  ['마이마운틴','mymountain 디랙스 drax 경사 급경사 등산 산타기 인클라인트레이너 오르막'],
   ['폼롤러','foamroller 마사지 이완'], ['스트레칭','stretch 스트레치 이완'],
   ['땅콩볼','peanut 피넛볼 트윈볼'],
   ['늘이기','스트레칭 stretch'], ['풀기','마사지 이완 릴리즈'],
@@ -1443,7 +1451,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '141';
+const BUILD = '144';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1664,9 +1672,11 @@ function cmOf(mid,ex,va){ return D.cm.filter(c=>c.mid===mid && c.ex===ex && (va=
 function unreadOf(mid){ return D.cm.filter(c=>c.mid===mid && !c.read).length; }
 
 function setTxt(id,s){ if(isMemo(id)) return '기록함';
-  return exOf(id).cardio ? `${s.reps}분`+(s.spd?` · ${s.spd}km/h`:'') : `${kgfmt(s.kg)}kg × ${s.reps}회`; }
+  return exOf(id).cardio
+    ? `${s.reps}분`+(s.spd?` · ${s.spd}km/h`:'')+(s.kg?` · 경사 ${kgfmt(s.kg)}°`:'')
+    : `${kgfmt(s.kg)}kg × ${s.reps}회`; }
 function setShort(id,s){ if(isMemo(id)) return '메모';
-  return exOf(id).cardio ? `${s.reps}분` : `${kgfmt(s.kg)}×${s.reps}`; }
+  return exOf(id).cardio ? `${s.reps}분`+(s.kg?` ${kgfmt(s.kg)}°`:'') : `${kgfmt(s.kg)}×${s.reps}`; }
 
 let toastT=null;
 function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('on'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('on'),1700); }
@@ -1739,8 +1749,21 @@ const me = () => MEMBERS.find(m=>m.id===S.mid);
 const myRoutines = mid => D.routines
   .filter(r=>r.mid===mid && !/준비운동/.test(r.grp||'')).sort((a,b)=>a.no-b.no);
 const rOf = id => D.routines.find(r=>r.id===id);
-function totalKg(w){ let s=0; (w.items||[]).forEach(it=>{ if(isMemo(it.ex)) return;
+/* 총 볼륨 — 유산소는 세지 않는다. 유산소의 kg 칸은 무게가 아니라 「경사」다 */
+function totalKg(w){ let s=0; (w.items||[]).forEach(it=>{
+  if(isMemo(it.ex) || (exOf(it.ex)||{}).cardio) return;
   (it.sets||[]).forEach(x=>{ s+=(x.kg||0)*(x.reps||0); }); }); return s; }
+
+/* 경사가 있는 기구인가 — 몇 도까지 올라가나 (0 이면 경사 칸을 안 띄운다).
+   런닝머신 20도 · 마이마운틴 50도 (2026-09-04 대표 확인).
+   자리는 세트의 kg 칸을 빌려 쓴다 — 표에 열을 새로 못 만들기 때문이다. */
+function 경사최대(ex){
+  const e = exOf(ex) || {};
+  if(!e.cardio) return 0;
+  if(/마이마운틴/.test(e.n)) return 50;
+  if(/트레드밀|런닝머신|러닝머신/.test(e.n)) return 20;
+  return 0;
+}
 function partTimes(w){ const m={}; (w.items||[]).forEach(it=>{ if(!(it.sec>0)) return; const p=exOf(it.ex).p; m[p]=(m[p]||0)+it.sec; }); return m; }
 const byDateDesc = (a,b)=> a.date<b.date?1 : a.date>b.date?-1 : (a.id<b.id?1:-1);
 function myWorkouts(){ return D.workouts.filter(w=>w.mid===S.mid && w.done).slice().sort(byDateDesc); }
@@ -2903,6 +2926,8 @@ function vWorkout(){
       ${e.cardio
         ? `<span class="n">${s.reps}</span><span class="u">분</span><span class="sl">/</span>
            <span class="n" style="margin-left:0">${s.spd||0}</span><span class="u">km/h</span>`
+          + (경사최대(cur.ex) ? `<span class="sl">/</span>
+           <span class="n" style="margin-left:0">${kgfmt(s.kg)}</span><span class="u">°</span>` : '')
         : `<span class="n">${kgfmt(s.kg)}</span><span class="u">kg</span><span class="sl">/</span>
            <span class="n" style="margin-left:0">${s.reps}</span><span class="u">회</span>`}
     </button>`).join('')}
@@ -3031,6 +3056,12 @@ function sheetEdit(i){
         <span class="vin"><input type="text" inputmode="decimal" data-k="setspd" data-i="${i}"
           value="${s.spd||0}"><small>km/h</small></span>
         <button data-act="d:spd:${i}:0.5" data-rep="1">＋</button></div>
+      ${경사최대(cur.ex) ? `
+      <div class="step"><span class="k">경사</span><button data-act="d:kg:${i}:-1" data-rep="1">−</button>
+        <span class="vin"><input type="text" inputmode="decimal" data-k="setkg" data-i="${i}"
+          value="${kgfmt(s.kg)}"><small>도</small></span>
+        <button data-act="d:kg:${i}:1" data-rep="1">＋</button></div>
+      <div class="unitlbl">이 기구는 경사가 <b>${경사최대(cur.ex)}도</b>까지 올라갑니다</div>` : ''}
       <div class="unitlbl">숫자를 눌러 직접 적을 수 있어요 — ＋ － 를 길게 누르면 빨리 바뀝니다</div>`
     :`<div class="step"><span class="k">무게</span>
         <button data-act="d:kg:${i}:-2.5" data-rep="1">−</button>
@@ -3313,6 +3344,8 @@ function sheetSetEdit(i, j){
           <input class="search" type="text" inputmode="decimal" data-k="se:reps" value="${esc(st.reps)}"></div>
         <div class="fld"><span class="fn">속도 km/h</span>
           <input class="search" type="text" inputmode="decimal" data-k="se:spd" value="${esc(st.spd==null?'':st.spd)}"></div>`
+        + (경사최대(it.ex) ? `<div class="fld"><span class="fn">경사 ° (최대 ${경사최대(it.ex)})</span>
+          <input class="search" type="text" inputmode="decimal" data-k="se:kg" value="${esc(st.kg||'')}"></div>` : '')
       : `<div class="fld"><span class="fn">무게 kg</span>
           <input class="search" type="text" inputmode="decimal" data-k="se:kg" value="${esc(st.kg)}"></div>
         <div class="fld"><span class="fn">횟수</span>
@@ -6133,7 +6166,8 @@ document.addEventListener('input', ev=>{
     const st=cur.sets[+ev.target.getAttribute('data-i')]; if(!st) return;
     const v=parseFloat((ev.target.value||'').replace(/[^0-9.]/g,''));
     if(!isNaN(v)){
-      if(k==='setkg') st.kg=Math.max(0, Math.round(v*10)/10);
+      if(k==='setkg'){ const 위 = 경사최대(cur.ex) || 9999;
+        st.kg = Math.min(위, Math.max(0, Math.round(v*10)/10)); }
       else if(k==='setspd') st.spd=Math.max(0, Math.round(v*10)/10);
       else st.reps=Math.max(1, Math.round(v));
       save(); render();               /* 뒤 화면만 새로 그린다 — 입력칸은 그대로 */
@@ -6828,7 +6862,9 @@ document.addEventListener('click', ev=>{
     case 'askleave': sheetLeave(); return;
     case 'edit': sheetEdit(+rest[0]); return;
     case 'd': { const [f,i,dv]=rest, s=w.items[w.cur].sets[+i];
-      if(f==='kg') s.kg=Math.max(0, Math.round((s.kg+(+dv))*10)/10);
+      /* 유산소면 kg 칸이 「경사」다 — 기구가 올라가는 만큼만 */
+      if(f==='kg'){ const 위 = 경사최대(w.items[w.cur].ex) || 9999;
+        s.kg = Math.min(위, Math.max(0, Math.round((s.kg+(+dv))*10)/10)); }
       else if(f==='spd') s.spd=Math.max(0, Math.round(((s.spd||0)+(+dv))*10)/10);
       else s.reps=Math.max(1, s.reps+(+dv));
       save();
@@ -6945,7 +6981,8 @@ document.addEventListener('click', ev=>{
     case 'rsetsave': {
       const [i,j] = rest.map(Number), it = S.recEdit.items[i], st = it.sets[j];
       const g = k => { const el=document.querySelector('[data-k="se:'+k+'"]'); return el? el.value.trim() : ''; };
-      if(exOf(it.ex).cardio){ st.reps = nnum(g('reps')); st.spd = g('spd')===''? undefined : nnum(g('spd')); }
+      if(exOf(it.ex).cardio){ st.reps = nnum(g('reps')); st.spd = g('spd')===''? undefined : nnum(g('spd'));
+        if(경사최대(it.ex)) st.kg = Math.min(경사최대(it.ex), nnum(g('kg'))); }
       else { st.kg = nnum(g('kg')); st.reps = nnum(g('reps')); }
       closeSheet(); toast('바꿨어요 · 아직 저장 전입니다'); render(); return; }
     case 'rsetdel': {
