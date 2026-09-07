@@ -898,6 +898,21 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .vdone .vd3{font-size:10.5px;font-weight:700;opacity:.66}
 .vsub{display:flex;align-items:center;gap:9px;flex:none;margin-top:-2px}
 .vsub .vh{font-size:10.5px;font-weight:600;color:#7d766e;line-height:1.45;flex:1;min-width:0}
+/* ── 되돌리기 ── 세트 완료 위, 속이 빈 작은 알약. 채워진 것과 확실히 갈린다 */
+.vright{display:flex;flex-direction:column;gap:7px;min-width:0}
+.vright .vdone{flex:1}
+.vundo2{flex:none;height:34px;display:flex;align-items:center;justify-content:center;gap:5px;
+  background:none;border:1.5px solid #5d5850;border-radius:999px;
+  font-size:12px;font-weight:700;color:var(--sub);white-space:nowrap;padding:0 6px}
+.vundo2 .ur{font-size:14px;font-weight:800;line-height:1}
+.vundo2:active{background:var(--dark-3);color:var(--cream)}
+.vundo2[disabled]{opacity:.28}
+#main.lite .vundo2{border-color:#ded2c0}
+/* 끝난 세트를 누르면 고칠 수 있다는 표시 */
+.setedit{flex:none;font-size:10.5px;font-weight:700;color:var(--gold-2);
+  border:1px solid #55482f;background:#33301f;border-radius:6px;padding:2px 7px;line-height:1.3}
+.set.done .setedit,.set.now .setedit{opacity:.9}
+#main.lite .setedit{background:#f6efe3;border-color:#e6ddcf;color:#8a6f3f}
 .vundo{flex:none;font-size:11.5px;font-weight:700;color:var(--sub);background:none;
   border:none;border-bottom:1px solid #55524a;padding:0 1px 1px;border-radius:0}
 .vundo[disabled]{opacity:.3}
@@ -1582,7 +1597,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '153';
+const BUILD = '155';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2583,7 +2598,10 @@ function EQS(){
                          [...있는].filter(x=>EQORDER.indexOf(x)<0));
 }
 function vPick(){
-  const w=live(), 담은=w?w.items.length:0;
+  const w=live();
+  const 추가중 = !!(w && w.begun);
+  const 처음 = 추가중 ? Math.min(S.addFrom||0, w.items.length) : 0;
+  const 담은 = w ? w.items.length - 처음 : 0;
   return { top: bar('종목 고르기','', (w&&w.begun)?'go:workout':'go:start'), body:`
     <div class="ptools">
       <input class="search" type="text" data-k="exq" placeholder="찾기 — 스쿼트 · 레그컬 · bp · 코어 · 맨몸">
@@ -2613,19 +2631,26 @@ function vPick(){
       찾는 게 없으면 위 「기타운동 추가」로 넣어 주세요.</div>`,
     foot: 담은
       ? `<button class="picked ${S.just?'bump':''}" data-act="askstart">
-           <span class="c">담은 종목 ${담은}개 ›</span>
-           <span class="l">${esc(w.items.map(it=>exName(it.ex,it.va)).join(' · '))}</span></button>
-         <button class="btn main" style="flex:1" data-act="askstart">운동 시작</button>`
+           <span class="c">${추가중?'추가한':'담은'} 종목 ${담은}개 ›</span>
+           <span class="l">${esc(w.items.slice(처음).map(it=>exName(it.ex,it.va)).join(' · '))}</span></button>
+         <button class="btn main" style="flex:1" data-act="askstart">${추가중?'추가하기':'운동 시작'}</button>`
       : `<button class="btn ghost" data-act="${(w&&w.begun)?'go:workout':'go:start'}">그만두기</button>` };
 }
 
 /* 담은 순서 확인 → 시작 */
 function sheetStart(){
   openSheet(()=>{ const w=live(); if(!w) return '<div class="h2">담은 종목이 없어요</div>';
-    return `<div class="h2">지금 순서대로 시작할까요?</div>
-    <p class="lbl plain" style="font-weight:500;color:var(--sub)">종목을 <b style="color:var(--teal)">길게 누르면</b> 순서를 바꿀 수 있어요</p>
-    ${w.items.map((it,i)=>{ const mv=(S.sordIdx===i);
-      return `<div class="card rowc ${mv?'teal':''}" style="padding:9px 9px 9px 13px" data-hold="sord:${i}">
+    /* 이미 하는 중이면 「추가」다 — 새로 담은 것만 보여 주고, 순서 바꾸기·전부 비우기는 감춘다 */
+    const 추가중 = !!w.begun;
+    const 처음 = 추가중 ? Math.min(S.addFrom||0, w.items.length) : 0;
+    const 보일것 = w.items.slice(처음);
+    if(추가중 && !보일것.length) return `<div class="h2">담은 종목이 없어요</div>
+      <button class="btn ghost sm" data-act="close">닫기</button>`;
+    return `<div class="h2">${추가중 ? '이 종목을 추가할까요?' : '지금 순서대로 시작할까요?'}</div>
+    ${추가중 ? '' : `<p class="lbl plain" style="font-weight:500;color:var(--sub)">종목을 <b style="color:var(--teal)">길게 누르면</b> 순서를 바꿀 수 있어요</p>`}
+    ${보일것.map((it,k)=>{ const i = 처음 + k; const mv=(S.sordIdx===i);
+      return `<div class="card rowc ${mv?'teal':''}" style="padding:9px 9px 9px 13px"
+        ${추가중?'':`data-hold="sord:${i}"`}>
         <div><div class="nm" style="font-size:14px">${i+1}. ${esc(exName(it.ex,it.va))}</div>
         <div class="sm">${esc(exOf(it.ex).p)}${isMemo(it.ex)?' · 메모':''}</div></div>
         ${mv?`<button class="ordbtn" data-act="sordmv:${i}:-1" ${i===0?'disabled':''}>▲</button>
@@ -2633,10 +2658,10 @@ function sheetStart(){
               <button class="chip t" data-act="sordend" style="flex:none;padding:6px 10px">놓기</button>`
             :`<button class="chip" data-act="spdel:${i}" style="flex:none;padding:6px 10px">빼기</button>`}
       </div>`; }).join('')}
-    <button class="btn main" data-act="startgo">시작하기</button>
+    <button class="btn main" data-act="startgo">${추가중 ? '추가하기' : '시작하기'}</button>
     <div style="display:flex;gap:9px">
       <button class="btn ghost" data-act="close">더 담기</button>
-      <button class="btn ghost" data-act="clearpick">전부 비우기</button></div>`; });
+      ${추가중 ? '' : `<button class="btn ghost" data-act="clearpick">전부 비우기</button>`}</div>`; });
 }
 function sheetMemoAdd(){
   openSheet(()=>`
@@ -3113,6 +3138,7 @@ function vWorkout(){
       : cur.sets.map((s,i)=> (!cur.locked && i===openIdx) ? '' :
         `<button class="set ${cur.locked?'lock':(s.done?'done':(i===openIdx?'now':''))}" data-act="edit:${i}">
       <span class="i">${i+1}${e.cardio?'구간':'세트'}</span>
+      ${cur.locked ? '' : '<span class="setedit">수정</span>'}
       ${e.cardio
         ? `<span class="n">${s.reps}</span><span class="u">분</span><span class="sl">/</span>
            <span class="n" style="margin-left:0">${s.spd||0}</span><span class="u">km/h</span>`
@@ -3241,16 +3267,21 @@ function 세로입력(cur, e, i){
     : [ 칸('무게','kg','setkg',kgfmt(s.kg),'kg',2.5),
         칸('횟수','reps','setreps',s.reps,'회',1) ];
   const 단위 = e.cardio ? '구간' : '세트';
+  /* 되돌리기는 「세트 완료」 바로 위에. 크기와 모양을 확 다르게 둔다 —
+     채워진 큰 덩어리 = 앞으로 가는 것, 속이 빈 작은 알약 = 되돌리는 것 (2026-09-07). */
   return `<div class="vstep ${칸들.length > 2 ? 'w3' : ''}">
       ${칸들.join('')}
-      <button class="vdone" data-act="rep">
-        <span class="vd1">✓</span>
-        <span class="vd2">${단위} 완료</span>
-        <span class="vd3">${i+1}${단위}째 · 다음</span></button>
+      <div class="vright">
+        <button class="vundo2" data-act="undo" ${cur.sets.length<2?'disabled':''}>
+          <span class="ur">↺</span>되돌리기</button>
+        <button class="vdone" data-act="rep">
+          <span class="vd1">✓</span>
+          <span class="vd2">이번 ${단위} 완료</span>
+          <span class="vd3">${i+1}${단위}째 · 다음</span></button>
+      </div>
     </div>
     <div class="vsub">
       <span class="vh">숫자를 눌러 직접 적어도 되고, ▲▼ 를 길게 눌러도 됩니다</span>
-      <button class="vundo" data-act="undo" ${cur.sets.length<2?'disabled':''}>되돌리기</button>
     </div>`;
 }
 
@@ -3524,6 +3555,8 @@ function vRecord(){
   return { top: bar(dateTxt(w.date), `<span class="sub">${ed?'수정 중':durTxt(w.dur)}</span>`, ed?'reccancel':back), body:
     `<div class="note">${w.kind?esc(w.kind):''}${w.rid&&rOf(w.rid)?` · 루틴 ${rOf(w.rid).no} ${esc(rOf(w.rid).n)}`:''}</div>`
     + (!ed && !canEdit ? '<div class="note">지난 날짜라 <b>고칠 수 없어요.</b></div>' : '')
+    + (ed?'':`<button class="btn sub sm" data-act="fendview:${w.id}"
+        style="margin-bottom:2px">운동 마친 화면 다시 보기</button>`)
     + items.map((it,i)=>`<div class="card">
         <div class="rowc" style="align-items:baseline">
           <div><div class="nm">${esc(exName(it.ex,it.va))}</div></div>
@@ -6986,7 +7019,10 @@ document.addEventListener('click', ev=>{
         /* 잠근 채로 앱을 껐다면 운동 화면으로 바로 되돌린다 */
         if(D.live && D.live.mid===rest[0] && D.live.lock) go('workout'); else go('home'); } return;
     case 'reset': reset(); toast('처음 상태로 되돌렸습니다'); return;
-    case 'go': { if(rest[0]==='workout' && !D.live) adoptLive(S.mid); go(rest[0]); return; }
+    case 'go': { if(rest[0]==='workout' && !D.live) adoptLive(S.mid);
+      /* 이미 하는 중에 종목을 담으러 가면 「여기서부터가 새로 담은 것」을 표시해 둔다 */
+      if(rest[0]==='pick'){ const lw = live(); S.addFrom = (lw && lw.begun) ? lw.items.length : null; }
+      go(rest[0]); return; }
     case 'dpick': S.day = rest[0]; render(); return;
     case 'dmove2': {
       const d = new Date((S.dietDay||TODAY)+'T00:00:00');
@@ -7053,6 +7089,7 @@ document.addEventListener('click', ev=>{
 
     case 'rt': S.rid=rest[0]; go('routine'); return;
     case 'rec': S.wid=rest[0]; go('record'); return;
+    case 'fendview': S.wid=rest[0]; go('summary'); return;
     case 'exd': S.vplay=null; S.editDesc=null; sheetExDesc(rest[0], rest[1], rest[2]); return;
     case 'editdesc': { const K=rest[0]+'|'+rest[1]; if(S.draft) delete S.draft['desc:'+K]; S.editDesc=K; drawSheet(); return; }
     case 'canceldesc': if(S.draft&&S.editDesc) delete S.draft['desc:'+S.editDesc]; S.editDesc=null; drawSheet(); return;
@@ -7266,7 +7303,9 @@ document.addEventListener('click', ev=>{
       live().items.push({ ex, va, rest:60, locked:false, sec:0, startAt: live().startAt ? Date.now() : null,
         sets:[ exOf(ex).cardio ? {kg:0, reps:last?last.reps:20, spd:(last&&last.spd)?last.spd:6.5, done:false}
                                : {kg:last?last.kg:20, reps:last?last.reps:10, done:false} ] });
-      live().cur=live().items.length-1; save();
+      /* 이미 하는 중이면 자리를 옮기지 않는다 — 담자마자 새 종목으로 튀면 하던 걸 놓친다 */
+      if(!live().begun) live().cur = live().items.length-1;
+      save();
       S.just = VID(ex,va); clearTimeout(S.justT);
       S.justT = setTimeout(()=>{ S.just=null; render(); }, 2600);
       toast(exName(ex,va)+' 담았어요');
@@ -7397,9 +7436,13 @@ document.addEventListener('click', ev=>{
       if(!w.items.length){ closeSheet(); render(); return; }
       drawSheet(); render(); return; }
     case 'startgo': { if(!w || !w.items.length) return;
-      w.begun=true; w.cur=0;
+      const 이미 = !!w.begun;
+      w.begun=true;
+      if(!이미) w.cur=0;            /* ⛔ 하던 중이면 자리를 옮기지 않는다 (1번으로 튀면 안 된다) */
       if(!w.startAt){ w.startAt=Date.now(); w.items.forEach(it=>{ if(!it.startAt) it.startAt=w.startAt; }); }
-      S.sordIdx=null; save(); closeSheet(); go('workout'); return; }
+      S.sordIdx=null; S.addFrom=null; save(); closeSheet();
+      if(이미) toast('추가했어요');
+      go('workout'); return; }
     case 'clearpick': { if(!w) return;
       w.items.forEach(it=>{ if(it._id) sv(sdel('workout_items','id=eq.'+it._id), '종목 빼기'); });
       w.items=[]; w.cur=0; save(); closeSheet(); toast('비웠어요'); render(); return; }
