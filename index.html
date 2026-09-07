@@ -1597,7 +1597,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '155';
+const BUILD = '156';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -4462,26 +4462,58 @@ function sheetOotd(){
   openSheet(()=>`
     <div class="h2">오운완 <small>이대로 올라갑니다</small></div>
     <img class="shot ootdimg" src="${S.ootd.url}" alt="">
-    <button class="btn main" data-act="ootdshare">이미지 저장 · 공유</button>
-    <button class="btn sub" data-act="ootdsave">내 프로필에 남기기</button>
+    <button class="btn main" data-act="ootddl">갤러리에 저장</button>
+    <div style="display:flex;gap:9px">
+      <button class="btn sub" data-act="ootdshare">공유하기</button>
+      <button class="btn sub" data-act="ootdsave">내 프로필에</button>
+    </div>
+    <div class="note">저장이 안 되면 <b>사진을 꾹 눌러</b> 「이미지 저장」을 고르셔도 됩니다.</div>
     <button class="btn ghost sm" data-act="ootdre:${S.ootd.wid}">다시 찍기</button>
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 
-/* 폰이면 공유 시트를, 안 되면 그냥 내려받기 */
-async function ootdShare(){
-  if(!S.ootd) return;
-  const blob = await (await fetch(S.ootd.url)).blob();
-  const 이름 = '글래드짐_오운완_' + (S.ootd.wid||'') + '.jpg';
-  const file = new File([blob], 이름, { type:'image/jpeg' });
-  if(navigator.canShare && navigator.canShare({ files:[file] })){
-    try{ await navigator.share({ files:[file] }); return; }catch(e){ if(e.name==='AbortError') return; }
-  }
+/* ── 오운완 사진 내보내기 ── 「저장」과 「공유」를 갈라 놓았다 (2026-09-07).
+   웹은 사진첩에 곧바로 못 넣는다. 그래서 두 길뿐이다 :
+     · 안드로이드 — 내려받기. 다운로드 폴더에 들어가고 갤러리가 잡아 준다
+     · 아이폰    — 내려받기로는 사진 앱에 안 들어간다. 공유 시트의 「이미지 저장」이 유일하다  */
+const 아이폰 = () => /iPad|iPhone|iPod/.test(navigator.userAgent)
+  || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+function ootd파일(blob, wid){
+  return new File([blob], '글래드짐_오운완_' + (wid||'') + '.jpg', { type:'image/jpeg' });
+}
+function 내려받기(blob, 이름){
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob); a.download = 이름;
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
-  toast('사진첩에 저장했어요');
+}
+
+/* 갤러리에 저장 */
+async function ootdDL(url, wid){
+  try{
+    const blob = await (await fetch(url)).blob();
+    const file = ootd파일(blob, wid);
+    if(아이폰() && navigator.canShare && navigator.canShare({ files:[file] })){
+      toast('「이미지 저장」을 골라 주세요');
+      try{ await navigator.share({ files:[file] }); return; }
+      catch(e){ if(e.name==='AbortError') return; }
+    }
+    내려받기(blob, file.name);
+    toast('갤러리에 저장했어요');
+  }catch(e){ console.error(e); toast('사진을 꾹 눌러 저장해 주세요'); }
+}
+
+/* 공유 — 공유 시트만. 안 되는 기기면 내려받기로 */
+async function ootdShare(){
+  if(!S.ootd) return;
+  const blob = await (await fetch(S.ootd.url)).blob();
+  const file = ootd파일(blob, S.ootd.wid);
+  if(navigator.canShare && navigator.canShare({ files:[file] })){
+    try{ await navigator.share({ files:[file] }); return; }catch(e){ if(e.name==='AbortError') return; }
+  }
+  내려받기(blob, file.name);
+  toast('공유를 못 열어 내려받았어요');
 }
 
 async function ootdSave(){
@@ -4864,6 +4896,7 @@ function sheetOotdView(id){
   openSheet(()=>`
     <div class="h2">${esc(dateTxt(x.date))} <small>오운완</small></div>
     <img class="shot ootdimg" src="${esc(phURL(x.path))}" alt="" onerror="picFail(this)">
+    <button class="btn main sm" data-act="ootddl2:${x.id}">갤러리에 저장</button>
     ${w?`<button class="btn sub sm" data-act="orec:${w.id}">그날 기록 보기</button>`:''}
     ${S.who==='tr'?'':`<button class="btn ghost sm" data-act="ootddel:${x.id}" style="color:var(--warn)">이 사진 지우기</button>`}
     <button class="btn ghost sm" data-act="close">닫기</button>`);
@@ -7487,6 +7520,9 @@ document.addEventListener('click', ev=>{
       closeSheet(); toast('저장했어요'); render(); return; }
     case 'ootdre': closeSheet(); ootdPick(rest[0]); return;
     case 'ootdshare': ootdShare(); return;
+    case 'ootddl': if(S.ootd) ootdDL(S.ootd.url, S.ootd.wid); return;
+    case 'ootddl2': { const x=(D.bph||[]).find(y=>y.id===rest[0]); if(!x) return;
+      ootdDL(phURL(x.path), x.memo); return; }
     case 'ootdsave': ootdSave(); return;
     case 'timego': { const w=live(); if(!w) return;
       w.startAt = Date.now();
