@@ -1597,7 +1597,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '156';
+const BUILD = '157';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -4479,9 +4479,13 @@ function sheetOotd(){
 const 아이폰 = () => /iPad|iPhone|iPod/.test(navigator.userAgent)
   || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
-function ootd파일(blob, wid){
-  return new File([blob], '글래드짐_오운완_' + (wid||'') + '.jpg', { type:'image/jpeg' });
+/* 파일 이름은 날짜로 — 기록 id 는 회원에게 뜻이 없다 (2026-09-07) */
+function ootd파일(blob, 날짜){
+  const d = (날짜 || TODAY).slice(0,10);
+  return new File([blob], '글래드짐_오운완_' + d + '.jpg', { type:'image/jpeg' });
 }
+/* 그 기록이 언제 것인가 */
+const ootd날 = wid => ((D.workouts||[]).find(z=>z.id===wid)||{}).date || TODAY;
 function 내려받기(blob, 이름){
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob); a.download = 이름;
@@ -4490,10 +4494,10 @@ function 내려받기(blob, 이름){
 }
 
 /* 갤러리에 저장 */
-async function ootdDL(url, wid){
+async function ootdDL(url, 날짜){
   try{
     const blob = await (await fetch(url)).blob();
-    const file = ootd파일(blob, wid);
+    const file = ootd파일(blob, 날짜);
     if(아이폰() && navigator.canShare && navigator.canShare({ files:[file] })){
       toast('「이미지 저장」을 골라 주세요');
       try{ await navigator.share({ files:[file] }); return; }
@@ -4508,7 +4512,7 @@ async function ootdDL(url, wid){
 async function ootdShare(){
   if(!S.ootd) return;
   const blob = await (await fetch(S.ootd.url)).blob();
-  const file = ootd파일(blob, S.ootd.wid);
+  const file = ootd파일(blob, ootd날(S.ootd.wid));
   if(navigator.canShare && navigator.canShare({ files:[file] })){
     try{ await navigator.share({ files:[file] }); return; }catch(e){ if(e.name==='AbortError') return; }
   }
@@ -7520,9 +7524,9 @@ document.addEventListener('click', ev=>{
       closeSheet(); toast('저장했어요'); render(); return; }
     case 'ootdre': closeSheet(); ootdPick(rest[0]); return;
     case 'ootdshare': ootdShare(); return;
-    case 'ootddl': if(S.ootd) ootdDL(S.ootd.url, S.ootd.wid); return;
+    case 'ootddl': if(S.ootd) ootdDL(S.ootd.url, ootd날(S.ootd.wid)); return;
     case 'ootddl2': { const x=(D.bph||[]).find(y=>y.id===rest[0]); if(!x) return;
-      ootdDL(phURL(x.path), x.memo); return; }
+      ootdDL(phURL(x.path), x.date); return; }
     case 'ootdsave': ootdSave(); return;
     case 'timego': { const w=live(); if(!w) return;
       w.startAt = Date.now();
