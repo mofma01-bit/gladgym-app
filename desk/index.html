@@ -449,7 +449,39 @@ textarea.inp{min-height:76px;resize:vertical;line-height:1.6}
 .tx-slash button:hover,.tx-slash button.on{background:var(--dark-3);color:var(--gold)}
 .tx-slash button i{font-style:normal;width:20px;text-align:center;font-size:14px;flex:none}
 .tx-slash button small{margin-left:auto;color:#5f5a54;font-weight:500;font-size:10.5px}
+.tx-slash .q{font-size:11px;color:#7c766e;padding:4px 9px 6px;border-bottom:1px solid var(--line);margin-bottom:4px}
+.tx-slash .q b{color:var(--gold)}
+.tx-slash .no{padding:14px 10px;text-align:center;color:#6f6a63;font-size:12px}
+.tx-tg{display:flex;gap:6px;align-items:flex-start}
+.tx-tg>button{flex:none;width:18px;height:26px;color:var(--sub);font-size:11px;display:flex;
+  align-items:center;justify-content:center;transition:transform .12s}
+.tx-tg>button:hover{color:var(--gold)}
+.tx-b[data-t=tog].open .tx-tg>button{transform:rotate(90deg)}
+.tx-b[data-t=tog] .tx-tg .tx-x{font-weight:700}
+.tx-kids{margin:2px 0 4px 22px;padding-left:10px;border-left:1px solid var(--line);display:none}
+.tx-b[data-t=tog].open>.tx-in>.tx-kids{display:block}
+.tx-kids .tx-hand{width:24px}
+.tx-kids .tx-plus{padding-left:26px}
 .tx-drop{outline:2px dashed var(--gold-2);outline-offset:3px;border-radius:10px}
+.pop.tx-side{background:rgba(8,8,7,.45);justify-content:flex-end;padding:0;align-items:stretch}
+.pop.tx-side .popbox{width:min(760px,100vw);max-width:100vw;max-height:100vh;height:100vh;
+  border-radius:18px 0 0 18px;border-right:0;padding:0;gap:0;
+  animation:txslide .18s ease-out}
+@keyframes txslide{from{transform:translateX(40px);opacity:.4}to{transform:none;opacity:1}}
+.pop.tx-side.tx-wide .popbox{width:100vw;border-radius:0}
+.tx-head{display:flex;align-items:center;gap:6px;padding:10px 14px 10px 18px;flex:none;
+  border-bottom:1px solid var(--line);background:var(--dark-2);position:sticky;top:0;z-index:5}
+.tx-head .who2{flex:1;min-width:0;font-size:12px;color:var(--sub);overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap}
+.tx-hb{width:32px;height:32px;border-radius:9px;color:var(--sub);display:flex;align-items:center;
+  justify-content:center;font-size:15px;flex:none}
+.tx-hb:hover{background:var(--dark-3);color:var(--cream)}
+.tx-scroll{flex:1;overflow:auto;padding:20px 26px 26px;display:flex;flex-direction:column;gap:11px}
+.pop.tx-side .tx-fbtns{flex:none;border-top:1px solid var(--line);padding:11px 18px;margin:0;
+  background:var(--dark-2);position:sticky;bottom:0}
+.pop.tx-side .tx-page .tx-ttl{font-size:26px;letter-spacing:-.03em}
+.pop.tx-side.tx-wide .tx-scroll{padding:26px max(26px,calc((100vw - 900px)/2)) 40px}
+@media (max-width:720px){ .pop.tx-side .popbox{width:100vw;border-radius:0} .tx-scroll{padding:16px 14px 22px} }
 .tx-cmts{display:flex;flex-direction:column;gap:8px}
 .tx-cmt{display:flex;gap:9px;align-items:flex-start}
 .tx-cmt .b{flex:1;min-width:0;background:var(--dark-3);border-radius:0 11px 11px 11px;padding:8px 11px;font-size:13px;line-height:1.55;white-space:pre-wrap;word-break:break-word}
@@ -631,7 +663,7 @@ textarea.inp{min-height:76px;resize:vertical;line-height:1.6}
 
 <script>
 "use strict";
-const BUILD = '27';
+const BUILD = '31';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -2162,7 +2194,8 @@ async function txView(key, id){
   const 긴열0 = T.열.filter(c => c.타입==='long' && !(c.관리자만 && !관리자()));
   const 본문키 = (긴열0[0]||{}).k;
   const bs = 본문키 ? 블록읽기(r[본문키]) : [];
-  const paths = bs.filter(b=>b.path).map(b=>b.path).concat((r.files||[]).map(f=>f.path));
+  const 길모으기 = arr => arr.reduce((a,b) => a.concat(b.path?[b.path]:[], b.c?길모으기(b.c):[]), []);
+  const paths = 길모으기(bs).concat((r.files||[]).map(f=>f.path));
   const got = paths.length ? await 서명주소들(paths) : [];
   const urlmap = {}; paths.forEach((pp,ii) => urlmap[pp] = got[ii]);
   const urls = (r.files||[]).map(f => urlmap[f.path]);
@@ -2174,7 +2207,8 @@ async function txView(key, id){
       || (Array.isArray(r[T.사람열]) ? 내것(r[T.사람열]) : r[T.사람열]===(ME&&ME.id)));
   const 긴열 = T.열.filter(c => c.타입==='long' && !(c.관리자만 && !관리자()));
   BL = 본문키 ? { key, id, f:본문키, bs, urls:urlmap } : null;
-  popOpen('<div class="tx-page">'
+  판열기(T.제목 + ' · ' + esc(x.제목),
+    '<div class="tx-page">'
     + '<div class="tx-ttl '+(done?'done':'')+'">'+esc(x.제목)+'</div>'
     + '<div class="tx-chips">'+x.칩+(x.오른쪽||'')+(r.vis && r.vis!=='all' ? '<span class="tx-vis">🔒 '+VIS[r.vis]+'</span>' : '')+'</div>'
     + (본문키 ? '<div class="tx-sec" id="txbwrap">'+블록들(bs, 편집, urlmap)+'</div>' : '')
@@ -2182,11 +2216,12 @@ async function txView(key, id){
     + ((r.files||[]).length ? '<div class="tx-sec"><div class="lbl">예전 첨부 <span style="font-weight:500;color:#7c766e">🔒 이 글을 볼 수 있는 사람만 엽니다</span></div>'+첨부칸(key, r, 편집, urls)+'</div>' : '')
     + '<div class="tx-sec"><div class="lbl">댓글 '+(댓글수(key,id)||'')+'</div>'+댓글칸(key, id)+'</div>'
     + '<div class="tx-meta">만든 사람 '+esc(사람(r.created_by).name)+' · '+시각한글(r.created_at)+(r.updated_at&&r.updated_at!==r.created_at?' · 고침 '+시각한글(r.updated_at):'')+'</div>'
-    + '</div><div class="tx-fbtns">'
-    + (편집 ? '<button class="btn gold" data-act="tx:edit">고치기</button>' : '')
-    + (편집 && x.체크 ? '<button class="btn sub" data-act="tx:toggle" data-k="'+key+'" data-id="'+id+'" data-f="'+x.체크+'" data-stay="1">'+(done?'완료 취소':'완료')+'</button>' : '')
-    + '<button class="btn ghost" data-act="popclose">닫기</button></div>');
-  if(BL) BL.bs.forEach((b,i) => { const el = document.querySelector('#txblocks .tx-x[data-bi="'+i+'"]'); if(el) el.innerText = b.x||''; });
+    + '</div>',
+    '<div class="tx-fbtns"><span class="tx-stat" id="txstat">'+(편집?'고치면 바로 저장돼요':'보기만 할 수 있어요')+'</span>'
+    + (편집 ? '<button class="btn sub" data-act="tx:edit">속성 고치기</button>' : '')
+    + (편집 && x.체크 ? '<button class="btn gold" data-act="tx:toggle" data-k="'+key+'" data-id="'+id+'" data-f="'+x.체크+'" data-stay="1">'+(done?'완료 취소':'완료')+'</button>' : '')
+    + '</div>');
+  if(BL) document.querySelectorAll('#txblocks .tx-x[data-bi]').forEach(el => { const b = 블록가져(el.dataset.bi); if(b) el.innerText = b.x||''; });
 }
 /* 첨부 올리기 — 회원 앱과 같은 media 저장소. 사진은 1280px로 줄여서 */
 async function txUpload(key, id, list){
@@ -2262,17 +2297,18 @@ async function txTick(el){
    옛 본문(그냥 글자)은 열 때 문단 블록으로 바꿔 준다 — 잃는 것 없다.
    ══════════════════════════════════════════════════════════════ */
 const 블록종류 = [
-  {t:'p',    i:'¶',  n:'글'},
-  {t:'h1',   i:'H1', n:'제목'},
-  {t:'h2',   i:'H2', n:'소제목'},
-  {t:'ul',   i:'•',  n:'글머리 목록'},
-  {t:'ol',   i:'1.', n:'번호 목록'},
-  {t:'todo', i:'☑',  n:'체크 목록'},
-  {t:'call', i:'📌', n:'강조 상자'},
-  {t:'hr',   i:'—',  n:'구분선'},
-  {t:'img',  i:'🖼', n:'사진', 파일:'image/*'},
-  {t:'vid',  i:'🎬', n:'영상', 파일:'video/*'},
-  {t:'file', i:'📎', n:'파일', 파일:'.pdf,.hwp,.hwpx,.xlsx,.docx,.pptx,.txt,.zip'},
+  {t:'p',    i:'¶',  n:'글', 별칭:'문단 텍스트 text 본문'},
+  {t:'h1',   i:'H1', n:'제목', 별칭:'헤딩 heading 큰제목 h1'},
+  {t:'h2',   i:'H2', n:'소제목', 별칭:'헤딩 heading 작은제목 h2 중제목'},
+  {t:'ul',   i:'•',  n:'글머리 목록', 별칭:'리스트 list bullet 점'},
+  {t:'ol',   i:'1.', n:'번호 목록', 별칭:'리스트 list number 숫자 순서'},
+  {t:'todo', i:'☑',  n:'체크 목록', 별칭:'todo 할일 체크박스 checkbox'},
+  {t:'call', i:'📌', n:'강조 상자', 별칭:'콜아웃 callout 노란 강조'},
+  {t:'tog',  i:'▸',  n:'토글 (접기)', 별칭:'toggle 접기 펼치기 아코디언'},
+  {t:'hr',   i:'—',  n:'구분선', 별칭:'divider 선 구분'},
+  {t:'img',  i:'🖼', n:'사진', 별칭:'이미지 image photo 그림', 파일:'image/*'},
+  {t:'vid',  i:'🎬', n:'영상', 별칭:'비디오 video 동영상 movie', 파일:'video/*'},
+  {t:'file', i:'📎', n:'파일', 별칭:'file 첨부 문서 pdf 한글 엑셀', 파일:'.pdf,.hwp,.hwpx,.xlsx,.docx,.pptx,.txt,.zip'},
 ];
 const 새블록 = (t, x) => Object.assign({ id: 'b'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), t: t||'p', x: x||'' });
 
@@ -2294,16 +2330,37 @@ function 블록읽기(v){
   }).filter((b,i,a) => !(b.t==='p' && !b.x && i===a.length-1 && a.length>1)) || [새블록('p')];
 }
 const 블록쓰기 = bs => JSON.stringify({ v:1, b:bs });
+/* 토글 안에도 블록이 들어간다 — 자리는 "3" 또는 "3.1" 처럼 점으로 잇는다 */
+function 블록가져(path){
+  const ps = String(path).split('.'); let arr = BL.bs, b = null;
+  for(const q of ps){ b = arr[+q]; if(!b) return null; arr = b.c || []; }
+  return b;
+}
+function 자리찾기(path){
+  const ps = String(path).split('.'); let arr = BL.bs;
+  for(let i=0;i<ps.length-1;i++){ const b = arr[+ps[i]]; if(!b) return null; arr = b.c || (b.c = []); }
+  return { arr, i: +ps[ps.length-1] };
+}
 /* 목록·홈에 보여 줄 한 줄 요약 */
 function 블록요약(v){
-  return 블록읽기(v).map(b => b.t==='img' ? '[사진]' : b.t==='vid' ? '[영상]' : b.t==='file' ? '[파일]'
-    : b.t==='hr' ? '' : b.x).filter(Boolean).join(' ').slice(0,120);
+  const 걷기 = bs => bs.map(b => (b.t==='img' ? '[사진]' : b.t==='vid' ? '[영상]' : b.t==='file' ? '[파일]'
+    : b.t==='hr' ? '' : b.x) + (b.c && b.c.length ? ' ' + 걷기(b.c) : '')).filter(Boolean).join(' ');
+  return 걷기(블록읽기(v)).slice(0,120);
 }
 const 링크살리기 = t => esc(t).replace(/(https?:\/\/[^\s<]+)/g,
   u => '<a href="'+u+'" target="_blank" rel="noopener">'+u+'</a>');
 
 /* 한 블록 그리기. 편집이면 직접 고칠 수 있는 칸으로 */
 function 블록칸(b, i, 편집, urls, 번호){
+  if(b.t === 'tog'){
+    return '<div class="tx-b '+(b.open?'open':'')+'" data-t="tog" data-i="'+i+'">'
+      + (편집 ? '<span class="tx-hand"><button data-act="tx:bup" data-i="'+i+'" title="위로">↑</button>'
+          + '<button data-act="tx:bmenu" data-i="'+i+'" title="블록 바꾸기·지우기">⋮</button></span>' : '<span class="tx-hand"></span>')
+      + '<div class="tx-in"><div class="tx-tg"><button data-act="tx:btog" data-i="'+i+'" title="펼치기">▶</button>'
+      + (편집 ? '<div class="tx-x" contenteditable="true" data-ph="접어 둘 제목" data-bi="'+i+'" spellcheck="false"></div>'
+              : '<div class="tx-x">'+링크살리기(b.x||'')+'</div>')
+      + '</div><div class="tx-kids">' + 블록들(b.c && b.c.length ? b.c : [새블록('p')], 편집, urls, i) + '</div></div></div>';
+  }
   const ph = b.t==='h1' ? '제목' : b.t==='h2' ? '소제목' : b.t==='call' ? '강조할 내용'
     : i===0 ? "내용을 적거나  /  를 눌러 블록을 넣으세요" : '';
   const 글 = 편집
@@ -2328,16 +2385,18 @@ function 블록칸(b, i, 편집, urls, 번호){
         + '<button data-act="tx:bmenu" data-i="'+i+'" title="블록 바꾸기·지우기">⋮</button></span>' : '<span class="tx-hand"></span>')
     + '<div class="tx-in">'+속+'</div></div>';
 }
-function 블록들(bs, 편집, urls){
+function 블록들(bs, 편집, urls, 접두){
   let no = 0;
-  return '<div class="tx-blocks" id="txblocks">'
-    + bs.map((b,i) => { no = b.t==='ol' ? no+1 : 0; return 블록칸(b, i, 편집, urls, no); }).join('')
+  const 길 = i => 접두 != null ? 접두 + '.' + i : String(i);
+  return '<div class="tx-blocks"'+(접두==null?' id="txblocks"':'')+'>'
+    + bs.map((b,i) => { no = b.t==='ol' ? no+1 : 0; return 블록칸(b, 길(i), 편집, urls, no); }).join('')
     + '</div>'
-    + (편집 ? '<div class="tx-plus"><button data-act="tx:badd" data-t="p">＋ 블록</button>'
-        + '<button data-act="tx:bpick" data-t="img">🖼 사진</button>'
+    + (편집 ? '<div class="tx-plus"><button data-act="tx:badd" data-t="p" data-i="'+길(bs.length-1)+'">＋ 블록</button>'
+        + (접두==null ? '<button data-act="tx:bpick" data-t="img">🖼 사진</button>'
         + '<button data-act="tx:bpick" data-t="vid">🎬 영상</button>'
         + '<button data-act="tx:bpick" data-t="file">📎 파일</button>'
-        + '<span style="align-self:center;color:#5f5a54;font-size:11.5px">붙여넣기·끌어놓기도 됩니다</span></div>' : '');
+        + '<span style="align-self:center;color:#5f5a54;font-size:11.5px">'
+        + '<b style="color:#7c766e">/</b> 를 치면 블록 메뉴 · 붙여넣기·끌어놓기도 됩니다</span>' : '') + '</div>' : '');
 }
 
 /* ── 편집 상태 ── 지금 열린 페이지의 블록들 */
@@ -2345,7 +2404,7 @@ let BL = null;   /* {key, id, f, bs, urls} */
 function 글자넣기(){                        /* 화면의 글을 블록에 담는다 */
   if(!BL) return;
   document.querySelectorAll('#txblocks .tx-x[data-bi]').forEach(el => {
-    const b = BL.bs[+el.dataset.bi]; if(b) b.x = el.innerText.replace(/\u00a0/g,' ').replace(/\n$/,'');
+    const b = 블록가져(el.dataset.bi); if(b) b.x = el.innerText.replace(/\u00a0/g,' ').replace(/\n$/,'');
   });
 }
 async function 블록저장(){
@@ -2372,7 +2431,7 @@ function 블록다시(포커스, 끝으로){
   글자넣기();
   const box = $('#txbwrap'); if(!box || !BL) return;
   box.innerHTML = 블록들(BL.bs, true, BL.urls);
-  BL.bs.forEach((b,i) => { const el = box.querySelector('.tx-x[data-bi="'+i+'"]'); if(el) el.innerText = b.x||''; });
+  box.querySelectorAll('.tx-x[data-bi]').forEach(el => { const b = 블록가져(el.dataset.bi); if(b) el.innerText = b.x||''; });
   if(포커스 != null){
     const el = box.querySelector('.tx-x[data-bi="'+포커스+'"]');
     if(el){ el.focus();
@@ -2385,7 +2444,12 @@ function 블록다시(포커스, 끝으로){
 async function 블록파일(i, list, t){
   if(!BL || !list || !list.length) return;
   const T = 표정의[BL.key];
-  let 자리 = i;
+  let z = 자리찾기(i==null ? String(BL.bs.length-1) : String(i));
+  if(!z) z = { arr: BL.bs, i: BL.bs.length-1 };
+  let 자리 = z.i;
+  /* 빈 문단 자리에 넣는 거면 그 줄을 대신한다 */
+  const 있던 = z.arr[z.i];
+  if(있던 && 있던.t==='p' && !있던.x && z.arr.length>1){ z.arr.splice(z.i,1); 자리 = z.i-1; }
   for(const f of Array.from(list)){
     const kind = /^image\//.test(f.type) ? 'img' : /^video\//.test(f.type) ? 'vid' : 'file';
     if(f.size > 300*1024*1024){ toast(f.name+' — 300MB를 넘어 못 올려요'); continue; }
@@ -2404,7 +2468,7 @@ async function 블록파일(i, list, t){
         headers:{ apikey:SB_KEY, Authorization:'Bearer '+tk, 'Content-Type':type }, body: blob });
       if(!res.ok) throw new Error((await res.text()).slice(0,80));
       const b = 새블록(kind); b.path = path; b.name = name; b.type = type; b.size = blob.size;
-      BL.bs.splice(++자리, 0, b);
+      z.arr.splice(++자리, 0, b);
       const u = await 서명주소들([path]); BL.urls[path] = u[0];
       블록다시();
     }catch(e){ toast(name+' 못 올렸어요 — '+e.message); }
@@ -2412,17 +2476,34 @@ async function 블록파일(i, list, t){
   await 블록저장();
   블록다시();
 }
-/* / 메뉴 */
-function 슬래시열기(i, x, y){
+/* ── / 메뉴 ── 「/제목」처럼 뒤에 글자를 치면 걸러진다 (2026-09-08 대표 지적) */
+let SL = null;   /* {path, 앞, 골라} */
+function 슬래시맞나(k, q){
+  if(!q) return true;
+  const s2 = (k.n + ' ' + (k.별칭||'') + ' ' + k.t).toLowerCase();
+  return q.toLowerCase().split(/\s+/).filter(Boolean).every(w => s2.indexOf(w) >= 0);
+}
+function 슬래시그리기(){
+  const d = $('#txslash'); if(!d || !SL) return;
+  const 것 = 블록종류.filter(k => 슬래시맞나(k, SL.q));
+  if(SL.골라 >= 것.length) SL.골라 = 0;
+  d.innerHTML = (SL.q ? '<div class="q">/<b>'+esc(SL.q)+'</b> 로 찾는 중</div>' : '')
+    + (것.length ? 것.map((k,i) => '<button class="'+(i===SL.골라?'on':'')+'" data-act="tx:bset" data-i="'+SL.path+'" data-t="'+k.t+'">'
+        + '<i>'+k.i+'</i>'+k.n+'</button>').join('')
+      : '<div class="no">그런 블록은 없어요</div>');
+  const on = d.querySelector('button.on'); if(on) on.scrollIntoView({ block:'nearest' });
+}
+function 슬래시열기(path, x, y, 앞){
   블록메뉴닫기();
+  SL = { path, 앞: 앞 || '', q: '', 골라: 0 };
   const d = document.createElement('div'); d.className = 'tx-slash'; d.id = 'txslash';
-  d.innerHTML = 블록종류.map(k => '<button data-act="tx:bset" data-i="'+i+'" data-t="'+k.t+'"><i>'+k.i+'</i>'+k.n+'</button>').join('');
   document.body.appendChild(d);
-  const w = 230, h = Math.min(300, d.scrollHeight);
+  슬래시그리기();
+  const w = 230, h = Math.min(300, d.scrollHeight || 300);
   d.style.left = Math.min(x, innerWidth - w - 12) + 'px';
   d.style.top  = (y + h > innerHeight - 12 ? Math.max(12, y - h - 24) : y) + 'px';
 }
-function 블록메뉴닫기(){ const d = $('#txslash'); if(d) d.remove(); }
+function 블록메뉴닫기(){ const d = $('#txslash'); if(d) d.remove(); SL = null; }
 
 /* 행 시트 (만들기 · 고치기) */
 let 시트 = null;   /* {key, id, 값} */
@@ -2467,13 +2548,14 @@ function txSheet(key, id, 초기){
     + (값.vis==='picked' ? '<div class="tx-pchips" style="margin-top:8px">'+W.staff.map(p=>'<button type="button" class="tx-pchip '+((값.viewers||[]).indexOf(p.id)>=0?'on':'')+'" data-act="tx:multi" data-f="viewers" data-v2="'+p.id+'">'+아바타(p.id)+esc(p.name)+'</button>').join('')+'</div>' : '')
     + '</div>';
   const 메타 = r ? '<div class="tx-meta">만든 사람 '+esc(사람(r.created_by).name)+' · '+시각한글(r.created_at)+(r.updated_at&&r.updated_at!==r.created_at?' · 고침 '+시각한글(r.updated_at):'')+'</div>' : '';
-  popOpen('<h2>'+(id?T.제목+' 고치기':'새 '+T.제목)+(잠김?' <span class="tx-tag warn">잠김 · 관리자만</span>':'')+'</h2>'
-    + '<div class="tx-form" id="txform">' + T.열.map(칸).join('') + 공개
+  판열기((id?T.제목+' 속성':'새 '+T.제목)+(잠김?' <span class="tx-tag warn">잠김 · 관리자만</span>':''),
+    '<div class="tx-form" id="txform">' + T.열.map(칸).join('') + 공개
     + (id && 편집 ? '<div class="fld"><span class="fn">첨부</span>'+첨부칸(key, r||{files:[]}, true, (r&&r.files||[]).map(f=>(서명캐시[f.path]||{}).url||''))+'</div>' : '')
-    + 메타 + '</div>'
-    + '<div class="tx-fbtns"><span class="tx-stat" id="txstat">'+(편집 ? (id ? '고치면 바로 저장돼요' : '') : '보기만 할 수 있어요')+'</span>'
+    + 메타 + '</div>',
+    '<div class="tx-fbtns"><span class="tx-stat" id="txstat">'+(편집 ? (id ? '고치면 바로 저장돼요' : '') : '보기만 할 수 있어요')+'</span>'
+    + (편집 && id ? '<button class="btn sub" data-act="tx:back">‹ 페이지로</button>' : '')
     + (편집 && id ? '<button class="btn ghost del" data-act="tx:del">페이지 삭제</button>' : '')
-    + '<button class="btn ghost" data-act="popclose">닫기</button></div>');
+    + '</div>');
 }
 /* ── 자동 저장 ── 노션처럼 저장 버튼이 없다. 글자를 치면 0.9초 뒤, 칩·날짜·체크는 바로 */
 let 저장타이머 = null;
@@ -2598,6 +2680,9 @@ async function txAct(a, el){
     return; }
   if(a==='open'){ txView(k, id); return; }
   if(a==='edit'){ txSheet(시트.key, 시트.id); return; }
+  if(a==='back'){ txView(시트.key, 시트.id); return; }
+  if(a==='wide'){ 넓게 = !넓게; $('#pop').classList.toggle('tx-wide', 넓게);
+    const b = document.querySelector('[data-act="tx:wide"]'); if(b) b.textContent = 넓게?'⤡':'⤢'; return; }
   if(a==='toggle'){ await txToggle(k, id, el.dataset.f); if(el.dataset.stay) txView(k, id); return; }
   if(a==='upload'){ const f = $('#txfile'); if(f) f.click(); return; }
   if(a==='fdel'){ await txFileDel(시트.key, 시트.id, +el.dataset.i); return; }
@@ -2605,16 +2690,23 @@ async function txAct(a, el){
   if(a==='cmdel'){ await txCmDel(id); return; }
   if(a==='tick'){ await txTick(el); return; }
   /* ── 블록 ── */
-  if(a==='badd'){ 글자넣기(); BL.bs.push(새블록('p')); 블록다시(BL.bs.length-1); return; }
+  if(a==='badd'){ 글자넣기();
+    const at = el.dataset.i;
+    if(at != null && at !== ''){ const z = 자리찾기(at); z.arr.splice(z.i+1, 0, 새블록('p')); 블록다시(at.replace(/\d+$/, z.i+1)); }
+    else { BL.bs.push(새블록('p')); 블록다시(String(BL.bs.length-1)); }
+    return; }
+  if(a==='btog'){ 글자넣기(); const b = 블록가져(el.dataset.i); if(!b) return;
+    b.open = !b.open; if(b.open && !(b.c||[]).length) b.c = [새블록('p')];
+    블록다시(); 블록자동저장(true); return; }
   if(a==='bpick'){ const t = el.dataset.t; const inp = $('#txbfile');
     inp.accept = (블록종류.find(k=>k.t===t)||{}).파일 || '*/*'; inp.dataset.at = BL.bs.length-1; inp.click(); return; }
-  if(a==='bck'){ 글자넣기(); const b = BL.bs[+el.dataset.i]; b.done = !b.done; 블록다시(); 블록자동저장(true); return; }
-  if(a==='bemo'){ const b = BL.bs[+el.dataset.i];
+  if(a==='bck'){ 글자넣기(); const b = 블록가져(el.dataset.i); if(!b) return; b.done = !b.done; 블록다시(); 블록자동저장(true); return; }
+  if(a==='bemo'){ const b = 블록가져(el.dataset.i); if(!b) return;
     const e2 = prompt('이 상자 앞에 둘 그림글자 (이모지)', b.emo || '📌'); if(e2==null) return;
     글자넣기(); b.emo = e2.slice(0,4) || '📌'; 블록다시(); 블록자동저장(true); return; }
-  if(a==='bup'){ 글자넣기(); const i = +el.dataset.i; if(i<1) return;
-    const t2 = BL.bs[i]; BL.bs[i] = BL.bs[i-1]; BL.bs[i-1] = t2; 블록다시(); 블록자동저장(true); return; }
-  if(a==='bmenu'){ const i = +el.dataset.i; const r2 = el.getBoundingClientRect();
+  if(a==='bup'){ 글자넣기(); const z = 자리찾기(el.dataset.i); if(!z || z.i<1) return;
+    const t2 = z.arr[z.i]; z.arr[z.i] = z.arr[z.i-1]; z.arr[z.i-1] = t2; 블록다시(); 블록자동저장(true); return; }
+  if(a==='bmenu'){ const i = el.dataset.i; const r2 = el.getBoundingClientRect();
     블록메뉴닫기();
     const d = document.createElement('div'); d.className = 'tx-slash'; d.id='txslash';
     d.innerHTML = 블록종류.filter(k=>!k.파일).map(k => '<button data-act="tx:bset" data-i="'+i+'" data-t="'+k.t+'"><i>'+k.i+'</i>'+k.n+'</button>').join('')
@@ -2625,21 +2717,31 @@ async function txAct(a, el){
     d.style.left = Math.min(r2.left, innerWidth-242)+'px';
     d.style.top = (r2.bottom+6+d.scrollHeight > innerHeight ? Math.max(12, r2.top - d.scrollHeight - 6) : r2.bottom+6)+'px';
     return; }
-  if(a==='bdown'){ 글자넣기(); const i = +el.dataset.i; 블록메뉴닫기();
-    if(i >= BL.bs.length-1) return; const t2 = BL.bs[i]; BL.bs[i] = BL.bs[i+1]; BL.bs[i+1] = t2;
+  if(a==='bdown'){ 글자넣기(); 블록메뉴닫기(); const z = 자리찾기(el.dataset.i); if(!z) return;
+    if(z.i >= z.arr.length-1) return; const t2 = z.arr[z.i]; z.arr[z.i] = z.arr[z.i+1]; z.arr[z.i+1] = t2;
     블록다시(); 블록자동저장(true); return; }
-  if(a==='bdel'){ 글자넣기(); const i = +el.dataset.i; 블록메뉴닫기();
-    const b = BL.bs[i];
+  if(a==='bdel'){ 글자넣기(); const i = el.dataset.i; 블록메뉴닫기();
+    const b = 블록가져(i), z = 자리찾기(i); if(!b || !z) return;
     if(b.path && !confirm('이 파일도 같이 지울까요?')) return;
-    BL.bs.splice(i,1); if(!BL.bs.length) BL.bs = [새블록('p')];
+    z.arr.splice(z.i,1); if(!BL.bs.length) BL.bs = [새블록('p')];
+    if(!z.arr.length) z.arr.push(새블록('p'));
     if(b.path) 토큰().then(t2 => fetch(SB_URL+'/storage/v1/object/tr/'+b.path, { method:'DELETE', headers:{ apikey:SB_KEY, Authorization:'Bearer '+t2 } })).catch(()=>{});
-    블록다시(Math.max(0,i-1), true); 블록자동저장(true); return; }
-  if(a==='bset'){ const i = +el.dataset.i, t = el.dataset.t; 블록메뉴닫기(); 글자넣기();
+    블록다시(i.replace(/\d+$/, Math.max(0,z.i-1)), true); 블록자동저장(true); return; }
+  if(a==='bset'){ const i = el.dataset.i, t = el.dataset.t;
+    const 앞 = SL && SL.path===i ? SL.앞 : null;
+    블록메뉴닫기(); 글자넣기();
+    const b = 블록가져(i); if(!b) return;
+    if(앞 != null){                             /* 「/제목」 자국을 지운다 */
+      b.x = 앞;
+      const el2 = document.querySelector('#txblocks .tx-x[data-bi="'+i+'"]');
+      if(el2) el2.innerText = 앞;               /* 화면도 같이 — 안 그러면 다시 그릴 때 되읽혀 덮인다 */
+    }
     const k = 블록종류.find(z=>z.t===t);
     if(k && k.파일){ const inp = $('#txbfile'); inp.accept = k.파일; inp.dataset.at = i;
-      if(BL.bs[i] && BL.bs[i].t==='p' && !BL.bs[i].x && BL.bs.length>1){ BL.bs.splice(i,1); inp.dataset.at = i-1; }
       블록다시(); inp.click(); return; }
-    const b = BL.bs[i]; b.t = t; if(t==='call' && !b.emo) b.emo = '📌';
+    b.t = t;
+    if(t==='call' && !b.emo) b.emo = '📌';
+    if(t==='tog'){ b.open = true; b.c = b.c && b.c.length ? b.c : [새블록('p')]; }
     블록다시(i, true); 블록자동저장(true); return; }
   if(a==='opt'){ 시트값읽기(); const f = el.dataset.f; 시트.값[f] = (시트.값[f]===v2 && f!=='vis') ? null : v2; txSheet(시트.key, 시트.id, 시트.값); 자동저장(true); return; }
   if(a==='multi'){ 시트값읽기(); const f = el.dataset.f; const arr = (시트.값[f]||[]).slice();
@@ -2876,7 +2978,19 @@ function gnbDraw(){
   $('#gnm').textContent = ME ? ME.name + (관리자() && S.who!=='전체' ? ' · '+S.who+' 보기' : '') : '—';
   $('#gav').textContent = ME ? ME.name.slice(-2) : '—';
 }
-function popOpen(html){ $('#popbox').innerHTML = html; $('#pop').classList.add('on'); }
+let 넓게 = false;
+function popOpen(html){ $('#popbox').innerHTML = html;
+  $('#pop').classList.add('on'); $('#pop').classList.remove('tx-side','tx-wide'); }
+/* 페이지는 오른쪽에서 나오는 판으로 — 전체화면 단추도 있다 (2026-09-08 대표 지시) */
+function 판열기(머리, 속, 발){
+  const pop = $('#pop');
+  $('#popbox').innerHTML =
+    '<div class="tx-head"><button class="tx-hb" data-act="tx:wide" title="넓게 / 좁게">'+(넓게?'⤡':'⤢')+'</button>'
+    + '<span class="who2">'+머리+'</span>'
+    + '<button class="tx-hb" data-act="popclose" title="닫기 (Esc)">✕</button></div>'
+    + '<div class="tx-scroll">'+속+'</div>' + (발||'');
+  pop.classList.add('on','tx-side'); pop.classList.toggle('tx-wide', 넓게);
+}
 function popClose(){ if(typeof BL!=='undefined' && BL){ try{ 글자넣기(); }catch(e){} }
   if(typeof 블록메뉴닫기==='function') 블록메뉴닫기();
   BL = null; $('#pop').classList.remove('on'); }
@@ -3581,15 +3695,23 @@ document.addEventListener('input', function(ev){
 document.addEventListener('input', function(ev){
   if(ev.target.closest && ev.target.closest('#txform') && ev.target.dataset.f) 자동저장(false);
   if(ev.target.classList && ev.target.classList.contains('tx-x') && ev.target.dataset.bi != null && BL){
-    const el = ev.target, i = +el.dataset.bi, t = el.innerText;
+    const el = ev.target, i = el.dataset.bi, t = el.innerText;
+    /* / 메뉴가 떠 있으면 뒤에 친 글자로 거른다 */
+    if(SL && SL.path === i){
+      const 시작 = SL.앞 + '/';
+      if(t.indexOf(시작) !== 0){ 블록메뉴닫기(); }
+      else { SL.q = t.slice(시작.length); SL.골라 = 0; 슬래시그리기(); return; }
+    }
     /* 줄 첫머리 신호로 블록 바꾸기 — 노션과 같은 손맛 */
-    const 규칙 = [[/^#\s/,'h1'],[/^##\s/,'h2'],[/^[-*]\s/,'ul'],[/^1[.)]\s/,'ol'],[/^\[\]\s|^\[ \]\s/,'todo'],[/^>\s/,'call'],[/^---$/,'hr']];
+    const 규칙 = [[/^##\s/,'h2'],[/^#\s/,'h1'],[/^[-*]\s/,'ul'],[/^1[.)]\s/,'ol'],[/^\[\]\s|^\[ \]\s/,'todo'],[/^>\s/,'call'],[/^\|\s/,'tog'],[/^---$/,'hr']];
+    const 지금 = 블록가져(i);
     for(const [re, t2] of 규칙){
-      if(re.test(t) && BL.bs[i].t !== t2){
-        BL.bs[i].t = t2; BL.bs[i].x = t.replace(re,'').replace(/^---$/,'');
-        if(t2==='call' && !BL.bs[i].emo) BL.bs[i].emo = '📌';
+      if(re.test(t) && 지금 && 지금.t !== t2){
+        지금.t = t2; 지금.x = t.replace(re,'').replace(/^---$/,'');
+        if(t2==='call' && !지금.emo) 지금.emo = '📌';
+        if(t2==='tog'){ 지금.open = true; 지금.c = 지금.c || [새블록('p')]; }
         블록다시(t2==='hr' ? null : i, true);
-        if(t2==='hr'){ BL.bs.push(새블록('p')); 블록다시(BL.bs.length-1); }
+        if(t2==='hr'){ const z = 자리찾기(i); z.arr.splice(z.i+1, 0, 새블록('p')); 블록다시(i.replace(/\d+$/, z.i+1)); }
         블록자동저장(true); return;
       }
     }
@@ -3600,22 +3722,45 @@ document.addEventListener('input', function(ev){
 document.addEventListener('keydown', function(ev){
   const el = ev.target;
   if(!(el.classList && el.classList.contains('tx-x') && el.dataset.bi != null && BL)) return;
-  const i = +el.dataset.bi;
+  const i = el.dataset.bi;
+  /* / 메뉴가 떠 있으면 방향키·엔터는 메뉴가 먹는다 */
+  if(SL && SL.path === i && $('#txslash')){
+    const 것 = 블록종류.filter(k => 슬래시맞나(k, SL.q));
+    if(ev.key === 'ArrowDown'){ ev.preventDefault(); SL.골라 = (SL.골라+1) % Math.max(1,것.length); 슬래시그리기(); return; }
+    if(ev.key === 'ArrowUp'){ ev.preventDefault(); SL.골라 = (SL.골라-1+것.length) % Math.max(1,것.length); 슬래시그리기(); return; }
+    if(ev.key === 'Enter' && !ev.isComposing){ ev.preventDefault();
+      const k = 것[SL.골라]; if(k){ const b2 = $('#txslash').querySelector('button.on') || $('#txslash').querySelector('button');
+        if(b2) b2.click(); } return; }
+    if(ev.key === 'Escape'){ ev.preventDefault(); 블록메뉴닫기(); return; }
+  }
   if(ev.key === 'Enter' && !ev.shiftKey && !ev.isComposing){
     ev.preventDefault(); 글자넣기();
-    const b = BL.bs[i];
+    const b = 블록가져(i); if(!b) return;
+    const z = 자리찾기(i);
+    if(b.t === 'tog'){    /* 토글 제목에서 엔터 → 안쪽 첫 줄로 */
+      b.open = true; b.c = b.c && b.c.length ? b.c : [새블록('p')];
+      블록다시(i + '.0'); 블록자동저장(true); return;
+    }
     const 이어짐 = ['ul','ol','todo'].indexOf(b.t) >= 0;
     if(이어짐 && !b.x){ b.t = 'p'; 블록다시(i); 블록자동저장(true); return; }
     const n = 새블록(이어짐 ? b.t : 'p');
-    BL.bs.splice(i+1, 0, n); 블록다시(i+1); 블록자동저장(true); return;
+    z.arr.splice(z.i+1, 0, n);
+    블록다시(i.replace(/\d+$/, z.i+1)); 블록자동저장(true); return;
   }
-  if(ev.key === 'Backspace' && !el.innerText && BL.bs.length > 1){
-    ev.preventDefault(); 글자넣기();
-    if(BL.bs[i].t !== 'p'){ BL.bs[i].t = 'p'; 블록다시(i); 블록자동저장(true); return; }
-    BL.bs.splice(i,1); 블록다시(Math.max(0,i-1), true); 블록자동저장(true); return;
+  if(ev.key === 'Backspace' && !el.innerText){
+    const b = 블록가져(i), z = 자리찾기(i);
+    if(!b) return;
+    if(b.t !== 'p'){ ev.preventDefault(); 글자넣기();
+      if(b.t === 'tog'){ b.c = null; b.open = false; }
+      b.t = 'p'; 블록다시(i); 블록자동저장(true); return; }
+    if(z.arr.length > 1){ ev.preventDefault(); 글자넣기();
+      z.arr.splice(z.i, 1);
+      블록다시(z.i > 0 ? i.replace(/\d+$/, z.i-1) : (i.indexOf('.') > 0 ? i.slice(0, i.lastIndexOf('.')) : '0'), true);
+      블록자동저장(true); return; }
   }
-  if(ev.key === '/' && !el.innerText){
-    setTimeout(() => { const r = el.getBoundingClientRect(); 슬래시열기(i, r.left, r.bottom+6); }, 0);
+  if(ev.key === '/'){
+    const 앞 = el.innerText;
+    setTimeout(() => { const r = el.getBoundingClientRect(); 슬래시열기(i, r.left, r.bottom+6, 앞); }, 0);
   }
   if(ev.key === 'Escape') 블록메뉴닫기();
 });
@@ -3624,7 +3769,7 @@ document.addEventListener('paste', function(ev){
   const el = ev.target;
   if(!(el.classList && el.classList.contains('tx-x') && el.dataset.bi != null && BL)) return;
   const items = (ev.clipboardData && ev.clipboardData.files) || [];
-  if(items.length){ ev.preventDefault(); 블록파일(+el.dataset.bi, items); return; }
+  if(items.length){ ev.preventDefault(); 블록파일(el.dataset.bi, items); return; }
   const t = ev.clipboardData && ev.clipboardData.getData('text/plain');
   if(t){ ev.preventDefault(); document.execCommand('insertText', false, t); }
 });
@@ -3642,14 +3787,14 @@ document.addEventListener('drop', function(ev){
   ev.preventDefault(); w.classList.remove('tx-drop');
   const b2 = ev.target.closest('.tx-b');
   if(ev.dataTransfer.files && ev.dataTransfer.files.length)
-    블록파일(b2 ? +b2.dataset.i : BL.bs.length-1, ev.dataTransfer.files);
+    블록파일(b2 ? b2.dataset.i : String(BL.bs.length-1), ev.dataTransfer.files);
 });
 document.addEventListener('mousedown', function(ev){
   if($('#txslash') && !ev.target.closest('#txslash') && !ev.target.closest('[data-act="tx:bmenu"]')) 블록메뉴닫기();
 });
 document.addEventListener('change', function(ev){
   if(ev.target.closest && ev.target.closest('#txform') && ev.target.dataset.f && ev.target.tagName!=='TEXTAREA' && ev.target.type!=='text'){ 자동저장(true); return; }
-  if(ev.target.id==='txbfile' && BL){ const at = +(ev.target.dataset.at||BL.bs.length-1);
+  if(ev.target.id==='txbfile' && BL){ const at = ev.target.dataset.at || String(BL.bs.length-1);
     블록파일(at, ev.target.files); ev.target.value=''; return; }
   if(ev.target.id==='txfile' && 시트){ txUpload(시트.key, 시트.id, ev.target.files); return; }
   if(ev.target.id==='cmex'){ S.cmex = ev.target.value; }
