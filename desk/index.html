@@ -2,6 +2,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>글래드짐 트레이너 데스크</title>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 :root{
   --dark:#131312; --dark-2:#1a1a18; --dark-3:#222220; --dark-4:#2c2c29;
@@ -364,7 +365,122 @@ textarea.inp{min-height:76px;resize:vertical;line-height:1.6}
   .body{padding:16px}
   .srch{width:140px}
 }
+
+/* ══ 업무 대시보드 (tx-) ══ 2026-09-08 BUILD 21 ══ */
+.tx-login{position:fixed;inset:0;background:var(--dark);z-index:80;display:none;
+  align-items:center;justify-content:center;padding:20px}
+.tx-login.on{display:flex}
+.tx-lbox{width:min(360px,92vw);background:var(--dark-2);border:1px solid var(--line);
+  border-radius:20px;padding:28px 24px 24px;display:flex;flex-direction:column;gap:12px}
+.tx-lbox .brand{padding:0 0 10px}
+.tx-lbox .err{font-size:12.5px;color:var(--warn);font-weight:700;min-height:18px}
+.tx-lbox .inp{padding:12px 13px;font-size:14px;width:100%}
+.tx-lbox .btn{padding:13px;font-size:14px}
+.tx-lbox .foot2{font-size:11.5px;color:var(--sub);text-align:center;line-height:1.6}
+.tx-gbtn{display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;color:#1f1f1f}
+.tx-gbtn:hover{background:#f3f1ec}
+.tx-or{display:flex;align-items:center;gap:10px;color:#6f6a63;font-size:11.5px;margin:2px 0}
+.tx-or:before,.tx-or:after{content:"";flex:1;height:1px;background:var(--line)}
+.tx-staff{display:flex;flex-direction:column;gap:6px}
+.tx-staff .rowc{padding:9px 11px}
+.tx-staff .off{opacity:.45}
+.tx-sadd{display:grid;grid-template-columns:1.4fr 1fr .8fr auto;gap:6px;align-items:center}
+.tx-sadd .inp{padding:8px 10px;font-size:12.5px;width:100%}
+.tx-sadd select.inp{appearance:auto}
+
+.tx-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.tx-bar .sp2{margin-left:auto;display:flex;gap:8px;align-items:center}
+.tx-views{display:flex;gap:4px;flex-wrap:wrap}
+.tx-views button{padding:7px 12px;border-radius:9px;font-size:12.5px;font-weight:700;color:var(--sub);
+  border:1px solid transparent}
+.tx-views button:hover{color:var(--cream);background:var(--dark-3)}
+.tx-views button.on{color:var(--gold);background:var(--gold-dim);border-color:var(--gold-2)}
+.tx-views button b{font-weight:800;margin-left:4px;opacity:.75}
+
+.tx-av{width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:800;flex:none;color:#1b1b19;background:#cfc7ba}
+.tx-avs{display:inline-flex;align-items:center}
+.tx-avs .tx-av{margin-left:-6px;border:2px solid var(--dark-2)}
+.tx-avs .tx-av:first-child{margin-left:0}
+.tx-c-red{background:#e8927c}.tx-c-green{background:#8fd0a5}.tx-c-pink{background:#e9a5c6}
+.tx-c-yellow{background:#e9d27a}.tx-c-orange{background:#eab07a}.tx-c-blue{background:#8fbde6}
+.tx-c-purple{background:#c3aee8}.tx-c-gray{background:#b9b3aa}
+
+.tx-list{display:flex;flex-direction:column;gap:8px}
+.tx-row{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--dark-2);
+  border:1px solid var(--line);border-radius:12px;text-align:left;width:100%;cursor:pointer}
+.tx-row:hover{border-color:#4a4a44}
+.tx-row.done{opacity:.55}
+.tx-row .tx-ck{width:20px;height:20px;border-radius:6px;border:1.5px solid #5a574f;flex:none;
+  display:flex;align-items:center;justify-content:center;font-size:12px;color:#1b1b19}
+.tx-row .tx-ck.on{background:var(--gold);border-color:var(--gold)}
+.tx-row .tx-main{flex:1;min-width:0}
+.tx-row .tx-t{font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tx-row.done .tx-t{text-decoration:line-through}
+.tx-row .tx-s{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:4px;font-size:11.5px;color:var(--sub)}
+.tx-row .tx-r{display:flex;align-items:center;gap:8px;flex:none}
+.tx-tag{font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;background:var(--dark-3);color:var(--sub)}
+.tx-tag.k-대표공지{background:#2b2240;color:#c3aee8}.tx-tag.k-마케팅{background:#1a2a3a;color:#8fbde6}
+.tx-tag.k-비품{background:#1a2e22;color:#8fd0a5}.tx-tag.k-확인사항{background:#3a1e1e;color:#e8927c}
+.tx-tag.k-기타업무{background:#3a2a16;color:#eab07a}.tx-tag.k-업무{background:#2e2620;color:#d9c3a8}
+.tx-tag.warn{background:#2e1c18;color:var(--warn)}.tx-tag.gold{background:var(--gold-dim);color:var(--gold)}
+.tx-tag.teal{background:var(--teal-dim);color:var(--teal)}
+.tx-vis{font-size:10.5px;color:#7c766e;display:inline-flex;align-items:center;gap:3px}
+.tx-grp{font-size:12px;font-weight:800;color:var(--sub);margin:10px 0 2px;letter-spacing:.02em}
+
+.tx-form{display:flex;flex-direction:column;gap:12px}
+.tx-form .fld .inp{width:100%}
+.tx-form textarea.inp{min-height:88px;resize:vertical;line-height:1.55}
+.tx-pchips{display:flex;flex-wrap:wrap;gap:6px}
+.tx-pchip{display:inline-flex;align-items:center;gap:6px;padding:5px 10px 5px 5px;border-radius:999px;
+  border:1px solid var(--line);font-size:12px;font-weight:700;color:var(--sub)}
+.tx-pchip.on{border-color:var(--gold-2);color:var(--gold);background:var(--gold-dim)}
+.tx-ochips{display:flex;flex-wrap:wrap;gap:6px}
+.tx-ochip{padding:6px 11px;border-radius:9px;border:1px solid var(--line);font-size:12px;font-weight:700;color:var(--sub)}
+.tx-ochip.on{border-color:var(--gold-2);color:var(--gold);background:var(--gold-dim)}
+.tx-fbtns{display:flex;gap:8px;margin-top:4px}
+.tx-fbtns .btn{flex:1}
+.tx-fbtns .btn.del{flex:0 0 auto;color:var(--warn)}
+.tx-meta{font-size:11px;color:#7c766e;line-height:1.6}
+.tx-menu{display:flex;flex-direction:column;gap:6px}
+.tx-menu button{text-align:left;padding:11px 13px;border-radius:10px;background:var(--dark-3);
+  border:1px solid var(--line);font-weight:700;font-size:13px}
+.tx-menu button small{display:block;font-weight:500;color:var(--sub);font-size:11.5px;margin-top:2px}
+.tx-menu button:hover{border-color:#4a4a44}
+
+.tx-home{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;align-items:start}
+.tx-home .sec .lbl .r{cursor:pointer;color:var(--gold-2)}
+.tx-notice{background:#2b2240;border:1px solid #4a3d6b;border-radius:13px;padding:13px 15px}
+.tx-notice .t1{color:#d9cdf4;font-size:14px;font-weight:800}
+.tx-notice .t2{color:#b8a9de;font-size:12px;margin-top:3px;white-space:pre-wrap}
+
+.tx-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:14px}
+.tx-cal .h{font-size:10.5px;font-weight:700;color:var(--sub);text-align:center;padding:2px 0}
+.tx-cd{min-height:64px;background:var(--dark-2);border:1px solid var(--line);border-radius:9px;padding:5px 6px;
+  font-size:11px;display:flex;flex-direction:column;gap:3px}
+.tx-cd.dim{opacity:.35}
+.tx-cd.today{border-color:var(--gold-2)}
+.tx-cd .d{font-weight:800;color:var(--sub)}
+.tx-cd .lv{font-size:10.5px;font-weight:700;border-radius:5px;padding:1px 5px;background:var(--gold-dim);
+  color:var(--gold);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tx-cd .lv.no{background:#2e1c18;color:var(--warn)}.tx-cd .lv.req{background:var(--dark-3);color:var(--sub)}
 </style></head><body>
+
+<div class="tx-login" id="txlogin">
+  <form class="tx-lbox" id="txlform" autocomplete="on">
+    <div class="brand"><b>GLAD GYM</b><span>트레이너 데스크</span></div>
+    <div id="txgsi" style="display:flex;justify-content:center;min-height:44px"></div>
+    <button class="btn main tx-gbtn" type="button" id="txgoogle" style="display:none">
+      <svg viewBox="0 0 24 24" width="18" height="18"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.76h3.57c2.08-1.92 3.27-4.74 3.27-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.76c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.11A6.6 6.6 0 0 1 5.5 12c0-.73.13-1.44.34-2.11V7.05H2.18A11 11 0 0 0 1 12c0 1.77.42 3.45 1.18 4.95l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1A11 11 0 0 0 2.18 7.05l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/></svg>
+      구글 계정으로 들어가기</button>
+    <div class="tx-or"><span>또는 이메일로</span></div>
+    <input class="inp" id="txlemail" type="email" placeholder="이메일" autocomplete="username" required>
+    <input class="inp" id="txlpw" type="password" placeholder="비밀번호" autocomplete="current-password" required>
+    <div class="err" id="txlerr"></div>
+    <button class="btn gold" type="submit" id="txlgo">들어가기</button>
+    <div class="foot2">대표님이 명단에 올린 구글 메일만 들어올 수 있어요.<br>안 들어가지면 대표님께 메일 주소를 알려 주세요.</div>
+  </form>
+</div>
 
 <div class="wrap">
 <header class="gnb">
@@ -388,7 +504,20 @@ textarea.inp{min-height:76px;resize:vertical;line-height:1.6}
 <div class="app">
   <aside class="side">
     <div class="brand"><b>GLAD GYM</b><span>트레이너 데스크</span></div>
-    <button class="nav on" data-v="members">
+    <button class="nav on" data-v="home">
+      <svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v9a2 2 0 0 1-2 2h-4v-6H9v6H5a2 2 0 0 1-2-2z"/></svg>
+      홈</button>
+    <button class="nav" data-v="tasks">
+      <svg viewBox="0 0 24 24"><path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>
+      업무<span class="bdg" id="txbdg" style="display:none"></span></button>
+    <button class="nav" data-v="leads">
+      <svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.6a2 2 0 0 1-.5 2.1L8.1 9.7a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.8.3 1.7.5 2.6.7a2 2 0 0 1 1.7 2z"/></svg>
+      상담</button>
+    <button class="nav" data-v="leave">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 15h3"/></svg>
+      연월차</button>
+    <div style="height:1px;background:var(--line);margin:8px 6px"></div>
+    <button class="nav" data-v="members">
       <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       회원</button>
     <button class="nav" data-v="cmall">
@@ -421,7 +550,7 @@ textarea.inp{min-height:76px;resize:vertical;line-height:1.6}
 
 <script>
 "use strict";
-const BUILD = '20';
+const BUILD = '23';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -437,6 +566,123 @@ const isReco = d => d===RECO1 || d===RECO2;
 
 const TODAY = (()=>{ const d=new Date(), p=n=>String(n).padStart(2,'0');
   return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); })();
+
+/* ══════════════════════════════════════════════════════════════
+   로그인 (Supabase Auth · 이메일+비번)  — 2026-09-08 BUILD 21
+   회원 표(members·workouts…)는 그대로 anon 키(HD)로 읽고,
+   업무 표(staff·tr_*)만 로그인한 사람의 토큰으로 읽는다 → 행 단위 권한(RLS)이 선다.
+   ══════════════════════════════════════════════════════════════ */
+const AUTH_KEY = 'gg_desk_auth';
+let AUTH = null;            /* {access_token, refresh_token, user, exp} */
+let ME = null;              /* staff 행 {id,name,role,color,goal} */
+const W = { staff:[], tasks:[], leads:[], leave:[] };
+const 관리자 = () => !!(ME && ME.role==='admin');
+
+function authLoad(){ try{ AUTH = JSON.parse(localStorage.getItem(AUTH_KEY)||'null'); }catch(e){ AUTH=null; } }
+function authSave(a){ AUTH = a; try{ a ? localStorage.setItem(AUTH_KEY, JSON.stringify(a)) : localStorage.removeItem(AUTH_KEY); }catch(e){} }
+async function authPost(q, body, bearer){
+  const h = { apikey:SB_KEY, 'Content-Type':'application/json' };
+  if(bearer) h.Authorization = 'Bearer ' + bearer;
+  const r = await fetch(SB_URL + '/auth/v1/' + q, { method:'POST', headers:h, body: JSON.stringify(body||{}) });
+  const j = await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(j.error_description || j.msg || j.message || ('auth ' + r.status));
+  return j;
+}
+function 토큰담기(j){
+  authSave({ access_token:j.access_token, refresh_token:j.refresh_token, user:j.user,
+             exp: Date.now() + ((j.expires_in||3600) - 60) * 1000 });
+}
+async function signIn(email, pw){ 토큰담기(await authPost('token?grant_type=password', { email, password:pw })); }
+
+/* ── 구글 로그인 (ID 토큰 방식) ── 2026-09-08 BUILD 23
+   구글 창에서 계정을 고르면 ID 토큰이 오고, 그걸 Supabase 에 내면 세션이 된다.
+   페이지를 안 떠나고, Supabase 엔 Client ID(공개값)만 있으면 된다 — Secret 불필요.
+   관리자 대시보드와 같은 OAuth 클라이언트. 배포 주소가 「승인된 JavaScript 원본」에 있어야 뜬다. */
+const G_CLIENT = '237947648980-4ajr650ji6o88ss3nsua3aj2cqnt2m8u.apps.googleusercontent.com';
+let G_NONCE = '';
+async function sha256hex(t){ const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t));
+  return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''); }
+async function gsiReady(){
+  if(!window.google || !google.accounts || !google.accounts.id) return false;
+  G_NONCE = crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2)+Date.now();
+  google.accounts.id.initialize({ client_id: G_CLIENT, callback: gsiGot, nonce: await sha256hex(G_NONCE),
+    ux_mode:'popup', auto_select:false, itp_support:true });
+  const box = $('#txgsi'); box.innerHTML = '';
+  google.accounts.id.renderButton(box, { theme:'filled_black', size:'large', width:312, text:'signin_with', locale:'ko', shape:'pill' });
+  return true;
+}
+async function gsiGot(res){
+  const b = $('#txlgo'); b.disabled = true; $('#txlerr').textContent = '';
+  try{
+    const j = await authPost('token?grant_type=id_token', { provider:'google', id_token: res.credential, nonce: G_NONCE });
+    토큰담기(j); await boot();
+  }catch(e){ $('#txlerr').textContent = '구글로 못 들어왔어요 — ' + e.message; }
+  b.disabled = false;
+}
+function 돌아올주소(){ return location.origin + location.pathname; }
+function googleStart(){ if(window.google && google.accounts) google.accounts.id.prompt(); else toast('구글 버튼이 아직 안 떴어요'); }
+/* 돌아온 주소의 #access_token=… 을 읽어 세션으로 담는다. 없으면 false */
+async function 구글돌아옴(h){
+  if(h==null) h = location.hash || '';          /* 시험할 땐 문자열을 직접 준다 */
+  if(h.indexOf('access_token=')<0) {
+    if(h.indexOf('error=')>=0){ const q = new URLSearchParams(h.slice(1));
+      $('#txlerr').textContent = '구글에서 못 들어왔어요 — ' + (q.get('error_description')||q.get('error')||'');
+      try{ history.replaceState(null, '', 돌아올주소()); }catch(e){} }
+    return false;
+  }
+  const q = new URLSearchParams(h.slice(1));
+  const at = q.get('access_token');
+  let user = null;
+  try{ const r = await fetch(SB_URL + '/auth/v1/user', { headers:{ apikey:SB_KEY, Authorization:'Bearer '+at } });
+       if(r.ok) user = await r.json(); }catch(e){}
+  if(!user){ try{ user = JSON.parse(atob(at.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))); user = { id:user.sub, email:user.email }; }catch(e){} }
+  authSave({ access_token:at, refresh_token:q.get('refresh_token'), user,
+             exp: Date.now() + ((+q.get('expires_in')||3600) - 60) * 1000 });
+  try{ history.replaceState(null, '', 돌아올주소()); }catch(e){}
+  return true;
+}
+const 내메일 = () => ((AUTH && AUTH.user && AUTH.user.email) || '').trim().toLowerCase();
+async function refreshAuth(){
+  if(!AUTH || !AUTH.refresh_token) throw new Error('no session');
+  try{ 토큰담기(await authPost('token?grant_type=refresh_token', { refresh_token: AUTH.refresh_token })); }
+  catch(e){ /* 세션이 끝났다 — 로그인 화면으로 돌려보낸다 */
+    authSave(null); ME = null; $('#txlerr').textContent = '다시 로그인해 주세요';
+    $('#txlogin').classList.add('on'); throw e; }
+}
+async function signOut(){
+  try{ if(AUTH) await authPost('logout', {}, AUTH.access_token); }catch(e){}
+  authSave(null); ME = null; location.reload();
+}
+async function 비번바꾸기(pw){
+  const r = await fetch(SB_URL + '/auth/v1/user', { method:'PUT',
+    headers:{ apikey:SB_KEY, Authorization:'Bearer '+AUTH.access_token, 'Content-Type':'application/json' },
+    body: JSON.stringify({ password: pw }) });
+  if(!r.ok){ const j = await r.json().catch(()=>({})); throw new Error(j.msg||j.message||('user '+r.status)); }
+}
+async function 토큰(){
+  if(!AUTH) throw new Error('로그인이 필요해요');
+  if(Date.now() > (AUTH.exp||0)) await refreshAuth();
+  return AUTH.access_token;
+}
+/* 로그인한 사람 토큰으로 읽고 쓰기 — 401이면 한 번 새로 받아 다시 시도 */
+async function uget(path, 재){
+  const t = await 토큰();
+  const r = await fetch(SB_URL+'/rest/v1/'+path,
+    { headers:{ apikey:SB_KEY, Authorization:'Bearer '+t, 'Content-Type':'application/json' }, cache:'no-store' });
+  if(r.status===401 && !재){ await refreshAuth(); return uget(path, true); }
+  if(!r.ok) throw new Error(path.split('?')[0]+' → '+r.status);
+  return r.json();
+}
+async function usend(path, method, body, pref, 재){
+  const t = await 토큰();
+  const h = { apikey:SB_KEY, Authorization:'Bearer '+t, 'Content-Type':'application/json' };
+  if(pref) h.Prefer = pref;
+  const r = await fetch(SB_URL+'/rest/v1/'+path, { method, headers:h, body: body==null?undefined:JSON.stringify(body) });
+  if(r.status===401 && !재){ await refreshAuth(); return usend(path, method, body, pref, true); }
+  if(!r.ok){ const t2 = await r.text().catch(()=>''); throw new Error(method+' '+path.split('?')[0]+' → '+r.status+(t2?' '+t2.slice(0,120):'')); }
+  const t3 = await r.text();
+  return t3 ? JSON.parse(t3) : null;
+}
 
 async function sget(path){
   const r = await fetch(SB_URL+'/rest/v1/'+path, { headers:HD, cache:'no-store' });
@@ -598,7 +844,7 @@ const IKNAME = {
 
 const D = { m:[], w:[], wi:[], r:[], ri:[], c:[], a:[], aAll:[], ex:[], va:[], asks:[] };
 const M = { wi:[], ws:[], meals:[], mi:[], bl:[], br:[], bc:null, plan:null, intake:null, cyc:null, bph:[] };
-const S = { view:'members', who:'전체', q:'', mid:null, rid:null, tab:'routine',
+const S = { view:'home', who:'전체', q:'', mid:null, rid:null, tab:'routine',
             exq:'', part:'전체', eq:'전체', pq:'', ptab:'s', cmex:null, day:null, kind:'수업', asDate:null, calMonth:null,
             cmw:null, cmopen:null, cday:null, mday:null, cmprev:null,
             bpPose:'정면', bpKind:'body',
@@ -1543,6 +1789,415 @@ function vCmAll(){
 }
 
 /* ── 오늘 ── */
+/* ══════════════════════════════════════════════════════════════
+   표 엔진 — 노션 데이터베이스가 하는 일(열·행·보기·템플릿·잠금·공개 범위)을 한 벌로.
+   업무·상담·연월차는 아래 표정의 한 장씩이다. 화면을 따로 짜지 않는다.
+   열 타입: text long select multi people date datetime check number
+   ══════════════════════════════════════════════════════════════ */
+const 사람 = id => W.staff.find(x=>x.id===id) || { id, name:'?', color:'gray' };
+const 이름들 = ids => (ids||[]).map(id=>사람(id).name).join(', ');
+const 아바타 = id => { const p = 사람(id);
+  return '<span class="tx-av tx-c-'+esc(p.color||'gray')+'" title="'+esc(p.name)+'">'+esc((p.name||'?').slice(-2))+'</span>'; };
+const 아바타들 = ids => (ids&&ids.length) ? '<span class="tx-avs">'+ids.map(아바타).join('')+'</span>' : '';
+const 날짜한글 = d => { if(!d) return ''; const x = new Date(d); if(isNaN(x)) return d;
+  return (x.getMonth()+1)+'/'+x.getDate()+'('+WDN[x.getDay()]+')'; };
+const 시각한글 = d => { if(!d) return ''; const x = new Date(d); if(isNaN(x)) return d;
+  const h = x.getHours(), m = x.getMinutes();
+  return (x.getMonth()+1)+'/'+x.getDate()+'('+WDN[x.getDay()]+') '+(h<12?'오전 ':'오후 ')+((h%12)||12)+':'+String(m).padStart(2,'0'); };
+const 오늘인가 = d => d && String(d).slice(0,10)===TODAY;
+const 이달인가 = d => d && String(d).slice(0,7)===TODAY.slice(0,7);
+const 로컬ISO = (d) => { const x = new Date(d), p=n=>String(n).padStart(2,'0');
+  return x.getFullYear()+'-'+p(x.getMonth()+1)+'-'+p(x.getDate())+'T'+p(x.getHours())+':'+p(x.getMinutes()); };
+const VIS = { all:'전체', owners:'담당자만', picked:'지정한 사람만', admin:'관리자만' };
+const 내것 = (ids) => !!(ME && (ids||[]).indexOf(ME.id)>=0);
+
+const 표정의 = {
+  tasks: {
+    table:'tr_tasks', 제목:'업무', 사람열:'owners', 제목열:'title',
+    열:[
+      {k:'title',  이름:'업무',     타입:'text', 필수:true, 힌트:'무엇을 할지 한 줄로'},
+      {k:'kind',   이름:'구분',     타입:'select', 옵션:['업무','대표공지','마케팅','비품','확인사항','기타업무'], 기본:'업무'},
+      {k:'owners', 이름:'담당',     타입:'people'},
+      {k:'due',    이름:'기한',     타입:'date'},
+      {k:'body',   이름:'내용',     타입:'long'},
+      {k:'note',   이름:'특이사항', 타입:'text'},
+      {k:'done',   이름:'완료',     타입:'check'},
+    ],
+    보기:[
+      {k:'mine',   이름:'내가 할 일', 필터:r=>!r.done && 내것(r.owners)},
+      {k:'open',   이름:'진행중',     필터:r=>!r.done},
+      {k:'notice', 이름:'대표공지',   필터:r=>r.kind==='대표공지'},
+      {k:'supply', 이름:'비품',       필터:r=>r.kind==='비품'},
+      {k:'done',   이름:'완료',       필터:r=>!!r.done},
+      {k:'all',    이름:'전체'},
+    ],
+    템플릿:[
+      {이름:'업무',            값:{kind:'업무'}},
+      {이름:'대표공지',        값:{kind:'대표공지', vis:'all'}, 관리자만:true},
+      {이름:'비품 요청',       값:{kind:'비품', title:'비품 요청 — '}},
+      {이름:'PT팀 주간보고',   값:{kind:'업무', title:'PT팀 주간보고', body:'· 이번 주 신규 / 재등록\n· 특이 회원\n· 다음 주 계획'}},
+      {이름:'월말 청소',       값:{kind:'확인사항', title:'월말 인수인계 청소', body:'담당 구역 사진 첨부'}},
+      {이름:'월요일 청소 점검', 값:{kind:'확인사항', title:'🚨 월요일 청소 점검!'}},
+    ],
+    잠금: r => r.kind==='대표공지' && !관리자(),        /* 대표공지는 관리자만 만들고 고친다 */
+    정렬: (a,b) => (a.done-b.done) || ((b.created_at||'') > (a.created_at||'') ? 1 : -1),
+    행: r => ({ 제목:r.title,
+      칩: '<span class="tx-tag k-'+esc(r.kind||'업무')+'">'+esc(r.kind||'업무')+'</span>'
+        + (r.due ? '<span class="tx-tag '+(r.due<TODAY&&!r.done?'warn':'')+'">'+날짜한글(r.due)+'까지</span>' : '')
+        + (r.note ? '<span>'+esc(r.note)+'</span>' : ''),
+      오른쪽: 아바타들(r.owners), 체크:'done' }),
+  },
+  leads: {
+    table:'tr_leads', 제목:'상담', 사람열:'counselors', 제목열:'name',
+    열:[
+      {k:'name',       이름:'이름',     타입:'text', 필수:true},
+      {k:'phone',      이름:'전화',     타입:'text', 힌트:'010-0000-0000'},
+      {k:'at',         이름:'예약 일시', 타입:'datetime'},
+      {k:'channels',   이름:'상담유형', 타입:'multi', 옵션:['방문','전화','문자','카카오톡','네이버예약','네이버톡','인스타','당근','소개','전단지','스마트콜','카카오맵','무료 체험권','재등록 리마케팅','양도','일일입장','각종 바우처','락커회수']},
+      {k:'segment',    이름:'회원구분', 타입:'select', 옵션:['신규','재등록','컴백','기존회원']},
+      {k:'counselors', 이름:'상담자',   타입:'people'},
+      {k:'content',    이름:'상담내용', 타입:'long'},
+      {k:'result',     이름:'상담결과', 타입:'long'},
+      {k:'reg',        이름:'등록여부', 타입:'select', 옵션:['o','x','미방문','무료체험','PT체험3회','일일입장','양도','일일권']},
+      {k:'note',       이름:'특이사항', 타입:'text'},
+      {k:'done',       이름:'완료',     타입:'check'},
+    ],
+    보기:[
+      {k:'today', 이름:'오늘',      필터:r=>오늘인가(r.at)},
+      {k:'mine',  이름:'내 상담',   필터:r=>내것(r.counselors) && !r.done},
+      {k:'open',  이름:'미완료',    필터:r=>!r.done},
+      {k:'month', 이름:'이번 달',   필터:r=>이달인가(r.at)||이달인가(r.created_at)},
+      {k:'trial', 이름:'무료체험',  필터:r=>['무료체험','PT체험3회'].indexOf(r.reg)>=0},
+      {k:'all',   이름:'전체'},
+    ],
+    템플릿:[
+      {이름:'상담 예약',   값:{vis:'all'}},
+      {이름:'방문 상담',   값:{channels:['방문'], vis:'all'}},
+      {이름:'네이버 예약', 값:{channels:['네이버예약'], segment:'신규', vis:'all'}},
+    ],
+    기본vis:'all',
+    정렬: (a,b) => (a.done-b.done) || ((b.at||b.created_at||'') > (a.at||a.created_at||'') ? 1 : -1),
+    행: r => ({ 제목: r.name + (r.segment ? ' · '+r.segment : ''),
+      칩: (r.at ? '<span class="tx-tag '+(오늘인가(r.at)?'gold':'')+'">'+시각한글(r.at)+'</span>' : '')
+        + (r.channels||[]).map(c=>'<span class="tx-tag">'+esc(c)+'</span>').join('')
+        + (r.reg ? '<span class="tx-tag '+(r.reg==='o'?'teal':'')+'">등록 '+esc(r.reg)+'</span>' : '')
+        + (r.note ? '<span>'+esc(r.note)+'</span>' : ''),
+      오른쪽: 아바타들(r.counselors), 체크:'done' }),
+  },
+  leave: {
+    table:'tr_leave', 제목:'연월차', 사람열:'staff_id', 제목열:'kind',
+    열:[
+      {k:'staff_id', 이름:'신청인', 타입:'person', 관리자만:true},
+      {k:'kind',     이름:'유형',   타입:'select', 옵션:['연차','월차','반차','OFF','여름휴가','당직','예비군','민방위','기타사유'], 기본:'연차'},
+      {k:'day',      이름:'날짜',   타입:'date', 필수:true},
+      {k:'day_end',  이름:'끝나는 날', 타입:'date', 힌트:'하루면 비워 두세요'},
+      {k:'reason',   이름:'사유',   타입:'text'},
+      {k:'status',   이름:'상태',   타입:'select', 옵션:['req','ok','no'], 표시:{req:'신청',ok:'승인',no:'반려'}, 관리자만:true},
+    ],
+    보기:[
+      {k:'week',  이름:'이번 주',  필터:r=>{ const d=new Date(r.day), t=new Date(TODAY); const diff=(d-t)/864e5; return diff>=-t.getDay() && diff<7-t.getDay(); }},
+      {k:'mine',  이름:'내 것',    필터:r=>ME && r.staff_id===ME.id},
+      {k:'req',   이름:'승인 대기', 필터:r=>r.status==='req'},
+      {k:'month', 이름:'이번 달',  필터:r=>이달인가(r.day)},
+      {k:'all',   이름:'전체'},
+    ],
+    템플릿:[ {이름:'연차', 값:{kind:'연차'}}, {이름:'반차', 값:{kind:'반차'}}, {이름:'OFF', 값:{kind:'OFF'}}, {이름:'당직', 값:{kind:'당직'}} ],
+    기본vis:'all',                                   /* 팀 캘린더에 서로 보이게 */
+    달력:true,
+    정렬: (a,b) => (a.day||'') > (b.day||'') ? -1 : 1,
+    행: r => ({ 제목: 사람(r.staff_id).name + ' · ' + r.kind + (r.days ? ' ('+r.days+'일)' : ''),
+      칩: '<span class="tx-tag gold">'+날짜한글(r.day)+(r.day_end?' ~ '+날짜한글(r.day_end):'')+'</span>'
+        + '<span class="tx-tag '+(r.status==='ok'?'teal':r.status==='no'?'warn':'')+'">'+({req:'신청',ok:'승인',no:'반려'}[r.status]||r.status)+'</span>'
+        + (r.reason ? '<span>'+esc(r.reason)+'</span>' : ''),
+      오른쪽: 아바타(r.staff_id), 체크:null }),
+  },
+};
+const 표상태 = { tasks:{보기:'mine', 사람:null, q:''}, leads:{보기:'today', 사람:null, q:''}, leave:{보기:'week', 사람:null, q:''} };
+
+async function loadWork(){
+  const g = await Promise.all([
+    uget('staff?select=*&order=name'),
+    uget('tr_tasks?select=*&order=created_at.desc&limit=500'),
+    uget('tr_leads?select=*&order=at.desc.nullslast&limit=500'),
+    uget('tr_leave?select=*&order=day.desc&limit=400'),
+  ]);
+  W.staff = g[0]; W.tasks = g[1]; W.leads = g[2]; W.leave = g[3];
+}
+
+/* 목록 화면 */
+function txTop(key){
+  const T = 표정의[key], st = 표상태[key];
+  const 전체 = W[key];
+  const n = k => { const v = T.보기.find(x=>x.k===k); return 전체.filter(r => !v.필터 || v.필터(r)).length; };
+  return '<h1>'+T.제목+'</h1><span class="cnt">'+전체.length+'건</span>'
+    + '<div class="sp"><input class="srch" id="txq" type="text" placeholder="'+T.제목+' 찾기" value="'+esc(st.q)+'">'
+    + '<button class="btn gold sm" data-act="tx:new" data-k="'+key+'">＋ 새로 만들기 ▾</button></div>';
+}
+function txList(key){
+  const T = 표정의[key], st = 표상태[key];
+  const v = T.보기.find(x=>x.k===st.보기) || T.보기[0];
+  const q = (st.q||'').trim().toLowerCase();
+  let rows = W[key].filter(r => !v.필터 || v.필터(r));
+  if(st.사람) rows = rows.filter(r => { const p = r[T.사람열]; return Array.isArray(p) ? p.indexOf(st.사람)>=0 : p===st.사람; });
+  if(q) rows = rows.filter(r => JSON.stringify(r).toLowerCase().indexOf(q)>=0);
+  rows = rows.slice().sort(T.정렬);
+  const 보기줄 = '<div class="tx-bar"><div class="tx-views">'
+    + T.보기.map(x => '<button class="'+(x.k===st.보기?'on':'')+'" data-act="tx:view" data-k="'+key+'" data-v2="'+x.k+'">'
+        + x.이름 + '<b>' + W[key].filter(r=>!x.필터||x.필터(r)).length + '</b></button>').join('')
+    + '</div><div class="sp2">'
+    + '<span class="tx-pchips"><button class="tx-pchip '+(!st.사람?'on':'')+'" data-act="tx:who" data-k="'+key+'" data-v2="">전원</button>'
+    + W.staff.filter(p=>p.active!==false).map(p => '<button class="tx-pchip '+(st.사람===p.id?'on':'')+'" data-act="tx:who" data-k="'+key+'" data-v2="'+p.id+'">'+아바타(p.id)+esc(p.name)+'</button>').join('')
+    + '</span></div></div>';
+  const 달력 = T.달력 ? txCal(key, rows) : '';
+  if(!rows.length) return 보기줄 + 달력 + '<div class="empty">여기엔 아직 없어요</div>';
+  return 보기줄 + 달력 + '<div class="tx-list">' + rows.map(r => txRow(key, r)).join('') + '</div>';
+}
+function txRow(key, r){
+  const T = 표정의[key], x = T.행(r);
+  const done = x.체크 ? !!r[x.체크] : false;
+  return '<button class="tx-row '+(done?'done':'')+'" data-act="tx:open" data-k="'+key+'" data-id="'+r.id+'">'
+    + (x.체크 ? '<span class="tx-ck '+(done?'on':'')+'" data-act="tx:toggle" data-k="'+key+'" data-id="'+r.id+'" data-f="'+x.체크+'">'+(done?'✓':'')+'</span>' : '')
+    + '<span class="tx-main"><span class="tx-t">'+esc(x.제목)+'</span><span class="tx-s">'+x.칩
+    + (r.vis && r.vis!=='all' ? '<span class="tx-vis">🔒 '+VIS[r.vis]+'</span>' : '') + '</span></span>'
+    + '<span class="tx-r">'+(x.오른쪽||'')+'</span></button>';
+}
+/* 연월차 달력 — 이번 달 */
+function txCal(key, rows){
+  const t = new Date(TODAY), y = t.getFullYear(), m = t.getMonth();
+  const 첫 = new Date(y, m, 1), 끝 = new Date(y, m+1, 0);
+  const 시작 = new Date(첫); 시작.setDate(1 - 첫.getDay());
+  const 셀 = [];
+  for(let i=0;i<42;i++){ const d = new Date(시작); d.setDate(시작.getDate()+i); if(i>=35 && d>끝) break; 셀.push(d); }
+  const ymd = d => { const p=n=>String(n).padStart(2,'0'); return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); };
+  const 전체 = W[key];
+  return '<div class="tx-cal">' + WDN.map(w=>'<div class="h">'+w+'</div>').join('')
+    + 셀.map(d => { const k = ymd(d);
+        const 것 = 전체.filter(r => r.day<=k && (r.day_end||r.day)>=k);
+        return '<div class="tx-cd '+(d.getMonth()!==m?'dim':'')+(k===TODAY?' today':'')+'"><span class="d">'+d.getDate()+'</span>'
+          + 것.map(r=>'<span class="lv '+esc(r.status)+'" data-act="tx:open" data-k="'+key+'" data-id="'+r.id+'">'+esc(사람(r.staff_id).name.slice(-2))+' '+esc(r.kind)+'</span>').join('') + '</div>'; }).join('')
+    + '</div>';
+}
+
+/* 행 시트 (만들기 · 고치기) */
+let 시트 = null;   /* {key, id, 값} */
+function txSheet(key, id, 초기){
+  const T = 표정의[key];
+  const r = id ? W[key].find(x=>x.id===id) : null;
+  const 값 = Object.assign({}, r || {}, 초기 || {});
+  if(!id){ T.열.forEach(c => { if(값[c.k]===undefined && c.기본!==undefined) 값[c.k]=c.기본; });
+    if(값.vis===undefined) 값.vis = T.기본vis || 'owners';
+    if(T.사람열 && 값[T.사람열]===undefined && ME) 값[T.사람열] = (T.열.find(c=>c.k===T.사람열)||{}).타입==='person' ? ME.id : [ME.id]; }
+  시트 = { key, id, 값 };
+  const 잠김 = T.잠금 && T.잠금(값);
+  const 내가고칠수 = !id || 관리자() || (r && (r.created_by===(ME&&ME.id)
+      || (Array.isArray(r[T.사람열]) ? 내것(r[T.사람열]) : r[T.사람열]===(ME&&ME.id))));
+  const 편집 = !잠김 && 내가고칠수;
+  const 칸 = c => {
+    if(c.관리자만 && !관리자()) return '';
+    const v = 값[c.k];
+    const dis = 편집 ? '' : ' disabled';
+    let inner = '';
+    if(c.타입==='text')   inner = '<input class="inp" data-f="'+c.k+'" value="'+esc(v||'')+'" placeholder="'+esc(c.힌트||'')+'"'+dis+'>';
+    if(c.타입==='number') inner = '<input class="inp" type="number" data-f="'+c.k+'" value="'+esc(v==null?'':v)+'"'+dis+'>';
+    if(c.타입==='long')   inner = '<textarea class="inp" data-f="'+c.k+'" placeholder="'+esc(c.힌트||'')+'"'+dis+'>'+esc(v||'')+'</textarea>';
+    if(c.타입==='date')   inner = '<input class="inp" type="date" data-f="'+c.k+'" value="'+esc(v||'')+'"'+dis+'>';
+    if(c.타입==='datetime') inner = '<input class="inp" type="datetime-local" data-f="'+c.k+'" value="'+esc(v?로컬ISO(v):'')+'"'+dis+'>';
+    if(c.타입==='check')  inner = '<label class="tx-ochip '+(v?'on':'')+'"><input type="checkbox" data-f="'+c.k+'" '+(v?'checked':'')+dis+' style="display:none">'+(v?'✓ ':'')+c.이름+'</label>';
+    if(c.타입==='select') inner = '<div class="tx-ochips">'+c.옵션.map(o=>'<button type="button" class="tx-ochip '+(v===o?'on':'')+'" data-act="tx:opt" data-f="'+c.k+'" data-v2="'+esc(o)+'"'+dis+'>'+esc((c.표시||{})[o]||o)+'</button>').join('')+'</div>';
+    if(c.타입==='multi')  inner = '<div class="tx-ochips">'+c.옵션.map(o=>'<button type="button" class="tx-ochip '+((v||[]).indexOf(o)>=0?'on':'')+'" data-act="tx:multi" data-f="'+c.k+'" data-v2="'+esc(o)+'"'+dis+'>'+esc(o)+'</button>').join('')+'</div>';
+    if(c.타입==='people') inner = '<div class="tx-pchips">'+W.staff.filter(p=>p.active!==false).map(p=>'<button type="button" class="tx-pchip '+((v||[]).indexOf(p.id)>=0?'on':'')+'" data-act="tx:multi" data-f="'+c.k+'" data-v2="'+p.id+'"'+dis+'>'+아바타(p.id)+esc(p.name)+'</button>').join('')+'</div>';
+    if(c.타입==='person') inner = '<div class="tx-pchips">'+W.staff.filter(p=>p.active!==false).map(p=>'<button type="button" class="tx-pchip '+(v===p.id?'on':'')+'" data-act="tx:opt" data-f="'+c.k+'" data-v2="'+p.id+'"'+dis+'>'+아바타(p.id)+esc(p.name)+'</button>').join('')+'</div>';
+    return '<div class="fld"><span class="fn">'+c.이름+(c.필수?' *':'')+'</span>'+inner+'</div>';
+  };
+  /* 공개 범위 — 관리자는 넷 다, 나머지는 전체/담당자만 */
+  const vis옵 = 관리자() ? ['all','owners','picked','admin'] : ['all','owners'];
+  const 공개 = '<div class="fld"><span class="fn">공개 범위</span><div class="tx-ochips">'
+    + vis옵.map(o=>'<button type="button" class="tx-ochip '+(값.vis===o?'on':'')+'" data-act="tx:opt" data-f="vis" data-v2="'+o+'"'+(편집?'':' disabled')+'>'+VIS[o]+'</button>').join('')
+    + '</div>'
+    + (값.vis==='picked' ? '<div class="tx-pchips" style="margin-top:8px">'+W.staff.map(p=>'<button type="button" class="tx-pchip '+((값.viewers||[]).indexOf(p.id)>=0?'on':'')+'" data-act="tx:multi" data-f="viewers" data-v2="'+p.id+'">'+아바타(p.id)+esc(p.name)+'</button>').join('')+'</div>' : '')
+    + '</div>';
+  const 메타 = r ? '<div class="tx-meta">만든 사람 '+esc(사람(r.created_by).name)+' · '+시각한글(r.created_at)+(r.updated_at&&r.updated_at!==r.created_at?' · 고침 '+시각한글(r.updated_at):'')+'</div>' : '';
+  popOpen('<h2>'+(id?T.제목+' 고치기':'새 '+T.제목)+(잠김?' <span class="tx-tag warn">잠김 · 관리자만</span>':'')+'</h2>'
+    + '<div class="tx-form" id="txform">' + T.열.map(칸).join('') + 공개 + 메타 + '</div>'
+    + '<div class="tx-fbtns">'
+    + (편집 ? '<button class="btn gold" data-act="tx:save">'+(id?'저장':'만들기')+'</button>' : '')
+    + (편집 && id ? '<button class="btn ghost del" data-act="tx:del">지우기</button>' : '')
+    + '<button class="btn ghost" data-act="popclose">닫기</button></div>');
+}
+function 시트값읽기(){
+  const f = $('#txform'); if(!f || !시트) return;
+  f.querySelectorAll('[data-f]').forEach(el => {
+    if(el.tagName==='BUTTON') return;
+    const k = el.dataset.f;
+    if(el.type==='checkbox') 시트.값[k] = el.checked;
+    else if(el.type==='datetime-local') 시트.값[k] = el.value ? new Date(el.value).toISOString() : null;
+    else if(el.type==='number') 시트.값[k] = el.value==='' ? null : Number(el.value);
+    else 시트.값[k] = el.value;
+  });
+}
+async function txSave(){
+  시트값읽기();
+  const { key, id, 값 } = 시트, T = 표정의[key];
+  for(const c of T.열) if(c.필수 && !값[c.k]){ toast(c.이름+'을(를) 적어 주세요'); return; }
+  const body = {};
+  T.열.forEach(c => { if(c.관리자만 && !관리자()) return; body[c.k] = 값[c.k]===undefined ? null : 값[c.k]; });
+  body.vis = 값.vis || 'owners'; body.viewers = 값.vis==='picked' ? (값.viewers||[]) : [];
+  if(key==='tasks'){ body.done_at = body.done ? (값.done_at||new Date().toISOString()) : null; body.template = 값.template||null; }
+  if(key==='leave' && !관리자()){ body.staff_id = ME.id; delete body.status; }
+  if(key==='leave'){ if(!body.day_end) body.day_end = null; }
+  if(key==='tasks' && !body.due) body.due = null;
+  try{
+    if(id){ const r = await usend(T.table+'?id=eq.'+id, 'PATCH', body, 'return=representation');
+      const i = W[key].findIndex(x=>x.id===id); if(i>=0 && r && r[0]) W[key][i] = r[0]; toast('저장했어요'); }
+    else { const r = await usend(T.table, 'POST', body, 'return=representation');
+      if(r && r[0]) W[key].unshift(r[0]); toast('만들었어요'); }
+    popClose(); render();
+  }catch(e){ toast('저장 못 했어요 — '+e.message); }
+}
+async function txDel(){
+  const { key, id } = 시트, T = 표정의[key];
+  if(!id || !confirm('정말 지울까요?')) return;
+  try{ await usend(T.table+'?id=eq.'+id, 'DELETE'); W[key] = W[key].filter(x=>x.id!==id); popClose(); toast('지웠어요'); render(); }
+  catch(e){ toast('못 지웠어요 — '+e.message); }
+}
+async function txToggle(key, id, f){
+  const T = 표정의[key], r = W[key].find(x=>x.id===id); if(!r) return;
+  const v = !r[f]; const body = { [f]: v };
+  if(key==='tasks') body.done_at = v ? new Date().toISOString() : null;
+  try{ const o = await usend(T.table+'?id=eq.'+id, 'PATCH', body, 'return=representation');
+    if(o && o[0]) Object.assign(r, o[0]); render(); }
+  catch(e){ toast('바꾸지 못했어요 — '+e.message); }
+}
+function txNewMenu(key){
+  const T = 표정의[key];
+  popOpen('<h2>새 '+T.제목+'</h2><div class="tx-menu">'
+    + T.템플릿.filter(t=>!t.관리자만||관리자()).map((t,i)=>'<button data-act="tx:tpl" data-k="'+key+'" data-i="'+i+'">'+esc(t.이름)
+        + (t.값.title?'<small>'+esc(t.값.title)+'</small>':'')+'</button>').join('')
+    + '</div><button class="btn ghost" data-act="popclose">닫기</button>');
+}
+
+/* 홈 — 오늘 한눈에 */
+function vHome(){
+  const 공지 = W.tasks.filter(r=>r.kind==='대표공지' && !r.done).slice(0,3);
+  const 내업무 = W.tasks.filter(r=>!r.done && 내것(r.owners)).sort(표정의.tasks.정렬).slice(0,8);
+  const 오늘상담 = W.leads.filter(r=>오늘인가(r.at) && !r.done).sort((a,b)=>(a.at||'')>(b.at||'')?1:-1);
+  const 이번주 = W.leave.filter(표정의.leave.보기[0].필터).sort((a,b)=>(a.day||'')>(b.day||'')?1:-1);
+  const 대기 = 관리자() ? W.leave.filter(r=>r.status==='req').length : 0;
+  const 섹 = (제목, key, 목록, 빈말) => '<div class="sec"><div class="lbl">'+제목+' '+목록.length+'건'
+    + '<span class="r" data-act="tx:go" data-k="'+key+'">전부 보기 ›</span></div>'
+    + (목록.length ? '<div class="tx-list">'+목록.map(r=>txRow(key, r)).join('')+'</div>' : '<div class="empty">'+빈말+'</div>') + '</div>';
+  return (공지.length ? '<div class="sec" style="margin-bottom:14px">'+공지.map(r=>'<button class="tx-notice" style="text-align:left;width:100%" data-act="tx:open" data-k="tasks" data-id="'+r.id+'"><div class="t1">📌 '+esc(r.title)+'</div>'+(r.body?'<div class="t2">'+esc(r.body)+'</div>':'')+'</button>').join('')+'</div>' : '')
+    + '<div class="tx-home">'
+    + 섹('내 업무', 'tasks', 내업무, '남은 업무가 없어요')
+    + 섹('오늘 상담', 'leads', 오늘상담, '오늘 잡힌 상담이 없어요')
+    + 섹('이번 주 연월차'+(대기?' <span class="tx-tag warn">승인 대기 '+대기+'</span>':''), 'leave', 이번주, '이번 주는 없어요')
+    + '</div><div style="height:18px"></div>' + vToday();
+}
+
+/* 내 정보 */
+function txMe(){
+  const g = (ME && ME.goal) || {};
+  popOpen('<h2>내 정보</h2>'
+    + '<div class="card rowc">'+아바타(ME.id)+'<div><div class="t1">'+esc(ME.name)+'</div><div class="t2">'+({admin:'관리자',trainer:'트레이너',fc:'FC'}[ME.role]||ME.role)+' · '+esc((AUTH.user||{}).email||'')+'</div></div></div>'
+    + '<div class="fld"><span class="fn">나의 핵심 가치</span><input class="inp" id="txg1" value="'+esc(g.value||'')+'" placeholder="예: 변하지 않는 진정성으로 회원님의 도전을 서포트한다"></div>'
+    + '<div class="fld"><span class="fn">이번 분기 목표</span><input class="inp" id="txg2" value="'+esc(g.quarter||'')+'" placeholder="예: 평균 매출 800 이상"></div>'
+    + '<button class="btn sub" data-act="tx:goal">목표 저장</button>'
+    + (관리자() ? '<div class="lbl" style="margin-top:6px">회원 화면에서 누구로 볼까요</div><div class="tx-pchips">'
+        + ['전체'].concat([...new Set(D.m.map(x=>x.trainer).filter(Boolean))]).map(t=>'<button class="tx-pchip '+(S.who===t?'on':'')+'" data-setwho="'+esc(t)+'">'+esc(t==='전체'?'전체 보기':t)+'</button>').join('')+'</div>' : '')
+    + (관리자() ? '<div class="lbl" style="margin-top:8px">직원 관리 <span class="r" style="color:var(--sub);font-weight:500">구글 메일을 넣으면 그 사람이 들어올 수 있어요</span></div>'
+        + '<div class="tx-staff">' + W.staff.map(p => '<div class="card rowc '+(p.active===false?'off':'')+'">'+아바타(p.id)
+            + '<div><div class="t1">'+esc(p.name)+' <span class="tx-tag">'+({admin:'관리자',trainer:'트레이너',fc:'FC'}[p.role]||p.role)+'</span></div>'
+            + '<div class="t2">'+esc(p.email||'')+'</div></div>'
+            + (p.id===ME.id ? '<span class="tx-tag gold">나</span>'
+               : '<button class="btn ghost sm" data-act="tx:staffoff" data-id="'+p.id+'">'+(p.active===false?'다시 켜기':'끄기')+'</button>')
+            + '</div>').join('')
+        + '<div class="tx-sadd"><input class="inp" id="txsmail" type="email" placeholder="구글 메일"><input class="inp" id="txsname" placeholder="이름">'
+        + '<select class="inp" id="txsrole"><option value="trainer">트레이너</option><option value="fc">FC</option><option value="admin">관리자</option></select>'
+        + '<button class="btn gold sm" data-act="tx:staffadd">넣기</button></div></div>' : '')
+    + '<div class="fld" style="margin-top:6px"><span class="fn">비밀번호 바꾸기 <span style="font-weight:500">(이메일로 들어온 계정만)</span></span><input class="inp" id="txpw" type="password" placeholder="새 비밀번호 (8자 이상)" autocomplete="new-password"></div>'
+    + '<div class="tx-fbtns"><button class="btn ghost" data-act="tx:pw">비밀번호 바꾸기</button><button class="btn ghost del" data-act="tx:out">로그아웃</button></div>'
+    + '<div class="tx-meta">데스크 BUILD '+BUILD+'</div>'
+    + '<button class="btn ghost" data-act="popclose">닫기</button>');
+}
+
+/* 손잡이 — 클릭 위임의 맨 앞에서 받는다 */
+async function txAct(a, el){
+  const k = el.dataset.k, id = el.dataset.id, v2 = el.dataset.v2;
+  if(a==='go'){ S.view = k; document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('on', b.dataset.v===k)); render(); return; }
+  if(a==='view'){ 표상태[k].보기 = v2; render(); return; }
+  if(a==='who'){ 표상태[k].사람 = v2 || null; render(); return; }
+  if(a==='new'){ txNewMenu(k); return; }
+  if(a==='tpl'){ const t = 표정의[k].템플릿[+el.dataset.i]; txSheet(k, null, Object.assign({template:t.이름}, t.값)); return; }
+  if(a==='open'){ txSheet(k, id); return; }
+  if(a==='toggle'){ await txToggle(k, id, el.dataset.f); return; }
+  if(a==='opt'){ 시트값읽기(); const f = el.dataset.f; 시트.값[f] = (시트.값[f]===v2 && f!=='vis') ? null : v2; txSheet(시트.key, 시트.id, 시트.값); return; }
+  if(a==='multi'){ 시트값읽기(); const f = el.dataset.f; const arr = (시트.값[f]||[]).slice();
+    const i = arr.indexOf(v2); if(i>=0) arr.splice(i,1); else arr.push(v2); 시트.값[f] = arr; txSheet(시트.key, 시트.id, 시트.값); return; }
+  if(a==='save'){ await txSave(); return; }
+  if(a==='del'){ await txDel(); return; }
+  if(a==='me'){ txMe(); return; }
+  if(a==='goal'){ const goal = { value:$('#txg1').value, quarter:$('#txg2').value };
+    try{ await usend('staff?id=eq.'+ME.id, 'PATCH', { goal }); ME.goal = goal; toast('목표를 저장했어요'); }catch(e){ toast('못 저장했어요 — '+e.message); } return; }
+  if(a==='pw'){ const pw = $('#txpw').value; if(pw.length<8){ toast('8자 이상이어야 해요'); return; }
+    try{ await 비번바꾸기(pw); toast('비밀번호를 바꿨어요'); $('#txpw').value=''; }catch(e){ toast('못 바꿨어요 — '+e.message); } return; }
+  if(a==='out'){ await signOut(); return; }
+  if(a==='staffadd'){
+    const email = ($('#txsmail').value||'').trim().toLowerCase(), name = ($('#txsname').value||'').trim(), role = $('#txsrole').value;
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ toast('메일 주소를 확인해 주세요'); return; }
+    if(!name){ toast('이름을 적어 주세요'); return; }
+    const 색 = ['red','green','pink','yellow','orange','blue','purple','gray'][W.staff.length % 8];
+    try{ const r = await usend('staff', 'POST', { email, name, role, color:색 }, 'return=representation');
+      if(r && r[0]) W.staff.push(r[0]); toast(name+' 넣었어요'); txMe(); }
+    catch(e){ toast('못 넣었어요 — '+(/duplicate|unique/i.test(e.message)?'이미 있는 메일이에요':e.message)); }
+    return; }
+  if(a==='staffoff'){
+    const p = W.staff.find(x=>x.id===id); if(!p) return;
+    try{ const r = await usend('staff?id=eq.'+id, 'PATCH', { active: p.active===false }, 'return=representation');
+      if(r && r[0]) Object.assign(p, r[0]); toast(p.name+(p.active===false?' 껐어요':' 켰어요')); txMe(); }
+    catch(e){ toast('못 바꿨어요 — '+e.message); }
+    return; }
+}
+function txRender(){
+  const top = $('#top'), line = $('#topline'), b = $('#body');
+  if(S.view==='home'){ top.innerHTML = '<h1>홈</h1><span class="cnt">'+dateFull(TODAY)+' · '+esc(ME?ME.name:'')+'</span>'; line.innerHTML=''; b.innerHTML = vHome(); return true; }
+  if(표정의[S.view]){ top.innerHTML = txTop(S.view); line.innerHTML=''; b.innerHTML = txList(S.view); return true; }
+  return false;
+}
+
+/* 부팅 — 로그인 → 직원 → 자료 */
+async function 구글버튼(){
+  for(let i=0;i<40;i++){ if(await gsiReady()) return; await new Promise(r=>setTimeout(r,250)); }
+  $('#txgoogle').style.display=''; $('#txgoogle').textContent = '구글 버튼을 못 불러왔어요 — 이메일로 들어가세요';
+}
+async function boot(){
+  authLoad();
+  if(await 구글돌아옴()) authLoad();
+  if(!AUTH){ $('#txlogin').classList.add('on'); 구글버튼(); return; }
+  try{
+    await loadWork();
+    ME = W.staff.find(x=>(x.email||'').toLowerCase()===내메일() && x.active!==false) || null;
+    if(!ME){ $('#txlerr').textContent = '명단에 없는 메일이에요 (' + 내메일() + '). 대표님께 이 주소를 알려 주세요.';
+      try{ await authPost('logout', {}, AUTH.access_token); }catch(e){}
+      authSave(null); $('#txlogin').classList.add('on'); 구글버튼(); return; }
+    S.who = 관리자() ? '전체' : ME.name;
+    $('#txlogin').classList.remove('on');
+    S.view = 'home';
+    document.querySelectorAll('.nav').forEach(x=>x.classList.toggle('on', x.dataset.v==='home'));
+    await load();
+  }catch(e){
+    $('#txlerr').textContent = '들어가지 못했어요 — ' + e.message;
+    authSave(null); $('#txlogin').classList.add('on');
+  }
+}
+$('#txgoogle').addEventListener('click', googleStart);
+$('#txlform').addEventListener('submit', async function(ev){
+  ev.preventDefault();
+  const b = $('#txlgo'); b.disabled = true; $('#txlerr').textContent = '';
+  try{ await signIn($('#txlemail').value.trim(), $('#txlpw').value); await boot(); }
+  catch(e){ $('#txlerr').textContent = /invalid/i.test(e.message) ? '이메일이나 비밀번호가 달라요' : e.message; }
+  b.disabled = false;
+});
+
 function vToday(){
   const mine = m => S.who==='전체' || (memOf(m).trainer||'')===S.who;
   const 오늘운동 = D.w.filter(w=>w.on_date===TODAY && mine(w.member_id));
@@ -1636,6 +2291,11 @@ const TABS = [['routine','루틴'],['record','운동 기록'],['comment','코멘
 function render(){
   const top = $('#top'), line = $('#topline'), b = $('#body');
   line.innerHTML = '';
+  if(txRender()){
+    const n2 = W.tasks.filter(r=>!r.done && 내것(r.owners)).length, bd2 = $('#txbdg');
+    if(n2){ bd2.textContent = n2; bd2.style.display=''; } else bd2.style.display='none';
+    gnbDraw(); return;
+  }
   if(S.view==='members'){
     const all = D.m.filter(x=>(x.role||'member')==='member');
     const trs = [...new Set(all.map(x=>x.trainer).filter(Boolean))];
@@ -1676,6 +2336,8 @@ function render(){
     top.innerHTML = '<h1>오늘</h1><span class="cnt">' + dateFull(TODAY) + '</span>';
     b.innerHTML = vToday();
   }
+  const n2 = W.tasks.filter(r=>!r.done && 내것(r.owners)).length, bd2 = $('#txbdg');
+  if(n2){ bd2.textContent = n2; bd2.style.display=''; } else bd2.style.display='none';
   const n = D.asks.filter(a=>!a.done_at).length;
   const bd = $('#cmbdg');
   if(n){ bd.textContent = n; bd.style.display=''; } else bd.style.display='none';
@@ -1700,8 +2362,8 @@ function gnbDraw(){
   const n = a.ask.length + a.cold.length;
   const dot = $('#belldot');
   if(n){ dot.textContent = n>99?'99+':n; dot.style.display=''; } else dot.style.display='none';
-  $('#gnm').textContent = S.who==='전체' ? '전체 보기' : S.who;
-  $('#gav').textContent = S.who==='전체' ? '전' : S.who.slice(-2);
+  $('#gnm').textContent = ME ? ME.name + (관리자() && S.who!=='전체' ? ' · '+S.who+' 보기' : '') : '—';
+  $('#gav').textContent = ME ? ME.name.slice(-2) : '—';
 }
 function popOpen(html){ $('#popbox').innerHTML = html; $('#pop').classList.add('on'); }
 function popClose(){ $('#pop').classList.remove('on'); }
@@ -1941,6 +2603,7 @@ document.addEventListener('click', async function(ev){
   const act = t.closest('[data-act]');
   if(!act){ if(t.id==='pop') popClose(); return; }
   const a = act.dataset.act, id = +act.dataset.i;
+  if(a.indexOf('tx:')===0){ ev.preventDefault(); await txAct(a.slice(3), act); return; }
 
   if(a==='toList'){ S.view='members'; render(); return; }
   if(a==='toMember'){ S.view='member'; render(); return; }
@@ -2293,15 +2956,16 @@ $('#gbell').addEventListener('click', function(){
 });
 $('#gnotice').addEventListener('click', function(){
   popOpen('<h2>공지사항</h2>'
-    + '<div class="card"><div class="t1">시험 단계입니다</div>'
-    + '<div class="t2">지금 자료는 모두 샘플입니다. 실제 회원 정보를 넣기 전에 '
-    + '로그인과 권한을 붙일 예정입니다.</div></div>'
+    + '<div class="card"><div class="t1">로그인이 붙었습니다</div>'
+    + '<div class="t2">업무·상담·연월차는 로그인한 사람 기준으로 보이고, '
+    + '공개 범위를 「지정한 사람만」으로 두면 그 사람과 관리자만 봅니다.</div></div>'
     + '<div class="card"><div class="t1">회원 앱과 그대로 이어집니다</div>'
     + '<div class="t2">여기서 만든 루틴·코멘트는 회원 폰에 바로 뜹니다. '
     + '회원이 운동한 기록도 여기서 그대로 봅니다.</div></div>'
     + '<button class="btn ghost" data-act="popclose">닫기</button>');
 });
 $('#gme').addEventListener('click', function(){
+  if(ME){ txMe(); return; }
   const trs = [...new Set(D.m.map(x=>x.trainer).filter(Boolean))];
   popOpen('<h2>내 정보</h2>'
     + '<div class="note">로그인은 <b>아직 붙이지 않았습니다.</b> 지금은 누구로 볼지 고르는 방식입니다.</div>'
@@ -2420,6 +3084,7 @@ function 되돌리기(st){
   S.who=st.who||S.who; S.day=st.day||null;
   document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('on',
     b.dataset.v===(st.view==='member'||st.view==='routine' ? 'members' : st.view)));
+  if(표정의[st.view] || st.view==='home') { /* 업무 화면은 표 자료만 있으면 그려진다 */ }
   render();
   if(st.mid && 회원바뀜) loadMember(st.mid);
 }
@@ -2433,14 +3098,18 @@ function push(){
 }
 window.addEventListener('popstate', function(e){
   if(e.state) 되돌리기(e.state);
-  else { S.view='members'; S.mid=null; S.rid=null; render(); }
+  else { S.view='home'; S.mid=null; S.rid=null; render(); }
 });
 
 /* 화면을 그릴 때마다 자리를 남긴다 */
 const _render = render;
 render = function(){ _render(); push(); };
 
-load();
-setInterval(function(){ if(S.view==='members'||S.view==='today'||S.view==='cmall') load(); }, 60000);
+boot();
+setInterval(async function(){
+  if(!ME) return;
+  if(S.view==='members'||S.view==='today'||S.view==='cmall') load();
+  if(S.view==='home'||표정의[S.view]){ try{ await loadWork(); if(!$('#pop').classList.contains('on')) render(); }catch(e){} }
+}, 60000);
 </script>
 </body></html>
