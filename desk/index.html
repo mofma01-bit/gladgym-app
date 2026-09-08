@@ -473,6 +473,30 @@ textarea.inp{min-height:76px;resize:vertical;line-height:1.6}
 .tx-b[data-t=tog].sz-h3 .tx-tg .tx-x{font-size:14.5px}
 .tx-b.tx-sel{background:rgba(230,196,135,.14)}
 .tx-b.tx-sel .tx-x{background:transparent}
+/* 블록 끌어 옮기기 */
+.tx-grip{cursor:grab}
+.tx-b.tx-grab{opacity:.35}
+body.tx-moving{cursor:grabbing}
+body.tx-moving .tx-x{cursor:grabbing}
+.tx-ins{position:fixed;height:2px;background:var(--gold);border-radius:2px;z-index:90;pointer-events:none;
+  box-shadow:0 0 7px rgba(230,196,135,.65)}
+/* 목록 고르기 — 왼쪽 체크상자·전체선택 */
+.tx-pick{width:16px;height:16px;border-radius:4px;border:1.5px solid #4a4740;flex:none;display:flex;
+  align-items:center;justify-content:center;font-size:10px;color:#1b1b19;cursor:pointer;
+  margin-right:2px;opacity:.4;transition:opacity .12s}
+.tx-row:hover .tx-pick,.tx-pick.on,.tx-selall .tx-pick{opacity:1}
+.tx-pick:hover{border-color:var(--gold)}
+.tx-pick.on{background:var(--gold);border-color:var(--gold)}
+.tx-row.tx-pk{border-color:var(--gold-2);background:rgba(230,196,135,.09)}
+.tx-selall{display:flex;align-items:center;gap:9px;padding:6px 4px 8px;font-size:12.5px;color:var(--sub);
+  font-weight:700;flex-wrap:wrap}
+.tx-selall b{color:var(--gold)}
+.tx-selall .acts{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
+.tx-selall .acts button{font-size:12px;font-weight:700;padding:5px 10px;border-radius:8px;
+  background:var(--dark-3);color:var(--cream)}
+.tx-selall .acts button:hover{background:var(--gold);color:#1b1b19}
+.tx-selall .acts button.wn{color:var(--warn)}
+.tx-selall .acts button.wn:hover{background:var(--warn);color:#1b1b19}
 .tx-emojis{display:grid;grid-template-columns:repeat(9,1fr);gap:2px;max-height:240px;overflow:auto;padding:2px}
 .tx-emojis button{font-size:19px;padding:5px 0;border-radius:7px;line-height:1.1}
 .tx-emojis button:hover{background:var(--dark-3)}
@@ -683,7 +707,7 @@ textarea.inp{min-height:76px;resize:vertical;line-height:1.6}
 
 <script>
 "use strict";
-const BUILD = '34';
+const BUILD = '35';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -2084,13 +2108,63 @@ function txList(key){
     + W.staff.filter(p=>p.active!==false).map(p => '<button class="tx-pchip '+(st.사람===p.id?'on':'')+'" data-act="tx:who" data-k="'+key+'" data-v2="'+p.id+'">'+아바타(p.id)+esc(p.name)+'</button>').join('')
     + '</span></div></div>';
   const 달력 = T.달력 ? txCal(key, rows) : '';
+  보인행[key] = rows.map(r => r.id);
+  if(고른행.key === key) 고른행.ids = 고른행.ids.filter(id => 보인행[key].indexOf(id) >= 0);
   if(!rows.length) return 보기줄 + 달력 + '<div class="empty">여기엔 아직 없어요</div>';
-  return 보기줄 + 달력 + '<div class="tx-list">' + rows.map(r => txRow(key, r)).join('') + '</div>';
+  return 보기줄 + 달력 + txPickBar(key, rows)
+    + '<div class="tx-list">' + rows.map(r => txRow(key, r, true)).join('') + '</div>';
 }
-function txRow(key, r){
+/* ── 목록 고르기 ── 왼쪽 체크상자 · 전체선택 · 고른 것 한꺼번에 (2026-09-08 대표 지시) */
+let 고른행 = { key:null, ids:[] };
+let 마지막고름 = null;
+let 시프트 = false;
+const 보인행 = {};
+const 체크열 = { tasks:'done', leads:'done', leave:null };
+function txPickBar(key, rows){
+  const T = 표정의[key];
+  const 고름 = 고른행.key === key ? 고른행.ids : [];
+  const 모두 = rows.length > 0 && 고름.length === rows.length;
+  let acts = '';
+  if(고름.length){
+    if(체크열[key]) acts += '<button data-act="tx:bulkck" data-k="'+key+'" data-v2="1">완료로</button>'
+                          + '<button data-act="tx:bulkck" data-k="'+key+'" data-v2="">되돌리기</button>';
+    if(key === 'leave' && 관리자()) acts += '<button data-act="tx:bulkst" data-k="'+key+'" data-v2="ok">승인</button>'
+                                          + '<button data-act="tx:bulkst" data-k="'+key+'" data-v2="no">반려</button>';
+    if(T.사람열) acts += '<button data-act="tx:bulkwho" data-k="'+key+'">담당 바꾸기</button>';
+    acts += '<button class="wn" data-act="tx:bulkdel" data-k="'+key+'">삭제</button>';
+  }
+  return '<div class="tx-selall"><span class="tx-pick '+(모두?'on':'')+'" data-act="tx:pickall" data-k="'+key+'">'+(모두?'✓':'')+'</span>'
+    + (고름.length
+        ? '<b>'+고름.length+'건</b> 골랐어요 <button data-act="tx:pickno" data-k="'+key+'" style="color:#6f6a63;font-weight:600;text-decoration:underline">해제</button>'
+        : '전체 선택 <span style="color:#5f5a54;font-weight:500">· Shift 를 누르고 고르면 사이가 한꺼번에</span>')
+    + '<span class="acts">'+acts+'</span></div>';
+}
+async function txBulk(key, body){
+  const T = 표정의[key], ids = (고른행.key === key ? 고른행.ids : []).slice();
+  if(!ids.length) return;
+  const 조건 = 'id=in.(' + ids.map(x => '"'+x+'"').join(',') + ')';
+  try{
+    const o = await usend(T.table+'?'+조건, 'PATCH', body, 'return=representation') || [];
+    o.forEach(n => { const r = W[key].find(x => x.id === n.id); if(r) Object.assign(r, n); });
+    toast(o.length + '건 바꿨어요' + (o.length < ids.length ? ' (' + (ids.length - o.length) + '건은 권한이 없어요)' : ''));
+    render();
+  }catch(e){ toast('못 바꿨어요 — ' + e.message); }
+}
+function txBulkWho(key){
+  const T = 표정의[key], c = T.열.find(x => x.k === T.사람열) || {};
+  popOpen('<h2>' + (c.이름 || '담당') + ' 바꾸기</h2>'
+    + '<div style="color:var(--sub);font-size:12.5px;margin-bottom:9px">고른 ' + 고른행.ids.length + '건을 이 사람으로 바꿔요</div>'
+    + '<div class="tx-menu">'
+    + W.staff.filter(p => p.active !== false).map(p => '<button data-act="tx:bulkpick" data-k="'+key+'" data-v2="'+p.id+'">'+아바타(p.id)+' '+esc(p.name)+'</button>').join('')
+    + (c.타입 === 'people' ? '<button data-act="tx:bulkpick" data-k="'+key+'" data-v2="">비우기</button>' : '')
+    + '</div><button class="btn ghost" data-act="popclose">닫기</button>');
+}
+function txRow(key, r, 고르기){
   const T = 표정의[key], x = T.행(r);
   const done = x.체크 ? !!r[x.체크] : false;
-  return '<button class="tx-row '+(done?'done':'')+'" data-act="tx:open" data-k="'+key+'" data-id="'+r.id+'">'
+  const 골랐나 = 고른행.key === key && 고른행.ids.indexOf(r.id) >= 0;
+  return '<button class="tx-row '+(done?'done':'')+(고르기&&골랐나?' tx-pk':'')+'" data-act="tx:open" data-k="'+key+'" data-id="'+r.id+'">'
+    + (고르기 ? '<span class="tx-pick '+(골랐나?'on':'')+'" data-act="tx:pick" data-k="'+key+'" data-id="'+r.id+'" title="고르기">'+(골랐나?'✓':'')+'</span>' : '')
     + (x.체크 ? '<span class="tx-ck '+(done?'on':'')+'" data-act="tx:toggle" data-k="'+key+'" data-id="'+r.id+'" data-f="'+x.체크+'">'+(done?'✓':'')+'</span>' : '')
     + '<span class="tx-main"><span class="tx-t">'+esc(x.제목)+'</span><span class="tx-s">'+x.칩
     + (r.vis && r.vis!=='all' ? '<span class="tx-vis">🔒 '+VIS[r.vis]+'</span>' : '') + '</span></span>'
@@ -2387,7 +2461,7 @@ const 링크살리기 = t => esc(t).replace(/(https?:\/\/[^\s<]+)/g,
 function 블록칸(b, i, 편집, urls, 번호){
   if(b.t === 'tog'){
     return '<div class="tx-b '+(b.open?'open':'')+(b.sz?' sz-'+b.sz:'')+'" data-t="tog" data-i="'+i+'">'
-      + (편집 ? '<span class="tx-hand"><button data-act="tx:bup" data-i="'+i+'" title="위로">↑</button>'
+      + (편집 ? '<span class="tx-hand"><button class="tx-grip" data-grip="'+i+'" title="끌어서 옮기기">⠿</button>'
           + '<button data-act="tx:bmenu" data-i="'+i+'" title="블록 바꾸기·지우기">⋮</button></span>' : '<span class="tx-hand"></span>')
       + '<div class="tx-in"><div class="tx-tg"><button data-act="tx:btog" data-i="'+i+'" title="펼치기">▶</button>'
       + (편집 ? '<div class="tx-x" contenteditable="true" data-ph="접어 둘 제목" data-bi="'+i+'" spellcheck="false"></div>'
@@ -2414,7 +2488,7 @@ function 블록칸(b, i, 편집, urls, 번호){
       : '<a class="tx-med doc" href="'+u+'" target="_blank" rel="noopener">📎 '+esc(b.name||'파일')+'<small>'+(b.size?Math.round(b.size/1024)+'KB':'')+'</small></a>';
   }
   return '<div class="tx-b'+(b.t==='todo'&&b.done?' ck':'')+'" data-t="'+b.t+'" data-i="'+i+'">'
-    + (편집 ? '<span class="tx-hand"><button data-act="tx:bup" data-i="'+i+'" title="위로">↑</button>'
+    + (편집 ? '<span class="tx-hand"><button class="tx-grip" data-grip="'+i+'" title="끌어서 옮기기">⠿</button>'
         + '<button data-act="tx:bmenu" data-i="'+i+'" title="블록 바꾸기·지우기">⋮</button></span>' : '<span class="tx-hand"></span>')
     + '<div class="tx-in">'+속+'</div></div>';
 }
@@ -2492,6 +2566,77 @@ document.addEventListener('mousemove', function(ev){
   고른줄 = 새; 고른줄표시();
 });
 document.addEventListener('mouseup', function(){ 끌기 = null; });
+
+/* ── 블록 끌어 옮기기 ── 노션처럼 ⠿ 를 잡아 옮긴다 (2026-09-08 대표 지시) */
+let 옮김 = null;
+function 객체자리(b, arr){                    /* 자리(숫자길)가 아니라 「그 블록 자체」로 찾는다 */
+  arr = arr || BL.bs;
+  for(let i=0;i<arr.length;i++){
+    if(arr[i] === b) return { arr, i };
+    if(arr[i].c && arr[i].c.length){ const r = 객체자리(b, arr[i].c); if(r) return r; }
+  }
+  return null;
+}
+function 품고있나(부모, 아이){
+  for(const q of (부모.c||[])){ if(q === 아이 || 품고있나(q, 아이)) return true; }
+  return false;
+}
+function 블록옮기기(부터, 까지, 아래){
+  const src = 블록가져(부터), dst = 블록가져(까지);
+  if(!src || !dst || src === dst) return false;
+  if(품고있나(src, dst)) return false;                          /* 제 안으로는 못 넣는다 */
+  const z = 자리찾기(부터); if(!z) return false;
+  z.arr.splice(z.i, 1);
+  if(!z.arr.length && z.arr !== BL.bs) z.arr.push(새블록('p')); /* 토글 속은 비워 두지 않는다 */
+  const w = 객체자리(dst);                                       /* 뺀 뒤라 자리가 밀렸다 — 다시 찾는다 */
+  if(!w){ z.arr.splice(z.i, 0, src); return false; }
+  w.arr.splice(w.i + (아래 ? 1 : 0), 0, src);
+  if(!BL.bs.length) BL.bs = [새블록('p')];
+  return true;
+}
+function 넣을자리선(rect, 아래){
+  let d = $('#txins');
+  if(!d){ d = document.createElement('div'); d.className = 'tx-ins'; d.id = 'txins'; document.body.appendChild(d); }
+  d.style.left = rect.left + 'px'; d.style.width = rect.width + 'px';
+  d.style.top = ((아래 ? rect.bottom : rect.top) - 1) + 'px';
+}
+const 자리선끄기 = () => { const d = $('#txins'); if(d) d.remove(); };
+document.addEventListener('mousedown', function(ev){
+  const g = ev.target.closest && ev.target.closest('[data-grip]');
+  if(!g || !BL) return;
+  const b = g.closest('.tx-b'); if(!b) return;
+  ev.preventDefault();
+  옮김 = { 부터: g.dataset.grip, 까지: null, 아래: false };
+  b.classList.add('tx-grab'); document.body.classList.add('tx-moving');
+  if(고른줄.length){ 고른줄 = []; 고른줄표시(); }
+}, true);
+document.addEventListener('mousemove', function(ev){
+  if(!옮김) return;
+  const box = $('#txblocks'); if(!box) return;
+  const 후보 = [...box.querySelectorAll('.tx-b')]
+    .filter(e => !e.closest('.tx-grab'))
+    .map(e => ({ i: e.dataset.i, r: e.getBoundingClientRect() }));
+  if(!후보.length) return;
+  /* 겹쳐 있으면 가장 안쪽(토글 속) 줄을 고른다 */
+  let 것 = 후보.filter(x => ev.clientY >= x.r.top && ev.clientY <= x.r.bottom)
+    .sort((a,b) => String(b.i).split('.').length - String(a.i).split('.').length)[0];
+  if(!것){ let 짧 = 1e9;
+    후보.forEach(x => { const d = Math.min(Math.abs(ev.clientY - x.r.top), Math.abs(ev.clientY - x.r.bottom));
+      if(d < 짧){ 짧 = d; 것 = x; } }); }
+  if(!것) return;
+  옮김.까지 = 것.i; 옮김.아래 = ev.clientY > (것.r.top + 것.r.bottom) / 2;
+  넣을자리선(것.r, 옮김.아래);
+});
+document.addEventListener('mouseup', function(){
+  if(!옮김) return;
+  const 부터 = 옮김.부터, 까지 = 옮김.까지, 아래 = 옮김.아래;
+  옮김 = null; 자리선끄기();
+  document.body.classList.remove('tx-moving');
+  document.querySelectorAll('.tx-grab').forEach(e => e.classList.remove('tx-grab'));
+  if(까지 == null) return;
+  글자넣기();                                  /* 고치기 전에 화면 글자를 먼저 담는다 */
+  if(블록옮기기(부터, 까지, 아래)){ 블록다시(); 블록자동저장(true); }
+});
 /* 한 줄 안에서 글자를 고르면 줄 선택은 푼다 */
 document.addEventListener('selectionchange', function(){
   if(!BL || !고른줄.length || 끌기) return;
@@ -2807,8 +2952,40 @@ function txMe(){
 async function txAct(a, el){
   const k = el.dataset.k, id = el.dataset.id, v2 = el.dataset.v2;
   if(a==='go'){ S.view = k; document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('on', b.dataset.v===k)); render(); return; }
-  if(a==='view'){ 표상태[k].보기 = v2; render(); return; }
-  if(a==='who'){ 표상태[k].사람 = v2 || null; render(); return; }
+  if(a==='view'){ 표상태[k].보기 = v2; 고른행 = { key:null, ids:[] }; render(); return; }
+  if(a==='who'){ 표상태[k].사람 = v2 || null; 고른행 = { key:null, ids:[] }; render(); return; }
+  /* ── 목록 고르기 ── */
+  if(a==='pick'){
+    if(고른행.key !== k){ 고른행 = { key:k, ids:[] }; 마지막고름 = null; }
+    const 목 = 보인행[k] || [];
+    if(시프트 && 마지막고름 && 목.indexOf(마지막고름) >= 0 && 목.indexOf(id) >= 0){
+      const a2 = 목.indexOf(마지막고름), b2 = 목.indexOf(id);
+      목.slice(Math.min(a2,b2), Math.max(a2,b2)+1).forEach(x => { if(고른행.ids.indexOf(x) < 0) 고른행.ids.push(x); });
+    } else {
+      const p = 고른행.ids.indexOf(id);
+      if(p >= 0) 고른행.ids.splice(p, 1); else 고른행.ids.push(id);
+    }
+    마지막고름 = id; render(); return; }
+  if(a==='pickall'){ const 목 = 보인행[k] || [];
+    고른행 = { key:k, ids: (고른행.key === k && 고른행.ids.length === 목.length) ? [] : 목.slice() };
+    마지막고름 = null; render(); return; }
+  if(a==='pickno'){ 고른행 = { key:null, ids:[] }; 마지막고름 = null; render(); return; }
+  if(a==='bulkck'){ const f = 체크열[k]; if(!f) return;
+    const v = !!v2, body = { [f]: v };
+    if(k === 'tasks') body.done_at = v ? new Date().toISOString() : null;
+    await txBulk(k, body); return; }
+  if(a==='bulkst'){ await txBulk(k, { status: v2 }); return; }
+  if(a==='bulkwho'){ txBulkWho(k); return; }
+  if(a==='bulkpick'){ popClose();
+    const T2 = 표정의[k], c2 = T2.열.find(x => x.k === T2.사람열) || {};
+    await txBulk(k, { [T2.사람열]: c2.타입 === 'people' ? (v2 ? [v2] : []) : (v2 || null) }); return; }
+  if(a==='bulkdel'){ const ids2 = (고른행.key === k ? 고른행.ids : []).slice();
+    if(!ids2.length || !confirm(ids2.length + '건을 지울까요? 첨부·댓글도 같이 지워져요')) return;
+    try{ await usend(표정의[k].table + '?id=in.(' + ids2.map(x => '"'+x+'"').join(',') + ')', 'DELETE');
+      W[k] = W[k].filter(x => ids2.indexOf(x.id) < 0);
+      고른행 = { key:null, ids:[] }; toast(ids2.length + '건 지웠어요'); render(); }
+    catch(e){ toast('못 지웠어요 — ' + e.message); }
+    return; }
   if(a==='new'){ txNewMenu(k); return; }
   if(a==='tpl'){ const t = 표정의[k].템플릿[+el.dataset.i];
     txSheet(k, null, Object.assign({template:t.이름}, t.값));     /* 기본값을 채우고 */
@@ -2840,7 +3017,7 @@ async function txAct(a, el){
   if(a==='bemo'){ const b = 블록가져(el.dataset.i); if(!b) return;
     const e2 = prompt('이 상자 앞에 둘 그림글자 (이모지)', b.emo || '📌'); if(e2==null) return;
     글자넣기(); b.emo = e2.slice(0,4) || '📌'; 블록다시(); 블록자동저장(true); return; }
-  if(a==='bup'){ 글자넣기(); const z = 자리찾기(el.dataset.i); if(!z || z.i<1) return;
+  if(a==='bup'){ 글자넣기(); 블록메뉴닫기(); const z = 자리찾기(el.dataset.i); if(!z || z.i<1) return;
     const t2 = z.arr[z.i]; z.arr[z.i] = z.arr[z.i-1]; z.arr[z.i-1] = t2; 블록다시(); 블록자동저장(true); return; }
   if(a==='bmenu'){ const i = el.dataset.i; const r2 = el.getBoundingClientRect();
     블록메뉴닫기();
@@ -2848,6 +3025,7 @@ async function txAct(a, el){
     d.innerHTML = 블록종류.filter(k=>!k.파일 && k.t!=='emoji').map(k => '<button data-act="tx:bset" data-i="'+i+'" data-t="'+k.t+'"'
         + (k.크기?' data-sz="'+k.크기+'"':'') + '><i>'+k.i+'</i>'+k.n+'</button>').join('')
       + '<div style="height:1px;background:var(--line);margin:5px 4px"></div>'
+      + '<button data-act="tx:bup" data-i="'+i+'"><i>↑</i>위로</button>'
       + '<button data-act="tx:bdown" data-i="'+i+'"><i>↓</i>아래로</button>'
       + '<button data-act="tx:bdel" data-i="'+i+'" style="color:var(--warn)"><i>✕</i>이 블록 지우기</button>';
     document.body.appendChild(d);
@@ -3222,6 +3400,7 @@ async function saveItemField(id, f, v){
 /* ── 눌림 ── */
 document.addEventListener('click', async function(ev){
   const t = ev.target;
+  시프트 = ev.shiftKey;                     /* 목록에서 사이 한꺼번에 고르기 */
 
   const nav = t.closest('.nav');
   if(nav){ S.view = nav.dataset.v;
