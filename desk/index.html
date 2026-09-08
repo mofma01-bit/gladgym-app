@@ -381,6 +381,40 @@ textarea.inp{min-height:76px;resize:vertical;line-height:1.6}
 .tx-gbtn:hover{background:#f3f1ec}
 .tx-or{display:flex;align-items:center;gap:10px;color:#6f6a63;font-size:11.5px;margin:2px 0}
 .tx-or:before,.tx-or:after{content:"";flex:1;height:1px;background:var(--line)}
+.tx-page{display:flex;flex-direction:column;gap:12px}
+.tx-page .tx-ttl{font-size:18px;font-weight:800;line-height:1.35}
+.tx-page .tx-ttl.done{text-decoration:line-through;opacity:.6}
+.tx-page .tx-chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--sub)}
+.tx-sec{border-top:1px solid var(--line);padding-top:10px}
+.tx-sec .lbl{margin-bottom:8px}
+.tx-body{font-size:13.5px;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+.tx-body .h{display:block;font-size:15px;font-weight:800;margin:4px 0 2px}
+.tx-body .li{display:block;padding-left:14px;text-indent:-14px}
+.tx-body .ck{display:inline-flex;align-items:center;gap:7px;cursor:pointer}
+.tx-body .ck i{width:16px;height:16px;border-radius:4px;border:1.5px solid #5a574f;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-style:normal;color:#1b1b19;flex:none}
+.tx-body .ck.on i{background:var(--gold);border-color:var(--gold)}
+.tx-body .ck.on{opacity:.6;text-decoration:line-through}
+.tx-body a{color:var(--teal);text-decoration:underline}
+.tx-body:empty:before{content:"내용이 없어요";color:#6f6a63}
+.tx-files{display:flex;flex-direction:column;gap:10px}
+.tx-file{position:relative;border-radius:12px;border:1px solid var(--line);background:#0e0e0d;overflow:hidden}
+.tx-file img,.tx-file video{width:100%;max-height:420px;object-fit:contain;display:block;background:#0e0e0d}
+.tx-file a.doc{display:flex;align-items:center;gap:10px;padding:11px 13px;font-size:13px;font-weight:600;color:var(--cream);background:var(--dark-3)}
+.tx-file a.doc b{font-size:18px}
+.tx-file a.doc small{margin-left:auto;color:var(--sub);font-weight:500;font-size:11px}
+.tx-file .x{position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center}
+.tx-file .nm{position:absolute;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);color:#eee;font-size:10.5px;padding:3px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-add{border:1px dashed #5a574f;color:var(--sub);font-size:12.5px;font-weight:700;border-radius:10px;padding:12px;text-align:center;width:100%}
+.tx-add:hover{border-color:var(--gold-2);color:var(--gold)}
+.tx-cmts{display:flex;flex-direction:column;gap:8px}
+.tx-cmt{display:flex;gap:9px;align-items:flex-start}
+.tx-cmt .b{flex:1;min-width:0;background:var(--dark-3);border-radius:0 11px 11px 11px;padding:8px 11px;font-size:13px;line-height:1.55;white-space:pre-wrap;word-break:break-word}
+.tx-cmt .m{font-size:10.5px;color:#7c766e;margin-top:3px}
+.tx-cmt .m button{color:#7c766e;margin-left:6px}
+.tx-cmt .m button:hover{color:var(--warn)}
+.tx-cmtin{display:flex;gap:8px;align-items:flex-end}
+.tx-cmtin textarea{flex:1;min-height:40px;max-height:120px;resize:vertical}
+.tx-cmn{font-size:11px;color:var(--sub);display:inline-flex;align-items:center;gap:3px}
 .tx-staff{display:flex;flex-direction:column;gap:6px}
 .tx-staff .rowc{padding:9px 11px}
 .tx-staff .off{opacity:.45}
@@ -441,6 +475,8 @@ textarea.inp{min-height:76px;resize:vertical;line-height:1.6}
 .tx-fbtns{display:flex;gap:8px;margin-top:4px}
 .tx-fbtns .btn{flex:1}
 .tx-fbtns .btn.del{flex:0 0 auto;color:var(--warn)}
+.tx-stat{flex:1;font-size:12px;color:var(--sub);align-self:center;min-height:18px}
+.tx-stat.bad{color:var(--warn)}
 .tx-meta{font-size:11px;color:#7c766e;line-height:1.6}
 .tx-menu{display:flex;flex-direction:column;gap:6px}
 .tx-menu button{text-align:left;padding:11px 13px;border-radius:10px;background:var(--dark-3);
@@ -550,7 +586,7 @@ textarea.inp{min-height:76px;resize:vertical;line-height:1.6}
 
 <script>
 "use strict";
-const BUILD = '23';
+const BUILD = '26';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -575,7 +611,7 @@ const TODAY = (()=>{ const d=new Date(), p=n=>String(n).padStart(2,'0');
 const AUTH_KEY = 'gg_desk_auth';
 let AUTH = null;            /* {access_token, refresh_token, user, exp} */
 let ME = null;              /* staff 행 {id,name,role,color,goal} */
-const W = { staff:[], tasks:[], leads:[], leave:[] };
+const W = { staff:[], tasks:[], leads:[], leave:[], cm:[] };
 const 관리자 = () => !!(ME && ME.role==='admin');
 
 function authLoad(){ try{ AUTH = JSON.parse(localStorage.getItem(AUTH_KEY)||'null'); }catch(e){ AUTH=null; } }
@@ -604,6 +640,7 @@ async function sha256hex(t){ const b = await crypto.subtle.digest('SHA-256', new
   return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''); }
 async function gsiReady(){
   if(!window.google || !google.accounts || !google.accounts.id) return false;
+  if(!(window.crypto && crypto.subtle)) return false;   /* http·file 에선 못 쓴다 — 40번 기다린 뒤 안내 */
   G_NONCE = crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2)+Date.now();
   google.accounts.id.initialize({ client_id: G_CLIENT, callback: gsiGot, nonce: await sha256hex(G_NONCE),
     ux_mode:'popup', auto_select:false, itp_support:true });
@@ -1920,8 +1957,9 @@ async function loadWork(){
     uget('tr_tasks?select=*&order=created_at.desc&limit=500'),
     uget('tr_leads?select=*&order=at.desc.nullslast&limit=500'),
     uget('tr_leave?select=*&order=day.desc&limit=400'),
+    uget('tr_comments?select=*&order=created_at&limit=2000').catch(()=>[]),
   ]);
-  W.staff = g[0]; W.tasks = g[1]; W.leads = g[2]; W.leave = g[3];
+  W.staff = g[0]; W.tasks = g[1]; W.leads = g[2]; W.leave = g[3]; W.cm = g[4] || [];
 }
 
 /* 목록 화면 */
@@ -1959,8 +1997,12 @@ function txRow(key, r){
     + (x.체크 ? '<span class="tx-ck '+(done?'on':'')+'" data-act="tx:toggle" data-k="'+key+'" data-id="'+r.id+'" data-f="'+x.체크+'">'+(done?'✓':'')+'</span>' : '')
     + '<span class="tx-main"><span class="tx-t">'+esc(x.제목)+'</span><span class="tx-s">'+x.칩
     + (r.vis && r.vis!=='all' ? '<span class="tx-vis">🔒 '+VIS[r.vis]+'</span>' : '') + '</span></span>'
-    + '<span class="tx-r">'+(x.오른쪽||'')+'</span></button>';
+    + '<span class="tx-r">'
+    + ((r.files||[]).length ? '<span class="tx-cmn">📎'+(r.files||[]).length+'</span>' : '')
+    + (댓글수(key, r.id) ? '<span class="tx-cmn">💬'+댓글수(key, r.id)+'</span>' : '')
+    + (x.오른쪽||'')+'</span></button>';
 }
+const 댓글수 = (key, id) => W.cm.filter(c => c.tbl===표정의[key].table && c.row_id===id).length;
 /* 연월차 달력 — 이번 달 */
 function txCal(key, rows){
   const t = new Date(TODAY), y = t.getFullYear(), m = t.getMonth();
@@ -1976,6 +2018,185 @@ function txCal(key, rows){
         return '<div class="tx-cd '+(d.getMonth()!==m?'dim':'')+(k===TODAY?' today':'')+'"><span class="d">'+d.getDate()+'</span>'
           + 것.map(r=>'<span class="lv '+esc(r.status)+'" data-act="tx:open" data-k="'+key+'" data-id="'+r.id+'">'+esc(사람(r.staff_id).name.slice(-2))+' '+esc(r.kind)+'</span>').join('') + '</div>'; }).join('')
     + '</div>';
+}
+
+/* ── 페이지 보기 ── 노션 페이지처럼: 제목 · 칩 · 본문 · 첨부 · 댓글. 「고치기」로 폼을 연다 */
+function 본문렌더(t){
+  if(!t) return '';
+  return String(t).split('\n').map((ln, i) => {
+    let h = esc(ln);
+    h = h.replace(/(https?:\/\/[^\s<]+)/g, u => '<a href="'+u+'" target="_blank" rel="noopener">'+u+'</a>');
+    if(/^#\s+/.test(ln)) return '<b class="h">'+h.replace(/^#\s+/,'')+'</b>';
+    const ck = ln.match(/^\s*[-*]?\s*\[( |x|X)\]\s?(.*)$/);
+    if(ck) return '<span class="ck '+(ck[1].trim()?'on':'')+'" data-act="tx:tick" data-line="'+i+'"><i>'+(ck[1].trim()?'✓':'')+'</i><span>'+esc(ck[2])+'</span></span>';
+    if(/^\s*[-*•]\s+/.test(ln)) return '<span class="li">• '+h.replace(/^\s*[-*•]\s+/,'')+'</span>';
+    return h;
+  }).join('\n');
+}
+const 파일종류 = f => /^image\//.test(f.type||'') ? 'img' : /^video\//.test(f.type||'') ? 'vid' : 'doc';
+
+/* ── 비공개 저장소 `tr` ── 주소만으로는 안 열린다. 로그인 토큰으로 1시간짜리 서명 주소를 받는다 (2026-09-08 대표 지시) */
+const 서명캐시 = {};   /* path → {url, exp} */
+async function 서명주소들(paths){
+  const 필요 = paths.filter(p => !(서명캐시[p] && 서명캐시[p].exp > Date.now()));
+  if(필요.length){
+    try{
+      const t = await 토큰();
+      const r = await fetch(SB_URL + '/storage/v1/object/sign/tr', { method:'POST',
+        headers:{ apikey:SB_KEY, Authorization:'Bearer '+t, 'Content-Type':'application/json' },
+        body: JSON.stringify({ expiresIn: 3600, paths: 필요 }) });
+      const j = r.ok ? await r.json() : [];
+      (j||[]).forEach(x => { if(x && x.signedURL && !x.error) 서명캐시[x.path] = { url: SB_URL + '/storage/v1' + x.signedURL, exp: Date.now() + 55*60*1000 }; });
+    }catch(e){}
+  }
+  return paths.map(p => (서명캐시[p]||{}).url || '');
+}
+/* 영상 줄이기 — 재생하면서 720p 로 다시 녹화한다 (PC·안드로이드 크롬). 안 되는 기기면 원본 그대로 */
+function 영상줄이기(file, 알림){
+  return new Promise(function(ok){
+    try{
+      if(!window.MediaRecorder || !HTMLCanvasElement.prototype.captureStream) return ok(null);
+      const mime = ['video/mp4;codecs=avc1.42E01E,mp4a.40.2','video/mp4','video/webm;codecs=vp9,opus','video/webm']
+        .find(m => MediaRecorder.isTypeSupported(m));
+      if(!mime) return ok(null);
+      const v = document.createElement('video'); v.muted = false; v.playsInline = true; v.preload = 'auto';
+      const url = URL.createObjectURL(file); v.src = url;
+      v.onloadedmetadata = function(){
+        const 배 = Math.min(1, 1280 / Math.max(v.videoWidth, v.videoHeight, 1));
+        if(배 >= 1 && file.size < 25*1024*1024) { URL.revokeObjectURL(url); return ok(null); }  /* 이미 작다 */
+        const c = document.createElement('canvas');
+        c.width = Math.round(v.videoWidth*배/2)*2; c.height = Math.round(v.videoHeight*배/2)*2;
+        const g = c.getContext('2d');
+        const st = c.captureStream(30);
+        try{ const a = (v.captureStream ? v.captureStream() : v.mozCaptureStream ? v.mozCaptureStream() : null);
+             if(a) a.getAudioTracks().forEach(tr => st.addTrack(tr)); }catch(e){}
+        const rec = new MediaRecorder(st, { mimeType: mime, videoBitsPerSecond: 1800000, audioBitsPerSecond: 96000 });
+        const chunks = []; rec.ondataavailable = e => { if(e.data && e.data.size) chunks.push(e.data); };
+        rec.onstop = function(){ URL.revokeObjectURL(url);
+          const b = new Blob(chunks, { type: mime.split(';')[0] });
+          ok(b.size && b.size < file.size ? b : null); };
+        let raf;
+        const 그리기 = () => { if(v.ended || v.paused){ return; } g.drawImage(v, 0, 0, c.width, c.height); raf = requestAnimationFrame(그리기); };
+        v.onended = function(){ cancelAnimationFrame(raf); try{ rec.stop(); }catch(e){ ok(null); } };
+        v.onerror = function(){ try{ rec.stop(); }catch(e){} ok(null); };
+        v.ontimeupdate = function(){ if(알림 && v.duration) 알림(Math.round(v.currentTime/v.duration*100)); };
+        v.volume = 0.0001;   /* 소리는 트랙으로만 잡고 스피커로는 거의 안 나가게 */
+        v.play().then(function(){ rec.start(1000); 그리기(); }).catch(function(){ ok(null); });
+      };
+      v.onerror = function(){ ok(null); };
+    }catch(e){ ok(null); }
+  });
+}
+function 첨부칸(key, r, 편집, urls){
+  const fs = r.files || [];
+  return '<div class="tx-files">' + fs.map((f, i) => {
+      const k = 파일종류(f), u = (urls && urls[i]) || '';
+      if(!u) return '<div class="tx-file"><a class="doc"><b>🔒</b>'+esc(f.name||'파일')+'<small>열 권한이 없거나 아직 준비 중</small></a></div>';
+      return '<div class="tx-file">'
+        + (k==='img' ? '<a href="'+u+'" target="_blank" rel="noopener"><img src="'+u+'" alt="" loading="lazy"></a>'
+         : k==='vid' ? '<video src="'+u+'" controls preload="metadata" playsinline></video>'
+         : '<a class="doc" href="'+u+'" target="_blank" rel="noopener"><b>📎</b>'+esc(f.name||'파일')+'<small>'+(f.size?Math.round(f.size/1024)+'KB':'')+'</small></a>')
+        + (k!=='doc' ? '<span class="nm">'+esc(f.name||'')+'</span>' : '')
+        + (편집 ? '<button class="x" data-act="tx:fdel" data-i="'+i+'" title="지우기">✕</button>' : '') + '</div>'; }).join('')
+    + (편집 ? '<button class="tx-add" data-act="tx:upload">＋ 사진·영상·파일</button>' : '')
+    + '</div><input type="file" id="txfile" multiple accept="image/*,video/*,.pdf,.hwp,.hwpx,.xlsx,.docx,.pptx,.txt,.zip" style="display:none">';
+}
+function 댓글칸(key, id){
+  const T = 표정의[key];
+  const cs = W.cm.filter(c => c.tbl===T.table && c.row_id===id);
+  return '<div class="tx-cmts" id="txcmts">' + (cs.length ? cs.map(c => '<div class="tx-cmt">'+아바타(c.created_by)
+      + '<div><div class="b">'+본문렌더(c.body)+'</div><div class="m">'+esc(사람(c.created_by).name)+' · '+시각한글(c.created_at)
+      + ((관리자() || c.created_by===(ME&&ME.id)) ? '<button data-act="tx:cmdel" data-id="'+c.id+'">지우기</button>' : '')
+      + '</div></div></div>').join('') : '<div class="tx-meta">아직 댓글이 없어요</div>')
+    + '</div><div class="tx-cmtin">'+아바타(ME.id)+'<textarea class="inp" id="txcmin" placeholder="댓글 남기기"></textarea>'
+    + '<button class="btn sub sm" data-act="tx:cmsend">보내기</button></div>';
+}
+async function txView(key, id){
+  const T = 표정의[key], r = W[key].find(x=>x.id===id); if(!r) return;
+  시트 = { key, id, 값: Object.assign({}, r) };
+  const urls = (r.files||[]).length ? await 서명주소들((r.files||[]).map(f=>f.path)) : [];
+  if(!시트 || 시트.key!==key || 시트.id!==id) return;   /* 기다리는 동안 다른 걸 열었으면 그만 */
+  const x = T.행(r);
+  const done = x.체크 ? !!r[x.체크] : false;
+  const 잠김 = T.잠금 && T.잠금(r);
+  const 편집 = !잠김 && (관리자() || r.created_by===(ME&&ME.id)
+      || (Array.isArray(r[T.사람열]) ? 내것(r[T.사람열]) : r[T.사람열]===(ME&&ME.id)));
+  const 긴열 = T.열.filter(c => c.타입==='long' && !(c.관리자만 && !관리자()));
+  popOpen('<div class="tx-page">'
+    + '<div class="tx-ttl '+(done?'done':'')+'">'+esc(x.제목)+'</div>'
+    + '<div class="tx-chips">'+x.칩+(x.오른쪽||'')+(r.vis && r.vis!=='all' ? '<span class="tx-vis">🔒 '+VIS[r.vis]+'</span>' : '')+'</div>'
+    + 긴열.map(c => '<div class="tx-sec"><div class="lbl">'+c.이름+'</div><div class="tx-body" data-f="'+c.k+'">'+본문렌더(r[c.k])+'</div></div>').join('')
+    + '<div class="tx-sec"><div class="lbl">첨부 '+((r.files||[]).length||'')+' <span style="font-weight:500;color:#7c766e">🔒 이 글을 볼 수 있는 사람만 엽니다</span></div>'+첨부칸(key, r, 편집, urls)+'</div>'
+    + '<div class="tx-sec"><div class="lbl">댓글 '+(댓글수(key,id)||'')+'</div>'+댓글칸(key, id)+'</div>'
+    + '<div class="tx-meta">만든 사람 '+esc(사람(r.created_by).name)+' · '+시각한글(r.created_at)+(r.updated_at&&r.updated_at!==r.created_at?' · 고침 '+시각한글(r.updated_at):'')+'</div>'
+    + '</div><div class="tx-fbtns">'
+    + (편집 ? '<button class="btn gold" data-act="tx:edit">고치기</button>' : '')
+    + (편집 && x.체크 ? '<button class="btn sub" data-act="tx:toggle" data-k="'+key+'" data-id="'+id+'" data-f="'+x.체크+'" data-stay="1">'+(done?'완료 취소':'완료')+'</button>' : '')
+    + '<button class="btn ghost" data-act="popclose">닫기</button></div>');
+}
+/* 첨부 올리기 — 회원 앱과 같은 media 저장소. 사진은 1280px로 줄여서 */
+async function txUpload(key, id, list){
+  const T = 표정의[key], r = W[key].find(x=>x.id===id); if(!r || !list || !list.length) return;
+  const files = (r.files||[]).slice();
+  for(const f of Array.from(list)){
+    if(f.size > 300*1024*1024){ toast(f.name+' — 300MB를 넘어 못 올려요'); continue; }
+    let blob = f, type = f.type || 'application/octet-stream', name = f.name;
+    if(/^image\//.test(f.type)){ try{ blob = await 줄이기(f); type = 'image/jpeg'; name = name.replace(/\.[^.]+$/,'') + '.jpg'; }catch(e){} }
+    else if(/^video\//.test(f.type)){
+      toast('영상을 줄이는 중 — 길이만큼 걸려요');
+      const b = await 영상줄이기(f, pct => toast('영상 줄이는 중 ' + pct + '%'));
+      if(b){ blob = b; type = b.type || 'video/webm'; name = name.replace(/\.[^.]+$/,'') + (/mp4/.test(type)?'.mp4':'.webm'); }
+      else toast('이 기기에선 못 줄여 원본으로 올려요');
+    }
+    const ext = (name.split('.').pop() || 'bin').toLowerCase().replace(/[^a-z0-9]/g,'') || 'bin';
+    const path = T.table + '/' + id + '/' + Date.now() + '_' + Math.random().toString(36).slice(2,6) + '.' + ext;
+    toast('올리는 중 — ' + name + ' (' + Math.round(blob.size/1024) + 'KB)');
+    try{
+      const t = await 토큰();
+      const res = await fetch(SB_URL+'/storage/v1/object/tr/'+path, { method:'POST',
+        headers:{ apikey:SB_KEY, Authorization:'Bearer '+t, 'Content-Type':type }, body: blob });
+      if(!res.ok) throw new Error((await res.text()).slice(0,80));
+      files.push({ path, name, type, size: blob.size, at: new Date().toISOString() });
+    }catch(e){ toast(name + ' 못 올렸어요 — ' + e.message); }
+  }
+  try{ const o = await usend(T.table+'?id=eq.'+id, 'PATCH', { files }, 'return=representation');
+    if(o && o[0]) Object.assign(r, o[0]); toast('붙였어요'); }
+  catch(e){ toast('저장 못 했어요 — '+e.message); }
+  txView(key, id);
+}
+async function txFileDel(key, id, i){
+  const T = 표정의[key], r = W[key].find(x=>x.id===id); if(!r) return;
+  const files = (r.files||[]).slice(); const f = files[i]; if(!f) return;
+  if(!confirm('이 첨부를 지울까요?')) return;
+  files.splice(i,1);
+  try{ const o = await usend(T.table+'?id=eq.'+id, 'PATCH', { files }, 'return=representation');
+    if(o && o[0]) Object.assign(r, o[0]);
+    토큰().then(t => fetch(SB_URL+'/storage/v1/object/tr/'+f.path, { method:'DELETE', headers:{ apikey:SB_KEY, Authorization:'Bearer '+t } })).catch(()=>{});
+    toast('지웠어요'); }
+  catch(e){ toast('못 지웠어요 — '+e.message); }
+  txView(key, id);
+}
+async function txCmSend(){
+  const { key, id } = 시트, T = 표정의[key];
+  const body = ($('#txcmin').value||'').trim(); if(!body){ toast('내용을 적어 주세요'); return; }
+  try{ const o = await usend('tr_comments', 'POST', { tbl:T.table, row_id:id, body }, 'return=representation');
+    if(o && o[0]) W.cm.push(o[0]); txView(key, id); }
+  catch(e){ toast('댓글을 못 남겼어요 — '+e.message); }
+}
+async function txCmDel(cid){
+  const { key, id } = 시트;
+  try{ await usend('tr_comments?id=eq.'+cid, 'DELETE'); W.cm = W.cm.filter(c=>c.id!==cid); txView(key, id); }
+  catch(e){ toast('못 지웠어요 — '+e.message); }
+}
+/* 본문 속 체크박스 누르면 그 줄만 바꿔 저장 */
+async function txTick(el){
+  const { key, id } = 시트, T = 표정의[key], r = W[key].find(x=>x.id===id); if(!r) return;
+  const f = el.closest('.tx-body').dataset.f, i = +el.dataset.line;
+  const lines = String(r[f]||'').split('\n');
+  lines[i] = /\[( )\]/.test(lines[i]) ? lines[i].replace('[ ]','[x]') : lines[i].replace(/\[(x|X)\]/,'[ ]');
+  try{ const o = await usend(T.table+'?id=eq.'+id, 'PATCH', { [f]: lines.join('\n') }, 'return=representation');
+    if(o && o[0]) Object.assign(r, o[0]); txView(key, id); }
+  catch(e){ toast('못 바꿨어요 — '+e.message); }
 }
 
 /* 행 시트 (만들기 · 고치기) */
@@ -2018,11 +2239,20 @@ function txSheet(key, id, 초기){
     + '</div>';
   const 메타 = r ? '<div class="tx-meta">만든 사람 '+esc(사람(r.created_by).name)+' · '+시각한글(r.created_at)+(r.updated_at&&r.updated_at!==r.created_at?' · 고침 '+시각한글(r.updated_at):'')+'</div>' : '';
   popOpen('<h2>'+(id?T.제목+' 고치기':'새 '+T.제목)+(잠김?' <span class="tx-tag warn">잠김 · 관리자만</span>':'')+'</h2>'
-    + '<div class="tx-form" id="txform">' + T.열.map(칸).join('') + 공개 + 메타 + '</div>'
-    + '<div class="tx-fbtns">'
-    + (편집 ? '<button class="btn gold" data-act="tx:save">'+(id?'저장':'만들기')+'</button>' : '')
-    + (편집 && id ? '<button class="btn ghost del" data-act="tx:del">지우기</button>' : '')
+    + '<div class="tx-form" id="txform">' + T.열.map(칸).join('') + 공개
+    + (id && 편집 ? '<div class="fld"><span class="fn">첨부</span>'+첨부칸(key, r||{files:[]}, true, (r&&r.files||[]).map(f=>(서명캐시[f.path]||{}).url||''))+'</div>' : '')
+    + 메타 + '</div>'
+    + '<div class="tx-fbtns"><span class="tx-stat" id="txstat">'+(편집 ? (id ? '고치면 바로 저장돼요' : '') : '보기만 할 수 있어요')+'</span>'
+    + (편집 && id ? '<button class="btn ghost del" data-act="tx:del">페이지 삭제</button>' : '')
     + '<button class="btn ghost" data-act="popclose">닫기</button></div>');
+}
+/* ── 자동 저장 ── 노션처럼 저장 버튼이 없다. 글자를 치면 0.9초 뒤, 칩·날짜·체크는 바로 */
+let 저장타이머 = null;
+function 자동저장(즉시){
+  if(!시트 || !$('#txform')) return;
+  clearTimeout(저장타이머);
+  const st = $('#txstat'); if(st){ st.textContent = '저장 중…'; st.classList.remove('bad'); }
+  저장타이머 = setTimeout(txSave, 즉시 ? 0 : 900);
 }
 function 시트값읽기(){
   const f = $('#txform'); if(!f || !시트) return;
@@ -2036,9 +2266,13 @@ function 시트값읽기(){
   });
 }
 async function txSave(){
+  if(!시트) return;
   시트값읽기();
   const { key, id, 값 } = 시트, T = 표정의[key];
-  for(const c of T.열) if(c.필수 && !값[c.k]){ toast(c.이름+'을(를) 적어 주세요'); return; }
+  const st = $('#txstat');
+  const 상태 = (t, bad) => { if(st){ st.textContent = t; st.classList.toggle('bad', !!bad); } };
+  if(key==='leave' && !값.day){ 상태('날짜를 고르면 저장돼요'); return; }
+  if(!값[T.제목열]) 값[T.제목열] = key==='leads' ? '이름 없음' : key==='tasks' ? '제목 없음' : 값[T.제목열];
   const body = {};
   T.열.forEach(c => { if(c.관리자만 && !관리자()) return; body[c.k] = 값[c.k]===undefined ? null : 값[c.k]; });
   body.vis = 값.vis || 'owners'; body.viewers = 값.vis==='picked' ? (값.viewers||[]) : [];
@@ -2048,15 +2282,17 @@ async function txSave(){
   if(key==='tasks' && !body.due) body.due = null;
   try{
     if(id){ const r = await usend(T.table+'?id=eq.'+id, 'PATCH', body, 'return=representation');
-      const i = W[key].findIndex(x=>x.id===id); if(i>=0 && r && r[0]) W[key][i] = r[0]; toast('저장했어요'); }
+      const i = W[key].findIndex(x=>x.id===id); if(i>=0 && r && r[0]) W[key][i] = r[0]; }
     else { const r = await usend(T.table, 'POST', body, 'return=representation');
-      if(r && r[0]) W[key].unshift(r[0]); toast('만들었어요'); }
-    popClose(); render();
-  }catch(e){ toast('저장 못 했어요 — '+e.message); }
+      if(r && r[0]){ W[key].unshift(r[0]); 시트.id = r[0].id; } }
+    const d = new Date();
+    상태('저장됨 ' + (d.getHours()<12?'오전 ':'오후 ') + ((d.getHours()%12)||12) + ':' + String(d.getMinutes()).padStart(2,'0'));
+    if(S.view==='home' || 표정의[S.view]) render();      /* 뒤의 목록만 새로 그린다. 팝업은 그대로 */
+  }catch(e){ 상태('저장 못 함 — '+e.message, true); }
 }
 async function txDel(){
   const { key, id } = 시트, T = 표정의[key];
-  if(!id || !confirm('정말 지울까요?')) return;
+  if(!id || !confirm('이 페이지를 지울까요? 첨부·댓글도 같이 지워져요')) return;
   try{ await usend(T.table+'?id=eq.'+id, 'DELETE'); W[key] = W[key].filter(x=>x.id!==id); popClose(); toast('지웠어요'); render(); }
   catch(e){ toast('못 지웠어요 — '+e.message); }
 }
@@ -2127,12 +2363,21 @@ async function txAct(a, el){
   if(a==='view'){ 표상태[k].보기 = v2; render(); return; }
   if(a==='who'){ 표상태[k].사람 = v2 || null; render(); return; }
   if(a==='new'){ txNewMenu(k); return; }
-  if(a==='tpl'){ const t = 표정의[k].템플릿[+el.dataset.i]; txSheet(k, null, Object.assign({template:t.이름}, t.값)); return; }
-  if(a==='open'){ txSheet(k, id); return; }
-  if(a==='toggle'){ await txToggle(k, id, el.dataset.f); return; }
-  if(a==='opt'){ 시트값읽기(); const f = el.dataset.f; 시트.값[f] = (시트.값[f]===v2 && f!=='vis') ? null : v2; txSheet(시트.key, 시트.id, 시트.값); return; }
+  if(a==='tpl'){ const t = 표정의[k].템플릿[+el.dataset.i];
+    txSheet(k, null, Object.assign({template:t.이름}, t.값));     /* 기본값을 채우고 */
+    if(k!=='leave'){ await txSave(); if(시트 && 시트.id) txSheet(k, 시트.id); }   /* 바로 페이지를 만든다 (연월차는 날짜 고르면) */
+    return; }
+  if(a==='open'){ txView(k, id); return; }
+  if(a==='edit'){ txSheet(시트.key, 시트.id); return; }
+  if(a==='toggle'){ await txToggle(k, id, el.dataset.f); if(el.dataset.stay) txView(k, id); return; }
+  if(a==='upload'){ const f = $('#txfile'); if(f) f.click(); return; }
+  if(a==='fdel'){ await txFileDel(시트.key, 시트.id, +el.dataset.i); return; }
+  if(a==='cmsend'){ await txCmSend(); return; }
+  if(a==='cmdel'){ await txCmDel(id); return; }
+  if(a==='tick'){ await txTick(el); return; }
+  if(a==='opt'){ 시트값읽기(); const f = el.dataset.f; 시트.값[f] = (시트.값[f]===v2 && f!=='vis') ? null : v2; txSheet(시트.key, 시트.id, 시트.값); 자동저장(true); return; }
   if(a==='multi'){ 시트값읽기(); const f = el.dataset.f; const arr = (시트.값[f]||[]).slice();
-    const i = arr.indexOf(v2); if(i>=0) arr.splice(i,1); else arr.push(v2); 시트.값[f] = arr; txSheet(시트.key, 시트.id, 시트.값); return; }
+    const i = arr.indexOf(v2); if(i>=0) arr.splice(i,1); else arr.push(v2); 시트.값[f] = arr; txSheet(시트.key, 시트.id, 시트.값); 자동저장(true); return; }
   if(a==='save'){ await txSave(); return; }
   if(a==='del'){ await txDel(); return; }
   if(a==='me'){ txMe(); return; }
@@ -3065,7 +3310,12 @@ document.addEventListener('input', function(ev){
     if(!isNaN(v)) saveItemField(i, f, f==='kg' ? Math.round(v*10)/10 : Math.round(v));
   }
 });
+document.addEventListener('input', function(ev){
+  if(ev.target.closest && ev.target.closest('#txform') && ev.target.dataset.f) 자동저장(false);
+});
 document.addEventListener('change', function(ev){
+  if(ev.target.closest && ev.target.closest('#txform') && ev.target.dataset.f && ev.target.tagName!=='TEXTAREA' && ev.target.type!=='text'){ 자동저장(true); return; }
+  if(ev.target.id==='txfile' && 시트){ txUpload(시트.key, 시트.id, ev.target.files); return; }
   if(ev.target.id==='cmex'){ S.cmex = ev.target.value; }
 });
 $('#whosel').addEventListener('change', function(e){ S.who = e.target.value;
