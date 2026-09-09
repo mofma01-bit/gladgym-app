@@ -537,6 +537,9 @@ body.tx-moving .tx-x{cursor:grabbing}
 .tx-td.tx-tck{justify-content:center;padding:8px 4px;background:var(--dark-2)}
 .tx-th>.tx-td.tx-tck{background:var(--dark-3)}
 .tx-td.tx-t1{cursor:pointer;font-size:13px;background:var(--dark-2)}
+/* 머리의 제목 칸도 붙여 둔다 — 본문만 붙어 있으면 머리와 어긋나 글자가 겹친다
+   (2026-09-09 대표: 「이거 여전히 따라다님」) 머리 글씨 크기는 머리 그대로 */
+.tx-th>.tx-td.tx-t1{font-size:11.5px;cursor:default;font-weight:700}
 .tx-tr:hover>.tx-td.tx-t1{background:#232320}
 .tx-th>.tx-td.tx-t1{background:var(--dark-3)}
 /* 「고정」을 켰을 때만 왼쪽에 붙는다 (2026-09-09 대표: 「업무 고정되는거 풀수없어?
