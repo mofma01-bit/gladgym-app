@@ -890,7 +890,7 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 
 <script>
 "use strict";
-const BUILD = '58';
+const BUILD = '59';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -3004,11 +3004,18 @@ function 표칸다시(key, id, k){
 }
 
 /* ── 필터·정렬 줄 ── 보기 밑에 조건을 쌓는다 */
+/* ⛔ 서버를 한 번 다녀온 값은 키 차례가 뒤바뀐다({k,cmp,v} → {cmp,k,v}).
+   JSON.stringify 로 견주면 담고 나서도 늘 「바뀜」으로 보인다 (2026-09-09 확인하다 찾음).
+   그래서 키를 가나다 순으로 세워 놓고 견준다 */
+const 굳히기 = x => Array.isArray(x) ? '[' + x.map(굳히기).join(',') + ']'
+  : (x && typeof x === 'object')
+    ? '{' + Object.keys(x).sort().map(k => k + ':' + 굳히기(x[k])).join(',') + '}'
+    : JSON.stringify(x == null ? null : x);
 /* 지금 화면이 보기에 담긴 것과 어디가 다른가 — 다르면 「모두에게 저장」이 떠오른다 */
 function 내변경(key){
   const v = 지금보기(key); if(!v) return [];
   const st = 표상태[key] || {}, mk = 모양키(key), 다 = [];
-  const 같나 = (a, b) => JSON.stringify(a == null ? null : a) === JSON.stringify(b == null ? null : b);
+  const 같나 = (a, b) => 굳히기(a) === 굳히기(b);
   const 내칸 = ((내설정[key] || {}).칸 || {})[v.k];
   if(내칸 && !같나(내칸, v.칸)) 다.push('칸 차례');
   const 내순 = (내설정[key] || {}).보기순;
