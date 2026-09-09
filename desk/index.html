@@ -522,6 +522,29 @@ body.tx-moving .tx-x{cursor:grabbing}
 .tx-cnew{font-size:10px;font-weight:700;color:var(--gold);background:var(--gold-dim);
   padding:1px 6px;border-radius:5px;margin-left:5px}
 .tx-when{font-size:10.5px;color:#5f5a54;font-weight:500;white-space:nowrap}
+/* 표 보기 — 노션 데이터베이스 모양 */
+.tx-tw{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--dark-2)}
+.tx-table{display:grid;min-width:100%;font-size:12.5px}
+.tx-tr{display:contents}
+.tx-tr>.tx-td{border-bottom:1px solid var(--line);padding:8px 10px;min-height:38px;
+  display:flex;align-items:center;gap:5px;flex-wrap:wrap;overflow:hidden}
+.tx-th>.tx-td{position:sticky;top:0;z-index:2;background:var(--dark-3);color:var(--sub);
+  font-weight:700;font-size:11.5px;white-space:nowrap;cursor:pointer}
+.tx-th>.tx-td:hover{color:var(--cream)}
+.tx-th>.tx-td i{font-style:normal;opacity:.75;font-size:11px}
+.tx-tr:hover>.tx-td{background:rgba(255,255,255,.022)}
+.tx-tr.pk>.tx-td{background:rgba(230,196,135,.08)}
+.tx-td.tx-tck{justify-content:center;padding:8px 4px}
+.tx-td.tx-t1{cursor:pointer;font-size:13px;position:sticky;left:34px;z-index:1;background:var(--dark-2)}
+.tx-tr:hover>.tx-td.tx-t1{background:#232320}
+.tx-th>.tx-td.tx-t1{left:34px;z-index:3;background:var(--dark-3)}
+.tx-td.tx-t1 b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tx-td.tx-t1 .go{font-style:normal;margin-left:auto;color:#5f5a54;opacity:0}
+.tx-tr:hover>.tx-td.tx-t1 .go{opacity:1}
+.tx-td.ed{cursor:pointer}
+.tx-td.ed:hover{background:var(--dark-3);box-shadow:inset 0 0 0 1px var(--gold-2)}
+.tx-table .tx-tag{font-size:11px}
+.tx-table .tx-av{width:18px;height:18px;font-size:9px}
 /* 필터·정렬 줄 */
 .tx-vplus{padding:7px 11px;border-radius:9px;font-size:13px;font-weight:800;color:#6f6a63}
 .tx-vplus:hover{color:var(--gold);background:var(--dark-3)}
@@ -789,7 +812,7 @@ body.tx-moving .tx-x{cursor:grabbing}
 
 <script>
 "use strict";
-const BUILD = '42';
+const BUILD = '43';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -2374,9 +2397,70 @@ function txList(key){
   보인행[key] = rows.map(r => r.id);
   if(고른행.key === key) 고른행.ids = 고른행.ids.filter(id => 보인행[key].indexOf(id) >= 0);
   if(!rows.length) return 보기줄 + 거름줄 + 달력 + '<div class="empty">결과 없음</div>';
-  return 보기줄 + 거름줄 + 달력 + txPickBar(key, rows)
-    + '<div class="tx-list">' + rows.map(r => txRow(key, r, true)).join('') + '</div>';
+  const 표다 = 표모양[key] === 'table';
+  return 보기줄 + 거름줄 + 달력 + txPickBar(key, rows, 표다)
+    + (표다 ? txTable(key, rows)
+            : '<div class="tx-list">' + rows.map(r => txRow(key, r, true)).join('') + '</div>');
 }
+/* ── 표 보기 ── 노션 데이터베이스처럼 속성마다 칸이 나뉜다 (2026-09-09 대표 지시:
+   「한 칸 안에 네이버 예약 이런 게 합쳐져 있잖아 · 노션 모양 그대로 보고 수정하게」) */
+let 표모양 = {};
+try{ 표모양 = JSON.parse(localStorage.getItem('gg_desk_layout') || '{}') || {}; }catch(e){}
+const 표모양저장 = () => { try{ localStorage.setItem('gg_desk_layout', JSON.stringify(표모양)); }catch(e){} };
+const 칸너비 = { text:170, long:220, select:110, multi:170, number:90, check:70,
+                 date:120, datetime:150, person:130, people:150, url:180, phone:140, email:180 };
+function 표칸들(key){
+  const 본문 = 본문열쇠(key), 제 = 표정의[key].제목열;
+  const cs = 열들(key).filter(c => c.k !== 본문 && !c.숨김 && !(c.관리자만 && !관리자()));
+  const i = cs.findIndex(c => c.k === 제);                 /* 제목은 늘 맨 앞 */
+  if(i > 0) cs.unshift(cs.splice(i, 1)[0]);
+  return cs;
+}
+function 표칸값(key, c, r){
+  if(c.k === 표정의[key].제목열)
+    return '<b>' + esc(String(r[c.k] == null ? '' : r[c.k]) || '이름 없음') + '</b>';
+  return 속성값보기(c, r);
+}
+function txTable(key, rows){
+  const cs = 표칸들(key), 제 = 표정의[key].제목열;
+  const 편집 = r => 고칠수있나(key, r);
+  const 폭 = '34px ' + cs.map(c => 'minmax(' + (칸너비[c.타입] || 140) + 'px, max-content)').join(' ');
+  const 고름 = 고른행.key === key ? 고른행.ids : [];
+  const 모두 = rows.length > 0 && 고름.length === rows.length;
+  const 머리 = '<div class="tx-tr tx-th">'
+    + '<span class="tx-td tx-tck"><span class="tx-pick '+(모두?'on':'')+'" data-act="tx:pickall" data-k="'+key+'">'+(모두?'✓':'')+'</span></span>'
+    + cs.map(c => '<span class="tx-td"'
+        + (관리자() && !c.시스템 ? ' data-act="tx:pmenu" data-k="'+key+'" data-v2="'+esc(c.k)+'"' : '')
+        + '><i>'+(타입아이콘[c.타입]||'≡')+'</i>'+esc(c.이름)+'</span>').join('')
+    + '</div>';
+  const 줄 = r => {
+    const 골랐나 = 고름.indexOf(r.id) >= 0, 고침 = 편집(r);
+    return '<div class="tx-tr'+(골랐나?' pk':'')+'">'
+      + '<span class="tx-td tx-tck"><span class="tx-pick '+(골랐나?'on':'')+'" data-act="tx:pick" data-k="'+key+'" data-id="'+r.id+'">'+(골랐나?'✓':'')+'</span></span>'
+      + cs.map(c => {
+          const 잠 = !!c.시스템 || !!(c.관리자만 && !관리자());
+          if(c.k === 제) return '<span class="tx-td tx-t1" data-act="tx:open" data-k="'+key+'" data-id="'+r.id+'" title="페이지 열기">'
+            + 표칸값(key, c, r) + '<i class="go">›</i></span>';
+          return '<span class="tx-td'+(고침&&!잠?' ed':'')+'" data-c="'+esc(c.k)+'" data-rid="'+r.id+'"'
+            + (고침 && !잠 ? ' data-act="tx:tedit" data-k="'+key+'" data-id="'+r.id+'" data-v2="'+esc(c.k)+'"' : '')
+            + '>' + 표칸값(key, c, r) + '</span>';
+        }).join('')
+      + '</div>';
+  };
+  return '<div class="tx-tw"><div class="tx-table" style="grid-template-columns:'+폭+'">'
+    + 머리 + rows.map(줄).join('') + '</div></div>';
+}
+/* 한 칸만 새로 그린다 — 표에서 고쳤을 때 */
+function 표칸다시(key, id, k){
+  const el = document.querySelector('.tx-table .tx-td[data-rid="'+id+'"][data-c="'+CSS.escape(k)+'"]');
+  const r = W[key].find(x => x.id === id);
+  if(!el || !r) return false;
+  const c = 열들(key).find(z => z.k === k);
+  if(!c) return false;
+  el.innerHTML = 표칸값(key, c, r);
+  return true;
+}
+
 /* ── 필터·정렬 줄 ── 보기 밑에 조건을 쌓는다 */
 function txFilterBar(key, v, 순){
   const st = 표상태[key];
@@ -2391,6 +2475,8 @@ function txFilterBar(key, v, 순){
     + 조건
     + ((st.규칙||[]).length ? '<button class="tx-fclr" data-act="tx:fclr" data-k="'+key+'">필터 삭제</button>' : '')
     + '<span class="sp3">'
+    + '<button class="tx-fadd" data-act="tx:layout" data-k="'+key+'" title="목록 ↔ 표">'
+      + (표모양[key]==='table' ? '▤ 표' : '☰ 목록') + '</button>'
     + '<button class="tx-fadd '+(순&&순.k?'on':'')+'" data-act="tx:sortmenu" data-k="'+key+'">↕ '+(순말 || '정렬')+'</button>'
     + ((st.규칙||[]).length || st.정렬
         ? '<button class="tx-fsave" data-act="tx:vsave" data-k="'+key+'">새 보기로 저장</button>' : '')
@@ -2524,7 +2610,7 @@ let 마지막고름 = null;
 let 시프트 = false;
 const 보인행 = {};
 const 체크열 = { tasks:'done', leads:'done', leave:null };
-function txPickBar(key, rows){
+function txPickBar(key, rows, 표다){
   const T = 표정의[key];
   const 고름 = 고른행.key === key ? 고른행.ids : [];
   const 모두 = rows.length > 0 && 고름.length === rows.length;
@@ -2537,7 +2623,9 @@ function txPickBar(key, rows){
     if(T.사람열) acts += '<button data-act="tx:bulkwho" data-k="'+key+'">담당</button>';
     acts += '<button class="wn" data-act="tx:bulkdel" data-k="'+key+'">삭제</button>';
   }
-  return '<div class="tx-selall"><span class="tx-pick '+(모두?'on':'')+'" data-act="tx:pickall" data-k="'+key+'">'+(모두?'✓':'')+'</span>'
+  if(표다 && !고름.length) return '';
+  return '<div class="tx-selall">'
+    + (표다 ? '' : '<span class="tx-pick '+(모두?'on':'')+'" data-act="tx:pickall" data-k="'+key+'">'+(모두?'✓':'')+'</span>')
     + (고름.length
         ? '<b>'+고름.length+'개</b> 선택 <button data-act="tx:pickno" data-k="'+key+'" style="color:#6f6a63;font-weight:600;text-decoration:underline">선택 해제</button>'
         : '전체 선택')
@@ -2801,6 +2889,7 @@ async function 속성저장하기(key, id, k, v){
   if(nr){ 시트.값 = Object.assign({}, nr);
     늘림열(key).forEach(c => { 시트.값[c.k] = (nr.extra||{})[c.k.slice(6)]; }); }
   속성줄다시(key, id);
+  표칸다시(key, id, k);
   const tt = document.querySelector('.tx-page .tx-ttl');
   if(tt && nr && document.activeElement !== tt) tt.innerHTML = esc(표정의[key].행(nr).제목);
 }
@@ -3776,6 +3865,8 @@ async function txAct(a, el){
     return; }
   /* ── 노션식 속성 줄 ── */
   if(a==='pedit'){ 속성편집(k, 시트.id, v2, el); return; }
+  if(a==='tedit'){ 속성편집(k, el.dataset.id, v2, el); return; }
+  if(a==='layout'){ 표모양[k] = 표모양[k]==='table' ? 'list' : 'table'; 표모양저장(); render(); return; }
   if(a==='pmenu'){ 속성이름메뉴(k, v2, el); return; }
   if(a==='padd'){ 속성추가쪽지(k, el); return; }
   if(a==='pempty'){ 빈속성숨김 = !빈속성숨김;
