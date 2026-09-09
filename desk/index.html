@@ -557,11 +557,15 @@ body.tx-moving .tx-x{cursor:grabbing}
 .tx-td.ed{cursor:pointer}
 .tx-td.ed:hover{background:var(--dark-3);box-shadow:inset 0 0 0 1px var(--gold-2)}
 .tx-td.on{background:var(--dark-3);box-shadow:inset 0 0 0 2px var(--gold);padding:2px 4px}
+.tx-td.sel,.tx-tr:hover>.tx-td.sel{box-shadow:inset 0 0 0 2px var(--gold);
+  background:rgba(230,196,135,.07);border-radius:3px}
 .tx-cin{width:100%;background:transparent;border:0;outline:none;color:var(--cream);
   font-size:12.5px;font-family:inherit;padding:6px;resize:none;min-height:32px}
 .tx-pmenu button.new{color:var(--gold)}
 .tx-pmenu button.new i{font-style:normal;font-weight:800}
 .tx-pop #txopq{margin-bottom:2px}
+.tx-help{font-size:11.5px;color:#5f5a54;padding:8px 4px 0}
+.tx-help b{color:#8b8479;font-weight:700}
 .tx-table .tx-tag{font-size:11px}
 .tx-table .tx-av{width:18px;height:18px;font-size:9px}
 /* 필터·정렬 줄 */
@@ -831,7 +835,7 @@ body.tx-moving .tx-x{cursor:grabbing}
 
 <script>
 "use strict";
-const BUILD = '45';
+const BUILD = '47';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -2524,7 +2528,9 @@ function txTable(key, rows){
       + '</div>';
   };
   return '<div class="tx-tw"><div class="tx-table" style="grid-template-columns:'+폭+'">'
-    + 머리 + rows.map(줄).join('') + '</div></div>';
+    + 머리 + rows.map(줄).join('') + '</div></div>'
+    + '<div class="tx-help">칸을 누르면 <b>선택</b> · <b>방향키</b>로 이동 · <b>Enter</b>나 한 번 더 누르면 수정 · '
+    + '수정 중 <b>Tab</b>은 옆 칸 · <b>Esc</b>는 취소</div>';
 }
 /* ── 칸 안에서 바로 치기 · 키보드로 옮겨 다니기 ──
    (2026-09-09 대표: 「텍스트 박스가 아래 따로 뜨는 게 아니라 바로 적을 수 있게 ·
@@ -2541,6 +2547,7 @@ function 칸안편집(key, id, k, td){
   const 종 = c.타입==='number' ? 'number' : c.타입==='url' ? 'url'
            : c.타입==='email' ? 'email' : c.타입==='phone' ? 'tel' : 'text';
   칸편집 = { key, id, k };
+  칸고르기(key, id, k);
   td.classList.add('on');
   td.innerHTML = (c.타입 === 'long')
     ? '<textarea class="tx-cin" rows="1"></textarea>'
@@ -2548,22 +2555,25 @@ function 칸안편집(key, id, k, td){
   const inp = td.querySelector('.tx-cin');
   inp.value = v == null ? '' : String(v);
   let 끝났 = false;
-  const 담기 = async (다음) => {
+  const 담기 = async (다음, 고칠까) => {
     if(끝났) return; 끝났 = true; 칸편집 = null; 칸편집끝 = null;
     const nv = inp.value;
     const 바뀜 = String(nv) !== String(v == null ? '' : v);
     td.classList.remove('on');
     if(바뀜) await 속성저장(key, id, k, c.타입==='number' ? (nv===''?null:Number(nv)) : (nv===''?null:nv));
     else 표칸다시(key, id, k);
-    if(다음) 옆칸으로(key, id, k, 다음);
+    if(다음) 옆칸으로(key, id, k, 다음, !!고칠까);
+    else 칸고르기(key, id, k);
   };
   inp.addEventListener('keydown', e => {
-    if(e.key === 'Escape'){ 끝났 = true; 칸편집 = null; 칸편집끝 = null; td.classList.remove('on'); 표칸다시(key, id, k); }
-    else if(e.key === 'Enter' && c.타입 !== 'long'){ e.preventDefault(); 담기('down'); }
-    else if(e.key === 'Enter' && e.ctrlKey){ e.preventDefault(); 담기('down'); }
-    else if(e.key === 'Tab'){ e.preventDefault(); 담기(e.shiftKey ? 'left' : 'right'); }
-    else if(e.key === 'ArrowDown' && c.타입 !== 'long'){ e.preventDefault(); 담기('down'); }
-    else if(e.key === 'ArrowUp' && c.타입 !== 'long'){ e.preventDefault(); 담기('up'); }
+    if(e.key === 'Escape'){ 끝났 = true; 칸편집 = null; 칸편집끝 = null;
+      td.classList.remove('on'); 표칸다시(key, id, k); 칸고르기(key, id, k); }
+    /* 엔터·방향키는 담고 「고른 상태」로 · Tab 은 담고 옆 칸을 바로 편집 (노션과 같다) */
+    else if(e.key === 'Enter' && c.타입 !== 'long'){ e.preventDefault(); 담기('down', false); }
+    else if(e.key === 'Enter' && e.ctrlKey){ e.preventDefault(); 담기('down', false); }
+    else if(e.key === 'Tab'){ e.preventDefault(); 담기(e.shiftKey ? 'left' : 'right', true); }
+    else if(e.key === 'ArrowDown' && c.타입 !== 'long'){ e.preventDefault(); 담기('down', false); }
+    else if(e.key === 'ArrowUp' && c.타입 !== 'long'){ e.preventDefault(); 담기('up', false); }
   });
   inp.addEventListener('blur', () => setTimeout(() => 담기(null), 120));
   칸편집끝 = 담기;
@@ -2571,23 +2581,75 @@ function 칸안편집(key, id, k, td){
   return true;
 }
 /* 옆·위아래 칸으로 옮겨 가서 바로 편집 상태로 만든다 */
-function 옆칸으로(key, id, k, 쪽){
-  const 표 = document.querySelector('.tx-table'); if(!표) return;
+const 칸찾기 = (id, k) => document.querySelector('.tx-table .tx-td[data-rid="'+id+'"][data-c="'+CSS.escape(k)+'"]');
+function 이웃칸(key, id, k, 쪽){
+  const 표 = document.querySelector('.tx-table'); if(!표) return null;
   const 줄들 = [...표.querySelectorAll('.tx-tr')].filter(e => !e.classList.contains('tx-th'));
   const ri = 줄들.findIndex(e => e.querySelector('[data-rid="'+id+'"]'));
-  if(ri < 0) return;
+  if(ri < 0) return null;
   const 칸이름 = 표칸들(key).map(c => c.k);
   let ci = 칸이름.indexOf(k), rj = ri;
   if(쪽 === 'down') rj++; else if(쪽 === 'up') rj--;
   else if(쪽 === 'right') ci++; else if(쪽 === 'left') ci--;
-  if(rj < 0 || rj >= 줄들.length) return;
-  if(ci < 0 || ci >= 칸이름.length) return;   /* 노션처럼 유형을 안 가리고 옆 칸으로 간다 */
-  const 다음줄 = 줄들[rj];
-  const td = 다음줄.querySelector('.tx-td[data-c="'+CSS.escape(칸이름[ci])+'"]');
-  if(!td || !td.dataset.rid) return;
-  td.scrollIntoView({ block:'nearest', inline:'nearest' });
-  if(!칸안편집(key, td.dataset.rid, 칸이름[ci], td)) td.click();
+  if(rj < 0 || rj >= 줄들.length) return null;
+  if(ci < 0 || ci >= 칸이름.length) return null;   /* 유형을 안 가리고 옆 칸으로 */
+  const td = 줄들[rj].querySelector('.tx-td[data-c="'+CSS.escape(칸이름[ci])+'"]');
+  if(!td || !td.dataset.rid) return null;
+  return { id: td.dataset.rid, k: 칸이름[ci], td };
 }
+/* 고칠까=true 면 옮겨 가서 바로 편집, false 면 「고른 상태」로만 둔다 */
+function 옆칸으로(key, id, k, 쪽, 고칠까){
+  const n = 이웃칸(key, id, k, 쪽); if(!n) return;
+  n.td.scrollIntoView({ block:'nearest', inline:'nearest' });
+  칸고르기(key, n.id, n.k);
+  if(고칠까){ if(!칸안편집(key, n.id, n.k, n.td)) n.td.click(); }
+}
+
+/* ── 「고른 상태」 ── 노션처럼 칸에 테두리만 두고 방향키로 옮겨 다닌다
+   (2026-09-09 대표: 「속성칸 한 칸씩 이동이 가능하고 엔터를 누르면 수정,
+    수정중에 탭키를 누르면 옆칸으로 이동」) */
+let 고른칸 = null;                                   /* {key, id, k} */
+function 칸고르기(key, id, k){
+  고른칸 = { key, id, k };
+  document.querySelectorAll('.tx-td.sel').forEach(e => e.classList.remove('sel'));
+  const td = 칸찾기(id, k); if(td) td.classList.add('sel');
+}
+function 칸고름지우기(){
+  고른칸 = null;
+  document.querySelectorAll('.tx-td.sel').forEach(e => e.classList.remove('sel'));
+}
+/* 화면을 다시 그려도 고른 칸은 그대로 둔다 */
+function 고른칸다시(){
+  if(!고른칸) return;
+  const td = 칸찾기(고른칸.id, 고른칸.k);
+  if(td) td.classList.add('sel'); else 고른칸 = null;
+}
+document.addEventListener('keydown', function(e){
+  if(!고른칸 || 칸편집) return;
+  if($('#txpop') || $('#pop').classList.contains('on')) return;   /* 쪽지·판이 열렸으면 그쪽 몫 */
+  const t = e.target;
+  if(t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+  const { key, id, k } = 고른칸;
+  const 쪽 = { ArrowRight:'right', ArrowLeft:'left', ArrowUp:'up', ArrowDown:'down' }[e.key];
+  if(쪽){ e.preventDefault(); 옆칸으로(key, id, k, 쪽, false); return; }
+  if(e.key === 'Tab'){ e.preventDefault(); 옆칸으로(key, id, k, e.shiftKey ? 'left' : 'right', false); return; }
+  if(e.key === 'Enter'){ e.preventDefault();
+    const td = 칸찾기(id, k); if(!td) return;
+    if(!칸안편집(key, id, k, td)) td.click(); return; }
+  if(e.key === 'Escape'){ 칸고름지우기(); return; }
+  /* 글자를 치면 바로 수정 상태로 (엑셀·노션처럼) */
+  if(e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey){
+    const c = 열들(key).find(z => z.k === k);
+    if(c && 바로칠수있나(c.타입)){
+      const td = 칸찾기(id, k);
+      if(td && 칸안편집(key, id, k, td)){
+        e.preventDefault();
+        const inp = td.querySelector('.tx-cin');
+        if(inp){ inp.value = e.key; inp.setSelectionRange(inp.value.length, inp.value.length); }
+      }
+    }
+  }
+});
 
 /* 한 칸만 새로 그린다 — 표에서 고쳤을 때 */
 function 표칸다시(key, id, k){
@@ -4044,8 +4106,14 @@ async function txAct(a, el){
   /* ── 노션식 속성 줄 ── */
   if(a==='pedit'){ 속성편집(k, 시트.id, v2, el); return; }
   if(a==='tedit'){
-    if(칸안편집(k, el.dataset.id, v2, el)) return;
-    속성편집(k, el.dataset.id, v2, el); return; }
+    const id3 = el.dataset.id;
+    const 이미 = !!(고른칸 && 고른칸.key === k && 고른칸.id === id3 && 고른칸.k === v2);
+    const c3 = 열들(k).find(z => z.k === v2) || {};
+    칸고르기(k, id3, v2);
+    if(c3.타입 === 'check'){ 속성편집(k, id3, v2, el); return; }   /* 체크는 한 번에 켜고 끈다 */
+    if(!이미) return;                        /* 처음 누르면 고르기만 — 방향키가 바로 먹는다 */
+    if(칸안편집(k, id3, v2, el)) return;
+    속성편집(k, id3, v2, el); return; }
   if(a==='layout'){ 표모양[k] = 표모양[k]==='table' ? 'list' : 'table'; 표모양저장(); render(); return; }
   if(a==='pmenu'){ 속성이름메뉴(k, v2, el); return; }
   if(a==='padd'){ 속성추가쪽지(k, el); return; }
@@ -4367,6 +4435,7 @@ function render(){
   const 났 = render0.apply(null, arguments);
   /* 회원 사이드 페이지가 열려 있으면 그 안도 같이 새로 그린다 */
   if(typeof 회원판 !== 'undefined' && 회원판 && $('#pop').classList.contains('on')) 회원판그리기();
+  if(typeof 고른칸다시 === 'function') 고른칸다시();
   return 났;
 }
 function render0(){
