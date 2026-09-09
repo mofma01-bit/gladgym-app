@@ -523,7 +523,7 @@ body.tx-moving .tx-x{cursor:grabbing}
   padding:1px 6px;border-radius:5px;margin-left:5px}
 .tx-when{font-size:10.5px;color:#5f5a54;font-weight:500;white-space:nowrap}
 /* 표 보기 — 노션 데이터베이스 모양 */
-.tx-tw{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--dark-2)}
+.tx-tw{overflow-x:auto;border:1px solid var(--line);border-radius:12px 12px 0 0;background:var(--dark-2)}
 .tx-table{display:grid;min-width:100%;font-size:12.5px}
 .tx-tr{display:contents}
 .tx-tr>.tx-td{border-bottom:1px solid var(--line);padding:8px 10px;min-height:38px;
@@ -564,6 +564,18 @@ body.tx-moving .tx-x{cursor:grabbing}
 .tx-pmenu button.new{color:var(--gold)}
 .tx-pmenu button.new i{font-style:normal;font-weight:800}
 .tx-pop #txopq{margin-bottom:2px}
+.tx-newrow{display:block;width:100%;text-align:left;padding:9px 12px;font-size:12.5px;font-weight:700;
+  color:#6f6a63;border:1px solid var(--line);border-top:0;border-radius:0 0 12px 12px;background:var(--dark-2)}
+.tx-newrow:hover{color:var(--gold);background:var(--dark-3)}
+.tx-cl.off{opacity:.45}
+.tx-cl.off b{font-weight:600}
+.tx-td.rng{background:rgba(230,196,135,.16)}
+.tx-grp{margin-bottom:14px}
+.tx-ghead{display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:7px 4px;
+  font-size:13px;font-weight:800;color:var(--cream)}
+.tx-ghead i{font-style:normal;font-size:10px;color:var(--sub)}
+.tx-ghead b{font-weight:700;color:var(--sub);font-size:11.5px}
+.tx-ghead:hover{color:var(--gold)}
 .tx-help{font-size:11.5px;color:#5f5a54;padding:8px 4px 0}
 .tx-help b{color:#8b8479;font-weight:700}
 .tx-table .tx-tag{font-size:11px}
@@ -835,7 +847,7 @@ body.tx-moving .tx-x{cursor:grabbing}
 
 <script>
 "use strict";
-const BUILD = '47';
+const BUILD = '50';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -2250,9 +2262,9 @@ const 표정의 = {
       오른쪽: 아바타(r.staff_id), 체크:null }),
   },
 };
-const 표상태 = { tasks:{보기:'mine', 사람:null, q:'', 규칙:[], op:'and', 정렬:null},
-                  leads:{보기:'today', 사람:null, q:'', 규칙:[], op:'and', 정렬:null},
-                  leave:{보기:'week', 사람:null, q:'', 규칙:[], op:'and', 정렬:null} };
+const 표상태 = { tasks:{보기:'mine', 사람:null, q:'', 규칙:[], op:'and', 정렬:null, 그룹:null, 접힘:{}},
+                  leads:{보기:'today', 사람:null, q:'', 규칙:[], op:'and', 정렬:null, 그룹:null, 접힘:{}},
+                  leave:{보기:'week', 사람:null, q:'', 규칙:[], op:'and', 정렬:null, 그룹:null, 접힘:{}} };
 
 /* ── 필터 · 정렬 · 보기 ── 조건을 「글」이 아니라 「자료」로 담는다 (2026-09-08 대표 지시)
    규칙 하나 = {k: 속성열쇠, cmp: 비교, v: 값}.  보기 하나 = 규칙 여러 개 + 정렬. */
@@ -2328,10 +2340,10 @@ function 보기들(key){
   const 덮 = {}; vs.forEach(v => { if(v.base) 덮[v.base] = v; });
   const 기본 = T.보기.map((b, i) => { const o = 덮[b.k] || {};
     return { k:b.k, 이름:o.name || b.이름, 필터:b.필터, sort:(o.sort != null ? o.sort : i),
-             숨김:!!o.hidden, 붙박이:true, 덮:o.id ? o : null }; });
+             칸:o.cols || null, 숨김:!!o.hidden, 붙박이:true, 덮:o.id ? o : null }; });
   const 내가만든 = vs.filter(v => !v.base).map(v => ({
     k:'v'+v.id, 이름:v.name, 규칙:v.rules||[], op:v.op||'and', ord:v.ord||null,
-    sort:v.sort, 숨김:!!v.hidden, 붙박이:false, 뷰:v }));
+    칸:v.cols||null, sort:v.sort, 숨김:!!v.hidden, 붙박이:false, 뷰:v }));
   return 기본.concat(내가만든).sort((a,b) => (a.sort - b.sort));
 }
 const 보기맞나 = (v, r, key) => v.필터 ? v.필터(r) : 규칙들맞나(v.규칙, v.op, r, key);
@@ -2475,24 +2487,67 @@ function txList(key){
   보인행[key] = rows.map(r => r.id);
   if(고른행.key === key) 고른행.ids = 고른행.ids.filter(id => 보인행[key].indexOf(id) >= 0);
   if(!rows.length) return 보기줄 + 거름줄 + 달력 + '<div class="empty">결과 없음</div>';
-  const 표다 = 표모양[key] === 'table';
-  return 보기줄 + 거름줄 + 달력 + txPickBar(key, rows, 표다)
-    + (표다 ? txTable(key, rows)
-            : '<div class="tx-list">' + rows.map(r => txRow(key, r, true)).join('') + '</div>');
+  const 표다 = 모양(key) === 'table';
+  const 그릴 = 줄 => 표다 ? txTable(key, 줄)
+                    : '<div class="tx-list">' + 줄.map(r => txRow(key, r, true)).join('') + '</div>';
+  if(st.그룹){                                        /* 그룹 묶기 */
+    const c = 열들(key).find(z => z.k === st.그룹);
+    const 이름 = v => c && (c.타입==='person' ? 사람(v).name
+      : c.타입==='check' ? (v ? '✓' : '안 됨')
+      : c.타입==='date' || c.타입==='datetime' ? (v ? String(v).slice(0,10) : '')
+      : (c.표시||{})[v] || v);
+    const 뭉치 = new Map();
+    rows.forEach(r => {
+      let v = 값읽기(r, st.그룹);
+      const 값들 = Array.isArray(v) ? (v.length ? v : [null]) : [v];
+      값들.forEach(x => { const nm = 값없나(x) ? '없음' : String(이름(x));
+        if(!뭉치.has(nm)) 뭉치.set(nm, []); 뭉치.get(nm).push(r); });
+    });
+    const 접힘 = st.접힘 || {};
+    return 보기줄 + 거름줄 + 달력 + txPickBar(key, rows, 표다)
+      + [...뭉치.entries()].map(([nm, 줄]) =>
+          '<div class="tx-grp"><button class="tx-ghead" data-act="tx:gfold" data-k="'+key+'" data-v2="'+esc(nm)+'">'
+          + '<i>'+(접힘[nm]?'▶':'▼')+'</i>'+esc(nm)+'<b>'+줄.length+'</b></button>'
+          + (접힘[nm] ? '' : 그릴(줄)) + '</div>').join('');
+  }
+  return 보기줄 + 거름줄 + 달력 + txPickBar(key, rows, 표다) + 그릴(rows);
 }
 /* ── 표 보기 ── 노션 데이터베이스처럼 속성마다 칸이 나뉜다 (2026-09-09 대표 지시:
    「한 칸 안에 네이버 예약 이런 게 합쳐져 있잖아 · 노션 모양 그대로 보고 수정하게」) */
+/* ⛔ 규칙: 모든 데이터베이스는 같다. 기본 모양은 표 하나로 통일한다
+   (2026-09-09 대표: 「여긴 뭔데 그대로야」 — 업무는 목록, 상담은 표로 보여 딴 물건 같았다)
+   모양은 「표:보기」 마다 기억한다 — 노션도 보기마다 모양이 따로다 */
 let 표모양 = {};
-try{ 표모양 = JSON.parse(localStorage.getItem('gg_desk_layout') || '{}') || {}; }catch(e){}
-const 표모양저장 = () => { try{ localStorage.setItem('gg_desk_layout', JSON.stringify(표모양)); }catch(e){} };
+try{ 표모양 = JSON.parse(localStorage.getItem('gg_desk_layout2') || '{}') || {}; }catch(e){}
+const 표모양저장 = () => { try{ localStorage.setItem('gg_desk_layout2', JSON.stringify(표모양)); }catch(e){} };
+const 모양키 = key => key + ':' + ((표상태[key] || {}).보기 || '');
+const 모양 = key => 표모양[모양키(key)] || 'table';      /* 기본은 표 */
 const 칸너비 = { text:170, long:220, select:110, multi:170, number:90, check:70,
                  date:120, datetime:150, person:130, people:150, url:180, phone:140, email:180 };
-function 표칸들(key){
+/* 보기마다 「보이는 칸과 순서」가 다르다 — 노션도 그렇다 (2026-09-09 직접 확인)
+   보기에 담긴 게 없으면 기본(숨김 아닌 것 전부)을 쓴다 */
+function 쓸수있는칸(key){
   const 본문 = 본문열쇠(key), 제 = 표정의[key].제목열;
-  const cs = 열들(key).filter(c => c.k !== 본문 && !c.숨김 && !(c.관리자만 && !관리자()));
+  const cs = 열들(key).filter(c => c.k !== 본문 && !(c.관리자만 && !관리자()));
   const i = cs.findIndex(c => c.k === 제);                 /* 제목은 늘 맨 앞 */
   if(i > 0) cs.unshift(cs.splice(i, 1)[0]);
   return cs;
+}
+function 지금보기(key){
+  const 목록 = 보기들(key), st = 표상태[key];
+  return 목록.find(x => x.k === st.보기) || 목록.filter(x => !x.숨김)[0] || 목록[0];
+}
+function 표칸들(key){
+  const 다 = 쓸수있는칸(key), v = 지금보기(key);
+  const 담김 = v && v.칸;
+  if(담김 && 담김.length){
+    const 뭉치 = {}; 다.forEach(c => { 뭉치[c.k] = c; });
+    const 골라 = 담김.map(k => 뭉치[k]).filter(Boolean);
+    const 제 = 표정의[key].제목열;
+    if(!골라.some(c => c.k === 제) && 뭉치[제]) 골라.unshift(뭉치[제]);   /* 제목은 늘 있다 */
+    return 골라.length ? 골라 : 다.filter(c => !c.숨김);
+  }
+  return 다.filter(c => !c.숨김);
 }
 function 표칸값(key, c, r){
   if(c.k === 표정의[key].제목열)
@@ -2529,8 +2584,10 @@ function txTable(key, rows){
   };
   return '<div class="tx-tw"><div class="tx-table" style="grid-template-columns:'+폭+'">'
     + 머리 + rows.map(줄).join('') + '</div></div>'
+    + (관리자() || true ? '<button class="tx-newrow" data-act="tx:rownew" data-k="'+key+'">＋ 새 '+표정의[key].제목+'</button>' : '')
     + '<div class="tx-help">칸을 누르면 <b>선택</b> · <b>방향키</b>로 이동 · <b>Enter</b>나 한 번 더 누르면 수정 · '
-    + '수정 중 <b>Tab</b>은 옆 칸 · <b>Esc</b>는 취소</div>';
+    + '수정 중 <b>Tab</b>은 옆 칸 · <b>Shift+방향키</b>로 여러 칸 · <b>Ctrl+D</b> 아래로 채우기 · '
+    + '<b>Ctrl+R</b> 오른쪽으로 채우기 · <b>Esc</b> 취소</div>';
 }
 /* ── 칸 안에서 바로 치기 · 키보드로 옮겨 다니기 ──
    (2026-09-09 대표: 「텍스트 박스가 아래 따로 뜨는 게 아니라 바로 적을 수 있게 ·
@@ -2624,6 +2681,67 @@ function 고른칸다시(){
   const td = 칸찾기(고른칸.id, 고른칸.k);
   if(td) td.classList.add('sel'); else 고른칸 = null;
 }
+/* ── 칸 범위 ── Shift+방향키로 여러 칸을 고르고 Ctrl+D/R 로 채운다
+   (공식 문서: 「여러 셀을 선택한 상태에서 cmd/ctrl+R 또는 cmd/ctrl+D」) */
+let 범위 = null;                                    /* {key, r1, c1, r2, c2} — 화면 자리 번호 */
+function 범위지우기(){ 범위 = null;
+  document.querySelectorAll('.tx-td.rng').forEach(e => e.classList.remove('rng')); }
+function 표자리(key){
+  const 표 = document.querySelector('.tx-table'); if(!표) return null;
+  const 줄들 = [...표.querySelectorAll('.tx-tr')].filter(e => !e.classList.contains('tx-th'));
+  return { 줄들, 칸이름: 표칸들(key).map(c => c.k) };
+}
+function 범위칠하기(){
+  document.querySelectorAll('.tx-td.rng').forEach(e => e.classList.remove('rng'));
+  if(!범위) return;
+  const z = 표자리(범위.key); if(!z) return;
+  const r0 = Math.min(범위.r1, 범위.r2), r9 = Math.max(범위.r1, 범위.r2);
+  const c0 = Math.min(범위.c1, 범위.c2), c9 = Math.max(범위.c1, 범위.c2);
+  for(let r = r0; r <= r9; r++) for(let c = c0; c <= c9; c++){
+    const td = z.줄들[r] && z.줄들[r].querySelector('.tx-td[data-c="'+CSS.escape(z.칸이름[c])+'"]');
+    if(td) td.classList.add('rng');
+  }
+}
+function 범위넓히기(쪽){
+  const z = 표자리(고른칸.key); if(!z) return;
+  const ri = z.줄들.findIndex(e => e.querySelector('[data-rid="'+고른칸.id+'"]'));
+  const ci = z.칸이름.indexOf(고른칸.k);
+  if(ri < 0 || ci < 0) return;
+  if(!범위 || 범위.key !== 고른칸.key) 범위 = { key:고른칸.key, r1:ri, c1:ci, r2:ri, c2:ci };
+  if(쪽 === 'down')  범위.r2 = Math.min(z.줄들.length - 1, 범위.r2 + 1);
+  if(쪽 === 'up')    범위.r2 = Math.max(0, 범위.r2 - 1);
+  if(쪽 === 'right') 범위.c2 = Math.min(z.칸이름.length - 1, 범위.c2 + 1);
+  if(쪽 === 'left')  범위.c2 = Math.max(0, 범위.c2 - 1);
+  범위칠하기();
+}
+/* 첫 칸 값을 범위 전체에 채운다 */
+async function 범위채우기(어디){
+  if(!범위) { toast('Shift+방향키로 칸을 먼저 고르세요'); return; }
+  const key = 범위.key, z = 표자리(key); if(!z) return;
+  const r0 = Math.min(범위.r1, 범위.r2), r9 = Math.max(범위.r1, 범위.r2);
+  const c0 = Math.min(범위.c1, 범위.c2), c9 = Math.max(범위.c1, 범위.c2);
+  const 줄id = r => (z.줄들[r].querySelector('[data-rid]') || {}).dataset ?
+                    z.줄들[r].querySelector('[data-rid]').dataset.rid : null;
+  let 몇 = 0;
+  if(어디 === 'down'){
+    for(let c = c0; c <= c9; c++){
+      const k = z.칸이름[c], 씨줄 = W[key].find(x => x.id === 줄id(r0));
+      if(!씨줄) continue; const v = 값읽기(씨줄, k);
+      for(let r = r0 + 1; r <= r9; r++){ const id2 = 줄id(r); if(!id2) continue;
+        await 속성저장(key, id2, k, v === undefined ? null : v); 몇++; }
+    }
+  } else {
+    const k0 = z.칸이름[c0];
+    for(let r = r0; r <= r9; r++){
+      const id2 = 줄id(r); const 씨줄 = W[key].find(x => x.id === id2); if(!씨줄) continue;
+      const v = 값읽기(씨줄, k0);
+      for(let c = c0 + 1; c <= c9; c++){
+        await 속성저장(key, id2, z.칸이름[c], v === undefined ? null : v); 몇++; }
+    }
+  }
+  범위칠하기();
+  toast(몇 + '칸을 채웠습니다');
+}
 document.addEventListener('keydown', function(e){
   if(!고른칸 || 칸편집) return;
   if($('#txpop') || $('#pop').classList.contains('on')) return;   /* 쪽지·판이 열렸으면 그쪽 몫 */
@@ -2631,12 +2749,15 @@ document.addEventListener('keydown', function(e){
   if(t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
   const { key, id, k } = 고른칸;
   const 쪽 = { ArrowRight:'right', ArrowLeft:'left', ArrowUp:'up', ArrowDown:'down' }[e.key];
-  if(쪽){ e.preventDefault(); 옆칸으로(key, id, k, 쪽, false); return; }
+  if(쪽 && e.shiftKey){ e.preventDefault(); 범위넓히기(쪽); return; }
+  if((e.ctrlKey || e.metaKey) && (e.key === 'd' || e.key === 'D')){ e.preventDefault(); 범위채우기('down'); return; }
+  if((e.ctrlKey || e.metaKey) && (e.key === 'r' || e.key === 'R')){ e.preventDefault(); 범위채우기('right'); return; }
+  if(쪽){ e.preventDefault(); 범위지우기(); 옆칸으로(key, id, k, 쪽, false); return; }
   if(e.key === 'Tab'){ e.preventDefault(); 옆칸으로(key, id, k, e.shiftKey ? 'left' : 'right', false); return; }
   if(e.key === 'Enter'){ e.preventDefault();
     const td = 칸찾기(id, k); if(!td) return;
     if(!칸안편집(key, id, k, td)) td.click(); return; }
-  if(e.key === 'Escape'){ 칸고름지우기(); return; }
+  if(e.key === 'Escape'){ 범위지우기(); 칸고름지우기(); return; }
   /* 글자를 치면 바로 수정 상태로 (엑셀·노션처럼) */
   if(e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey){
     const c = 열들(key).find(z => z.k === k);
@@ -2679,7 +2800,9 @@ function txFilterBar(key, v, 순){
     + ((st.규칙||[]).length ? '<button class="tx-fclr" data-act="tx:fclr" data-k="'+key+'">필터 삭제</button>' : '')
     + '<span class="sp3">'
     + '<button class="tx-fadd" data-act="tx:layout" data-k="'+key+'" title="목록 ↔ 표">'
-      + (표모양[key]==='table' ? '▤ 표' : '☰ 목록') + '</button>'
+      + (모양(key)==='table' ? '▤ 표' : '☰ 목록') + '</button>'
+    + '<button class="tx-fadd '+(st.그룹?'on':'')+'" data-act="tx:grpmenu" data-k="'+key+'">⊞ '
+      + (st.그룹 ? ((열들(key).find(z=>z.k===st.그룹)||{}).이름 || '그룹') : '그룹') + '</button>'
     + '<button class="tx-fadd '+(순&&순.k?'on':'')+'" data-act="tx:sortmenu" data-k="'+key+'">↕ '+(순말 || '정렬')+'</button>'
     + ((st.규칙||[]).length || st.정렬
         ? '<button class="tx-fsave" data-act="tx:vsave" data-k="'+key+'">새 보기로 저장</button>' : '')
@@ -2719,6 +2842,16 @@ function 조건값판(key){
     + (새규칙.cmp && 값칸 ? '<div class="fld" style="margin-top:12px"><span class="fn">값</span>'+값칸+'</div>' : '')
     + (새규칙.cmp && !값칸 ? '<button class="btn gold" style="margin-top:12px" data-act="tx:fval" data-k="'+key+'">추가</button>' : ''),
     '<div class="tx-fbtns"><span class="tx-stat"></span><button class="btn ghost" data-act="tx:fnew" data-k="'+key+'">‹ 뒤로</button></div>');
+}
+function 그룹판(key){
+  const st = 표상태[key];
+  const cs = 열들(key).filter(c => ['select','multi','person','people','check'].indexOf(c.타입) >= 0);
+  판열기('그룹화',
+    '<div class="tx-menu">'
+    + '<button data-act="tx:grpset" data-k="'+key+'" data-v2="">그룹화 제거</button>'
+    + cs.map(c => '<button data-act="tx:grpset" data-k="'+key+'" data-v2="'+esc(c.k)+'">'+esc(c.이름)
+        + (st.그룹===c.k ? '<small style="margin-left:auto;color:var(--gold)">지금 이것</small>' : '') + '</button>').join('')
+    + '</div><button class="btn ghost" data-act="popclose">닫기</button>');
 }
 function 정렬판(key){
   const st = 표상태[key], 순 = st.정렬 || {};
@@ -3183,9 +3316,66 @@ function 속성이름메뉴(key, k, el){
       + '<button class="wn" data-act="tx:cdel" data-k="'+key+'" data-id="'+id+'"><i>✕</i>삭제</button>'
       : '<div class="mut">'+(c.시스템 ? '자동으로 적히는 속성' : '기본 속성')+'</div>')
     + '<div class="tx-pdiv"></div>'
+    + (관리자() ? '<button data-act="tx:vhidecol" data-k="'+key+'" data-v2="'+esc(c.k)+'"><i>🙈</i>이 보기에서 숨기기</button>' : '')
+    + '<button data-act="tx:vcols" data-k="'+key+'"><i>▤</i>이 보기의 칸</button>'
     + '<button data-act="tx:cols" data-k="'+key+'"><i>⠿</i>속성 편집</button>'
     + '</div>', 235);
 }
+/* 이 보기에 어떤 칸을 어떤 차례로 보일지 */
+function 보기칸판(key){
+  const v = 지금보기(key), 다 = 쓸수있는칸(key), 보임 = 표칸들(key).map(c => c.k);
+  const 제 = 표정의[key].제목열;
+  const 줄들 = 보임.map(k => 다.find(c => c.k === k)).filter(Boolean)
+    .concat(다.filter(c => 보임.indexOf(c.k) < 0));
+  판열기('「' + esc(v ? v.이름 : '') + '」 보기의 칸',
+    '<div class="tx-cols"><div class="tx-clist" id="txvclist" data-vck="'+key+'">'
+    + 줄들.map((c,i) => { const 보이나 = 보임.indexOf(c.k) >= 0;
+        return '<div class="tx-cl'+(보이나?'':' off')+'" data-vci="'+i+'">'
+        + '<span class="g"'+(보이나 ? ' data-vcgrip="'+i+'" title="끌어서 순서 바꾸기"' : '')+'>'+(보이나?'⠿':'·')+'</span>'
+        + '<b>'+esc(c.이름)+'</b><small>'+타입이름(c.타입)+'</small>'
+        + (c.k === 제
+           ? '<button style="margin-left:auto;opacity:.3;cursor:default" title="제목 칸은 늘 보입니다">👁</button>'
+           : '<button style="margin-left:auto" data-act="tx:vcol" data-k="'+key+'" data-v2="'+esc(c.k)+'" title="'+(보이나?'숨기기':'보이기')+'">'+(보이나?'👁':'🙈')+'</button>')
+        + '</div>'; }).join('')
+    + '</div><div class="tx-meta">여기서 고른 것이 <b>이 보기</b>에만 적용됩니다</div></div>',
+    '<div class="tx-fbtns"><span class="tx-stat"></span>'
+    + '<button class="btn sub" data-act="tx:vcolall" data-k="'+key+'">모두 보이기</button>'
+    + '<button class="btn sub" data-act="popclose">닫기</button></div>');
+}
+/* 보기 칸 순서 끌어 바꾸기 */
+let 보기칸끌기 = null;
+document.addEventListener('mousedown', function(ev){
+  const g = ev.target.closest && ev.target.closest('[data-vcgrip]');
+  if(!g) return;
+  const box = g.closest('#txvclist'); if(!box) return;
+  ev.preventDefault();
+  보기칸끌기 = { key: box.dataset.vck, 부터: +g.dataset.vcgrip, 까지: null, 아래: false };
+  g.closest('.tx-cl').classList.add('tx-grab'); document.body.classList.add('tx-moving');
+}, true);
+document.addEventListener('mousemove', function(ev){
+  if(!보기칸끌기) return;
+  const box = $('#txvclist'); if(!box) return;
+  const 것 = [...box.querySelectorAll('.tx-cl[data-vci]')]
+    .map(e => ({ i:+e.dataset.vci, r:e.getBoundingClientRect() }))
+    .filter(x => ev.clientY >= x.r.top - 6 && ev.clientY <= x.r.bottom + 6)[0];
+  if(!것) return;
+  보기칸끌기.까지 = 것.i; 보기칸끌기.아래 = ev.clientY > (것.r.top + 것.r.bottom) / 2;
+  넣을자리선(것.r, 보기칸끌기.아래);
+});
+document.addEventListener('mouseup', async function(){
+  if(!보기칸끌기) return;
+  const z = 보기칸끌기; 보기칸끌기 = null; 자리선끄기();
+  document.body.classList.remove('tx-moving');
+  document.querySelectorAll('.tx-cl.tx-grab').forEach(e => e.classList.remove('tx-grab'));
+  if(z.까지 == null || z.까지 === z.부터) return;
+  const 보임 = 표칸들(z.key).map(c => c.k);
+  if(z.부터 >= 보임.length || z.까지 >= 보임.length) return;   /* 숨긴 줄로는 못 옮긴다 */
+  const m = 보임.splice(z.부터, 1)[0];
+  let at = z.까지 + (z.아래 ? 1 : 0); if(z.부터 < at) at--;
+  보임.splice(Math.max(0, Math.min(at, 보임.length)), 0, m);
+  if(await 보기칸바꾸기(z.key, 보임)){ 보기칸판(z.key); toast('순서를 바꿨습니다'); }
+});
+
 function 속성추가쪽지(key, el){
   쪽지열기(el, '<input class="inp" id="txpn" placeholder="속성 이름">'
     + '<div class="tx-pdiv"></div><div class="tx-pmenu">'
@@ -3901,6 +4091,23 @@ async function 옵션더하기(key, k, 값){
     return true;
   }catch(e){ toast('고를 것을 못 더했어요 — '+e.message); return false; }
 }
+/* 이 보기에서 칸을 숨기거나 다시 보이게 한다 */
+async function 보기칸바꾸기(key, 새칸들){
+  const v = 지금보기(key); if(!v) return false;
+  return await 덮어쓰기(key, v.k, { cols: 새칸들 });
+}
+async function 보기칸숨기기(key, k){
+  const 지금 = 표칸들(key).map(c => c.k);
+  if(k === 표정의[key].제목열) { toast('제목 칸은 숨길 수 없어요'); return false; }
+  return await 보기칸바꾸기(key, 지금.filter(x => x !== k));
+}
+async function 보기칸보이기(key, k){
+  const 지금 = 표칸들(key).map(c => c.k);
+  if(지금.indexOf(k) >= 0) return true;
+  const 다 = 쓸수있는칸(key).map(c => c.k);
+  const 새 = 다.filter(x => 지금.indexOf(x) >= 0 || x === k);   /* 원래 차례를 지킨다 */
+  return await 보기칸바꾸기(key, 새);
+}
 async function 속성고치기(id, body){
   try{
     const o = await usend('tr_cols?id=eq.'+id, 'PATCH', body, 'return=representation');
@@ -4041,6 +4248,22 @@ async function txAct(a, el){
     catch(e){ toast('못 지웠어요 — ' + e.message); }
     return; }
   if(a==='new'){ txNewMenu(k); return; }
+  if(a==='rownew'){                       /* 표 맨 아래에서 바로 한 줄 만든다 (노션과 같다) */
+    const T2 = 표정의[k], 몸 = { vis: T2.기본vis || 'owners', viewers: [] };
+    T2.열.forEach(c => { if(c.기본 !== undefined) 몸[c.k] = c.기본; });
+    if(T2.사람열 && ME) 몸[T2.사람열] = (T2.열.find(c => c.k === T2.사람열) || {}).타입 === 'person' ? ME.id : [ME.id];
+    몸[T2.제목열] = 몸[T2.제목열] || '';
+    if(k === 'leave') 몸.day = TODAY;
+    if(k === 'leads') 몸.name = '';
+    try{
+      const o = await usend(T2.table, 'POST', 몸, 'return=representation');
+      if(o && o[0]){ W[k].unshift(o[0]); render();
+        const td = 칸찾기(o[0].id, T2.제목열);
+        if(td){ 칸고르기(k, o[0].id, T2.제목열);
+          td.scrollIntoView({ block:'nearest' });
+          칸안편집(k, o[0].id, T2.제목열, td); } }
+    }catch(e){ toast('못 만들었습니다 — '+e.message); }
+    return; }
   /* ── 필터 · 정렬 ── */
   if(a==='fnew'){ 새규칙 = { k:null, cmp:null, v:null }; 조건판(k); return; }
   if(a==='fpick'){ 새규칙 = { k:v2, cmp:null, v:null };
@@ -4057,6 +4280,10 @@ async function txAct(a, el){
   if(a==='fdrop'){ 표상태[k].규칙.splice(+el.dataset.i, 1); render(); return; }
   if(a==='fclr'){ 표상태[k].규칙 = []; 표상태[k].op = 'and'; render(); return; }
   if(a==='fop'){ 표상태[k].op = 표상태[k].op === 'or' ? 'and' : 'or'; render(); return; }
+  if(a==='grpmenu'){ 그룹판(k); return; }
+  if(a==='grpset'){ 표상태[k].그룹 = v2 || null; 표상태[k].접힘 = {}; popClose(); render(); return; }
+  if(a==='gfold'){ const st = 표상태[k]; st.접힘 = st.접힘 || {};
+    st.접힘[v2] = !st.접힘[v2]; render(); return; }
   if(a==='sortmenu'){ 정렬판(k); return; }
   if(a==='sortset'){ const st = 표상태[k];
     if(!v2) st.정렬 = null;
@@ -4114,7 +4341,7 @@ async function txAct(a, el){
     if(!이미) return;                        /* 처음 누르면 고르기만 — 방향키가 바로 먹는다 */
     if(칸안편집(k, id3, v2, el)) return;
     속성편집(k, id3, v2, el); return; }
-  if(a==='layout'){ 표모양[k] = 표모양[k]==='table' ? 'list' : 'table'; 표모양저장(); render(); return; }
+  if(a==='layout'){ 표모양[모양키(k)] = 모양(k)==='table' ? 'list' : 'table'; 표모양저장(); render(); return; }
   if(a==='pmenu'){ 속성이름메뉴(k, v2, el); return; }
   if(a==='padd'){ 속성추가쪽지(k, el); return; }
   if(a==='pempty'){ 빈속성숨김 = !빈속성숨김;
@@ -4154,6 +4381,12 @@ async function txAct(a, el){
     return; }
   /* ── 속성(열) 관리 ── */
   if(a==='cols'){ 속성판(k); return; }
+  if(a==='vcols'){ 쪽지닫기(); 보기칸판(k); return; }
+  if(a==='vhidecol'){ 쪽지닫기(); if(await 보기칸숨기기(k, v2)) toast('이 보기에서 숨겼습니다'); return; }
+  if(a==='vcol'){ const 보임 = 표칸들(k).map(c => c.k);
+    const 됐 = 보임.indexOf(v2) >= 0 ? await 보기칸숨기기(k, v2) : await 보기칸보이기(k, v2);
+    if(됐) 보기칸판(k); return; }
+  if(a==='vcolall'){ if(await 보기칸바꾸기(k, 쓸수있는칸(k).map(c => c.k))) 보기칸판(k); return; }
   if(a==='cadd'){
     const nm = ($('#txcname').value || '').trim();
     if(!nm) return toast('이름을 입력하세요');
