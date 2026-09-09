@@ -534,7 +534,8 @@ body.tx-moving .tx-x{cursor:grabbing}
 .tx-th>.tx-td i{font-style:normal;opacity:.75;font-size:11px}
 .tx-tr:hover>.tx-td{background:rgba(255,255,255,.022)}
 .tx-tr.pk>.tx-td{background:rgba(230,196,135,.08)}
-.tx-td.tx-tck{justify-content:center;padding:8px 4px}
+.tx-td.tx-tck{justify-content:center;padding:8px 4px;position:sticky;left:0;z-index:1;background:var(--dark-2)}
+.tx-th>.tx-td.tx-tck{z-index:3;background:var(--dark-3)}
 .tx-td.tx-t1{cursor:pointer;font-size:13px;position:sticky;left:34px;z-index:1;background:var(--dark-2)}
 .tx-tr:hover>.tx-td.tx-t1{background:#232320}
 .tx-th>.tx-td.tx-t1{left:34px;z-index:3;background:var(--dark-3)}
@@ -571,12 +572,28 @@ body.tx-moving .tx-x{cursor:grabbing}
 .tx-cl.off{opacity:.45}
 .tx-cl.off b{font-weight:600}
 .tx-td.rng{background:rgba(230,196,135,.16)}
+/* ⛔ 왼쪽에 얼린 칸(체크·이름)은 배경이 늘 불투명해야 한다.
+   반투명이면 옆으로 스크롤한 칸이 밑에서 비쳐 글자가 겹친다 (2026-09-09 대표 지적) */
+.tx-td.tx-tck,.tx-td.tx-t1{background:var(--dark-2)}
+.tx-tr:hover>.tx-td.tx-tck,.tx-tr:hover>.tx-td.tx-t1{background:#232320}
+.tx-tr.pk>.tx-td.tx-tck,.tx-tr.pk>.tx-td.tx-t1{background:#2b2721}
+.tx-td.tx-t1.rng,.tx-tr:hover>.tx-td.tx-t1.rng{background:#3a3226}
+.tx-td.tx-t1.sel,.tx-tr:hover>.tx-td.tx-t1.sel{background:#342e22}
+.tx-td.tx-t1.on,.tx-tr:hover>.tx-td.tx-t1.on{background:var(--dark-3)}
+.tx-th>.tx-td.tx-tck,.tx-th>.tx-td.tx-t1{background:var(--dark-3)}
 .tx-grp{margin-bottom:14px}
 .tx-ghead{display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:7px 4px;
   font-size:13px;font-weight:800;color:var(--cream)}
 .tx-ghead i{font-style:normal;font-size:10px;color:var(--sub)}
 .tx-ghead b{font-weight:700;color:var(--sub);font-size:11.5px}
 .tx-ghead:hover{color:var(--gold)}
+.tx-views button[data-vtab]{cursor:grab}
+.tx-views button.drag,.tx-th .tx-td.drag{opacity:.4}
+.tx-views button.dropL{box-shadow:inset 2px 0 0 var(--gold)}
+.tx-views button.dropR{box-shadow:inset -2px 0 0 var(--gold)}
+.tx-th .tx-td[data-hc]{cursor:grab}
+.tx-th .tx-td.dropL{box-shadow:inset 2px 0 0 var(--gold)}
+.tx-th .tx-td.dropR{box-shadow:inset -2px 0 0 var(--gold)}
 .tx-help{font-size:11.5px;color:#5f5a54;padding:8px 4px 0}
 .tx-help b{color:#8b8479;font-weight:700}
 .tx-table .tx-tag{font-size:11px}
@@ -848,7 +865,7 @@ body.tx-moving .tx-x{cursor:grabbing}
 
 <script>
 "use strict";
-const BUILD = '51';
+const BUILD = '54';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -873,7 +890,7 @@ const TODAY = (()=>{ const d=new Date(), p=n=>String(n).padStart(2,'0');
 const AUTH_KEY = 'gg_desk_auth';
 let AUTH = null;            /* {access_token, refresh_token, user, exp} */
 let ME = null;              /* staff 행 {id,name,role,color,goal} */
-const W = { staff:[], tasks:[], leads:[], leave:[], cm:[], cols:[], views:[] };
+const W = { staff:[], tasks:[], leads:[], leave:[], cm:[], cols:[], views:[], meta:[] };
 const 관리자 = () => !!(ME && ME.role==='admin');
 
 function authLoad(){ try{ AUTH = JSON.parse(localStorage.getItem(AUTH_KEY)||'null'); }catch(e){ AUTH=null; } }
@@ -2345,7 +2362,12 @@ function 보기들(key){
   const 내가만든 = vs.filter(v => !v.base).map(v => ({
     k:'v'+v.id, 이름:v.name, 규칙:v.rules||[], op:v.op||'and', ord:v.ord||null,
     칸:v.cols||null, sort:v.sort, 숨김:!!v.hidden, 붙박이:false, 뷰:v }));
-  return 기본.concat(내가만든).sort((a,b) => (a.sort - b.sort));
+  const 다 = 기본.concat(내가만든);
+  if(!모두같게(key)){                                   /* 각자 모드면 내 순서를 얹는다 */
+    const 내순 = (내설정[key] || {}).보기순 || [];
+    다.forEach(x => { const i = 내순.indexOf(x.k); if(i >= 0) x.sort = i; });
+  }
+  return 다.sort((a,b) => (a.sort - b.sort));
 }
 const 보기맞나 = (v, r, key) => v.필터 ? v.필터(r) : 규칙들맞나(v.규칙, v.op, r, key);
 function 줄세우기(rows, ord, key){
@@ -2386,10 +2408,22 @@ async function loadWork(){
     uget('tr_comments?select=*&order=created_at&limit=2000').catch(()=>[]),
     uget('tr_cols?select=*&order=sort').catch(()=>[]),        /* 표가 아직 없으면 빈 채로 */
     uget('tr_views?select=*&order=sort').catch(()=>[]),
+    uget('tr_meta?select=*').catch(()=>[]),
   ]);
   W.staff = g[0]; W.tasks = g[1]; W.leads = g[2]; W.leave = g[3]; W.cm = g[4] || [];
-  W.cols = g[5] || []; W.views = g[6] || [];
+  W.cols = g[5] || []; W.views = g[6] || []; W.meta = g[7] || [];
 }
+/* ── 잠금 · 「모두 같게 / 각자」 ── (2026-09-09 대표 지시)
+   모두 같게 = 순서·칸·모양을 서버(tr_views)에 담아 모두가 같게 본다 (관리자만 바꾼다)
+   각자     = 각자 브라우저에 담아 저마다 다르게 본다 (누구나 바꾼다) */
+const 표설정 = key => W.meta.find(x => x.tbl === 표정의[key].table) || {};
+const 잠겼나 = key => !!표설정(key).locked;
+const 모두같게 = key => 표설정(key).shared !== false;
+const 바꿀수있나 = key => !잠겼나(key) && (모두같게(key) ? 관리자() : true);
+/* 각자 모드에서 쓰는 내 브라우저 저장소 */
+let 내설정 = {};
+try{ 내설정 = JSON.parse(localStorage.getItem('gg_desk_mine') || '{}') || {}; }catch(e){}
+const 내설정저장 = () => { try{ localStorage.setItem('gg_desk_mine', JSON.stringify(내설정)); }catch(e){} };
 
 /* ── 늘린 속성 ── 대표님이 화면에서 만든 칸. 값은 각 줄의 extra 에 담긴다 (2026-09-08)
    기본 속성은 코드에 박혀 있고(표정의.열), 늘린 속성은 tr_cols 표에 있다.
@@ -2476,7 +2510,8 @@ function txList(key){
   const 순 = st.정렬 || (v.ord || null);
   rows = 줄세우기(rows, 순, key) || rows.slice().sort(T.정렬);
   const 보기줄 = '<div class="tx-bar"><div class="tx-views">'
-    + 보임.map(x => '<button class="'+(x.k===st.보기?'on':'')+'" data-act="tx:view" data-k="'+key+'" data-v2="'+x.k+'">'
+    + 보임.map((x,i) => '<button class="'+(x.k===st.보기?'on':'')+'" data-act="tx:view" data-k="'+key+'" data-v2="'+x.k+'"'
+        + (바꿀수있나(key) ? ' data-vtab="'+i+'" title="끌어서 순서를 바꿀 수 있어요"' : '')+'>'
         + esc(x.이름) + '<b>' + W[key].filter(r => 보기맞나(x, r, key)).length + '</b></button>').join('')
     + (관리자() ? '<button class="tx-vplus" data-act="tx:views" data-k="'+key+'" title="새 보기 추가">＋</button>' : '')
     + '</div><div class="sp2">'
@@ -2514,6 +2549,76 @@ function txList(key){
   }
   return 보기줄 + 거름줄 + 달력 + txPickBar(key, rows, 표다) + 그릴(rows);
 }
+/* ── 보기 탭·표 머리를 바로 끌어 옮기기 (2026-09-09 대표 지시) ── */
+let 탭끌기 = null;
+document.addEventListener('mousedown', function(ev){
+  const b = ev.target.closest && ev.target.closest('[data-vtab]');
+  if(!b) return;
+  const 상자 = b.closest('.tx-views'); if(!상자) return;
+  탭끌기 = { key: b.dataset.k, 부터: +b.dataset.vtab, 까지: null, 아래: false, 움직임: false, el: b };
+});
+document.addEventListener('mousemove', function(ev){
+  if(!탭끌기 || ev.buttons !== 1) return;
+  const b = ev.target.closest && ev.target.closest('[data-vtab]');
+  if(!b) return;
+  탭끌기.움직임 = true; 탭끌기.el.classList.add('drag');
+  const r = b.getBoundingClientRect();
+  탭끌기.까지 = +b.dataset.vtab; 탭끌기.아래 = ev.clientX > (r.left + r.right) / 2;
+  document.querySelectorAll('.tx-views button.dropL,.tx-views button.dropR')
+    .forEach(e => e.classList.remove('dropL','dropR'));
+  b.classList.add(탭끌기.아래 ? 'dropR' : 'dropL');
+});
+document.addEventListener('mouseup', async function(){
+  if(!탭끌기) return;
+  const z = 탭끌기; 탭끌기 = null;
+  document.querySelectorAll('.tx-views button').forEach(e => e.classList.remove('drag','dropL','dropR'));
+  if(!z.움직임 || z.까지 == null || z.까지 === z.부터) return;
+  const 보임 = 보기들(z.key).filter(x => !x.숨김);
+  if(z.부터 >= 보임.length || z.까지 >= 보임.length) return;
+  const m = 보임.splice(z.부터, 1)[0];
+  let at = z.까지 + (z.아래 ? 1 : 0); if(z.부터 < at) at--;
+  보임.splice(Math.max(0, Math.min(at, 보임.length)), 0, m);
+  await 보기순서저장(z.key, 보임.map(x => x.k));
+});
+async function 보기순서저장(key, 차례){
+  if(!바꿀수있나(key)){ toast(잠겼나(key) ? '잠겨 있어요 — 자물쇠를 풀어 주세요' : '관리자만 바꿀 수 있어요'); return; }
+  if(!모두같게(key)){
+    내설정[key] = 내설정[key] || {}; 내설정[key].보기순 = 차례; 내설정저장(); render();
+    toast('순서를 바꿨습니다 (내 화면만)'); return;
+  }
+  for(let i = 0; i < 차례.length; i++) await 덮어쓰기(key, 차례[i], { sort: i });
+  render(); toast('순서를 바꿨습니다');
+}
+/* 표 머리를 바로 끌어 칸 순서 바꾸기 */
+let 머리끌기 = null;
+document.addEventListener('mousedown', function(ev){
+  const th = ev.target.closest && ev.target.closest('.tx-th .tx-td[data-hc]');
+  if(!th) return;
+  머리끌기 = { key: th.dataset.hk, 부터: +th.dataset.hi, 까지: null, 아래: false, 움직임: false, el: th };
+});
+document.addEventListener('mousemove', function(ev){
+  if(!머리끌기 || ev.buttons !== 1) return;
+  const th = ev.target.closest && ev.target.closest('.tx-th .tx-td[data-hc]');
+  if(!th) return;
+  머리끌기.움직임 = true; 머리끌기.el.classList.add('drag');
+  const r = th.getBoundingClientRect();
+  머리끌기.까지 = +th.dataset.hi; 머리끌기.아래 = ev.clientX > (r.left + r.right) / 2;
+  document.querySelectorAll('.tx-th .tx-td').forEach(e => e.classList.remove('dropL','dropR'));
+  th.classList.add(머리끌기.아래 ? 'dropR' : 'dropL');
+});
+document.addEventListener('mouseup', async function(){
+  if(!머리끌기) return;
+  const z = 머리끌기; 머리끌기 = null;
+  document.querySelectorAll('.tx-th .tx-td').forEach(e => e.classList.remove('drag','dropL','dropR'));
+  if(!z.움직임 || z.까지 == null || z.까지 === z.부터) return;
+  const 이름들 = 표칸들(z.key).map(c => c.k);
+  if(z.부터 >= 이름들.length || z.까지 >= 이름들.length) return;
+  const m = 이름들.splice(z.부터, 1)[0];
+  let at = z.까지 + (z.아래 ? 1 : 0); if(z.부터 < at) at--;
+  이름들.splice(Math.max(0, Math.min(at, 이름들.length)), 0, m);
+  if(await 보기칸바꾸기(z.key, 이름들)) toast('칸 순서를 바꿨습니다');
+});
+
 /* ── 표 보기 ── 노션 데이터베이스처럼 속성마다 칸이 나뉜다 (2026-09-09 대표 지시:
    「한 칸 안에 네이버 예약 이런 게 합쳐져 있잖아 · 노션 모양 그대로 보고 수정하게」) */
 /* ⛔ 규칙: 모든 데이터베이스는 같다. 기본 모양은 표 하나로 통일한다
@@ -2523,7 +2628,11 @@ let 표모양 = {};
 try{ 표모양 = JSON.parse(localStorage.getItem('gg_desk_layout2') || '{}') || {}; }catch(e){}
 const 표모양저장 = () => { try{ localStorage.setItem('gg_desk_layout2', JSON.stringify(표모양)); }catch(e){} };
 const 모양키 = key => key + ':' + ((표상태[key] || {}).보기 || '');
-const 모양 = key => 표모양[모양키(key)] || 'table';      /* 기본은 표 */
+function 모양(key){
+  if(모두같게(key)){ const v = 지금보기(key); if(v && v.뷰 && v.뷰.layout) return v.뷰.layout;
+    if(v && v.덮 && v.덮.layout) return v.덮.layout; }
+  return 표모양[모양키(key)] || 'table';                 /* 기본은 표 */
+}
 const 칸너비 = { text:170, long:220, select:110, multi:170, number:90, check:70,
                  date:120, datetime:150, person:130, people:150, url:180, phone:140, email:180 };
 /* 보기마다 「보이는 칸과 순서」가 다르다 — 노션도 그렇다 (2026-09-09 직접 확인)
@@ -2541,12 +2650,15 @@ function 지금보기(key){
 }
 function 표칸들(key){
   const 다 = 쓸수있는칸(key), v = 지금보기(key);
-  const 담김 = v && v.칸;
+  const 담김 = 모두같게(key) ? (v && v.칸)
+             : ((내설정[key] || {}).칸 || {})[v ? v.k : ''] || (v && v.칸);
   if(담김 && 담김.length){
     const 뭉치 = {}; 다.forEach(c => { 뭉치[c.k] = c; });
     const 골라 = 담김.map(k => 뭉치[k]).filter(Boolean);
     const 제 = 표정의[key].제목열;
-    if(!골라.some(c => c.k === 제) && 뭉치[제]) 골라.unshift(뭉치[제]);   /* 제목은 늘 있다 */
+    const i제 = 골라.findIndex(c => c.k === 제);
+    if(i제 > 0) 골라.unshift(골라.splice(i제, 1)[0]);                   /* 제목은 늘 맨 앞 */
+    else if(i제 < 0 && 뭉치[제]) 골라.unshift(뭉치[제]);
     return 골라.length ? 골라 : 다.filter(c => !c.숨김);
   }
   return 다.filter(c => !c.숨김);
@@ -2564,7 +2676,9 @@ function txTable(key, rows){
   const 모두 = rows.length > 0 && 고름.length === rows.length;
   const 머리 = '<div class="tx-tr tx-th">'
     + '<span class="tx-td tx-tck"><span class="tx-pick '+(모두?'on':'')+'" data-act="tx:pickall" data-k="'+key+'">'+(모두?'✓':'')+'</span></span>'
-    + cs.map(c => '<span class="tx-td"'
+    + cs.map((c,i) => '<span class="tx-td"'
+        + (바꿀수있나(key) && c.k !== 표정의[key].제목열
+           ? ' data-hc="'+esc(c.k)+'" data-hi="'+i+'" data-hk="'+key+'"' : '')
         + (관리자() && !c.시스템 ? ' data-act="tx:pmenu" data-k="'+key+'" data-v2="'+esc(c.k)+'"' : '')
         + '><i>'+(타입아이콘[c.타입]||'≡')+'</i>'+esc(c.이름)+'</span>').join('')
     + '</div>';
@@ -2801,6 +2915,12 @@ function txFilterBar(key, v, 순){
     + 조건
     + ((st.규칙||[]).length ? '<button class="tx-fclr" data-act="tx:fclr" data-k="'+key+'">필터 삭제</button>' : '')
     + '<span class="sp3">'
+    + (관리자() ? '<button class="tx-fadd '+(잠겼나(key)?'on':'')+'" data-act="tx:lock" data-k="'+key+'" '
+        + 'title="'+(잠겼나(key)?'잠김 — 순서·칸을 못 바꿉니다':'풀림 — 끌어서 옮길 수 있습니다')+'">'
+        + (잠겼나(key)?'🔒 잠김':'🔓 풀림') + '</button>'
+      + '<button class="tx-fadd" data-act="tx:share" data-k="'+key+'" '
+        + 'title="'+(모두같게(key)?'모두 같은 순서로 봅니다 (관리자만 바꿈)':'각자 자기 순서로 봅니다')+'">'
+        + (모두같게(key)?'👥 모두 같게':'👤 각자') + '</button>' : '')
     + '<button class="tx-fadd" data-act="tx:layout" data-k="'+key+'" title="목록 ↔ 표">'
       + (모양(key)==='table' ? '▤ 표' : '☰ 목록') + '</button>'
     + '<button class="tx-fadd '+(st.그룹?'on':'')+'" data-act="tx:grpmenu" data-k="'+key+'">⊞ '
@@ -4096,6 +4216,14 @@ async function 옵션더하기(key, k, 값){
 /* 이 보기에서 칸을 숨기거나 다시 보이게 한다 */
 async function 보기칸바꾸기(key, 새칸들){
   const v = 지금보기(key); if(!v) return false;
+  /* ⛔ 제목 칸은 늘 맨 앞이어야 한다 — 왼쪽에 얼려 두기 때문에 자리를 옮기면 화면이 깨진다 */
+  const 제 = 표정의[key].제목열;
+  새칸들 = [제].concat(새칸들.filter(x => x !== 제));
+  if(!바꿀수있나(key)){ toast(잠겼나(key) ? '잠겨 있어요 — 자물쇠를 풀어 주세요' : '관리자만 바꿀 수 있어요'); return false; }
+  if(!모두같게(key)){
+    내설정[key] = 내설정[key] || {}; 내설정[key].칸 = 내설정[key].칸 || {};
+    내설정[key].칸[v.k] = 새칸들; 내설정저장(); render(); return true;
+  }
   return await 덮어쓰기(key, v.k, { cols: 새칸들 });
 }
 async function 보기칸숨기기(key, k){
@@ -4282,6 +4410,24 @@ async function txAct(a, el){
   if(a==='fdrop'){ 표상태[k].규칙.splice(+el.dataset.i, 1); render(); return; }
   if(a==='fclr'){ 표상태[k].규칙 = []; 표상태[k].op = 'and'; render(); return; }
   if(a==='fop'){ 표상태[k].op = 표상태[k].op === 'or' ? 'and' : 'or'; render(); return; }
+  if(a==='lock'){ if(!관리자()) return;
+    const m = 표설정(k);
+    try{ const o = await usend('tr_meta?tbl=eq.'+표정의[k].table, 'PATCH',
+        { locked: !m.locked, updated_at: new Date().toISOString() }, 'return=representation');
+      if(o && o[0]){ const i = W.meta.findIndex(x=>x.tbl===표정의[k].table);
+        if(i>=0) W.meta[i] = o[0]; else W.meta.push(o[0]); }
+      render(); toast(!m.locked ? '잠갔습니다 — 순서·칸을 못 바꿉니다' : '풀었습니다 — 끌어서 옮길 수 있습니다');
+    }catch(e){ toast('못 바꿨습니다 — '+e.message); }
+    return; }
+  if(a==='share'){ if(!관리자()) return;
+    const m = 표설정(k), 새 = !(m.shared !== false);
+    try{ const o = await usend('tr_meta?tbl=eq.'+표정의[k].table, 'PATCH',
+        { shared: 새, updated_at: new Date().toISOString() }, 'return=representation');
+      if(o && o[0]){ const i = W.meta.findIndex(x=>x.tbl===표정의[k].table);
+        if(i>=0) W.meta[i] = o[0]; else W.meta.push(o[0]); }
+      render(); toast(새 ? '이제 모두가 같은 순서로 봅니다' : '이제 각자 자기 순서로 봅니다');
+    }catch(e){ toast('못 바꿨습니다 — '+e.message); }
+    return; }
   if(a==='grpmenu'){ 그룹판(k); return; }
   if(a==='grpset'){ 표상태[k].그룹 = v2 || null; 표상태[k].접힘 = {}; popClose(); render(); return; }
   if(a==='gfold'){ const st = 표상태[k]; st.접힘 = st.접힘 || {};
@@ -4343,7 +4489,12 @@ async function txAct(a, el){
     if(!이미) return;                        /* 처음 누르면 고르기만 — 방향키가 바로 먹는다 */
     if(칸안편집(k, id3, v2, el)) return;
     속성편집(k, id3, v2, el); return; }
-  if(a==='layout'){ 표모양[모양키(k)] = 모양(k)==='table' ? 'list' : 'table'; 표모양저장(); render(); return; }
+  if(a==='layout'){ const 새 = 모양(k)==='table' ? 'list' : 'table';
+    if(모두같게(k)){
+      if(!바꿀수있나(k)) return toast(잠겼나(k) ? '잠겨 있어요' : '관리자만 바꿀 수 있어요');
+      await 덮어쓰기(k, 지금보기(k).k, { layout: 새 });
+    } else { 표모양[모양키(k)] = 새; 표모양저장(); }
+    render(); return; }
   if(a==='pmenu'){ 속성이름메뉴(k, v2, el); return; }
   if(a==='padd'){ 속성추가쪽지(k, el); return; }
   if(a==='pempty'){ 빈속성숨김 = !빈속성숨김;
