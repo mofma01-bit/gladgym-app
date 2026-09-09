@@ -896,7 +896,7 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 
 <script>
 "use strict";
-const BUILD = '61';
+const BUILD = '62';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -2784,7 +2784,7 @@ function txTable(key, rows){
   const 모두 = rows.length > 0 && 고름.length === rows.length;
   const 머리 = '<div class="tx-tr tx-th">'
     + '<span class="tx-td tx-tck"><span class="tx-pick '+(모두?'on':'')+'" data-act="tx:pickall" data-k="'+key+'">'+(모두?'✓':'')+'</span></span>'
-    + cs.map((c,i) => '<span class="tx-td"'
+    + cs.map((c,i) => '<span class="tx-td'+(c.k === 제 ? ' tx-t1' : '')+'"'
         + (바꿀수있나(key) && !(얼렸나(key) && c.k === 표정의[key].제목열)
            ? ' data-hc="'+esc(c.k)+'" data-hi="'+i+'" data-hk="'+key+'"' : '')
         + (관리자() && !c.시스템 ? ' data-act="tx:pmenu" data-k="'+key+'" data-v2="'+esc(c.k)+'"' : '')
