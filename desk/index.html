@@ -566,6 +566,7 @@ body.tx-moving .tx-x{cursor:grabbing}
 .tx-pop #txopq{margin-bottom:2px}
 .tx-newrow{display:block;width:100%;text-align:left;padding:9px 12px;font-size:12.5px;font-weight:700;
   color:#6f6a63;border:1px solid var(--line);border-top:0;border-radius:0 0 12px 12px;background:var(--dark-2)}
+.tx-newrow.one{border-top:1px solid var(--line);border-radius:12px;margin-top:8px}
 .tx-newrow:hover{color:var(--gold);background:var(--dark-3)}
 .tx-cl.off{opacity:.45}
 .tx-cl.off b{font-weight:600}
@@ -847,7 +848,7 @@ body.tx-moving .tx-x{cursor:grabbing}
 
 <script>
 "use strict";
-const BUILD = '50';
+const BUILD = '51';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -2486,7 +2487,8 @@ function txList(key){
   const 거름줄 = txFilterBar(key, v, 순);
   보인행[key] = rows.map(r => r.id);
   if(고른행.key === key) 고른행.ids = 고른행.ids.filter(id => 보인행[key].indexOf(id) >= 0);
-  if(!rows.length) return 보기줄 + 거름줄 + 달력 + '<div class="empty">결과 없음</div>';
+  if(!rows.length) return 보기줄 + 거름줄 + 달력 + '<div class="empty">결과 없음</div>'
+    + '<button class="tx-newrow one" data-act="tx:rownew" data-k="'+key+'">＋ 새 '+표정의[key].제목+'</button>';
   const 표다 = 모양(key) === 'table';
   const 그릴 = 줄 => 표다 ? txTable(key, 줄)
                     : '<div class="tx-list">' + 줄.map(r => txRow(key, r, true)).join('') + '</div>';
