@@ -662,7 +662,10 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 .tx-page .tx-ttl[contenteditable]:empty:before{content:attr(data-ph);color:#5f5a54}
 /* 쪽지 — 그 자리에서 고르는 작은 창 */
 .tx-pop{position:fixed;z-index:95;background:var(--dark-2);border:1px solid var(--line);border-radius:12px;
-  padding:6px;box-shadow:0 14px 34px rgba(0,0,0,.55);max-height:360px;overflow:auto}
+  padding:6px;box-shadow:0 14px 34px rgba(0,0,0,.55);max-height:360px;overflow-y:auto;overflow-x:hidden;
+  overscroll-behavior:contain}
+/* 찾는 칸은 목록이 길어도 늘 보이게 위에 붙여 둔다 */
+.tx-pop #txopq{position:sticky;top:-6px;z-index:2;background:var(--dark-2)}
 .tx-pop .inp{width:100%;padding:8px 10px;font-size:13px}
 .tx-pop textarea.inp{resize:vertical;min-height:76px}
 .tx-pop .hd,.tx-pop .hd2{font-size:11px;color:#7c766e;padding:4px 9px 6px;font-weight:700}
@@ -890,7 +893,7 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 
 <script>
 "use strict";
-const BUILD = '60';
+const BUILD = '61';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -3468,14 +3471,31 @@ function 쪽지닫기(){
   const d = $('#txpop'); if(d) d.remove();
   if(f) f();
 }
+/* ⛔ 자리는 「속을 채운 뒤에」 다시 잡아야 한다 —
+   고를 것 목록은 쪽지를 연 뒤에 채워 넣는다. 열 때 잰 높이로 자리를 잡으면
+   목록이 자란 만큼 화면 밖으로 흘러 스크롤이 안 내려간다
+   (2026-09-09 대표: 「확대할때 담당자 매핑 하려하는데 스크롤이 안내려감」)
+   그래서 ①빈 곳에 맞춰 max-height 를 그때그때 정하고 ②채울 때마다 d.자리() 를 다시 부른다 */
+function 쪽지자리(d, el){
+  const r = el.getBoundingClientRect();
+  d.style.maxHeight = 'none';
+  const 속 = d.scrollHeight + 2;
+  const 아래빈곳 = innerHeight - r.bottom - 16, 위빈곳 = r.top - 16;
+  const 위로 = 아래빈곳 < Math.min(속, 240) && 위빈곳 > 아래빈곳;
+  const 쓸수있는 = Math.max(150, 위로 ? 위빈곳 : 아래빈곳);
+  const 높이 = Math.min(속, 쓸수있는);
+  d.style.maxHeight = 높이 + 'px';
+  d.style.left = Math.max(10, Math.min(r.left, innerWidth - d.offsetWidth - 12)) + 'px';
+  d.style.top  = (위로 ? Math.max(10, r.top - 6 - 높이)
+                       : Math.min(r.bottom + 6, Math.max(10, innerHeight - 높이 - 10))) + 'px';
+}
 function 쪽지열기(el, html, w){
   쪽지닫기();
   const d = document.createElement('div'); d.className = 'tx-pop'; d.id = 'txpop';
   d.style.width = (w || 240) + 'px'; d.innerHTML = html;
   document.body.appendChild(d);
-  const r = el.getBoundingClientRect(), h = d.offsetHeight;
-  d.style.left = Math.max(10, Math.min(r.left, innerWidth - (w||240) - 12)) + 'px';
-  d.style.top  = (r.bottom + 6 + h > innerHeight - 10 ? Math.max(10, r.top - h - 6) : r.bottom + 6) + 'px';
+  d.자리 = () => 쪽지자리(d, el);
+  d.자리();
   return d;
 }
 function 쪽지입력(el, 값, 종류, 확정){
@@ -3555,6 +3575,7 @@ function 속성편집(key, id, k, el){
       if(!h) h = '<div class="mut">고를 것이 없어요</div>';
       if(!여럿) h += '<div class="tx-pdiv"></div>' + 씨(k, null, ' class="mut"') + '비우기</button>';
       $('#txoplist').innerHTML = h;
+      d.자리();                                  /* 목록을 채웠으니 자리를 다시 잡는다 */
     };
     그리기();
     const inp = $('#txopq');
