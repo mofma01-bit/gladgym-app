@@ -592,9 +592,12 @@ body.tx-moving .tx-x{cursor:grabbing}
 /* 끌고 있는 원래 자리 — 흐리게 파인 것처럼 */
 .tx-views button.drag,.tx-th .tx-td.drag{opacity:.25;background:#242320 !important;color:transparent !important}
 .tx-views button.drag>*,.tx-th .tx-td.drag>*{opacity:0}
-/* 놓을 자리 — 굵은 금색 줄 */
-.tx-views button.dropL,.tx-th .tx-td.dropL{box-shadow:inset 3px 0 0 var(--gold),-3px 0 8px -2px rgba(212,175,110,.5)}
-.tx-views button.dropR,.tx-th .tx-td.dropR{box-shadow:inset -3px 0 0 var(--gold),3px 0 8px -2px rgba(212,175,110,.5)}
+/* 놓을 자리 — 떠 있는 금색 막대. 탭 자체 테두리에 묻히지 않는다 */
+.tx-dropline{position:fixed;z-index:11999;pointer-events:none;width:3px;border-radius:2px;
+  background:var(--gold);box-shadow:0 0 9px 1px rgba(212,175,110,.85)}
+.tx-dropline::before,.tx-dropline::after{content:'';position:absolute;left:-2.5px;
+  width:8px;height:8px;border-radius:50%;background:var(--gold)}
+.tx-dropline::before{top:-4px} .tx-dropline::after{bottom:-4px}
 /* 마우스에 집혀 따라오는 조각 */
 .tx-ghost{position:fixed;z-index:12000;pointer-events:none;left:-999px;top:-999px;
   display:flex;align-items:center;gap:6px;max-width:260px;
@@ -876,7 +879,7 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 
 <script>
 "use strict";
-const BUILD = '55';
+const BUILD = '56';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -2576,15 +2579,25 @@ const 끌대상 = {
           자리: e => +e.dataset.hi, 표: e => e.dataset.hk, 딱지: '⠿' }
 };
 
-function 끌자리지우기(){
-  document.querySelectorAll('.dropL,.dropR').forEach(e => e.classList.remove('dropL','dropR'));
-}
+function 끌자리지우기(){ document.querySelectorAll('.tx-dropline').forEach(e => e.remove()); }
+/* ⛔ 그리는 중에 render() 가 돌면 잡고 있던 칸이 통째로 바뀐다.
+   그때 조각만 남아 화면에 붙어 버리므로 「남은 조각 전부」를 지운다 (2026-09-09 확인하다 찾음) */
 function 끌치우기(){
-  if(끌 && 끌.유령) 끌.유령.remove();
+  document.querySelectorAll('.tx-ghost').forEach(e => e.remove());
   document.querySelectorAll('.drag').forEach(e => e.classList.remove('drag'));
   끌자리지우기();
   document.body.classList.remove('끄는중');
   끌 = null;
+}
+function 끌자리보이기(t, 아래){
+  끌자리지우기();
+  const r = t.getBoundingClientRect();
+  const d = document.createElement('div');
+  d.className = 'tx-dropline';
+  d.style.left = ((아래 ? r.right : r.left) - 1.5) + 'px';
+  d.style.top = (r.top + 2) + 'px';
+  d.style.height = Math.max(12, r.height - 4) + 'px';
+  document.body.appendChild(d);
 }
 /* 마우스 밑에 없어도 가장 가까운 칸을 찾는다 — 틈에 놓아도 먹히게 */
 function 가까운것(종류, x, y){
@@ -2603,6 +2616,7 @@ function 가까운것(종류, x, y){
 
 document.addEventListener('mousedown', function(ev){
   if(ev.button !== 0 || !ev.target.closest) return;
+  끌치우기();                       /* 앞엣것이 남아 있으면 먼저 치운다 */
   for(const 종류 of ['탭','머리']){
     const el = 끌대상[종류].고르기(ev.target);
     if(!el) continue;
@@ -2637,8 +2651,11 @@ document.addEventListener('mousemove', function(ev){
   const r = t.getBoundingClientRect();
   끌.까지 = 끌대상[끌.종류].자리(t);
   끌.아래 = ev.clientX > (r.left + r.right) / 2;
-  if(끌.까지 !== 끌.부터) t.classList.add(끌.아래 ? 'dropR' : 'dropL');
+  if(끌.까지 !== 끌.부터) 끌자리보이기(t, 끌.아래);
 });
+/* 창을 벗어나거나 딴 데를 보면 끌기를 접는다 — 조각이 남지 않게 */
+window.addEventListener('blur', 끌치우기);
+document.addEventListener('mouseleave', function(){ if(끌 && !끌.움직임) 끌치우기(); });
 
 document.addEventListener('mouseup', async function(){
   if(!끌) return;
