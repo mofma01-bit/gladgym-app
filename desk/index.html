@@ -541,6 +541,17 @@ body.tx-moving .tx-x{cursor:grabbing}
 .tx-td.tx-t1 b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tx-td.tx-t1 .go{font-style:normal;margin-left:auto;color:#5f5a54;opacity:0}
 .tx-tr:hover>.tx-td.tx-t1 .go{opacity:1}
+/* 회원 줄 버튼 */
+.mgo{white-space:nowrap;text-align:right}
+.mbtns{display:inline-flex;gap:3px;opacity:0;transition:opacity .12s}
+.mtb tbody tr:hover .mbtns{opacity:1}
+.mbtns button{font-size:11.5px;font-weight:700;color:var(--sub);padding:4px 8px;border-radius:7px;
+  border:1px solid var(--line);white-space:nowrap}
+.mbtns button:hover{color:var(--gold);border-color:var(--gold-2);background:var(--gold-dim)}
+.mbtns button.full{color:#6f6a63;padding:4px 7px}
+.pop.tx-side .mtabs{margin-bottom:12px}
+.pop.tx-side .mpane{display:flex;flex-direction:column;gap:12px}
+.who3{font-size:11.5px;font-weight:600;color:var(--sub);margin-left:6px}
 .tx-td.ed{cursor:pointer}
 .tx-td.ed:hover{background:var(--dark-3);box-shadow:inset 0 0 0 1px var(--gold-2)}
 .tx-table .tx-tag{font-size:11px}
@@ -812,7 +823,7 @@ body.tx-moving .tx-x{cursor:grabbing}
 
 <script>
 "use strict";
-const BUILD = '43';
+const BUILD = '44';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -1260,6 +1271,7 @@ function vMembers(){
   const 표 = '<div class="mwrap"><table class="mtb"><thead><tr>'
     + '<th style="width:26px"></th><th>이름</th><th>담당</th><th>마지막 운동</th>'
     + '<th class="n">이번 주</th><th class="n">루틴</th><th>봐 주세요</th><th>오늘</th>'
+    + '<th style="width:1%"></th>'
     + '</tr></thead><tbody>'
     + rows.map(function(o){ const m=o.m, i=o.i;
         return '<tr data-m="' + esc(m.id) + '">'
@@ -1280,10 +1292,48 @@ function vMembers(){
           + (!i.ask && !i.newcm ? '<span class="sub3">—</span>' : '') + '</td>'
         + '<td>' + (i.today ? '<span class="tag gold">' + esc(i.today.kind||'지정') + '</span>'
             : '<span class="sub3">—</span>') + '</td>'
+        + '<td class="mgo">' + 회원버튼(m.id) + '</td>'
         + '</tr>'; }).join('')
     + '</tbody></table></div>';
 
   return 요약 + 표;
+}
+
+/* ── 회원 줄 버튼 ── 목록에서 바로 그 탭을 사이드 페이지로 연다
+   (2026-09-09 대표: 「전체 페이지를 누르면 또 찾아다녀야 해서 복잡해」) */
+function 회원버튼(mid){
+  return '<span class="mbtns">'
+    + TABS.map(t => '<button data-m="'+esc(mid)+'" data-tab="'+t[0]+'" title="'+t[1]+'">'+t[1]+'</button>').join('')
+    + '<button class="full" data-mfull="'+esc(mid)+'" title="전체 페이지로 열기">⤢</button></span>';
+}
+let 회원판 = null;                                   /* {mid, tab} */
+const 회원탭내용 = () => S.tab==='routine' ? tabRoutine()
+  : S.tab==='record'  ? tabRecord()
+  : S.tab==='comment' ? tabComment()
+  : S.tab==='meal'    ? tabMeal()
+  : S.tab==='body'    ? tabBody() : tabInfo();
+function 회원판그리기(){
+  if(!회원판) return;
+  S.mid = 회원판.mid; S.tab = 회원판.tab;      /* 딴 데서 바뀌었어도 판은 제 것을 그린다 */
+  const m = memOf(회원판.mid);
+  판열기(esc(m.name) + ' <span class="who3">' + esc(m.trainer||'담당 없음') + '</span>',
+    '<div class="tabs mtabs">'
+    + TABS.map(t => '<button class="'+(S.tab===t[0]?'on':'')+'" data-mtab="'+t[0]+'">'+t[1]+'</button>').join('')
+    + '</div><div class="mpane">' + 회원탭내용() + '</div>',
+    '<div class="tx-fbtns"><span class="tx-stat"></span>'
+    + '<button class="btn sub" data-act="wnew">＋ 오늘 운동 기록</button>'
+    + '<button class="btn gold" data-act="mfull">⤢ 전체 페이지</button></div>');
+}
+async function 회원판열기(mid, tab){
+  회원판 = { mid, tab: tab || 'routine' };
+  S.mid = mid; S.tab = 회원판.tab;
+  S.day=null; S.cmex=null; S.cmw=null; S.cmopen=null; S.cday=null; S.mday=null;
+  S.cmprev=null; S.calMonth=null;
+  S.edit = { record:false, routine:false, body:false, meal:false, plan:false, minfo:false };
+  M.wi=[];M.ws=[];M.meals=[];M.mi=[];M.bl=[];M.br=[];M.bc=null;M.plan=null;M.intake=null;M.cyc=null;M.bph=[];
+  회원판그리기();
+  await loadMember(mid);
+  회원판그리기();
 }
 
 /* ── 회원 상세 · 루틴 ── */
@@ -4172,6 +4222,12 @@ function popPrep(){
 const TABS = [['routine','루틴'],['record','운동 기록'],['comment','코멘트'],
               ['meal','식단'],['body','체형'],['info','정보']];
 function render(){
+  const 났 = render0.apply(null, arguments);
+  /* 회원 사이드 페이지가 열려 있으면 그 안도 같이 새로 그린다 */
+  if(typeof 회원판 !== 'undefined' && 회원판 && $('#pop').classList.contains('on')) 회원판그리기();
+  return 났;
+}
+function render0(){
   const top = $('#top'), line = $('#topline'), b = $('#body');
   line.innerHTML = '';
   if(txRender()){
@@ -4262,6 +4318,7 @@ function 판열기(머리, 속, 발){
   pop.classList.add('on','tx-side'); pop.classList.toggle('tx-wide', 넓게);
 }
 function popClose(){ if(typeof 쪽지닫기==='function') 쪽지닫기();
+  if(typeof 회원판 !== 'undefined') 회원판 = null;
   if(typeof BL!=='undefined' && BL){ try{ 글자넣기(); }catch(e){} }
   if(typeof 고른줄!=='undefined'){ 고른줄 = []; const sb = $('#txselbar'); if(sb) sb.remove(); }
   if(typeof 블록메뉴닫기==='function') 블록메뉴닫기();
@@ -4369,13 +4426,17 @@ document.addEventListener('click', async function(ev){
     S.edit = { record:false, routine:false, body:false, meal:false, plan:false, minfo:false };
     render(); return; }
 
+  const mtab = t.closest('[data-mtab]');
+  if(mtab && 회원판){ S.tab = mtab.dataset.mtab; 회원판.tab = S.tab; 회원판그리기(); return; }
+
+  const 전체 = t.closest('[data-mfull]');
+  if(전체){ const mid = 전체.dataset.mfull;
+    회원판 = null; $('#pop').classList.remove('on');
+    S.mid = mid; S.view='member'; S.tab = S.tab || 'routine';
+    render(); loadMember(mid); return; }
+
   const card = t.closest('[data-m]');
-  if(card){ S.mid = card.dataset.m; S.view='member';
-    S.tab = card.dataset.tab || 'routine'; S.day=null; S.cmex=null; S.cmw=null; S.cmopen=null;
-    S.cday=null; S.mday=null; S.cmprev=null; S.calMonth=null;
-    S.edit = { record:false, routine:false, body:false, meal:false, plan:false, minfo:false };
-    M.wi=[];M.ws=[];M.meals=[];M.mi=[];M.bl=[];M.br=[];M.bc=null;M.plan=null;M.intake=null;M.cyc=null;M.bph=[];
-    render(); loadMember(S.mid); return; }
+  if(card){ await 회원판열기(card.dataset.m, card.dataset.tab); return; }
 
   const day = t.closest('[data-day]');
   if(day){ S.day = day.dataset.day; render(); return; }
@@ -4508,6 +4569,9 @@ document.addEventListener('click', async function(ev){
   const a = act.dataset.act, id = +act.dataset.i;
   if(a.indexOf('tx:')===0){ ev.preventDefault(); await txAct(a.slice(3), act); return; }
 
+  if(a==='mfull'){ const mid = (회원판 && 회원판.mid) || S.mid;
+    회원판 = null; $('#pop').classList.remove('on');
+    S.mid = mid; S.view='member'; render(); loadMember(mid); return; }
   if(a==='toList'){ S.view='members'; render(); return; }
   if(a==='toMember'){ S.view='member'; render(); return; }
   if(a==='popclose'){ popClose(); return; }
