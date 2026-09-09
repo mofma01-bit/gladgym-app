@@ -890,7 +890,7 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 
 <script>
 "use strict";
-const BUILD = '59';
+const BUILD = '60';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -3055,7 +3055,9 @@ async function 모두에게저장(key){
   내것지우기(key, v.k);
   render(); toast('모두에게 저장했습니다');
 }
-function 되돌리기(key){
+/* ⛔ 이름이 겹치면 나중에 선언된 쪽이 이긴다 — 뒤로가기용 되돌리기(st) 가 이미 있었다.
+   그래서 「내것되돌리기」로 바꿨다 (2026-09-09 확인하다 찾음) */
+function 내것되돌리기(key){
   const v = 지금보기(key); if(!v) return;
   내것지우기(key, v.k);
   보기얹기(key); render(); toast('원래대로 되돌렸습니다');
@@ -4584,10 +4586,10 @@ async function txAct(a, el){
     }catch(e){ toast('못 바꿨습니다 — '+e.message); }
     return; }
   if(a==='vpush'){ await 모두에게저장(k); return; }
-  if(a==='vreset'){ 되돌리기(k); return; }
+  if(a==='vreset'){ 내것되돌리기(k); return; }
   if(a==='grpmenu'){ 그룹판(k); return; }
   if(a==='grpset'){ 표상태[k].그룹 = v2 || null; 표상태[k].접힘 = {}; popClose(); render(); return; }
-  if(a==='vcolsreset'){ 되돌리기(k); popClose(); return; }
+  if(a==='vcolsreset'){ 내것되돌리기(k); popClose(); return; }
   if(a==='gfold'){ const st = 표상태[k]; st.접힘 = st.접힘 || {};
     st.접힘[v2] = !st.접힘[v2]; render(); return; }
   if(a==='sortmenu'){ 정렬판(k); return; }
