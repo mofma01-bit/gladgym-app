@@ -613,6 +613,12 @@ body.tx-moving .tx-x{cursor:grabbing}
 .tx-ghost i{font-style:normal;font-size:11px;opacity:.75}
 body.끄는중,body.끄는중 *{cursor:grabbing !important}
 body.끄는중{user-select:none;-webkit-user-select:none}
+.tx-freset{padding:4px 10px;border-radius:7px;font-size:11.5px;font-weight:700;
+  color:var(--sub);background:transparent}
+.tx-freset:hover{color:var(--cream);background:#2a2825}
+.tx-fpush{padding:4px 11px;border-radius:7px;font-size:11.5px;font-weight:800;
+  color:#1b1a17;background:var(--gold);box-shadow:0 0 0 1px var(--gold-2)}
+.tx-fpush:hover{filter:brightness(1.08)}
 .tx-help{font-size:11.5px;color:#5f5a54;padding:8px 4px 0}
 .tx-help b{color:#8b8479;font-weight:700}
 .tx-table .tx-tag{font-size:11px}
@@ -884,7 +890,7 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 
 <script>
 "use strict";
-const BUILD = '57';
+const BUILD = '58';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -2372,23 +2378,27 @@ function 규칙말 (q, key){
   return esc(c.이름) + ': ' + esc(값말 || '—') + 꼬리;
 }
 /* 기본 보기(코드) + 대표님이 만든 보기(tr_views). 이름·순서·숨김은 덮어쓸 수 있다 */
-function 보기들(key){
+function 보기들(key, 서버차례){
   const T = 표정의[key], vs = W.views.filter(v => v.tbl === T.table);
   const 덮 = {}; vs.forEach(v => { if(v.base) 덮[v.base] = v; });
   const 기본 = T.보기.map((b, i) => { const o = 덮[b.k] || {};
     return { k:b.k, 이름:o.name || b.이름, 필터:b.필터, sort:(o.sort != null ? o.sort : i),
+             규칙:o.rules||[], op:o.op||'and', ord:o.ord||null, 모양:o.layout||null,
+             고정:(o.frozen == null ? null : !!o.frozen), 그룹:o.grp||null,
              칸:o.cols || null, 숨김:!!o.hidden, 붙박이:true, 덮:o.id ? o : null }; });
   const 내가만든 = vs.filter(v => !v.base).map(v => ({
     k:'v'+v.id, 이름:v.name, 규칙:v.rules||[], op:v.op||'and', ord:v.ord||null,
+    모양:v.layout||null, 고정:(v.frozen == null ? null : !!v.frozen), 그룹:v.grp||null,
     칸:v.cols||null, sort:v.sort, 숨김:!!v.hidden, 붙박이:false, 뷰:v }));
   const 다 = 기본.concat(내가만든);
-  if(!모두같게(key)){                                   /* 각자 모드면 내 순서를 얹는다 */
+  if(!서버차례){                                        /* 내가 끌어 둔 차례를 얹는다 */
     const 내순 = (내설정[key] || {}).보기순 || [];
     다.forEach(x => { const i = 내순.indexOf(x.k); if(i >= 0) x.sort = i; });
   }
   return 다.sort((a,b) => (a.sort - b.sort));
 }
-const 보기맞나 = (v, r, key) => v.필터 ? v.필터(r) : 규칙들맞나(v.규칙, v.op, r, key);
+const 보기맞나 = (v, r, key) => (v.필터 ? v.필터(r) : true)
+  && (v.규칙 && v.규칙.length ? 규칙들맞나(v.규칙, v.op, r, key) : true);
 function 줄세우기(rows, ord, key){
   if(!ord || !ord.k) return null;
   const c = 열들(key).find(z => z.k === ord.k) || {};
@@ -2431,14 +2441,18 @@ async function loadWork(){
   ]);
   W.staff = g[0]; W.tasks = g[1]; W.leads = g[2]; W.leave = g[3]; W.cm = g[4] || [];
   W.cols = g[5] || []; W.views = g[6] || []; W.meta = g[7] || [];
+  /* 보기에 담긴 조건·정렬·그룹을 화면에 얹는다 — 없으면 빈 채로 */
+  try{ Object.keys(표정의).forEach(k => 보기얹기(k)); }catch(e){}
 }
-/* ── 잠금 · 「모두 같게 / 각자」 ── (2026-09-09 대표 지시)
-   모두 같게 = 순서·칸·모양을 서버(tr_views)에 담아 모두가 같게 본다 (관리자만 바꾼다)
-   각자     = 각자 브라우저에 담아 저마다 다르게 본다 (누구나 바꾼다) */
+/* ── 잠금 ── 잠그면 아무도 순서·칸을 못 바꾼다 (관리자만 잠그고 푼다) */
 const 표설정 = key => W.meta.find(x => x.tbl === 표정의[key].table) || {};
 const 잠겼나 = key => !!표설정(key).locked;
-const 모두같게 = key => 표설정(key).shared !== false;
-const 바꿀수있나 = key => !잠겼나(key) && (모두같게(key) ? 관리자() : true);
+/* ⛔ 2026-09-09 대표 지시로 바뀐 규칙 —
+   「내가 배치한 속성의 순서나 보여지는게 모두에게 적용되도록 하는 버튼을 신설하고
+     필터나 배치가 바뀌면 모두에게 저장 버튼이 떠오르게 만들어」
+   → 순서·칸·필터를 바꾸면 **내 화면에만** 먼저 든다. 서버(모두)에는 「모두에게 저장」으로만 간다.
+     그래서 👥모두같게/👤각자 토글은 없앴다 (그 일을 이 단추 둘이 대신한다) */
+const 바꿀수있나 = key => !잠겼나(key);
 /* 각자 모드에서 쓰는 내 브라우저 저장소 */
 let 내설정 = {};
 try{ 내설정 = JSON.parse(localStorage.getItem('gg_desk_mine') || '{}') || {}; }catch(e){}
@@ -2691,13 +2705,9 @@ document.addEventListener('keydown', function(ev){
 });
 
 async function 보기순서저장(key, 차례){
-  if(!바꿀수있나(key)){ toast(잠겼나(key) ? '잠겨 있어요 — 자물쇠를 풀어 주세요' : '관리자만 바꿀 수 있어요'); return; }
-  if(!모두같게(key)){
-    내설정[key] = 내설정[key] || {}; 내설정[key].보기순 = 차례; 내설정저장(); render();
-    toast('순서를 바꿨습니다 (내 화면만)'); return;
-  }
-  for(let i = 0; i < 차례.length; i++) await 덮어쓰기(key, 차례[i], { sort: i });
-  render(); toast('순서를 바꿨습니다');
+  if(!바꿀수있나(key)){ toast('잠겨 있어요 — 자물쇠를 풀어 주세요'); return; }
+  내설정[key] = 내설정[key] || {}; 내설정[key].보기순 = 차례; 내설정저장(); render();
+  toast('순서를 바꿨습니다 — 모두에게 적용하려면 「모두에게 저장」');
 }
 
 /* ── 표 보기 ── 노션 데이터베이스처럼 속성마다 칸이 나뉜다 (2026-09-09 대표 지시:
@@ -2710,21 +2720,21 @@ try{ 표모양 = JSON.parse(localStorage.getItem('gg_desk_layout2') || '{}') || 
 const 표모양저장 = () => { try{ localStorage.setItem('gg_desk_layout2', JSON.stringify(표모양)); }catch(e){} };
 const 모양키 = key => key + ':' + ((표상태[key] || {}).보기 || '');
 /* 첫 칸 고정 — 모양(layout)과 똑같은 자리에 담는다.
-   모두같게면 서버 tr_views.frozen · 각자면 내 브라우저. 담긴 게 없으면 고정(기본) */
+   내 브라우저에 먼저 담기고, 「모두에게 저장」을 눌러야 서버(tr_views.frozen)로 간다 */
 let 표얼림 = {};
 try{ 표얼림 = JSON.parse(localStorage.getItem('gg_desk_freeze') || '{}') || {}; }catch(e){}
 const 표얼림저장 = () => { try{ localStorage.setItem('gg_desk_freeze', JSON.stringify(표얼림)); }catch(e){} };
 function 얼렸나(key){
-  if(모두같게(key)){ const v = 지금보기(key);
-    if(v && v.뷰 && v.뷰.frozen != null) return !!v.뷰.frozen;
-    if(v && v.덮 && v.덮.frozen != null) return !!v.덮.frozen; }
   const t = 표얼림[모양키(key)];
-  return t == null ? true : !!t;
+  if(t != null) return !!t;
+  const v = 지금보기(key);
+  return (v && v.고정 != null) ? !!v.고정 : true;               /* 담긴 게 없으면 고정 */
 }
 function 모양(key){
-  if(모두같게(key)){ const v = 지금보기(key); if(v && v.뷰 && v.뷰.layout) return v.뷰.layout;
-    if(v && v.덮 && v.덮.layout) return v.덮.layout; }
-  return 표모양[모양키(key)] || 'table';                 /* 기본은 표 */
+  const t = 표모양[모양키(key)];
+  if(t) return t;
+  const v = 지금보기(key);
+  return (v && v.모양) || 'table';                       /* 기본은 표 */
 }
 const 칸너비 = { text:170, long:220, select:110, multi:170, number:90, check:70,
                  date:120, datetime:150, person:130, people:150, url:180, phone:140, email:180 };
@@ -2743,8 +2753,7 @@ function 지금보기(key){
 }
 function 표칸들(key){
   const 다 = 쓸수있는칸(key), v = 지금보기(key);
-  const 담김 = 모두같게(key) ? (v && v.칸)
-             : ((내설정[key] || {}).칸 || {})[v ? v.k : ''] || (v && v.칸);
+  const 담김 = ((내설정[key] || {}).칸 || {})[v ? v.k : ''] || (v && v.칸);
   if(담김 && 담김.length){
     const 뭉치 = {}; 다.forEach(c => { 뭉치[c.k] = c; });
     const 골라 = 담김.map(k => 뭉치[k]).filter(Boolean);
@@ -2995,8 +3004,58 @@ function 표칸다시(key, id, k){
 }
 
 /* ── 필터·정렬 줄 ── 보기 밑에 조건을 쌓는다 */
+/* 지금 화면이 보기에 담긴 것과 어디가 다른가 — 다르면 「모두에게 저장」이 떠오른다 */
+function 내변경(key){
+  const v = 지금보기(key); if(!v) return [];
+  const st = 표상태[key] || {}, mk = 모양키(key), 다 = [];
+  const 같나 = (a, b) => JSON.stringify(a == null ? null : a) === JSON.stringify(b == null ? null : b);
+  const 내칸 = ((내설정[key] || {}).칸 || {})[v.k];
+  if(내칸 && !같나(내칸, v.칸)) 다.push('칸 차례');
+  const 내순 = (내설정[key] || {}).보기순;
+  if(내순 && !같나(내순, 보기들(key, true).map(x => x.k))) 다.push('보기 차례');
+  if(표모양[mk] && 표모양[mk] !== (v.모양 || 'table')) 다.push('모양');
+  if(표얼림[mk] != null && !!표얼림[mk] !== (v.고정 == null ? true : !!v.고정)) 다.push('첫 칸 고정');
+  if(!같나(st.규칙 || [], v.규칙 || []) || (st.op || 'and') !== (v.op || 'and')) 다.push('필터');
+  if(!같나(st.정렬, v.ord)) 다.push('정렬');
+  if(!같나(st.그룹, v.그룹)) 다.push('그룹');
+  return 다;
+}
+/* 보기를 고르면 그 보기에 담긴 조건을 화면에 얹는다 */
+function 보기얹기(key){
+  const v = 지금보기(key); if(!v) return;
+  const st = 표상태[key];
+  st.규칙 = (v.규칙 || []).slice(); st.op = v.op || 'and';
+  st.정렬 = v.ord || null; st.그룹 = v.그룹 || null; st.접힘 = {};
+}
+function 내것지우기(key, vk){
+  const m = 내설정[key];
+  if(m){ if(m.칸) delete m.칸[vk]; delete m.보기순; 내설정저장(); }
+  const mk = key + ':' + vk;
+  delete 표모양[mk]; 표모양저장(); delete 표얼림[mk]; 표얼림저장();
+}
+async function 모두에게저장(key){
+  if(!관리자()) return toast('관리자만 모두에게 저장할 수 있어요');
+  if(잠겼나(key)) return toast('잠겨 있어요 — 자물쇠를 풀어 주세요');
+  const v = 지금보기(key); if(!v) return;
+  const st = 표상태[key], mk = 모양키(key);
+  const 몸 = { rules: st.규칙 || [], op: st.op || 'and', ord: st.정렬 || null, grp: st.그룹 || null };
+  const 내칸 = ((내설정[key] || {}).칸 || {})[v.k]; if(내칸) 몸.cols = 내칸;
+  if(표모양[mk]) 몸.layout = 표모양[mk];
+  if(표얼림[mk] != null) 몸.frozen = !!표얼림[mk];
+  if(!await 덮어쓰기(key, v.k, 몸)) return;
+  const 내순 = (내설정[key] || {}).보기순;
+  if(내순) for(let i = 0; i < 내순.length; i++) await 덮어쓰기(key, 내순[i], { sort: i });
+  내것지우기(key, v.k);
+  render(); toast('모두에게 저장했습니다');
+}
+function 되돌리기(key){
+  const v = 지금보기(key); if(!v) return;
+  내것지우기(key, v.k);
+  보기얹기(key); render(); toast('원래대로 되돌렸습니다');
+}
 function txFilterBar(key, v, 순){
   const st = 표상태[key];
+  const 바뀜 = 내변경(key);
   const 조건 = (st.규칙||[]).map((q,i) => '<span class="tx-fchip">'+규칙말(q, key)
       + '<button data-act="tx:fdrop" data-k="'+key+'" data-i="'+i+'" title="빼기">✕</button></span>').join('');
   const 순말 = 순 && 순.k ? ((열들(key).find(z=>z.k===순.k)||{}).이름 || 순.k) + (순.dir==='desc'?' 내림차순':' 오름차순') : '';
@@ -3008,24 +3067,23 @@ function txFilterBar(key, v, 순){
     + 조건
     + ((st.규칙||[]).length ? '<button class="tx-fclr" data-act="tx:fclr" data-k="'+key+'">필터 삭제</button>' : '')
     + '<span class="sp3">'
+    + (바뀜.length
+        ? '<button class="tx-freset" data-act="tx:vreset" data-k="'+key+'" '
+          + 'title="'+esc(바뀜.join(' · '))+'을 되돌립니다">초기화</button>'
+          + (관리자()
+            ? '<button class="tx-fpush" data-act="tx:vpush" data-k="'+key+'" '
+              + 'title="'+esc(바뀜.join(' · '))+'을 모두에게 적용합니다">모두에게 저장</button>' : '')
+        : '')
     + (관리자() ? '<button class="tx-fadd '+(잠겼나(key)?'on':'')+'" data-act="tx:lock" data-k="'+key+'" '
         + 'title="'+(잠겼나(key)?'잠김 — 순서·칸을 못 바꿉니다':'풀림 — 끌어서 옮길 수 있습니다')+'">'
-        + (잠겼나(key)?'🔒 잠김':'🔓 풀림') + '</button>'
-      + '<button class="tx-fadd" data-act="tx:share" data-k="'+key+'" '
-        + 'title="'+(모두같게(key)?'모두 같은 순서로 봅니다 (관리자만 바꿈)':'각자 자기 순서로 봅니다')+'">'
-        + (모두같게(key)?'👥 모두 같게':'👤 각자') + '</button>' : '')
+        + (잠겼나(key)?'🔒 잠김':'🔓 풀림') + '</button>' : '')
     + '<button class="tx-fadd" data-act="tx:layout" data-k="'+key+'" title="목록 ↔ 표">'
       + (모양(key)==='table' ? '▤ 표' : '☰ 목록') + '</button>'
-    + (모양(key)==='table'
-        ? '<button class="tx-fadd '+(얼렸나(key)?'on':'')+'" data-act="tx:freeze" data-k="'+key+'" title="'
-          + (얼렸나(key) ? '이름 칸이 왼쪽에 붙어 옆으로 밀어도 따라옵니다 — 눌러서 풀기'
-                         : '이름 칸도 같이 밀립니다 — 눌러서 왼쪽에 붙이기')+'">'
-          + (얼렸나(key) ? '📌 첫 칸 고정' : '📌 고정 풀림') + '</button>' : '')
     + '<button class="tx-fadd '+(st.그룹?'on':'')+'" data-act="tx:grpmenu" data-k="'+key+'">⊞ '
       + (st.그룹 ? ((열들(key).find(z=>z.k===st.그룹)||{}).이름 || '그룹') : '그룹') + '</button>'
     + '<button class="tx-fadd '+(순&&순.k?'on':'')+'" data-act="tx:sortmenu" data-k="'+key+'">↕ '+(순말 || '정렬')+'</button>'
-    + ((st.규칙||[]).length || st.정렬
-        ? '<button class="tx-fsave" data-act="tx:vsave" data-k="'+key+'">새 보기로 저장</button>' : '')
+    + (바뀜.length
+        ? '<button class="tx-fsave" data-act="tx:vsave" data-k="'+key+'">새 보기로</button>' : '')
     + '</span></div>';
 }
 /* 조건 만들기 — ① 속성 ② 비교 ③ 값 */
@@ -3537,6 +3595,9 @@ function 속성이름메뉴(key, k, el){
       : '<div class="mut">'+(c.시스템 ? '자동으로 적히는 속성' : '기본 속성')+'</div>')
     + '<div class="tx-pdiv"></div>'
     + (관리자() ? '<button data-act="tx:vhidecol" data-k="'+key+'" data-v2="'+esc(c.k)+'"><i>🙈</i>이 보기에서 숨기기</button>' : '')
+    + (c.k === 표정의[key].제목열
+        ? '<button data-act="tx:freeze" data-k="'+key+'"><i>📌</i>'
+          + (얼렸나(key) ? '첫 칸 고정 풀기' : '첫 칸 고정하기') + '</button>' : '')
     + '<button data-act="tx:vcols" data-k="'+key+'"><i>▤</i>이 보기의 칸</button>'
     + '<button data-act="tx:cols" data-k="'+key+'"><i>⠿</i>속성 편집</button>'
     + '</div>', 235);
@@ -4318,12 +4379,9 @@ async function 보기칸바꾸기(key, 새칸들){
      고정을 풀면 다른 칸과 똑같이 아무 데나 놓을 수 있다 */
   const 제 = 표정의[key].제목열;
   if(얼렸나(key)) 새칸들 = [제].concat(새칸들.filter(x => x !== 제));
-  if(!바꿀수있나(key)){ toast(잠겼나(key) ? '잠겨 있어요 — 자물쇠를 풀어 주세요' : '관리자만 바꿀 수 있어요'); return false; }
-  if(!모두같게(key)){
-    내설정[key] = 내설정[key] || {}; 내설정[key].칸 = 내설정[key].칸 || {};
-    내설정[key].칸[v.k] = 새칸들; 내설정저장(); render(); return true;
-  }
-  return await 덮어쓰기(key, v.k, { cols: 새칸들 });
+  if(!바꿀수있나(key)){ toast('잠겨 있어요 — 자물쇠를 풀어 주세요'); return false; }
+  내설정[key] = 내설정[key] || {}; 내설정[key].칸 = 내설정[key].칸 || {};
+  내설정[key].칸[v.k] = 새칸들; 내설정저장(); render(); return true;
 }
 async function 보기칸숨기기(key, k){
   const 지금 = 표칸들(key).map(c => c.k);
@@ -4441,7 +4499,7 @@ function txMe(){
 async function txAct(a, el){
   const k = el.dataset.k, id = el.dataset.id, v2 = el.dataset.v2;
   if(a==='go'){ S.view = k; document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('on', b.dataset.v===k)); render(); return; }
-  if(a==='view'){ 표상태[k].보기 = v2; 표상태[k].규칙 = []; 표상태[k].정렬 = null;
+  if(a==='view'){ 표상태[k].보기 = v2; 보기얹기(k);
     고른행 = { key:null, ids:[] }; render(); return; }
   if(a==='who'){ 표상태[k].사람 = v2 || null; 고른행 = { key:null, ids:[] }; render(); return; }
   /* ── 목록 고르기 ── */
@@ -4518,17 +4576,11 @@ async function txAct(a, el){
       render(); toast(!m.locked ? '잠갔습니다 — 순서·칸을 못 바꿉니다' : '풀었습니다 — 끌어서 옮길 수 있습니다');
     }catch(e){ toast('못 바꿨습니다 — '+e.message); }
     return; }
-  if(a==='share'){ if(!관리자()) return;
-    const m = 표설정(k), 새 = !(m.shared !== false);
-    try{ const o = await usend('tr_meta?tbl=eq.'+표정의[k].table, 'PATCH',
-        { shared: 새, updated_at: new Date().toISOString() }, 'return=representation');
-      if(o && o[0]){ const i = W.meta.findIndex(x=>x.tbl===표정의[k].table);
-        if(i>=0) W.meta[i] = o[0]; else W.meta.push(o[0]); }
-      render(); toast(새 ? '이제 모두가 같은 순서로 봅니다' : '이제 각자 자기 순서로 봅니다');
-    }catch(e){ toast('못 바꿨습니다 — '+e.message); }
-    return; }
+  if(a==='vpush'){ await 모두에게저장(k); return; }
+  if(a==='vreset'){ 되돌리기(k); return; }
   if(a==='grpmenu'){ 그룹판(k); return; }
   if(a==='grpset'){ 표상태[k].그룹 = v2 || null; 표상태[k].접힘 = {}; popClose(); render(); return; }
+  if(a==='vcolsreset'){ 되돌리기(k); popClose(); return; }
   if(a==='gfold'){ const st = 표상태[k]; st.접힘 = st.접힘 || {};
     st.접힘[v2] = !st.접힘[v2]; render(); return; }
   if(a==='sortmenu'){ 정렬판(k); return; }
@@ -4551,13 +4603,10 @@ async function txAct(a, el){
   if(a==='vsave'){ const st = 표상태[k];
     const 지금 = 보기들(k).find(x => x.k === st.보기);
     const 담기 = { rules: st.규칙||[], op: st.op||'and', ord: st.정렬 || null };
-    if(지금 && !지금.붙박이 && confirm('「'+지금.이름+'」 보기에 이 조건을 담을까요?\n(취소를 누르면 새 보기로 만듭니다)')){
-      if(await 덮어쓰기(k, 지금.k, 담기)){ st.규칙 = []; st.정렬 = null; render(); toast('보기에 담았어요'); }
-      return; }
     const nm = prompt('새 보기 이름', (지금?지금.이름:'')+' 조건'); if(nm == null || !nm.trim()) return;
     try{ const o = await usend('tr_views', 'POST', Object.assign(
         { tbl:표정의[k].table, name:nm.trim(), sort:보기들(k).length }, 담기), 'return=representation');
-      if(o && o[0]){ W.views.push(o[0]); st.보기 = 'v'+o[0].id; st.규칙 = []; st.정렬 = null; }
+      if(o && o[0]){ W.views.push(o[0]); st.보기 = 'v'+o[0].id; 내것지우기(k, 지금 ? 지금.k : ''); 보기얹기(k); }
       render(); toast('「'+nm.trim()+'」 보기를 만들었어요'); }
     catch(e){ toast('추가하지 못했습니다 — '+e.message); }
     return; }
@@ -4588,17 +4637,11 @@ async function txAct(a, el){
     if(!이미) return;                        /* 처음 누르면 고르기만 — 방향키가 바로 먹는다 */
     if(칸안편집(k, id3, v2, el)) return;
     속성편집(k, id3, v2, el); return; }
-  if(a==='layout'){ const 새 = 모양(k)==='table' ? 'list' : 'table';
-    if(모두같게(k)){
-      if(!바꿀수있나(k)) return toast(잠겼나(k) ? '잠겨 있어요' : '관리자만 바꿀 수 있어요');
-      await 덮어쓰기(k, 지금보기(k).k, { layout: 새 });
-    } else { 표모양[모양키(k)] = 새; 표모양저장(); }
+  if(a==='layout'){ if(!바꿀수있나(k)) return toast('잠겨 있어요 — 자물쇠를 풀어 주세요');
+    표모양[모양키(k)] = 모양(k)==='table' ? 'list' : 'table'; 표모양저장();
     render(); return; }
-  if(a==='freeze'){ const 새 = !얼렸나(k);
-    if(모두같게(k)){
-      if(!바꿀수있나(k)) return toast(잠겼나(k) ? '잠겨 있어요' : '관리자만 바꿀 수 있어요');
-      await 덮어쓰기(k, 지금보기(k).k, { frozen: 새 });
-    } else { 표얼림[모양키(k)] = 새; 표얼림저장(); }
+  if(a==='freeze'){ if(!바꿀수있나(k)) return toast('잠겨 있어요 — 자물쇠를 풀어 주세요');
+    const 새 = !얼렸나(k); 표얼림[모양키(k)] = 새; 표얼림저장(); popClose();
     render(); toast(새 ? '이름 칸을 왼쪽에 붙였습니다' : '고정을 풀었습니다 — 이름 칸도 같이 밀립니다'); return; }
   if(a==='pmenu'){ 속성이름메뉴(k, v2, el); return; }
   if(a==='padd'){ 속성추가쪽지(k, el); return; }
