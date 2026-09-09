@@ -588,12 +588,23 @@ body.tx-moving .tx-x{cursor:grabbing}
 .tx-ghead b{font-weight:700;color:var(--sub);font-size:11.5px}
 .tx-ghead:hover{color:var(--gold)}
 .tx-views button[data-vtab]{cursor:grab}
-.tx-views button.drag,.tx-th .tx-td.drag{opacity:.4}
-.tx-views button.dropL{box-shadow:inset 2px 0 0 var(--gold)}
-.tx-views button.dropR{box-shadow:inset -2px 0 0 var(--gold)}
 .tx-th .tx-td[data-hc]{cursor:grab}
-.tx-th .tx-td.dropL{box-shadow:inset 2px 0 0 var(--gold)}
-.tx-th .tx-td.dropR{box-shadow:inset -2px 0 0 var(--gold)}
+/* 끌고 있는 원래 자리 — 흐리게 파인 것처럼 */
+.tx-views button.drag,.tx-th .tx-td.drag{opacity:.25;background:#242320 !important;color:transparent !important}
+.tx-views button.drag>*,.tx-th .tx-td.drag>*{opacity:0}
+/* 놓을 자리 — 굵은 금색 줄 */
+.tx-views button.dropL,.tx-th .tx-td.dropL{box-shadow:inset 3px 0 0 var(--gold),-3px 0 8px -2px rgba(212,175,110,.5)}
+.tx-views button.dropR,.tx-th .tx-td.dropR{box-shadow:inset -3px 0 0 var(--gold),3px 0 8px -2px rgba(212,175,110,.5)}
+/* 마우스에 집혀 따라오는 조각 */
+.tx-ghost{position:fixed;z-index:12000;pointer-events:none;left:-999px;top:-999px;
+  display:flex;align-items:center;gap:6px;max-width:260px;
+  padding:6px 12px;border-radius:9px;border:1px solid var(--gold);
+  background:#2e2a22;color:var(--gold);font-size:12.5px;font-weight:800;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  box-shadow:0 10px 26px rgba(0,0,0,.6);transform:rotate(-2.5deg) translateZ(0)}
+.tx-ghost i{font-style:normal;font-size:11px;opacity:.75}
+body.끄는중,body.끄는중 *{cursor:grabbing !important}
+body.끄는중{user-select:none;-webkit-user-select:none}
 .tx-help{font-size:11.5px;color:#5f5a54;padding:8px 4px 0}
 .tx-help b{color:#8b8479;font-weight:700}
 .tx-table .tx-tag{font-size:11px}
@@ -865,7 +876,7 @@ body.tx-moving .tx-x{cursor:grabbing}
 
 <script>
 "use strict";
-const BUILD = '54';
+const BUILD = '55';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -2549,37 +2560,114 @@ function txList(key){
   }
   return 보기줄 + 거름줄 + 달력 + txPickBar(key, rows, 표다) + 그릴(rows);
 }
-/* ── 보기 탭·표 머리를 바로 끌어 옮기기 (2026-09-09 대표 지시) ── */
-let 탭끌기 = null;
+/* ── 보기 탭·표 머리를 「마우스로 집어서」 옮기기 ──
+   2026-09-09 대표: 「클릭을 하고 옮기는게 지금 선택이 된건지 마우스에 집혀서 따라오지
+   않아서 인지가 안돼 · 마우스로 집어서 옮기게 해줘」
+   → 잡으면 조각이 마우스를 따라오고, 원래 자리는 비어 보이고, 놓을 자리에 금색 줄이 선다 */
+let 끌 = null;          /* {종류,key,부터,까지,아래,움직임,el,x0,y0,유령} */
+let 끌고놓음 = false;    /* 끌고 난 직후의 click 은 삼킨다 (보기가 바뀌면 안 된다) */
+
+const 끌대상 = {
+  탭:   { 고르기: e => e.closest('.tx-views button[data-vtab]'),
+          모두: () => [...document.querySelectorAll('.tx-views button[data-vtab]')],
+          자리: e => +e.dataset.vtab, 표: e => e.dataset.k, 딱지: '▦' },
+  머리: { 고르기: e => e.closest('.tx-th .tx-td[data-hc]'),
+          모두: () => [...document.querySelectorAll('.tx-th .tx-td[data-hc]')],
+          자리: e => +e.dataset.hi, 표: e => e.dataset.hk, 딱지: '⠿' }
+};
+
+function 끌자리지우기(){
+  document.querySelectorAll('.dropL,.dropR').forEach(e => e.classList.remove('dropL','dropR'));
+}
+function 끌치우기(){
+  if(끌 && 끌.유령) 끌.유령.remove();
+  document.querySelectorAll('.drag').forEach(e => e.classList.remove('drag'));
+  끌자리지우기();
+  document.body.classList.remove('끄는중');
+  끌 = null;
+}
+/* 마우스 밑에 없어도 가장 가까운 칸을 찾는다 — 틈에 놓아도 먹히게 */
+function 가까운것(종류, x, y){
+  const 다 = 끌대상[종류].모두();
+  if(!다.length) return null;
+  let 맞 = null, 짧 = Infinity;
+  for(const e of 다){
+    const r = e.getBoundingClientRect();
+    const dx = x < r.left ? r.left - x : (x > r.right ? x - r.right : 0);
+    const dy = y < r.top ? r.top - y : (y > r.bottom ? y - r.bottom : 0);
+    const d = dx + dy * 3;                    /* 가로로 움직이는 조작이라 세로는 무겁게 */
+    if(d < 짧){ 짧 = d; 맞 = e; }
+  }
+  return 짧 > 220 ? null : 맞;
+}
+
 document.addEventListener('mousedown', function(ev){
-  const b = ev.target.closest && ev.target.closest('[data-vtab]');
-  if(!b) return;
-  const 상자 = b.closest('.tx-views'); if(!상자) return;
-  탭끌기 = { key: b.dataset.k, 부터: +b.dataset.vtab, 까지: null, 아래: false, 움직임: false, el: b };
+  if(ev.button !== 0 || !ev.target.closest) return;
+  for(const 종류 of ['탭','머리']){
+    const el = 끌대상[종류].고르기(ev.target);
+    if(!el) continue;
+    끌 = { 종류, key: 끌대상[종류].표(el), 부터: 끌대상[종류].자리(el),
+           까지: null, 아래: false, 움직임: false, el,
+           x0: ev.clientX, y0: ev.clientY, 유령: null };
+    return;
+  }
 });
+
 document.addEventListener('mousemove', function(ev){
-  if(!탭끌기 || ev.buttons !== 1) return;
-  const b = ev.target.closest && ev.target.closest('[data-vtab]');
-  if(!b) return;
-  탭끌기.움직임 = true; 탭끌기.el.classList.add('drag');
-  const r = b.getBoundingClientRect();
-  탭끌기.까지 = +b.dataset.vtab; 탭끌기.아래 = ev.clientX > (r.left + r.right) / 2;
-  document.querySelectorAll('.tx-views button.dropL,.tx-views button.dropR')
-    .forEach(e => e.classList.remove('dropL','dropR'));
-  b.classList.add(탭끌기.아래 ? 'dropR' : 'dropL');
+  if(!끌) return;
+  if(ev.buttons !== 1){ 끌치우기(); return; }          /* 창 밖에서 손을 뗀 경우 */
+  if(!끌.움직임){
+    if(Math.abs(ev.clientX - 끌.x0) + Math.abs(ev.clientY - 끌.y0) < 4) return;
+    끌.움직임 = true;
+    const g = document.createElement('div');
+    g.className = 'tx-ghost';
+    g.innerHTML = '<i>' + 끌대상[끌.종류].딱지 + '</i>'
+      + esc((끌.el.textContent || '').replace(/\s+/g,' ').trim().slice(0, 22) || '칸');
+    document.body.appendChild(g);
+    끌.유령 = g;
+    끌.el.classList.add('drag');
+    document.body.classList.add('끄는중');
+  }
+  ev.preventDefault();
+  끌.유령.style.left = (ev.clientX + 14) + 'px';
+  끌.유령.style.top  = (ev.clientY + 12) + 'px';
+  const t = 끌대상[끌.종류].고르기(ev.target) || 가까운것(끌.종류, ev.clientX, ev.clientY);
+  끌자리지우기();
+  if(!t) { 끌.까지 = null; return; }
+  const r = t.getBoundingClientRect();
+  끌.까지 = 끌대상[끌.종류].자리(t);
+  끌.아래 = ev.clientX > (r.left + r.right) / 2;
+  if(끌.까지 !== 끌.부터) t.classList.add(끌.아래 ? 'dropR' : 'dropL');
 });
+
 document.addEventListener('mouseup', async function(){
-  if(!탭끌기) return;
-  const z = 탭끌기; 탭끌기 = null;
-  document.querySelectorAll('.tx-views button').forEach(e => e.classList.remove('drag','dropL','dropR'));
-  if(!z.움직임 || z.까지 == null || z.까지 === z.부터) return;
-  const 보임 = 보기들(z.key).filter(x => !x.숨김);
-  if(z.부터 >= 보임.length || z.까지 >= 보임.length) return;
-  const m = 보임.splice(z.부터, 1)[0];
+  if(!끌) return;
+  const z = 끌;
+  끌치우기();
+  if(!z.움직임) return;
+  끌고놓음 = true; setTimeout(() => { 끌고놓음 = false; }, 0);
+  if(z.까지 == null || z.까지 === z.부터) return;
+  const 다 = z.종류 === '탭'
+    ? 보기들(z.key).filter(x => !x.숨김).map(x => x.k)
+    : 표칸들(z.key).map(c => c.k);
+  if(z.부터 >= 다.length || z.까지 >= 다.length) return;
+  const m = 다.splice(z.부터, 1)[0];
   let at = z.까지 + (z.아래 ? 1 : 0); if(z.부터 < at) at--;
-  보임.splice(Math.max(0, Math.min(at, 보임.length)), 0, m);
-  await 보기순서저장(z.key, 보임.map(x => x.k));
+  다.splice(Math.max(0, Math.min(at, 다.length)), 0, m);
+  if(z.종류 === '탭') await 보기순서저장(z.key, 다);
+  else if(await 보기칸바꾸기(z.key, 다)) toast('칸 순서를 바꿨습니다');
 });
+
+/* 끌고 놓은 직후의 click 은 삼킨다 — 탭이 눌려 보기가 바뀌면 안 된다 */
+document.addEventListener('click', function(ev){
+  if(!끌고놓음) return;
+  ev.stopPropagation(); ev.preventDefault();
+}, true);
+/* Esc 로 끌기 취소 */
+document.addEventListener('keydown', function(ev){
+  if(ev.key === 'Escape' && 끌){ 끌.까지 = null; 끌치우기(); }
+});
+
 async function 보기순서저장(key, 차례){
   if(!바꿀수있나(key)){ toast(잠겼나(key) ? '잠겨 있어요 — 자물쇠를 풀어 주세요' : '관리자만 바꿀 수 있어요'); return; }
   if(!모두같게(key)){
@@ -2589,35 +2677,6 @@ async function 보기순서저장(key, 차례){
   for(let i = 0; i < 차례.length; i++) await 덮어쓰기(key, 차례[i], { sort: i });
   render(); toast('순서를 바꿨습니다');
 }
-/* 표 머리를 바로 끌어 칸 순서 바꾸기 */
-let 머리끌기 = null;
-document.addEventListener('mousedown', function(ev){
-  const th = ev.target.closest && ev.target.closest('.tx-th .tx-td[data-hc]');
-  if(!th) return;
-  머리끌기 = { key: th.dataset.hk, 부터: +th.dataset.hi, 까지: null, 아래: false, 움직임: false, el: th };
-});
-document.addEventListener('mousemove', function(ev){
-  if(!머리끌기 || ev.buttons !== 1) return;
-  const th = ev.target.closest && ev.target.closest('.tx-th .tx-td[data-hc]');
-  if(!th) return;
-  머리끌기.움직임 = true; 머리끌기.el.classList.add('drag');
-  const r = th.getBoundingClientRect();
-  머리끌기.까지 = +th.dataset.hi; 머리끌기.아래 = ev.clientX > (r.left + r.right) / 2;
-  document.querySelectorAll('.tx-th .tx-td').forEach(e => e.classList.remove('dropL','dropR'));
-  th.classList.add(머리끌기.아래 ? 'dropR' : 'dropL');
-});
-document.addEventListener('mouseup', async function(){
-  if(!머리끌기) return;
-  const z = 머리끌기; 머리끌기 = null;
-  document.querySelectorAll('.tx-th .tx-td').forEach(e => e.classList.remove('drag','dropL','dropR'));
-  if(!z.움직임 || z.까지 == null || z.까지 === z.부터) return;
-  const 이름들 = 표칸들(z.key).map(c => c.k);
-  if(z.부터 >= 이름들.length || z.까지 >= 이름들.length) return;
-  const m = 이름들.splice(z.부터, 1)[0];
-  let at = z.까지 + (z.아래 ? 1 : 0); if(z.부터 < at) at--;
-  이름들.splice(Math.max(0, Math.min(at, 이름들.length)), 0, m);
-  if(await 보기칸바꾸기(z.key, 이름들)) toast('칸 순서를 바꿨습니다');
-});
 
 /* ── 표 보기 ── 노션 데이터베이스처럼 속성마다 칸이 나뉜다 (2026-09-09 대표 지시:
    「한 칸 안에 네이버 예약 이런 게 합쳐져 있잖아 · 노션 모양 그대로 보고 수정하게」) */
