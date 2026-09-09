@@ -521,6 +521,7 @@ body.tx-moving .tx-x{cursor:grabbing}
 .tx-cadd select.inp{appearance:auto}
 .tx-cnew{font-size:10px;font-weight:700;color:var(--gold);background:var(--gold-dim);
   padding:1px 6px;border-radius:5px;margin-left:5px}
+.tx-when{font-size:10.5px;color:#5f5a54;font-weight:500;white-space:nowrap}
 /* 필터·정렬 줄 */
 .tx-vplus{padding:7px 11px;border-radius:9px;font-size:13px;font-weight:800;color:#6f6a63}
 .tx-vplus:hover{color:var(--gold);background:var(--dark-3)}
@@ -788,7 +789,7 @@ body.tx-moving .tx-x{cursor:grabbing}
 
 <script>
 "use strict";
-const BUILD = '40';
+const BUILD = '41';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -2269,9 +2270,9 @@ function 줄세우기(rows, ord, key){
 async function loadWork(){
   const g = await Promise.all([
     uget('staff?select=*&order=name'),
-    uget('tr_tasks?select=*&order=created_at.desc&limit=500'),
-    uget('tr_leads?select=*&order=at.desc.nullslast&limit=500'),
-    uget('tr_leave?select=*&order=day.desc&limit=400'),
+    uget('tr_tasks?select=*&order=created_at.desc&limit=3000'),
+    uget('tr_leads?select=*&order=created_at.desc&limit=3000'),
+    uget('tr_leave?select=*&order=day.desc&limit=1000'),
     uget('tr_comments?select=*&order=created_at&limit=2000').catch(()=>[]),
     uget('tr_cols?select=*&order=sort').catch(()=>[]),        /* 표가 아직 없으면 빈 채로 */
     uget('tr_views?select=*&order=sort').catch(()=>[]),
@@ -2294,7 +2295,26 @@ const 늘림열 = key => W.cols.filter(c => c.tbl === 표정의[key].table)
   .slice().sort((a,b) => (a.sort - b.sort) || ((a.created_at||'') > (b.created_at||'') ? 1 : -1))
   .map(c => ({ k:'extra.'+c.k, 이름:c.name, 타입:c.type, 옵션:c.opts||[], 힌트:c.hint||'',
                관리자만:!!c.locked, 숨김:!!c.hidden, 늘림:c }));
-const 열들 = key => 표정의[key].열.concat(늘림열(key));
+/* 노션의 「생성 일시 · 최종 편집 일시 · 생성자」 — 자동으로 적히고 못 고친다 (2026-09-09 대표 지적) */
+const 시스템열 = key => [
+  { k:'created_at', 이름:'생성일',          타입:'datetime', 시스템:true },
+].concat(표정의[key].열.some(c => c.k === 'done')
+      ? [{ k:'done_at', 이름:'완료일',      타입:'datetime', 시스템:true }] : [])
+ .concat([
+  { k:'updated_at', 이름:'최종 편집 일시',  타입:'datetime', 시스템:true },
+  { k:'created_by', 이름:'생성자',          타입:'person',   시스템:true },
+]);
+const 열들 = key => 표정의[key].열.concat(늘림열(key)).concat(시스템열(key));
+/* 노션 표에 늘 보이는 생성일·완료일 — 목록 줄 끝에 옅게 */
+function 시각칩(key, r){
+  const 짧 = d => { if(!d) return ''; const x = new Date(d); if(isNaN(x)) return '';
+    const 올 = new Date(TODAY+'T00:00:00').getFullYear();
+    return (x.getFullYear()===올 ? '' : String(x.getFullYear()).slice(2)+'.')
+      + (x.getMonth()+1) + '/' + x.getDate(); };
+  const c = 짧(r.created_at), d = r.done_at ? 짧(r.done_at) : '';
+  return (c ? '<span class="tx-when">'+c+' 만듦</span>' : '')
+       + (d ? '<span class="tx-when">'+d+' 완료</span>' : '');
+}
 function 늘림칩(key, r){
   return 늘림열(key).filter(c => !c.숨김).map(c => {
     const v = (r.extra || {})[c.k.slice(6)];
@@ -2536,7 +2556,7 @@ function txRow(key, r, 고르기){
   const 골랐나 = 고른행.key === key && 고른행.ids.indexOf(r.id) >= 0;
   return '<button class="tx-row '+(done?'done':'')+(고르기&&골랐나?' tx-pk':'')+'" data-act="tx:open" data-k="'+key+'" data-id="'+r.id+'">'
     + (고르기 ? '<span class="tx-pick '+(골랐나?'on':'')+'" data-act="tx:pick" data-k="'+key+'" data-id="'+r.id+'" title="고르기">'+(골랐나?'✓':'')+'</span>' : '')
-    + '<span class="tx-main"><span class="tx-t">'+esc(x.제목)+'</span><span class="tx-s">'+x.칩+늘림칩(key, r)
+    + '<span class="tx-main"><span class="tx-t">'+esc(x.제목)+'</span><span class="tx-s">'+x.칩+늘림칩(key, r)+시각칩(key, r)
     + (r.vis && r.vis!=='all' ? '<span class="tx-vis">🔒 '+VIS[r.vis]+'</span>' : '') + '</span></span>'
     + '<span class="tx-r">'
     + ((r.files||[]).length ? '<span class="tx-cmn">📎'+(r.files||[]).length+'</span>' : '')
@@ -2691,12 +2711,12 @@ function 속성줄들(key, r, 편집){
   const 빈수 = 열들(key).filter(c => c.k !== 본문 && 값비었나(c)).length;
   const 줄 = c => {
     if(c.k === 본문) return '';                        /* 본문은 아래 글 편집기에서 쓴다 */
-    const 잠 = !!(c.관리자만 && !관리자());
+    const 잠 = !!(c.관리자만 && !관리자()) || !!c.시스템;
     const 고침 = 편집 && !잠;
     return '<div class="tx-prow">'
       + '<button class="tx-pname"'+(관리자() ? ' data-act="tx:pmenu" data-k="'+key+'" data-v2="'+esc(c.k)+'"' : '')+'>'
         + '<i>'+(타입아이콘[c.타입]||'≡')+'</i><span>'+esc(c.이름)+'</span>'
-        + (c.관리자만 ? '<b class="lk">🔒</b>' : '') + (c.숨김 ? '<b class="lk">🙈</b>' : '') + '</button>'
+        + (c.시스템 ? '' : (c.관리자만 ? '<b class="lk">🔒</b>' : '') + (c.숨김 ? '<b class="lk">🙈</b>' : '')) + '</button>'
       + '<button class="tx-pval'+(고침?'':' ro')+'"'+(고침 ? ' data-act="tx:pedit" data-k="'+key+'" data-v2="'+esc(c.k)+'"' : '')+'>'
         + 속성값보기(c, r) + '</button></div>';
   };
@@ -2838,7 +2858,7 @@ function 속성이름메뉴(key, k, el){
       + '<button data-act="tx:clock" data-k="'+key+'" data-id="'+id+'"><i>'+(c.관리자만?'🔓':'🔒')+'</i>'+(c.관리자만?'잠금 해제':'잠그기')+'</button>'
       + '<div class="tx-pdiv"></div>'
       + '<button class="wn" data-act="tx:cdel" data-k="'+key+'" data-id="'+id+'"><i>✕</i>삭제</button>'
-      : '<div class="mut">기본 속성</div>')
+      : '<div class="mut">'+(c.시스템 ? '자동으로 적히는 속성' : '기본 속성')+'</div>')
     + '<div class="tx-pdiv"></div>'
     + '<button data-act="tx:cols" data-k="'+key+'"><i>⠿</i>속성 편집</button>'
     + '</div>', 235);
@@ -3375,6 +3395,7 @@ function txSheet(key, id, 초기){
       || (Array.isArray(r[T.사람열]) ? 내것(r[T.사람열]) : r[T.사람열]===(ME&&ME.id))));
   const 편집 = !잠김 && 내가고칠수;
   const 칸 = c => {
+    if(c.시스템) return '';
     if(c.관리자만 && !관리자()) return '';
     const v = 값[c.k];
     const dis = 편집 ? '' : ' disabled';
@@ -3445,6 +3466,7 @@ async function txSave(){
   const body = {};
   let ex = null;
   열들(key).forEach(c => {
+    if(c.시스템) return;                                   /* 자동 기록이라 쓰지 않는다 */
     if(c.관리자만 && !관리자()) return;
     if(c.k.indexOf('extra.') === 0){                       /* 늘린 속성은 딸림칸에 모아 담는다 */
       if(!ex) ex = Object.assign({}, 값.extra || {});
