@@ -534,11 +534,16 @@ body.tx-moving .tx-x{cursor:grabbing}
 .tx-th>.tx-td i{font-style:normal;opacity:.75;font-size:11px}
 .tx-tr:hover>.tx-td{background:rgba(255,255,255,.022)}
 .tx-tr.pk>.tx-td{background:rgba(230,196,135,.08)}
-.tx-td.tx-tck{justify-content:center;padding:8px 4px;position:sticky;left:0;z-index:1;background:var(--dark-2)}
-.tx-th>.tx-td.tx-tck{z-index:3;background:var(--dark-3)}
-.tx-td.tx-t1{cursor:pointer;font-size:13px;position:sticky;left:34px;z-index:1;background:var(--dark-2)}
+.tx-td.tx-tck{justify-content:center;padding:8px 4px;background:var(--dark-2)}
+.tx-th>.tx-td.tx-tck{background:var(--dark-3)}
+.tx-td.tx-t1{cursor:pointer;font-size:13px;background:var(--dark-2)}
 .tx-tr:hover>.tx-td.tx-t1{background:#232320}
-.tx-th>.tx-td.tx-t1{left:34px;z-index:3;background:var(--dark-3)}
+.tx-th>.tx-td.tx-t1{background:var(--dark-3)}
+/* 「고정」을 켰을 때만 왼쪽에 붙는다 (2026-09-09 대표: 「업무 고정되는거 풀수없어?
+   하단 스크롤바를 움직이면 따라오잖아 · 겹쳐버리니까 수정할때도 이상해」) */
+.tx-table.frz .tx-td.tx-tck{position:sticky;left:0;z-index:1}
+.tx-table.frz .tx-td.tx-t1{position:sticky;left:34px;z-index:1}
+.tx-table.frz .tx-th>.tx-td.tx-tck,.tx-table.frz .tx-th>.tx-td.tx-t1{z-index:3}
 .tx-td.tx-t1 b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tx-td.tx-t1 .go{margin-left:auto;color:#7c766e;opacity:0;font-size:11px;font-weight:700;
   padding:3px 7px;border-radius:6px;border:1px solid var(--line);white-space:nowrap;flex:none}
@@ -879,7 +884,7 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 
 <script>
 "use strict";
-const BUILD = '56';
+const BUILD = '57';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -2704,6 +2709,18 @@ let 표모양 = {};
 try{ 표모양 = JSON.parse(localStorage.getItem('gg_desk_layout2') || '{}') || {}; }catch(e){}
 const 표모양저장 = () => { try{ localStorage.setItem('gg_desk_layout2', JSON.stringify(표모양)); }catch(e){} };
 const 모양키 = key => key + ':' + ((표상태[key] || {}).보기 || '');
+/* 첫 칸 고정 — 모양(layout)과 똑같은 자리에 담는다.
+   모두같게면 서버 tr_views.frozen · 각자면 내 브라우저. 담긴 게 없으면 고정(기본) */
+let 표얼림 = {};
+try{ 표얼림 = JSON.parse(localStorage.getItem('gg_desk_freeze') || '{}') || {}; }catch(e){}
+const 표얼림저장 = () => { try{ localStorage.setItem('gg_desk_freeze', JSON.stringify(표얼림)); }catch(e){} };
+function 얼렸나(key){
+  if(모두같게(key)){ const v = 지금보기(key);
+    if(v && v.뷰 && v.뷰.frozen != null) return !!v.뷰.frozen;
+    if(v && v.덮 && v.덮.frozen != null) return !!v.덮.frozen; }
+  const t = 표얼림[모양키(key)];
+  return t == null ? true : !!t;
+}
 function 모양(key){
   if(모두같게(key)){ const v = 지금보기(key); if(v && v.뷰 && v.뷰.layout) return v.뷰.layout;
     if(v && v.덮 && v.덮.layout) return v.덮.layout; }
@@ -2733,7 +2750,7 @@ function 표칸들(key){
     const 골라 = 담김.map(k => 뭉치[k]).filter(Boolean);
     const 제 = 표정의[key].제목열;
     const i제 = 골라.findIndex(c => c.k === 제);
-    if(i제 > 0) 골라.unshift(골라.splice(i제, 1)[0]);                   /* 제목은 늘 맨 앞 */
+    if(i제 > 0 && 얼렸나(key)) 골라.unshift(골라.splice(i제, 1)[0]);     /* 고정일 때만 맨 앞 */
     else if(i제 < 0 && 뭉치[제]) 골라.unshift(뭉치[제]);
     return 골라.length ? 골라 : 다.filter(c => !c.숨김);
   }
@@ -2753,7 +2770,7 @@ function txTable(key, rows){
   const 머리 = '<div class="tx-tr tx-th">'
     + '<span class="tx-td tx-tck"><span class="tx-pick '+(모두?'on':'')+'" data-act="tx:pickall" data-k="'+key+'">'+(모두?'✓':'')+'</span></span>'
     + cs.map((c,i) => '<span class="tx-td"'
-        + (바꿀수있나(key) && c.k !== 표정의[key].제목열
+        + (바꿀수있나(key) && !(얼렸나(key) && c.k === 표정의[key].제목열)
            ? ' data-hc="'+esc(c.k)+'" data-hi="'+i+'" data-hk="'+key+'"' : '')
         + (관리자() && !c.시스템 ? ' data-act="tx:pmenu" data-k="'+key+'" data-v2="'+esc(c.k)+'"' : '')
         + '><i>'+(타입아이콘[c.타입]||'≡')+'</i>'+esc(c.이름)+'</span>').join('')
@@ -2774,7 +2791,7 @@ function txTable(key, rows){
         }).join('')
       + '</div>';
   };
-  return '<div class="tx-tw"><div class="tx-table" style="grid-template-columns:'+폭+'">'
+  return '<div class="tx-tw"><div class="tx-table'+(얼렸나(key)?' frz':'')+'" style="grid-template-columns:'+폭+'">'
     + 머리 + rows.map(줄).join('') + '</div></div>'
     + (관리자() || true ? '<button class="tx-newrow" data-act="tx:rownew" data-k="'+key+'">＋ 새 '+표정의[key].제목+'</button>' : '')
     + '<div class="tx-help">칸을 누르면 <b>선택</b> · <b>방향키</b>로 이동 · <b>Enter</b>나 한 번 더 누르면 수정 · '
@@ -2999,6 +3016,11 @@ function txFilterBar(key, v, 순){
         + (모두같게(key)?'👥 모두 같게':'👤 각자') + '</button>' : '')
     + '<button class="tx-fadd" data-act="tx:layout" data-k="'+key+'" title="목록 ↔ 표">'
       + (모양(key)==='table' ? '▤ 표' : '☰ 목록') + '</button>'
+    + (모양(key)==='table'
+        ? '<button class="tx-fadd '+(얼렸나(key)?'on':'')+'" data-act="tx:freeze" data-k="'+key+'" title="'
+          + (얼렸나(key) ? '이름 칸이 왼쪽에 붙어 옆으로 밀어도 따라옵니다 — 눌러서 풀기'
+                         : '이름 칸도 같이 밀립니다 — 눌러서 왼쪽에 붙이기')+'">'
+          + (얼렸나(key) ? '📌 첫 칸 고정' : '📌 고정 풀림') + '</button>' : '')
     + '<button class="tx-fadd '+(st.그룹?'on':'')+'" data-act="tx:grpmenu" data-k="'+key+'">⊞ '
       + (st.그룹 ? ((열들(key).find(z=>z.k===st.그룹)||{}).이름 || '그룹') : '그룹') + '</button>'
     + '<button class="tx-fadd '+(순&&순.k?'on':'')+'" data-act="tx:sortmenu" data-k="'+key+'">↕ '+(순말 || '정렬')+'</button>'
@@ -4292,9 +4314,10 @@ async function 옵션더하기(key, k, 값){
 /* 이 보기에서 칸을 숨기거나 다시 보이게 한다 */
 async function 보기칸바꾸기(key, 새칸들){
   const v = 지금보기(key); if(!v) return false;
-  /* ⛔ 제목 칸은 늘 맨 앞이어야 한다 — 왼쪽에 얼려 두기 때문에 자리를 옮기면 화면이 깨진다 */
+  /* ⛔ 고정(frz)일 때만 제목 칸을 맨 앞에 못박는다 — 왼쪽에 붙여 두는데 자리가 밀리면 깨진다.
+     고정을 풀면 다른 칸과 똑같이 아무 데나 놓을 수 있다 */
   const 제 = 표정의[key].제목열;
-  새칸들 = [제].concat(새칸들.filter(x => x !== 제));
+  if(얼렸나(key)) 새칸들 = [제].concat(새칸들.filter(x => x !== 제));
   if(!바꿀수있나(key)){ toast(잠겼나(key) ? '잠겨 있어요 — 자물쇠를 풀어 주세요' : '관리자만 바꿀 수 있어요'); return false; }
   if(!모두같게(key)){
     내설정[key] = 내설정[key] || {}; 내설정[key].칸 = 내설정[key].칸 || {};
@@ -4571,6 +4594,12 @@ async function txAct(a, el){
       await 덮어쓰기(k, 지금보기(k).k, { layout: 새 });
     } else { 표모양[모양키(k)] = 새; 표모양저장(); }
     render(); return; }
+  if(a==='freeze'){ const 새 = !얼렸나(k);
+    if(모두같게(k)){
+      if(!바꿀수있나(k)) return toast(잠겼나(k) ? '잠겨 있어요' : '관리자만 바꿀 수 있어요');
+      await 덮어쓰기(k, 지금보기(k).k, { frozen: 새 });
+    } else { 표얼림[모양키(k)] = 새; 표얼림저장(); }
+    render(); toast(새 ? '이름 칸을 왼쪽에 붙였습니다' : '고정을 풀었습니다 — 이름 칸도 같이 밀립니다'); return; }
   if(a==='pmenu'){ 속성이름메뉴(k, v2, el); return; }
   if(a==='padd'){ 속성추가쪽지(k, el); return; }
   if(a==='pempty'){ 빈속성숨김 = !빈속성숨김;
