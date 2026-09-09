@@ -537,6 +537,46 @@ body.tx-moving .tx-x{cursor:grabbing}
   background:var(--dark-3);border:1px solid var(--line);border-radius:8px;padding:5px 6px 5px 10px}
 .tx-fchip button{width:17px;height:17px;border-radius:5px;color:#8b8479;font-size:10px}
 .tx-fchip button:hover{background:var(--warn);color:#1b1b19}
+/* 노션식 속성 줄 */
+.tx-props{display:flex;flex-direction:column;gap:1px;margin:0 0 2px}
+.tx-prow{display:flex;align-items:flex-start;gap:4px;border-radius:7px}
+.tx-pname{flex:none;width:150px;display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:7px;
+  font-size:12.5px;font-weight:600;color:var(--sub);text-align:left;min-height:31px}
+.tx-pname:hover{background:var(--dark-3);color:var(--cream)}
+.tx-pname i{font-style:normal;width:15px;text-align:center;font-size:12px;opacity:.8;flex:none}
+.tx-pname>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tx-pname .lk{font-size:9px;opacity:.8}
+.tx-pval{flex:1;min-width:0;display:flex;align-items:center;gap:5px;flex-wrap:wrap;padding:6px 9px;
+  border-radius:7px;font-size:13px;color:var(--cream);text-align:left;min-height:31px}
+.tx-pval:hover{background:var(--dark-3)}
+.tx-pval.ro,.tx-pval.ro:hover{background:transparent;cursor:default}
+.tx-pmut{color:#5f5a54;font-weight:500}
+.tx-plink{color:var(--gold);text-decoration:underline}
+.tx-padd{align-self:flex-start;display:flex;align-items:center;padding:6px 9px;border-radius:7px;
+  font-size:12.5px;font-weight:700;color:#6f6a63;margin-top:1px}
+.tx-padd:hover{background:var(--dark-3);color:var(--gold)}
+.tx-page .tx-ttl[contenteditable]{outline:none;border-radius:7px;padding:2px 5px;margin-left:-5px}
+.tx-page .tx-ttl[contenteditable]:focus{background:rgba(255,255,255,.04)}
+.tx-page .tx-ttl[contenteditable]:empty:before{content:attr(data-ph);color:#5f5a54}
+/* 쪽지 — 그 자리에서 고르는 작은 창 */
+.tx-pop{position:fixed;z-index:95;background:var(--dark-2);border:1px solid var(--line);border-radius:12px;
+  padding:6px;box-shadow:0 14px 34px rgba(0,0,0,.55);max-height:360px;overflow:auto}
+.tx-pop .inp{width:100%;padding:8px 10px;font-size:13px}
+.tx-pop textarea.inp{resize:vertical;min-height:76px}
+.tx-pop .hd,.tx-pop .hd2{font-size:11px;color:#7c766e;padding:4px 9px 6px;font-weight:700}
+.tx-pop .hd small{font-weight:500;color:#5f5a54}
+.tx-pop .hd2{font-weight:500}
+.tx-pmenu{display:flex;flex-direction:column;gap:1px}
+.tx-pmenu button{display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:7px 9px;
+  border-radius:8px;font-size:13px;font-weight:600;color:var(--cream)}
+.tx-pmenu button:hover{background:var(--dark-3);color:var(--gold)}
+.tx-pmenu button.wn{color:var(--warn)}
+.tx-pmenu button.wn:hover{background:var(--warn);color:#1b1b19}
+.tx-pmenu button.mut{color:#6f6a63;font-weight:500}
+.tx-pmenu button i{font-style:normal;width:16px;text-align:center;opacity:.8;flex:none;font-size:12px}
+.tx-pmenu .mut{font-size:11.5px;color:#6f6a63;padding:5px 9px 8px;line-height:1.55}
+.tx-pdiv{height:1px;background:var(--line);margin:5px 4px}
+.tx-pop .tx-pchips{display:flex;flex-wrap:wrap;gap:4px}
 .tx-emojis{display:grid;grid-template-columns:repeat(9,1fr);gap:2px;max-height:240px;overflow:auto;padding:2px}
 .tx-emojis button{font-size:19px;padding:5px 0;border-radius:7px;line-height:1.1}
 .tx-emojis button:hover{background:var(--dark-3)}
@@ -748,7 +788,7 @@ body.tx-moving .tx-x{cursor:grabbing}
 
 <script>
 "use strict";
-const BUILD = '38';
+const BUILD = '39';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -2130,11 +2170,24 @@ const 표상태 = { tasks:{보기:'mine', 사람:null, q:'', 규칙:[], op:'and'
 
 /* ── 필터 · 정렬 · 보기 ── 조건을 「글」이 아니라 「자료」로 담는다 (2026-09-08 대표 지시)
    규칙 하나 = {k: 속성열쇠, cmp: 비교, v: 값}.  보기 하나 = 규칙 여러 개 + 정렬. */
+/* 말투는 노션과 같게 맞춘다 (2026-09-09 대표 지시) */
 const 비교표 = {
-  eq:'이다', ne:'아니다', has:'들어있다', nohas:'안 들어있다',
-  empty:'비었다', filled:'있다', gt:'보다 크다·뒤', lt:'보다 작다·앞',
-  me:'나', today:'오늘', week:'이번 주', month:'이번 달', past:'지났다',
+  eq:'다음 값과 동일한 데이터', ne:'다음 값과 동일하지 않은 데이터',
+  has:'다음 값을 포함하는 데이터', nohas:'다음 값을 포함하지 않는 데이터',
+  empty:'비어 있음', filled:'비어 있지 않음',
+  gt:'다음 값보다 큼', lt:'다음 값보다 작음',
+  me:'나를 포함하는 데이터', today:'오늘', week:'이번 주', month:'이번 달', past:'오늘 이전',
 };
+function 비교말(cmp, t){
+  if(t === 'date' || t === 'datetime'){
+    if(cmp === 'gt') return '다음 날짜 이후';
+    if(cmp === 'lt') return '다음 날짜 이전';
+    if(cmp === 'eq') return '다음 날짜';
+    if(cmp === 'ne') return '다음 날짜가 아닌 데이터';
+  }
+  return 비교표[cmp] || cmp;
+}
+const 값없는비교 = cmp => ['empty','filled','me','today','week','month','past'].indexOf(cmp) >= 0;
 function 쓸수있는비교(t){
   if(t==='select')                     return ['eq','ne','empty','filled'];
   if(t==='multi' || t==='people')      return ['has','nohas','empty','filled'];
@@ -2170,12 +2223,18 @@ function 규칙맞나(q, r, key){
 }
 const 규칙들맞나 = (rules, op, r, key) => !rules || !rules.length ? true
   : (op === 'or' ? rules.some(q => 규칙맞나(q, r, key)) : rules.every(q => 규칙맞나(q, r, key)));
+/* 칩은 노션처럼 「속성: 값」 꼴로 */
 function 규칙말 (q, key){
   const c = 열들(key).find(z => z.k === q.k) || { 이름:q.k, 타입:'text' };
-  const 값말 = q.cmp==='eq' && c.타입==='check' ? (q.v===true||q.v==='true' ? '✓' : '아님')
+  if(값없는비교(q.cmp)) return esc(c.이름) + ': ' + 비교말(q.cmp, c.타입);
+  const 값말 = c.타입==='check' ? (q.v===true||q.v==='true' ? '체크됨' : '체크 안 됨')
     : (c.타입==='person'||c.타입==='people') ? 사람(q.v).name
+    : c.타입==='date' || c.타입==='datetime' ? 날짜한글(q.v)
     : (q.v==null || q.v==='') ? '' : String(q.v);
-  return esc(c.이름) + ' ' + 비교표[q.cmp] + (값말 ? ' ' + esc(값말) : '');
+  const 꼬리 = q.cmp==='ne' ? ' 아님' : q.cmp==='nohas' ? ' 제외'
+    : q.cmp==='gt' ? ((c.타입==='date'||c.타입==='datetime') ? ' 이후' : ' 초과')
+    : q.cmp==='lt' ? ((c.타입==='date'||c.타입==='datetime') ? ' 이전' : ' 미만') : '';
+  return esc(c.이름) + ': ' + esc(값말 || '—') + 꼬리;
 }
 /* 기본 보기(코드) + 대표님이 만든 보기(tr_views). 이름·순서·숨김은 덮어쓸 수 있다 */
 function 보기들(key){
@@ -2290,26 +2349,26 @@ function txFilterBar(key, v, 순){
   const st = 표상태[key];
   const 조건 = (st.규칙||[]).map((q,i) => '<span class="tx-fchip">'+규칙말(q, key)
       + '<button data-act="tx:fdrop" data-k="'+key+'" data-i="'+i+'" title="빼기">✕</button></span>').join('');
-  const 순말 = 순 && 순.k ? ((열들(key).find(z=>z.k===순.k)||{}).이름 || 순.k) + (순.dir==='desc'?' ↓':' ↑') : '';
+  const 순말 = 순 && 순.k ? ((열들(key).find(z=>z.k===순.k)||{}).이름 || 순.k) + (순.dir==='desc'?' 내림차순':' 오름차순') : '';
   return '<div class="tx-fbar">'
-    + '<button class="tx-fadd" data-act="tx:fnew" data-k="'+key+'">⧩ 조건 추가</button>'
+    + '<button class="tx-fadd" data-act="tx:fnew" data-k="'+key+'">＋ 필터</button>'
     + ((st.규칙||[]).length > 1
-        ? '<button class="tx-fop" data-act="tx:fop" data-k="'+key+'" title="모두 맞아야 / 아무거나 맞으면">'
-          + (st.op==='or' ? '아무거나' : '모두 맞음') + '</button>' : '')
+        ? '<button class="tx-fop" data-act="tx:fop" data-k="'+key+'" title="그리고 = 모두 맞아야 · 또는 = 하나만 맞아도">'
+          + (st.op==='or' ? '또는' : '그리고') + '</button>' : '')
     + 조건
-    + ((st.규칙||[]).length ? '<button class="tx-fclr" data-act="tx:fclr" data-k="'+key+'">조건 지우기</button>' : '')
+    + ((st.규칙||[]).length ? '<button class="tx-fclr" data-act="tx:fclr" data-k="'+key+'">필터 모두 지우기</button>' : '')
     + '<span class="sp3">'
     + '<button class="tx-fadd '+(순&&순.k?'on':'')+'" data-act="tx:sortmenu" data-k="'+key+'">↕ '+(순말 || '정렬')+'</button>'
     + ((st.규칙||[]).length || st.정렬
-        ? '<button class="tx-fsave" data-act="tx:vsave" data-k="'+key+'">이 조건을 보기로 저장</button>' : '')
+        ? '<button class="tx-fsave" data-act="tx:vsave" data-k="'+key+'">보기로 저장</button>' : '')
     + '</span></div>';
 }
 /* 조건 만들기 — ① 속성 ② 비교 ③ 값 */
 let 새규칙 = null;
 function 조건판(key){
   const cs = 열들(key).filter(c => c.타입 !== 'long');
-  판열기('조건 추가',
-    '<div class="tx-meta">어떤 속성으로 거를까요</div><div class="tx-menu">'
+  판열기('필터 추가',
+    '<div class="tx-meta">속성 선택</div><div class="tx-menu">'
     + cs.map(c => '<button data-act="tx:fpick" data-k="'+key+'" data-v2="'+esc(c.k)+'">'+esc(c.이름)
         + '<small style="margin-left:auto;color:#6f6a63">'+타입이름(c.타입)+'</small></button>').join('')
     + '</div><button class="btn ghost" data-act="popclose">그만두기</button>');
@@ -2331,24 +2390,24 @@ function 조건값판(key){
     return '<input class="inp" id="txfv" type="'+t+'" placeholder="값을 적어 주세요">'
       + '<button class="btn sub sm" data-act="tx:fval" data-k="'+key+'" style="margin-top:8px">넣기</button>';
   })();
-  판열기('조건 — ' + esc(c.이름),
-    '<div class="tx-meta">어떻게 견줄까요</div><div class="tx-ochips">'
-    + 쓸수있는비교(c.타입).map(m => '<button class="tx-ochip '+(새규칙.cmp===m?'on':'')+'" data-act="tx:fcmp" data-k="'+key+'" data-v2="'+m+'">'+비교표[m]+'</button>').join('')
+  판열기('필터 — ' + esc(c.이름),
+    '<div class="tx-meta">조건</div><div class="tx-ochips">'
+    + 쓸수있는비교(c.타입).map(m => '<button class="tx-ochip '+(새규칙.cmp===m?'on':'')+'" data-act="tx:fcmp" data-k="'+key+'" data-v2="'+m+'">'+비교말(m, c.타입)+'</button>').join('')
     + '</div>'
-    + (새규칙.cmp ? '<div class="fld" style="margin-top:12px"><span class="fn">값</span>'+(값칸 || '<div class="tx-meta">값이 없어도 되는 조건이에요</div>')+'</div>' : '')
-    + (새규칙.cmp && !값칸 ? '<button class="btn gold" data-act="tx:fval" data-k="'+key+'">이 조건 넣기</button>' : ''),
-    '<div class="tx-fbtns"><span class="tx-stat"></span><button class="btn ghost" data-act="tx:fnew" data-k="'+key+'">‹ 속성 다시</button></div>');
+    + (새규칙.cmp && 값칸 ? '<div class="fld" style="margin-top:12px"><span class="fn">값</span>'+값칸+'</div>' : '')
+    + (새규칙.cmp && !값칸 ? '<button class="btn gold" style="margin-top:12px" data-act="tx:fval" data-k="'+key+'">이 필터 추가</button>' : ''),
+    '<div class="tx-fbtns"><span class="tx-stat"></span><button class="btn ghost" data-act="tx:fnew" data-k="'+key+'">‹ 속성 다시 고르기</button></div>');
 }
 function 정렬판(key){
   const st = 표상태[key], 순 = st.정렬 || {};
   const cs = 열들(key).filter(c => c.타입 !== 'long');
   판열기('정렬',
     '<div class="tx-menu">'
-    + '<button data-act="tx:sortset" data-k="'+key+'" data-v2="">기본 순서로</button>'
+    + '<button data-act="tx:sortset" data-k="'+key+'" data-v2="">정렬 없음 (기본 순서)</button>'
     + cs.map(c => '<button data-act="tx:sortset" data-k="'+key+'" data-v2="'+esc(c.k)+'">'+esc(c.이름)
-        + (순.k===c.k ? '<small style="margin-left:auto;color:var(--gold)">'+(순.dir==='desc'?'내림차순 ↓':'오름차순 ↑')+'</small>' : '')
+        + (순.k===c.k ? '<small style="margin-left:auto;color:var(--gold)">'+(순.dir==='desc'?'내림차순':'오름차순')+'</small>' : '')
         + '</button>').join('')
-    + '</div><div class="tx-meta">같은 것을 다시 누르면 오름 ↔ 내림이 바뀝니다</div>'
+    + '</div><div class="tx-meta">같은 속성을 다시 누르면 오름차순 ↔ 내림차순이 바뀝니다</div>'
     + '<button class="btn ghost" data-act="popclose">닫기</button>');
 }
 /* ── 보기 판 ── 이름 바꾸기 · 순서 · 숨김 · 지우기 · 빈 보기 추가 */
@@ -2598,6 +2657,193 @@ function 댓글칸(key, id){
     + '</div><div class="tx-cmtin">'+아바타(ME.id)+'<textarea class="inp" id="txcmin" placeholder="댓글 남기기"></textarea>'
     + '<button class="btn sub sm" data-act="tx:cmsend">보내기</button></div>';
 }
+/* ── 노션식 속성 줄 ── 페이지에서 바로 고친다. 「속성 고치기」 폼으로 안 들어간다
+   (2026-09-09 대표: 「여기저기 들어가서 수정하는게 헷갈려」) */
+const 타입아이콘 = { text:'≡', long:'≡', select:'⊙', multi:'⊞', number:'#',
+  date:'📅', datetime:'📅', check:'☑', person:'👤', people:'👤',
+  url:'🔗', phone:'📞', email:'✉' };
+const 본문열쇠 = key => ((표정의[key].열.filter(z => z.타입 === 'long')[0]) || {}).k;
+function 고칠수있나(key, r){
+  const T = 표정의[key];
+  if(T.잠금 && T.잠금(r)) return false;
+  return 관리자() || r.created_by === (ME && ME.id)
+    || (Array.isArray(r[T.사람열]) ? 내것(r[T.사람열]) : r[T.사람열] === (ME && ME.id));
+}
+function 속성값보기(c, r){
+  const v = c.늘림 ? (r.extra||{})[c.k.slice(6)] : r[c.k];
+  if(c.타입 === 'check') return '<span class="tx-cb '+(v?'on':'')+'">'+(v?'✓':'')+'</span>';
+  if(값없나(v)) return '<span class="tx-pmut">비어 있음</span>';
+  if(c.타입 === 'select')   return '<span class="tx-tag">'+esc((c.표시||{})[v]||v)+'</span>';
+  if(c.타입 === 'multi')    return (v||[]).map(o => '<span class="tx-tag">'+esc(o)+'</span>').join('');
+  if(c.타입 === 'person')   return 아바타(v)+'<span>'+esc(사람(v).name)+'</span>';
+  if(c.타입 === 'people')   return (v||[]).map(p => 아바타(p)+'<span>'+esc(사람(p).name)+'</span>').join('');
+  if(c.타입 === 'date')     return esc(날짜한글(v));
+  if(c.타입 === 'datetime') return esc(시각한글(v));
+  if(c.타입 === 'url' || c.타입 === 'phone' || c.타입 === 'email')
+    return '<span class="tx-plink">'+esc(String(v))+'</span>';
+  return esc(String(v));
+}
+function 속성줄들(key, r, 편집){
+  const 본문 = 본문열쇠(key);
+  const 줄 = c => {
+    if(c.k === 본문) return '';                        /* 본문은 아래 글 편집기에서 쓴다 */
+    const 잠 = !!(c.관리자만 && !관리자());
+    const 고침 = 편집 && !잠;
+    return '<div class="tx-prow">'
+      + '<button class="tx-pname"'+(관리자() ? ' data-act="tx:pmenu" data-k="'+key+'" data-v2="'+esc(c.k)+'"' : '')+'>'
+        + '<i>'+(타입아이콘[c.타입]||'≡')+'</i><span>'+esc(c.이름)+'</span>'
+        + (c.관리자만 ? '<b class="lk">🔒</b>' : '') + (c.숨김 ? '<b class="lk">🙈</b>' : '') + '</button>'
+      + '<button class="tx-pval'+(고침?'':' ro')+'"'+(고침 ? ' data-act="tx:pedit" data-k="'+key+'" data-v2="'+esc(c.k)+'"' : '')+'>'
+        + 속성값보기(c, r) + '</button></div>';
+  };
+  return '<div class="tx-props" id="txprops">'
+    + 열들(key).filter(c => !(c.관리자만 && !관리자() && 값없나(c.늘림 ? (r.extra||{})[c.k.slice(6)] : r[c.k]))).map(줄).join('')
+    + '<div class="tx-prow"><button class="tx-pname"><i>🔒</i><span>공개 범위</span></button>'
+      + '<button class="tx-pval'+(편집?'':' ro')+'"'+(편집 ? ' data-act="tx:pedit" data-k="'+key+'" data-v2="vis"' : '')+'>'
+      + esc(VIS[r.vis||'owners'])
+      + (r.vis === 'picked' ? ' <span class="tx-pmut">'+((r.viewers||[]).length)+'명</span>' : '') + '</button></div>'
+    + (관리자() ? '<button class="tx-padd" data-act="tx:padd" data-k="'+key+'">＋ 속성 추가</button>' : '')
+    + '</div>';
+}
+function 속성줄다시(key, id){
+  const box = $('#txprops'), r = W[key].find(x => x.id === id);
+  if(!box || !r) return;
+  box.outerHTML = 속성줄들(key, r, 고칠수있나(key, r));
+}
+/* ── 쪽지(작은 팝오버) ── 판을 새로 열지 않고 그 자리에서 고른다 */
+/* ⛔ 지워진 칸에는 브라우저가 blur 를 안 보낸다 — 닫기 전에 먼저 담아야 글자가 안 사라진다
+   (2026-09-09 「45 적고 다른 속성 누르니 없어짐」) */
+let 쪽지끝 = null;
+function 쪽지닫기(){
+  const f = 쪽지끝; 쪽지끝 = null;
+  const d = $('#txpop'); if(d) d.remove();
+  if(f) f();
+}
+function 쪽지열기(el, html, w){
+  쪽지닫기();
+  const d = document.createElement('div'); d.className = 'tx-pop'; d.id = 'txpop';
+  d.style.width = (w || 240) + 'px'; d.innerHTML = html;
+  document.body.appendChild(d);
+  const r = el.getBoundingClientRect(), h = d.offsetHeight;
+  d.style.left = Math.max(10, Math.min(r.left, innerWidth - (w||240) - 12)) + 'px';
+  d.style.top  = (r.bottom + 6 + h > innerHeight - 10 ? Math.max(10, r.top - h - 6) : r.bottom + 6) + 'px';
+  return d;
+}
+function 쪽지입력(el, 값, 종류, 확정){
+  const 여러줄 = 종류 === 'long';
+  쪽지열기(el, 여러줄 ? '<textarea class="inp" id="txpv" rows="4"></textarea>'
+    : '<input class="inp" id="txpv" type="'+종류+'">', 여러줄 ? 320 : 260);
+  const inp = $('#txpv'); if(!inp) return;
+  inp.value = 값 == null ? '' : String(값);
+  let 끝났나 = false;
+  const 끝 = () => { if(끝났나) return; 끝났나 = true; 확정(inp.value); };
+  쪽지끝 = 끝;                                  /* 닫힐 때 이 값을 담는다 */
+  inp.addEventListener('keydown', e => {
+    if(e.key === 'Enter' && !여러줄){ e.preventDefault(); 쪽지닫기(); }
+    else if(e.key === 'Escape'){ 끝났나 = true; 쪽지끝 = null; 쪽지닫기(); }
+  });
+  inp.addEventListener('blur', () => setTimeout(() => { if(쪽지끝 === 끝) 쪽지닫기(); }, 120));
+  inp.focus(); if(inp.select) inp.select();
+}
+/* 저장은 한 줄로 세운다.
+   ⛔ 글자칸은 다른 곳을 누를 때(blur) 뒤늦게 저장된다 — 그 사이 다른 속성을 고치면
+      옛 값으로 통째로 덮어쓴다 (2026-09-09 담당 토글이 되돌아간 사고) */
+let 저장줄 = Promise.resolve();
+function 속성저장(key, id, k, v){
+  저장줄 = 저장줄.then(() => 속성저장하기(key, id, k, v)).catch(() => {});
+  return 저장줄;
+}
+async function 속성저장하기(key, id, k, v){
+  const r = W[key].find(x => x.id === id); if(!r) return;
+  if(!시트 || 시트.key !== key || 시트.id !== id) 시트 = { key, id, 값: Object.assign({}, r) };
+  늘림열(key).forEach(c => { if(시트.값[c.k] === undefined) 시트.값[c.k] = (r.extra||{})[c.k.slice(6)]; });
+  시트.값[k] = v;
+  await txSave();
+  const nr = W[key].find(x => x.id === id);
+  if(nr){ 시트.값 = Object.assign({}, nr);
+    늘림열(key).forEach(c => { 시트.값[c.k] = (nr.extra||{})[c.k.slice(6)]; }); }
+  속성줄다시(key, id);
+  const tt = document.querySelector('.tx-page .tx-ttl');
+  if(tt && nr && document.activeElement !== tt) tt.innerHTML = esc(표정의[key].행(nr).제목);
+}
+function 속성편집(key, id, k, el){
+  const r = W[key].find(x => x.id === id); if(!r) return;
+  const 씨 = (f, v, extra) => '<button data-act="tx:pset" data-k="'+key+'" data-id="'+id+'" data-f="'+esc(f)+'"'
+    + (v == null ? '' : ' data-v2="'+esc(v)+'"') + (extra||'') + '>';
+  if(k === 'vis'){
+    const 옵 = 관리자() ? ['all','owners','picked','admin'] : ['all','owners'];
+    쪽지열기(el, '<div class="tx-pmenu">'
+      + 옵.map(o => 씨('vis', o) + esc(VIS[o]) + (r.vis===o ? ' <small style="margin-left:auto;color:var(--gold)">✓</small>' : '') + '</button>').join('')
+      + '</div>'
+      + (r.vis === 'picked'
+        ? '<div class="tx-pdiv"></div><div class="tx-pchips">'
+          + W.staff.filter(p => p.active!==false).map(p => '<button class="tx-pchip '+((r.viewers||[]).indexOf(p.id)>=0?'on':'')
+            + '" data-act="tx:pmul" data-k="'+key+'" data-id="'+id+'" data-f="viewers" data-v2="'+p.id+'">'+아바타(p.id)+esc(p.name)+'</button>').join('')
+          + '</div>' : ''), 250);
+    return;
+  }
+  const c = 열들(key).find(z => z.k === k); if(!c) return;
+  const v = c.늘림 ? (r.extra||{})[c.k.slice(6)] : r[c.k];
+  const 넣기 = nv => 속성저장(key, id, k, nv);
+  if(c.타입 === 'check'){ 넣기(!v); return; }
+  if(c.타입 === 'select'){
+    쪽지열기(el, '<div class="tx-pmenu">'
+      + (c.옵션||[]).map(o => 씨(k, o) + esc((c.표시||{})[o]||o) + (v===o ? ' <small style="margin-left:auto;color:var(--gold)">✓</small>' : '') + '</button>').join('')
+      + '<div class="tx-pdiv"></div>' + 씨(k, null, ' class="mut"') + '비우기</button></div>', 230);
+    return; }
+  if(c.타입 === 'person'){
+    쪽지열기(el, '<div class="tx-pmenu">'
+      + W.staff.filter(p => p.active!==false).map(p => 씨(k, p.id) + 아바타(p.id) + esc(p.name)
+          + (v===p.id ? ' <small style="margin-left:auto;color:var(--gold)">✓</small>' : '') + '</button>').join('')
+      + '<div class="tx-pdiv"></div>' + 씨(k, null, ' class="mut"') + '비우기</button></div>', 230);
+    return; }
+  if(c.타입 === 'multi'){
+    쪽지열기(el, '<div class="tx-pchips" style="padding:3px">'
+      + (c.옵션||[]).map(o => '<button class="tx-pchip '+(((v||[]).indexOf(o)>=0)?'on':'')
+        + '" data-act="tx:pmul" data-k="'+key+'" data-id="'+id+'" data-f="'+esc(k)+'" data-v2="'+esc(o)+'">'+esc(o)+'</button>').join('')
+      + '</div>', 250);
+    return; }
+  if(c.타입 === 'people'){
+    쪽지열기(el, '<div class="tx-pchips" style="padding:3px">'
+      + W.staff.filter(p => p.active!==false).map(p => '<button class="tx-pchip '+(((v||[]).indexOf(p.id)>=0)?'on':'')
+        + '" data-act="tx:pmul" data-k="'+key+'" data-id="'+id+'" data-f="'+esc(k)+'" data-v2="'+p.id+'">'+아바타(p.id)+esc(p.name)+'</button>').join('')
+      + '</div>', 250);
+    return; }
+  if(c.타입 === 'long'){ 쪽지입력(el, v||'', 'long', nv => 넣기(nv === '' ? null : nv)); return; }
+  const 종류 = c.타입==='number' ? 'number' : c.타입==='date' ? 'date'
+    : c.타입==='datetime' ? 'datetime-local' : c.타입==='url' ? 'url'
+    : c.타입==='email' ? 'email' : c.타입==='phone' ? 'tel' : 'text';
+  const 보일 = c.타입==='datetime' ? (v ? 로컬ISO(v) : '') : v;
+  쪽지입력(el, 보일, 종류, nv => 넣기(
+      c.타입==='number'   ? (nv === '' ? null : Number(nv))
+    : c.타입==='datetime' ? (nv ? new Date(nv).toISOString() : null)
+    : (nv === '' ? null : nv)));
+}
+function 속성이름메뉴(key, k, el){
+  const c = 열들(key).find(z => z.k === k); if(!c) return;
+  const id = c.늘림 ? c.늘림.id : '';
+  쪽지열기(el, '<div class="tx-pmenu">'
+    + '<div class="hd">'+esc(c.이름)+' <small>· '+타입이름(c.타입)+'</small></div>'
+    + (c.늘림
+      ? '<button data-act="tx:cname" data-k="'+key+'" data-id="'+id+'"><i>✎</i>이름 바꾸기</button>'
+      + '<button data-act="tx:ctype" data-k="'+key+'" data-id="'+id+'"><i>'+(타입아이콘[c.타입]||'≡')+'</i>타입 바꾸기</button>'
+      + '<button data-act="tx:chide" data-k="'+key+'" data-id="'+id+'"><i>'+(c.숨김?'👁':'🙈')+'</i>'+(c.숨김?'목록에 보이기':'목록에서 숨기기')+'</button>'
+      + '<button data-act="tx:clock" data-k="'+key+'" data-id="'+id+'"><i>'+(c.관리자만?'🔓':'🔒')+'</i>'+(c.관리자만?'잠금 풀기':'관리자만 고치게')+'</button>'
+      + '<div class="tx-pdiv"></div>'
+      + '<button class="wn" data-act="tx:cdel" data-k="'+key+'" data-id="'+id+'"><i>✕</i>속성 삭제</button>'
+      : '<div class="mut">기본 속성이라 이름·타입을 바꿀 수 없어요</div>')
+    + '<div class="tx-pdiv"></div>'
+    + '<button data-act="tx:cols" data-k="'+key+'"><i>⠿</i>속성 모두 보기 · 순서 바꾸기</button>'
+    + '</div>', 235);
+}
+function 속성추가쪽지(key, el){
+  쪽지열기(el, '<input class="inp" id="txpn" placeholder="속성 이름 (예: 긴급도)">'
+    + '<div class="tx-pdiv"></div><div class="hd2">타입을 고르면 바로 만들어져요</div>'
+    + '<div class="tx-pmenu">'
+    + 열타입들.map(t => '<button data-act="tx:pnew" data-k="'+key+'" data-v2="'+t[0]+'"><i>'+(타입아이콘[t[0]]||'≡')+'</i>'+t[1]+'</button>').join('')
+    + '</div>', 250);
+  const inp = $('#txpn'); if(inp) inp.focus();
+}
 async function txView(key, id){
   const T = 표정의[key], r = W[key].find(x=>x.id===id); if(!r) return;
   시트 = { key, id, 값: Object.assign({}, r) };
@@ -2613,14 +2859,15 @@ async function txView(key, id){
   const x = T.행(r);
   const done = x.체크 ? !!r[x.체크] : false;
   const 잠김 = T.잠금 && T.잠금(r);
-  const 편집 = !잠김 && (관리자() || r.created_by===(ME&&ME.id)
-      || (Array.isArray(r[T.사람열]) ? 내것(r[T.사람열]) : r[T.사람열]===(ME&&ME.id)));
+  const 편집 = 고칠수있나(key, r);
   const 긴열 = 열들(key).filter(c => c.타입==='long' && !(c.관리자만 && !관리자()));
   BL = 본문키 ? { key, id, f:본문키, bs, urls:urlmap } : null;
   판열기(T.제목 + ' · ' + esc(x.제목),
     '<div class="tx-page">'
-    + '<div class="tx-ttl '+(done?'done':'')+'">'+esc(x.제목)+'</div>'
-    + '<div class="tx-chips">'+x.칩+늘림칩(key, r)+(x.오른쪽||'')+(r.vis && r.vis!=='all' ? '<span class="tx-vis">🔒 '+VIS[r.vis]+'</span>' : '')+'</div>'
+    + '<div class="tx-ttl '+(done?'done':'')+'"'
+      + ((편집 && String(r[T.제목열]||'') === String(x.제목)) ? ' contenteditable="true" spellcheck="false" data-ph="제목 없음"' : '')
+      + '>'+esc(x.제목)+'</div>'
+    + 속성줄들(key, r, 편집)
     + (본문키 ? '<div class="tx-sec" id="txbwrap">'+블록들(bs, 편집, urlmap)+'</div>' : '')
     + 긴열.slice(1).map(c => '<div class="tx-sec"><div class="lbl">'+c.이름+'</div><div class="tx-body">'+링크살리기((c.늘림 ? (r.extra||{})[c.k.slice(6)] : r[c.k])||'')+'</div></div>').join('')
     + ((r.files||[]).length ? '<div class="tx-sec"><div class="lbl">예전 첨부 <span style="font-weight:500;color:#7c766e">🔒 이 글을 볼 수 있는 사람만 엽니다</span></div>'+첨부칸(key, r, 편집, urls)+'</div>' : '')
@@ -2628,10 +2875,14 @@ async function txView(key, id){
     + '<div class="tx-meta">만든 사람 '+esc(사람(r.created_by).name)+' · '+시각한글(r.created_at)+(r.updated_at&&r.updated_at!==r.created_at?' · 고침 '+시각한글(r.updated_at):'')+'</div>'
     + '</div>',
     '<div class="tx-fbtns"><span class="tx-stat" id="txstat">'+(편집?'고치면 바로 저장돼요':'보기만 할 수 있어요')+'</span>'
-    + (편집 ? '<button class="btn sub" data-act="tx:edit">속성 고치기</button>' : '')
     + (편집 && x.체크 ? '<button class="btn gold" data-act="tx:toggle" data-k="'+key+'" data-id="'+id+'" data-f="'+x.체크+'" data-stay="1">'+(done?'완료 취소':'완료')+'</button>' : '')
     + '</div>');
   if(BL) document.querySelectorAll('#txblocks .tx-x[data-bi]').forEach(el => { const b = 블록가져(el.dataset.bi); if(b) el.innerText = b.x||''; });
+  const tt = document.querySelector('.tx-page .tx-ttl[contenteditable]');
+  if(tt) tt.addEventListener('blur', function(){
+    const nv = tt.innerText.replace(/\s+/g,' ').trim();
+    if(nv && nv !== String(r[T.제목열]||'')) 속성저장(key, id, T.제목열, nv);
+  });
 }
 /* 첨부 올리기 — 회원 앱과 같은 media 저장소. 사진은 1280px로 줄여서 */
 async function txUpload(key, id, list){
@@ -3258,6 +3509,7 @@ function 속성판(key){
     + '<div class="tx-meta">「하나 고르기 · 여러 개 고르기」는 만든 뒤 타입을 눌러 고를 것들을 적어 주세요</div>'
     + '</div>',
     '<div class="tx-fbtns"><span class="tx-stat">속성은 관리자만 바꿀 수 있어요</span>'
+    + (시트 && 시트.id ? '<button class="btn sub" data-act="tx:back">‹ 페이지로</button>' : '')
     + '<button class="btn sub" data-act="popclose">닫기</button></div>');
 }
 function 속성타입판(key, id){
@@ -3272,7 +3524,14 @@ function 속성타입판(key, id){
         + '<input class="inp" id="txcopts" value="'+esc((c.opts||[]).join(', '))+'" placeholder="높음, 보통, 낮음">'
         + '<button class="btn sub sm" data-act="tx:copts" data-k="'+key+'" data-id="'+id+'" style="margin-top:8px">고를 것들 저장</button></div>'
       : '')
-    + '<button class="btn ghost" style="margin-top:12px" data-act="tx:cols" data-k="'+key+'">‹ 속성으로</button>');
+    + '<button class="btn ghost" style="margin-top:12px" data-act="tx:cols" data-k="'+key+'">‹ 속성 모두 보기</button>'
+    + (시트 && 시트.id ? '<button class="btn ghost" style="margin-top:7px" data-act="tx:back">‹ 페이지로</button>' : ''));
+}
+/* 속성 판이 열려 있으면 판을, 페이지에서 고쳤으면 페이지 줄만 새로 그린다 */
+function 속성다시(key){
+  쪽지닫기();
+  if($('#txclist')) 속성판(key);
+  else if($('#txprops') && 시트) 속성줄다시(시트.key, 시트.id);
 }
 async function 속성고치기(id, body){
   try{
@@ -3476,6 +3735,30 @@ async function txAct(a, el){
       보기판(k); render(); toast('지웠어요'); }
     catch(e){ toast('못 지웠어요 — '+e.message); }
     return; }
+  /* ── 노션식 속성 줄 ── */
+  if(a==='pedit'){ 속성편집(k, 시트.id, v2, el); return; }
+  if(a==='pmenu'){ 속성이름메뉴(k, v2, el); return; }
+  if(a==='padd'){ 속성추가쪽지(k, el); return; }
+  if(a==='pset'){ 쪽지닫기(); await 속성저장(k, el.dataset.id, el.dataset.f, v2 === undefined ? null : v2); return; }
+  if(a==='pmul'){ const f = el.dataset.f, id2 = el.dataset.id;
+    const r2 = W[k].find(z => z.id === id2); if(!r2) return;
+    const 지금 = (f.indexOf('extra.')===0 ? (r2.extra||{})[f.slice(6)] : r2[f]) || [];
+    const arr = 지금.slice(), i2 = arr.indexOf(v2);
+    if(i2 >= 0) arr.splice(i2, 1); else arr.push(v2);
+    el.classList.toggle('on', i2 < 0);
+    await 속성저장(k, id2, f, arr); return; }
+  if(a==='pnew'){
+    const nm = (($('#txpn')||{}).value || '').trim();
+    if(!nm){ toast('속성 이름을 적어 주세요'); const q = $('#txpn'); if(q) q.focus(); return; }
+    const 있는것 = 늘림열(k);
+    const sort = 있는것.length ? Math.max(...있는것.map(c => c.늘림.sort)) + 1 : 0;
+    try{
+      const o = await usend('tr_cols', 'POST',
+        { tbl:표정의[k].table, k:'p'+Date.now().toString(36), name:nm, type:v2, sort:sort }, 'return=representation');
+      if(o && o[0]) W.cols.push(o[0]);
+      쪽지닫기(); if(시트) 속성줄다시(k, 시트.id); render(); toast('「'+nm+'」 속성을 만들었어요');
+    }catch(e){ toast('못 만들었어요 — '+e.message); }
+    return; }
   /* ── 속성(열) 관리 ── */
   if(a==='cols'){ 속성판(k); return; }
   if(a==='cadd'){
@@ -3493,19 +3776,19 @@ async function txAct(a, el){
     return; }
   if(a==='cname'){ const c = W.cols.find(x => x.id === el.dataset.id); if(!c) return;
     const nm = prompt('속성 이름', c.name); if(nm == null || !nm.trim()) return;
-    if(await 속성고치기(c.id, { name:nm.trim() })) 속성판(k); return; }
-  if(a==='ctype'){ 속성타입판(k, el.dataset.id); return; }
+    if(await 속성고치기(c.id, { name:nm.trim() })) 속성다시(k); return; }
+  if(a==='ctype'){ 쪽지닫기(); 속성타입판(k, el.dataset.id); return; }
   if(a==='ctset'){ if(await 속성고치기(el.dataset.id, { type:v2 })) 속성타입판(k, el.dataset.id); return; }
   if(a==='copts'){ const v = ($('#txcopts').value || '').split(',').map(x => x.trim()).filter(Boolean);
     if(await 속성고치기(el.dataset.id, { opts:v })) { 속성타입판(k, el.dataset.id); toast('저장했어요'); } return; }
   if(a==='chide'){ const c = W.cols.find(x => x.id === el.dataset.id); if(!c) return;
-    if(await 속성고치기(c.id, { hidden: !c.hidden })) 속성판(k); return; }
+    if(await 속성고치기(c.id, { hidden: !c.hidden })) 속성다시(k); return; }
   if(a==='clock'){ const c = W.cols.find(x => x.id === el.dataset.id); if(!c) return;
-    if(await 속성고치기(c.id, { locked: !c.locked })) 속성판(k); return; }
+    if(await 속성고치기(c.id, { locked: !c.locked })) 속성다시(k); return; }
   if(a==='cdel'){ const c = W.cols.find(x => x.id === el.dataset.id); if(!c) return;
     if(!confirm('「'+c.name+'」 속성을 지울까요?\n이미 적어 둔 값은 안 보이게 돼요')) return;
     try{ await usend('tr_cols?id=eq.'+c.id, 'DELETE');
-      W.cols = W.cols.filter(x => x.id !== c.id); 속성판(k); render(); toast('지웠어요'); }
+      W.cols = W.cols.filter(x => x.id !== c.id); 속성다시(k); render(); toast('지웠어요'); }
     catch(e){ toast('못 지웠어요 — '+e.message); }
     return; }
   if(a==='tpl'){ const t = 표정의[k].템플릿[+el.dataset.i];
@@ -3837,7 +4120,8 @@ function 판열기(머리, 속, 발){
     + '<div class="tx-scroll">'+속+'</div>' + (발||'');
   pop.classList.add('on','tx-side'); pop.classList.toggle('tx-wide', 넓게);
 }
-function popClose(){ if(typeof BL!=='undefined' && BL){ try{ 글자넣기(); }catch(e){} }
+function popClose(){ if(typeof 쪽지닫기==='function') 쪽지닫기();
+  if(typeof BL!=='undefined' && BL){ try{ 글자넣기(); }catch(e){} }
   if(typeof 고른줄!=='undefined'){ 고른줄 = []; const sb = $('#txselbar'); if(sb) sb.remove(); }
   if(typeof 블록메뉴닫기==='function') 블록메뉴닫기();
   BL = null; $('#pop').classList.remove('on'); }
@@ -3922,6 +4206,9 @@ async function saveItemField(id, f, v){
 document.addEventListener('click', async function(ev){
   const t = ev.target;
   시프트 = ev.shiftKey;                     /* 목록에서 사이 한꺼번에 고르기 */
+  /* 쪽지(작은 팝오버)는 바깥을 누르면 닫는다 */
+  if(typeof 쪽지닫기 === 'function' && $('#txpop') && t.closest && !t.closest('#txpop')
+     && !t.closest('[data-act="tx:pedit"]') && !t.closest('[data-act="tx:pmenu"]') && !t.closest('[data-act="tx:padd"]')) 쪽지닫기();
 
   const nav = t.closest('.nav');
   if(nav){ S.view = nav.dataset.v;
