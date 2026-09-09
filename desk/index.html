@@ -722,7 +722,7 @@ body.tx-moving .tx-x{cursor:grabbing}
 <div class="wrap">
 <header class="gnb">
   <span class="ev">GLAD</span>
-  <span class="msg" id="gnbmsg">글래드짐 트레이너 데스크 — 시험 단계입니다. 자료는 회원 앱과 그대로 이어져 있어요.</span>
+  <span class="msg" id="gnbmsg">트레이너 데스크 · 시험 단계</span>
   <div class="rt2">
     <button class="gbtn" id="gbell" title="알림">
       <svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
@@ -788,7 +788,7 @@ body.tx-moving .tx-x{cursor:grabbing}
 
 <script>
 "use strict";
-const BUILD = '39';
+const BUILD = '40';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -2283,10 +2283,11 @@ async function loadWork(){
 /* ── 늘린 속성 ── 대표님이 화면에서 만든 칸. 값은 각 줄의 extra 에 담긴다 (2026-09-08)
    기본 속성은 코드에 박혀 있고(표정의.열), 늘린 속성은 tr_cols 표에 있다.
    두 개를 이어 붙인 것이 「그 표의 모든 속성」= 열들(key). */
+/* 유형 이름은 노션 한국어판 그대로 (2026-09-09) */
 const 열타입들 = [
-  ['text','한 줄 글'], ['long','여러 줄 글'], ['select','하나 고르기'], ['multi','여러 개 고르기'],
-  ['number','숫자'], ['date','날짜'], ['datetime','날짜·시각'], ['check','체크'],
-  ['person','사람 하나'], ['people','사람 여럿'], ['url','링크'], ['phone','전화'], ['email','이메일'],
+  ['text','텍스트'], ['long','텍스트(여러 줄)'], ['select','선택'], ['multi','다중 선택'],
+  ['number','숫자'], ['date','날짜'], ['datetime','날짜(시간 포함)'], ['check','체크박스'],
+  ['person','사람'], ['people','사람(여러 명)'], ['url','URL'], ['phone','전화번호'], ['email','이메일'],
 ];
 const 타입이름 = t => (열타입들.find(x => x[0] === t) || [t, t])[1];
 const 늘림열 = key => W.cols.filter(c => c.tbl === 표정의[key].table)
@@ -2314,7 +2315,7 @@ function txTop(key){
   const n = k => { const v = T.보기.find(x=>x.k===k); return 전체.filter(r => !v.필터 || v.필터(r)).length; };
   return '<h1>'+T.제목+'</h1><span class="cnt">'+전체.length+'건</span>'
     + '<div class="sp"><input class="srch" id="txq" type="text" placeholder="'+T.제목+' 찾기" value="'+esc(st.q)+'">'
-    + (관리자() ? '<button class="btn ghost sm" data-act="tx:cols" data-k="'+key+'" title="속성 추가 · 순서 · 숨김 · 잠금">⚙ 속성</button>' : '')
+    + (관리자() ? '<button class="btn ghost sm" data-act="tx:cols" data-k="'+key+'" title="속성 편집">⚙ 속성</button>' : '')
     + '<button class="btn gold sm" data-act="tx:new" data-k="'+key+'">＋ 새로 만들기 ▾</button></div>';
 }
 function txList(key){
@@ -2331,7 +2332,7 @@ function txList(key){
   const 보기줄 = '<div class="tx-bar"><div class="tx-views">'
     + 보임.map(x => '<button class="'+(x.k===st.보기?'on':'')+'" data-act="tx:view" data-k="'+key+'" data-v2="'+x.k+'">'
         + esc(x.이름) + '<b>' + W[key].filter(r => 보기맞나(x, r, key)).length + '</b></button>').join('')
-    + (관리자() ? '<button class="tx-vplus" data-act="tx:views" data-k="'+key+'" title="보기 이름·순서·추가">＋</button>' : '')
+    + (관리자() ? '<button class="tx-vplus" data-act="tx:views" data-k="'+key+'" title="새 보기 추가">＋</button>' : '')
     + '</div><div class="sp2">'
     + '<span class="tx-pchips"><button class="tx-pchip '+(!st.사람?'on':'')+'" data-act="tx:who" data-k="'+key+'" data-v2="">전원</button>'
     + W.staff.filter(p=>p.active!==false).map(p => '<button class="tx-pchip '+(st.사람===p.id?'on':'')+'" data-act="tx:who" data-k="'+key+'" data-v2="'+p.id+'">'+아바타(p.id)+esc(p.name)+'</button>').join('')
@@ -2340,7 +2341,7 @@ function txList(key){
   const 거름줄 = txFilterBar(key, v, 순);
   보인행[key] = rows.map(r => r.id);
   if(고른행.key === key) 고른행.ids = 고른행.ids.filter(id => 보인행[key].indexOf(id) >= 0);
-  if(!rows.length) return 보기줄 + 거름줄 + 달력 + '<div class="empty">여기엔 아직 없어요</div>';
+  if(!rows.length) return 보기줄 + 거름줄 + 달력 + '<div class="empty">결과 없음</div>';
   return 보기줄 + 거름줄 + 달력 + txPickBar(key, rows)
     + '<div class="tx-list">' + rows.map(r => txRow(key, r, true)).join('') + '</div>';
 }
@@ -2351,16 +2352,16 @@ function txFilterBar(key, v, 순){
       + '<button data-act="tx:fdrop" data-k="'+key+'" data-i="'+i+'" title="빼기">✕</button></span>').join('');
   const 순말 = 순 && 순.k ? ((열들(key).find(z=>z.k===순.k)||{}).이름 || 순.k) + (순.dir==='desc'?' 내림차순':' 오름차순') : '';
   return '<div class="tx-fbar">'
-    + '<button class="tx-fadd" data-act="tx:fnew" data-k="'+key+'">＋ 필터</button>'
+    + '<button class="tx-fadd" data-act="tx:fnew" data-k="'+key+'">필터</button>'
     + ((st.규칙||[]).length > 1
         ? '<button class="tx-fop" data-act="tx:fop" data-k="'+key+'" title="그리고 = 모두 맞아야 · 또는 = 하나만 맞아도">'
           + (st.op==='or' ? '또는' : '그리고') + '</button>' : '')
     + 조건
-    + ((st.규칙||[]).length ? '<button class="tx-fclr" data-act="tx:fclr" data-k="'+key+'">필터 모두 지우기</button>' : '')
+    + ((st.규칙||[]).length ? '<button class="tx-fclr" data-act="tx:fclr" data-k="'+key+'">필터 삭제</button>' : '')
     + '<span class="sp3">'
     + '<button class="tx-fadd '+(순&&순.k?'on':'')+'" data-act="tx:sortmenu" data-k="'+key+'">↕ '+(순말 || '정렬')+'</button>'
     + ((st.규칙||[]).length || st.정렬
-        ? '<button class="tx-fsave" data-act="tx:vsave" data-k="'+key+'">보기로 저장</button>' : '')
+        ? '<button class="tx-fsave" data-act="tx:vsave" data-k="'+key+'">새 보기로 저장</button>' : '')
     + '</span></div>';
 }
 /* 조건 만들기 — ① 속성 ② 비교 ③ 값 */
@@ -2368,10 +2369,10 @@ let 새규칙 = null;
 function 조건판(key){
   const cs = 열들(key).filter(c => c.타입 !== 'long');
   판열기('필터 추가',
-    '<div class="tx-meta">속성 선택</div><div class="tx-menu">'
+    '<div class="tx-menu">'
     + cs.map(c => '<button data-act="tx:fpick" data-k="'+key+'" data-v2="'+esc(c.k)+'">'+esc(c.이름)
         + '<small style="margin-left:auto;color:#6f6a63">'+타입이름(c.타입)+'</small></button>').join('')
-    + '</div><button class="btn ghost" data-act="popclose">그만두기</button>');
+    + '</div><button class="btn ghost" data-act="popclose">취소</button>');
 }
 function 조건값판(key){
   const c = 열들(key).find(z => z.k === 새규칙.k) || {};
@@ -2387,35 +2388,34 @@ function 조건값판(key){
       + W.staff.filter(p=>p.active!==false).map(p => '<button class="tx-pchip" data-act="tx:fval" data-k="'+key+'" data-v2="'+p.id+'">'+아바타(p.id)+esc(p.name)+'</button>').join('')
       + '</div>';
     const t = c.타입==='number' ? 'number' : (c.타입==='date'||c.타입==='datetime') ? 'date' : 'text';
-    return '<input class="inp" id="txfv" type="'+t+'" placeholder="값을 적어 주세요">'
-      + '<button class="btn sub sm" data-act="tx:fval" data-k="'+key+'" style="margin-top:8px">넣기</button>';
+    return '<input class="inp" id="txfv" type="'+t+'" placeholder="값">'
+      + '<button class="btn sub sm" data-act="tx:fval" data-k="'+key+'" style="margin-top:8px">추가</button>';
   })();
   판열기('필터 — ' + esc(c.이름),
-    '<div class="tx-meta">조건</div><div class="tx-ochips">'
+    '<div class="tx-ochips">'
     + 쓸수있는비교(c.타입).map(m => '<button class="tx-ochip '+(새규칙.cmp===m?'on':'')+'" data-act="tx:fcmp" data-k="'+key+'" data-v2="'+m+'">'+비교말(m, c.타입)+'</button>').join('')
     + '</div>'
     + (새규칙.cmp && 값칸 ? '<div class="fld" style="margin-top:12px"><span class="fn">값</span>'+값칸+'</div>' : '')
-    + (새규칙.cmp && !값칸 ? '<button class="btn gold" style="margin-top:12px" data-act="tx:fval" data-k="'+key+'">이 필터 추가</button>' : ''),
-    '<div class="tx-fbtns"><span class="tx-stat"></span><button class="btn ghost" data-act="tx:fnew" data-k="'+key+'">‹ 속성 다시 고르기</button></div>');
+    + (새규칙.cmp && !값칸 ? '<button class="btn gold" style="margin-top:12px" data-act="tx:fval" data-k="'+key+'">추가</button>' : ''),
+    '<div class="tx-fbtns"><span class="tx-stat"></span><button class="btn ghost" data-act="tx:fnew" data-k="'+key+'">‹ 뒤로</button></div>');
 }
 function 정렬판(key){
   const st = 표상태[key], 순 = st.정렬 || {};
   const cs = 열들(key).filter(c => c.타입 !== 'long');
   판열기('정렬',
     '<div class="tx-menu">'
-    + '<button data-act="tx:sortset" data-k="'+key+'" data-v2="">정렬 없음 (기본 순서)</button>'
+    + '<button data-act="tx:sortset" data-k="'+key+'" data-v2="">정렬 삭제</button>'
     + cs.map(c => '<button data-act="tx:sortset" data-k="'+key+'" data-v2="'+esc(c.k)+'">'+esc(c.이름)
         + (순.k===c.k ? '<small style="margin-left:auto;color:var(--gold)">'+(순.dir==='desc'?'내림차순':'오름차순')+'</small>' : '')
         + '</button>').join('')
-    + '</div><div class="tx-meta">같은 속성을 다시 누르면 오름차순 ↔ 내림차순이 바뀝니다</div>'
-    + '<button class="btn ghost" data-act="popclose">닫기</button>');
+    + '</div><button class="btn ghost" data-act="popclose">닫기</button>');
 }
 /* ── 보기 판 ── 이름 바꾸기 · 순서 · 숨김 · 지우기 · 빈 보기 추가 */
 function 보기판(key){
   const T = 표정의[key], 목록 = 보기들(key);
   판열기(T.제목 + ' 보기',
     '<div class="tx-cols">'
-    + '<div class="lbl">보기 '+목록.length+'개 <span style="font-weight:500;color:#7c766e">— ⠿ 로 순서, 이름을 눌러 바꾸기</span></div>'
+    + '<div class="lbl">보기 '+목록.length+'</div>'
     + '<div class="tx-clist" id="txvlist" data-vk="'+key+'">'
     + 목록.map((x,i) => '<div class="tx-cl" data-vi="'+i+'">'
         + '<span class="g" data-vgrip="'+i+'" title="끌어서 순서 바꾸기">⠿</span>'
@@ -2426,11 +2426,10 @@ function 보기판(key){
                    : '<button class="wn" data-act="tx:vdel" data-k="'+key+'" data-v2="'+esc(x.k)+'" title="지우기">✕</button>')
       + '</div>').join('')
     + '</div>'
-    + '<div class="tx-cadd" style="grid-template-columns:1fr auto"><input class="inp" id="txvname" placeholder="새 보기 이름 (예: 이번 주 마감)">'
+    + '<div class="tx-cadd" style="grid-template-columns:1fr auto"><input class="inp" id="txvname" placeholder="새 보기 이름">'
     + '<button class="btn gold sm" data-act="tx:vadd" data-k="'+key+'">＋ 추가</button></div>'
-    + '<div class="tx-meta">빈 보기를 만든 뒤, 그 보기에서 조건을 걸고 「이 조건을 보기로 저장」을 누르면 담깁니다</div>'
     + '</div>',
-    '<div class="tx-fbtns"><span class="tx-stat">보기는 관리자만 바꿀 수 있어요</span>'
+    '<div class="tx-fbtns"><span class="tx-stat"></span>'
     + '<button class="btn sub" data-act="popclose">닫기</button></div>');
 }
 /* 기본 보기를 덮어쓰는 줄을 만들거나 찾는다 */
@@ -2448,7 +2447,7 @@ async function 덮어쓰기(key, vk, body){
       if(o && o[0]){ const i = W.views.findIndex(z => z.id === x.뷰.id); if(i>=0) W.views[i] = o[0]; }
     }
     render(); return true;
-  }catch(e){ toast('못 바꿨어요 — '+e.message); return false; }
+  }catch(e){ toast('바꾸지 못했습니다 — '+e.message); return false; }
 }
 /* 보기 순서를 ⠿ 로 끌어 바꾼다 */
 let 보기끌기 = null;
@@ -2484,7 +2483,7 @@ document.addEventListener('mouseup', async function(){
   if(at === z.부터) return;
   목록.splice(Math.max(0, Math.min(at, 목록.length)), 0, m);
   for(let i = 0; i < 목록.length; i++){ if(목록[i].sort !== i) await 덮어쓰기(z.key, 목록[i].k, { sort:i }); }
-  보기판(z.key); toast('순서를 바꿨어요');
+  보기판(z.key); toast('순서를 바꿨습니다');
 });
 
 /* ── 목록 고르기 ── 왼쪽 체크상자 · 전체선택 · 고른 것 한꺼번에 (2026-09-08 대표 지시) */
@@ -2499,17 +2498,17 @@ function txPickBar(key, rows){
   const 모두 = rows.length > 0 && 고름.length === rows.length;
   let acts = '';
   if(고름.length){
-    if(체크열[key]) acts += '<button data-act="tx:bulkck" data-k="'+key+'" data-v2="1">완료로</button>'
-                          + '<button data-act="tx:bulkck" data-k="'+key+'" data-v2="">되돌리기</button>';
+    if(체크열[key]) acts += '<button data-act="tx:bulkck" data-k="'+key+'" data-v2="1">완료</button>'
+                          + '<button data-act="tx:bulkck" data-k="'+key+'" data-v2="">완료 해제</button>';
     if(key === 'leave' && 관리자()) acts += '<button data-act="tx:bulkst" data-k="'+key+'" data-v2="ok">승인</button>'
                                           + '<button data-act="tx:bulkst" data-k="'+key+'" data-v2="no">반려</button>';
-    if(T.사람열) acts += '<button data-act="tx:bulkwho" data-k="'+key+'">담당 바꾸기</button>';
+    if(T.사람열) acts += '<button data-act="tx:bulkwho" data-k="'+key+'">담당</button>';
     acts += '<button class="wn" data-act="tx:bulkdel" data-k="'+key+'">삭제</button>';
   }
   return '<div class="tx-selall"><span class="tx-pick '+(모두?'on':'')+'" data-act="tx:pickall" data-k="'+key+'">'+(모두?'✓':'')+'</span>'
     + (고름.length
-        ? '<b>'+고름.length+'건</b> 골랐어요 <button data-act="tx:pickno" data-k="'+key+'" style="color:#6f6a63;font-weight:600;text-decoration:underline">해제</button>'
-        : '전체 선택 <span style="color:#5f5a54;font-weight:500">· Shift 를 누르고 고르면 사이가 한꺼번에</span>')
+        ? '<b>'+고름.length+'개</b> 선택 <button data-act="tx:pickno" data-k="'+key+'" style="color:#6f6a63;font-weight:600;text-decoration:underline">선택 해제</button>'
+        : '전체 선택')
     + '<span class="acts">'+acts+'</span></div>';
 }
 async function txBulk(key, body){
@@ -2526,7 +2525,6 @@ async function txBulk(key, body){
 function txBulkWho(key){
   const T = 표정의[key], c = T.열.find(x => x.k === T.사람열) || {};
   popOpen('<h2>' + (c.이름 || '담당') + ' 바꾸기</h2>'
-    + '<div style="color:var(--sub);font-size:12.5px;margin-bottom:9px">고른 ' + 고른행.ids.length + '건을 이 사람으로 바꿔요</div>'
     + '<div class="tx-menu">'
     + W.staff.filter(p => p.active !== false).map(p => '<button data-act="tx:bulkpick" data-k="'+key+'" data-v2="'+p.id+'">'+아바타(p.id)+' '+esc(p.name)+'</button>').join('')
     + (c.타입 === 'people' ? '<button data-act="tx:bulkpick" data-k="'+key+'" data-v2="">비우기</button>' : '')
@@ -2637,7 +2635,7 @@ function 첨부칸(key, r, 편집, urls){
   const fs = r.files || [];
   return '<div class="tx-files">' + fs.map((f, i) => {
       const k = 파일종류(f), u = (urls && urls[i]) || '';
-      if(!u) return '<div class="tx-file"><a class="doc"><b>🔒</b>'+esc(f.name||'파일')+'<small>열 권한이 없거나 아직 준비 중</small></a></div>';
+      if(!u) return '<div class="tx-file"><a class="doc"><b>🔒</b>'+esc(f.name||'파일')+'<small>열 수 없음</small></a></div>';
       return '<div class="tx-file">'
         + (k==='img' ? '<a href="'+u+'" target="_blank" rel="noopener"><img src="'+u+'" alt="" loading="lazy"></a>'
          : k==='vid' ? '<video src="'+u+'" controls preload="metadata" playsinline></video>'
@@ -2653,7 +2651,7 @@ function 댓글칸(key, id){
   return '<div class="tx-cmts" id="txcmts">' + (cs.length ? cs.map(c => '<div class="tx-cmt">'+아바타(c.created_by)
       + '<div><div class="b">'+본문렌더(c.body)+'</div><div class="m">'+esc(사람(c.created_by).name)+' · '+시각한글(c.created_at)
       + ((관리자() || c.created_by===(ME&&ME.id)) ? '<button data-act="tx:cmdel" data-id="'+c.id+'">지우기</button>' : '')
-      + '</div></div></div>').join('') : '<div class="tx-meta">아직 댓글이 없어요</div>')
+      + '</div></div></div>').join('') : '<div class="tx-meta">댓글 없음</div>')
     + '</div><div class="tx-cmtin">'+아바타(ME.id)+'<textarea class="inp" id="txcmin" placeholder="댓글 남기기"></textarea>'
     + '<button class="btn sub sm" data-act="tx:cmsend">보내기</button></div>';
 }
@@ -2683,8 +2681,14 @@ function 속성값보기(c, r){
     return '<span class="tx-plink">'+esc(String(v))+'</span>';
   return esc(String(v));
 }
+/* 노션처럼 값이 빈 속성은 접어 둘 수 있다 */
+let 빈속성숨김 = false;
+try{ 빈속성숨김 = localStorage.getItem('gg_desk_pempty') === '1'; }catch(e){}
 function 속성줄들(key, r, 편집){
   const 본문 = 본문열쇠(key);
+  /* 체크박스는 꺼져 있어도 「빈 것」으로 치지 않는다 */
+  const 값비었나 = c => c.타입 !== 'check' && 값없나(c.늘림 ? (r.extra||{})[c.k.slice(6)] : r[c.k]);
+  const 빈수 = 열들(key).filter(c => c.k !== 본문 && 값비었나(c)).length;
   const 줄 = c => {
     if(c.k === 본문) return '';                        /* 본문은 아래 글 편집기에서 쓴다 */
     const 잠 = !!(c.관리자만 && !관리자());
@@ -2697,11 +2701,13 @@ function 속성줄들(key, r, 편집){
         + 속성값보기(c, r) + '</button></div>';
   };
   return '<div class="tx-props" id="txprops">'
-    + 열들(key).filter(c => !(c.관리자만 && !관리자() && 값없나(c.늘림 ? (r.extra||{})[c.k.slice(6)] : r[c.k]))).map(줄).join('')
+    + 열들(key).filter(c => !(c.관리자만 && !관리자() && 값비었나(c)) && !(빈속성숨김 && 값비었나(c))).map(줄).join('')
     + '<div class="tx-prow"><button class="tx-pname"><i>🔒</i><span>공개 범위</span></button>'
       + '<button class="tx-pval'+(편집?'':' ro')+'"'+(편집 ? ' data-act="tx:pedit" data-k="'+key+'" data-v2="vis"' : '')+'>'
       + esc(VIS[r.vis||'owners'])
       + (r.vis === 'picked' ? ' <span class="tx-pmut">'+((r.viewers||[]).length)+'명</span>' : '') + '</button></div>'
+    + (빈속성숨김 && 빈수 ? '<button class="tx-padd" data-act="tx:pempty">빈 속성 '+빈수+'개 표시</button>'
+       : 빈수 ? '<button class="tx-padd" data-act="tx:pempty">빈 속성 '+빈수+'개 숨기기</button>' : '')
     + (관리자() ? '<button class="tx-padd" data-act="tx:padd" data-k="'+key+'">＋ 속성 추가</button>' : '')
     + '</div>';
 }
@@ -2826,20 +2832,20 @@ function 속성이름메뉴(key, k, el){
     + '<div class="hd">'+esc(c.이름)+' <small>· '+타입이름(c.타입)+'</small></div>'
     + (c.늘림
       ? '<button data-act="tx:cname" data-k="'+key+'" data-id="'+id+'"><i>✎</i>이름 바꾸기</button>'
-      + '<button data-act="tx:ctype" data-k="'+key+'" data-id="'+id+'"><i>'+(타입아이콘[c.타입]||'≡')+'</i>타입 바꾸기</button>'
-      + '<button data-act="tx:chide" data-k="'+key+'" data-id="'+id+'"><i>'+(c.숨김?'👁':'🙈')+'</i>'+(c.숨김?'목록에 보이기':'목록에서 숨기기')+'</button>'
-      + '<button data-act="tx:clock" data-k="'+key+'" data-id="'+id+'"><i>'+(c.관리자만?'🔓':'🔒')+'</i>'+(c.관리자만?'잠금 풀기':'관리자만 고치게')+'</button>'
+      + '<button data-act="tx:ctype" data-k="'+key+'" data-id="'+id+'"><i>'+(타입아이콘[c.타입]||'≡')+'</i>속성 유형</button>'
+      + '<button data-act="tx:cdup" data-k="'+key+'" data-id="'+id+'"><i>⧉</i>복제</button>'
+      + '<button data-act="tx:chide" data-k="'+key+'" data-id="'+id+'"><i>'+(c.숨김?'👁':'🙈')+'</i>'+(c.숨김?'목록에 표시':'목록에서 숨기기')+'</button>'
+      + '<button data-act="tx:clock" data-k="'+key+'" data-id="'+id+'"><i>'+(c.관리자만?'🔓':'🔒')+'</i>'+(c.관리자만?'잠금 해제':'잠그기')+'</button>'
       + '<div class="tx-pdiv"></div>'
-      + '<button class="wn" data-act="tx:cdel" data-k="'+key+'" data-id="'+id+'"><i>✕</i>속성 삭제</button>'
-      : '<div class="mut">기본 속성이라 이름·타입을 바꿀 수 없어요</div>')
+      + '<button class="wn" data-act="tx:cdel" data-k="'+key+'" data-id="'+id+'"><i>✕</i>삭제</button>'
+      : '<div class="mut">기본 속성</div>')
     + '<div class="tx-pdiv"></div>'
-    + '<button data-act="tx:cols" data-k="'+key+'"><i>⠿</i>속성 모두 보기 · 순서 바꾸기</button>'
+    + '<button data-act="tx:cols" data-k="'+key+'"><i>⠿</i>속성 편집</button>'
     + '</div>', 235);
 }
 function 속성추가쪽지(key, el){
-  쪽지열기(el, '<input class="inp" id="txpn" placeholder="속성 이름 (예: 긴급도)">'
-    + '<div class="tx-pdiv"></div><div class="hd2">타입을 고르면 바로 만들어져요</div>'
-    + '<div class="tx-pmenu">'
+  쪽지열기(el, '<input class="inp" id="txpn" placeholder="속성 이름">'
+    + '<div class="tx-pdiv"></div><div class="tx-pmenu">'
     + 열타입들.map(t => '<button data-act="tx:pnew" data-k="'+key+'" data-v2="'+t[0]+'"><i>'+(타입아이콘[t[0]]||'≡')+'</i>'+t[1]+'</button>').join('')
     + '</div>', 250);
   const inp = $('#txpn'); if(inp) inp.focus();
@@ -2870,11 +2876,11 @@ async function txView(key, id){
     + 속성줄들(key, r, 편집)
     + (본문키 ? '<div class="tx-sec" id="txbwrap">'+블록들(bs, 편집, urlmap)+'</div>' : '')
     + 긴열.slice(1).map(c => '<div class="tx-sec"><div class="lbl">'+c.이름+'</div><div class="tx-body">'+링크살리기((c.늘림 ? (r.extra||{})[c.k.slice(6)] : r[c.k])||'')+'</div></div>').join('')
-    + ((r.files||[]).length ? '<div class="tx-sec"><div class="lbl">예전 첨부 <span style="font-weight:500;color:#7c766e">🔒 이 글을 볼 수 있는 사람만 엽니다</span></div>'+첨부칸(key, r, 편집, urls)+'</div>' : '')
+    + ((r.files||[]).length ? '<div class="tx-sec"><div class="lbl">첨부</div>'+첨부칸(key, r, 편집, urls)+'</div>' : '')
     + '<div class="tx-sec"><div class="lbl">댓글 '+(댓글수(key,id)||'')+'</div>'+댓글칸(key, id)+'</div>'
     + '<div class="tx-meta">만든 사람 '+esc(사람(r.created_by).name)+' · '+시각한글(r.created_at)+(r.updated_at&&r.updated_at!==r.created_at?' · 고침 '+시각한글(r.updated_at):'')+'</div>'
     + '</div>',
-    '<div class="tx-fbtns"><span class="tx-stat" id="txstat">'+(편집?'고치면 바로 저장돼요':'보기만 할 수 있어요')+'</span>'
+    '<div class="tx-fbtns"><span class="tx-stat" id="txstat">'+(편집?'':'읽기 전용')+'</span>'
     + (편집 && x.체크 ? '<button class="btn gold" data-act="tx:toggle" data-k="'+key+'" data-id="'+id+'" data-f="'+x.체크+'" data-stay="1">'+(done?'완료 취소':'완료')+'</button>' : '')
     + '</div>');
   if(BL) document.querySelectorAll('#txblocks .tx-x[data-bi]').forEach(el => { const b = 블록가져(el.dataset.bi); if(b) el.innerText = b.x||''; });
@@ -2922,8 +2928,8 @@ async function txFileDel(key, id, i){
   try{ const o = await usend(T.table+'?id=eq.'+id, 'PATCH', { files }, 'return=representation');
     if(o && o[0]) Object.assign(r, o[0]);
     토큰().then(t => fetch(SB_URL+'/storage/v1/object/tr/'+f.path, { method:'DELETE', headers:{ apikey:SB_KEY, Authorization:'Bearer '+t } })).catch(()=>{});
-    toast('지웠어요'); }
-  catch(e){ toast('못 지웠어요 — '+e.message); }
+    toast('삭제했습니다'); }
+  catch(e){ toast('삭제하지 못했습니다 — '+e.message); }
   txView(key, id);
 }
 async function txCmSend(){
@@ -2936,7 +2942,7 @@ async function txCmSend(){
 async function txCmDel(cid){
   const { key, id } = 시트;
   try{ await usend('tr_comments?id=eq.'+cid, 'DELETE'); W.cm = W.cm.filter(c=>c.id!==cid); txView(key, id); }
-  catch(e){ toast('못 지웠어요 — '+e.message); }
+  catch(e){ toast('삭제하지 못했습니다 — '+e.message); }
 }
 /* 본문 속 체크박스 누르면 그 줄만 바꿔 저장 */
 async function txTick(el){
@@ -2946,7 +2952,7 @@ async function txTick(el){
   lines[i] = /\[( )\]/.test(lines[i]) ? lines[i].replace('[ ]','[x]') : lines[i].replace(/\[(x|X)\]/,'[ ]');
   try{ const o = await usend(T.table+'?id=eq.'+id, 'PATCH', { [f]: lines.join('\n') }, 'return=representation');
     if(o && o[0]) Object.assign(r, o[0]); txView(key, id); }
-  catch(e){ toast('못 바꿨어요 — '+e.message); }
+  catch(e){ toast('바꾸지 못했습니다 — '+e.message); }
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -3048,8 +3054,8 @@ function 블록칸(b, i, 편집, urls, 번호){
   if(b.t==='hr')   속 = '<hr>';
   if(b.t==='img' || b.t==='vid' || b.t==='file'){
     const u = urls[b.path] || '';
-    속 = !b.path ? '<div class="tx-med wait">파일을 고르는 중…</div>'
-      : !u ? '<div class="tx-med wait">🔒 열 권한이 없거나 불러오는 중</div>'
+    속 = !b.path ? '<div class="tx-med wait">불러오는 중…</div>'
+      : !u ? '<div class="tx-med wait">🔒 열 수 없음</div>'
       : b.t==='img' ? '<div class="tx-med"><a href="'+u+'" target="_blank" rel="noopener"><img src="'+u+'" alt="'+esc(b.name||'')+'" loading="lazy"></a>'+(b.name?'<div class="cap">'+esc(b.name)+'</div>':'')+'</div>'
       : b.t==='vid' ? '<div class="tx-med"><video src="'+u+'" controls preload="metadata" playsinline></video>'+(b.name?'<div class="cap">'+esc(b.name)+'</div>':'')+'</div>'
       : '<a class="tx-med doc" href="'+u+'" target="_blank" rel="noopener">📎 '+esc(b.name||'파일')+'<small>'+(b.size?Math.round(b.size/1024)+'KB':'')+'</small></a>';
@@ -3070,7 +3076,7 @@ function 블록들(bs, 편집, urls, 접두){
         + '<button data-act="tx:bpick" data-t="vid">🎬 영상</button>'
         + '<button data-act="tx:bpick" data-t="file">📎 파일</button>'
         + '<span style="align-self:center;color:#5f5a54;font-size:11.5px">'
-        + '<b style="color:#7c766e">/</b> 를 치면 블록 메뉴 · 붙여넣기·끌어놓기도 됩니다</span>' : '') + '</div>' : '');
+        + '<b style="color:#7c766e">/</b> 를 치면 블록 메뉴</span>' : '') + '</div>' : '');
 }
 
 /* ── 커서 자리 보기 ── 워드처럼 앞 줄과 이어지게 하려면 맨 앞인지 알아야 한다 */
@@ -3102,7 +3108,7 @@ function 고른줄표시(){
   if(고른줄.length < 2) return;
   고른줄.forEach(pth => { const e = document.querySelector('#txblocks .tx-b[data-i="'+pth+'"]'); if(e) e.classList.add('tx-sel'); });
   const d = document.createElement('div'); d.className = 'tx-selbar'; d.id = 'txselbar';
-  d.innerHTML = 고른줄.length + '줄 골랐어요 <button data-act="tx:bdelsel">모두 지우기</button>';
+  d.innerHTML = '<b>'+고른줄.length+'개</b> 선택 <button data-act="tx:bdelsel">삭제</button>';
   document.body.appendChild(d);
 }
 /* ⛔ 블록마다 편집 영역(contenteditable)이 따로라, 브라우저는 여러 줄에 걸친 선택을 첫 줄에서 자른다.
@@ -3377,7 +3383,7 @@ function txSheet(key, id, 초기){
     if(c.타입==='number') inner = '<input class="inp" type="number" data-f="'+c.k+'" value="'+esc(v==null?'':v)+'"'+dis+'>';
     if(c.타입==='long'){
       const 본문 = (T.열.filter(z=>z.타입==='long')[0]||{}).k === c.k;
-      if(본문) return '<div class="fld"><span class="fn">'+c.이름+'</span><div class="tx-meta">본문은 페이지에서 씁니다 — 사진·영상도 글 사이에 바로 넣을 수 있어요</div></div>';
+      if(본문) return '';
       inner = '<textarea class="inp" data-f="'+c.k+'" placeholder="'+esc(c.힌트||'')+'"'+dis+'>'+esc(v||'')+'</textarea>';
     }
     if(c.타입==='date')   inner = '<input class="inp" type="date" data-f="'+c.k+'" value="'+esc(v||'')+'"'+dis+'>';
@@ -3404,7 +3410,7 @@ function txSheet(key, id, 초기){
     '<div class="tx-form" id="txform">' + 열들(key).map(칸).join('') + 공개
     + (id && 편집 ? '<div class="fld"><span class="fn">첨부</span>'+첨부칸(key, r||{files:[]}, true, (r&&r.files||[]).map(f=>(서명캐시[f.path]||{}).url||''))+'</div>' : '')
     + 메타 + '</div>',
-    '<div class="tx-fbtns"><span class="tx-stat" id="txstat">'+(편집 ? (id ? '고치면 바로 저장돼요' : '') : '보기만 할 수 있어요')+'</span>'
+    '<div class="tx-fbtns"><span class="tx-stat" id="txstat">'+(편집 ? '' : '읽기 전용')+'</span>'
     + (편집 && id ? '<button class="btn sub" data-act="tx:back">‹ 페이지로</button>' : '')
     + (편집 && id ? '<button class="btn ghost del" data-act="tx:del">페이지 삭제</button>' : '')
     + '</div>');
@@ -3467,8 +3473,8 @@ async function txSave(){
 async function txDel(){
   const { key, id } = 시트, T = 표정의[key];
   if(!id || !confirm('이 페이지를 지울까요? 첨부·댓글도 같이 지워져요')) return;
-  try{ await usend(T.table+'?id=eq.'+id, 'DELETE'); W[key] = W[key].filter(x=>x.id!==id); popClose(); toast('지웠어요'); render(); }
-  catch(e){ toast('못 지웠어요 — '+e.message); }
+  try{ await usend(T.table+'?id=eq.'+id, 'DELETE'); W[key] = W[key].filter(x=>x.id!==id); popClose(); toast('삭제했습니다'); render(); }
+  catch(e){ toast('삭제하지 못했습니다 — '+e.message); }
 }
 async function txToggle(key, id, f){
   const T = 표정의[key], r = W[key].find(x=>x.id===id); if(!r) return;
@@ -3485,12 +3491,12 @@ function 속성판(key){
   const T = 표정의[key], cs = 늘림열(key);
   판열기(T.제목 + ' 속성',
     '<div class="tx-cols">'
-    + '<div class="lbl">기본 속성 <span style="font-weight:500;color:#7c766e">— 집계·자동화가 걸려 있어 지울 수 없어요</span></div>'
+    + '<div class="lbl">기본 속성</div>'
     + '<div class="tx-clist dim">'
     + T.열.map(c => '<div class="tx-cl"><span class="g">·</span><b>'+esc(c.이름)+'</b><small>'+타입이름(c.타입)+'</small></div>').join('')
     + '</div>'
     + '<div class="lbl" style="margin-top:13px">늘린 속성 '+cs.length+'개'
-    + (cs.length ? ' <span style="font-weight:500;color:#7c766e">— ⠿ 를 끌어 순서를 바꿔요</span>' : '') + '</div>'
+    + '</div>'
     + (cs.length
       ? '<div class="tx-clist" id="txclist" data-ck="'+key+'">'
         + cs.map((c,i) => '<div class="tx-cl" data-ci="'+i+'">'
@@ -3502,13 +3508,12 @@ function 속성판(key){
             + '<button data-act="tx:clock" data-k="'+key+'" data-id="'+c.늘림.id+'" title="'+(c.관리자만?'관리자만 고침 — 눌러서 풀기':'누구나 고침 — 눌러서 잠그기')+'">'+(c.관리자만?'🔒':'🔓')+'</button>'
             + '<button class="wn" data-act="tx:cdel" data-k="'+key+'" data-id="'+c.늘림.id+'" title="지우기">✕</button>'
           + '</div>').join('') + '</div>'
-      : '<div class="tx-meta">아직 없어요. 아래에서 만들어 보세요</div>')
-    + '<div class="tx-cadd"><input class="inp" id="txcname" placeholder="새 속성 이름 (예: 긴급도)">'
+      : '')
+    + '<div class="tx-cadd"><input class="inp" id="txcname" placeholder="새 속성 이름">'
     + '<select class="inp" id="txctype">'+열타입들.map(t=>'<option value="'+t[0]+'">'+t[1]+'</option>').join('')+'</select>'
     + '<button class="btn gold sm" data-act="tx:cadd" data-k="'+key+'">＋ 추가</button></div>'
-    + '<div class="tx-meta">「하나 고르기 · 여러 개 고르기」는 만든 뒤 타입을 눌러 고를 것들을 적어 주세요</div>'
     + '</div>',
-    '<div class="tx-fbtns"><span class="tx-stat">속성은 관리자만 바꿀 수 있어요</span>'
+    '<div class="tx-fbtns"><span class="tx-stat"></span>'
     + (시트 && 시트.id ? '<button class="btn sub" data-act="tx:back">‹ 페이지로</button>' : '')
     + '<button class="btn sub" data-act="popclose">닫기</button></div>');
 }
@@ -3520,11 +3525,11 @@ function 속성타입판(key, id){
         + t[1] + (c.type===t[0] ? ' <small style="margin-left:auto;color:var(--gold)">지금 이것</small>' : '') + '</button>').join('')
     + '</div>'
     + (['select','multi'].indexOf(c.type) >= 0
-      ? '<div class="fld" style="margin-top:10px"><span class="fn">고를 것들 (쉼표로 나눠서)</span>'
+      ? '<div class="fld" style="margin-top:10px"><span class="fn">옵션 (쉼표로 구분)</span>'
         + '<input class="inp" id="txcopts" value="'+esc((c.opts||[]).join(', '))+'" placeholder="높음, 보통, 낮음">'
-        + '<button class="btn sub sm" data-act="tx:copts" data-k="'+key+'" data-id="'+id+'" style="margin-top:8px">고를 것들 저장</button></div>'
+        + '<button class="btn sub sm" data-act="tx:copts" data-k="'+key+'" data-id="'+id+'" style="margin-top:8px">저장</button></div>'
       : '')
-    + '<button class="btn ghost" style="margin-top:12px" data-act="tx:cols" data-k="'+key+'">‹ 속성 모두 보기</button>'
+    + '<button class="btn ghost" style="margin-top:12px" data-act="tx:cols" data-k="'+key+'">‹ 뒤로</button>'
     + (시트 && 시트.id ? '<button class="btn ghost" style="margin-top:7px" data-act="tx:back">‹ 페이지로</button>' : ''));
 }
 /* 속성 판이 열려 있으면 판을, 페이지에서 고쳤으면 페이지 줄만 새로 그린다 */
@@ -3538,7 +3543,7 @@ async function 속성고치기(id, body){
     const o = await usend('tr_cols?id=eq.'+id, 'PATCH', body, 'return=representation');
     if(o && o[0]){ const i = W.cols.findIndex(x => x.id === id); if(i>=0) W.cols[i] = o[0]; }
     render(); return true;
-  }catch(e){ toast('못 바꿨어요 — '+e.message); return false; }
+  }catch(e){ toast('바꾸지 못했습니다 — '+e.message); return false; }
 }
 /* 속성 순서를 ⠿ 로 끌어 바꾼다 (블록 옮기기와 같은 방식) */
 let 열끌기 = null;
@@ -3577,7 +3582,7 @@ document.addEventListener('mouseup', async function(){
     cs.forEach((c,i) => { const j = W.cols.findIndex(x => x.id === c.id); if(j>=0) W.cols[j].sort = i; });
     속성판(z.key);
     await Promise.all(cs.map((c,i) => usend('tr_cols?id=eq.'+c.id, 'PATCH', { sort:i })));
-    toast('순서를 바꿨어요');
+    toast('순서를 바꿨습니다');
   }catch(e){ toast('순서를 못 바꿨어요 — '+e.message); }
 });
 
@@ -3698,13 +3703,13 @@ async function txAct(a, el){
   /* ── 보기 ── */
   if(a==='views'){ 보기판(k); return; }
   if(a==='vadd'){ const nm = ($('#txvname').value || '').trim();
-    if(!nm) return toast('이름을 적어 주세요');
+    if(!nm) return toast('이름을 입력하세요');
     const sort = 보기들(k).length;
     try{ const o = await usend('tr_views', 'POST',
         { tbl:표정의[k].table, name:nm, rules:[], op:'and', sort:sort }, 'return=representation');
       if(o && o[0]){ W.views.push(o[0]); 표상태[k].보기 = 'v'+o[0].id; }
       보기판(k); render(); toast('「'+nm+'」 보기를 만들었어요'); }
-    catch(e){ toast('못 만들었어요 — '+e.message); }
+    catch(e){ toast('추가하지 못했습니다 — '+e.message); }
     return; }
   if(a==='vsave'){ const st = 표상태[k];
     const 지금 = 보기들(k).find(x => x.k === st.보기);
@@ -3717,7 +3722,7 @@ async function txAct(a, el){
         { tbl:표정의[k].table, name:nm.trim(), sort:보기들(k).length }, 담기), 'return=representation');
       if(o && o[0]){ W.views.push(o[0]); st.보기 = 'v'+o[0].id; st.규칙 = []; st.정렬 = null; }
       render(); toast('「'+nm.trim()+'」 보기를 만들었어요'); }
-    catch(e){ toast('못 만들었어요 — '+e.message); }
+    catch(e){ toast('추가하지 못했습니다 — '+e.message); }
     return; }
   if(a==='vname'){ const x = 보기들(k).find(z => z.k === v2); if(!x) return;
     const nm = prompt('보기 이름', x.이름); if(nm == null || !nm.trim()) return;
@@ -3732,13 +3737,16 @@ async function txAct(a, el){
     try{ await usend('tr_views?id=eq.'+x.뷰.id, 'DELETE');
       W.views = W.views.filter(z => z.id !== x.뷰.id);
       if(표상태[k].보기 === v2) 표상태[k].보기 = (보기들(k).filter(z=>!z.숨김)[0]||{}).k;
-      보기판(k); render(); toast('지웠어요'); }
-    catch(e){ toast('못 지웠어요 — '+e.message); }
+      보기판(k); render(); toast('삭제했습니다'); }
+    catch(e){ toast('삭제하지 못했습니다 — '+e.message); }
     return; }
   /* ── 노션식 속성 줄 ── */
   if(a==='pedit'){ 속성편집(k, 시트.id, v2, el); return; }
   if(a==='pmenu'){ 속성이름메뉴(k, v2, el); return; }
   if(a==='padd'){ 속성추가쪽지(k, el); return; }
+  if(a==='pempty'){ 빈속성숨김 = !빈속성숨김;
+    try{ localStorage.setItem('gg_desk_pempty', 빈속성숨김 ? '1' : '0'); }catch(e){}
+    if(시트) 속성줄다시(시트.key, 시트.id); return; }
   if(a==='pset'){ 쪽지닫기(); await 속성저장(k, el.dataset.id, el.dataset.f, v2 === undefined ? null : v2); return; }
   if(a==='pmul'){ const f = el.dataset.f, id2 = el.dataset.id;
     const r2 = W[k].find(z => z.id === id2); if(!r2) return;
@@ -3749,21 +3757,21 @@ async function txAct(a, el){
     await 속성저장(k, id2, f, arr); return; }
   if(a==='pnew'){
     const nm = (($('#txpn')||{}).value || '').trim();
-    if(!nm){ toast('속성 이름을 적어 주세요'); const q = $('#txpn'); if(q) q.focus(); return; }
+    if(!nm){ toast('속성 이름을 입력하세요'); const q = $('#txpn'); if(q) q.focus(); return; }
     const 있는것 = 늘림열(k);
     const sort = 있는것.length ? Math.max(...있는것.map(c => c.늘림.sort)) + 1 : 0;
     try{
       const o = await usend('tr_cols', 'POST',
         { tbl:표정의[k].table, k:'p'+Date.now().toString(36), name:nm, type:v2, sort:sort }, 'return=representation');
       if(o && o[0]) W.cols.push(o[0]);
-      쪽지닫기(); if(시트) 속성줄다시(k, 시트.id); render(); toast('「'+nm+'」 속성을 만들었어요');
-    }catch(e){ toast('못 만들었어요 — '+e.message); }
+      쪽지닫기(); if(시트) 속성줄다시(k, 시트.id); render(); toast('속성을 추가했습니다');
+    }catch(e){ toast('추가하지 못했습니다 — '+e.message); }
     return; }
   /* ── 속성(열) 관리 ── */
   if(a==='cols'){ 속성판(k); return; }
   if(a==='cadd'){
     const nm = ($('#txcname').value || '').trim();
-    if(!nm) return toast('이름을 적어 주세요');
+    if(!nm) return toast('이름을 입력하세요');
     const t = $('#txctype').value;
     const 있는것 = 늘림열(k);
     const sort = 있는것.length ? Math.max(...있는것.map(c => c.늘림.sort)) + 1 : 0;
@@ -3771,16 +3779,24 @@ async function txAct(a, el){
       const o = await usend('tr_cols', 'POST',
         { tbl:표정의[k].table, k:'p'+Date.now().toString(36), name:nm, type:t, sort:sort }, 'return=representation');
       if(o && o[0]) W.cols.push(o[0]);
-      속성판(k); render(); toast('「'+nm+'」 속성을 만들었어요');
-    }catch(e){ toast('못 만들었어요 — '+e.message); }
+      속성판(k); render(); toast('속성을 추가했습니다');
+    }catch(e){ toast('추가하지 못했습니다 — '+e.message); }
     return; }
   if(a==='cname'){ const c = W.cols.find(x => x.id === el.dataset.id); if(!c) return;
     const nm = prompt('속성 이름', c.name); if(nm == null || !nm.trim()) return;
     if(await 속성고치기(c.id, { name:nm.trim() })) 속성다시(k); return; }
   if(a==='ctype'){ 쪽지닫기(); 속성타입판(k, el.dataset.id); return; }
+  if(a==='cdup'){ const c = W.cols.find(x => x.id === el.dataset.id); if(!c) return;
+    try{ const o = await usend('tr_cols', 'POST',
+        { tbl:c.tbl, k:'p'+Date.now().toString(36), name:c.name+' 사본', type:c.type,
+          opts:c.opts||[], sort:(c.sort||0)+1, hidden:c.hidden, locked:c.locked }, 'return=representation');
+      if(o && o[0]) W.cols.push(o[0]);
+      속성다시(k); render(); toast('복제했습니다'); }
+    catch(e){ toast('복제하지 못했습니다 — '+e.message); }
+    return; }
   if(a==='ctset'){ if(await 속성고치기(el.dataset.id, { type:v2 })) 속성타입판(k, el.dataset.id); return; }
   if(a==='copts'){ const v = ($('#txcopts').value || '').split(',').map(x => x.trim()).filter(Boolean);
-    if(await 속성고치기(el.dataset.id, { opts:v })) { 속성타입판(k, el.dataset.id); toast('저장했어요'); } return; }
+    if(await 속성고치기(el.dataset.id, { opts:v })) { 속성타입판(k, el.dataset.id); toast('저장했습니다'); } return; }
   if(a==='chide'){ const c = W.cols.find(x => x.id === el.dataset.id); if(!c) return;
     if(await 속성고치기(c.id, { hidden: !c.hidden })) 속성다시(k); return; }
   if(a==='clock'){ const c = W.cols.find(x => x.id === el.dataset.id); if(!c) return;
@@ -3788,8 +3804,8 @@ async function txAct(a, el){
   if(a==='cdel'){ const c = W.cols.find(x => x.id === el.dataset.id); if(!c) return;
     if(!confirm('「'+c.name+'」 속성을 지울까요?\n이미 적어 둔 값은 안 보이게 돼요')) return;
     try{ await usend('tr_cols?id=eq.'+c.id, 'DELETE');
-      W.cols = W.cols.filter(x => x.id !== c.id); 속성다시(k); render(); toast('지웠어요'); }
-    catch(e){ toast('못 지웠어요 — '+e.message); }
+      W.cols = W.cols.filter(x => x.id !== c.id); 속성다시(k); render(); toast('삭제했습니다'); }
+    catch(e){ toast('삭제하지 못했습니다 — '+e.message); }
     return; }
   if(a==='tpl'){ const t = 표정의[k].템플릿[+el.dataset.i];
     txSheet(k, null, Object.assign({template:t.이름}, t.값));     /* 기본값을 채우고 */
@@ -3881,12 +3897,12 @@ async function txAct(a, el){
   if(a==='goal'){ const goal = { value:$('#txg1').value, quarter:$('#txg2').value };
     try{ await usend('staff?id=eq.'+ME.id, 'PATCH', { goal }); ME.goal = goal; toast('목표를 저장했어요'); }catch(e){ toast('못 저장했어요 — '+e.message); } return; }
   if(a==='pw'){ const pw = $('#txpw').value; if(pw.length<8){ toast('8자 이상이어야 해요'); return; }
-    try{ await 비번바꾸기(pw); toast('비밀번호를 바꿨어요'); $('#txpw').value=''; }catch(e){ toast('못 바꿨어요 — '+e.message); } return; }
+    try{ await 비번바꾸기(pw); toast('비밀번호를 바꿨어요'); $('#txpw').value=''; }catch(e){ toast('바꾸지 못했습니다 — '+e.message); } return; }
   if(a==='out'){ await signOut(); return; }
   if(a==='staffadd'){
     const email = ($('#txsmail').value||'').trim().toLowerCase(), name = ($('#txsname').value||'').trim(), role = $('#txsrole').value;
     if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ toast('메일 주소를 확인해 주세요'); return; }
-    if(!name){ toast('이름을 적어 주세요'); return; }
+    if(!name){ toast('이름을 입력하세요'); return; }
     const 색 = ['red','green','pink','yellow','orange','blue','purple','gray'][W.staff.length % 8];
     try{ const r = await usend('staff', 'POST', { email, name, role, color:색 }, 'return=representation');
       if(r && r[0]) W.staff.push(r[0]); toast(name+' 넣었어요'); txMe(); }
@@ -3896,7 +3912,7 @@ async function txAct(a, el){
     const p = W.staff.find(x=>x.id===id); if(!p) return;
     try{ const r = await usend('staff?id=eq.'+id, 'PATCH', { active: p.active===false }, 'return=representation');
       if(r && r[0]) Object.assign(p, r[0]); toast(p.name+(p.active===false?' 껐어요':' 켰어요')); txMe(); }
-    catch(e){ toast('못 바꿨어요 — '+e.message); }
+    catch(e){ toast('바꾸지 못했습니다 — '+e.message); }
     return; }
 }
 function txRender(){
