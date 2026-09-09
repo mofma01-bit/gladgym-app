@@ -789,7 +789,7 @@ body.tx-moving .tx-x{cursor:grabbing}
 
 <script>
 "use strict";
-const BUILD = '41';
+const BUILD = '42';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -2267,12 +2267,24 @@ function 줄세우기(rows, ord, key){
   });
 }
 
+/* ⛔ 서버는 한 번에 1000줄까지만 준다 — 그보다 많으면 나눠 받아야 한다
+   (2026-09-09 상담 1093건이 1000건에서 잘렸다) */
+async function 모두가져(path, 쪽=1000){
+  const 다 = [];
+  for(let i = 0; i < 30; i++){
+    const 한쪽 = await uget(path + '&limit=' + 쪽 + '&offset=' + (i * 쪽));
+    if(!한쪽 || !한쪽.length) break;
+    다.push(...한쪽);
+    if(한쪽.length < 쪽) break;
+  }
+  return 다;
+}
 async function loadWork(){
   const g = await Promise.all([
     uget('staff?select=*&order=name'),
-    uget('tr_tasks?select=*&order=created_at.desc&limit=3000'),
-    uget('tr_leads?select=*&order=created_at.desc&limit=3000'),
-    uget('tr_leave?select=*&order=day.desc&limit=1000'),
+    모두가져('tr_tasks?select=*&order=created_at.desc'),
+    모두가져('tr_leads?select=*&order=created_at.desc'),
+    모두가져('tr_leave?select=*&order=day.desc'),
     uget('tr_comments?select=*&order=created_at&limit=2000').catch(()=>[]),
     uget('tr_cols?select=*&order=sort').catch(()=>[]),        /* 표가 아직 없으면 빈 채로 */
     uget('tr_views?select=*&order=sort').catch(()=>[]),
