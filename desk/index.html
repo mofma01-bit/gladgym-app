@@ -996,7 +996,7 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 
 <script>
 "use strict";
-const BUILD = '72';
+const BUILD = '73';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -5022,7 +5022,7 @@ function 끊긴회원줄(N){
         + (x.gap===null ? '<span class="fd none">기간 모름</span>'
                         : '<span class="fd">'+x.gap+'<small>일</small></span>')
         + '<span class="fs">'+(x.없음
-            ? (x.gap===null ? '코멘트 없음' : x.gap+'일 동안 없음')
+            ? (x.gap===null ? '코멘트 없음' : '동안 코멘트 없음')
             : '마지막 코멘트 '+dayText(x.last))+'</span>'
         + '<span class="fw'+(x.운동!==null && x.운동<=7 ? ' hot' : '')+'">'
           + (x.운동수 ? '운동 '+x.운동수+'회 기록' : '운동 기록 없음')
