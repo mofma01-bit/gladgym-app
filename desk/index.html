@@ -922,7 +922,7 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 
 <script>
 "use strict";
-const BUILD = '65';
+const BUILD = '66';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -966,6 +966,7 @@ const 최고관리자세워짐 = () => (W.staff||[]).some(x => x.super === true 
 const 휴지통일수 = 60;
 let 휴지통 = [];                       /* 최고 관리자가 열어 볼 때만 채운다 */
 let 휴지통없음 = false;                /* 표가 아직 없으면 true — 그때는 지우기를 막는다 */
+let 휴지통읽음 = false;                /* 화면에 들어올 때 한 번만 읽는다 */
 
 async function 휴지통담기(tbl, row, 이름){
   if(!row) throw new Error('지울 줄을 못 찾았어요');
@@ -6476,7 +6477,12 @@ boot();
 setInterval(async function(){
   if(!ME) return;
   if(S.view==='members'||S.view==='today'||S.view==='cmall') load();
-  if(S.view==='trash'){ 휴지통청소().then(휴지통읽기).then(()=>render0()); }
+  /* ⛔ 이 줄은 render0 안에 있다. 조건 없이 다시 그리면 끝없이 돈다
+     (2026-09-17 배포본에서 확인). 화면에 **들어올 때 한 번만** 읽는다 */
+  if(S.view==='trash'){
+    if(!휴지통읽음){ 휴지통읽음 = true;
+      휴지통청소().then(휴지통읽기).then(()=>render0()).catch(()=>{}); }
+  } else 휴지통읽음 = false;
   if(S.view==='home'||표정의[S.view]){ try{ await loadWork(); if(!$('#pop').classList.contains('on')) render(); }catch(e){} }
 }, 60000);
 </script>
