@@ -1608,7 +1608,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '168';
+const BUILD = '169';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2695,7 +2695,7 @@ function vPick(){
       <div id="pickhint">
         <button class="pbtn etc" data-act="memoadd">
           <span class="ic">＋</span>
-          <span class="tx"><b>기타운동 추가</b><span>기능성 운동 및 검색에 없는 것 · 볼륨에는 안 들어갑니다</span></span>
+          <span class="tx"><b>기타운동 추가</b><span>검색에 없는 것</span></span>
           <span class="ar">›</span></button></div>
     </div>
     ${EX.map(e=>{ const vs=vars(e.id), n=cmOf(S.mid,e.id).length, last=lastSet(e.id);
@@ -2749,7 +2749,7 @@ function sheetMemoAdd(){
     <input class="search" type="text" data-k="memo:n" placeholder="예) 팔로프 프레스 · 케틀벨 스윙 · 밴드 워크">
     <div class="chips">${['팔로프 프레스','케틀벨 스윙','밴드 워크','TRX','메디신볼','박스 점프','스텝업','데드버그']
       .map(x=>`<button class="chip" data-act="memofill:${x}">${x}</button>`).join('')}</div>
-    <div class="note">여기 적은 것은 <b>기록으로 남지만</b> 무게·볼륨·증량 그래프에는 들어가지 않습니다.</div>
+    <div class="note">볼륨·그래프에는 안 들어갑니다</div>
     <button class="btn main sm" data-act="memogo">담기</button>
     <button class="btn ghost sm" data-act="close">그만두기</button>`);
 }
@@ -3216,7 +3216,7 @@ function vWorkout(){
       ${(!tr&&nw)?'<span class="pill t">NEW</span>':''}
       <span class="r">${dsc?'설명':'설명 없음'}${cms.length?` · 코멘트 ${cms.length}`:''} ›</span></button>`}
     ${isMemo(cur.ex)
-      ? `<div class="note">기록으로만 남깁니다 — 무게·볼륨은 세지 않아요</div>`
+      ? ''
       : cur.sets.map((s,i)=> (!cur.locked && i===보일칸) ? '' :
         `<button class="set ${cur.locked?'lock':(s.done?'done':(i===openIdx?'now':''))}" data-act="edit:${i}">
       <span class="i">${i+1}${e.cardio?'구간':'세트'}</span>
@@ -3371,11 +3371,7 @@ function 세로입력(cur, e, i){
                <span class="vd3">${i+1}${단위}째 기록</span></button>`}
       </div>
     </div>
-    <div class="vsub">
-      <span class="vh">${잠
-        ? `${i+1}${단위} 기록을 담았어요 — 이어서 하려면 <b>다음 ${단위}</b>`
-        : '숫자를 눌러 직접 적어도 되고, ▲▼ 를 길게 눌러도 됩니다'}</span>
-    </div>`;
+    `;
 }
 
 /* ── 시트들 ── */
@@ -3398,7 +3394,7 @@ function sheetEdit(i){
           value="${kgfmt(s.kg)}"><small>도</small></span>
         <button data-act="d:kg:${i}:1" data-rep="1">＋</button></div>
       <div class="unitlbl">이 기구는 경사가 <b>${경사최대(cur.ex)}도</b>까지 올라갑니다</div>` : ''}
-      <div class="unitlbl">숫자를 눌러 직접 적을 수 있어요 — ＋ － 를 길게 누르면 빨리 바뀝니다</div>`
+      `
     :`<div class="step"><span class="k">무게</span>
         <button data-act="d:kg:${i}:-2.5" data-rep="1">−</button>
         <span class="vin"><input type="text" inputmode="decimal" data-k="setkg" data-i="${i}"
@@ -3409,7 +3405,7 @@ function sheetEdit(i){
         <span class="vin"><input type="text" inputmode="numeric" data-k="setreps" data-i="${i}"
           value="${s.reps}"><small>회</small></span>
         <button data-act="d:reps:${i}:1" data-rep="1">＋</button></div>
-      <div class="unitlbl">숫자를 눌러 직접 적을 수 있어요 — ＋ － 를 길게 누르면 빨리 바뀝니다</div>`}
+      `}
     <div style="display:flex;gap:9px">
       ${s.done?`<button class="btn ghost" data-act="undone:${i}">완료 풀기</button>`
               :`<button class="btn gold" data-act="done:${i}">세트 완료</button>`}
