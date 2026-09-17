@@ -688,6 +688,8 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 .fd{font-size:24px;font-weight:800;color:var(--warn);line-height:1;letter-spacing:-.02em}
 .fd small{font-size:10.5px;font-weight:700;color:#a8796c;margin-left:2px}
 .fd.none{font-size:13px;font-weight:800}
+.fw{font-size:10.5px;color:#5f5a55;font-weight:700}
+.fw.hot{color:var(--teal)}
 .tx-face.tx-c-warn{background:var(--warn-dim);color:var(--warn)}
 .tx-face.tx-c-teal{background:var(--teal-dim);color:var(--teal)}
 .tx-face.tx-c-gold{background:var(--gold-dim);color:var(--gold)}
@@ -994,7 +996,7 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 
 <script>
 "use strict";
-const BUILD = '70';
+const BUILD = '71';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -4971,36 +4973,54 @@ function vHome(){
 
 /* 숫자 한 줄 */
 function 숫자줄(업무수, 상담수){
-  const 끊 = 끊긴목록().length;
+  const 밀 = 끊긴목록().length;
   const 요청 = D.asks.filter(a=>!a.done_at && 내담당(a.member_id)).length;
   const 안본 = D.c.filter(c=>!c.read_at && 내담당(c.member_id)).length;
   const 오늘운동 = D.w.filter(w=>w.on_date===TODAY && 내담당(w.member_id)).length;
   const it = (v, k, c) => '<button class="num'+(v?' '+c:' zero')+'"><span class="v">'+v+'</span><span class="k">'+k+'</span></button>';
   return '<div class="homenums">'
-    + it(끊,'기록 끊김','warn') + it(업무수,'내 업무','gold') + it(요청,'코멘트 요청','teal')
+    + it(밀,'코멘트 밀림','warn') + it(업무수,'내 업무','gold') + it(요청,'코멘트 요청','teal')
     + it(안본,'회원 안 봄','teal') + it(오늘운동,'오늘 운동','gold') + it(상담수,'오늘 상담','gold')
     + '</div>';
 }
-/* 기록이 끊긴 회원 — 앱 운동 기록 기준이다(출입 자료가 아니다) */
+/* ── 코멘트가 밀린 회원 ──
+   ⛔ 운동 기록이 아니라 **마지막으로 코멘트를 단 날**이 기준이다
+   (2026-09-17 대표: 「기록 끊김 말고 코멘트가 오래된 날 순으로 14일차부터 역순으로 떨어지게」)
+   · 14일 넘게 코멘트를 안 단 사람만 나온다
+   · 오래된 사람이 맨 위 — 한 번도 안 단 사람이 제일 위 */
+const 코멘트밀림일 = 14;
 function 끊긴목록(){
   return D.m.filter(x=>(x.role||'member')==='member' && 내담당(x.id)).map(function(m){
+    const cs = D.c.filter(c=>c.member_id===m.id)
+                  .sort((a,b)=> (a.created_at||'') < (b.created_at||'') ? 1 : -1);
+    const 마지막 = cs[0] ? (cs[0].created_at||'').slice(0,10) : null;
+    /* 회원이 스스로 한 운동은 따로 잰다 — 성격이 다른 신호라 섞지 않는다 */
     const ws = D.w.filter(w=>w.member_id===m.id && w.done).sort((a,b)=> a.on_date<b.on_date?1:-1);
-    return { m, gap: ws[0] ? daysAgo(ws[0].on_date) : null, last: ws[0]?ws[0].on_date:null };
-  }).filter(x=>x.gap===null || x.gap>=7).sort((a,b)=>(b.gap||9999)-(a.gap||9999));
+    const 운동날 = ws[0] ? ws[0].on_date : null;
+    return { m, gap: 마지막 ? daysAgo(마지막) : null, last: 마지막, 수: cs.length,
+             운동: 운동날 ? daysAgo(운동날) : null, 운동날 };
+  }).filter(x => x.gap === null || x.gap >= 코멘트밀림일)
+    .sort((a,b) => (b.gap === null ? 99999 : b.gap) - (a.gap === null ? 99999 : a.gap));
 }
 function 끊긴회원줄(N){
-  const 다 = 끊긴목록().slice(0, N);
+  const 온 = 끊긴목록();
+  const 다 = 온.slice(0, N);
   return '<div class="tx-home one"><div class="sec">'
-    + '<div class="lbl">기록이 끊긴 회원 '+끊긴목록().length+'명'
-    + '<span class="r" data-act="go" data-k="members">전부 보기 ›</span></div>'
+    + '<div class="lbl">코멘트 밀린 회원 '+온.length+'명'
+    + ' <span style="color:#6f6a63;font-weight:600">'+코멘트밀림일+'일 넘게 안 단 사람 · 오래된 순</span>'
+    + '<span class="r" data-act="go" data-k="cmall">전부 보기 ›</span></div>'
     + (다.length ? '<div class="faces">' + 다.map(x =>
-        '<button class="face" data-m="'+esc(x.m.id)+'" data-tab="routine">'
+        '<button class="face" data-m="'+esc(x.m.id)+'" data-tab="comment">'
         + 얼굴(Object.assign({}, x.m, {color:'warn'}), 46)
         + '<span class="fn2">'+esc(x.m.name)+'</span>'
-        + (x.gap===null ? '<span class="fd none">기록 없음</span>'
+        + (x.gap===null ? '<span class="fd none">한 번도</span>'
                         : '<span class="fd">'+x.gap+'<small>일</small></span>')
-        + '<span class="fs">'+(x.last?'마지막 '+dayText(x.last):'앱을 아직 안 썼어요')+'</span></button>').join('') + '</div>'
-      : '<div class="empty">모두 잘 나오고 있어요</div>') + '</div></div>';
+        + '<span class="fs">'+(x.last ? '마지막 코멘트 '+dayText(x.last) : '코멘트가 없어요')+'</span>'
+        + '<span class="fw'+(x.운동!==null && x.운동<=7 ? ' hot' : '')+'">'
+          + (x.운동===null ? '운동 기록 없음'
+             : (x.운동<=7 ? '운동은 '+x.운동+'일 전 — 오고 있어요' : '운동도 '+x.운동+'일 전'))
+          + '</span></button>').join('') + '</div>'
+      : '<div class="empty">'+코멘트밀림일+'일 넘게 밀린 회원이 없어요</div>') + '</div></div>';
 }
 /* 코멘트 — 요청과 아직 안 단 것 */
 function 코멘트줄(N){
@@ -5027,7 +5047,7 @@ const 홈블록 = [
   { k:'notice',이름:'대표 공지',        설명:'읽어야 하는 공지' },
   { k:'nums',  이름:'숫자 한 줄',       설명:'업무 · 기록 끊김 · 코멘트 …' },
   { k:'tasks', 이름:'내 업무',          설명:'남은 업무' },
-  { k:'cold',  이름:'기록 끊긴 회원',   설명:'오래 기록이 없는 회원' },
+  { k:'cold',  이름:'코멘트 밀린 회원',  설명:'코멘트를 오래 안 단 사람부터' },
   { k:'cm',    이름:'코멘트',           설명:'요청 · 아직 안 단 것' },
   { k:'leads', 이름:'오늘 상담',        설명:'오늘 잡힌 상담' },
   { k:'today', 이름:'오늘 수업 · 루틴',  설명:'오늘 운동과 지정한 루틴' },
