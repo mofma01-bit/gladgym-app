@@ -1608,7 +1608,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '167';
+const BUILD = '168';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1775,9 +1775,32 @@ async function boot(){
 }
 
 /* 어제까지의 안 끝낸 기록은 그날로 마감한다 — 「기록 중」으로 계속 떠 있지 않게 */
-const CAP_EX = 2*3600, CAP_W = 8*3600;         /* 2026-09-17 대표: 8시간이 적정 */
-const 강제종료 = 8*3600*1000;                   /* 이만큼 지나면 손 안 대도 마무리한다 */
+const CAP_EX = 2*3600, CAP_W = 8*3600;         /* 기록 길이의 상한 — 판단 기준이 아니다 */
+const 놀린한계 = 3*3600*1000;                   /* 아무것도 안 건드리고 이만큼이면 끝난 것으로 본다 */
+const 안정심박분 = 20;                          /* ③ 워치가 붙으면 쓸 값 — 아직 안 쓴다 */
 const capSec = (n, cap) => Math.max(0, Math.min(Math.round(Number(n)||0), cap));
+
+/* ══ 운동이 끝났는지 재는 자 — 판단은 오직 여기서만 한다 ══
+   (2026-09-17 대표: 「하나의 판단기준을 신설하는거지」)
+   기준이 늘면 **이 함수에 한 줄만** 더한다. 다른 곳에 흩뿌리지 않는다.
+     ① 날짜가 지났다
+     ② 아무것도 안 건드리고 3시간 (`w.touch`)
+     ③ 안정시 심박수가 20분 이상 이어졌다 — **워치가 붙으면 시행.** 지금은 심박수를 받는 데가 없다
+   ⛔ 「끝났나」와 「얼마나 했나」는 다른 자다.
+      끝났는지는 `w.touch`(손댄 시각)로, 얼마나 했는지는 `s.at`(세트 체크 시각)로 잰다.
+      운동만 담고 세트는 안 찍은 시간은 「아직 하는 중」이지만 「운동한 시간」은 아니기 때문이다. */
+function 끝났나(w){
+  if(!w || w.done) return null;
+  if(w.date && w.date < TODAY) return '날짜가 지나';
+  const 마지막 = w.touch || 마지막체크(w) || w.startAt || 0;
+  if(마지막 && Date.now() - 마지막 >= 놀린한계) return '3시간 동안 손대지 않아';
+  /* ③ 워치 연동되면 여기 한 줄:
+     if(안정심박이어진분(w) >= 안정심박분) return '안정시 심박수가 '+안정심박분+'분 이어져'; */
+  return null;
+}
+/* 뭐든 누르면 시계가 처음부터 다시 간다 — 손잡이 한 곳에서 찍으므로
+   앞으로 새 동작이 생겨도 저절로 들어온다 */
+function 손댐(){ const w = live(); if(w && !w.done){ w.touch = Date.now(); } }
 
 /* 마지막으로 세트를 체크한 시각 — 세트를 완료할 때 s.at 에 찍어 둔다.
    (2026-09-17 대표: 「마지막으로 반복수체크한 시간까지를 운동 종료시간으로」) */
@@ -1806,10 +1829,7 @@ function 접기(w, 왜){
    ① 날짜가 지났거나 ② 시작한 지 8시간이 지났으면 스스로 접는다.
    접을 때 길이는 지금 시각이 아니라 **마지막으로 체크한 세트 시각**까지다. */
 function closeStale(){
-  const 지금 = Date.now();
-  const old = D.workouts.filter(w => !w.done && (
-    (w.date && w.date < TODAY) ||
-    (w.startAt && 지금 - w.startAt >= 강제종료)));
+  const old = D.workouts.filter(w => !!끝났나(w));
   if(!old.length) return 0;
   old.forEach(w => 접기(w, '오래된 기록 자동 종료'));
   if(D.live && old.some(w => w.id === D.live.id)) { D.live = null; save(); }
@@ -1823,12 +1843,12 @@ function 오래됐나(){
   if(지금 - 접기본때 < 60000) return;
   접기본때 = 지금;
   const w = live();
-  if(!(w && w.startAt && 지금 - w.startAt >= 강제종료)) return;
-  const dur = 접기(w, '8시간이 지나 자동 종료');
+  const 왜 = 끝났나(w); if(!왜) return;
+  const dur = 접기(w, 왜 + ' 자동 종료');
   const i = D.workouts.findIndex(x => x.id === w.id);
   if(i < 0) D.workouts.unshift(w);
   D.live = null; save();
-  toast('8시간이 지나 운동을 마무리했어요 — ' + durTxt(dur));
+  toast(왜 + ' 운동을 마무리했어요 — ' + durTxt(dur));
   render();
 }
 
@@ -6900,6 +6920,7 @@ document.addEventListener('click', ev=>{
   /* 길게 눌러 끝낸 직후의 「따라오는 눌림」은 흘려보낸다 (풀자마자 다시 잠기지 않게) */
   if(!el.hasAttribute('data-syn') && S.heldAt && Date.now()-S.heldAt < 600){ S.heldAt=0; return; }
   const a=el.getAttribute('data-act'), [k,...rest]=a.split(':'), w=live();
+  손댐();                                    /* 뭐든 누르면 「끝났나」 시계가 다시 간다 */
   /* 「운동 중으로 돌아가기」만은 잠겨도 열어 둔다 — 자물쇠가 거기 있기 때문이다.
      막아 두면 앱을 다시 켰을 때 홈에 갇힌다 (2026-09-04 확인). */
   if(잠금이막는것[k] && 잠겼나() && !(k==='go' && rest[0]==='workout')){
