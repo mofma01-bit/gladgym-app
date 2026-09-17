@@ -657,6 +657,9 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 .mb-n{display:block;font-size:15px;font-weight:800;letter-spacing:-.01em}
 .mb-n i{font-style:normal;font-size:10.5px;font-weight:800;color:var(--sub);
   background:var(--dark-4);border-radius:7px;padding:2px 7px;margin-left:8px;vertical-align:2px}
+.mb-s.empty{color:#4d4a45}
+.only{font-size:10.5px;font-weight:800;color:var(--gold);background:var(--gold-dim);
+  border-radius:7px;padding:2px 8px;margin-left:8px;vertical-align:2px}
 .mb-s{display:block;font-size:12px;color:var(--sub);margin-top:3px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mb-q{flex:none;max-width:340px;padding:8px 13px;border-left:1px solid var(--line)}
@@ -999,7 +1002,7 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 
 <script>
 "use strict";
-const BUILD = '75';
+const BUILD = '77';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -1612,8 +1615,7 @@ function 지정판그리기(){
         + esc((D.r.find(x=>x.id===그날.routine_id)||{}).name || '루틴') + '</b> ('
         + esc(그날.kind||'') + ')로 잡혀 있어요 — 다시 지정하면 바뀝니다</div>' : '')
     + (kind === '개인운동'
-      ? '<div class="hr2"></div><div class="t2" style="line-height:1.6">날짜를 안 정하고 <b>다음 개인운동 때</b> 뜨게 하려면'
-        + ' 루틴의 <b>지정</b> 대신 아래 <b>추천</b>을 쓰세요. 최대 2개 (' + recos.length + '/2)</div>' : '')
+      ? '' : '')
     + '</div>'
 
     + '<div class="sec"><div class="lbl">루틴 ' + rs.length + '개'
@@ -3241,9 +3243,7 @@ function txTable(key, rows){
   return '<div class="tx-tw"><div class="tx-table'+(얼렸나(key)?' frz':'')+'" style="grid-template-columns:'+폭+'">'
     + 머리 + rows.map(줄).join('') + '</div></div>'
     + (관리자() || true ? '<button class="tx-newrow" data-act="tx:rownew" data-k="'+key+'">＋ 새 '+표정의[key].제목+'</button>' : '')
-    + '<div class="tx-help">칸을 누르면 <b>선택</b> · <b>방향키</b>로 이동 · <b>Enter</b>나 한 번 더 누르면 수정 · '
-    + '수정 중 <b>Tab</b>은 옆 칸 · <b>Shift+방향키</b>로 여러 칸 · <b>Ctrl+D</b> 아래로 채우기 · '
-    + '<b>Ctrl+R</b> 오른쪽으로 채우기 · <b>Esc</b> 취소</div>';
+    ;
 }
 /* ── 칸 안에서 바로 치기 · 키보드로 옮겨 다니기 ──
    (2026-09-09 대표: 「텍스트 박스가 아래 따로 뜨는 게 아니라 바로 적을 수 있게 ·
@@ -4942,11 +4942,11 @@ function vHome(){
       + '<span class="mb-tx">'
       + '<span class="mb-n">' + esc(ME.name)
         + '<i>' + ({admin:'관리자',trainer:'트레이너',fc:'FC'}[ME.role]||ME.role) + '</i></span>'
-      + '<span class="mb-s">' + (g.value ? esc(g.value) : '슬로건을 적어 주세요 — 눌러서 씁니다') + '</span>'
+      + '<span class="mb-s' + (g.value ? '' : ' empty') + '">' + (g.value ? esc(g.value) : '슬로건') + '</span>'
       + '</span>'
       + '<span class="mb-q' + (g.quarter ? '' : ' none') + '">'
       + '<b>' + esc(이번분기()) + ' 목표</b>'
-      + '<span>' + (g.quarter ? esc(g.quarter) : '아직 안 적었어요 — 매분기마다 기입해 주세요!') + '</span>'
+      + '<span>' + (g.quarter ? esc(g.quarter) : '＋ 적기') + '</span>'
       + '</span></button>' : '';
 
   const 공지판 = 공지.length ? '<div class="sec" style="margin-bottom:14px">'
@@ -5021,7 +5021,6 @@ function 끊긴회원줄(N){
   const 다 = 온.slice(0, N);
   return '<div class="tx-home one"><div class="sec">'
     + '<div class="lbl">코멘트 밀린 회원 '+온.length+'명'
-    + ' <span style="color:#6f6a63;font-weight:600">'+코멘트밀림일+'일 넘게 안 단 사람 · 오래된 순</span>'
     + '<span class="r" data-act="go" data-k="cmall">전부 보기 ›</span></div>'
     + (다.length ? '<div class="faces">' + 다.map(x =>
         '<button class="face" data-m="'+esc(x.m.id)+'" data-tab="comment">'
@@ -5060,15 +5059,15 @@ function 코멘트줄(N){
 /* ⛔ `mine` 은 vCmAll·vToday 안에만 있는 지역 이름이다. 홈은 제 것을 쓴다 */
 const 내담당 = mid => S.who === '전체' || (memOf(mid).trainer || '') === S.who;
 const 홈블록 = [
-  { k:'band',  이름:'내 이름표',        설명:'사진 · 슬로건 · 분기 목표' },
-  { k:'notice',이름:'대표 공지',        설명:'읽어야 하는 공지' },
-  { k:'nums',  이름:'숫자 한 줄',       설명:'업무 · 기록 끊김 · 코멘트 …' },
-  { k:'tasks', 이름:'내 업무',          설명:'남은 업무' },
-  { k:'cold',  이름:'코멘트 밀린 회원',  설명:'코멘트를 오래 안 단 사람부터' },
-  { k:'cm',    이름:'코멘트',           설명:'요청 · 아직 안 단 것' },
-  { k:'leads', 이름:'오늘 상담',        설명:'오늘 잡힌 상담' },
-  { k:'today', 이름:'오늘 수업 · 루틴',  설명:'오늘 운동과 지정한 루틴' },
-  { k:'leave', 이름:'이번 주 연월차',   설명:'승인 대기 포함' },
+  { k:'band',  이름:'내 이름표' },
+  { k:'notice',이름:'대표 공지' },
+  { k:'nums',  이름:'숫자 한 줄' },
+  { k:'tasks', 이름:'내 업무' },
+  { k:'cold',  이름:'코멘트 밀린 회원' },
+  { k:'cm',    이름:'코멘트 요청' },
+  { k:'leads', 이름:'오늘 상담' },
+  { k:'today', 이름:'오늘 수업 · 루틴' },
+  { k:'leave', 이름:'이번 주 연월차' },
 ];
 /* ══ 꾸밈 규격 ══ 넓힐 때는 **이 표에 한 줄만** 더한다. 판은 표를 보고 저절로 그려진다.
    (2026-09-17 대표: 「커스텀하는 영역은 규정해야겠지 · 넓혀나갈거니까 뼈대부터 잡아」)
@@ -5084,11 +5083,10 @@ const 홈블록 = [
      고름  몇 개 중 하나 (칩)
      숫자  몇 개 중 하나 (칩, 숫자) */
 const 꾸밈규격 = [
-  { k:'차례', 꼴:'차례', 이름:'블록 차례',   설명:'끌어서 차례를 바꾸고, 눈을 눌러 끕니다', 기본:null },
-  { k:'줄수', 꼴:'숫자', 이름:'한 블록에 몇 줄까지', 값:[3,5,8,12], 기본:5 },
+  { k:'차례', 꼴:'차례', 이름:'블록', 기본:null },
+  { k:'줄수', 꼴:'숫자', 이름:'줄 수', 값:[3,5,8,12], 기본:5 },
   { k:'색',   꼴:'고름', 이름:'내 이름표 색',
-    값:[['gold','금색'],['teal','청록'],['warn','살구'],['cream','흰색']], 기본:'gold',
-    밑말:'바탕은 모두 같게 둡니다 — 브랜드 톤이라 바꾸지 않습니다' },
+    값:[['gold','금색'],['teal','청록'],['warn','살구'],['cream','흰색']], 기본:'gold' },
 ];
 const 홈기본 = (()=>{ const o = { 차례:홈블록.map(x=>x.k), 끔:{} };
   꾸밈규격.forEach(x => { if(x.기본 != null) o[x.k] = x.기본; }); return o; })();
@@ -5118,7 +5116,7 @@ function 홈꾸미기(){
         const b = 홈블록.find(z=>z.k===k) || {이름:k}; const 꺼짐 = !!h.끔[k];
         return '<div class="hmrow'+(꺼짐?' off':'')+'" data-hmi="'+i+'">'
           + '<span class="grip">⠿</span>'
-          + '<span class="tx"><b>'+esc(b.이름)+'</b><i>'+esc(b.설명||'')+'</i></span>'
+          + '<span class="tx"><b>'+esc(b.이름)+'</b></span>'
           + '<button class="eye" data-act="tx:hmtog" data-v2="'+esc(k)+'">'+(꺼짐?'🙈':'👁')+'</button></div>'; }).join('')
         + '</div>';
     const 값들 = x.꼴 === '숫자' ? x.값.map(v=>[v, v+'줄']) : x.값;
@@ -5126,16 +5124,10 @@ function 홈꾸미기(){
       '<button class="chip '+(String(h[x.k])===String(v[0])?'on':'')+'" '
       + 'data-act="tx:hmset" data-f="'+esc(x.k)+'" data-v2="'+esc(v[0])+'">'+esc(v[1])+'</button>').join('') + '</div>';
   };
-  판열기('내 홈 꾸미기',
-    꾸밈규격.map(x => '<div class="sec"><div class="lbl">'+esc(x.이름)
-      + (x.꼴==='차례' ? ' <span class="r" style="color:#6f6a63;font-weight:600">'+esc(x.설명)+'</span>' : '')
-      + '</div>' + 칸(x)
-      + (x.밑말 ? '<div class="t2" style="margin-top:8px;color:#6f6a63">'+esc(x.밑말)+'</div>' : '')
-      + '</div>').join('')
-    + '<div class="sec"><button class="btn ghost" data-act="tx:hmreset">처음 모양으로 되돌리기</button></div>'
-    + '<div class="t2" style="color:#5f5a55;line-height:1.7">여기서 바꾼 것은 <b>내 화면에만</b> 듭니다.'
-    + ' 표의 보기·필터·칸 차례는 「모두에게 저장」 쪽입니다.</div>',
-    '<div class="tx-fbtns"><span class="tx-stat">바꾸면 바로 저장됩니다</span>'
+  판열기('내 홈 꾸미기 <span class="only">나만</span>',
+    꾸밈규격.map(x => '<div class="sec"><div class="lbl">'+esc(x.이름)+'</div>' + 칸(x) + '</div>').join('')
+    + '<div class="sec"><button class="btn ghost" data-act="tx:hmreset">처음 모양으로</button></div>',
+    '<div class="tx-fbtns"><span class="tx-stat"></span>'
     + '<button class="btn gold" data-act="popclose">닫기</button></div>');
 }
 /* 꾸미기 판에서 끌어 차례 바꾸기 */
@@ -5233,14 +5225,14 @@ function txMe(){
       + ({admin:'관리자',trainer:'트레이너',fc:'FC'}[ME.role]||ME.role)+' · '+esc((AUTH.user||{}).email||'')+'</div></div>'
       + '<button class="btn ghost sm" data-act="tx:photo">'+(ME.photo?'사진 바꾸기':'＋ 사진')+'</button>'
       + (ME.photo ? '<button class="btn ghost sm" data-act="tx:photox">빼기</button>' : '') + '</div>'
-    + '<div class="fld"><span class="fn">슬로건 — 나의 핵심 가치</span><input class="inp" id="txg1" value="'+esc(g.value||'')+'" placeholder="예: 변하지 않는 진정성으로 회원님의 도전을 서포트한다"></div>'
-    + '<div class="fld"><span class="fn">'+esc(이번분기())+' 목표 <b style="color:var(--gold)">— 매분기마다 기입해 주세요!</b></span>'
+    + '<div class="fld"><span class="fn">슬로건</span><input class="inp" id="txg1" value="'+esc(g.value||'')+'" placeholder="예: 변하지 않는 진정성으로 회원님의 도전을 서포트한다"></div>'
+    + '<div class="fld"><span class="fn">'+esc(이번분기())+' 목표</span>'
       + '<input class="inp" id="txg2" value="'+esc(g.quarter||'')+'" placeholder="예: 평균 매출 800 이상"></div>'
     + '<button class="btn sub" data-act="tx:goal">목표 저장</button>'
     + (()=>{ const 지난 = (g.지난||[]).slice().reverse();
         return 지난.length ? '<div class="lbl" style="margin-top:12px">지난 목표 '+지난.length+'개</div>'
           + '<div class="tx-past">' + 지난.map(x=>'<div class="pq"><b>'+esc(x.q)+'</b><span>'+esc(x.tx||'')+'</span></div>').join('') + '</div>'
-          : '<div class="t2" style="margin-top:9px;color:#6f6a63">분기가 바뀌어 목표를 새로 적으면 지난 목표가 여기 쌓입니다</div>'; })()
+          : ''; })()
     + (관리자() ? '<div class="lbl" style="margin-top:6px">회원 화면에서 누구로 볼까요</div><div class="tx-pchips">'
         + ['전체'].concat([...new Set(D.m.map(x=>x.trainer).filter(Boolean))]).map(t=>'<button class="tx-pchip '+(S.who===t?'on':'')+'" data-setwho="'+esc(t)+'">'+esc(t==='전체'?'전체 보기':t)+'</button>').join('')+'</div>' : '')
     + (관리자() ? '<div class="lbl" style="margin-top:8px">직원 관리 <span class="r" style="color:var(--sub);font-weight:500">구글 메일을 넣으면 그 사람이 들어올 수 있어요</span></div>'
@@ -5836,7 +5828,7 @@ function render0(){
     top.innerHTML = '<h1>오늘</h1><span class="cnt">' + dateFull(TODAY) + '</span>';
     b.innerHTML = vToday();
   } else if(S.view==='trash'){
-    top.innerHTML = '<h1>휴지통</h1><span class="cnt">' + 휴지통일수 + '일 지나면 저절로 사라집니다</span>';
+    top.innerHTML = '<h1>휴지통</h1>';
     b.innerHTML = vTrash();
   }
 
