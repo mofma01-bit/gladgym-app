@@ -320,6 +320,21 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .phstrip .pt{flex:none;width:86px;border-radius:11px;overflow:hidden;
   background:#0e0e0d;border:1px solid var(--line)}
 .phstrip .pt img{width:100%;height:106px;object-fit:cover;display:block}
+/* ⛔ 화면 밖의 무음 영상은 크롬이 전력 절약으로 멈춘다
+   ("video-only background media was paused to save power")
+   → 줄이는 동안 **보이게** 튼다. 얼마나 남았는지도 같이 보인다 */
+.vidwork{position:fixed;inset:0;z-index:99;background:rgba(10,10,9,.95);
+  display:flex;align-items:center;justify-content:center;padding:22px}
+.vw-box{width:100%;max-width:330px;text-align:center}
+.vw-t{font-size:16px;font-weight:800;color:var(--cream);margin-bottom:4px}
+.vw-s{font-size:12px;font-weight:500;color:var(--sub);margin-bottom:14px}
+.vw-box video{width:100%;max-height:46vh;border-radius:12px;background:#000;display:block}
+.vw-bar{height:6px;border-radius:99px;background:var(--dark-4);overflow:hidden;margin-top:14px}
+.vw-bar i{display:block;height:100%;width:0;background:var(--gold);transition:width .25s}
+.phstrip .pt video{width:100%;height:106px;object-fit:cover;display:block;background:#000}
+.phstrip .pt.vid{position:relative}
+.phstrip .pt.vid::after{content:'▶';position:absolute;left:50%;top:44px;transform:translate(-50%,-50%);
+  font-size:15px;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.8);pointer-events:none}
 .phstrip .pt span{display:block;font-size:10.5px;font-weight:700;color:#8f8a83;padding:5px 2px;text-align:center}
 .lrbar{display:flex;height:34px;border-radius:9px;overflow:hidden;background:var(--dark-3);border:1px solid var(--line)}
 .lrbar span{display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;min-width:34px}
@@ -1608,7 +1623,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '169';
+const BUILD = '170';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -6058,6 +6073,7 @@ function bodyPane(mid){
   const L = (S.bpL && ds.includes(S.bpL)) ? S.bpL : ds[0];
   const R = (S.bpR && ds.includes(S.bpR)) ? S.bpR : ds[ds.length-1];
   const ai = bphOf(mid, 'ai');
+  const vids = bphOf(mid, 'vid');
   const all = bphOf(mid, 'body');
   const groups = [...new Set(BODY_TESTS.map(t=>t.g))];
   const done = Object.keys(b.checks||{}).length;
@@ -6094,6 +6110,15 @@ function bodyPane(mid){
           <img src="${esc(phURL(x.path))}" alt="" onerror="picFail(this)"><span>${mdTxt(x.date)}</span></button>`).join('')}</div>`
       : '<div class="empty">아직 없어요</div>'}
     ${tr?`<button class="btn sub sm" data-act="bpadd:ai">＋ AI 사진 넣기</button>`:''}
+
+    <div class="hr"></div>
+    <span class="lbl">영상 · ${vids.length}개</span>
+    ${vids.length
+      ? `<div class="phstrip">${vids.slice().reverse().map(x=>`<button class="pt vid" data-act="bpview:${x.id}">
+          <video src="${esc(phURL(x.path))}#t=0.1" preload="metadata" muted playsinline></video>
+          <span>${mdTxt(x.date)}</span></button>`).join('')}</div>`
+      : '<div class="empty">아직 없어요</div>'}
+    <button class="btn sub sm" data-act="bpvid">＋ 영상 넣기</button>
 
     ${all.length ? `<div class="hr"></div>
       <span class="lbl">사진 모두 · ${all.length}장</span>
@@ -6156,6 +6181,133 @@ function bpAdd(kind){
   inp.click();
 }
 
+/* ── 영상 넣기 (2026-09-17 대표: 「영상업로드 추가하고 · 직접 올리는거야」) ──
+   ⛔ 왜 다시 굽는가 — 폰이 찍은 1080p60 은 1분에 90MB 다. 저장소도 전송량도 못 버틴다.
+      긴 변 720 · 1.2Mbps 로 다시 구우면 30초에 4MB 안팎이 된다.
+   ⛔ 소리는 담지 않는다 — 폼을 보는 영상이고, 옆 사람 말소리가 같이 올라가면 안 된다. */
+const 영상최대초 = 60;
+const 영상최대MB = 45;
+function 영상줄이기(file, 알림){
+  return new Promise((res, rej) => {
+    const 판 = document.createElement('div');
+    판.className = 'vidwork';
+    판.innerHTML = '<div class="vw-box"><div class="vw-t">영상을 줄이는 중이에요</div>'
+      + '<div class="vw-s">영상 길이만큼 걸립니다 · 다른 앱으로 가면 멈췄다 이어집니다</div>'
+      + '<div class="vw-bar"><i></i></div></div>';
+    const v = document.createElement('video');
+    v.muted = true; v.defaultMuted = true; v.playsInline = true; v.preload = 'auto';
+    v.setAttribute('muted',''); v.setAttribute('playsinline','');
+    document.body.appendChild(판);
+    판.querySelector('.vw-box').insertBefore(v, 판.querySelector('.vw-bar'));
+    const 막대 = 판.querySelector('.vw-bar i');
+    let 보임바뀜 = null;
+    const 치우기 = () => { try{ v.pause(); }catch(e){} try{ 판.remove(); }catch(e){}
+      if(보임바뀜) document.removeEventListener('visibilitychange', 보임바뀜); };
+    v.src = URL.createObjectURL(file);
+    v.onerror = () => { 치우기(); rej(new Error('영상을 읽지 못했어요')); };
+    v.onloadedmetadata = () => {
+      const dur = v.duration || 0;
+      if(dur > 영상최대초 + 2){ 치우기();
+        rej(new Error(영상최대초 + '초까지만 올라갑니다 — 지금 ' + Math.round(dur) + '초예요')); return; }
+      let w = v.videoWidth, h = v.videoHeight;
+      const sc = Math.min(1, 720 / Math.max(w, h));
+      w = Math.max(2, Math.round(w * sc / 2) * 2);
+      h = Math.max(2, Math.round(h * sc / 2) * 2);
+      const 꼴 = (typeof MediaRecorder !== 'undefined')
+        ? ['video/mp4;codecs=avc1', 'video/webm;codecs=vp9', 'video/webm'].find(t => MediaRecorder.isTypeSupported(t))
+        : null;
+      const 구울수있나 = !!꼴 && !!(HTMLCanvasElement.prototype.captureStream);
+      /* 못 굽는 브라우저 — 작은 것만 원본 그대로 받는다 */
+      if(!구울수있나){
+        치우기();
+        if(file.size <= 영상최대MB * 1048576)
+          return res({ blob:file, ext:(String(file.type).indexOf('webm') >= 0 ? 'webm' : 'mp4'), 원본:true });
+        return rej(new Error('이 브라우저가 영상을 줄이지 못해요 — 더 짧게 찍어 주세요'));
+      }
+      const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+      const cx = cv.getContext('2d');
+      let rec;
+      try{ rec = new MediaRecorder(cv.captureStream(30), { mimeType:꼴, videoBitsPerSecond:1200000 }); }
+      catch(e){ 치우기(); return rej(new Error('영상을 줄이지 못했어요')); }
+      const 조각 = [];
+      rec.ondataavailable = e => { if(e.data && e.data.size) 조각.push(e.data); };
+      rec.onstop = () => { 치우기(); res({ blob:new Blob(조각, { type:꼴.split(';')[0] }),
+                               ext:(꼴.indexOf('mp4') >= 0 ? 'mp4' : 'webm') }); };
+      let raf = 0, 지난 = -1;
+      const 그리기 = () => {
+        if(v.ended) return;
+        if(v.paused){ raf = requestAnimationFrame(그리기); return; }   /* 멈춰 있으면 굽지 않고 기다린다 */
+        cx.drawImage(v, 0, 0, w, h);
+        if(dur){ const pc = Math.min(100, Math.round(v.currentTime / dur * 100));
+          막대.style.width = pc + '%';
+          const n = Math.floor(pc / 10) * 10;
+          if(알림 && n !== 지난){ 지난 = n; 알림(n); } }
+        raf = requestAnimationFrame(그리기);
+      };
+      v.onended = () => { cancelAnimationFrame(raf); setTimeout(() => { try{ rec.stop(); }catch(e){} }, 150); };
+      /* ⛔ 화면이 가려지면 브라우저가 무음 영상을 스스로 멈춘다.
+         굽기를 **재생에 묶어** 둔다 — 안 묶으면 멈춘 동안 그림 없이 구워져 알맹이가 날아간다
+         (실제로 5초짜리가 1.1초로 잘렸다) */
+      v.onpause = () => { try{ if(rec.state === 'recording') rec.pause(); }catch(e){} };
+      v.onplay  = () => { try{ if(rec.state === 'paused') rec.resume(); }catch(e){} };
+      const 이어감 = () => { if(v.ended || !v.paused) return; v.play().then(그리기).catch(() => {}); };
+      보임바뀜 = () => { if(document.visibilityState === 'visible') 이어감(); };
+      document.addEventListener('visibilitychange', 보임바뀜);
+      try{ rec.start(500); }catch(e){ 치우기(); return rej(new Error('영상을 줄이지 못했어요')); }
+      v.play().then(그리기).catch(er => {
+        if(document.visibilityState !== 'visible') return;   /* 가려졌을 뿐 — 돌아오면 이어간다 */
+        console.error('영상 줄이기', er); 치우기(); try{ rec.stop(); }catch(e2){}
+        rej(new Error('영상을 열지 못했어요')); });
+    };
+  });
+}
+function bpVid(){
+  const inp = document.createElement('input');
+  inp.type='file'; inp.accept='video/*';
+  inp.style.display='none'; document.body.appendChild(inp);
+  inp.addEventListener('change', async () => {
+    const f = inp.files && inp.files[0]; inp.remove();
+    if(!f) return;
+    try{
+      const r = await 영상줄이기(f);
+      S.bpVid = { url:URL.createObjectURL(r.blob), blob:r.blob, ext:r.ext,
+                  mb:Math.round(r.blob.size / 1048576 * 10) / 10 };
+      S.bpNewDate = TODAY;
+      sheetBpVid();
+    }catch(e){ console.error(e); toast(e.message || '영상을 읽지 못했어요'); }
+  });
+  inp.click();
+}
+function sheetBpVid(){
+  const V = S.bpVid; if(!V) return;
+  openSheet(()=>`
+    <div class="h2">영상 <small>넣기 · ${V.mb}MB</small></div>
+    <video src="${V.url}" controls playsinline
+      style="width:100%;max-height:44vh;border-radius:12px;background:#000"></video>
+    <div class="fld" style="margin-top:10px"><span class="fn">찍은 날</span>
+      <input class="search" type="date" data-k="bp:d" value="${S.bpNewDate||TODAY}"></div>
+    <button class="btn blue sm" data-act="bpvgo">넣기</button>
+    <button class="btn ghost sm" data-act="close">그만두기</button>`);
+}
+async function bpVidUpload(){
+  const V = S.bpVid; if(!V) return;
+  const el = document.querySelector('[data-k="bp:d"]');
+  const date = (el && el.value) || S.bpNewDate || TODAY;
+  const mid = S.bpMid;
+  const id = 'bv' + Date.now();
+  const path = `body/${mid}/${id}.${V.ext}`;
+  closeSheet(); toast('올리는 중이에요');
+  const r = await fetch(SB_URL+'/storage/v1/object/media/'+path, {
+    method:'POST', headers:{ apikey:SB_KEY, Authorization:'Bearer '+SB_KEY,
+      'Content-Type': (V.ext === 'webm' ? 'video/webm' : 'video/mp4') }, body: V.blob });
+  if(!r.ok){ toast('영상을 못 올렸어요'); console.error(await r.text()); return; }
+  await sv(spost('body_photos',[{ id, member_id:mid, kind:'vid', pose:'영상', on_date:date, path, memo:'' }]), '영상 저장');
+  D.bph = D.bph || [];
+  D.bph.push({ id, mid, kind:'vid', pose:'영상', date, path, memo:'' });
+  S.bpVid = null;
+  toast('넣었어요'); render();
+}
+
 function shrinkPhoto(file){
   return new Promise((res, rej) => {
     const img = new Image();
@@ -6210,12 +6362,15 @@ function sheetBpView(id){
   const tr = (S.who==='tr'), own = tr || (x.kind !== 'ai');
   openSheet(()=>`
     <div class="h2">${esc(dateTxt(x.date))} <small>${x.kind==='ai'?'AI 체형분석':esc(x.pose)}</small></div>
-    ${(x.marks && x.marks.pts && x.marks.pts.length)
+    ${x.kind==='vid'
+      ? `<video src="${esc(phURL(x.path))}" controls playsinline
+           style="width:100%;max-height:52vh;border-radius:12px;background:#000"></video>`
+      : (x.marks && x.marks.pts && x.marks.pts.length)
       ? `<div class="mkwrap"><img src="${esc(phURL(x.path))}" alt="" onerror="picFail(this)">${markSvg(x.marks.pts)}</div>`
         + markTxt(x.marks.pts)
       : `<img class="shot" src="${esc(phURL(x.path))}" alt="" onerror="picFail(this)">`}
-    ${x.kind!=='ai'?`<button class="btn sub sm" data-act="bpmark:${x.id}">기준선 긋기</button>`:''}
-    ${own?`<button class="btn ghost sm" data-act="bpdel:${x.id}" style="color:var(--warn)">이 사진 지우기</button>`:''}
+    ${(x.kind!=='ai' && x.kind!=='vid')?`<button class="btn sub sm" data-act="bpmark:${x.id}">기준선 긋기</button>`:''}
+    ${own?`<button class="btn ghost sm" data-act="bpdel:${x.id}" style="color:var(--warn)">이 ${x.kind==='vid'?'영상':'사진'} 지우기</button>`:''}
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 
@@ -7365,10 +7520,12 @@ document.addEventListener('click', ev=>{
     case 'bpnp': { const el=document.querySelector('[data-k="bp:d"]');
       if(el) S.bpNewDate = el.value || TODAY;
       S.bpNewPose = rest[0]; drawSheet(); return; }
+    case 'bpvid': { S.bpMid = (S.screen==='body') ? subj() : anaMid(); bpVid(); return; }
+    case 'bpvgo': bpVidUpload(); return;
     case 'bpgo': bpUpload(); return;
     case 'bpview': sheetBpView(rest[0]); return;
     case 'bpdel': { const x=(D.bph||[]).find(y=>y.id===rest[0]); if(!x) return;
-      openSheet(()=>`<div class="h2">이 사진을 지울까요?</div>
+      openSheet(()=>`<div class="h2">이 ${x.kind==='vid'?'영상':'사진'}을 지울까요?</div>
         <div class="note">${esc(dateTxt(x.date))} · ${x.kind==='ai'?'AI 체형분석':esc(x.pose)} — 되돌릴 수 없습니다.</div>
         <button class="btn main" data-act="bpdelgo:${x.id}" style="background:var(--warn);color:#241310">지우기</button>
         <button class="btn ghost sm" data-act="close">그만두기</button>`);
