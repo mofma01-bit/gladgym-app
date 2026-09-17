@@ -663,12 +663,23 @@ body.끄는중{user-select:none;-webkit-user-select:none}
   background:var(--dark-2);border:1px solid var(--line);border-radius:14px;
   padding:14px 18px;margin:0 0 14px;border-bottom:1px solid var(--line)}
 .hc-r .homenums .v{font-size:32px}
+/* 맨 윗줄 — 두 단을 가로지른다. 현황판이 여기 산다 */
+.hc-t{margin-bottom:16px}
+.hc-t .homenums{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;
+  background:var(--dark-2);border:1px solid var(--line);border-radius:14px;
+  padding:16px 20px;margin:0;border-bottom:1px solid var(--line)}
+.hc-t .homenums .v{font-size:36px}
+.hc-t .homenums .k{font-size:11.5px;white-space:nowrap}
+.hc-t .tx-home.one,.hc-t .mycard{margin-bottom:14px}
+.tx-notice.none{width:100%;text-align:left;font-size:13px;font-weight:800;color:#9a8cc4;
+  background:transparent;border-style:dashed}
+.tx-notice.none:hover{background:#2b2240;color:#d9cdf4}
 .hc-l .mycard{margin-bottom:14px}
 .hc-l .faces{grid-template-columns:repeat(auto-fill,minmax(118px,1fr))}
 .hmrow .side{font-size:14px;padding:3px 7px;flex:none;color:var(--gold)}
 .hmrow .side:hover{background:var(--gold-dim);border-radius:7px}
 @media(max-width:1100px){ .homecols{grid-template-columns:1fr !important}
-  .hc-l .homenums{grid-template-columns:repeat(3,1fr)} }
+  .hc-l .homenums,.hc-t .homenums{grid-template-columns:repeat(3,1fr);row-gap:14px} }
 .hometop{display:grid;grid-template-columns:minmax(212px,0.85fr) 2.1fr;gap:14px;
   align-items:stretch;margin-bottom:18px}
 .mycard{display:flex;flex-direction:column;gap:7px;text-align:left;padding:13px 15px;
@@ -1034,7 +1045,7 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 
 <script>
 "use strict";
-const BUILD = '80';
+const BUILD = '81';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -4955,7 +4966,8 @@ function vHome(){
   const H = 내홈();
   const N = H.줄수;
   const 공지 = W.tasks.filter(r=>r.kind==='대표공지' && !r.done).slice(0,3);
-  const 내업무 = W.tasks.filter(r=>!r.done && 내것(r.owners)).sort(표정의.tasks.정렬).slice(0,N);
+  const 내업무 = W.tasks.filter(r=>!r.done && r.kind!=='대표공지' && 내것(r.owners))
+                      .sort(표정의.tasks.정렬).slice(0,N);
   const 오늘상담 = W.leads.filter(r=>오늘인가(r.at) && !r.done).sort((a,b)=>(a.at||'')>(b.at||'')?1:-1).slice(0,N);
   const 이번주 = W.leave.filter(표정의.leave.보기[0].필터).sort((a,b)=>(a.day||'')>(b.day||'')?1:-1).slice(0,N);
   const 대기 = 관리자() ? W.leave.filter(r=>r.status==='req').length : 0;
@@ -4978,16 +4990,23 @@ function vHome(){
       + '<span>' + (g.quarter ? esc(g.quarter) : '＋ 목표 적기') + '</span>'
       + '</span></button>' : '';
 
-  const 공지판 = 공지.length ? '<div class="sec" style="margin-bottom:14px">'
+  const 공지없음 = 관리자() ? '<div class="sec" style="margin-bottom:14px">'
+    + '<button class="tx-notice none" data-act="tx:new" data-k="tasks">＋ 공지 쓰기</button></div>' : '';
+  const 공지판 = !공지.length ? 공지없음 : '<div class="sec" style="margin-bottom:14px">'
     + 공지.map(r=>'<button class="tx-notice" style="text-align:left;width:100%" data-act="tx:open" data-k="tasks" data-id="'+r.id+'">'
       + '<div class="t1">📌 '+esc(r.title)+'</div>'
-      + (블록요약(r.body)?'<div class="t2">'+esc(블록요약(r.body))+'</div>':'')+'</button>').join('')+'</div>' : '';
+      + (블록요약(r.body)?'<div class="t2">'+esc(블록요약(r.body))+'</div>':'')+'</button>').join('')+'</div>';
 
   const 그릴것 = {
     band:   () => 이름표,
     notice: () => 공지판,
     nums:   () => 숫자줄(내업무.length, 오늘상담.length),
-    tasks:  () => '<div class="tx-home one">' + 섹('내 업무', 'tasks', 내업무, '남은 업무가 없어요') + '</div>',
+    /* 카드 줄이 아니라 **표**로 본다 (2026-09-17 대표: 「그 아래 업무 데이터베이스로 바꿔」) */
+    tasks:  () => '<div class="tx-home one"><div class="sec">'
+      + '<div class="lbl">내 업무 ' + 내업무.length + '건'
+        + '<span class="r" data-act="tx:go" data-k="tasks">전부 보기 ›</span></div>'
+      + (내업무.length ? txTable('tasks', 내업무) : '<div class="empty">남은 업무가 없어요</div>')
+      + '</div></div>',
     leads:  () => '<div class="tx-home one">' + 섹('오늘 상담', 'leads', 오늘상담, '오늘 잡힌 상담이 없어요') + '</div>',
     leave:  () => '<div class="tx-home one">'
       + 섹('이번 주 연월차'+(대기?' <span class="tx-tag warn">승인 대기 '+대기+'</span>':''), 'leave', 이번주, '이번 주는 없어요')
@@ -5000,7 +5019,9 @@ function vHome(){
   const 살아있는 = H.차례.filter(k => !H.끔[k] && 그릴것[k]);
   const 단그리기 = 쪽 => 살아있는.filter(k => 블록단(k, H) === 쪽).map(k => 그릴것[k]()).join('');
   const 왼폭 = Math.max(260, 사진크기 + 150);
-  return '<div class="homecols" style="grid-template-columns:minmax('+왼폭+'px,1fr) 2.2fr">'
+  const 윗줄 = 단그리기('위');
+  return (윗줄 ? '<div class="hc-t">' + 윗줄 + '</div>' : '')
+    + '<div class="homecols" style="grid-template-columns:minmax('+왼폭+'px,1fr) 2.2fr">'
     + '<div class="hc-l">' + 단그리기('좌')
       + '<button class="hmbtn" data-act="tx:hm">⚙ 내 홈 꾸미기</button></div>'
     + '<div class="hc-r">' + 단그리기('우') + '</div>'
@@ -5096,7 +5117,7 @@ const 내담당 = mid => S.who === '전체' || (memOf(mid).trainer || '') === S.
    새 블록을 만들 때 `단` 을 적어 두면 그 자리에서 시작한다. 각자 옮길 수 있다 */
 const 홈블록 = [
   { k:'band',  이름:'내 이름표',        단:'좌' },
-  { k:'nums',  이름:'숫자 한 줄',       단:'좌' },
+  { k:'nums',  이름:'현황판',           단:'위' },
   { k:'notice',이름:'대표 공지',        단:'우' },
   { k:'tasks', 이름:'내 업무',          단:'우' },
   { k:'cold',  이름:'코멘트 밀린 회원',  단:'우' },
@@ -5105,6 +5126,9 @@ const 홈블록 = [
   { k:'today', 이름:'오늘 수업 · 루틴',  단:'우' },
   { k:'leave', 이름:'이번 주 연월차',   단:'좌' },
 ];
+/* 위 = 두 단을 가로지르는 맨 윗줄 (2026-09-17 대표: 「현황판을 가장 상단에 열로 구축하고」) */
+const 단차례 = ['위','좌','우'];
+const 단딱지 = { 위:'▤', 좌:'◧', 우:'◨' };
 const 블록단 = (k, h) => (h.단 && h.단[k]) || (홈블록.find(x=>x.k===k)||{}).단 || '우';
 /* ══ 꾸밈 규격 ══ 넓힐 때는 **이 표에 한 줄만** 더한다. 판은 표를 보고 저절로 그려진다.
    (2026-09-17 대표: 「커스텀하는 영역은 규정해야겠지 · 넓혀나갈거니까 뼈대부터 잡아」)
@@ -5157,7 +5181,7 @@ function 홈꾸미기(){
           + '<span class="grip">⠿</span>'
           + '<span class="tx"><b>'+esc(b.이름)+'</b></span>'
           + '<button class="side" data-act="tx:hmside" data-v2="'+esc(k)+'">'
-            + (쪽==='좌' ? '◧' : '◨') + '</button>'
+            + (단딱지[쪽] || '◨') + '</button>'
           + '<button class="eye" data-act="tx:hmtog" data-v2="'+esc(k)+'">'+(꺼짐?'🙈':'👁')+'</button></div>'; }).join('')
         + '</div>';
     const 값들 = x.꼴 === '숫자' ? x.값.map(v=>[v, v + (x.단위 || '줄')]) : x.값;
@@ -5639,7 +5663,7 @@ async function txAct(a, el){
     }catch(e){ toast('못 남겼어요 — ' + e.message); }
     return; }
   if(a==='hmside'){ const 단 = Object.assign({}, 내홈().단);
-    단[v2] = 블록단(v2, 내홈()) === '좌' ? '우' : '좌';
+    단[v2] = 단차례[(단차례.indexOf(블록단(v2, 내홈())) + 1) % 단차례.length];
     await 내홈저장({ 단 }); 홈꾸미기(); return; }
   if(a==='hmtog'){ const 끔 = Object.assign({}, 내홈().끔);
     if(끔[v2]) delete 끔[v2]; else 끔[v2] = 1;
