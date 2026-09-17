@@ -657,6 +657,9 @@ body.끄는중{user-select:none;-webkit-user-select:none}
   background:var(--dark-2);border:1px solid var(--line);border-radius:14px;min-width:0}
 .mycard:hover{border-color:var(--gold-2)}
 .mc-top{display:flex;align-items:center;gap:10px;min-width:0}
+.mycard.big .mc-top{flex-direction:column;align-items:flex-start;gap:9px}
+.mycard.big .mc-nm{font-size:16px}
+.mycard.big .mc-s{font-size:12px}
 .mc-nm{font-size:14px;font-weight:800;letter-spacing:-.01em;white-space:nowrap;
   overflow:hidden;text-overflow:ellipsis;min-width:0}
 .mc-nm i{font-style:normal;font-size:10px;font-weight:800;color:var(--sub);
@@ -1013,7 +1016,7 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 
 <script>
 "use strict";
-const BUILD = '78';
+const BUILD = '79';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -4946,8 +4949,9 @@ function vHome(){
   /* 내 이름표 — 슬로건과 이번 분기 목표를 출근하면 늘 본다 */
   const g = (ME && ME.goal) || {};
   /* 왼쪽 = 나 · 오른쪽 = 현황판. 1:1 이 아니라 현황판이 넓다 (2026-09-17 대표 지시) */
-  const 이름표 = ME ? '<button class="mycard c-'+esc(H.색)+'" data-act="tx:me">'
-      + '<span class="mc-top">' + 얼굴(ME, 38)
+  const 사진크기 = H.사진 || 88;
+  const 이름표 = ME ? '<button class="mycard c-'+esc(H.색)+(사진크기>=88?' big':'')+'" data-act="tx:me">'
+      + '<span class="mc-top">' + 얼굴(ME, 사진크기)
         + '<span class="mc-nm">' + esc(ME.name)
         + '<i>' + ({admin:'관리자',trainer:'트레이너',fc:'FC'}[ME.role]||ME.role) + '</i></span></span>'
       + '<span class="mc-s' + (g.value ? '' : ' empty') + '">' + (g.value ? esc(g.value) : '슬로건') + '</span>'
@@ -4965,7 +4969,9 @@ function vHome(){
   const 나란히 = !H.끔.band && !H.끔.nums;
   let 짝그렸나 = false;
   const 짝 = () => { if(짝그렸나) return ''; 짝그렸나 = true;
-    return '<div class="hometop">' + 이름표 + 숫자줄(내업무.length, 오늘상담.length) + '</div>'; };
+    const 왼 = Math.max(212, 사진크기 + 130);
+    return '<div class="hometop" style="grid-template-columns:minmax('+왼+'px,0.85fr) 2.1fr">'
+      + 이름표 + 숫자줄(내업무.length, 오늘상담.length) + '</div>'; };
   const 그릴것 = {
     band:   () => 나란히 ? 짝() : 이름표,
     notice: () => 공지판,
@@ -5097,6 +5103,7 @@ const 홈블록 = [
 const 꾸밈규격 = [
   { k:'차례', 꼴:'차례', 이름:'블록', 기본:null },
   { k:'줄수', 꼴:'숫자', 이름:'줄 수', 값:[3,5,8,12], 기본:5 },
+  { k:'사진', 꼴:'숫자', 이름:'내 사진 크기', 값:[44,64,88,120,160], 기본:88, 단위:'px' },
   { k:'색',   꼴:'고름', 이름:'내 이름표 색',
     값:[['gold','금색'],['teal','청록'],['warn','살구'],['cream','흰색']], 기본:'gold' },
 ];
@@ -5131,7 +5138,7 @@ function 홈꾸미기(){
           + '<span class="tx"><b>'+esc(b.이름)+'</b></span>'
           + '<button class="eye" data-act="tx:hmtog" data-v2="'+esc(k)+'">'+(꺼짐?'🙈':'👁')+'</button></div>'; }).join('')
         + '</div>';
-    const 값들 = x.꼴 === '숫자' ? x.값.map(v=>[v, v+'줄']) : x.값;
+    const 값들 = x.꼴 === '숫자' ? x.값.map(v=>[v, v + (x.단위 || '줄')]) : x.값;
     return '<div class="chips" style="margin:0">' + 값들.map(v =>
       '<button class="chip '+(String(h[x.k])===String(v[0])?'on':'')+'" '
       + 'data-act="tx:hmset" data-f="'+esc(x.k)+'" data-v2="'+esc(v[0])+'">'+esc(v[1])+'</button>').join('') + '</div>';
@@ -5202,14 +5209,14 @@ async function 프로필올리기(file){
   toast('사진을 줄이는 중…');
   const blob = await new Promise(ok => {
     const img = new Image(), url = URL.createObjectURL(file);
-    img.onload = () => { const S2 = 256, c = document.createElement('canvas');
+    img.onload = () => { const S2 = 512, c = document.createElement('canvas');
       c.width = c.height = S2;
       const x = c.getContext('2d');
       const r = Math.max(S2/img.width, S2/img.height);
       const w = img.width*r, h = img.height*r;
       x.drawImage(img, (S2-w)/2, (S2-h)/2, w, h);
       URL.revokeObjectURL(url);
-      c.toBlob(b => ok(b), 'image/jpeg', 0.82); };
+      c.toBlob(b => ok(b), 'image/jpeg', 0.85); };
     img.onerror = () => { URL.revokeObjectURL(url); ok(null); };
     img.src = url;
   });
