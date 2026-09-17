@@ -193,6 +193,22 @@ textarea.inp{min-height:76px;resize:vertical;line-height:1.6}
 .cm .ex{font-size:12px;font-weight:700;color:var(--gold-2)}
 .cm .tx{font-size:13.5px;line-height:1.65;white-space:pre-wrap}
 .cm.new{border-left-color:var(--gold)}
+/* 코멘트 화면 — 구분 · 차례 줄 (2026-09-17) */
+.cmbar{display:flex;flex-wrap:wrap;gap:14px;align-items:center;padding:0 2px 9px}
+.cmg{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.cmg>b{font-size:11px;font-weight:800;color:#6f6a63;margin-right:3px}
+.cmg .chip i{font-style:normal;margin-left:5px;opacity:.6;font-size:10.5px}
+.cmta{width:100%;min-height:74px;resize:vertical;margin-top:6px;font-size:13px;line-height:1.55}
+.cmacts{display:flex;gap:6px;margin-top:7px}
+.cmacts .wn{color:var(--warn);border-color:rgba(214,112,96,.4)}
+.cmask{text-align:center;padding:4px 2px 2px}
+.cmask .q1{font-size:15px;font-weight:800;color:var(--cream);margin-bottom:6px}
+.cmask .q2{font-size:12.5px;color:var(--sub);line-height:1.6;margin-bottom:12px}
+.cmask .qbox{background:var(--dark-3);border:1px solid var(--line);border-radius:10px;
+  padding:9px 11px;font-size:12.5px;color:var(--cream);text-align:left;margin-bottom:12px;
+  max-height:160px;overflow:auto;white-space:pre-wrap}
+.cmask .qbtns{display:flex;gap:8px}
+.cmask .qbtns .btn{flex:1}
 
 /* 표 */
 .tb{width:100%;border-collapse:collapse;font-size:13px}
@@ -560,6 +576,13 @@ body.tx-moving .tx-x{cursor:grabbing}
   border:1px solid var(--line);white-space:nowrap}
 .mbtns button:hover{color:var(--gold);border-color:var(--gold-2);background:var(--gold-dim)}
 .mbtns button.full{color:#6f6a63;padding:4px 7px}
+/* 「개인운동 · 수업」은 늘 보인다 — 나머지 탭 단추와 달리 자주 쓴다 (2026-09-17) */
+.mbtns button.kbtn{color:var(--gold);border-color:var(--gold-2);background:var(--gold-dim)}
+.mbtns button.kbtn:hover{background:var(--gold);color:#1b1b19;border-color:var(--gold)}
+.mbar{display:inline-block;width:1px;height:15px;background:var(--line);margin:0 3px;vertical-align:middle}
+.mbtns{opacity:1}
+.mbtns>button:not(.kbtn),.mbar{opacity:0;transition:opacity .12s}
+.mtb tbody tr:hover .mbtns>button:not(.kbtn),.mtb tbody tr:hover .mbar{opacity:1}
 .pop.tx-side .mtabs{margin-bottom:12px}
 .pop.tx-side .mpane{display:flex;flex-direction:column;gap:12px}
 .who3{font-size:11.5px;font-weight:600;color:var(--sub);margin-left:6px}
@@ -871,6 +894,9 @@ body.끄는중{user-select:none;-webkit-user-select:none}
     <button class="nav" data-v="today">
       <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
       오늘</button>
+    <button class="nav" data-v="trash" id="navtrash" style="display:none">
+      <svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+      휴지통</button>
     <div class="foot">
       <div class="who" style="display:none"><select id="whosel"></select></div>
       <button class="svcbtn" id="svcopen">
@@ -896,7 +922,7 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 
 <script>
 "use strict";
-const BUILD = '62';
+const BUILD = '65';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -923,6 +949,81 @@ let AUTH = null;            /* {access_token, refresh_token, user, exp} */
 let ME = null;              /* staff 행 {id,name,role,color,goal} */
 const W = { staff:[], tasks:[], leads:[], leave:[], cm:[], cols:[], views:[], meta:[] };
 const 관리자 = () => !!(ME && ME.role==='admin');
+/* 최고 관리자 — 휴지통을 비우고 영구 삭제할 수 있는 단 한 등급.
+   아직 아무도 세워 두지 않았으면 관리자가 대신 맡는다 (잠겨 버리지 않게).
+   `staff.super` 를 켜는 순간부터 그 사람만 할 수 있다 (2026-09-17 대표 지시) */
+const 최고관리자 = () => {
+  if(!ME) return false;
+  if(ME.super === true) return true;
+  const 세워짐 = (W.staff||[]).some(x => x.super === true && x.active !== false);
+  return !세워짐 && ME.role === 'admin';
+};
+const 최고관리자세워짐 = () => (W.staff||[]).some(x => x.super === true && x.active !== false);
+
+/* ══ 휴지통 ══ 지우기는 「옮기기」다 — 60일 뒤에 진짜로 사라진다
+   ⛔ 휴지통에 담는 데 실패하면 **원본을 지우지 않는다.** 자료가 그냥 없어지면 안 된다.
+   (2026-09-17 대표: 「삭제를 하면 바로 데이터가 날아가는게 아니라 휴지통으로 모이게」) */
+const 휴지통일수 = 60;
+let 휴지통 = [];                       /* 최고 관리자가 열어 볼 때만 채운다 */
+let 휴지통없음 = false;                /* 표가 아직 없으면 true — 그때는 지우기를 막는다 */
+
+async function 휴지통담기(tbl, row, 이름){
+  if(!row) throw new Error('지울 줄을 못 찾았어요');
+  await usend('tr_trash', 'POST', [{
+    tbl: tbl, row_id: String(row.id), label: (이름 || '').slice(0, 120),
+    data: row, deleted_name: (ME && ME.name) || '' }]);
+}
+/* 한 줄 지우기 — 담고 나서 지운다. 담기에 실패하면 지우지 않는다 */
+async function 휴지통으로(tbl, row, 이름, 지우개){
+  try{
+    await 휴지통담기(tbl, row, 이름);
+  }catch(e){
+    휴지통없음 = true;
+    throw new Error('휴지통에 담지 못해 지우지 않았습니다 — ' + e.message);
+  }
+  await (지우개 || usend)(tbl + '?id=eq.' + encodeURIComponent(row.id), 'DELETE');
+}
+/* 여러 줄 — 전부 담은 뒤에 한 번에 지운다 */
+async function 휴지통으로여럿(tbl, rows, 이름뽑기, 지우개){
+  if(!rows.length) return;
+  try{
+    await usend('tr_trash', 'POST', rows.map(r => ({
+      tbl: tbl, row_id: String(r.id), label: String(이름뽑기 ? 이름뽑기(r) : '').slice(0, 120),
+      data: r, deleted_name: (ME && ME.name) || '' })));
+  }catch(e){
+    휴지통없음 = true;
+    throw new Error('휴지통에 담지 못해 지우지 않았습니다 — ' + e.message);
+  }
+  await (지우개 || usend)(tbl + '?id=in.(' + rows.map(r => '"' + r.id + '"').join(',') + ')', 'DELETE');
+}
+async function 휴지통읽기(){
+  try{
+    휴지통 = await uget('tr_trash?select=*&order=deleted_at.desc&limit=500') || [];
+    휴지통없음 = false;
+  }catch(e){ 휴지통 = []; 휴지통없음 = true; }
+  return 휴지통;
+}
+/* 60일 지난 것 자동 비우기 — 최고 관리자가 켤 때 한 번 (하루 한 번만) */
+async function 휴지통청소(){
+  if(!최고관리자()) return 0;
+  try{ if(localStorage.getItem('gg_sweep') === TODAY) return 0; }catch(e){}
+  const 끊는날 = new Date(Date.now() - 휴지통일수*864e5).toISOString();
+  try{
+    const 옛것 = await uget('tr_trash?select=id&deleted_at=lt.' + 끊는날 + '&limit=1000') || [];
+    if(옛것.length){
+      await usend('tr_trash?deleted_at=lt.' + 끊는날, 'DELETE');
+      console.log('휴지통 자동 비움', 옛것.length, '건');
+    }
+    try{ localStorage.setItem('gg_sweep', TODAY); }catch(e){}
+    return 옛것.length;
+  }catch(e){ return 0; }
+}
+async function 되살리기(t){
+  const 줄 = Object.assign({}, t.data || {});
+  const 보내기 = String(t.tbl).indexOf('tr_') === 0 ? usend : ssend;
+  await 보내기(t.tbl, 'POST', [줄], 'resolution=merge-duplicates');
+  await usend('tr_trash?id=eq.' + t.id, 'DELETE');
+}
 
 function authLoad(){ try{ AUTH = JSON.parse(localStorage.getItem(AUTH_KEY)||'null'); }catch(e){ AUTH=null; } }
 function authSave(a){ AUTH = a; try{ a ? localStorage.setItem(AUTH_KEY, JSON.stringify(a)) : localStorage.removeItem(AUTH_KEY); }catch(e){} }
@@ -1334,7 +1435,8 @@ function vMembers(){
     + '<div class="sumit"><span class="k2">회원</span><span class="v2">' + rows.length + '</span></div>'
     + '<div class="sumit gold"><span class="k2">오늘 지정</span><span class="v2">' + 오늘수 + '</span></div>'
     + '<div class="sumit warn"><span class="k2">코멘트 요청</span><span class="v2">' + 요청수 + '</span></div>'
-    + '<div class="sumit teal"><span class="k2">안 읽은 코멘트</span><span class="v2">' + 안읽음 + '</span></div>'
+    + '<div class="sumit teal" title="트레이너가 남긴 코멘트를 회원이 앱에서 아직 안 연 것">'
+      + '<span class="k2">회원이 안 본 코멘트</span><span class="v2">' + 안읽음 + '</span></div>'
     + '<div class="sumit warn"><span class="k2">2주 넘게 안 옴</span><span class="v2">' + 뜸한수 + '</span></div>'
     + '</div>';
 
@@ -1361,7 +1463,7 @@ function vMembers(){
         + '<td class="n"><span class="numbig ' + (i.routines?'':'zero') + '">' + i.routines + '</span>'
           + '<span class="sub3">개</span></td>'
         + '<td>' + (i.ask ? '<span class="tag warn">요청 ' + i.ask + '</span> ' : '')
-          + (i.newcm ? '<span class="tag teal">안 읽음 ' + i.newcm + '</span>' : '')
+          + (i.newcm ? '<span class="tag teal" title="회원이 아직 안 봤어요">회원 안 봄 ' + i.newcm + '</span>' : '')
           + (!i.ask && !i.newcm ? '<span class="sub3">—</span>' : '') + '</td>'
         + '<td>' + (i.today ? '<span class="tag gold">' + esc(i.today.kind||'지정') + '</span>'
             : '<span class="sub3">—</span>') + '</td>'
@@ -1375,9 +1477,96 @@ function vMembers(){
 /* ── 회원 줄 버튼 ── 목록에서 바로 그 탭을 사이드 페이지로 연다
    (2026-09-09 대표: 「전체 페이지를 누르면 또 찾아다녀야 해서 복잡해」) */
 function 회원버튼(mid){
+  /* 「개인운동 · 수업」은 루틴을 바로 지정하는 사이드 페이지를 연다
+     (2026-09-17 대표: 「운동기록에서 루틴을 추가하는 식 말고 바로 루틴을 추가하는 형식」) */
   return '<span class="mbtns">'
+    + ['개인운동','수업'].map(k => '<button class="kbtn" data-mas="'+esc(mid)+'" data-kind="'+k+'"'
+        + ' title="'+k+' 루틴 지정">'+k+'</button>').join('')
+    + '<i class="mbar"></i>'
     + TABS.map(t => '<button data-m="'+esc(mid)+'" data-tab="'+t[0]+'" title="'+t[1]+'">'+t[1]+'</button>').join('')
     + '<button class="full" data-mfull="'+esc(mid)+'" title="전체 페이지로 열기">⤢</button></span>';
+}
+
+/* ══ 루틴 지정 사이드 페이지 ══ 목록에서 바로 열어 루틴을 그 자리에서 지정한다.
+   루틴이 없거나 새로 만들고 싶으면 여기서 바로 만든다 (2026-09-17 대표 지시) */
+let 지정판 = null;                                   /* {mid, kind} */
+function 지정판그리기(){
+  if(!지정판) return;
+  const mid = 지정판.mid, kind = 지정판.kind;
+  const m = memOf(mid);
+  const 날 = S.asDate || TODAY;
+  const rs = D.r.filter(x => x.member_id === mid && (x.grp||'') !== '준비운동')
+                .sort((a,b) => a.no - b.no);
+  const 그날 = D.aAll.find(x => x.member_id === mid && x.on_date === 날) || null;
+  const recos = recosOf(mid);
+  const 추천된 = recos.map(x => x.row.routine_id);
+
+  const 날칩 = [['오늘',0],['내일',1],['모레',2],['다음 주',7]].map(x => {
+      const d = plusDays(TODAY, x[1]);
+      return '<button class="chip '+(날===d?'on':'')+'" data-asday="'+d+'">'+x[0]+'</button>'; }).join('');
+
+  const 루틴줄 = r0 => {
+    const 종목 = D.ri.filter(x => x.routine_id === r0.id).length;
+    const 이미 = 그날 && 그날.routine_id === r0.id;
+    const 추천 = 추천된.indexOf(r0.id) >= 0;
+    return '<div class="card rowc' + (이미?' gold':'') + '">'
+      + '<div style="flex:1;min-width:0">'
+      + '<div class="t1">루틴 ' + r0.no + ' · ' + esc(r0.name)
+        + (이미 ? ' <span class="tag gold">지정됨</span>' : '')
+        + (추천 ? ' <span class="tag teal">추천 중</span>' : '') + '</div>'
+      + '<div class="t2">' + 종목 + '종목' + (r0.purpose ? ' · ' + esc(r0.purpose) : '') + '</div></div>'
+      + (종목 ? '' : '<span class="tag warn">비어 있음</span>')
+      + '<button class="btn sub sm" data-asr="' + esc(r0.id) + '">＋ 종목</button>'
+      + '<button class="btn gold sm" data-asput="' + esc(r0.id) + '">'
+        + (이미 ? '다시 지정' : '지정') + '</button></div>';
+  };
+
+  판열기(esc(m.name) + ' <span class="who3">' + esc(kind) + ' 루틴 지정</span>',
+    '<div class="sec"><div class="lbl">어떤 종류로</div>'
+    + '<div class="chips" style="margin:0">'
+    + ['개인운동','수업'].map(k => '<button class="chip '+(kind===k?'on':'')+'" data-askind="'+k+'">'
+        + k + '</button>').join('') + '</div></div>'
+
+    + '<div class="sec"><div class="lbl">언제 — 앞날을 고르면 예약이 됩니다</div>'
+    + '<div class="chips" style="margin:0 0 8px">' + 날칩 + '</div>'
+    + '<input class="inp" type="date" id="asdate2" value="' + esc(날) + '">'
+    + (그날 ? '<div class="t2" style="margin-top:7px">이 날은 이미 <b>'
+        + esc((D.r.find(x=>x.id===그날.routine_id)||{}).name || '루틴') + '</b> ('
+        + esc(그날.kind||'') + ')로 잡혀 있어요 — 다시 지정하면 바뀝니다</div>' : '')
+    + (kind === '개인운동'
+      ? '<div class="hr2"></div><div class="t2" style="line-height:1.6">날짜를 안 정하고 <b>다음 개인운동 때</b> 뜨게 하려면'
+        + ' 루틴의 <b>지정</b> 대신 아래 <b>추천</b>을 쓰세요. 최대 2개 (' + recos.length + '/2)</div>' : '')
+    + '</div>'
+
+    + '<div class="sec"><div class="lbl">루틴 ' + rs.length + '개'
+    + '<span class="r"><button class="btn sub sm" data-act="asnew">＋ 새 루틴 만들기</button></span></div>'
+    + (지정판.새 ? '<div class="card" style="display:flex;gap:8px;align-items:center">'
+        + '<input class="inp" id="asnewname" placeholder="루틴 이름 — 예: 하체 A" style="flex:1">'
+        + '<button class="btn gold sm" data-act="asmake">만들기</button>'
+        + '<button class="btn ghost sm" data-act="asnewx">취소</button></div>' : '')
+    + (rs.length ? rs.map(루틴줄).join('')
+        : '<div class="empty">아직 루틴이 없어요 — 「＋ 새 루틴 만들기」로 바로 만드세요</div>')
+    + '</div>'
+
+    + (kind === '개인운동' && rs.length
+      ? '<div class="sec"><div class="lbl">날짜 없이 추천해 두기</div>'
+        + rs.map(r0 => '<button class="card click rowc" data-asreco="' + esc(r0.id) + '"><div>'
+            + '<div class="t1">루틴 ' + r0.no + ' · ' + esc(r0.name) + '</div>'
+            + '<div class="t2">다음 개인운동 때 앱 첫 화면에 뜹니다</div></div>'
+            + '<span class="rt">추천 &rsaquo;</span></button>').join('') + '</div>' : '')
+
+    + '<div class="sec">' + assignedList(mid) + '</div>',
+
+    '<div class="tx-fbtns"><span class="tx-stat"></span>'
+    + '<button class="btn sub" data-mfull="' + esc(mid) + '">⤢ 회원 전체 페이지</button></div>');
+}
+async function 지정판열기(mid, kind){
+  회원판 = null;
+  지정판 = { mid, kind: kind || '개인운동', 새:false };
+  S.mid = mid; S.kind = 지정판.kind; S.asDate = S.asDate || TODAY;
+  지정판그리기();
+  await loadMember(mid);                        /* 루틴 종목 수를 채운다 */
+  지정판그리기();
 }
 let 회원판 = null;                                   /* {mid, tab} */
 const 회원탭내용 = () => S.tab==='routine' ? tabRoutine()
@@ -2075,6 +2264,43 @@ function vRoutine(){
     + '</div></div>';
 }
 
+/* ── 지정·추천은 한 곳에서만 한다 — 루틴 화면과 지정판이 같이 쓴다 (2026-09-17) ── */
+async function 루틴지정(mid, rid, kind, day){
+  const el = document.getElementById('asdate2') || document.getElementById('asdate');
+  const 날 = day || (el && el.value) || S.asDate || TODAY;
+  const r = D.r.find(x=>x.id===rid); if(!r) return;
+  try{
+    await ssend('assignments', 'POST',
+      [{ member_id:mid, on_date:날, routine_id:rid, kind:kind||'개인운동', assigned_by:'트레이너' }],
+      'resolution=merge-duplicates');
+    D.aAll = D.aAll.filter(x=>!(x.member_id===mid && x.on_date===날));
+    D.aAll.push({ member_id:mid, on_date:날, routine_id:rid, kind:kind||'개인운동' });
+    D.a = D.aAll.filter(x=>x.on_date===TODAY);
+    S.asDate = 날;
+    toast((날===TODAY?'오늘 ':dateFull(날)+' ') + (kind||'개인운동') + '으로 「' + r.name + '」 지정했습니다');
+    render();
+  }catch(e){ toast('지정 실패 — ' + e.message); }
+}
+async function 루틴추천(mid, rid){
+  const r = D.r.find(x=>x.id===rid); if(!r) return;
+  const 먼저 = D.aAll.find(x=>x.member_id===mid && x.on_date===RECO1);
+  const 나중 = D.aAll.find(x=>x.member_id===mid && x.on_date===RECO2);
+  if((먼저 && 먼저.routine_id===rid) || (나중 && 나중.routine_id===rid)){
+    toast('이미 추천해 둔 루틴이에요'); return; }
+  const 자리 = 먼저 ? RECO2 : RECO1;
+  const 밀림 = (자리===RECO2 && 나중) ? D.r.find(x=>x.id===나중.routine_id) : null;
+  try{
+    await ssend('assignments', 'POST',
+      [{ member_id:mid, on_date:자리, routine_id:rid, kind:'개인운동', assigned_by:'트레이너' }],
+      'resolution=merge-duplicates');
+    D.aAll = D.aAll.filter(x=>!(x.member_id===mid && x.on_date===자리));
+    D.aAll.push({ member_id:mid, on_date:자리, routine_id:rid, kind:'개인운동' });
+    toast(밀림 ? '나중 자리를 「' + 밀림.name + '」에서 바꿨어요'
+               : (자리===RECO1 ? '먼저 추천으로 담았어요' : '나중 추천으로 담았어요'));
+    render();
+  }catch(e){ toast('추천 실패 — ' + e.message); }
+}
+
 /* 이 회원에게 이미 지정된 날들 */
 function recosOf(mid){
   const g = d => D.aAll.find(x=>x.member_id===mid && x.on_date===d) || null;
@@ -2123,33 +2349,83 @@ function vCmAll(){
       unread: mine2.filter(c=>!c.read_at).length,
       ask: asks.filter(a=>a.member_id===m.id).length,
       last: mine2[0] || null };
-  }).sort((a,b)=> (b.ask-a.ask) || (b.unread-a.unread)
-      || ((b.last?b.last.created_at:'') < (a.last?a.last.created_at:'') ? -1 : 1));
+  });
+
+  /* ── 구분(신규/재등록) 걸러내기 ──
+     `members.reg_kind` 를 본다. 자료는 자동화 에이전트가 채워 준다.
+     칸이 아직 없어도 화면은 그대로 돈다 — 그때는 전부 「미정」이다 (2026-09-17 대표 지시) */
+  const 구분 = m => (m.reg_kind || '').trim() || '미정';
+  const 구분수 = { 신규:0, 재등록:0, 미정:0 };
+  rows.forEach(o => { const k = 구분(o.m); if(구분수[k] != null) 구분수[k]++; else 구분수.미정++; });
+  const 고른구분 = S.cmReg || '';
+  const 걸러진 = 고른구분 ? rows.filter(o => 구분(o.m) === 고른구분) : rows;
+
+  /* ── 차례 ── 기본은 「코멘트 안 남긴 지 오래된 순」 (대표 지시)
+     한 번도 안 남긴 회원이 맨 위, 그다음 오래 안 남긴 순 */
+  const 마지막 = o => o.last ? (o.last.created_at || '') : '';
+  const 차례들 = [
+    ['old',    '오래 안 남긴 순'],
+    ['recent', '최근 남긴 순'],
+    ['ask',    '요청 많은 순'],
+    ['unread', '회원 안 본 순'],
+    ['many',   '코멘트 많은 순'],
+    ['name',   '이름 순'],
+  ];
+  const 차례 = S.cmSort || 'old';
+  const 정렬된 = 걸러진.slice().sort((a,b) => {
+    if(차례==='recent') return 마지막(a) < 마지막(b) ? 1 : (마지막(a) > 마지막(b) ? -1 : 0);
+    if(차례==='ask')    return (b.ask-a.ask) || (마지막(a) < 마지막(b) ? -1 : 1);
+    if(차례==='unread') return (b.unread-a.unread) || (마지막(a) < 마지막(b) ? -1 : 1);
+    if(차례==='many')   return (b.n-a.n) || (a.m.name||'').localeCompare(b.m.name||'');
+    if(차례==='name')   return (a.m.name||'').localeCompare(b.m.name||'');
+    /* old — 안 남긴 사람 먼저, 그다음 오래된 순 */
+    if(!a.last && !b.last) return (a.m.name||'').localeCompare(b.m.name||'');
+    if(!a.last) return -1;
+    if(!b.last) return 1;
+    return 마지막(a) < 마지막(b) ? -1 : (마지막(a) > 마지막(b) ? 1 : 0);
+  });
 
   const 요약 = '<div class="sumbar">'
     + '<div class="sumit warn"><span class="k2">봐 달라는 요청</span><span class="v2">' + asks.length + '</span></div>'
-    + '<div class="sumit teal"><span class="k2">안 읽은 코멘트</span><span class="v2">'
+    + '<div class="sumit teal" title="트레이너가 남긴 코멘트를 회원이 앱에서 아직 안 연 것">'
+      + '<span class="k2">회원이 안 본 코멘트</span><span class="v2">'
       + cs.filter(c=>!c.read_at).length + '</span></div>'
     + '<div class="sumit"><span class="k2">전체 코멘트</span><span class="v2">' + cs.length + '</span></div>'
     + '<div class="sumit gold"><span class="k2">코멘트 없는 회원</span><span class="v2">'
       + rows.filter(x=>!x.n).length + '</span></div>'
     + '</div>';
 
-  const 표 = '<div class="mwrap"><table class="mtb"><thead><tr>'
+  const 줄바 = '<div class="cmbar">'
+    + '<span class="cmg"><b>구분</b>'
+    + [['','전체',rows.length],['신규','신규',구분수.신규],['재등록','재등록',구분수.재등록],
+       ['미정','미정',구분수.미정]]
+        .map(x => '<button class="chip ' + (고른구분===x[0]?'on':'') + '" data-cmreg="' + x[0] + '">'
+          + x[1] + '<i>' + x[2] + '</i></button>').join('') + '</span>'
+    + '<span class="cmg"><b>차례</b>'
+    + 차례들.map(x => '<button class="chip ' + (차례===x[0]?'on':'') + '" data-cmsort="' + x[0] + '">'
+        + x[1] + '</button>').join('') + '</span></div>';
+
+  const 표 = 줄바 + '<div class="mwrap"><table class="mtb"><thead><tr>'
     + '<th style="width:26px"></th><th>이름</th><th>담당</th><th>마지막 코멘트</th>'
-    + '<th class="n">코멘트</th><th class="n">안 읽음</th><th>요청</th>'
+    + '<th class="n">코멘트</th><th class="n" title="회원이 앱에서 아직 안 연 것">회원 안 봄</th><th>요청</th>'
     + '</tr></thead><tbody>'
-    + rows.map(function(o){ const m=o.m;
+    + (정렬된.length ? '' : '<tr><td colspan="7"><div class="empty">해당하는 회원이 없어요</div></td></tr>')
+    + 정렬된.map(function(o){ const m=o.m;
         const 점 = o.ask ? 'warn' : (o.unread ? 'teal' : (o.n ? '' : ''));
+        const 지난날 = o.last ? Math.round((new Date(TODAY) - new Date((o.last.created_at||'').slice(0,10)))/864e5) : null;
+        const kk = 구분(m);
         return '<tr data-m="' + esc(m.id) + '" data-tab="comment">'
         + '<td><span class="dot2 ' + 점 + '"></span></td>'
-        + '<td><div class="nm2">' + esc(m.name) + '</div></td>'
+        + '<td><div class="nm2">' + esc(m.name)
+          + (kk==='미정' ? '' : ' <span class="tag ' + (kk==='신규'?'gold':'teal') + '">' + kk + '</span>')
+          + '</div></td>'
         + '<td><span class="sub3">' + esc(m.trainer||'담당 없음') + '</span></td>'
         + '<td>' + (o.last
-            ? '<div style="font-weight:700">' + dateFull((o.last.created_at||'').slice(0,10)) + '</div>'
+            ? '<div style="font-weight:700">' + dateFull((o.last.created_at||'').slice(0,10))
+                + (지난날 >= 7 ? ' <span class="tag warn">' + 지난날 + '일째</span>' : '') + '</div>'
               + '<div class="sub3" style="max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'
               + esc(vaName(o.last.variant_id)) + ' — ' + esc(o.last.body||'') + '</div>'
-            : '<span class="sub3">아직 없음</span>') + '</td>'
+            : '<span class="tag warn">한 번도 없음</span>') + '</td>'
         + '<td class="n"><span class="numbig ' + (o.n?'':'zero') + '">' + o.n + '</span></td>'
         + '<td class="n">' + (o.unread ? '<span class="tag teal">' + o.unread + '</span>'
             : '<span class="sub3">—</span>') + '</td>'
@@ -2168,18 +2444,75 @@ function vCmAll(){
   const 최근 = cs.length ? '<div class="listbox">' + cs.slice(0,60).map(c=>'<div class="cm '
       + (c.read_at?'':'new') + '">'
       + '<div class="who2">' + esc(memOf(c.member_id).name) + ' · '
-      + dateFull((c.created_at||'').slice(0,10)) + (c.read_at?'':' · 아직 안 읽음')
-      + '<button class="del" data-act="cmdel" data-c="' + esc(c.id) + '">지우기</button></div>'
+      + dateFull((c.created_at||'').slice(0,10)) + (c.read_at?'':' · 회원이 아직 안 봤어요')
+      + '<button class="del" data-act="cmedit" data-c="' + esc(c.id) + '">수정하기</button></div>'
       + '<div class="ex">' + esc(vaName(c.variant_id)) + '</div>'
-      + '<div class="tx">' + esc(c.body||'') + '</div></div>').join('') + '</div>'
+      + (S.cmEdit === c.id
+        ? '<textarea class="inp cmta" id="cmedit_' + esc(c.id) + '">' + esc(c.body||'') + '</textarea>'
+          + '<div class="cmacts">'
+          + '<button class="btn gold sm" data-act="cmfix" data-c="' + esc(c.id) + '">수정</button>'
+          + '<button class="btn ghost sm wn" data-act="cmdel" data-c="' + esc(c.id) + '">삭제</button>'
+          + '<button class="btn ghost sm" data-act="cmeditx">취소</button></div>'
+        : '<div class="tx">' + esc(c.body||'') + '</div>') + '</div>').join('') + '</div>'
     : '<div class="empty">아직 코멘트가 없어요</div>';
 
   return 요약
     + '<div class="cols">'
-    + '<div class="sec"><div class="lbl">회원별 코멘트 — 줄을 누르면 그 회원 코멘트로 갑니다</div>'
+    + '<div class="sec"><div class="lbl">회원별 코멘트 — 줄을 누르면 그 회원 코멘트로 갑니다'
+    + '<span class="r sub3">' + 정렬된.length + '명</span></div>'
     + 표 + '</div>'
     + '<div class="sec"><div class="lbl">봐 달라는 요청 ' + asks.length + '건</div>' + 요청
     + '<div class="lbl" style="margin-top:12px">최근 코멘트</div>' + 최근 + '</div></div>';
+}
+
+/* ── 휴지통 ── 최고 관리자만 본다. 되살리거나 영구히 지운다 (2026-09-17) */
+const 표이름 = { tr_tasks:'업무', tr_leads:'상담', tr_leave:'연월차', tr_comments:'표 코멘트',
+                 comments:'회원 코멘트', body_logs:'체형 기록', routines:'루틴',
+                 routine_items:'루틴 종목', workout_sets:'운동 세트' };
+function vTrash(){
+  if(!최고관리자())
+    return '<div class="empty">휴지통은 <b>최고 관리자</b>만 볼 수 있어요</div>';
+  if(휴지통없음)
+    return '<div class="note" style="border-color:var(--warn)">'
+      + '<b style="color:var(--warn)">휴지통 표가 아직 없습니다</b>'
+      + '<div style="margin-top:6px;line-height:1.6">'
+      + '<code>앱만들기 › 설계서 › 6단계_SQL_휴지통.sql</code> 을 Supabase 에서 한 번 돌려 주세요.<br>'
+      + '표가 없으면 <b>지우기가 아예 막힙니다</b> — 자료가 그냥 없어지지 않게 일부러 그렇게 뒀습니다.</div></div>';
+
+  const 지금 = Date.now();
+  const 남은날 = t => 휴지통일수 - Math.floor((지금 - new Date(t.deleted_at).getTime())/864e5);
+  const 묶음 = {};
+  휴지통.forEach(t => { (묶음[t.tbl] = 묶음[t.tbl] || []).push(t); });
+
+  const 요약 = '<div class="sumbar">'
+    + '<div class="sumit"><span class="k2">담긴 것</span><span class="v2">' + 휴지통.length + '</span></div>'
+    + '<div class="sumit warn"><span class="k2">이레 안에 사라짐</span><span class="v2">'
+      + 휴지통.filter(t => 남은날(t) <= 7).length + '</span></div>'
+    + '<div class="sumit gold"><span class="k2">' + 휴지통일수 + '일 뒤 자동 삭제</span>'
+      + '<span class="v2">켜짐</span></div>'
+    + '</div>';
+
+  if(!휴지통.length) return 요약 + '<div class="empty">휴지통이 비어 있어요</div>';
+
+  const 줄 = t => {
+    const d = 남은날(t);
+    return '<div class="card rowc">'
+      + '<div style="flex:1;min-width:0">'
+      + '<div class="t1">' + esc(t.label || '(이름 없음)') + '</div>'
+      + '<div class="t2">' + esc(표이름[t.tbl] || t.tbl) + ' · '
+        + dateFull((t.deleted_at||'').slice(0,10))
+        + (t.deleted_name ? ' · ' + esc(t.deleted_name) : '') + ' 지움</div></div>'
+      + '<span class="tag ' + (d <= 7 ? 'warn' : '') + '">' + (d > 0 ? d + '일 남음' : '곧 사라짐') + '</span>'
+      + '<button class="btn sub sm" data-trrs="' + t.id + '">되살리기</button>'
+      + '<button class="btn ghost sm" data-trdel="' + t.id + '">영구 삭제</button></div>';
+  };
+  return 요약
+    + '<div class="sec"><div class="lbl">전부 비우기'
+    + '<span class="r"><button class="btn ghost sm" data-act="trsweep">'
+    + 휴지통일수 + '일 지난 것 지금 비우기</button></span></div></div>'
+    + Object.keys(묶음).map(k => '<div class="sec"><div class="lbl">'
+        + esc(표이름[k] || k) + ' ' + 묶음[k].length + '건</div>'
+        + 묶음[k].map(줄).join('') + '</div>').join('');
 }
 
 /* ── 오늘 ── */
@@ -3788,8 +4121,10 @@ async function txCmSend(){
 }
 async function txCmDel(cid){
   const { key, id } = 시트;
-  try{ await usend('tr_comments?id=eq.'+cid, 'DELETE'); W.cm = W.cm.filter(c=>c.id!==cid); txView(key, id); }
-  catch(e){ toast('삭제하지 못했습니다 — '+e.message); }
+  const c0 = W.cm.find(c=>c.id===cid);
+  try{ await 휴지통으로('tr_comments', c0, (c0&&c0.body)||'코멘트');
+    W.cm = W.cm.filter(c=>c.id!==cid); txView(key, id); toast('휴지통으로 보냈습니다'); }
+  catch(e){ toast(e.message); }
 }
 /* 본문 속 체크박스 누르면 그 줄만 바꿔 저장 */
 async function txTick(el){
@@ -4321,9 +4656,11 @@ async function txSave(){
 }
 async function txDel(){
   const { key, id } = 시트, T = 표정의[key];
-  if(!id || !confirm('이 페이지를 지울까요? 첨부·댓글도 같이 지워져요')) return;
-  try{ await usend(T.table+'?id=eq.'+id, 'DELETE'); W[key] = W[key].filter(x=>x.id!==id); popClose(); toast('삭제했습니다'); render(); }
-  catch(e){ toast('삭제하지 못했습니다 — '+e.message); }
+  if(!id || !confirm('이 페이지를 휴지통으로 보낼까요?\n60일 동안 휴지통에 있다가 사라집니다')) return;
+  const r = W[key].find(x=>x.id===id);
+  try{ await 휴지통으로(T.table, r, (r && r[T.제목열]) || T.제목);
+    W[key] = W[key].filter(x=>x.id!==id); popClose(); toast('휴지통으로 보냈습니다'); render(); }
+  catch(e){ toast(e.message); }
 }
 async function txToggle(key, id, f){
   const T = 표정의[key], r = W[key].find(x=>x.id===id); if(!r) return;
@@ -4561,11 +4898,13 @@ async function txAct(a, el){
     const T2 = 표정의[k], c2 = T2.열.find(x => x.k === T2.사람열) || {};
     await txBulk(k, { [T2.사람열]: c2.타입 === 'people' ? (v2 ? [v2] : []) : (v2 || null) }); return; }
   if(a==='bulkdel'){ const ids2 = (고른행.key === k ? 고른행.ids : []).slice();
-    if(!ids2.length || !confirm(ids2.length + '건을 지울까요? 첨부·댓글도 같이 지워져요')) return;
-    try{ await usend(표정의[k].table + '?id=in.(' + ids2.map(x => '"'+x+'"').join(',') + ')', 'DELETE');
+    if(!ids2.length || !confirm(ids2.length + '건을 휴지통으로 보낼까요?\n60일 동안 휴지통에 있다가 사라집니다')) return;
+    const T3 = 표정의[k];
+    const 줄들 = W[k].filter(x => ids2.indexOf(x.id) >= 0);
+    try{ await 휴지통으로여럿(T3.table, 줄들, r => r[T3.제목열] || T3.제목);
       W[k] = W[k].filter(x => ids2.indexOf(x.id) < 0);
-      고른행 = { key:null, ids:[] }; toast(ids2.length + '건 지웠어요'); render(); }
-    catch(e){ toast('못 지웠어요 — ' + e.message); }
+      고른행 = { key:null, ids:[] }; toast(ids2.length + '건 휴지통으로 보냈어요'); render(); }
+    catch(e){ toast(e.message); }
     return; }
   if(a==='new'){ txNewMenu(k); return; }
   if(a==='rownew'){                       /* 표 맨 아래에서 바로 한 줄 만든다 (노션과 같다) */
@@ -5002,6 +5341,7 @@ function render(){
   const 났 = render0.apply(null, arguments);
   /* 회원 사이드 페이지가 열려 있으면 그 안도 같이 새로 그린다 */
   if(typeof 회원판 !== 'undefined' && 회원판 && $('#pop').classList.contains('on')) 회원판그리기();
+  if(typeof 지정판 !== 'undefined' && 지정판 && $('#pop').classList.contains('on')) 지정판그리기();
   if(typeof 고른칸다시 === 'function') 고른칸다시();
   return 났;
 }
@@ -5052,7 +5392,11 @@ function render0(){
   } else if(S.view==='today'){
     top.innerHTML = '<h1>오늘</h1><span class="cnt">' + dateFull(TODAY) + '</span>';
     b.innerHTML = vToday();
+  } else if(S.view==='trash'){
+    top.innerHTML = '<h1>휴지통</h1><span class="cnt">' + 휴지통일수 + '일 지나면 저절로 사라집니다</span>';
+    b.innerHTML = vTrash();
   }
+  const nt = $('#navtrash'); if(nt) nt.style.display = 최고관리자() ? '' : 'none';
   const n2 = W.tasks.filter(r=>!r.done && 내것(r.owners)).length, bd2 = $('#txbdg');
   if(n2){ bd2.textContent = n2; bd2.style.display=''; } else bd2.style.display='none';
   const n = D.asks.filter(a=>!a.done_at).length;
@@ -5097,6 +5441,7 @@ function 판열기(머리, 속, 발){
 }
 function popClose(){ if(typeof 쪽지닫기==='function') 쪽지닫기();
   if(typeof 회원판 !== 'undefined') 회원판 = null;
+  if(typeof 지정판 !== 'undefined') 지정판 = null;
   if(typeof BL!=='undefined' && BL){ try{ 글자넣기(); }catch(e){} }
   if(typeof 고른줄!=='undefined'){ 고른줄 = []; const sb = $('#txselbar'); if(sb) sb.remove(); }
   if(typeof 블록메뉴닫기==='function') 블록메뉴닫기();
@@ -5203,6 +5548,48 @@ document.addEventListener('click', async function(ev){
   if(tab && !tab.dataset.m){ S.tab = tab.dataset.tab;
     S.edit = { record:false, routine:false, body:false, meal:false, plan:false, minfo:false };
     render(); return; }
+
+  /* ── 회원 줄 「개인운동 · 수업」 → 루틴 지정 사이드 페이지 ── */
+  const 지정열기 = t.closest('[data-mas]');
+  if(지정열기){ 지정판열기(지정열기.dataset.mas, 지정열기.dataset.kind || '개인운동'); return; }
+  if(지정판){
+    const 종 = t.closest('[data-askind]');
+    if(종){ 지정판.kind = S.kind = 종.dataset.askind; 지정판그리기(); return; }
+    const 날 = t.closest('[data-asday]');
+    if(날){ S.asDate = 날.dataset.asday; 지정판그리기(); return; }
+    const 담기 = t.closest('[data-asr]');
+    if(담기){ const rid = 담기.dataset.asr;
+      지정판 = null; $('#pop').classList.remove('on');
+      S.rid = rid; S.view = 'routine'; render(); return; }
+    const 지정 = t.closest('[data-asput]');
+    if(지정){ 루틴지정(지정판.mid, 지정.dataset.asput, 지정판.kind); return; }
+    const 추천 = t.closest('[data-asreco]');
+    if(추천){ 루틴추천(지정판.mid, 추천.dataset.asreco); return; }
+  }
+
+  /* ── 휴지통 ── 영구 삭제는 되돌릴 수 없어 가운데 팝업으로 한 번 더 묻는다 */
+  const 되살 = t.closest('[data-trrs]');
+  if(되살){ const it = 휴지통.find(x=>String(x.id)===되살.dataset.trrs); if(!it) return;
+    (async ()=>{ try{ await 되살리기(it);
+        휴지통 = 휴지통.filter(x=>x.id!==it.id);
+        toast('되살렸습니다 — 화면을 새로 고치면 보입니다');
+        await 휴지통읽기(); render(); }
+      catch(e){ toast('되살리지 못했습니다 — ' + e.message); } })();
+    return; }
+  const 영구 = t.closest('[data-trdel]');
+  if(영구){ const it = 휴지통.find(x=>String(x.id)===영구.dataset.trdel); if(!it) return;
+    popOpen('<div class="cmask"><div class="q1">영구히 지울까요?</div>'
+      + '<div class="q2">' + esc(표이름[it.tbl]||it.tbl)
+      + '<br><b style="color:var(--warn)">되돌릴 수 없습니다</b></div>'
+      + '<div class="qbox">' + esc(it.label||'(이름 없음)') + '</div>'
+      + '<div class="qbtns"><button class="btn ghost" data-act="popclose">아니요</button>'
+      + '<button class="btn gold" data-act="trdelok" data-i="' + it.id + '">지우기</button></div></div>');
+    return; }
+
+  const 구분칩 = t.closest('[data-cmreg]');
+  if(구분칩){ S.cmReg = 구분칩.dataset.cmreg; render(); return; }
+  const 차례칩 = t.closest('[data-cmsort]');
+  if(차례칩){ S.cmSort = 차례칩.dataset.cmsort; render(); return; }
 
   const mtab = t.closest('[data-mtab]');
   if(mtab && 회원판){ S.tab = mtab.dataset.mtab; 회원판.tab = S.tab; 회원판그리기(); return; }
@@ -5412,7 +5799,7 @@ document.addEventListener('click', async function(ev){
   if(a==='bldel'){
     const bid = act.dataset.b;
     if(!confirm('이 인바디 기록을 지울까요?')) return;
-    try{ await ssend('body_logs?id=eq.'+bid, 'DELETE');
+    try{ await 휴지통으로('body_logs', M.bl.find(x=>String(x.id)===String(bid)), '체형 기록', ssend);
       M.bl = M.bl.filter(x=>x.id!==bid); toast('지웠습니다'); render(); }
     catch(e){ toast('지우기 실패 — ' + e.message); }
     return;
@@ -5535,12 +5922,78 @@ document.addEventListener('click', async function(ev){
   if(a==='cmprev'){
     const v = act.dataset.v; S.cmprev = (S.cmprev===v) ? null : v; render(); return;
   }
+  /* ── 코멘트 고치기 ── 바로 지우지 않는다.
+     「수정하기」로 열고, 수정·삭제 둘 다 **가운데 팝업**으로 한 번 더 묻는다
+     (2026-09-17 대표 지시) */
+  if(a==='trdelok'){
+    if(!최고관리자()) return toast('최고 관리자만 할 수 있어요');
+    const tid = act.dataset.i;
+    try{ await usend('tr_trash?id=eq.'+tid, 'DELETE');
+      휴지통 = 휴지통.filter(x=>String(x.id)!==String(tid));
+      popClose(); toast('영구히 지웠습니다'); render(); }
+    catch(e){ toast('지우기 실패 — ' + e.message); }
+    return; }
+  if(a==='trsweep'){
+    if(!최고관리자()) return toast('최고 관리자만 할 수 있어요');
+    const 끊는날 = new Date(Date.now() - 휴지통일수*864e5).toISOString();
+    const 셀것 = 휴지통.filter(x => x.deleted_at < 끊는날).length;
+    if(!셀것) return toast(휴지통일수 + '일 지난 것이 없어요');
+    popOpen('<div class="cmask"><div class="q1">' + 휴지통일수 + '일 지난 ' + 셀것 + '건을 지울까요?</div>'
+      + '<div class="q2"><b style="color:var(--warn)">되돌릴 수 없습니다</b></div>'
+      + '<div class="qbtns"><button class="btn ghost" data-act="popclose">아니요</button>'
+      + '<button class="btn gold" data-act="trsweepok">비우기</button></div></div>');
+    return; }
+  if(a==='trsweepok'){
+    if(!최고관리자()) return toast('최고 관리자만 할 수 있어요');
+    const 끊는날 = new Date(Date.now() - 휴지통일수*864e5).toISOString();
+    try{ await usend('tr_trash?deleted_at=lt.'+끊는날, 'DELETE');
+      await 휴지통읽기(); popClose(); toast('비웠습니다'); render(); }
+    catch(e){ toast('비우기 실패 — ' + e.message); }
+    return; }
+  if(a==='cmedit'){ S.cmEdit = (S.cmEdit === act.dataset.c) ? null : act.dataset.c; render();
+    setTimeout(()=>{ const el = document.getElementById('cmedit_'+S.cmEdit); if(el){ el.focus();
+      el.setSelectionRange(el.value.length, el.value.length); } }, 30);
+    return; }
+  if(a==='cmeditx'){ S.cmEdit = null; render(); return; }
+  if(a==='cmfix'){
+    const cid = act.dataset.c;
+    const c = D.c.find(x=>x.id===cid); if(!c) return;
+    const el = document.getElementById('cmedit_'+cid);
+    const 새글 = el ? el.value.trim() : '';
+    if(!새글){ toast('내용을 적어 주세요'); return; }
+    if(새글 === (c.body||'')){ toast('바뀐 것이 없어요'); S.cmEdit=null; render(); return; }
+    S.cmTmp = 새글;
+    popOpen('<div class="cmask"><div class="q1">이렇게 고칠까요?</div>'
+      + '<div class="q2">' + esc(memOf(c.member_id).name) + ' · ' + esc(vaName(c.variant_id))
+      + '<br>회원 앱에도 바로 바뀐 글이 보입니다</div>'
+      + '<div class="qbox">' + esc(새글) + '</div>'
+      + '<div class="qbtns"><button class="btn ghost" data-act="popclose">아니요</button>'
+      + '<button class="btn gold" data-act="cmfixok" data-c="' + esc(cid) + '">고치기</button></div></div>');
+    return; }
+  if(a==='cmfixok'){
+    const cid = act.dataset.c, 새글 = S.cmTmp || '';
+    try{ await ssend('comments?id=eq.'+cid, 'PATCH', { body: 새글 });
+      const c = D.c.find(x=>x.id===cid); if(c) c.body = 새글;
+      S.cmEdit = null; S.cmTmp = null; popClose(); toast('고쳤습니다'); render(); }
+    catch(e){ toast('고치기 실패 — ' + e.message); }
+    return; }
   if(a==='cmdel'){
     const cid = act.dataset.c;
-    if(!confirm('이 코멘트를 지울까요?')) return;
-    try{ await ssend('comments?id=eq.'+cid, 'DELETE');
-      D.c = D.c.filter(x=>x.id!==cid); toast('지웠습니다'); render(); }
-    catch(e){ toast('지우기 실패 — ' + e.message); }
+    const c = D.c.find(x=>x.id===cid); if(!c) return;
+    popOpen('<div class="cmask"><div class="q1">이 코멘트를 지울까요?</div>'
+      + '<div class="q2">' + esc(memOf(c.member_id).name) + ' · ' + esc(vaName(c.variant_id))
+      + '<br><b style="color:var(--warn)">되돌릴 수 없습니다</b></div>'
+      + '<div class="qbox">' + esc(c.body||'') + '</div>'
+      + '<div class="qbtns"><button class="btn ghost" data-act="popclose">아니요</button>'
+      + '<button class="btn gold" data-act="cmdelok" data-c="' + esc(cid) + '">지우기</button></div></div>');
+    return; }
+  if(a==='cmdelok'){
+    const cid = act.dataset.c;
+    const c0 = D.c.find(x=>x.id===cid);
+    try{ await 휴지통으로('comments', c0, memOf(c0.member_id).name + ' · ' + (c0.body||''), ssend);
+      D.c = D.c.filter(x=>x.id!==cid); S.cmEdit=null; popClose();
+      toast('휴지통으로 보냈습니다 — 60일 안에 되살릴 수 있어요'); render(); }
+    catch(e){ toast(e.message); }
     return;
   }
   if(a==='cmsend'){
@@ -5638,6 +6091,26 @@ document.addEventListener('click', async function(ev){
       D.r = D.r.filter(x=>x.id!==r.id);
       S.view='member'; S.tab='routine'; toast('지웠습니다'); render();
     }catch(e){ toast('지우기 실패 — ' + e.message); }
+    return;
+  }
+  if(a==='asnew'){ if(지정판){ 지정판.새 = true; 지정판그리기();
+      setTimeout(()=>{ const el=document.getElementById('asnewname'); if(el) el.focus(); }, 30); } return; }
+  if(a==='asnewx'){ if(지정판){ 지정판.새 = false; 지정판그리기(); } return; }
+  if(a==='asmake'){
+    if(!지정판) return;
+    const el = document.getElementById('asnewname');
+    const 이름 = (el && el.value || '').trim();
+    const mid = 지정판.mid;
+    const rs = D.r.filter(x=>x.member_id===mid);
+    const used = rs.map(x=>x.no); let no=1; while(used.includes(no)) no++;
+    const id2 = 'r'+Date.now();
+    const nm = 이름 || ('새 루틴 '+no);
+    try{
+      await ssend('routines','POST',[{ id:id2, member_id:mid, no:no, name:nm, purpose:'', grp:'' }]);
+      D.r.push({ id:id2, member_id:mid, no:no, name:nm, purpose:'', grp:'' });
+      지정판.새 = false; toast('「'+nm+'」 루틴을 만들었어요 — 종목을 담아 주세요');
+      지정판그리기();
+    }catch(e){ toast('만들기 실패 — ' + e.message); }
     return;
   }
   if(a==='reco'){
@@ -6003,6 +6476,7 @@ boot();
 setInterval(async function(){
   if(!ME) return;
   if(S.view==='members'||S.view==='today'||S.view==='cmall') load();
+  if(S.view==='trash'){ 휴지통청소().then(휴지통읽기).then(()=>render0()); }
   if(S.view==='home'||표정의[S.view]){ try{ await loadWork(); if(!$('#pop').classList.contains('on')) render(); }catch(e){} }
 }, 60000);
 </script>
