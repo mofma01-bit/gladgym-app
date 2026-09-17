@@ -922,7 +922,7 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 
 <script>
 "use strict";
-const BUILD = '66';
+const BUILD = '67';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -5349,6 +5349,10 @@ function render(){
 function render0(){
   const top = $('#top'), line = $('#topline'), b = $('#body');
   line.innerHTML = '';
+  /* ⛔ 바로 아래 txRender() 가 참이면 여기서 return 한다 (홈·업무·상담·연월차).
+     메뉴를 켜고 끄는 일은 그 전에 해야 한다 — 늦게 두었다가 홈에서 휴지통이 안 보였다
+     (2026-09-17 대표: 「휴지통 안나오는데?」) */
+  const nt = $('#navtrash'); if(nt) nt.style.display = 최고관리자() ? '' : 'none';
   if(txRender()){
     const n2 = W.tasks.filter(r=>!r.done && 내것(r.owners)).length, bd2 = $('#txbdg');
     if(n2){ bd2.textContent = n2; bd2.style.display=''; } else bd2.style.display='none';
@@ -5397,7 +5401,7 @@ function render0(){
     top.innerHTML = '<h1>휴지통</h1><span class="cnt">' + 휴지통일수 + '일 지나면 저절로 사라집니다</span>';
     b.innerHTML = vTrash();
   }
-  const nt = $('#navtrash'); if(nt) nt.style.display = 최고관리자() ? '' : 'none';
+
   const n2 = W.tasks.filter(r=>!r.done && 내것(r.owners)).length, bd2 = $('#txbdg');
   if(n2){ bd2.textContent = n2; bd2.style.display=''; } else bd2.style.display='none';
   const n = D.asks.filter(a=>!a.done_at).length;
