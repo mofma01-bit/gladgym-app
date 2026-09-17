@@ -999,7 +999,7 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 
 <script>
 "use strict";
-const BUILD = '74';
+const BUILD = '75';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -5180,15 +5180,15 @@ function 빠른코멘트열기(mid){
     + (its.length
       ? '<div class="lbl">어느 종목에</div><div class="chips" style="margin:0 0 10px">'
         + its.map(it => '<button class="chip ' + (빠른코멘트.vid===it.variant_id?'on':'') + '" '
-            + 'data-act="qcv" data-v2="' + esc(it.variant_id) + '" data-id="' + esc(mid) + '">'
+            + 'data-act="tx:qcv" data-v2="' + esc(it.variant_id) + '" data-id="' + esc(mid) + '">'
             + esc(vaName(it.variant_id)) + '</button>').join('') + '</div>'
       : '<div class="note" style="border-color:var(--warn)">'
         + '<b style="color:var(--warn)">운동 기록이 없어요</b>'
         + '<div>코멘트는 종목에 답니다. 먼저 회원이 운동을 기록하거나, 사이드 페이지에서 기록을 만들어 주세요.</div></div>')
     + (its.length ? '<textarea class="inp" id="qctx" rows="4" placeholder="지금 본 것을 한 줄 적어 주세요"></textarea>' : '')
     + '<div style="display:flex;gap:9px;margin-top:10px">'
-    + (its.length ? '<button class="btn gold" data-act="qcsend" data-id="' + esc(mid) + '">보내기</button>' : '')
-    + '<button class="btn ghost" data-act="qcfull" data-id="' + esc(mid) + '">⤢ 회원 코멘트 전체</button>'
+    + (its.length ? '<button class="btn gold" data-act="tx:qcsend" data-id="' + esc(mid) + '">보내기</button>' : '')
+    + '<button class="btn ghost" data-act="tx:qcfull" data-id="' + esc(mid) + '">⤢ 회원 코멘트 전체</button>'
     + '<button class="btn ghost" data-act="popclose">닫기</button></div>');
   setTimeout(()=>{ const t = document.getElementById('qctx'); if(t) t.focus(); }, 40);
 }
