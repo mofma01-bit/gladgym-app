@@ -645,6 +645,78 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 .tx-fpush{padding:4px 11px;border-radius:7px;font-size:11.5px;font-weight:800;
   color:#1b1a17;background:var(--gold);box-shadow:0 0 0 1px var(--gold-2)}
 .tx-fpush:hover{filter:brightness(1.08)}
+/* ── 프로필 사진 · 내 이름표 ── (2026-09-17) */
+.tx-face{display:inline-flex;align-items:center;justify-content:center;border-radius:50%;
+  font-weight:800;flex:none;overflow:hidden;background:var(--dark-4);color:var(--sub)}
+.tx-face img{width:100%;height:100%;object-fit:cover;display:block}
+#gav img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
+.myband{display:flex;align-items:center;gap:14px;width:100%;text-align:left;margin-bottom:16px;
+  padding:13px 16px;background:var(--dark-2);border:1px solid var(--line);border-radius:14px}
+.myband:hover{border-color:var(--gold-2)}
+.mb-tx{flex:1;min-width:0}
+.mb-n{display:block;font-size:15px;font-weight:800;letter-spacing:-.01em}
+.mb-n i{font-style:normal;font-size:10.5px;font-weight:800;color:var(--sub);
+  background:var(--dark-4);border-radius:7px;padding:2px 7px;margin-left:8px;vertical-align:2px}
+.mb-s{display:block;font-size:12px;color:var(--sub);margin-top:3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mb-q{flex:none;max-width:340px;padding:8px 13px;border-left:1px solid var(--line)}
+.mb-q b{display:block;font-size:10.5px;font-weight:800;color:var(--gold);margin-bottom:3px}
+.mb-q span{display:block;font-size:12.5px;font-weight:700;color:var(--cream);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mb-q.none span{color:#6f6a63;font-weight:600}
+.tx-past{display:flex;flex-direction:column;gap:6px}
+.tx-past .pq{display:flex;gap:10px;background:var(--dark-3);border-radius:9px;padding:8px 11px}
+.tx-past .pq b{font-size:11px;font-weight:800;color:var(--gold-2);flex:none;min-width:66px}
+.tx-past .pq span{font-size:12px;color:var(--sub)}
+/* ── 홈 — 블록마다 생김새가 다르다 ── */
+.homewrap{display:flex;flex-direction:column;gap:2px}
+.tx-home.one{display:block;margin-bottom:16px}
+.homenums{display:flex;gap:28px;padding:0 3px 17px;margin-bottom:18px;border-bottom:1px solid var(--line)}
+.homenums .num{display:block;text-align:left}
+.homenums .v{display:block;font-size:28px;font-weight:800;line-height:1;letter-spacing:-.03em}
+.homenums .k{display:block;font-size:11.5px;color:var(--sub);font-weight:700;margin-top:5px}
+.homenums .num.zero .v{color:#454540} .homenums .num.zero .k{color:#575751}
+.homenums .num.warn .v{color:var(--warn)}
+.homenums .num.gold .v{color:var(--gold)}
+.homenums .num.teal .v{color:var(--teal)}
+/* 회원 — 얼굴 타일 */
+.faces{display:grid;grid-template-columns:repeat(auto-fill,minmax(142px,1fr));gap:10px}
+.face{background:var(--dark-2);border:1px solid #3d2a24;border-radius:15px;padding:14px 12px 12px;
+  text-align:center;display:flex;flex-direction:column;align-items:center;gap:7px}
+.face:hover{border-color:var(--warn)}
+.fn2{font-size:13.5px;font-weight:800}
+.fd{font-size:24px;font-weight:800;color:var(--warn);line-height:1;letter-spacing:-.02em}
+.fd small{font-size:10.5px;font-weight:700;color:#a8796c;margin-left:2px}
+.fd.none{font-size:13px;font-weight:800}
+.tx-face.tx-c-warn{background:var(--warn-dim);color:var(--warn)}
+.tx-face.tx-c-teal{background:var(--teal-dim);color:var(--teal)}
+.tx-face.tx-c-gold{background:var(--gold-dim);color:var(--gold)}
+.fs{font-size:10.5px;color:#6f6a63;font-weight:600}
+/* 코멘트 — 말풍선 */
+.bub{display:flex;gap:11px;align-items:flex-start;width:100%;text-align:left;margin-bottom:9px}
+.bub .say{flex:1;min-width:0}
+.bub .who{display:block;font-size:11.5px;color:var(--sub);font-weight:700;margin-bottom:4px}
+.bub .tx{display:inline-block;max-width:min(560px,100%);background:var(--teal-dim);
+  border-radius:3px 13px 13px 13px;padding:9px 13px;font-size:13px;line-height:1.55;color:#d8ecf2}
+.bub .act{display:block;margin-top:6px;font-size:11.5px;color:var(--teal);font-weight:800}
+/* 꾸미기 */
+.hmbtn{align-self:flex-start;margin-top:6px;padding:8px 14px;border-radius:10px;
+  border:1px dashed var(--line);font-size:12px;font-weight:700;color:#6f6a63}
+.hmbtn:hover{border-color:var(--gold-2);color:var(--gold)}
+.hmlist{display:flex;flex-direction:column;gap:5px}
+.hmrow{display:flex;align-items:center;gap:11px;background:var(--dark-3);border:1px solid transparent;
+  border-radius:10px;padding:9px 12px;cursor:grab}
+.hmrow.off{opacity:.45}
+.hmrow.drag{opacity:.3}
+.hmrow.over{border-color:var(--gold)}
+.hmrow .grip{color:#5f5a55;font-size:13px;flex:none}
+.hmrow .tx{flex:1;min-width:0}
+.hmrow .tx b{display:block;font-size:13px;font-weight:800}
+.hmrow .tx i{display:block;font-style:normal;font-size:11px;color:var(--sub);margin-top:1px}
+.hmrow .eye{font-size:14px;padding:3px 6px;flex:none}
+.myband.c-teal{border-color:var(--teal)} .myband.c-teal .mb-q b{color:var(--teal)}
+.myband.c-warn{border-color:var(--warn)} .myband.c-warn .mb-q b{color:var(--warn)}
+.myband.c-cream{border-color:#6f6a63} .myband.c-cream .mb-q b{color:var(--cream)}
 .tx-help{font-size:11.5px;color:#5f5a54;padding:8px 4px 0}
 .tx-help b{color:#8b8479;font-weight:700}
 .tx-table .tx-tag{font-size:11px}
@@ -922,7 +994,7 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 
 <script>
 "use strict";
-const BUILD = '68';
+const BUILD = '70';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -2524,6 +2596,26 @@ function vTrash(){
    ══════════════════════════════════════════════════════════════ */
 const 사람 = id => W.staff.find(x=>x.id===id) || { id, name:'?', color:'gray' };
 const 이름들 = ids => (ids||[]).map(id=>사람(id).name).join(', ');
+/* ── 프로필 사진 · 분기 목표 ── (2026-09-17 대표 지시)
+   사진은 비공개 저장소 `tr` 에 넣고 1시간짜리 서명 주소로 본다 — 주소만으로는 안 열린다 */
+const 이번분기 = (d) => { const x = d ? new Date(d) : new Date();
+  return x.getFullYear() + ' ' + (Math.floor(x.getMonth()/3) + 1) + '분기'; };
+const 사진주소 = {};                       /* staff.photo(path) → 서명 주소 */
+async function 사진채우기(){
+  const ps = (W.staff||[]).map(x => x.photo).filter(x => x && !사진주소[x]);
+  if(!ps.length) return;
+  const us = await 서명주소들(ps);
+  ps.forEach((x,i) => { if(us[i]) 사진주소[x] = us[i]; });
+}
+/* 사람 하나를 동그란 사진으로 — 사진이 없으면 지금처럼 이름 두 글자 */
+function 얼굴(p, 크기){
+  const sz = 크기 || 30;
+  const url = p && p.photo ? 사진주소[p.photo] : '';
+  const 속 = url ? '<img src="'+esc(url)+'" alt="">' : esc(((p&&p.name)||'?').slice(-2));
+  return '<span class="tx-face tx-c-'+esc((p&&p.color)||'gray')+'" '
+    + 'style="width:'+sz+'px;height:'+sz+'px;font-size:'+Math.round(sz*0.34)+'px" '
+    + 'title="'+esc((p&&p.name)||'')+'">'+속+'</span>';
+}
 const 아바타 = id => { const p = 사람(id);
   return '<span class="tx-av tx-c-'+esc(p.color||'gray')+'" title="'+esc(p.name)+'">'+esc((p.name||'?').slice(-2))+'</span>'; };
 const 아바타들 = ids => (ids&&ids.length) ? '<span class="tx-avs">'+ids.map(아바타).join('')+'</span>' : '';
@@ -2780,6 +2872,7 @@ async function loadWork(){
     uget('tr_meta?select=*').catch(()=>[]),
   ]);
   W.staff = g[0]; W.tasks = g[1]; W.leads = g[2]; W.leave = g[3]; W.cm = g[4] || [];
+  try{ await 사진채우기(); }catch(e){}
   W.cols = g[5] || []; W.views = g[6] || []; W.meta = g[7] || [];
   /* 보기에 담긴 조건·정렬·그룹을 화면에 얹는다 — 없으면 빈 채로 */
   try{ Object.keys(표정의).forEach(k => 보기얹기(k)); }catch(e){}
@@ -4824,30 +4917,261 @@ function txNewMenu(key){
 
 /* 홈 — 오늘 한눈에 */
 function vHome(){
+  /* ⛔ 홈은 사람마다 다르다 — 차례·켜짐·줄수는 `staff.home` 에서 읽는다 (2026-09-17) */
+  const H = 내홈();
+  const N = H.줄수;
   const 공지 = W.tasks.filter(r=>r.kind==='대표공지' && !r.done).slice(0,3);
-  const 내업무 = W.tasks.filter(r=>!r.done && 내것(r.owners)).sort(표정의.tasks.정렬).slice(0,8);
-  const 오늘상담 = W.leads.filter(r=>오늘인가(r.at) && !r.done).sort((a,b)=>(a.at||'')>(b.at||'')?1:-1);
-  const 이번주 = W.leave.filter(표정의.leave.보기[0].필터).sort((a,b)=>(a.day||'')>(b.day||'')?1:-1);
+  const 내업무 = W.tasks.filter(r=>!r.done && 내것(r.owners)).sort(표정의.tasks.정렬).slice(0,N);
+  const 오늘상담 = W.leads.filter(r=>오늘인가(r.at) && !r.done).sort((a,b)=>(a.at||'')>(b.at||'')?1:-1).slice(0,N);
+  const 이번주 = W.leave.filter(표정의.leave.보기[0].필터).sort((a,b)=>(a.day||'')>(b.day||'')?1:-1).slice(0,N);
   const 대기 = 관리자() ? W.leave.filter(r=>r.status==='req').length : 0;
+
   const 섹 = (제목, key, 목록, 빈말) => '<div class="sec"><div class="lbl">'+제목+' '+목록.length+'건'
     + '<span class="r" data-act="tx:go" data-k="'+key+'">전부 보기 ›</span></div>'
     + (목록.length ? '<div class="tx-list">'+목록.map(r=>txRow(key, r)).join('')+'</div>' : '<div class="empty">'+빈말+'</div>') + '</div>';
-  return (공지.length ? '<div class="sec" style="margin-bottom:14px">'+공지.map(r=>'<button class="tx-notice" style="text-align:left;width:100%" data-act="tx:open" data-k="tasks" data-id="'+r.id+'"><div class="t1">📌 '+esc(r.title)+'</div>'+(블록요약(r.body)?'<div class="t2">'+esc(블록요약(r.body))+'</div>':'')+'</button>').join('')+'</div>' : '')
-    + '<div class="tx-home">'
-    + 섹('내 업무', 'tasks', 내업무, '남은 업무가 없어요')
-    + 섹('오늘 상담', 'leads', 오늘상담, '오늘 잡힌 상담이 없어요')
-    + 섹('이번 주 연월차'+(대기?' <span class="tx-tag warn">승인 대기 '+대기+'</span>':''), 'leave', 이번주, '이번 주는 없어요')
-    + '</div><div style="height:18px"></div>' + vToday();
+
+  /* 내 이름표 — 슬로건과 이번 분기 목표를 출근하면 늘 본다 */
+  const g = (ME && ME.goal) || {};
+  const 이름표 = ME ? '<button class="myband c-'+esc(H.색)+'" data-act="tx:me">'
+      + 얼굴(ME, 46)
+      + '<span class="mb-tx">'
+      + '<span class="mb-n">' + esc(ME.name)
+        + '<i>' + ({admin:'관리자',trainer:'트레이너',fc:'FC'}[ME.role]||ME.role) + '</i></span>'
+      + '<span class="mb-s">' + (g.value ? esc(g.value) : '슬로건을 적어 주세요 — 눌러서 씁니다') + '</span>'
+      + '</span>'
+      + '<span class="mb-q' + (g.quarter ? '' : ' none') + '">'
+      + '<b>' + esc(이번분기()) + ' 목표</b>'
+      + '<span>' + (g.quarter ? esc(g.quarter) : '아직 안 적었어요 — 매분기마다 기입해 주세요!') + '</span>'
+      + '</span></button>' : '';
+
+  const 공지판 = 공지.length ? '<div class="sec" style="margin-bottom:14px">'
+    + 공지.map(r=>'<button class="tx-notice" style="text-align:left;width:100%" data-act="tx:open" data-k="tasks" data-id="'+r.id+'">'
+      + '<div class="t1">📌 '+esc(r.title)+'</div>'
+      + (블록요약(r.body)?'<div class="t2">'+esc(블록요약(r.body))+'</div>':'')+'</button>').join('')+'</div>' : '';
+
+  const 그릴것 = {
+    band:   () => 이름표,
+    notice: () => 공지판,
+    nums:   () => 숫자줄(내업무.length, 오늘상담.length),
+    tasks:  () => '<div class="tx-home one">' + 섹('내 업무', 'tasks', 내업무, '남은 업무가 없어요') + '</div>',
+    leads:  () => '<div class="tx-home one">' + 섹('오늘 상담', 'leads', 오늘상담, '오늘 잡힌 상담이 없어요') + '</div>',
+    leave:  () => '<div class="tx-home one">'
+      + 섹('이번 주 연월차'+(대기?' <span class="tx-tag warn">승인 대기 '+대기+'</span>':''), 'leave', 이번주, '이번 주는 없어요')
+      + '</div>',
+    cold:   () => 끊긴회원줄(N),
+    cm:     () => 코멘트줄(N),
+    today:  () => vToday(),
+  };
+
+  return '<div class="homewrap">'
+    + H.차례.filter(k => !H.끔[k]).map(k => (그릴것[k] ? 그릴것[k]() : '')).join('')
+    + '<button class="hmbtn" data-act="tx:hm">⚙ 내 홈 꾸미기</button>'
+    + '</div>';
+}
+
+/* 숫자 한 줄 */
+function 숫자줄(업무수, 상담수){
+  const 끊 = 끊긴목록().length;
+  const 요청 = D.asks.filter(a=>!a.done_at && 내담당(a.member_id)).length;
+  const 안본 = D.c.filter(c=>!c.read_at && 내담당(c.member_id)).length;
+  const 오늘운동 = D.w.filter(w=>w.on_date===TODAY && 내담당(w.member_id)).length;
+  const it = (v, k, c) => '<button class="num'+(v?' '+c:' zero')+'"><span class="v">'+v+'</span><span class="k">'+k+'</span></button>';
+  return '<div class="homenums">'
+    + it(끊,'기록 끊김','warn') + it(업무수,'내 업무','gold') + it(요청,'코멘트 요청','teal')
+    + it(안본,'회원 안 봄','teal') + it(오늘운동,'오늘 운동','gold') + it(상담수,'오늘 상담','gold')
+    + '</div>';
+}
+/* 기록이 끊긴 회원 — 앱 운동 기록 기준이다(출입 자료가 아니다) */
+function 끊긴목록(){
+  return D.m.filter(x=>(x.role||'member')==='member' && 내담당(x.id)).map(function(m){
+    const ws = D.w.filter(w=>w.member_id===m.id && w.done).sort((a,b)=> a.on_date<b.on_date?1:-1);
+    return { m, gap: ws[0] ? daysAgo(ws[0].on_date) : null, last: ws[0]?ws[0].on_date:null };
+  }).filter(x=>x.gap===null || x.gap>=7).sort((a,b)=>(b.gap||9999)-(a.gap||9999));
+}
+function 끊긴회원줄(N){
+  const 다 = 끊긴목록().slice(0, N);
+  return '<div class="tx-home one"><div class="sec">'
+    + '<div class="lbl">기록이 끊긴 회원 '+끊긴목록().length+'명'
+    + '<span class="r" data-act="go" data-k="members">전부 보기 ›</span></div>'
+    + (다.length ? '<div class="faces">' + 다.map(x =>
+        '<button class="face" data-m="'+esc(x.m.id)+'" data-tab="routine">'
+        + 얼굴(Object.assign({}, x.m, {color:'warn'}), 46)
+        + '<span class="fn2">'+esc(x.m.name)+'</span>'
+        + (x.gap===null ? '<span class="fd none">기록 없음</span>'
+                        : '<span class="fd">'+x.gap+'<small>일</small></span>')
+        + '<span class="fs">'+(x.last?'마지막 '+dayText(x.last):'앱을 아직 안 썼어요')+'</span></button>').join('') + '</div>'
+      : '<div class="empty">모두 잘 나오고 있어요</div>') + '</div></div>';
+}
+/* 코멘트 — 요청과 아직 안 단 것 */
+function 코멘트줄(N){
+  const 요청 = D.asks.filter(a=>!a.done_at && 내담당(a.member_id)).slice(0, N);
+  return '<div class="tx-home one"><div class="sec">'
+    + '<div class="lbl">코멘트 요청 '+요청.length+'건'
+    + '<span class="r" data-act="go" data-k="cmall">전부 보기 ›</span></div>'
+    + (요청.length ? 요청.map(a=>'<button class="bub" data-m="'+esc(a.member_id)+'" data-tab="comment">'
+        + 얼굴(Object.assign({}, memOf(a.member_id), {color:'teal'}), 32)
+        + '<span class="say"><span class="who">'+esc(memOf(a.member_id).name)+' · '+esc(vaName(a.variant_id))+'</span>'
+        + '<span class="tx">'+esc(a.note||'따로 적은 말은 없습니다')+'</span>'
+        + '<span class="act">답 남기기 ›</span></span></button>').join('')
+      : '<div class="empty">지금은 요청이 없어요</div>') + '</div></div>';
+}
+
+/* ══ 내 홈 꾸미기 ══ 사람마다 자기 홈을 다르게 짠다 (2026-09-17 대표: 「개인의 스타일에 맞게 커스텀」)
+   ⛔ 다크+골드 톤앤매너는 확정 항목이라 건드리지 않는다. 바꾸는 것은
+      ① 블록 차례 ② 켜고 끄기 ③ 몇 줄까지 보일지 ④ 내 이름표 강조색 — 넷뿐이다.
+   담기는 곳은 `staff.home`(jsonb) — 기기를 바꿔도 따라온다 */
+/* ⛔ `mine` 은 vCmAll·vToday 안에만 있는 지역 이름이다. 홈은 제 것을 쓴다 */
+const 내담당 = mid => S.who === '전체' || (memOf(mid).trainer || '') === S.who;
+const 홈블록 = [
+  { k:'band',  이름:'내 이름표',        설명:'사진 · 슬로건 · 분기 목표' },
+  { k:'notice',이름:'대표 공지',        설명:'읽어야 하는 공지' },
+  { k:'nums',  이름:'숫자 한 줄',       설명:'업무 · 기록 끊김 · 코멘트 …' },
+  { k:'tasks', 이름:'내 업무',          설명:'남은 업무' },
+  { k:'cold',  이름:'기록 끊긴 회원',   설명:'오래 기록이 없는 회원' },
+  { k:'cm',    이름:'코멘트',           설명:'요청 · 아직 안 단 것' },
+  { k:'leads', 이름:'오늘 상담',        설명:'오늘 잡힌 상담' },
+  { k:'today', 이름:'오늘 수업 · 루틴',  설명:'오늘 운동과 지정한 루틴' },
+  { k:'leave', 이름:'이번 주 연월차',   설명:'승인 대기 포함' },
+];
+/* ══ 꾸밈 규격 ══ 넓힐 때는 **이 표에 한 줄만** 더한다. 판은 표를 보고 저절로 그려진다.
+   (2026-09-17 대표: 「커스텀하는 영역은 규정해야겠지 · 넓혀나갈거니까 뼈대부터 잡아」)
+
+   ⛔ 경계 — 개인이 꾸미는 것과 모두가 같이 보는 것을 **절대 섞지 않는다**
+     · 개인   → `staff.home` (이 표에 있는 것만). 기기를 바꿔도 따라온다
+     · 모두   → `tr_views` · `tr_meta` (보기·필터·칸 차례). 「모두에게 저장」으로만 바뀐다
+     · 못 바꿈 → 다크+골드 바탕 · 글씨 크기 체계 · 왼쪽 메뉴 구성 (브랜드 확정 항목)
+
+   꼴(type)
+     차례  블록 순서 — 끌어서
+     토글  블록 켜기/끄기
+     고름  몇 개 중 하나 (칩)
+     숫자  몇 개 중 하나 (칩, 숫자) */
+const 꾸밈규격 = [
+  { k:'차례', 꼴:'차례', 이름:'블록 차례',   설명:'끌어서 차례를 바꾸고, 눈을 눌러 끕니다', 기본:null },
+  { k:'줄수', 꼴:'숫자', 이름:'한 블록에 몇 줄까지', 값:[3,5,8,12], 기본:5 },
+  { k:'색',   꼴:'고름', 이름:'내 이름표 색',
+    값:[['gold','금색'],['teal','청록'],['warn','살구'],['cream','흰색']], 기본:'gold',
+    밑말:'바탕은 모두 같게 둡니다 — 브랜드 톤이라 바꾸지 않습니다' },
+];
+const 홈기본 = (()=>{ const o = { 차례:홈블록.map(x=>x.k), 끔:{} };
+  꾸밈규격.forEach(x => { if(x.기본 != null) o[x.k] = x.기본; }); return o; })();
+function 내홈(){
+  const h = (ME && ME.home) || {};
+  const 차례 = (h.차례||[]).filter(k => 홈블록.some(b=>b.k===k));
+  홈블록.forEach(b => { if(차례.indexOf(b.k) < 0) 차례.push(b.k); });   /* 새로 생긴 블록은 뒤에 */
+  const o = { 차례, 끔: h.끔||{} };
+  꾸밈규격.forEach(x => { if(x.기본 != null) o[x.k] = (h[x.k] != null ? h[x.k] : x.기본); });
+  return o;
+}
+const 홈켜짐 = k => !내홈().끔[k];
+async function 내홈저장(h){
+  const home = Object.assign({}, 내홈(), h);
+  try{ await usend('staff?id=eq.'+ME.id, 'PATCH', { home });
+    ME.home = home;
+    const i = W.staff.findIndex(x=>x.id===ME.id); if(i>=0) W.staff[i].home = home;
+    render(); }
+  catch(e){ toast('못 저장했어요 — '+e.message); }
+}
+/* 꾸미기 판 */
+function 홈꾸미기(){
+  const h = 내홈();
+  const 칸 = x => {
+    if(x.꼴 === '차례')
+      return '<div class="hmlist">' + h.차례.map((k,i) => {
+        const b = 홈블록.find(z=>z.k===k) || {이름:k}; const 꺼짐 = !!h.끔[k];
+        return '<div class="hmrow'+(꺼짐?' off':'')+'" data-hmi="'+i+'">'
+          + '<span class="grip">⠿</span>'
+          + '<span class="tx"><b>'+esc(b.이름)+'</b><i>'+esc(b.설명||'')+'</i></span>'
+          + '<button class="eye" data-act="tx:hmtog" data-v2="'+esc(k)+'">'+(꺼짐?'🙈':'👁')+'</button></div>'; }).join('')
+        + '</div>';
+    const 값들 = x.꼴 === '숫자' ? x.값.map(v=>[v, v+'줄']) : x.값;
+    return '<div class="chips" style="margin:0">' + 값들.map(v =>
+      '<button class="chip '+(String(h[x.k])===String(v[0])?'on':'')+'" '
+      + 'data-act="tx:hmset" data-f="'+esc(x.k)+'" data-v2="'+esc(v[0])+'">'+esc(v[1])+'</button>').join('') + '</div>';
+  };
+  판열기('내 홈 꾸미기',
+    꾸밈규격.map(x => '<div class="sec"><div class="lbl">'+esc(x.이름)
+      + (x.꼴==='차례' ? ' <span class="r" style="color:#6f6a63;font-weight:600">'+esc(x.설명)+'</span>' : '')
+      + '</div>' + 칸(x)
+      + (x.밑말 ? '<div class="t2" style="margin-top:8px;color:#6f6a63">'+esc(x.밑말)+'</div>' : '')
+      + '</div>').join('')
+    + '<div class="sec"><button class="btn ghost" data-act="tx:hmreset">처음 모양으로 되돌리기</button></div>'
+    + '<div class="t2" style="color:#5f5a55;line-height:1.7">여기서 바꾼 것은 <b>내 화면에만</b> 듭니다.'
+    + ' 표의 보기·필터·칸 차례는 「모두에게 저장」 쪽입니다.</div>',
+    '<div class="tx-fbtns"><span class="tx-stat">바꾸면 바로 저장됩니다</span>'
+    + '<button class="btn gold" data-act="popclose">닫기</button></div>');
+}
+/* 꾸미기 판에서 끌어 차례 바꾸기 */
+let 홈끌기 = null;
+document.addEventListener('mousedown', function(ev){
+  const r = ev.target.closest && ev.target.closest('.hmrow'); if(!r) return;
+  if(ev.target.closest('.eye')) return;
+  홈끌기 = { 부터:+r.dataset.hmi, el:r };
+});
+document.addEventListener('mousemove', function(ev){
+  if(!홈끌기 || ev.buttons!==1) return;
+  const r = ev.target.closest && ev.target.closest('.hmrow'); if(!r) return;
+  홈끌기.el.classList.add('drag'); 홈끌기.까지 = +r.dataset.hmi;
+  document.querySelectorAll('.hmrow').forEach(e=>e.classList.remove('over'));
+  if(홈끌기.까지 !== 홈끌기.부터) r.classList.add('over');
+});
+document.addEventListener('mouseup', async function(){
+  if(!홈끌기) return; const z = 홈끌기; 홈끌기 = null;
+  document.querySelectorAll('.hmrow').forEach(e=>e.classList.remove('drag','over'));
+  if(z.까지 == null || z.까지 === z.부터) return;
+  const 차례 = 내홈().차례.slice();
+  차례.splice(z.까지, 0, 차례.splice(z.부터, 1)[0]);
+  await 내홈저장({ 차례 }); 홈꾸미기();
+});
+
+/* 프로필 사진 올리기 — 320px 정사각으로 줄여 담는다 (용량·모양을 일정하게) */
+async function 프로필올리기(file){
+  toast('사진을 줄이는 중…');
+  const blob = await new Promise(ok => {
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => { const S2 = 320, c = document.createElement('canvas');
+      c.width = c.height = S2;
+      const x = c.getContext('2d');
+      const r = Math.max(S2/img.width, S2/img.height);
+      const w = img.width*r, h = img.height*r;
+      x.drawImage(img, (S2-w)/2, (S2-h)/2, w, h);
+      URL.revokeObjectURL(url);
+      c.toBlob(b => ok(b), 'image/jpeg', 0.88); };
+    img.onerror = () => { URL.revokeObjectURL(url); ok(null); };
+    img.src = url;
+  });
+  if(!blob) return toast('사진을 읽지 못했어요');
+  const path = 'staff/' + ME.id + '/' + Date.now() + '.jpg';
+  try{
+    const t = await 토큰();
+    const res = await fetch(SB_URL+'/storage/v1/object/tr/'+path, { method:'POST',
+      headers:{ apikey:SB_KEY, Authorization:'Bearer '+t, 'Content-Type':'image/jpeg' }, body: blob });
+    if(!res.ok) throw new Error((await res.text()).slice(0,80));
+    await usend('staff?id=eq.'+ME.id, 'PATCH', { photo: path });
+    ME.photo = path;
+    const i = W.staff.findIndex(x=>x.id===ME.id); if(i>=0) W.staff[i].photo = path;
+    사진주소[path] = (await 서명주소들([path]))[0] || '';
+    toast('사진을 올렸어요'); txMe(); render();
+  }catch(e){ toast('못 올렸어요 — ' + e.message); }
 }
 
 /* 내 정보 */
 function txMe(){
   const g = (ME && ME.goal) || {};
   popOpen('<h2>내 정보</h2>'
-    + '<div class="card rowc">'+아바타(ME.id)+'<div><div class="t1">'+esc(ME.name)+'</div><div class="t2">'+({admin:'관리자',trainer:'트레이너',fc:'FC'}[ME.role]||ME.role)+' · '+esc((AUTH.user||{}).email||'')+'</div></div></div>'
-    + '<div class="fld"><span class="fn">나의 핵심 가치</span><input class="inp" id="txg1" value="'+esc(g.value||'')+'" placeholder="예: 변하지 않는 진정성으로 회원님의 도전을 서포트한다"></div>'
-    + '<div class="fld"><span class="fn">이번 분기 목표</span><input class="inp" id="txg2" value="'+esc(g.quarter||'')+'" placeholder="예: 평균 매출 800 이상"></div>'
+    + '<div class="card rowc">' + 얼굴(ME, 52)
+      + '<div style="flex:1"><div class="t1">'+esc(ME.name)+'</div><div class="t2">'
+      + ({admin:'관리자',trainer:'트레이너',fc:'FC'}[ME.role]||ME.role)+' · '+esc((AUTH.user||{}).email||'')+'</div></div>'
+      + '<button class="btn ghost sm" data-act="tx:photo">'+(ME.photo?'사진 바꾸기':'＋ 사진')+'</button>'
+      + (ME.photo ? '<button class="btn ghost sm" data-act="tx:photox">빼기</button>' : '') + '</div>'
+    + '<div class="fld"><span class="fn">슬로건 — 나의 핵심 가치</span><input class="inp" id="txg1" value="'+esc(g.value||'')+'" placeholder="예: 변하지 않는 진정성으로 회원님의 도전을 서포트한다"></div>'
+    + '<div class="fld"><span class="fn">'+esc(이번분기())+' 목표 <b style="color:var(--gold)">— 매분기마다 기입해 주세요!</b></span>'
+      + '<input class="inp" id="txg2" value="'+esc(g.quarter||'')+'" placeholder="예: 평균 매출 800 이상"></div>'
     + '<button class="btn sub" data-act="tx:goal">목표 저장</button>'
+    + (()=>{ const 지난 = (g.지난||[]).slice().reverse();
+        return 지난.length ? '<div class="lbl" style="margin-top:12px">지난 목표 '+지난.length+'개</div>'
+          + '<div class="tx-past">' + 지난.map(x=>'<div class="pq"><b>'+esc(x.q)+'</b><span>'+esc(x.tx||'')+'</span></div>').join('') + '</div>'
+          : '<div class="t2" style="margin-top:9px;color:#6f6a63">분기가 바뀌어 목표를 새로 적으면 지난 목표가 여기 쌓입니다</div>'; })()
     + (관리자() ? '<div class="lbl" style="margin-top:6px">회원 화면에서 누구로 볼까요</div><div class="tx-pchips">'
         + ['전체'].concat([...new Set(D.m.map(x=>x.trainer).filter(Boolean))]).map(t=>'<button class="tx-pchip '+(S.who===t?'on':'')+'" data-setwho="'+esc(t)+'">'+esc(t==='전체'?'전체 보기':t)+'</button>').join('')+'</div>' : '')
     + (관리자() ? '<div class="lbl" style="margin-top:8px">직원 관리 <span class="r" style="color:var(--sub);font-weight:500">구글 메일을 넣으면 그 사람이 들어올 수 있어요</span></div>'
@@ -5186,8 +5510,36 @@ async function txAct(a, el){
   if(a==='save'){ await txSave(); return; }
   if(a==='del'){ await txDel(); return; }
   if(a==='me'){ txMe(); return; }
-  if(a==='goal'){ const goal = { value:$('#txg1').value, quarter:$('#txg2').value };
-    try{ await usend('staff?id=eq.'+ME.id, 'PATCH', { goal }); ME.goal = goal; toast('목표를 저장했어요'); }catch(e){ toast('못 저장했어요 — '+e.message); } return; }
+  if(a==='goal'){
+    const 앞 = (ME.goal||{}), 이번 = 이번분기();
+    const 지난 = (앞.지난||[]).slice();
+    /* 분기가 바뀌었는데 앞 분기 목표가 아직 안 옮겨졌으면 옮긴다 */
+    if(앞.quarter && 앞.qat && 앞.qat !== 이번 && !지난.some(x=>x.q===앞.qat))
+      지난.push({ q: 앞.qat, tx: 앞.quarter });
+    const goal = { value:$('#txg1').value, quarter:$('#txg2').value, qat: 이번, 지난: 지난.slice(-16) };
+    try{ await usend('staff?id=eq.'+ME.id, 'PATCH', { goal }); ME.goal = goal;
+      const i = W.staff.findIndex(x=>x.id===ME.id); if(i>=0) W.staff[i].goal = goal;
+      toast('목표를 저장했어요'); txMe(); render(); }
+    catch(e){ toast('못 저장했어요 — '+e.message); } return; }
+  if(a==='hm'){ 홈꾸미기(); return; }
+  if(a==='hmtog'){ const 끔 = Object.assign({}, 내홈().끔);
+    if(끔[v2]) delete 끔[v2]; else 끔[v2] = 1;
+    await 내홈저장({ 끔 }); 홈꾸미기(); return; }
+  if(a==='hmset'){ const f = el.dataset.f; const 규 = 꾸밈규격.find(x=>x.k===f); if(!규) return;
+    await 내홈저장({ [f]: (규.꼴==='숫자' ? +v2 : v2) }); 홈꾸미기(); return; }
+  if(a==='hmreset'){ await 내홈저장(JSON.parse(JSON.stringify(홈기본)));
+    홈꾸미기(); toast('처음 모양으로 되돌렸어요'); return; }
+  if(a==='photo'){ const inp = document.createElement('input');
+    inp.type='file'; inp.accept='image/*';
+    inp.onchange = async () => { const f = inp.files && inp.files[0]; if(!f) return;
+      if(!/^image\//.test(f.type)) return toast('사진만 올릴 수 있어요');
+      await 프로필올리기(f); };
+    inp.click(); return; }
+  if(a==='photox'){
+    try{ await usend('staff?id=eq.'+ME.id, 'PATCH', { photo:null }); ME.photo = null;
+      const i = W.staff.findIndex(x=>x.id===ME.id); if(i>=0) W.staff[i].photo = null;
+      toast('사진을 뺐어요'); txMe(); render(); }
+    catch(e){ toast('못 뺐어요 — '+e.message); } return; }
   if(a==='pw'){ const pw = $('#txpw').value; if(pw.length<8){ toast('8자 이상이어야 해요'); return; }
     try{ await 비번바꾸기(pw); toast('비밀번호를 바꿨어요'); $('#txpw').value=''; }catch(e){ toast('바꾸지 못했습니다 — '+e.message); } return; }
   if(a==='out'){ await signOut(); return; }
@@ -5429,7 +5781,10 @@ function gnbDraw(){
   const dot = $('#belldot');
   if(n){ dot.textContent = n>99?'99+':n; dot.style.display=''; } else dot.style.display='none';
   $('#gnm').textContent = ME ? ME.name + (관리자() && S.who!=='전체' ? ' · '+S.who+' 보기' : '') : '—';
-  $('#gav').textContent = ME ? ME.name.slice(-2) : '—';
+  const gav = $('#gav');
+  const u = ME && ME.photo ? 사진주소[ME.photo] : '';
+  if(u) gav.innerHTML = '<img src="'+esc(u)+'" alt="">';
+  else gav.textContent = ME ? ME.name.slice(-2) : '—';
 }
 let 넓게 = false;
 function popOpen(html){ $('#popbox').innerHTML = html;
