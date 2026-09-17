@@ -996,7 +996,7 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 
 <script>
 "use strict";
-const BUILD = '71';
+const BUILD = '72';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -4997,10 +4997,16 @@ function 끊긴목록(){
     /* 회원이 스스로 한 운동은 따로 잰다 — 성격이 다른 신호라 섞지 않는다 */
     const ws = D.w.filter(w=>w.member_id===m.id && w.done).sort((a,b)=> a.on_date<b.on_date?1:-1);
     const 운동날 = ws[0] ? ws[0].on_date : null;
-    return { m, gap: 마지막 ? daysAgo(마지막) : null, last: 마지막, 수: cs.length,
-             운동: 운동날 ? daysAgo(운동날) : null, 운동날 };
+    /* 코멘트가 한 번도 없으면 「한 번도」가 아니라 **회원 등록일부터 오늘까지**를 센다
+       (2026-09-17 대표: 「한번도 x · 00일 동안 없음」) */
+    const 든날 = (m.created_at||'').slice(0,10);
+    const 빈날 = 든날 ? daysAgo(든날) : null;
+    return { m, gap: 마지막 ? daysAgo(마지막) : 빈날, last: 마지막, 수: cs.length,
+             없음: !마지막, 운동: 운동날 ? daysAgo(운동날) : null, 운동날, 운동수: ws.length };
   }).filter(x => x.gap === null || x.gap >= 코멘트밀림일)
-    .sort((a,b) => (b.gap === null ? 99999 : b.gap) - (a.gap === null ? 99999 : a.gap));
+    .sort((a,b) => { /* 한 번도 안 단 사람이 먼저, 그다음 오래된 순 */
+      if(a.없음 !== b.없음) return a.없음 ? -1 : 1;
+      return (b.gap === null ? 99999 : b.gap) - (a.gap === null ? 99999 : a.gap); });
 }
 function 끊긴회원줄(N){
   const 온 = 끊긴목록();
@@ -5013,12 +5019,13 @@ function 끊긴회원줄(N){
         '<button class="face" data-m="'+esc(x.m.id)+'" data-tab="comment">'
         + 얼굴(Object.assign({}, x.m, {color:'warn'}), 46)
         + '<span class="fn2">'+esc(x.m.name)+'</span>'
-        + (x.gap===null ? '<span class="fd none">한 번도</span>'
+        + (x.gap===null ? '<span class="fd none">기간 모름</span>'
                         : '<span class="fd">'+x.gap+'<small>일</small></span>')
-        + '<span class="fs">'+(x.last ? '마지막 코멘트 '+dayText(x.last) : '코멘트가 없어요')+'</span>'
+        + '<span class="fs">'+(x.없음
+            ? (x.gap===null ? '코멘트 없음' : x.gap+'일 동안 없음')
+            : '마지막 코멘트 '+dayText(x.last))+'</span>'
         + '<span class="fw'+(x.운동!==null && x.운동<=7 ? ' hot' : '')+'">'
-          + (x.운동===null ? '운동 기록 없음'
-             : (x.운동<=7 ? '운동은 '+x.운동+'일 전 — 오고 있어요' : '운동도 '+x.운동+'일 전'))
+          + (x.운동수 ? '운동 '+x.운동수+'회 기록' : '운동 기록 없음')
           + '</span></button>').join('') + '</div>'
       : '<div class="empty">'+코멘트밀림일+'일 넘게 밀린 회원이 없어요</div>') + '</div></div>';
 }
