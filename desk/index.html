@@ -922,7 +922,7 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 
 <script>
 "use strict";
-const BUILD = '67';
+const BUILD = '68';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -5783,7 +5783,8 @@ document.addEventListener('click', async function(ev){
     const x = (M.bph||[]).find(y=>y.id===id); if(!x) return;
     if(!confirm(dateFull(x.on_date) + ' 사진을 지울까요? 되돌릴 수 없습니다.')) return;
     try{
-      await ssend('body_photos?id=eq.'+id, 'DELETE');
+      await 휴지통으로('body_photos', (M.bph||[]).find(x=>String(x.id)===String(id)) || {id:id},
+        '체형 사진', ssend);
       fetch(SB_URL+'/storage/v1/object/media/'+x.path,
         { method:'DELETE', headers:{ apikey:SB_KEY, Authorization:'Bearer '+SB_KEY } }).catch(()=>{});
       M.bph = M.bph.filter(y=>y.id!==id);
@@ -5903,7 +5904,9 @@ document.addEventListener('click', async function(ev){
   if(a==='setdel'){
     const sid = +act.dataset.s;
     M.ws = M.ws.filter(x=>x.id!==sid); render();
-    try{ await ssend('workout_sets?id=eq.'+sid, 'DELETE'); }catch(e){ toast('지우기 실패'); }
+    try{ const s0 = (M.ws0||M.ws).find(x=>x.id===sid) || {id:sid};
+      await 휴지통으로('workout_sets', s0, '세트 ' + (s0.kg||0) + 'kg × ' + (s0.reps||0), ssend); }
+    catch(e){ toast(e.message); }
     return;
   }
   if(a==='asdel'){
@@ -6039,7 +6042,9 @@ document.addEventListener('click', async function(ev){
   }
   if(a==='del'){
     D.ri = D.ri.filter(x=>x.id!==id); render();
-    try{ await ssend('routine_items?id=eq.'+id, 'DELETE'); }catch(e){ toast('빼기 실패'); }
+    try{ const it0 = D.ri.find(x=>String(x.id)===String(id));
+      await 휴지통으로('routine_items', it0, '루틴 종목 · ' + (vaName(it0&&it0.variant_id)||''), ssend); }
+    catch(e){ toast(e.message); }
     return;
   }
   if(a==='rsave'){
@@ -6090,8 +6095,11 @@ document.addEventListener('click', async function(ev){
     const r = D.r.find(x=>x.id===S.rid); if(!r) return;
     if(!confirm('루틴 ' + r.no + ' · ' + r.name + ' 을 지울까요? 되돌릴 수 없습니다.')) return;
     try{
-      await ssend('routine_items?routine_id=eq.'+r.id, 'DELETE');
-      await ssend('routines?id=eq.'+r.id, 'DELETE');
+      /* 루틴은 종목까지 통째로 담는다 — 되살리면 종목도 같이 돌아온다 */
+      const 종목들 = D.ri.filter(x=>x.routine_id===r.id);
+      if(종목들.length) await 휴지통으로여럿('routine_items', 종목들,
+        x => '루틴 ' + r.no + ' 종목', ssend);
+      await 휴지통으로('routines', r, '루틴 ' + r.no + ' · ' + (r.name||''), ssend);
       D.ri = D.ri.filter(x=>x.routine_id!==r.id);
       D.r = D.r.filter(x=>x.id!==r.id);
       S.view='member'; S.tab='routine'; toast('지웠습니다'); render();
