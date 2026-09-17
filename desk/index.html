@@ -650,23 +650,37 @@ body.끄는중{user-select:none;-webkit-user-select:none}
   font-weight:800;flex:none;overflow:hidden;background:var(--dark-4);color:var(--sub)}
 .tx-face img{width:100%;height:100%;object-fit:cover;display:block}
 #gav img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
-.myband{display:flex;align-items:center;gap:14px;width:100%;text-align:left;margin-bottom:16px;
-  padding:13px 16px;background:var(--dark-2);border:1px solid var(--line);border-radius:14px}
-.myband:hover{border-color:var(--gold-2)}
-.mb-tx{flex:1;min-width:0}
-.mb-n{display:block;font-size:15px;font-weight:800;letter-spacing:-.01em}
-.mb-n i{font-style:normal;font-size:10.5px;font-weight:800;color:var(--sub);
-  background:var(--dark-4);border-radius:7px;padding:2px 7px;margin-left:8px;vertical-align:2px}
-.mb-s.empty{color:#4d4a45}
+/* 맨 위 2단 — 왼쪽 나(좁게) · 오른쪽 현황판(넓게). 1:1 이 아니다 (2026-09-17) */
+.hometop{display:grid;grid-template-columns:minmax(212px,0.85fr) 2.1fr;gap:14px;
+  align-items:stretch;margin-bottom:18px}
+.mycard{display:flex;flex-direction:column;gap:7px;text-align:left;padding:13px 15px;
+  background:var(--dark-2);border:1px solid var(--line);border-radius:14px;min-width:0}
+.mycard:hover{border-color:var(--gold-2)}
+.mc-top{display:flex;align-items:center;gap:10px;min-width:0}
+.mc-nm{font-size:14px;font-weight:800;letter-spacing:-.01em;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;min-width:0}
+.mc-nm i{font-style:normal;font-size:10px;font-weight:800;color:var(--sub);
+  background:var(--dark-4);border-radius:6px;padding:2px 6px;margin-left:6px;vertical-align:2px}
+.mc-s{font-size:11.5px;color:var(--sub);line-height:1.45;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mc-s.empty{color:#4a4741}
+.mc-q{margin-top:auto;padding-top:9px;border-top:1px solid var(--line)}
+.mc-q b{display:block;font-size:10px;font-weight:800;color:var(--gold);margin-bottom:3px}
+.mc-q span{display:block;font-size:12px;font-weight:700;color:var(--cream);line-height:1.45;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mc-q.none span{color:#6f6a63;font-weight:600}
+.mycard.c-teal{border-color:var(--teal)} .mycard.c-teal .mc-q b{color:var(--teal)}
+.mycard.c-warn{border-color:var(--warn)} .mycard.c-warn .mc-q b{color:var(--warn)}
+.mycard.c-cream{border-color:#6f6a63} .mycard.c-cream .mc-q b{color:var(--cream)}
 .only{font-size:10.5px;font-weight:800;color:var(--gold);background:var(--gold-dim);
   border-radius:7px;padding:2px 8px;margin-left:8px;vertical-align:2px}
-.mb-s{display:block;font-size:12px;color:var(--sub);margin-top:3px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mb-q{flex:none;max-width:340px;padding:8px 13px;border-left:1px solid var(--line)}
-.mb-q b{display:block;font-size:10.5px;font-weight:800;color:var(--gold);margin-bottom:3px}
-.mb-q span{display:block;font-size:12.5px;font-weight:700;color:var(--cream);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mb-q.none span{color:#6f6a63;font-weight:600}
+/* 현황판 — 넓은 쪽. 숫자를 크게 벌려 놓는다 */
+.hometop .homenums{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;
+  background:var(--dark-2);border:1px solid var(--line);border-radius:14px;
+  padding:14px 18px;margin:0;border-bottom:1px solid var(--line);align-content:center}
+.hometop .homenums .v{font-size:34px}
+.hometop .homenums .k{font-size:11.5px;white-space:nowrap}
+@media(max-width:1100px){ .hometop{grid-template-columns:1fr} .hometop .homenums{grid-template-columns:repeat(3,1fr);row-gap:14px} }
 .tx-past{display:flex;flex-direction:column;gap:6px}
 .tx-past .pq{display:flex;gap:10px;background:var(--dark-3);border-radius:9px;padding:8px 11px}
 .tx-past .pq b{font-size:11px;font-weight:800;color:var(--gold-2);flex:none;min-width:66px}
@@ -722,9 +736,6 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 .hmrow .tx b{display:block;font-size:13px;font-weight:800}
 .hmrow .tx i{display:block;font-style:normal;font-size:11px;color:var(--sub);margin-top:1px}
 .hmrow .eye{font-size:14px;padding:3px 6px;flex:none}
-.myband.c-teal{border-color:var(--teal)} .myband.c-teal .mb-q b{color:var(--teal)}
-.myband.c-warn{border-color:var(--warn)} .myband.c-warn .mb-q b{color:var(--warn)}
-.myband.c-cream{border-color:#6f6a63} .myband.c-cream .mb-q b{color:var(--cream)}
 .tx-help{font-size:11.5px;color:#5f5a54;padding:8px 4px 0}
 .tx-help b{color:#8b8479;font-weight:700}
 .tx-table .tx-tag{font-size:11px}
@@ -1002,7 +1013,7 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 
 <script>
 "use strict";
-const BUILD = '77';
+const BUILD = '78';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -2607,17 +2618,14 @@ const 이름들 = ids => (ids||[]).map(id=>사람(id).name).join(', ');
    사진은 비공개 저장소 `tr` 에 넣고 1시간짜리 서명 주소로 본다 — 주소만으로는 안 열린다 */
 const 이번분기 = (d) => { const x = d ? new Date(d) : new Date();
   return x.getFullYear() + ' ' + (Math.floor(x.getMonth()/3) + 1) + '분기'; };
-const 사진주소 = {};                       /* staff.photo(path) → 서명 주소 */
-async function 사진채우기(){
-  const ps = (W.staff||[]).map(x => x.photo).filter(x => x && !사진주소[x]);
-  if(!ps.length) return;
-  const us = await 서명주소들(ps);
-  ps.forEach((x,i) => { if(us[i]) 사진주소[x] = us[i]; });
-}
+/* ⛔ 저장소 `tr` 은 경로마다 권한이 걸려 있어 `staff/` 로 올리면 403 이 난다
+   (2026-09-17 «new row violates row-level security policy»).
+   프로필 사진은 작으니 **staff.photo 에 그림 자체를 담는다** — 권한도 만료도 없다 */
+async function 사진채우기(){ return; }
 /* 사람 하나를 동그란 사진으로 — 사진이 없으면 지금처럼 이름 두 글자 */
 function 얼굴(p, 크기){
   const sz = 크기 || 30;
-  const url = p && p.photo ? 사진주소[p.photo] : '';
+  const url = (p && p.photo) || '';
   const 속 = url ? '<img src="'+esc(url)+'" alt="">' : esc(((p&&p.name)||'?').slice(-2));
   return '<span class="tx-face tx-c-'+esc((p&&p.color)||'gray')+'" '
     + 'style="width:'+sz+'px;height:'+sz+'px;font-size:'+Math.round(sz*0.34)+'px" '
@@ -4937,16 +4945,15 @@ function vHome(){
 
   /* 내 이름표 — 슬로건과 이번 분기 목표를 출근하면 늘 본다 */
   const g = (ME && ME.goal) || {};
-  const 이름표 = ME ? '<button class="myband c-'+esc(H.색)+'" data-act="tx:me">'
-      + 얼굴(ME, 46)
-      + '<span class="mb-tx">'
-      + '<span class="mb-n">' + esc(ME.name)
-        + '<i>' + ({admin:'관리자',trainer:'트레이너',fc:'FC'}[ME.role]||ME.role) + '</i></span>'
-      + '<span class="mb-s' + (g.value ? '' : ' empty') + '">' + (g.value ? esc(g.value) : '슬로건') + '</span>'
-      + '</span>'
-      + '<span class="mb-q' + (g.quarter ? '' : ' none') + '">'
-      + '<b>' + esc(이번분기()) + ' 목표</b>'
-      + '<span>' + (g.quarter ? esc(g.quarter) : '＋ 적기') + '</span>'
+  /* 왼쪽 = 나 · 오른쪽 = 현황판. 1:1 이 아니라 현황판이 넓다 (2026-09-17 대표 지시) */
+  const 이름표 = ME ? '<button class="mycard c-'+esc(H.색)+'" data-act="tx:me">'
+      + '<span class="mc-top">' + 얼굴(ME, 38)
+        + '<span class="mc-nm">' + esc(ME.name)
+        + '<i>' + ({admin:'관리자',trainer:'트레이너',fc:'FC'}[ME.role]||ME.role) + '</i></span></span>'
+      + '<span class="mc-s' + (g.value ? '' : ' empty') + '">' + (g.value ? esc(g.value) : '슬로건') + '</span>'
+      + '<span class="mc-q' + (g.quarter ? '' : ' none') + '">'
+      + '<b>' + esc(이번분기()) + '</b>'
+      + '<span>' + (g.quarter ? esc(g.quarter) : '＋ 목표 적기') + '</span>'
       + '</span></button>' : '';
 
   const 공지판 = 공지.length ? '<div class="sec" style="margin-bottom:14px">'
@@ -4954,10 +4961,15 @@ function vHome(){
       + '<div class="t1">📌 '+esc(r.title)+'</div>'
       + (블록요약(r.body)?'<div class="t2">'+esc(블록요약(r.body))+'</div>':'')+'</button>').join('')+'</div>' : '';
 
+  /* band 와 nums 가 둘 다 켜져 있으면 나란히 놓는다 — 앞에 오는 자리에 한 번만 그린다 */
+  const 나란히 = !H.끔.band && !H.끔.nums;
+  let 짝그렸나 = false;
+  const 짝 = () => { if(짝그렸나) return ''; 짝그렸나 = true;
+    return '<div class="hometop">' + 이름표 + 숫자줄(내업무.length, 오늘상담.length) + '</div>'; };
   const 그릴것 = {
-    band:   () => 이름표,
+    band:   () => 나란히 ? 짝() : 이름표,
     notice: () => 공지판,
-    nums:   () => 숫자줄(내업무.length, 오늘상담.length),
+    nums:   () => 나란히 ? 짝() : 숫자줄(내업무.length, 오늘상담.length),
     tasks:  () => '<div class="tx-home one">' + 섹('내 업무', 'tasks', 내업무, '남은 업무가 없어요') + '</div>',
     leads:  () => '<div class="tx-home one">' + 섹('오늘 상담', 'leads', 오늘상담, '오늘 잡힌 상담이 없어요') + '</div>',
     leave:  () => '<div class="tx-home one">'
@@ -5190,28 +5202,25 @@ async function 프로필올리기(file){
   toast('사진을 줄이는 중…');
   const blob = await new Promise(ok => {
     const img = new Image(), url = URL.createObjectURL(file);
-    img.onload = () => { const S2 = 320, c = document.createElement('canvas');
+    img.onload = () => { const S2 = 256, c = document.createElement('canvas');
       c.width = c.height = S2;
       const x = c.getContext('2d');
       const r = Math.max(S2/img.width, S2/img.height);
       const w = img.width*r, h = img.height*r;
       x.drawImage(img, (S2-w)/2, (S2-h)/2, w, h);
       URL.revokeObjectURL(url);
-      c.toBlob(b => ok(b), 'image/jpeg', 0.88); };
+      c.toBlob(b => ok(b), 'image/jpeg', 0.82); };
     img.onerror = () => { URL.revokeObjectURL(url); ok(null); };
     img.src = url;
   });
   if(!blob) return toast('사진을 읽지 못했어요');
-  const path = 'staff/' + ME.id + '/' + Date.now() + '.jpg';
+  const url = await new Promise(ok => { const r = new FileReader();
+    r.onload = () => ok(r.result); r.onerror = () => ok(''); r.readAsDataURL(blob); });
+  if(!url) return toast('사진을 읽지 못했어요');
   try{
-    const t = await 토큰();
-    const res = await fetch(SB_URL+'/storage/v1/object/tr/'+path, { method:'POST',
-      headers:{ apikey:SB_KEY, Authorization:'Bearer '+t, 'Content-Type':'image/jpeg' }, body: blob });
-    if(!res.ok) throw new Error((await res.text()).slice(0,80));
-    await usend('staff?id=eq.'+ME.id, 'PATCH', { photo: path });
-    ME.photo = path;
-    const i = W.staff.findIndex(x=>x.id===ME.id); if(i>=0) W.staff[i].photo = path;
-    사진주소[path] = (await 서명주소들([path]))[0] || '';
+    await usend('staff?id=eq.'+ME.id, 'PATCH', { photo: url });
+    ME.photo = url;
+    const i = W.staff.findIndex(x=>x.id===ME.id); if(i>=0) W.staff[i].photo = url;
     toast('사진을 올렸어요'); txMe(); render();
   }catch(e){ toast('못 올렸어요 — ' + e.message); }
 }
@@ -5233,7 +5242,7 @@ function txMe(){
         return 지난.length ? '<div class="lbl" style="margin-top:12px">지난 목표 '+지난.length+'개</div>'
           + '<div class="tx-past">' + 지난.map(x=>'<div class="pq"><b>'+esc(x.q)+'</b><span>'+esc(x.tx||'')+'</span></div>').join('') + '</div>'
           : ''; })()
-    + (관리자() ? '<div class="lbl" style="margin-top:6px">회원 화면에서 누구로 볼까요</div><div class="tx-pchips">'
+    + (관리자() ? '<div class="lbl" style="margin-top:6px">담당 보기</div><div class="tx-pchips">'
         + ['전체'].concat([...new Set(D.m.map(x=>x.trainer).filter(Boolean))]).map(t=>'<button class="tx-pchip '+(S.who===t?'on':'')+'" data-setwho="'+esc(t)+'">'+esc(t==='전체'?'전체 보기':t)+'</button>').join('')+'</div>' : '')
     + (관리자() ? '<div class="lbl" style="margin-top:8px">직원 관리 <span class="r" style="color:var(--sub);font-weight:500">구글 메일을 넣으면 그 사람이 들어올 수 있어요</span></div>'
         + '<div class="tx-staff">' + W.staff.map(p => '<div class="card rowc '+(p.active===false?'off':'')+'">'+아바타(p.id)
@@ -5860,7 +5869,7 @@ function gnbDraw(){
   if(n){ dot.textContent = n>99?'99+':n; dot.style.display=''; } else dot.style.display='none';
   $('#gnm').textContent = ME ? ME.name + (관리자() && S.who!=='전체' ? ' · '+S.who+' 보기' : '') : '—';
   const gav = $('#gav');
-  const u = ME && ME.photo ? 사진주소[ME.photo] : '';
+  const u = (ME && ME.photo) || '';
   if(u) gav.innerHTML = '<img src="'+esc(u)+'" alt="">';
   else gav.textContent = ME ? ME.name.slice(-2) : '—';
 }
