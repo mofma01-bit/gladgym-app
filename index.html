@@ -898,6 +898,15 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .vdone .vd1{font-size:20px;font-weight:900;line-height:1}
 .vdone .vd2{font-size:14.5px;font-weight:800;letter-spacing:-.01em}
 .vdone .vd3{font-size:10.5px;font-weight:700;opacity:.66}
+/* 완료해서 잠긴 세트 칸 — 담겼다는 게 한눈에 보이게 (2026-09-17) */
+.vstep.lockrow .vnum{border-color:var(--gold-2);background:var(--gold-dim)}
+.vstep.lockrow .vnum input{color:var(--gold)}
+.vstep.lockrow .varr{opacity:.22}
+.vstep.lockrow .vcap{color:var(--gold-2)}
+.vdone.next{background:var(--dark-3);color:var(--gold);box-shadow:0 3px 0 #2a2822;
+  border:1px solid var(--gold-2)}
+.vdone.next:active{box-shadow:0 1px 0 #2a2822}
+#main.lite .vstep.lockrow .vnum input{color:#8a6c2f}
 .vsub{display:flex;align-items:center;gap:9px;flex:none;margin-top:-2px}
 .vsub .vh{font-size:10.5px;font-weight:600;color:#7d766e;line-height:1.45;flex:1;min-width:0}
 /* ── 되돌리기 ── 세트 완료 위, 속이 빈 작은 알약. 채워진 것과 확실히 갈린다 */
@@ -1599,7 +1608,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '166';
+const BUILD = '167';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -1766,22 +1775,61 @@ async function boot(){
 }
 
 /* 어제까지의 안 끝낸 기록은 그날로 마감한다 — 「기록 중」으로 계속 떠 있지 않게 */
-const CAP_EX = 2*3600, CAP_W = 4*3600;
+const CAP_EX = 2*3600, CAP_W = 8*3600;         /* 2026-09-17 대표: 8시간이 적정 */
+const 강제종료 = 8*3600*1000;                   /* 이만큼 지나면 손 안 대도 마무리한다 */
 const capSec = (n, cap) => Math.max(0, Math.min(Math.round(Number(n)||0), cap));
 
+/* 마지막으로 세트를 체크한 시각 — 세트를 완료할 때 s.at 에 찍어 둔다.
+   (2026-09-17 대표: 「마지막으로 반복수체크한 시간까지를 운동 종료시간으로」) */
+function 마지막체크(w){
+  let t = 0;
+  (w.items||[]).forEach(it => (it.sets||[]).forEach(s => {
+    if(s.done && s.at && s.at > t) t = s.at;
+  }));
+  return t || 0;
+}
+/* 손 안 대고 끝난 운동의 「진짜 끝난 시각」 — 마지막 체크 → 없으면 종목 시간 합 */
+function 저절로끝난길이(w){
+  const 끝 = 마지막체크(w);
+  if(끝 && w.startAt && 끝 > w.startAt) return capSec((끝 - w.startAt)/1000, CAP_W);
+  return capSec(w.items.reduce((a,it)=> a + (Number(it.sec)||0), 0), CAP_W);
+}
+function 접기(w, 왜){
+  w.done = true;
+  w.items.forEach(it => { it.locked = true; it.sec = capSec(it.sec, CAP_EX); });
+  const dur = 저절로끝난길이(w);
+  w.dur = dur; w.autoClosed = true;
+  sv(spatch('workouts','id=eq.'+w.id, { done:true, dur }), 왜);
+  return dur;
+}
+/* ⛔ 「운동 마치기」를 안 누르고 두면 시계가 계속 돌았다 (2026-09-17 대표 지적).
+   ① 날짜가 지났거나 ② 시작한 지 8시간이 지났으면 스스로 접는다.
+   접을 때 길이는 지금 시각이 아니라 **마지막으로 체크한 세트 시각**까지다. */
 function closeStale(){
-  const old = D.workouts.filter(w => !w.done && w.date && w.date < TODAY);
-  if(!old.length) return;
-  old.forEach(w => {
-    w.done = true;
-    w.items.forEach(it => { it.locked = true; it.sec = capSec(it.sec, CAP_EX); });
-    const dur = capSec(Number(w.dur) || w.items.reduce((a,it)=> a + it.sec, 0), CAP_W);
-    w.dur = dur;
-    w.autoClosed = true;
-    sv(spatch('workouts','id=eq.'+w.id, { done:true, dur }), '지난 기록 자동 종료');
-  });
+  const 지금 = Date.now();
+  const old = D.workouts.filter(w => !w.done && (
+    (w.date && w.date < TODAY) ||
+    (w.startAt && 지금 - w.startAt >= 강제종료)));
+  if(!old.length) return 0;
+  old.forEach(w => 접기(w, '오래된 기록 자동 종료'));
   if(D.live && old.some(w => w.id === D.live.id)) { D.live = null; save(); }
-  console.log('지난 기록 자동 종료', old.length, '건');
+  console.log('오래된 기록 자동 종료', old.length, '건');
+  return old.length;
+}
+/* 켜 두고 잊은 화면에서도 접히게 — 1분에 한 번만 본다 */
+let 접기본때 = 0;
+function 오래됐나(){
+  const 지금 = Date.now();
+  if(지금 - 접기본때 < 60000) return;
+  접기본때 = 지금;
+  const w = live();
+  if(!(w && w.startAt && 지금 - w.startAt >= 강제종료)) return;
+  const dur = 접기(w, '8시간이 지나 자동 종료');
+  const i = D.workouts.findIndex(x => x.id === w.id);
+  if(i < 0) D.workouts.unshift(w);
+  D.live = null; save();
+  toast('8시간이 지나 운동을 마무리했어요 — ' + durTxt(dur));
+  render();
 }
 
 async function reset(){
@@ -2298,6 +2346,7 @@ const 자물쇠 = 잠김 => `<svg viewBox="0 0 24 24" width="21" height="21" fil
   <circle cx="12" cy="15.8" r="1.1" fill="currentColor" stroke="none"/></svg>`;
 
 setInterval(()=>{
+  오래됐나();                                   /* 8시간 넘었나 — 1분에 한 번만 본다 */
   const w=live();
   if(w && w.startAt && (S.screen==='workout'||S.screen==='t_live')){ const el=$('#tm'); if(el) el.textContent=mmss((Date.now()-w.startAt)/1000); }
   if(S.rest && S.rest.until){
@@ -3127,6 +3176,8 @@ function vWorkout(){
   const cur=w.items[w.cur]||w.items[0], e=exOf(cur.ex), v=varOf(cur.ex,cur.va);
   const wmid = w.mid || S.mid, tr = (S.who==='tr');
   const openIdx=cur.sets.findIndex(s=>!s.done);
+  /* 완료해도 마지막 세트 칸은 그대로 둔다 — 잠긴 채로 「다음 세트」를 기다린다 */
+  const 보일칸 = openIdx >= 0 ? openIdx : cur.sets.length - 1;
   const cms=cmOf(wmid,cur.ex,cur.va), nw=cms.filter(c=>!c.read).length, dsc=descOf(wmid,cur.ex,cur.va);
 
   /* 지금 하는 종목의 「펼쳐진 카드」 — 목록에서 그 종목 바로 아래에 붙는다 */
@@ -3146,7 +3197,7 @@ function vWorkout(){
       <span class="r">${dsc?'설명':'설명 없음'}${cms.length?` · 코멘트 ${cms.length}`:''} ›</span></button>`}
     ${isMemo(cur.ex)
       ? `<div class="note">기록으로만 남깁니다 — 무게·볼륨은 세지 않아요</div>`
-      : cur.sets.map((s,i)=> (!cur.locked && i===openIdx) ? '' :
+      : cur.sets.map((s,i)=> (!cur.locked && i===보일칸) ? '' :
         `<button class="set ${cur.locked?'lock':(s.done?'done':(i===openIdx?'now':''))}" data-act="edit:${i}">
       <span class="i">${i+1}${e.cardio?'구간':'세트'}</span>
       ${cur.locked ? '' : '<span class="setedit">수정</span>'}
@@ -3160,9 +3211,7 @@ function vWorkout(){
     </button>`).join('')}
     ${isMemo(cur.ex) ? '' : (cur.locked
       ? `<button class="btn sub" data-act="redo">재기록</button>`
-      : (openIdx >= 0
-        ? 세로입력(cur, e, openIdx)
-        : `<button class="btn gold" data-act="rep">${e.cardio?'구간':'세트'} 하나 더 ＋</button>`))}
+      : 세로입력(cur, e, 보일칸))}
     ${cur.locked ? '' : `<button class="btn main fin" data-act="fin">${esc(e.n)} 완료</button>`}
   </div>`;
 
@@ -3265,11 +3314,14 @@ function sheetExDesc(exid, vk, mid){
    화면 전체가 똑같은 가로 막대라 무엇을 눌러야 할지 눈에 안 들어왔다.   */
 function 세로입력(cur, e, i){
   const s = cur.sets[i] || {};
+  const 잠 = !!s.done;                       /* 완료한 세트는 잠긴다 */
   const 칸 = (라벨, f, k, 값, 단, 폭) => `<div class="vcol">
-    <button class="varr" data-act="d:${f}:${i}:${폭}" data-rep="1" aria-label="${라벨} 올리기">▲</button>
+    <button class="varr" data-act="d:${f}:${i}:${폭}" data-rep="1" aria-label="${라벨} 올리기"
+      ${잠?'disabled':''}>▲</button>
     <span class="vnum"><input type="text" inputmode="decimal" data-k="${k}" data-i="${i}"
-        value="${값}" aria-label="${라벨}"><small>${단}</small></span>
-    <button class="varr" data-act="d:${f}:${i}:-${폭}" data-rep="1" aria-label="${라벨} 내리기">▼</button>
+        value="${값}" aria-label="${라벨}" ${잠?'readonly':''}><small>${단}</small></span>
+    <button class="varr" data-act="d:${f}:${i}:-${폭}" data-rep="1" aria-label="${라벨} 내리기"
+      ${잠?'disabled':''}>▼</button>
     <span class="vcap">${라벨}</span></div>`;
   const 칸들 = e.cardio
     ? [ 칸('시간','reps','setreps',s.reps,'분',1),
@@ -3280,19 +3332,29 @@ function 세로입력(cur, e, i){
   const 단위 = e.cardio ? '구간' : '세트';
   /* 되돌리기는 「세트 완료」 바로 위에. 크기와 모양을 확 다르게 둔다 —
      채워진 큰 덩어리 = 앞으로 가는 것, 속이 빈 작은 알약 = 되돌리는 것 (2026-09-07). */
-  return `<div class="vstep ${칸들.length > 2 ? 'w3' : ''}">
+  /* 완료한 뒤에는 칸이 잠긴다. 「완료 풀기」로 열고, 「다음 ○○」로 새 줄을 만든다
+     (2026-09-17 대표: 「세트완료하면 기록잠김 → 다음세트 누르면 새로운 열생성」) */
+  return `<div class="vstep ${칸들.length > 2 ? 'w3' : ''} ${잠?'lockrow':''}">
       ${칸들.join('')}
       <div class="vright">
-        <button class="vundo2" data-act="undo" ${cur.sets.length<2?'disabled':''}>
-          <span class="ur">↺</span>되돌리기</button>
-        <button class="vdone" data-act="rep">
-          <span class="vd1">✓</span>
-          <span class="vd2">이번 ${단위} 완료</span>
-          <span class="vd3">${i+1}${단위}째 · 다음</span></button>
+        ${잠
+          ? `<button class="vundo2" data-act="unlock"><span class="ur">🔓</span>완료 풀기</button>
+             <button class="vdone next" data-act="nextset">
+               <span class="vd1">＋</span>
+               <span class="vd2">다음 ${단위}</span>
+               <span class="vd3">${i+2}${단위}째 만들기</span></button>`
+          : `<button class="vundo2" data-act="undo" ${cur.sets.length<2?'disabled':''}>
+               <span class="ur">↺</span>되돌리기</button>
+             <button class="vdone" data-act="rep">
+               <span class="vd1">✓</span>
+               <span class="vd2">이번 ${단위} 완료</span>
+               <span class="vd3">${i+1}${단위}째 기록</span></button>`}
       </div>
     </div>
     <div class="vsub">
-      <span class="vh">숫자를 눌러 직접 적어도 되고, ▲▼ 를 길게 눌러도 됩니다</span>
+      <span class="vh">${잠
+        ? `${i+1}${단위} 기록을 담았어요 — 이어서 하려면 <b>다음 ${단위}</b>`
+        : '숫자를 눌러 직접 적어도 되고, ▲▼ 를 길게 눌러도 됩니다'}</span>
     </div>`;
 }
 
@@ -4396,12 +4458,22 @@ function ootdDraw(img, w){
   x.fillText((w.date||TODAY).replace(/-/g,'.'), 여, 130);
   자간끄기();
 
-  /* ── 주인공 : 총 볼륨 ── */
+  /* ── 주인공 : 총 볼륨 ──
+     ⛔ 톤은 「1.2」처럼 짧아 좋지만 몸에 와 닿지 않는다
+     (2026-09-17 대표: 「톤 말고 kg 으로 · 숫자가 커지면 크기를 조정하면 되니까」).
+     그래서 kg 그대로 쓰고, 자릿수가 늘면 글씨를 줄여 자리 안에 넣는다.
+     분석 화면은 숫자가 길어져 그대로 톤을 쓴다. */
   const 볼륨 = totalKg(w);
-  글(214, 400, OOTD_B, '#fff', -8);
-  x.fillText((볼륨/1000).toFixed(1), 여-5, 378);
+  const 볼글 = Math.round(볼륨).toLocaleString('en-US');
+  const 최대폭 = OOTD_W - 여*2 - 20;
+  let 볼크기 = 214;
+  글(볼크기, 400, OOTD_B, '#fff', -8);
+  while(볼크기 > 96 && x.measureText(볼글).width > 최대폭){
+    볼크기 -= 6; 글(볼크기, 400, OOTD_B, '#fff', -8);
+  }
+  x.fillText(볼글, 여-5, 378);
   글(27, 700, OOTD_A, 'rgba(255,255,255,.92)', 4);
-  x.fillText('TONS', 여, 424);
+  x.fillText('KG', 여, 424);
   자간끄기();
 
   /* ── 왼쪽 세로 열 ── */
@@ -7476,11 +7548,23 @@ document.addEventListener('click', ev=>{
       if(S.repeating) 숫자만갱신();          /* 길게 누르는 중 — 숫자만 */
       else { drawSheet(); render(); }
       return; }
-    case 'done': w.items[w.cur].sets[+rest[0]].done=true; save(); closeSheet(); render(); return;
+    case 'done': { const s=w.items[w.cur].sets[+rest[0]];
+      s.done=true; s.at=Date.now(); save(); closeSheet(); render(); return; }
     case 'undone': w.items[w.cur].sets[+rest[0]].done=false; save(); closeSheet(); render(); return;
+    /* ⛔ 예전에는 「완료」 하나가 잠그기와 새 줄 만들기를 같이 했다.
+       그래서 한 세트를 진짜 한 것인지, 그냥 줄만 생긴 것인지 구별이 안 됐다.
+       (2026-09-17 대표: 「세트를 진행한것과 완료한것에 구분이 있으면 좋겠어」)
+       이제 완료는 잠그기만 하고, 새 줄은 「다음 세트」를 눌러야 생긴다. */
     case 'rep': { const cur=w.items[w.cur], last=cur.sets[cur.sets.length-1];
-      last.done=true; cur.sets.push({kg:last.kg, reps:last.reps, spd:last.spd, done:false});
+      if(!last || last.done) return;
+      last.done=true; last.at=Date.now(); save();
+      render(); return; }
+    case 'nextset': { const cur=w.items[w.cur], last=cur.sets[cur.sets.length-1];
+      if(!last || !last.done) return toast('이번 세트를 먼저 완료해 주세요');
+      cur.sets.push({kg:last.kg, reps:last.reps, spd:last.spd, done:false});
       save(); render(); return; }
+    case 'unlock': { const cur=w.items[w.cur], last=cur.sets[cur.sets.length-1];
+      if(!last) return; last.done=false; save(); toast('다시 고칠 수 있어요'); render(); return; }
     case 'undo': { const cur=w.items[w.cur]; if(cur.sets.length<2) return;
       cur.sets.pop(); cur.sets[cur.sets.length-1].done=false; save(); toast('한 세트 되돌렸어요'); render(); return; }
     case 'setvar': {
@@ -7770,6 +7854,7 @@ async function finish(){
     return; }
   done.forEach(it=>{ if(!it.locked){ it.locked=true; it.sec=(it.sec||0)+(it.startAt ? (Date.now()-it.startAt)/1000 : 0); } });
   w.items.forEach(it=>{ it.sec = capSec(it.sec, CAP_EX); });
+  /* 직접 누른 「마치기」는 누른 그 시각이 끝이다. 다만 8시간은 못 넘는다 */
   const dur=capSec(w.startAt ? (Date.now()-w.startAt)/1000
     : w.items.reduce((a,it)=>a+(Number(it.sec)||0), 0), CAP_W);
   for(let i=0;i<w.items.length;i++) await svItem(i);
