@@ -650,7 +650,25 @@ body.끄는중{user-select:none;-webkit-user-select:none}
   font-weight:800;flex:none;overflow:hidden;background:var(--dark-4);color:var(--sub)}
 .tx-face img{width:100%;height:100%;object-fit:cover;display:block}
 #gav img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
-/* 맨 위 2단 — 왼쪽 나(좁게) · 오른쪽 현황판(넓게). 1:1 이 아니다 (2026-09-17) */
+/* 홈 전체를 2단으로 — 왼쪽 나·현황(좁게) · 오른쪽 해야 할 일(넓게)
+   (2026-09-17 대표: 「노션처럼 단을 나누면」) */
+.homecols{display:grid;gap:16px;align-items:start}
+.hc-l,.hc-r{display:flex;flex-direction:column;min-width:0}
+.hc-l .tx-home.one,.hc-r .tx-home.one{margin-bottom:14px}
+.hc-l .homenums{display:grid;grid-template-columns:repeat(2,1fr);gap:12px 8px;
+  background:var(--dark-2);border:1px solid var(--line);border-radius:14px;
+  padding:15px 16px;margin:0 0 14px;border-bottom:1px solid var(--line)}
+.hc-l .homenums .v{font-size:26px}
+.hc-r .homenums{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;
+  background:var(--dark-2);border:1px solid var(--line);border-radius:14px;
+  padding:14px 18px;margin:0 0 14px;border-bottom:1px solid var(--line)}
+.hc-r .homenums .v{font-size:32px}
+.hc-l .mycard{margin-bottom:14px}
+.hc-l .faces{grid-template-columns:repeat(auto-fill,minmax(118px,1fr))}
+.hmrow .side{font-size:14px;padding:3px 7px;flex:none;color:var(--gold)}
+.hmrow .side:hover{background:var(--gold-dim);border-radius:7px}
+@media(max-width:1100px){ .homecols{grid-template-columns:1fr !important}
+  .hc-l .homenums{grid-template-columns:repeat(3,1fr)} }
 .hometop{display:grid;grid-template-columns:minmax(212px,0.85fr) 2.1fr;gap:14px;
   align-items:stretch;margin-bottom:18px}
 .mycard{display:flex;flex-direction:column;gap:7px;text-align:left;padding:13px 15px;
@@ -1016,7 +1034,7 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 
 <script>
 "use strict";
-const BUILD = '79';
+const BUILD = '80';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -4965,17 +4983,10 @@ function vHome(){
       + '<div class="t1">📌 '+esc(r.title)+'</div>'
       + (블록요약(r.body)?'<div class="t2">'+esc(블록요약(r.body))+'</div>':'')+'</button>').join('')+'</div>' : '';
 
-  /* band 와 nums 가 둘 다 켜져 있으면 나란히 놓는다 — 앞에 오는 자리에 한 번만 그린다 */
-  const 나란히 = !H.끔.band && !H.끔.nums;
-  let 짝그렸나 = false;
-  const 짝 = () => { if(짝그렸나) return ''; 짝그렸나 = true;
-    const 왼 = Math.max(212, 사진크기 + 130);
-    return '<div class="hometop" style="grid-template-columns:minmax('+왼+'px,0.85fr) 2.1fr">'
-      + 이름표 + 숫자줄(내업무.length, 오늘상담.length) + '</div>'; };
   const 그릴것 = {
-    band:   () => 나란히 ? 짝() : 이름표,
+    band:   () => 이름표,
     notice: () => 공지판,
-    nums:   () => 나란히 ? 짝() : 숫자줄(내업무.length, 오늘상담.length),
+    nums:   () => 숫자줄(내업무.length, 오늘상담.length),
     tasks:  () => '<div class="tx-home one">' + 섹('내 업무', 'tasks', 내업무, '남은 업무가 없어요') + '</div>',
     leads:  () => '<div class="tx-home one">' + 섹('오늘 상담', 'leads', 오늘상담, '오늘 잡힌 상담이 없어요') + '</div>',
     leave:  () => '<div class="tx-home one">'
@@ -4986,9 +4997,13 @@ function vHome(){
     today:  () => vToday(),
   };
 
-  return '<div class="homewrap">'
-    + H.차례.filter(k => !H.끔[k]).map(k => (그릴것[k] ? 그릴것[k]() : '')).join('')
-    + '<button class="hmbtn" data-act="tx:hm">⚙ 내 홈 꾸미기</button>'
+  const 살아있는 = H.차례.filter(k => !H.끔[k] && 그릴것[k]);
+  const 단그리기 = 쪽 => 살아있는.filter(k => 블록단(k, H) === 쪽).map(k => 그릴것[k]()).join('');
+  const 왼폭 = Math.max(260, 사진크기 + 150);
+  return '<div class="homecols" style="grid-template-columns:minmax('+왼폭+'px,1fr) 2.2fr">'
+    + '<div class="hc-l">' + 단그리기('좌')
+      + '<button class="hmbtn" data-act="tx:hm">⚙ 내 홈 꾸미기</button></div>'
+    + '<div class="hc-r">' + 단그리기('우') + '</div>'
     + '</div>';
 }
 
@@ -5076,17 +5091,21 @@ function 코멘트줄(N){
    담기는 곳은 `staff.home`(jsonb) — 기기를 바꿔도 따라온다 */
 /* ⛔ `mine` 은 vCmAll·vToday 안에만 있는 지역 이름이다. 홈은 제 것을 쓴다 */
 const 내담당 = mid => S.who === '전체' || (memOf(mid).trainer || '') === S.who;
+/* 단(段) — 왼쪽은 나와 현황, 오른쪽은 해야 할 일. 노션 페이지처럼 나눈다
+   (2026-09-17 대표: 「노션처럼 단을 나누면 · 좌측에는 프로필 · 우측에는 할일이나 코멘트」)
+   새 블록을 만들 때 `단` 을 적어 두면 그 자리에서 시작한다. 각자 옮길 수 있다 */
 const 홈블록 = [
-  { k:'band',  이름:'내 이름표' },
-  { k:'notice',이름:'대표 공지' },
-  { k:'nums',  이름:'숫자 한 줄' },
-  { k:'tasks', 이름:'내 업무' },
-  { k:'cold',  이름:'코멘트 밀린 회원' },
-  { k:'cm',    이름:'코멘트 요청' },
-  { k:'leads', 이름:'오늘 상담' },
-  { k:'today', 이름:'오늘 수업 · 루틴' },
-  { k:'leave', 이름:'이번 주 연월차' },
+  { k:'band',  이름:'내 이름표',        단:'좌' },
+  { k:'nums',  이름:'숫자 한 줄',       단:'좌' },
+  { k:'notice',이름:'대표 공지',        단:'우' },
+  { k:'tasks', 이름:'내 업무',          단:'우' },
+  { k:'cold',  이름:'코멘트 밀린 회원',  단:'우' },
+  { k:'cm',    이름:'코멘트 요청',      단:'우' },
+  { k:'leads', 이름:'오늘 상담',        단:'우' },
+  { k:'today', 이름:'오늘 수업 · 루틴',  단:'우' },
+  { k:'leave', 이름:'이번 주 연월차',   단:'좌' },
 ];
+const 블록단 = (k, h) => (h.단 && h.단[k]) || (홈블록.find(x=>x.k===k)||{}).단 || '우';
 /* ══ 꾸밈 규격 ══ 넓힐 때는 **이 표에 한 줄만** 더한다. 판은 표를 보고 저절로 그려진다.
    (2026-09-17 대표: 「커스텀하는 영역은 규정해야겠지 · 넓혀나갈거니까 뼈대부터 잡아」)
 
@@ -5113,7 +5132,7 @@ function 내홈(){
   const h = (ME && ME.home) || {};
   const 차례 = (h.차례||[]).filter(k => 홈블록.some(b=>b.k===k));
   홈블록.forEach(b => { if(차례.indexOf(b.k) < 0) 차례.push(b.k); });   /* 새로 생긴 블록은 뒤에 */
-  const o = { 차례, 끔: h.끔||{} };
+  const o = { 차례, 끔: h.끔||{}, 단: h.단||{} };
   꾸밈규격.forEach(x => { if(x.기본 != null) o[x.k] = (h[x.k] != null ? h[x.k] : x.기본); });
   return o;
 }
@@ -5133,9 +5152,12 @@ function 홈꾸미기(){
     if(x.꼴 === '차례')
       return '<div class="hmlist">' + h.차례.map((k,i) => {
         const b = 홈블록.find(z=>z.k===k) || {이름:k}; const 꺼짐 = !!h.끔[k];
+        const 쪽 = 블록단(k, h);
         return '<div class="hmrow'+(꺼짐?' off':'')+'" data-hmi="'+i+'">'
           + '<span class="grip">⠿</span>'
           + '<span class="tx"><b>'+esc(b.이름)+'</b></span>'
+          + '<button class="side" data-act="tx:hmside" data-v2="'+esc(k)+'">'
+            + (쪽==='좌' ? '◧' : '◨') + '</button>'
           + '<button class="eye" data-act="tx:hmtog" data-v2="'+esc(k)+'">'+(꺼짐?'🙈':'👁')+'</button></div>'; }).join('')
         + '</div>';
     const 값들 = x.꼴 === '숫자' ? x.값.map(v=>[v, v + (x.단위 || '줄')]) : x.값;
@@ -5616,6 +5638,9 @@ async function txAct(a, el){
       빠른코멘트 = null; popClose(); toast('코멘트를 남겼어요'); render();
     }catch(e){ toast('못 남겼어요 — ' + e.message); }
     return; }
+  if(a==='hmside'){ const 단 = Object.assign({}, 내홈().단);
+    단[v2] = 블록단(v2, 내홈()) === '좌' ? '우' : '좌';
+    await 내홈저장({ 단 }); 홈꾸미기(); return; }
   if(a==='hmtog'){ const 끔 = Object.assign({}, 내홈().끔);
     if(끔[v2]) delete 끔[v2]; else 끔[v2] = 1;
     await 내홈저장({ 끔 }); 홈꾸미기(); return; }
