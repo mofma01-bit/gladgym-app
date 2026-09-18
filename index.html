@@ -1724,7 +1724,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '179';
+const BUILD = '180';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2744,6 +2744,18 @@ const 목표종류 = {
   종목무게: { 이름:'종목 무게',           단위:'kg', 기간:'없음', 기본:60, 말:'목표를 정한 날부터 든 가장 무거운 세트' },
 };
 const 내목표 = mid => ((GOALS[mid]||{}).my) || [];
+async function 목표뱃지저장(mid){
+  const g = GOALS[mid] || (GOALS[mid] = {});
+  let 서버 = null;
+  try{ 서버 = ((await sget('plans?select=data&member_id=eq.'+encodeURIComponent(mid)))[0]||{}).data || null; }catch(e){}
+  const 합 = Object.assign({}, 서버 || g);
+  합.my = g.my || [];
+  const 뱃 = ((서버 && 서버.badges) || []).slice();
+  (g.badges||[]).forEach(b => { if(!뱃.some(x => x.k === b.k)) 뱃.push(b); });
+  합.badges = 뱃;
+  GOALS[mid] = 합;
+  await sv(spost('plans', [{ member_id:mid, data:합, updated_at:new Date().toISOString() }], {on:'member_id'}), '목표 저장');
+}
 const 내뱃지 = mid => ((GOALS[mid]||{}).badges) || [];
 function 이달날들(){ const out=[], m=TODAY.slice(0,8); for(let d=1; d<=+TODAY.slice(8); d++) out.push(m+String(d).padStart(2,'0')); return out; }
 function 목표재기(mid, g){
@@ -2775,7 +2787,7 @@ function 뱃지주기(mid){
   g.my.forEach(x => { const r = 목표재기(mid, x);
     if(r && r.p >= 1 && !g.badges.some(b => b.k === r.키)){ const b = { k:r.키, 이름:r.뱃지, at:TODAY }; g.badges.push(b); 새것.push(b); } });
   if(!새것.length) return;
-  sv(spost('plans', [{ member_id:mid, data:g, updated_at:new Date().toISOString() }], {on:'member_id'}), '뱃지 저장');
+  목표뱃지저장(mid);
   setTimeout(() => toast('🏅 뱃지를 받았어요 — ' + 새것.map(b=>b.이름).join(', ')), 300);
 }
 function 목표칸(mid){
@@ -2826,8 +2838,8 @@ function 목표저장(){
   if(옛 && 옛.t === t && 옛.ex === x.ex && 옛.va === x.va) x.since = 옛.since || TODAY;   /* 숫자만 바꾸면 시작일은 그대로 */
   g.my = (g.my||[]).filter(y => y.id !== x.id).concat([x]);
   S.gd = null; closeSheet();
-  sv(spost('plans', [{ member_id:mid, data:g, updated_at:new Date().toISOString() }], {on:'member_id'}), '목표 저장');
   toast('목표를 정했어요'); render();
+  목표뱃지저장(mid).then(render);
 }
 
 /* 이번 달 출석 — 개인운동 · PT 수업 · 목표 대비 출석률 */
@@ -7912,8 +7924,8 @@ document.addEventListener('click', ev=>{
         <button class="btn ghost sm" data-act="close">그만두기</button>`); return; }
     case 'goaldelgo': { const g = GOALS[S.mid]; if(!g) return;
       g.my = (g.my||[]).filter(x => x.id !== rest[0]); closeSheet();
-      sv(spost('plans', [{ member_id:S.mid, data:g, updated_at:new Date().toISOString() }], {on:'member_id'}), '목표 지우기');
-      toast('지웠어요'); render(); return; }
+      toast('지웠어요'); render();
+      목표뱃지저장(S.mid).then(render); return; }
     case 'rpt': S.rw=rest[0]; go('report'); return;
     case 'noop': return;
     case 'rcopy': { const u = 리포트링크(rest[0]);
