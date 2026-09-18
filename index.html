@@ -356,6 +356,45 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .blrow .c{text-align:right;font-size:13.5px;font-weight:800;color:var(--cream);font-variant-numeric:tabular-nums}
 .blrow .c i{font-style:normal;font-size:10.5px;font-weight:700;margin-left:3px}
 .blrow .c i.up{color:#6fa07f}.blrow .c i.dn{color:var(--warn)}
+.ibdot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--teal);margin-left:5px;vertical-align:middle}
+.ibfd .blrow,.ibfd .blhd{grid-template-columns:76px 1fr 1fr 1fr}
+.ibfd .blrow{text-align:left}
+.ibfd .d0{white-space:nowrap}
+.ibpull{text-align:center;padding:10px 4px 4px}
+.ibpull .ttl{font-size:16px;font-weight:800;color:var(--cream);margin-bottom:14px}
+.ibpull .bar{height:12px;border-radius:99px;background:var(--dark-3);overflow:hidden}
+.ibpull .bar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--gold-2),var(--gold));transition:width .25s ease}
+.ibpull .pc{margin-top:8px;font-size:22px;font-weight:800;color:var(--gold);font-variant-numeric:tabular-nums}
+.ibpull .ico{font-size:40px;line-height:1;margin:4px 0 8px}
+.ibpull .res{font-size:17px;font-weight:800;color:var(--cream)}
+.ibpull .sub{margin-top:5px;font-size:12.5px;font-weight:600;color:var(--sub)}
+.ibcmp{background:var(--dark-2);border:1px solid var(--line);border-radius:16px;padding:12px;flex:0 0 auto}
+/* 인바디 — 루킨바디처럼: 날짜 두 개 골라 비교 · 변화 그래프는 최근 10회 · 기록은 접어 두고 찾기
+   (2026-09-18 대표: 「인바디UI처럼 최근 기록, 아래 기록들도 다 펼치지말고 날짜, 기록찾는걸 인바디처럼」) */
+.ibsel{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.ibsel button{display:flex;flex-direction:column;align-items:flex-start;gap:1px;background:var(--dark-3);
+  border:1px solid var(--line);border-radius:11px;padding:7px 10px;text-align:left}
+.ibsel button small{font-size:10.5px;font-weight:800;color:#8f8a83}
+.ibsel button b{font-size:13.5px;font-weight:800;color:var(--cream);font-variant-numeric:tabular-nums}
+.ibsel button.b b{color:var(--gold)}
+.ibrow{display:grid;grid-template-columns:62px 1fr 1fr 64px;gap:4px;align-items:baseline;padding:7px 2px;border-top:1px solid var(--line)}
+.ibrow.hd{border-top:none;padding-top:0}
+.ibrow.hd span{font-size:10.5px;font-weight:700;color:#75706a}
+.ibrow .n{font-size:12px;font-weight:800;color:#b9b2a8}
+.ibrow .v{text-align:right;font-size:14px;font-weight:800;color:#b9b2a8;font-variant-numeric:tabular-nums}
+.ibrow .v.b{color:var(--cream)}
+.ibrow .d{text-align:right;font-size:12px;font-weight:800;font-variant-numeric:tabular-nums;color:#8f8a83}
+.ibrow .d.up{color:#6fa07f}.ibrow .d.dn{color:var(--warn)}
+.ibhd{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.ibhd b{font-size:13px;font-weight:800;color:var(--cream)}
+.ibhd .seg{margin:0;width:auto}
+.ibhd .seg button{padding:4px 10px;font-size:11.5px}
+.ibch{display:flex;align-items:stretch}
+.ibch .lb{flex:0 0 50px;display:flex;flex-direction:column}
+.ibch .lb span{height:62px;display:flex;flex-direction:column;justify-content:center;font-size:11.5px;font-weight:800;color:#b9b2a8}
+.ibch .lb span i{font-style:normal;font-size:10px;font-weight:600;color:#75706a}
+.ibch .sc{flex:1;min-width:0;overflow-x:auto;direction:rtl;scrollbar-width:thin}
+.ibch .sc svg{direction:ltr;display:block}
 .blhd{display:grid;grid-template-columns:58px 1fr 1fr 1fr;gap:4px;padding:0 2px 6px}
 .blhd span{font-size:10.5px;font-weight:700;color:#75706a;text-align:right}
 .blhd span:first-child{text-align:left}
@@ -1759,7 +1798,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '185';
+const BUILD = '186';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -4082,7 +4121,7 @@ function vReport(){
       <div class="gbox">${bodyMap(ps, Math.max(1, 끝날/7))}</div>` : ''}`,
     foot: tr
       ? `<button class="btn sub" data-act="rcopy:${w.id}">링크 복사</button>
-         <button class="btn main dim" data-act="rsend:${w.id}">알림톡 보내기</button>`
+         <button class="btn main" data-act="rsend:${w.id}">알림톡 보내기</button>`
       : `<button class="btn main" data-act="tab:home">홈으로</button>` };
 }
 function anaMid(){ return (S.who==='tr') ? (S.tmid || S.subj || S.mid) : S.mid; }
@@ -4105,10 +4144,10 @@ function vRecords(){
     <button class="ex ${at==='ex'?'on':''}" data-act="anat:ex">
       <span class="ic3">${IC_DUMB}</span>운동분석</button>
     <button class="bd ${at==='body'?'on':''}" data-act="anat:body">
-      <span class="ic3">${IC_BODY}</span>체형분석</button>
+      <span class="ic3">${IC_BODY}</span>인/아웃바디</button>
     <button class="lg ${at==='log'?'on':''}" data-act="anat:log">
       <span class="ic3">${IC_CAL}</span>지난기록</button></div>`;
-  const topbar = bar('분석', `<span class="sub">${S.who==='tr'?esc((MEMBERS.find(x=>x.id===mid)||{}).n||'')+' · ':''}${at==='body'?'체형':esc(per)}</span>`,
+  const topbar = bar('분석', `<span class="sub">${S.who==='tr'?esc((MEMBERS.find(x=>x.id===mid)||{}).n||'')+' · ':''}${at==='body'?'인/아웃바디':esc(per)}</span>`,
       S.who==='tr' ? 'tm:'+mid : null);
   const tabn = S.who==='tr' ? 0 : 1;
 
@@ -5683,7 +5722,7 @@ function vMe(){
     <div class="hr"></div><span class="lbl">내 기록장</span>
     ${[['note','상담일지','첫 상담 때 트레이너가 적은 내용','sub:intake'],
        ['plan','운동계획','목표 선언 · 맞춤 칼로리 · 다짐','sub:plan'],
-       ['chart','체형분석','체크리스트 · AI 장비 사진 · 비포애프터','sub:body'],
+       ['chart','인/아웃바디','인바디 · 비포애프터 · 체형분석','sub:body'],
        ['moon','생리주기', (cycOf(S.mid)&&cycOf(S.mid).on)
           ? `오늘 ${cycToday(cycOf(S.mid)).day}일차 · ${esc(cycToday(cycOf(S.mid)).ph)}`
           : '켜면 시기에 맞춰 운동을 조절합니다 — 선택이에요', 'sub:cycle'],
@@ -6419,39 +6458,146 @@ function lineChart2(pts, unit, dec){
 const BL_M = { w:{n:'몸무게', u:'kg', d:1, good:-1}, m:{n:'근육량', u:'kg', d:1, good:1},
   f:{n:'체지방량', u:'kg', d:1, good:-1}, fp:{n:'체지방률', u:'%', d:1, good:-1} };
 
+const ib수 = v => (+v).toFixed(1);
+const ib날 = d => d ? d.slice(2).replace(/-/g,'.') : '';
+
+/* 비교할 두 날짜 — 고른 게 없으면 최근 = 마지막, 이전 = 그 바로 앞 */
+function ib두날(ls){
+  const ds = ls.map(x=>x.date);
+  const B = (S.ibB && ds.includes(S.ibB)) ? S.ibB : ds[ds.length-1];
+  const bi = ds.indexOf(B);
+  const A = (S.ibA && ds.includes(S.ibA) && S.ibA !== B) ? S.ibA : (bi > 0 ? ds[bi-1] : null);
+  return { A, B };
+}
+
+/* 변화 그래프 — 루킨바디 「변화」처럼 몸무게·근육량·체지방량을 한 줄씩 쌓는다.
+   점 사이를 넓게 고정해 숫자가 겹치지 않고, 많으면 옆으로 밀어 본다(처음엔 최근 쪽이 보임) */
+function ib변화(ls){
+  const K = ['w','m','f'], BH = 62, PB = 30, GAP = 48, PX = 22;
+  const n = ls.length, W = Math.max(PX*2 + (n-1)*GAP, 260), H = BH*K.length + PB;
+  const x = i => n === 1 ? W/2 : PX + i*GAP;
+  let g = '';
+  K.forEach((k, r) => {
+    const pts = ls.map((o,i) => o[k] ? { i, v:+o[k] } : null).filter(Boolean);
+    const top = r*BH;
+    g += `<line x1="0" x2="${W}" y1="${top+BH}" y2="${top+BH}" stroke="var(--line)" stroke-width="1"/>`;
+    if(!pts.length) return;
+    let mn = Math.min(...pts.map(p=>p.v)), mx = Math.max(...pts.map(p=>p.v));
+    if(mx - mn < 0.5){ mn -= 0.5; mx += 0.5; }
+    const y = v => top + 22 + (1 - (v-mn)/(mx-mn)) * (BH - 34);
+    g += `<path d="${pts.map((p,j)=>(j?'L':'M')+x(p.i).toFixed(1)+' '+y(p.v).toFixed(1)).join(' ')}"
+      fill="none" stroke="var(--gold-2)" stroke-width="1.6" stroke-linejoin="round"/>`;
+    pts.forEach((p,j) => { const last = j === pts.length-1;
+      g += `<circle cx="${x(p.i).toFixed(1)}" cy="${y(p.v).toFixed(1)}" r="${last?3.6:2.8}" fill="${last?'var(--gold)':'var(--gold-2)'}"/>
+        <text x="${x(p.i).toFixed(1)}" y="${(y(p.v)-7).toFixed(1)}" text-anchor="middle" font-size="10.5" font-weight="800"
+          fill="${last?'var(--gold)':'#c9c2b9'}">${ib수(p.v)}</text>`; });
+  });
+  ls.forEach((o,i) => { g += `<text x="${x(i).toFixed(1)}" y="${H-15}" text-anchor="middle" font-size="9.5" font-weight="700" fill="#8f8a83">${ib날(o.date)}</text>`
+    + (o.note==='인바디' ? `<circle cx="${x(i).toFixed(1)}" cy="${H-5}" r="2.2" fill="var(--teal)"/>` : ''); });
+  return `<div class="ibch">
+    <div class="lb">${K.map(k=>`<span>${BL_M[k].n}<i>${BL_M[k].u}</i></span>`).join('')}</div>
+    <div class="sc"><svg viewBox="0 0 ${W} ${H}" style="width:${W}px;height:${H}px;max-width:none">${g}</svg></div></div>`;
+}
+
 function blPane(mid){
   const ls = (D.blog && D.blog[mid]) || [];
-  const key = S.blM || 'w';
-  const mt = BL_M[key];
-  const pts = ls.filter(x=>x[key]).map(x=>({ label: mdTxt(x.date), v: x[key] }));
-  const first = ls[0], last = ls[ls.length-1];
-  const dl = (k) => { if(!first || !last || first===last) return '';
-    const d = Math.round((last[k]-first[k])*10)/10;
-    if(!d) return '<i>그대로</i>';
-    const good = (BL_M[k].good > 0) === (d > 0);
-    return `<i class="${good?'up':'dn'}">${d>0?'▲':'▼'}${Math.abs(d)}</i>`; };
+  const { A, B } = ib두날(ls);
+  const a = ls.find(x=>x.date===A), b = ls.find(x=>x.date===B);
+  const 모두 = S.ibAll === mid;
+  const 보일것 = 모두 ? ls : ls.slice(-10);
+  const 줄 = k => { const m = BL_M[k], va = a && a[k], vb = b && b[k];
+    let d = '', c = '';
+    if(va && vb){ const x = Math.round((vb-va)*10)/10;
+      if(!x) d = '0'; else { c = ((m.good > 0) === (x > 0)) ? 'up' : 'dn'; d = (x>0?'+':'−') + Math.abs(x); } }
+    return `<div class="ibrow"><span class="n">${m.n}</span>
+      <span class="v">${va?ib수(va):'—'}</span><span class="v b">${vb?ib수(vb):'—'}</span>
+      <span class="d ${c}">${d||'—'}</span></div>`; };
   return `
-    <span class="lbl">인/아웃바디</span>
+    <span class="lbl">인바디 · 체성분</span>
     ${ls.length ? `
+    <div class="ibcmp">
+      <div class="ibsel">
+        <button data-act="ibsel:A"><small>이전</small><b>${A?ib날(A):'없음'} ▾</b></button>
+        <button class="b" data-act="ibsel:B"><small>최근</small><b>${ib날(B)} ▾</b></button>
+      </div>
+      <div class="ibrow hd"><span></span><span style="text-align:right">이전</span><span style="text-align:right">최근</span><span style="text-align:right">변화</span></div>
+      ${['w','m','f','fp'].map(줄).join('')}
+    </div>
     <div class="gbox">
-      <div class="seg" style="margin-bottom:10px">${['w','m','f','fp'].map(k=>
-        `<button class="${key===k?'on':''}" data-act="blm:${k}">${BL_M[k].n}</button>`).join('')}</div>
-      ${pts.length>1 ? lineChart2(pts, mt.u, mt.d)
-        : `<div class="empty">${mt.n} 기록이 한 번뿐이라 그래프가 안 나옵니다</div>`}
+      <div class="ibhd"><b>변화 그래프</b>
+        ${ls.length > 10 ? `<div class="seg"><button class="${모두?'':'on'}" data-act="iball:0">최근 10회</button>
+          <button class="${모두?'on':''}" data-act="iball:1">전체 ${ls.length}회</button></div>` : ''}</div>
+      ${ib변화(보일것)}
     </div>
-    <div class="card" style="padding:8px 12px 10px">
-      <div class="blhd"><span>잰 날</span><span>몸무게</span><span>근육량</span><span>체지방률</span></div>
-      ${ls.slice().reverse().map(x=>`<div class="blrow">
-        <span class="d0">${mdTxt(x.date)}${x.note==='인바디'?'<b class="ibtag">인바디</b>':''}</span>
-        <span class="c">${x.w?kgfmt(x.w):'—'}</span>
-        <span class="c">${x.m?kgfmt(x.m):'—'}</span>
-        <span class="c">${x.fp?kgfmt(x.fp):'—'}</span></div>`).join('')}
-    </div>
-    ${(first && last && first!==last) ? `<div class="note">${esc(dateTxt(first.date))}부터 ${esc(dateTxt(last.date))}까지 —
-      몸무게 ${dl('w')} · 근육량 ${dl('m')} · 체지방률 ${dl('fp')}
-      <br><b style="color:var(--gold-2)">근육은 지키고 지방만 줄었는지</b>를 이 줄로 봅니다.</div>` : ''}
+    <button class="btn sub sm" data-act="ibfind">기록 찾기 · ${ls.length}건 ›</button>
     ` : '<div class="empty">아직 잰 기록이 없어요</div>'}
+    <button class="btn blue sm" data-act="ibpull:${mid}">루킨바디에서 지난 기록 가져오기</button>
     <button class="btn sub sm" data-act="bladd:${mid}">＋ 오늘 몸 상태 기록</button>`;
+}
+
+/* 기록 찾기 · 날짜 고르기 — 같은 창. 고르면 그 날이 비교 칸에 들어간다 */
+function sheetIbPick(mid, side){
+  const ls = (D.blog && D.blog[mid]) || [];
+  const { A, B } = ib두날(ls);
+  const 지금 = side === 'A' ? A : side === 'B' ? B : null;
+  const 해들 = [...new Set(ls.map(x=>x.date.slice(0,4)))].reverse();
+  const 해 = (S.ibY && 해들.includes(S.ibY)) ? S.ibY : 해들[0];
+  openSheet(()=>`<div class="h2">${side==='A'?'이전 날짜':side==='B'?'최근 날짜':'기록 찾기'} <small>${ls.length}건</small></div>
+    ${해들.length > 1 ? `<div class="seg" style="margin-bottom:8px">${해들.map(y=>
+      `<button class="${y===해?'on':''}" data-act="ibyr:${side}:${y}">${y}년</button>`).join('')}</div>` : ''}
+    <div class="card ibfd" style="padding:8px 12px 10px">
+      <div class="blhd"><span>잰 날</span><span>몸무게</span><span>근육량</span><span>체지방률</span></div>
+      ${ls.filter(x=>x.date.slice(0,4)===해).slice().reverse().map(x=>`<button class="blrow" style="width:100%;${x.date===지금?'background:var(--gold-dim);border-radius:8px':''}"
+          data-act="ibset:${side}:${x.date}">
+        <span class="d0">${ib날(x.date)}${x.note==='인바디'?'<i class="ibdot" title="인바디"></i>':''}</span>
+        <span class="c">${x.w?ib수(x.w):'—'}</span>
+        <span class="c">${x.m?ib수(x.m):'—'}</span>
+        <span class="c">${x.fp?ib수(x.fp):'—'}</span></button>`).join('')}
+    </div>
+    <div class="note">${side==='F' ? '누르면 그 날을 <b>최근</b> 칸에 놓고, 바로 앞 기록과 견줍니다.' : '누르면 그 날짜로 바꿉니다.'}
+      <br><i class="ibdot"></i> 인바디 기계로 잰 기록</div>
+    <button class="btn ghost sm" data-act="close">닫기</button>`);
+}
+
+/* 서버가 루킨바디에서 그 회원의 지난 측정을 찾아 몸 기록에 넣는다.
+   답: { state:'ok'|'none'|'already', n }. 서버 쪽이 아직 없거나(인바디 목록 권한 대기) 실패하면 준비중으로 보인다 */
+const IB_PULL = 'https://dash.gladgym.co.kr/hook/inbody-pull';
+async function 인바디가져오기(mid){
+  const r = await fetch(IB_PULL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ member_id: mid }) });
+  if(!r.ok) throw new Error('HTTP ' + r.status);
+  return r.json();
+}
+async function ibPull(mid){
+  let pc = 0, 끝 = false;
+  openSheet(()=>`<div class="ibpull"><div class="ttl">지난 기록 가져오는 중</div>
+    <div class="bar"><i id="ibbar"></i></div><div class="pc" id="ibpc">0%</div>
+    <div class="sub">루킨바디에서 찾고 있어요</div></div>`);
+  const 칠 = v => { const b = document.getElementById('ibbar'), t = document.getElementById('ibpc');
+    if(b) b.style.width = v + '%'; if(t) t.textContent = Math.round(v) + '%'; };
+  /* 답을 기다리는 동안 90%까지 천천히 — 답이 오면 100% */
+  const tm = setInterval(() => { if(끝) return; pc += (90 - pc) * 0.12; 칠(pc); }, 120);
+  const 적어도 = new Promise(r => setTimeout(r, 1200));
+  let res;
+  try{ res = await 인바디가져오기(mid); }catch(e){ res = { state:'wait' }; }
+  await 적어도; 끝 = true; clearInterval(tm); 칠(100);
+  if(res.state === 'ok' && res.n){
+    try{ const rows = await Promise.race([sget('body_logs?select=*&member_id=eq.' + encodeURIComponent(mid) + '&order=on_date'),
+        new Promise((_, no) => setTimeout(() => no(new Error('늦음')), 4000))]);
+      D.blog = D.blog || {};
+      D.blog[mid] = rows.map(r => ({ id:r.id, mid:r.member_id, date:r.on_date, w:num0(r.w), m:num0(r.m), f:num0(r.f), fp:num0(r.fp), note:r.note||'' }));
+      S.ibA = S.ibB = null; }catch(e){}
+  }
+  await new Promise(r => setTimeout(r, 350));
+  const 결과 = {
+    ok:      ['✅', '성공', `지난 기록 ${res.n||0}건을 가져왔어요`],
+    none:    ['📭', '지난 기록 없음', '루킨바디에 이 회원의 측정 기록이 없어요'],
+    already: ['👌', '이미 가져왔음', '루킨바디 기록이 모두 들어와 있어요'],
+    wait:    ['⏳', '연결 준비중', '인바디 연결을 마무리하고 있어요. 새로 재는 기록은 자동으로 들어와요'],
+  }[res.state === 'ok' && !res.n ? 'already' : res.state] || ['⏳', '연결 준비중', '잠시 뒤 다시 눌러 주세요'];
+  openSheet(()=>`<div class="ibpull">
+    <div class="ico">${결과[0]}</div><div class="res">${결과[1]}</div><div class="sub">${결과[2]}</div></div>
+    <button class="btn main sm" data-act="close">확인</button>`);
+  render();
 }
 
 function sheetBlAdd(mid){
@@ -6706,7 +6852,7 @@ function bodyPane(mid){
 function vBody(){
   const mid = subj(), tr = (S.who==='tr');
   const n = (D.bph||[]).filter(x=>x.mid===mid).length;
-  return { top: bar('체형분석', `<span class="sub">사진 ${n}장</span>`, tr?'tm:'+mid:'tab:me'),
+  return { top: bar('인/아웃바디', `<span class="sub">사진 ${n}장</span>`, tr?'tm:'+mid:'tab:me'),
     body: bodyPane(mid) };
 }
 
@@ -7144,7 +7290,7 @@ function tMember(){
       <div class="sm">${(g.now&&g.now.w)?`${g.now.w}kg → ${(g.to&&g.to.w)||'?'}kg`:'아직 없음'}</div></div><span class="rt">›</span></button>
     <button class="card rowc plan" data-act="tsub:diet:${m.id}"><div><div class="nm">식단</div>
       <div class="sm">${mealsOf(m.id).length?`${mealsOf(m.id).length}장 · 최근 ${dateTxt(mealsOf(m.id)[0].date)}`:'아직 없음'}</div></div><span class="rt">›</span></button>
-    <button class="card rowc plan" data-act="tsub:body:${m.id}"><div><div class="nm">체형분석</div>
+    <button class="card rowc plan" data-act="tsub:body:${m.id}"><div><div class="nm">인/아웃바디</div>
       <div class="sm">${Object.keys(checksOf(m.id)).length}개 표시 · ${roundsOf(m.id).length}회차 · 사진 ${((D.bph||[]).filter(x=>x.mid===m.id)).length}장</div></div><span class="rt">›</span></button>
     ${(()=>{ const c=cycOf(m.id); if(!c||!c.on) return `<div class="card rowc dim"><div><div class="nm">생리주기</div>
         <div class="sm">회원님이 켜지 않았어요</div></div></div>`;
@@ -8106,6 +8252,15 @@ document.addEventListener('click', ev=>{
       if(S.figSel) figFace(S.figSel);
       render(); return; }
     case 'blm': S.blM = rest[0]; render(); return;
+    case 'ibsel': sheetIbPick((S.screen==='body') ? subj() : anaMid(), rest[0]); return;
+    case 'ibpull': ibPull(rest[0]); return;
+    case 'ibfind': sheetIbPick((S.screen==='body') ? subj() : anaMid(), 'F'); return;
+    case 'ibyr': { S.ibY = rest[1]; sheetIbPick((S.screen==='body') ? subj() : anaMid(), rest[0]); return; }
+    case 'iball': S.ibAll = rest[0]==='1' ? ((S.screen==='body') ? subj() : anaMid()) : null; render(); return;
+    case 'ibset': { const side = rest[0], d = rest[1];
+      if(side==='A') S.ibA = d;
+      else { S.ibB = d; if(side==='F' || S.ibA >= d) S.ibA = null; }
+      closeSheet(); render(); return; }
     case 'bladd': { S.blDate = TODAY; sheetBlAdd(rest[0]); return; }
     case 'blgo': blSave(rest[0]); return;
     case 'bldel': { const id = rest[0]; closeSheet();
