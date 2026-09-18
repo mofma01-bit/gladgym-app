@@ -1263,6 +1263,50 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
 #main.lite .dtitle{color:#2b231c;border-bottom-color:#e6ddcf}
 #main.lite .dtitle small{color:#a0917f}
 .dhd2{width:100%;display:flex;align-items:center;gap:10px;padding:14px 15px;text-align:left}
+/* 기록 카드 머리 + 오른쪽 「새 코멘트」 (2026-09-18 대표: 「새 코멘트는 여기에 버튼이 바로 보이게」) */
+.dhrow{display:flex;align-items:center}
+.dhrow>.dhd2{flex:1;min-width:0}
+.dhrow + .dhrow{border-top:1px solid var(--line)}
+.dnew{flex:none;margin-right:12px;font-size:12px;font-weight:800;color:#0d2027;background:var(--teal);
+  border-radius:9px;padding:7px 11px;white-space:nowrap}
+/* 이번 달 현황판 — 달력 자리를 줄이고 한눈에 */
+.board{background:var(--dark-2);border:1px solid var(--line);border-radius:14px;padding:12px 12px 13px;flex:none}
+.board .bd-hd{font-size:12px;font-weight:800;color:var(--gold-2);margin:0 2px 9px}
+.bd3{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.bd3>div,.bd3>button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:0;text-align:left;
+  background:var(--dark-3);border-radius:11px;padding:9px 10px 10px}
+.bd3 .k{font-size:11px;font-weight:700;color:var(--sub)}
+.bd3 .v{font-size:21px;font-weight:800;color:var(--cream);font-variant-numeric:tabular-nums;line-height:1.2}
+.bd3 .v small{font-size:11px;font-weight:700;color:var(--sub);margin-left:1px}
+.bd3 .v.dim{color:#6f6a64}
+.bd3 .s{font-size:10.5px;font-weight:600;color:#8f8a83;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.bd3 .bar{display:block;width:100%;height:4px;border-radius:9px;background:var(--dark-4);margin-top:5px;overflow:hidden}
+.bd3 .bar b{display:block;height:100%;background:var(--gold);border-radius:9px}
+.bd3.two{grid-template-columns:repeat(2,1fr)}
+.dayslink{width:100%}
+/* 내 목표 · 뱃지 */
+.gl-hd{display:flex;align-items:center;justify-content:space-between;margin:12px 2px 7px}
+.gl-hd b{font-size:12px;font-weight:800;color:var(--gold-2)}
+.gl-hd button{font-size:11.5px;font-weight:800;color:var(--gold);padding:3px 4px}
+.glrow{display:grid;grid-template-columns:1fr auto;align-items:baseline;gap:2px 8px;width:100%;text-align:left;
+  background:var(--dark-3);border-radius:11px;padding:9px 11px 10px;margin-bottom:6px;position:relative}
+.glrow .gl-t{font-size:13px;font-weight:700;color:var(--cream);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.glrow .gl-v{font-size:15px;font-weight:800;color:var(--gold);font-variant-numeric:tabular-nums}
+.glrow .gl-v small{font-size:11px;font-weight:700;color:var(--sub)}
+.glrow .bar{grid-column:1 / -1;display:block;height:5px;border-radius:9px;background:var(--dark-4);overflow:hidden;margin-top:4px}
+.glrow .bar b{display:block;height:100%;background:var(--gold);border-radius:9px}
+.glrow.ok .bar b{background:var(--teal)} .glrow.ok .gl-v{color:var(--teal)}
+.gl-add{width:100%;border:1px dashed #55482f;border-radius:11px;padding:11px;font-size:13px;font-weight:800;color:var(--gold)}
+.bdgs{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.bdgs::-webkit-scrollbar{display:none}
+.bdg{flex:none;display:flex;align-items:center;gap:5px;background:#3a3020;border:1px solid #6b5a33;border-radius:20px;
+  padding:5px 10px 5px 7px;font-size:11.5px;font-weight:800;color:var(--gold);white-space:nowrap}
+.bdg i{font-style:normal}
+#main.lite .glrow{background:#f6efe3} #main.lite .glrow .gl-t{color:#2b231c}
+#main.lite .board{background:#fff;border-color:#e6ddcf}
+#main.lite .bd3>div,#main.lite .bd3>button{background:#f6efe3}
+#main.lite .bd3 .v{color:#2b231c}
+.dsum .on .v{color:var(--gold)} .dsum .on2 .v{color:var(--teal)}
 .dhd2 + .dhd2{border-top:1px solid var(--line)}
 .dhd2.dtop .t{font-size:14.5px;font-weight:800}
 .dhd2.dtop .r{font-size:12px;line-height:1.5}
@@ -1680,7 +1724,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '176';
+const BUILD = '179';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2119,6 +2163,15 @@ function 마지막운동날(mid){
 /* 그날 무엇을 몇 kg 몇 세트 했는지.
    ⛔ 「최근 운동기록」은 진짜 마지막 날일 때만 쓴다 — 9월 1일을 보면서 「최근」이라 하면 안 된다.
    분석 탭은 아예 「지난 운동기록」으로 못 박아 넘긴다 (2026-09-07 대표 지적).        */
+function 새코멘트(mid, w){
+  if(S.who==='tr') return '';
+  const 종목 = new Set(w.items.filter(i=>i.sets.length).map(i=>i.ex+':'+i.va));
+  const u = (D.cm||[]).filter(c => c.mid===mid && !c.read && 종목.has(c.ex+':'+c.va));
+  if(!u.length) return '';
+  /* 한 종목이면 그 종목 코멘트 창으로 바로, 여럿이면 코멘트 모아 보기로 */
+  const 한종목 = new Set(u.map(c=>c.ex+':'+c.va)).size === 1;
+  return `<button class="dnew" data-act="${한종목 ? `exd:${u[0].ex}:${u[0].va}` : 'tab:feedback'}">새 코멘트 ${u.length}</button>`;
+}
 function dayDetail(mid, date, 제목){
   const T = 제목 || (date === 마지막운동날(mid) ? '최근 운동기록' : '지난 운동기록');
   const all = D.workouts.filter(w => w.mid===mid && w.date===date && w.done);
@@ -2154,12 +2207,12 @@ function dayDetail(mid, date, 제목){
   if(ws.length === 1){
     const w = ws[0], 열림 = S.dayOpen === w.id;
     return `<div class="card" style="padding:0;overflow:hidden;flex:none">
-      <button class="dhd2 dtop" data-act="dopen:${w.id}">
+      <div class="dhrow"><button class="dhd2 dtop" data-act="dopen:${w.id}">
         <span class="tx">
           <span class="t">📋 ${T}</span>
           <span class="r">${dateTxt(date)} · ${요약(w)}</span>
         </span>
-        <span class="ar">${열림?'▴':'▾'}</span></button>
+        <span class="ar">${열림?'▴':'▾'}</span></button>${새코멘트(mid, w)}</div>
       ${열림 ? 속(w) : ''}</div>`;
   }
 
@@ -2169,9 +2222,9 @@ function dayDetail(mid, date, 제목){
       <small>${dateTxt(date)} · ${ws.length}개${dayVol?` · 총 ${Math.round(dayVol).toLocaleString()}kg`:''}${dayCar?` · 유산소 ${dayCar}분`:''}</small></div>`
    + ws.map(w => { const 열림 = S.dayOpen === w.id;
        return `
-      <button class="dhd2" data-act="dopen:${w.id}">
+      <div class="dhrow"><button class="dhd2" data-act="dopen:${w.id}">
         <span class="tx"><span class="t">${요약(w)}</span></span>
-        <span class="ar">${열림?'▴':'▾'}</span></button>
+        <span class="ar">${열림?'▴':'▾'}</span></button>${새코멘트(mid, w)}</div>
       ${열림 ? 속(w) : ''}`; }).join('') + '</div>';
 }
 
@@ -2389,10 +2442,11 @@ function weekStrip(mid){
         <span class="dn ${i===0?'sun':''}">${DOW[i]}</span>
         ${ring(t.pw, t.pk)}
         <span class="num">${+d.slice(8)}</span></button>`; }).join('')}</div>
-    <div class="dsum" style="grid-template-columns:repeat(4,1fr)">
-      <div><span class="k">운동시간</span><span class="v">${수(st.dur?Math.max(1,Math.round(st.dur/60)):0)}<small> 분</small></span></div>
-      <div><span class="k">종목</span><span class="v">${수(st.ex)}<small> 개</small></span></div>
-      <div><span class="k">총 볼륨</span><span class="v">${수(st.vol ? (st.vol>=1000 ? +(st.vol/1000).toFixed(1) : st.vol) : 0)}<small> ${st.vol>=1000?'톤':'kg'}</small></span></div>
+    ${(()=>{ const 한것 = st.ws.filter(세트있나), 수업 = 한것.filter(w=>w.kind==='수업').length, 개인 = 한것.length - 수업;
+      return `<div class="dsum" style="grid-template-columns:repeat(4,1fr)">
+      <div class="${수업?'on':''}"><span class="k">수업</span><span class="v">${수업}<small> 회</small></span></div>
+      <div class="${개인?'on2':''}"><span class="k">개인운동</span><span class="v">${개인}<small> 회</small></span></div>
+      <div><span class="k">운동시간</span><span class="v">${수(st.dur?Math.max(1,Math.round(st.dur/60)):0)}<small> 분</small></span></div>`; })()}
       <div><span class="k">식단</span><span class="v">${st.kcal?수(st.kcal,1):(st.shots?'—':0)}<small> kcal</small></span></div>
     </div>
   </div>`;
@@ -2680,6 +2734,174 @@ function vNewMem(){
 }
 
 /* ── 홈 ── */
+const 목표종류 = {
+  월운동:   { 이름:'이번 달 개인운동',    단위:'회', 기간:'달', 기본:8, 말:'혼자 운동을 기록한 날로 셉니다 (PT 수업은 빼고)' },
+  주운동:   { 이름:'이번 주 개인운동',    단위:'회', 기간:'주', 기본:2, 말:'혼자 운동을 기록한 날로 셉니다 (PT 수업은 빼고)' },
+  식단기록: { 이름:'이번 달 식단 기록',   단위:'일', 기간:'달', 기본:20 },
+  칼로리이하:{ 이름:'칼로리 이하로 먹은 날', 단위:'일', 기간:'달', 기본:15, kcal:1800, 말:'식단을 기록한 날만 셉니다' },
+  칼로리이상:{ 이름:'칼로리 이상 먹은 날',  단위:'일', 기간:'달', 기본:15, kcal:2500, 말:'식단을 기록한 날만 셉니다' },
+  볼륨:     { 이름:'이번 달 총 볼륨',     단위:'톤', 기간:'달', 기본:20 },
+  종목무게: { 이름:'종목 무게',           단위:'kg', 기간:'없음', 기본:60, 말:'목표를 정한 날부터 든 가장 무거운 세트' },
+};
+const 내목표 = mid => ((GOALS[mid]||{}).my) || [];
+const 내뱃지 = mid => ((GOALS[mid]||{}).badges) || [];
+function 이달날들(){ const out=[], m=TODAY.slice(0,8); for(let d=1; d<=+TODAY.slice(8); d++) out.push(m+String(d).padStart(2,'0')); return out; }
+function 목표재기(mid, g){
+  const T = 목표종류[g.t]; if(!T) return null;
+  const 달 = TODAY.slice(0,7), m = +달.slice(5);
+  const 한날 = ws => new Set(ws.filter(w => 세트있나(w) && w.kind!=='수업').map(w=>w.date)).size;   /* 개인운동만 */
+  const kcal날 = 이달날들().map(d => mealDayStat(mid, d)).filter(x => x.n && x.kcal > 0);
+  let 지금 = 0, 기간 = 달, 이름 = T.이름, 뱃지 = '';
+  if(g.t==='월운동'){ 지금 = 한날(workoutsOf(mid).filter(w=>w.date.slice(0,7)===달)); 뱃지 = `${m}월 개인운동 ${g.n}회`; }
+  else if(g.t==='주운동'){ const wk = weekOf(TODAY); 기간 = wk[0];
+    지금 = 한날(workoutsOf(mid).filter(w=>w.date>=wk[0] && w.date<=wk[6])); 뱃지 = `${+wk[0].slice(5,7)}/${+wk[0].slice(8)} 주 개인운동 ${g.n}회`; }
+  else if(g.t==='식단기록'){ 지금 = 이달날들().filter(d => mealDayStat(mid, d).n).length; 뱃지 = `${m}월 식단 기록 ${g.n}일`; }
+  else if(g.t==='칼로리이하'){ 지금 = kcal날.filter(x => x.kcal <= g.kcal).length; 이름 = `${(+g.kcal).toLocaleString()}kcal 이하로 먹은 날`; 뱃지 = `${m}월 ${(+g.kcal).toLocaleString()}kcal 이하 ${g.n}일`; }
+  else if(g.t==='칼로리이상'){ 지금 = kcal날.filter(x => x.kcal >= g.kcal).length; 이름 = `${(+g.kcal).toLocaleString()}kcal 이상 먹은 날`; 뱃지 = `${m}월 ${(+g.kcal).toLocaleString()}kcal 이상 ${g.n}일`; }
+  else if(g.t==='볼륨'){ 지금 = Math.round(workoutsOf(mid).filter(w=>w.date.slice(0,7)===달).reduce((a,w)=>a+totalKg(w),0)/100)/10; 뱃지 = `${m}월 볼륨 ${g.n}톤`; }
+  else if(g.t==='종목무게'){ 기간 = 'all';
+    workoutsOf(mid).filter(w => w.date >= (g.since||'')).forEach(w => w.items.forEach(it => {
+      if(it.ex===g.ex && it.va===g.va) it.sets.forEach(x => { 지금 = Math.max(지금, +x.kg||0); }); }));
+    이름 = `${exName(g.ex, g.va)} 무게`; 뱃지 = `${exName(g.ex, g.va)} ${kgfmt(g.n)}kg`; }
+  const n = +g.n || 1;
+  return { 이름, 지금, n, 단위:T.단위, p: Math.min(1, 지금 / n), 키: g.id + '|' + 기간, 뱃지 };
+}
+/* 달성하면 뱃지를 준다 — 이미 받은 것(같은 목표 · 같은 기간)은 다시 안 준다 */
+function 뱃지주기(mid){
+  if(S.who==='tr') return;
+  const g = GOALS[mid]; if(!g || !(g.my||[]).length) return;
+  g.badges = g.badges || [];
+  const 새것 = [];
+  g.my.forEach(x => { const r = 목표재기(mid, x);
+    if(r && r.p >= 1 && !g.badges.some(b => b.k === r.키)){ const b = { k:r.키, 이름:r.뱃지, at:TODAY }; g.badges.push(b); 새것.push(b); } });
+  if(!새것.length) return;
+  sv(spost('plans', [{ member_id:mid, data:g, updated_at:new Date().toISOString() }], {on:'member_id'}), '뱃지 저장');
+  setTimeout(() => toast('🏅 뱃지를 받았어요 — ' + 새것.map(b=>b.이름).join(', ')), 300);
+}
+function 목표칸(mid){
+  const my = 내목표(mid), bs = 내뱃지(mid).slice().reverse();
+  const 줄 = my.map(x => { const r = 목표재기(mid, x); if(!r) return '';
+    const 값 = r.단위==='톤' ? r.지금 : (+r.지금).toLocaleString();
+    return `<button class="glrow${r.p>=1?' ok':''}" data-act="goal:${x.id}">
+      <span class="gl-t">${esc(r.이름)}</span>
+      <span class="gl-v">${r.p>=1?'달성 · ':''}${값}<small>/${r.단위==='kg'?kgfmt(r.n):(+r.n).toLocaleString()}${r.단위}</small></span>
+      <i class="bar"><b style="width:${Math.round(r.p*100)}%"></b></i></button>`; }).join('');
+  return `<div class="gl-hd"><b>내 목표</b>${my.length && my.length < 5 ? '<button data-act="goal:new">＋ 목표</button>' : ''}</div>
+    ${my.length ? 줄 : '<button class="gl-add" data-act="goal:new">＋ 내 목표 정하기</button>'}
+    ${bs.length ? `<div class="gl-hd"><b>뱃지 ${bs.length}개</b></div>
+      <div class="bdgs">${bs.map(b => `<span class="bdg">🏅<i>${esc(b.이름)}</i></span>`).join('')}</div>` : ''}`;
+}
+/* 목표 정하기 · 고치기 창 */
+function sheetGoal(id){
+  const mid = S.mid, 옛 = 내목표(mid).find(x => x.id === id);
+  S.gd = S.gd && S.gd.id === (id||'new') ? S.gd : { id: id||'new', t: 옛 ? 옛.t : '월운동' };
+  const 한종목 = (()=>{ const o = {}; workoutsOf(mid).forEach(w => w.items.forEach(it => {
+    const e = exOf(it.ex); if(e && !e.cardio && !isMemo(it.ex) && it.sets.length) o[it.ex+':'+it.va] = exName(it.ex, it.va); })); return o; })();
+  openSheet(()=>{ const t = S.gd.t, T = 목표종류[t], 같은 = 옛 && 옛.t === t;
+    const n = 같은 ? 옛.n : T.기본, kc = 같은 && 옛.kcal ? 옛.kcal : T.kcal;
+    const 종목 = 같은 && 옛.ex ? 옛.ex+':'+옛.va : Object.keys(한종목)[0] || '';
+    return `<div class="h2">${옛 ? '목표 고치기' : '내 목표 정하기'}</div>
+      <div class="chips">${Object.keys(목표종류).map(k => `<button class="chip ${k===t?'on':''}" data-act="gt:${k}">${목표종류[k].이름}</button>`).join('')}</div>
+      ${t==='종목무게' ? (Object.keys(한종목).length
+          ? `<div class="fld"><span class="fn">종목</span><select class="search" data-k="gl:ex">${Object.keys(한종목).map(k =>
+              `<option value="${esc(k)}" ${k===종목?'selected':''}>${esc(한종목[k])}</option>`).join('')}</select></div>`
+          : '<div class="empty">아직 무게를 든 종목이 없어요</div>') : ''}
+      ${T.kcal ? `<div class="fld"><span class="fn">하루 칼로리</span>
+          <input class="search" type="number" inputmode="numeric" data-k="gl:kcal" value="${kc}"><span class="fn">kcal</span></div>` : ''}
+      <div class="fld"><span class="fn">목표</span>
+        <input class="search" type="number" inputmode="decimal" data-k="gl:n" value="${n}"><span class="fn">${T.단위}</span></div>
+      ${T.말 ? `<div class="note">${T.말}</div>` : ''}
+      <button class="btn main" data-act="goalsave">저장</button>
+      ${옛 ? `<button class="dngr" data-act="goaldel:${옛.id}">이 목표 지우기</button>` : ''}
+      <button class="btn ghost sm" data-act="close">닫기</button>`; });
+}
+function 목표저장(){
+  const mid = S.mid, g = GOALS[mid] = GOALS[mid] || {}, t = S.gd.t, T = 목표종류[t];
+  const v = k => { const el = document.querySelector('#sheetbox [data-k="gl:'+k+'"]'); return el ? el.value : ''; };
+  const n = +v('n'); if(!(n > 0)){ toast('목표 숫자를 넣어 주세요'); return; }
+  const x = { id: S.gd.id !== 'new' ? S.gd.id : 'g' + Date.now(), t, n, since: TODAY };
+  if(T.kcal){ const kc = +v('kcal'); if(!(kc > 0)){ toast('하루 칼로리를 넣어 주세요'); return; } x.kcal = kc; }
+  if(t==='종목무게'){ const e = v('ex'); if(!e){ toast('무게를 든 종목이 아직 없어요'); return; } [x.ex, x.va] = e.split(':'); }
+  const 옛 = (g.my||[]).find(y => y.id === x.id);
+  if(옛 && 옛.t === t && 옛.ex === x.ex && 옛.va === x.va) x.since = 옛.since || TODAY;   /* 숫자만 바꾸면 시작일은 그대로 */
+  g.my = (g.my||[]).filter(y => y.id !== x.id).concat([x]);
+  S.gd = null; closeSheet();
+  sv(spost('plans', [{ member_id:mid, data:g, updated_at:new Date().toISOString() }], {on:'member_id'}), '목표 저장');
+  toast('목표를 정했어요'); render();
+}
+
+/* 이번 달 출석 — 개인운동 · PT 수업 · 목표 대비 출석률 */
+function 출석셈(mid){
+  const 달 = TODAY.slice(0,7), 오늘 = +TODAY.slice(8);
+  const ws = workoutsOf(mid).filter(w => w.date.slice(0,7)===달 && 세트있나(w));
+  const 개인ws = ws.filter(w=>w.kind!=='수업'), 수업ws = ws.filter(w=>w.kind==='수업');
+  const 개인 = new Set(개인ws.map(w=>w.date)).size, 수업 = 수업ws.length;
+  const g = GOALS[mid]||{}, my = g.my||[];
+  const 월 = my.find(x=>x.t==='월운동'), 주 = my.find(x=>x.t==='주운동');
+  /* 목표 — 달 목표가 있으면 그걸로, 없으면 주 목표 × 지난 주 수, 그것도 없으면 주 3회 */
+  let 목표수, 기준;
+  if(월){ 목표수 = +월.n; 기준 = `이번 달 목표 ${+월.n}회`; }
+  else { const n = (주 && +주.n) || +g.freq || 3; 목표수 = n * 오늘 / 7;
+    기준 = `주 ${n}회 목표 · 오늘까지 ${Math.round(목표수*10)/10}회`; }
+  const 률 = 목표수 ? Math.round(개인 / 목표수 * 100) : 0;
+  /* 주마다 — 달력 주(일~토) */
+  const 주들 = [];
+  for(let d=1; d<=오늘; d++){ const ds = 달 + '-' + String(d).padStart(2,'0'), wk = weekOf(ds)[0];
+    let x = 주들.find(y=>y.wk===wk); if(!x){ x = { wk, 첫:ds, 끝:ds, 개인:new Set(), 수업:0 }; 주들.push(x); } x.끝 = ds; }
+  개인ws.forEach(w => { const x = 주들.find(y=>w.date>=y.첫 && w.date<=y.끝); if(x) x.개인.add(w.date); });
+  수업ws.forEach(w => { const x = 주들.find(y=>w.date>=y.첫 && w.date<=y.끝); if(x) x.수업++; });
+  return { m:+달.slice(5), 개인, 수업, 률, 기준, 목표있나:!!(월||주), 주들 };
+}
+function sheetAttend(mid){
+  openSheet(()=>{ const a = 출석셈(mid);
+    return `<div class="h2">${a.m}월 출석</div>
+      <div class="gsum">
+        <div><span class="k">개인운동</span><span class="v">${a.개인}<small> 회</small></span></div>
+        <div><span class="k">PT 수업</span><span class="v" style="color:var(--teal)">${a.수업}<small> 회</small></span></div>
+        <div><span class="k">합계</span><span class="v">${a.개인 + a.수업}<small> 회</small></span></div>
+      </div>
+      <span class="lbl">목표 출석률 · 개인운동</span>
+      <div class="card">
+        <div class="rowc" style="align-items:baseline"><div class="nm" style="font-size:26px;color:var(--gold)">${a.률}<small style="font-size:13px"> %</small></div>
+          <div class="sm">${esc(a.기준)}</div></div>
+        <i class="bar" style="display:block;height:6px;border-radius:9px;background:var(--dark-4);overflow:hidden;margin-top:8px">
+          <b style="display:block;height:100%;width:${Math.min(100,a.률)}%;background:var(--gold)"></b></i>
+        ${a.목표있나 ? '' : `<button class="btn sub sm" style="margin-top:10px" data-act="goal:new">개인운동 목표 정하기</button>`}
+      </div>
+      <span class="lbl">주마다</span>
+      <div class="card" style="padding:6px 14px">${a.주들.map(x=>`<div class="trow">
+        <span class="e">${+x.첫.slice(5,7)}/${+x.첫.slice(8)} ~ ${+x.끝.slice(8)}</span>
+        <span class="n">개인 ${x.개인.size}</span>
+        <span class="v" style="color:var(--teal)">PT ${x.수업}</span></div>`).join('')}</div>
+      <div class="note">개인운동은 운동을 기록한 날, PT 수업은 수업 횟수로 셉니다.</div>
+      <button class="btn ghost sm" data-act="close">닫기</button>`; });
+}
+
+/* 이번 달 현황판 — 출석 · 출석률 · 목표 달성
+   출석률 기준 = 주 N회(운동계획 freq, 없으면 3회) × 이번 달 지난 주 수 */
+function 현황판(mid){
+  const 달 = TODAY.slice(0,7);
+  const 출 = 출석셈(mid), g = GOALS[mid]||{};
+  const now = g.now||{}, to = g.to||{}, 있다 = v => v!=null && v!=='';
+  const k = ['w','fp','m'].find(u => 있다(to[u]) && 있다(now[u]));
+  let 목표 = null;
+  if(k){ const logs = ((D.blog||{})[mid]||[]).filter(x => +x[k]), first = logs[0], last = logs[logs.length-1];
+    const a = first ? +first[k] : +now[k], b = +to[k], c = last ? +last[k] : a;
+    목표 = { 이름: k==='w' ? '체중' : k==='fp' ? '체지방률' : '근육량', 단위: k==='fp' ? '%' : 'kg', b, c,
+      p: a===b ? 100 : Math.max(0, Math.min(100, Math.round((a-c)/(a-b)*100))) }; }
+  return `<div class="board">
+    <div class="bd-hd">${+달.slice(5)}월 현황</div>
+    <div class="bd3 two">
+      <button data-act="attend"><span class="k">개인운동</span><span class="v">${출.개인}<small>회</small></span>
+        <span class="s">이번 달 ›</span></button>
+      <button data-act="sub:plan"><span class="k">몸 목표</span>${목표
+        ? `<span class="v">${목표.p}<small>%</small></span>
+           <span class="s">${목표.이름} ${kgfmt(목표.c)}→${kgfmt(목표.b)}${목표.단위}</span>
+           <i class="bar"><b style="width:${목표.p}%"></b></i>`
+        : `<span class="v dim">—</span><span class="s">아직 없어요</span>`}</button>
+    </div>
+    ${목표칸(mid)}</div>`;
+}
 function vHome(){
   const u = unreadOf(S.mid), t = D.today[S.mid], r = t ? rOf(t.rid) : null;
   const lw = liveOf(S.mid), g = GOALS[S.mid] || {};
@@ -2698,10 +2920,9 @@ function vHome(){
           hs:'지정된 루틴이 없어요<br>내 루틴에서 골라 시작합니다', go:'루틴 고르기' };
 
   return { top: bar('글래드짐', `<span class="sub">${esc(me().n)} 회원님</span>`), tabs:1, body:`
-    ${weekStrip(S.mid)}
-    ${past
-      ? (dayDetail(S.mid, sel) || 빔('note','이 날은 기록이 없어요','운동을 시작하면 여기에 쌓입니다'))
-      : dayDetail(S.mid, sel)}
+    ${(뱃지주기(S.mid), 현황판(S.mid))}
+    ${(()=>{ const d = 마지막운동날(S.mid); return d ? dayDetail(S.mid, d) : ''; })()}
+    <button class="btn sub sm dayslink" data-act="days">지난 운동기록 ›</button>
 
     <button class="hero" data-act="${hero.act}">
       <span class="tag">${hero.tag}</span>
@@ -3628,7 +3849,8 @@ function sheetLeave(nextTab){
     <p class="lbl plain" style="line-height:1.8;font-weight:500;color:var(--sub)">
       기록하는 동안에는 다른 화면으로 갈 수 없어요.<br>마치면 오늘 기록이 저장됩니다.</p>
     <button class="btn gold" data-act="askfin">오늘 운동 마치기</button>
-    <button class="btn ghost" data-act="close">계속 운동하기</button>`);
+    <button class="btn ghost" data-act="close">계속 운동하기</button>
+    <button class="dngr" data-act="askcancel">기록 지우고 나가기</button>`);
 }
 function sheetRest(){
   const w=live(), cur=w.items[w.cur], preset=[30,60,90,120];
@@ -3906,7 +4128,7 @@ function daysPane(mid){
 function vDays(){
   const mid = anaMid();
   return { top: bar('지난 운동기록', `<span class="sub">${esc((MEMBERS.find(x=>x.id===mid)||{}).n||'')}</span>`,
-      S.who==='tr'?'go:records':'tab:records'), body: daysPane(mid) };
+      S.who==='tr'?'go:records':'tab:home'), body: daysPane(mid) };
 }
 
 function recEditing(wid){ return S.recEdit && S.recEdit.wid === wid; }
@@ -7678,6 +7900,20 @@ document.addEventListener('click', ev=>{
     case 'rt': S.rid=rest[0]; go('routine'); return;
     case 'rec': S.wid=rest[0]; go('record'); return;
     case 'fendview': S.wid=rest[0]; go('summary'); return;
+    case 'days': S.day = TODAY; go('days'); return;
+    case 'attend': sheetAttend(S.mid); return;
+    case 'goal': S.gd = null; sheetGoal(rest[0]==='new' ? null : rest[0]); return;
+    case 'gt': S.gd.t = rest[0]; drawSheet(); return;
+    case 'goalsave': 목표저장(); return;
+    case 'goaldel': { const g = GOALS[S.mid]; if(!g) return;
+      openSheet(()=>`<div class="h2">이 목표를 지울까요?</div>
+        <div class="note">이미 받은 뱃지는 그대로 남아요.</div>
+        <button class="btn main" data-act="goaldelgo:${rest[0]}" style="background:var(--warn);color:#241310">지우기</button>
+        <button class="btn ghost sm" data-act="close">그만두기</button>`); return; }
+    case 'goaldelgo': { const g = GOALS[S.mid]; if(!g) return;
+      g.my = (g.my||[]).filter(x => x.id !== rest[0]); closeSheet();
+      sv(spost('plans', [{ member_id:S.mid, data:g, updated_at:new Date().toISOString() }], {on:'member_id'}), '목표 지우기');
+      toast('지웠어요'); render(); return; }
     case 'rpt': S.rw=rest[0]; go('report'); return;
     case 'noop': return;
     case 'rcopy': { const u = 리포트링크(rest[0]);
