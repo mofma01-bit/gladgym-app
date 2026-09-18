@@ -652,6 +652,25 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 #gav img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
 /* 홈 전체를 2단으로 — 왼쪽 나·현황(좁게) · 오른쪽 해야 할 일(넓게)
    (2026-09-17 대표: 「노션처럼 단을 나누면」) */
+/* 회원 현황 탭 */
+.st-nums{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:8px}
+.st-nums>div{background:var(--dark-2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.st-nums .k{display:block;font-size:11px;font-weight:700;color:var(--sub)}
+.st-nums .v{display:block;font-size:24px;font-weight:800;color:var(--cream);font-variant-numeric:tabular-nums}
+.st-nums .v small{font-size:11px;color:var(--sub);margin-left:2px}
+.st-nums .v.t{color:var(--teal)} .st-nums .v.g{color:var(--gold)}
+.st-bar{display:block;height:6px;border-radius:9px;background:var(--dark-4);overflow:hidden;margin-top:6px}
+.st-bar b{display:block;height:100%;background:var(--gold);border-radius:9px}
+.st-row{display:grid;grid-template-columns:1fr 70px 70px;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);font-size:12.5px;color:var(--sub)}
+.st-row:last-child{border-bottom:none}
+.st-row b{color:var(--cream)} .st-row .t b{color:var(--teal)}
+.st-goal .rowc{align-items:baseline}
+.st-v{font-size:15px;font-weight:800;color:var(--gold);white-space:nowrap} .st-v small{font-size:11px;color:var(--sub)}
+.st-goal.ok .st-v{color:var(--teal)} .st-goal.ok .st-bar b{background:var(--teal)}
+.st-bdgs{display:flex;flex-wrap:wrap;gap:6px}
+.st-bdg{display:inline-flex;align-items:center;gap:6px;background:#3a3020;border:1px solid #6b5a33;border-radius:20px;
+  padding:5px 11px;font-size:12px;font-weight:800;color:var(--gold)}
+.st-bdg i{font-style:normal;font-size:10.5px;font-weight:600;color:#8f8a83}
 .homecols{display:grid;gap:16px;align-items:start}
 .hc-l,.hc-r{display:flex;flex-direction:column;min-width:0}
 .hc-l .tx-home.one,.hc-r .tx-home.one{margin-bottom:14px}
@@ -1045,7 +1064,7 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 
 <script>
 "use strict";
-const BUILD = '81';
+const BUILD = '82';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -1692,7 +1711,8 @@ async function 지정판열기(mid, kind){
   지정판그리기();
 }
 let 회원판 = null;                                   /* {mid, tab} */
-const 회원탭내용 = () => S.tab==='routine' ? tabRoutine()
+const 회원탭내용 = () => S.tab==='stat' ? tabStat()
+  : S.tab==='routine' ? tabRoutine()
   : S.tab==='record'  ? tabRecord()
   : S.tab==='comment' ? tabComment()
   : S.tab==='meal'    ? tabMeal()
@@ -1719,6 +1739,99 @@ async function 회원판열기(mid, tab){
   회원판그리기();
   await loadMember(mid);
   회원판그리기();
+}
+
+/* ── 회원 상세 · 현황 ── (회원 앱과 같은 셈) */
+const 목표이름 = { 월운동:'이번 달 개인운동', 주운동:'이번 주 개인운동', 식단기록:'이번 달 식단 기록',
+  칼로리이하:'칼로리 이하로 먹은 날', 칼로리이상:'칼로리 이상 먹은 날', 볼륨:'이번 달 총 볼륨', 종목무게:'종목 무게' };
+const 목표단위 = { 월운동:'회', 주운동:'회', 식단기록:'일', 칼로리이하:'일', 칼로리이상:'일', 볼륨:'톤', 종목무게:'kg' };
+function 주첫날(ds){ const d = new Date(ds+'T00:00:00'); d.setDate(d.getDate() - d.getDay());
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function 현황셈(mid){
+  const 달 = TODAY.slice(0,7), 오늘 = +TODAY.slice(8);
+  /* 세트가 하나라도 있는 운동만 — 회원 앱 세트있나 와 같다 */
+  const 세트아이템 = new Set(M.ws.map(x=>x.item_id));
+  const 세트운동 = new Set(M.wi.filter(i=>세트아이템.has(i.id)).map(i=>i.workout_id));
+  const ws = D.w.filter(w => w.member_id===mid && w.done && 세트운동.has(w.id));
+  const 이달 = ws.filter(w => (w.on_date||'').slice(0,7)===달);
+  const 개인ws = 이달.filter(w=>w.kind!=='수업'), 수업ws = 이달.filter(w=>w.kind==='수업');
+  const 개인 = new Set(개인ws.map(w=>w.on_date)).size, 수업 = 수업ws.length;
+  const g = (M.plan && M.plan.data) || {}, my = g.my || [];
+  const 월 = my.find(x=>x.t==='월운동'), 주 = my.find(x=>x.t==='주운동');
+  let 목표수, 기준;
+  if(월){ 목표수 = +월.n; 기준 = '이번 달 목표 ' + (+월.n) + '회'; }
+  else { const n = (주 && +주.n) || +g.freq || 3; 목표수 = n * 오늘 / 7;
+    기준 = '주 ' + n + '회 목표 · 오늘까지 ' + Math.round(목표수*10)/10 + '회'; }
+  const 률 = 목표수 ? Math.round(개인 / 목표수 * 100) : 0;
+  /* 주마다 */
+  const 주들 = [];
+  for(let d=1; d<=오늘; d++){ const ds = 달+'-'+String(d).padStart(2,'0'), wk = 주첫날(ds);
+    let x = 주들.find(y=>y.wk===wk); if(!x){ x = { wk, 첫:ds, 끝:ds, 개인:new Set(), 수업:0 }; 주들.push(x); } x.끝 = ds; }
+  개인ws.forEach(w => { const x = 주들.find(y=>w.on_date>=y.첫 && w.on_date<=y.끝); if(x) x.개인.add(w.on_date); });
+  수업ws.forEach(w => { const x = 주들.find(y=>w.on_date>=y.첫 && w.on_date<=y.끝); if(x) x.수업++; });
+  /* 하루 칼로리 — 식단을 기록한 날만 */
+  const kcal = {}; M.meals.forEach(m => { const d = m.on_date; if((d||'').slice(0,7)!==달) return;
+    kcal[d] = (kcal[d]||0) + (Number(m.kcal)||0); });
+  const 식단날 = new Set(M.meals.filter(m=>(m.on_date||'').slice(0,7)===달).map(m=>m.on_date)).size;
+  const 세트들 = wid => { const ids = new Set(M.wi.filter(i=>i.workout_id===wid).map(i=>i.id)); return M.ws.filter(x=>ids.has(x.item_id)); };
+  const 목표들 = my.map(x => { let 지금 = 0, 이름 = 목표이름[x.t] || x.t;
+    if(x.t==='월운동') 지금 = 개인;
+    else if(x.t==='주운동'){ const wk = 주첫날(TODAY);
+      지금 = new Set(ws.filter(w=>w.kind!=='수업' && w.on_date>=wk && 주첫날(w.on_date)===wk).map(w=>w.on_date)).size; }
+    else if(x.t==='식단기록') 지금 = 식단날;
+    else if(x.t==='칼로리이하'){ 지금 = Object.values(kcal).filter(v=>v>0 && v<=x.kcal).length; 이름 = (+x.kcal).toLocaleString()+'kcal 이하로 먹은 날'; }
+    else if(x.t==='칼로리이상'){ 지금 = Object.values(kcal).filter(v=>v>0 && v>=x.kcal).length; 이름 = (+x.kcal).toLocaleString()+'kcal 이상 먹은 날'; }
+    else if(x.t==='볼륨'){ let v = 0; 이달.forEach(w => 세트들(w.id).forEach(s2 => { v += (+s2.kg||0)*(+s2.reps||0); })); 지금 = Math.round(v/100)/10; }
+    else if(x.t==='종목무게'){ const vid = x.ex+':'+x.va; 이름 = vaName(vid) + ' 무게';
+      ws.filter(w => (w.on_date||'') >= (x.since||'')).forEach(w => {
+        const ids = new Set(M.wi.filter(i=>i.workout_id===w.id && i.variant_id===vid).map(i=>i.id));
+        M.ws.forEach(s2 => { if(ids.has(s2.item_id)) 지금 = Math.max(지금, +s2.kg||0); }); }); }
+    const n = +x.n || 1;
+    return { 이름, 지금, n, 단위: 목표단위[x.t] || '', p: Math.min(1, 지금/n) }; });
+  /* 몸 목표 — 처음 잰 몸 기록이 출발점 (회원 앱과 같다) */
+  const now = g.now||{}, to = g.to||{}, 있다 = v => v!=null && v!=='';
+  const k = ['w','fp','m'].find(u => 있다(to[u]) && 있다(now[u]));
+  let 몸 = null;
+  if(k){ const logs = M.bl.filter(x=>+x[k]).slice().sort((a,b)=>a.on_date<b.on_date?-1:1), first = logs[0], last = logs[logs.length-1];
+    const a = first ? +first[k] : +now[k], b = +to[k], c = last ? +last[k] : a;
+    몸 = { 이름: k==='w'?'체중':k==='fp'?'체지방률':'근육량', 단위: k==='fp'?'%':'kg', a, b, c,
+      p: a===b ? 100 : Math.max(0, Math.min(100, Math.round((a-c)/(a-b)*100))) }; }
+  return { m:+달.slice(5), 개인, 수업, 률, 기준, 주들, 목표들, 뱃지:(g.badges||[]).slice().reverse(), 몸, 계획있나:!!M.plan };
+}
+function tabStat(){
+  if(!M.plan && !M.wi.length && !M.meals.length) return '<div class="empty">불러오는 중…</div>';
+  const a = 현황셈(S.mid);
+  const 막대 = p => '<i class="st-bar"><b style="width:'+Math.round(p)+'%"></b></i>';
+  return '<div class="cols">'
+    + '<div class="sec"><div class="lbl">' + a.m + '월 출석</div>'
+    + '<div class="st-nums">'
+      + '<div><span class="k">개인운동</span><span class="v">' + a.개인 + '<small>회</small></span></div>'
+      + '<div><span class="k">PT 수업</span><span class="v t">' + a.수업 + '<small>회</small></span></div>'
+      + '<div><span class="k">합계</span><span class="v">' + (a.개인+a.수업) + '<small>회</small></span></div>'
+      + '<div><span class="k">목표 출석률</span><span class="v g">' + a.률 + '<small>%</small></span></div>'
+    + '</div>'
+    + '<div class="card" style="padding:10px 14px">' + 막대(Math.min(100,a.률))
+      + '<div class="t2" style="margin-top:6px">개인운동 기준 · ' + esc(a.기준) + '</div></div>'
+    + '<div class="lbl" style="margin-top:12px">주마다</div>'
+    + '<div class="card" style="padding:4px 14px">' + a.주들.map(x => '<div class="st-row"><span>'
+      + (+x.첫.slice(5,7)) + '/' + (+x.첫.slice(8)) + ' ~ ' + (+x.끝.slice(8)) + '</span><span>개인 <b>' + x.개인.size
+      + '</b></span><span class="t">PT <b>' + x.수업 + '</b></span></div>').join('') + '</div>'
+    + '</div>'
+    + '<div class="sec"><div class="lbl">회원이 정한 목표 ' + a.목표들.length + '개</div>'
+    + (a.목표들.length ? a.목표들.map(x => '<div class="card st-goal' + (x.p>=1?' ok':'') + '">'
+        + '<div class="rowc"><span class="t1">' + esc(x.이름) + '</span><span class="st-v">' + (x.p>=1?'달성 · ':'')
+        + (x.단위==='kg'?kgfmt(x.지금):(+x.지금).toLocaleString()) + '<small>/' + (x.단위==='kg'?kgfmt(x.n):(+x.n).toLocaleString()) + x.단위 + '</small></span></div>'
+        + 막대(x.p*100) + '</div>').join('')
+      : '<div class="empty">아직 정한 목표가 없어요</div>')
+    + '<div class="lbl" style="margin-top:12px">뱃지 ' + a.뱃지.length + '개</div>'
+    + (a.뱃지.length ? '<div class="st-bdgs">' + a.뱃지.map(b => '<span class="st-bdg">🏅 ' + esc(b.이름)
+        + '<i>' + esc((b.at||'').slice(5).replace('-','.')) + '</i></span>').join('') + '</div>'
+      : '<div class="empty">아직 받은 뱃지가 없어요</div>')
+    + '<div class="lbl" style="margin-top:12px">몸 목표</div>'
+    + (a.몸 ? '<div class="card"><div class="rowc"><span class="t1">' + a.몸.이름 + ' ' + kgfmt(a.몸.a) + ' → <b>' + kgfmt(a.몸.c)
+        + '</b> → ' + kgfmt(a.몸.b) + a.몸.단위 + '</span><span class="st-v">' + a.몸.p + '<small>%</small></span></div>' + 막대(a.몸.p) + '</div>'
+      : '<div class="empty">운동계획에 몸 목표가 없어요</div>')
+    + '</div></div>';
 }
 
 /* ── 회원 상세 · 루틴 ── */
@@ -5831,7 +5944,7 @@ function popPrep(){
 }
 
 /* ── 그리기 ── */
-const TABS = [['routine','루틴'],['record','운동 기록'],['comment','코멘트'],
+const TABS = [['stat','현황'],['routine','루틴'],['record','운동 기록'],['comment','코멘트'],
               ['meal','식단'],['body','체형'],['info','정보']];
 function render(){
   const 났 = render0.apply(null, arguments);
@@ -6317,7 +6430,9 @@ document.addEventListener('click', async function(ev){
   if(a==='plsave'){
     const g = k => { const el=document.querySelector('[data-pl="'+k+'"]'); return el?el.value.trim():''; };
     const num = v => { const n=parseFloat(String(v).replace(/[^0-9.]/g,'')); return isNaN(n)?null:n; };
-    const data = Object.assign({}, (M.plan && M.plan.data) || {});
+    let 최신 = null;
+    try{ 최신 = ((await sget('plans?select=data&member_id=eq.'+encodeURIComponent(S.mid)))[0]||{}).data || null; }catch(e){}
+    const data = Object.assign({}, 최신 || (M.plan && M.plan.data) || {});
     data.goal = g('goal'); data.wk = g('wk'); data.mo = g('mo'); data.diet = g('diet');
     data.now = Object.assign({}, data.now||{}, { w:num(g('now.w')), m:num(g('now.m')), fp:num(g('now.fp')) });
     data.to  = Object.assign({}, data.to||{},  { w:num(g('to.w')), fp:num(g('to.fp')), date:g('to.date') });
