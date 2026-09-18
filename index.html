@@ -1012,6 +1012,7 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .attth button{position:absolute;top:3px;right:3px;width:22px;height:22px;border-radius:50%;
   background:rgba(0,0,0,.72);color:#fff;font-size:11px;font-weight:800;line-height:22px;padding:0}
 /* 넘겨 보기 — 폰은 옆으로 밀고, PC 는 ‹ › (2026-09-18 대표: 「올린 순서대로 넘기면서 볼 수 있게」) */
+.cs-kind{margin-top:8px}
 .cmslide{position:relative;margin-top:8px}
 .cs-track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;border-radius:10px;
   background:#000;scrollbar-width:none;overscroll-behavior-x:contain}
@@ -1679,7 +1680,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '175';
+const BUILD = '176';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2443,9 +2444,15 @@ function 붙인것(K){
       <b class="no">${i+1}</b>
       <button data-act="attx:f:${K}:${i}" aria-label="빼기">✕</button></span>`).join('')}</div>`;
 }
-function 넘겨보기(ms){
+function 넘겨보기(전부, cid){
+  const np = 전부.filter(m=>m.kind!=='video').length, nv = 전부.length - np;
+  const f = (S.cmf||{})[cid] || '';
+  const ms = f==='photo' ? 전부.filter(m=>m.kind!=='video') : f==='video' ? 전부.filter(m=>m.kind==='video') : 전부;
   const n = ms.length;
-  return `<div class="cmslide">
+  const 나눔 = (np && nv && cid) ? `<div class="seg cs-kind">
+      <button class="${f==='photo'?'on':''}" data-act="csk:${cid}:photo">사진 ${np}</button>
+      <button class="${f==='video'?'on':''}" data-act="csk:${cid}:video">영상 ${nv}</button></div>` : '';
+  return 나눔 + `<div class="cmslide">
     <div class="cs-track">${ms.map(m => `<div class="cs-item">${m.kind==='video'
       ? `<video src="${esc(phURL(m.path))}" controls playsinline preload="metadata"></video>`
       : `<img src="${esc(phURL(m.path))}" alt="" onerror="picFail(this)">`}</div>`).join('')}</div>
@@ -3293,11 +3300,13 @@ function vPrep3(){
 }
 
 /* ── ★ 운동 중 ── */
+/* 트레이너가 기록하는 운동인가 — 그러면 시계는 「시간 재기 ▶」를 눌러야만 켜진다 */
+const 시계는손으로 = w => !!w && (w.kind === '수업' || w.by === '트레이너' || S.who === 'tr');
 async function newLive(title, items, kind, rid, mid, by){
   const id='w'+Date.now();
   mid = mid || S.mid;
   const kd = kind || '개인운동';
-  const t0 = (kd === '수업') ? null : Date.now();          /* 수업은 시계를 자동으로 켜지 않는다 */
+  const t0 = 시계는손으로({ kind:kd, by }) ? null : Date.now();   /* 수업·트레이너 기록은 시계를 자동으로 켜지 않는다 */
   D.live={ id, mid, title, kind:kd, rid:rid||null, date:TODAY, startAt:t0, items, cur:0,
            by:by||'회원', begun: items.length>0 };   /* 담기만 한 상태면 아직 시작 전 */
   if(!t0) items.forEach(it=>{ it.startAt = null; });
@@ -3315,10 +3324,11 @@ function adoptLive(mid){
   const w = D.workouts.find(x=>!x.done && x.mid===mid && x.date===TODAY);
   if(!w || !w.items || !w.items.length) return false;
   const i = w.items.findIndex(it=>!it.locked);
+  const 꺼둠 = 시계는손으로(w) && !Number(w.dur);           /* 시계 없이 하던 수업은 이어받아도 꺼 둔다 */
   D.live = { id:w.id, mid:w.mid, title:w.title||'운동', kind:w.kind, rid:w.rid, date:w.date,
-    startAt: Date.now() - (Number(w.dur)||0)*1000, cur: i>=0?i:w.items.length-1,
+    startAt: 꺼둠 ? null : Date.now() - (Number(w.dur)||0)*1000, cur: i>=0?i:w.items.length-1,
     items: w.items.map(it=>({ _id:it._id, ex:it.ex, va:it.va, rest:60, locked:it.locked,
-      sec:it.sec, startAt:Date.now(), sets:(it.sets||[]).map(x=>({kg:x.kg,reps:x.reps,spd:x.spd,done:true})) })) };
+      sec:it.sec, startAt: 꺼둠 ? null : Date.now(), sets:(it.sets||[]).map(x=>({kg:x.kg,reps:x.reps,spd:x.spd,done:true})) })) };
   if(!D.live.items.length) { D.live=null; return false; }
   if(D.live.items.every(it=>it.locked)) D.live.cur = D.live.items.length-1;
   save(); return true;
@@ -3474,14 +3484,14 @@ function sheetExDesc(exid, vk, mid){
         ${isEdited(mid,exid,vk)?'<span class="pill q">이 회원용</span>':'<span class="pill q">공통</span>'}
         ${tr?`<button class="chip t" style="margin-left:auto" data-act="editdesc:${exid}:${vk}">고치기</button>`:''}</div>
         <div class="tx">${dsc? esc(dsc) : '아직 설명이 없어요'+(tr?' — 고치기를 눌러 적어 주세요':'')}</div></div>
-      ${demoBox(exOf(exid), v)}
+      ${S.screen==='workout' ? '' : demoBox(exOf(exid), v)}
       <span class="lbl">코멘트 ${cms.length?`${cms.length}개`:''}</span>
       ${cms.length? cms.map(c=>`<div class="cm">
         <span class="who">${esc(c.tr)} 트레이너 · ${esc(c.at)}
           ${tr?`<button class="chip" style="margin-left:auto;padding:3px 9px;font-size:11.5px"
             data-act="delcm:${c.id}">지우기</button>`:''}</span>
         <span class="tx">${esc(c.tx)}</span>
-        ${(c.media&&c.media.length) ? 넘겨보기(c.media)
+        ${(c.media&&c.media.length) ? 넘겨보기(c.media, c.id)
         : (c.pics||c.vids)?`<div class="media2">
           ${c.pics?'<div class="pbox"><span class="ic">▨</span><span>보낸 사진</span></div>':''}
           ${c.vids?(S.vplay===c.id
@@ -7692,6 +7702,8 @@ document.addEventListener('click', ev=>{
         updated_at:new Date().toISOString() }], {on:'member_id,variant_id'}), '설명 저장');
       toast('이 회원용 설명으로 저장했습니다'); drawSheet(); return; }
     case 'att': 첨부고르기(rest[0], rest[1]); return;
+    case 'csk': { S.cmf = S.cmf || {};
+      S.cmf[rest[0]] = S.cmf[rest[0]]===rest[1] ? '' : rest[1]; drawSheet(); return; }
     case 'attx': { (att(rest[1]).files||[]).splice(+rest[2], 1); drawSheet(); return; }
     case 'csl': { const t = el.closest('.cmslide') && el.closest('.cmslide').querySelector('.cs-track');
       if(!t) return;
@@ -8079,7 +8091,7 @@ document.addEventListener('click', ev=>{
       const 이미 = !!w.begun;
       w.begun=true;
       if(!이미) w.cur=0;            /* ⛔ 하던 중이면 자리를 옮기지 않는다 (1번으로 튀면 안 된다) */
-      if(!w.startAt){ w.startAt=Date.now(); w.items.forEach(it=>{ if(!it.startAt) it.startAt=w.startAt; }); }
+      if(!w.startAt && !시계는손으로(w)){ w.startAt=Date.now(); w.items.forEach(it=>{ if(!it.startAt) it.startAt=w.startAt; }); }
       S.sordIdx=null; S.addFrom=null; save(); closeSheet();
       if(이미) toast('추가했어요');
       go('workout'); return; }
@@ -8174,8 +8186,10 @@ document.addEventListener('click', ev=>{
       if(i<0){ toast('되돌릴 수 없어요'); return; }
       const rec=D.workouts[i];
       D.workouts.splice(i,1);
+      /* 시계를 안 켜고 끝낸 수업이면 이어서 할 때도 꺼 둔다 */
+      const 꺼둠 = 시계는손으로(rec) && !Number(rec.dur);
       D.live={ id:rec.id, mid:rec.mid, title:rec.title||'이어서 하는 운동', kind:rec.kind, rid:rec.rid, date:rec.date,
-        startAt: Date.now() - rec.dur*1000, cur: Math.max(0, rec.items.length-1),
+        startAt: 꺼둠 ? null : Date.now() - rec.dur*1000, cur: Math.max(0, rec.items.length-1),
         items: rec.items.map(it=>({ _id:it._id, ex:it.ex, va:it.va, rest:60, locked:true, sec:it.sec, startAt:Date.now(),
           sets: it.sets.map(x=>({kg:x.kg, reps:x.reps, spd:x.spd, done:true})) })) };
       rec.done=false; D.workouts.unshift(rec);
