@@ -312,6 +312,12 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .bcmp .cel .hd2 b{font-size:12.5px;font-weight:800;color:var(--cream)}
 .bcmp .cel .hd2 i{font-style:normal;font-size:11.5px;font-weight:700;color:#8bbdd2}
 .bcmp .cel img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;background:#000}
+/* 비포·애프터 각각 넘기기 (2026-09-18 대표: 「왼쪽 오른쪽 각각넘겨가며 비교할 수 있게」) */
+.bcmp .cnav{display:flex;align-items:center;justify-content:space-between;gap:4px;padding:6px 6px 0}
+.bcmp .cnav button{width:34px;height:30px;border-radius:9px;background:var(--dark-3);color:var(--gold);
+  font-size:18px;font-weight:800;line-height:30px;padding:0}
+.bcmp .cnav button:disabled{opacity:.25}
+.bcmp .cnav span{font-size:11.5px;font-weight:800;color:var(--sub);font-variant-numeric:tabular-nums}
 .bcmp .cel .no2{aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;
   font-size:12px;font-weight:600;color:#6f6a64;text-align:center;padding:10px;line-height:1.5}
 .bcmp .cel .ft2{padding:7px 8px;font-size:11.5px;font-weight:700;color:#8f8a83;text-align:center}
@@ -341,6 +347,8 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .lrbar .l{background:var(--gold);color:#241d12}
 .lrbar .r{background:#4d7f96;color:#f2fafd}
 .lrbar .z{flex:1;color:#6f6a64;font-weight:600;font-size:12px}
+.ibtag{display:inline-block;margin-left:5px;font-size:9.5px;font-weight:800;color:#0d2027;background:var(--teal);
+  border-radius:5px;padding:1px 5px;vertical-align:1px}
 .blrow{display:grid;grid-template-columns:58px 1fr 1fr 1fr;gap:4px;align-items:baseline;
   padding:9px 2px;border-top:1px solid var(--line)}
 .blrow:first-child{border-top:none}
@@ -1751,7 +1759,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '181';
+const BUILD = '184';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2872,13 +2880,14 @@ function sheetGoal(id){
           ? `<div class="fld"><span class="fn">종목</span><select class="search" data-k="gl:ex">${Object.keys(한종목).map(k =>
               `<option value="${esc(k)}" ${k===종목?'selected':''}>${esc(한종목[k])}</option>`).join('')}</select></div>`
           : '<div class="empty">아직 무게를 든 종목이 없어요</div>') : ''}
-      ${T.kcal ? `<div class="fld"><span class="fn">하루 칼로리</span>
-          <input class="search" type="number" inputmode="numeric" data-k="gl:kcal" value="${kc}"><span class="fn">kcal</span></div>` : ''}
-      <div class="fld"><span class="fn">목표</span>
-        <input class="search" type="number" inputmode="decimal" data-k="gl:n" value="${n}"><span class="fn">${T.단위}</span></div>
+      ${T.kcal ? `<div class="fld"><span class="fn">하루 칼로리 · kcal</span>
+          <input class="search" type="number" inputmode="numeric" data-k="gl:kcal" value="${kc}"></div>` : ''}
+      <div class="fld"><span class="fn">목표 · ${T.단위}</span>
+        <input class="search" type="number" inputmode="decimal" data-k="gl:n" value="${n}"></div>
       ${T.말 ? `<div class="note">${T.말}</div>` : ''}
-      <button class="btn main" data-act="goalsave">저장</button>
-      ${옛 ? `<button class="dngr" data-act="goaldel:${옛.id}">이 목표 지우기</button>` : ''}
+      <div style="display:flex;gap:9px">
+        ${옛 ? `<button class="btn ghost" data-act="goaldel:${옛.id}" style="color:var(--warn);border-color:#5a3a33">삭제</button>` : ''}
+        <button class="btn main" data-act="goalsave">저장</button></div>
       <button class="btn ghost sm" data-act="close">닫기</button>`; });
 }
 function 목표저장(){
@@ -6433,7 +6442,7 @@ function blPane(mid){
     <div class="card" style="padding:8px 12px 10px">
       <div class="blhd"><span>잰 날</span><span>몸무게</span><span>근육량</span><span>체지방률</span></div>
       ${ls.slice().reverse().map(x=>`<div class="blrow">
-        <span class="d0">${mdTxt(x.date)}</span>
+        <span class="d0">${mdTxt(x.date)}${x.note==='인바디'?'<b class="ibtag">인바디</b>':''}</span>
         <span class="c">${x.w?kgfmt(x.w):'—'}</span>
         <span class="c">${x.m?kgfmt(x.m):'—'}</span>
         <span class="c">${x.fp?kgfmt(x.fp):'—'}</span></div>`).join('')}
@@ -6613,7 +6622,12 @@ function bodyPane(mid){
 
   const cel = (d, lab, side) => {
     const x = d ? list.filter(y=>y.date===d)[0] : null;
-    return `<div class="cel">
+    const i = d ? ds.indexOf(d) : -1;
+    const 넘김 = ds.length > 1 ? `<div class="cnav">
+        <button data-act="bpstep:${side}:-1" ${i<=0?'disabled':''} aria-label="앞 날짜">‹</button>
+        <span>${i+1} / ${ds.length}</span>
+        <button data-act="bpstep:${side}:1" ${i>=ds.length-1?'disabled':''} aria-label="다음 날짜">›</button></div>` : '';
+    return `<div class="cel" data-swipe="bpstep:${side}">${넘김}
       <button class="hd2" data-act="bpsel:${side}"><b>${lab}</b><i>${d?mdTxt(d):'없음'} ▾</i></button>
       ${x ? `<span class="mkwrap" style="display:block;border:none;border-radius:0" data-act="bpview:${x.id}">
               <img src="${esc(phURL(x.path))}" alt="" onerror="picFail(this)">
@@ -6633,7 +6647,7 @@ function bodyPane(mid){
             ? `날짜를 눌러 다른 날과 견줍니다. <b>${esc(pose)}</b> 사진이 <b>${ds.length}일치</b> 있어요.`
             : '사진이 하루치뿐입니다. 다음에 한 장 더 넣으면 나란히 견줍니다.'}</div>`
       : `<div class="empty">${esc(pose)} 사진이 아직 없어요</div>`}
-    <button class="btn blue sm" data-act="bpadd:body">＋ 몸 사진 넣기</button>
+    <button class="btn blue sm" data-act="bpadd:body">＋ ${esc(pose)} 사진 넣기</button>
     ${tr?'':'<div class="note">집에서 찍으실 때는 <b>같은 자리 · 같은 옷 · 같은 밝기</b>로 찍어야 견주기 좋습니다.</div>'}
 
     <div class="hr"></div>
@@ -7599,6 +7613,17 @@ document.addEventListener('click', ev=>{
   S.fpQ=''; S.fpRes=null; sheetFoodPick(w.getAttribute('data-meal'));
 }, true);
 
+/* 옆으로 밀기 — 세로로 스크롤하는 손길과 헷갈리지 않게, 옆으로 40px 넘고 세로보다 확실히 길 때만 */
+let 밀기 = null;
+document.addEventListener('touchstart', e => { const el = e.target.closest('[data-swipe]'); if(!el) return;
+  const t = e.touches[0]; 밀기 = { el, x:t.clientX, y:t.clientY }; }, { passive:true });
+document.addEventListener('touchend', e => { if(!밀기) return; const m = 밀기; 밀기 = null;
+  const t = e.changedTouches[0], dx = t.clientX - m.x, dy = t.clientY - m.y;
+  if(Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+  const b = document.createElement('button');
+  b.setAttribute('data-act', m.el.getAttribute('data-swipe') + ':' + (dx < 0 ? 1 : -1));
+  b.style.display = 'none'; document.body.appendChild(b); b.click(); b.remove(); }, { passive:true });
+
 document.addEventListener('click', ev=>{
   const el=ev.target.closest('[data-act]'); if(!el) return;
   /* 길게 눌러 끝낸 직후의 「따라오는 눌림」은 흘려보낸다 (풀자마자 다시 잠기지 않게) */
@@ -8101,6 +8126,15 @@ document.addEventListener('click', ev=>{
           </button>`; }).join('')}
         <button class="btn ghost sm" data-act="close">닫기</button>`);
       return; }
+    case 'bpstep': { const side = rest[0], dir = +rest[1];
+      const mid = (S.screen==='body') ? subj() : anaMid();
+      const ds = [...new Set(bphOf(mid,'body',S.bpPose||'정면').map(x=>x.date))];
+      if(!ds.length) return;
+      const 지금 = side==='L' ? ((S.bpL && ds.includes(S.bpL)) ? S.bpL : ds[0])
+                              : ((S.bpR && ds.includes(S.bpR)) ? S.bpR : ds[ds.length-1]);
+      const d = ds[Math.max(0, Math.min(ds.length-1, ds.indexOf(지금) + dir))];
+      if(side==='L') S.bpL = d; else S.bpR = d;
+      render(); return; }
     case 'bpset': { if(rest[0]==='L') S.bpL = rest[1]; else S.bpR = rest[1];
       closeSheet(); render(); return; }
     case 'bpadd': { S.bpMid = (S.screen==='body') ? subj() : anaMid(); bpAdd(rest[0]); return; }
