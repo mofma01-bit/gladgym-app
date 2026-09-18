@@ -1759,7 +1759,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '184';
+const BUILD = '185';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -6431,7 +6431,7 @@ function blPane(mid){
     const good = (BL_M[k].good > 0) === (d > 0);
     return `<i class="${good?'up':'dn'}">${d>0?'▲':'▼'}${Math.abs(d)}</i>`; };
   return `
-    <span class="lbl">몸 상태 · 인바디</span>
+    <span class="lbl">인/아웃바디</span>
     ${ls.length ? `
     <div class="gbox">
       <div class="seg" style="margin-bottom:10px">${['w','m','f','fp'].map(k=>
@@ -6638,6 +6638,9 @@ function bodyPane(mid){
   };
 
   return `
+    ${blPane(mid)}
+
+    <div class="hr"></div>
     <span class="lbl">비포 · 애프터 견주기</span>
     <div class="seg">${POSES.map(x=>
       `<button class="${pose===x?'on':''}" data-act="bppose:${x}">${x}</button>`).join('')}</div>
@@ -6671,9 +6674,6 @@ function bodyPane(mid){
       <span class="lbl">사진 모두 · ${all.length}장</span>
       <div class="phstrip">${all.slice().reverse().map(x=>`<button class="pt" data-act="bpview:${x.id}">
         <img src="${esc(phURL(x.path))}" alt="" onerror="picFail(this)"><span>${mdTxt(x.date)} ${esc(x.pose)}</span></button>`).join('')}</div>` : ''}
-
-    <div class="hr"></div>
-    ${blPane(mid)}
 
     <div class="hr"></div>
     ${roundPane(mid)}
