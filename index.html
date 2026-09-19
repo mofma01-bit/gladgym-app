@@ -360,6 +360,18 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .ibfd .blrow,.ibfd .blhd{grid-template-columns:76px 1fr 1fr 1fr}
 .ibfd .blrow{text-align:left}
 .ibfd .d0{white-space:nowrap}
+/* 홈 오운완 — 오늘 기록을 마쳤는데 아직 안 찍었을 때만 (2026-09-19 대표: 「놓칠 수 있으니까 메인 화면에도」) */
+.ootdnudge{display:flex;align-items:center;gap:12px;width:100%;text-align:left;flex:none;
+  background:linear-gradient(135deg,#3a2f1c,#2a2419);border:1.5px solid var(--gold);border-radius:16px;padding:13px 14px}
+.ootdnudge .ic{font-size:26px;line-height:1}
+.ootdnudge .t{font-size:15.5px;font-weight:800;color:var(--gold)}
+.ootdnudge .s{font-size:12px;font-weight:600;color:var(--sub);margin-top:2px}
+.ootdnudge .go{margin-left:auto;font-size:20px;font-weight:700;color:var(--gold)}
+/* 트레이너 코멘트 — 사진·영상 첨부를 맨 위에 크게 (2026-09-19 대표) */
+.attbig{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.attbig button{display:flex;align-items:center;justify-content:center;gap:7px;padding:15px 8px;border-radius:14px;
+  border:1.5px dashed var(--teal);background:#1e343b;color:var(--teal);font-size:15px;font-weight:800}
+.attbig button .ic{font-size:19px;line-height:1}
 .ibpull{text-align:center;padding:10px 4px 4px}
 .ibpull .ttl{font-size:16px;font-weight:800;color:var(--cream);margin-bottom:14px}
 .ibpull .bar{height:12px;border-radius:99px;background:var(--dark-3);overflow:hidden}
@@ -1798,7 +1810,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '186';
+const BUILD = '187';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -3035,6 +3047,7 @@ function vHome(){
 
   return { top: bar('글래드짐', `<span class="sub">${esc(me().n)} 회원님</span>`), tabs:1, body:`
     ${(뱃지주기(S.mid), 현황판(S.mid))}
+    ${오운완홈(S.mid)}
     <div class="homerec">
       <div class="hr-l">
         ${최근카드(S.mid)}
@@ -3808,6 +3821,28 @@ function sheetExDesc(exid, vk, mid){
       <div style="display:flex;gap:9px">
         <button class="btn main sm" data-act="savedesc:${exid}:${vk}:${mid}">저장</button>
         <button class="btn ghost sm" data-act="canceldesc">그만두기</button></div>`;
+    if(tr) return head + `
+      ${askOf(mid, exid, vk).length?`<div class="note" style="border-color:var(--gold-2)">
+        <b style="color:var(--gold)">회원이 이 종목을 봐 달라고 했어요</b>
+        <div>${esc(askOf(mid, exid, vk)[0].note||'따로 적은 말은 없습니다.')}</div></div>`:''}
+      <div class="attbig">
+        <button data-act="att:pic:${K}"><span class="ic">📷</span>사진 첨부</button>
+        <button data-act="att:vid:${K}"><span class="ic">🎬</span>영상 첨부</button></div>
+      ${붙인것(K)}
+      <textarea data-k="cm:${K}" placeholder="코멘트를 적으세요 — 길이 제한 없어요"></textarea>
+      <button class="btn main sm" data-act="sendcm:${exid}:${vk}:${mid}">${S.보내는중?'보내는 중…':'보내기'}</button>
+      <div class="hr"></div>
+      <span class="lbl">지난 코멘트 ${cms.length?`${cms.length}개`:''}</span>
+      ${cms.length? cms.map(c=>`<div class="cm">
+        <span class="who">${esc(c.tr)} 트레이너 · ${esc(c.at)}
+          <button class="chip" style="margin-left:auto;padding:3px 9px;font-size:11.5px" data-act="delcm:${c.id}">지우기</button></span>
+        <span class="tx">${esc(c.tx)}</span>
+        ${(c.media&&c.media.length) ? 넘겨보기(c.media, c.id) : ''}</div>`).join('') : '<div class="empty">아직 코멘트가 없어요</div>'}
+      <div class="desc" style="margin-top:6px"><div class="hd"><b>기본 설명</b>
+        ${isEdited(mid,exid,vk)?'<span class="pill q">이 회원용</span>':'<span class="pill q">공통</span>'}
+        <button class="chip t" style="margin-left:auto" data-act="editdesc:${exid}:${vk}">고치기</button></div>
+        <div class="tx">${dsc? esc(dsc) : '아직 설명이 없어요 — 고치기를 눌러 적어 주세요'}</div></div>
+      <button class="btn ghost sm" data-act="close">닫기</button>`;
     return head + `
       <div class="desc"><div class="hd"><b>기본 설명</b>
         ${isEdited(mid,exid,vk)?'<span class="pill q">이 회원용</span>':'<span class="pill q">공통</span>'}
@@ -4046,10 +4081,12 @@ function vSummary(){
   const times=partTimes(w);
   return { top: bar('오늘 운동', `<span class="sub">${dateTxt(w.date)}</span>`, S.who==='tr'?'ttab:t_today':'tab:home'), body:`
     ${끝카드(w)}
-    ${S.who==='tr' ? `<button class="btn gold" data-act="rpt:${w.id}">오늘 수업 리포트 보내기</button>`
-    : `<button class="btn gold" data-act="ootd:${w.id}">📷 오운완 기록하기</button>
-    <div class="note" style="margin-top:-4px">사진을 찍으면 <b>오늘 한 종목·세트·총 무게</b>가 얹힌 한 장이 만들어집니다.
-      그대로 인스타에 올리거나 내 프로필에 남겨 두세요.</div>`}
+    ${w.date === TODAY
+      ? `<button class="btn gold" data-act="ootd:${w.id}">📷 ${ootd찍었나(w) ? '오운완 다시 찍기' : '오운완 찍기'}</button>
+         <div class="note" style="margin-top:-4px">사진을 찍으면 <b>오늘 한 종목·세트·총 무게</b>가 얹힌 한 장이 만들어집니다.
+           ${S.who==='tr' ? '찍은 사진은 <b>회원 프로필 오운완</b>에 남습니다.' : '그대로 인스타에 올리거나 내 프로필에 남겨 두세요.'}</div>`
+      : `<div class="note">오운완은 <b>기록한 날에만</b> 찍을 수 있어요.</div>`}
+    ${S.who==='tr' ? `<button class="btn sub" data-act="rpt:${w.id}">오늘 수업 리포트 보내기</button>` : ''}
 
     <div class="grid2">${Object.entries(times).slice(0,4).map(([k,v])=>
       `<div class="tile"><span class="k">${esc(k)}</span><span class="v">${parseInt(durTxt(v))}<small> ${durTxt(v).slice(-1)}</small></span></div>`).join('')}</div>
@@ -5179,6 +5216,7 @@ function ootdDraw(img, w){
 
 function ootdPick(wid){
   const w = D.workouts.find(z => z.id === wid); if(!w) return;
+  if(w.date !== TODAY){ toast('지난 날짜 기록은 오운완을 찍을 수 없어요'); return; }
   const inp = document.createElement('input');
   inp.type='file'; inp.accept='image/*'; inp.setAttribute('capture','environment');
   inp.style.display='none'; document.body.appendChild(inp);
@@ -5277,6 +5315,20 @@ async function ootdSave(){
   D.bph = D.bph || [];
   D.bph.push({ id, mid, kind:'ootd', pose:'오운완', date:날, path, memo:S.ootd.wid||'' });
   S.ootd = null; toast('프로필에 남겼어요'); render();
+}
+const ootd찍었나 = w => (D.bph||[]).some(x => x.kind==='ootd' && x.mid===w.mid && (x.memo===w.id || x.date===w.date));
+function 오운완남음(mid){
+  const ws = D.workouts.filter(w => w.mid===mid && w.date===TODAY && w.done && 세트있나(w));
+  if(!ws.length || ws.some(ootd찍었나)) return null;
+  return ws[ws.length-1];
+}
+function 오운완홈(mid){
+  const w = 오운완남음(mid); if(!w) return '';
+  return `<button class="ootdnudge" data-act="ootd:${w.id}">
+    <span class="ic">📷</span>
+    <span><div class="t">오늘 오운완 찍기</div>
+      <div class="s">${w.kind==='수업' ? 'PT 수업' : '오늘 운동'}을 마쳤어요 · 오늘만 찍을 수 있어요</div></span>
+    <span class="go">›</span></button>`;
 }
 const ootdsOf = mid => (D.bph||[]).filter(x => x.mid===mid && x.kind==='ootd')
   .slice().sort((a,b)=> a.date<b.date ? 1 : -1);
