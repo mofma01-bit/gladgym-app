@@ -1077,12 +1077,21 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
   background:#000;scrollbar-width:none;overscroll-behavior-x:contain}
 .cs-track::-webkit-scrollbar{display:none}
 .cs-item{flex:0 0 100%;scroll-snap-align:center;display:flex;align-items:center;justify-content:center;
-  height:min(52vh,420px)}
+  height:min(52vh,420px);position:relative}
 .cs-item img,.cs-item video{max-width:100%;max-height:100%;object-fit:contain;display:block}
 .cs-prev,.cs-next{position:absolute;top:50%;transform:translateY(-50%);width:34px;height:34px;
   border-radius:50%;background:rgba(0,0,0,.58);color:#fff;font-size:21px;line-height:32px;padding:0}
 .cs-prev{left:6px} .cs-next{right:6px}
 .cs-prev.end,.cs-next.end{display:none}
+/* 소리 켜기 단추 — 코멘트 영상은 **기본 음소거**로 튼다 (2026-09-21 대표:
+   「틀자마자 갑자기 소리가 팍 튀어나오면 당황하니까」).
+   폰 기본 재생기에는 음소거 버튼이 없는 기기가 있어서 우리가 따로 단다. */
+.vmute{position:absolute;left:8px;bottom:8px;z-index:3;display:inline-flex;align-items:center;gap:5px;
+  padding:6px 10px;border:0;border-radius:999px;background:rgba(0,0,0,.66);color:#fff;
+  font-size:12px;font-weight:600;cursor:pointer;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+.vmute b{font-weight:600}
+.vmute.on{background:rgba(230,196,135,.92);color:#1a1814}
+.vmute.on b{display:none}
 .cs-n{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.62);color:#fff;font-size:11.5px;
   font-weight:800;border-radius:10px;padding:2px 8px;pointer-events:none}
 .attth .no{position:absolute;left:4px;bottom:4px;min-width:18px;height:18px;border-radius:9px;
@@ -1105,19 +1114,6 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 @keyframes lift{0%,100%{transform:translateY(0)}50%{transform:translateY(26px)}}
 @media (prefers-reduced-motion:reduce){.demo .bar{animation:none}}
 
-.demo2{background:var(--dark-2);border:1px solid var(--line);border-radius:13px;height:252px;
-  position:relative;overflow:hidden;flex:none}
-.demo2 img{position:absolute;left:0;right:0;margin:0 auto;bottom:22px;height:calc(100% - 34px);
-  width:auto;max-width:96%;object-fit:contain;display:block}
-.demo2 img.a{animation:dmA 2.6s ease-in-out infinite}
-.demo2 img.b{animation:dmB 2.6s ease-in-out infinite}
-@keyframes dmA{0%,38%{opacity:1}46%,88%{opacity:0}96%,100%{opacity:1}}
-@keyframes dmB{0%,38%{opacity:0}46%,88%{opacity:1}96%,100%{opacity:0}}
-.demo2 .cap{position:absolute;left:0;right:0;bottom:7px;text-align:center;z-index:2;
-  font-size:11.5px;font-weight:500;color:var(--sub)}
-.demo2.off img{animation:none}
-.demo2.off img.b{opacity:0}
-@media (prefers-reduced-motion:reduce){.demo2 img{animation:none}.demo2 img.b{opacity:0}}
 
 .vbox{background:#0e0e0d;border:1px solid var(--line);border-radius:12px;height:120px;width:100%;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
@@ -1654,6 +1650,9 @@ const 아이콘 = {
   prep:   '<circle cx="12" cy="5.2" r="2.1"/><path d="M12 8v5.6"/>'
          +'<path d="M12 13.6l-3.2 5.6M12 13.6l3.2 5.6"/><path d="M6.8 10.4L12 8.4l5.2 2"/>',
   clock:  '<circle cx="12" cy="12" r="8"/><path d="M12 7.4V12l3.1 1.9"/>',
+  소리끔: '<path d="M4 9.4h3.2L11.4 6v12L7.2 14.6H4z"/><path d="M16.2 9.6l4 4.8M20.2 9.6l-4 4.8"/>',
+  소리켬: '<path d="M4 9.4h3.2L11.4 6v12L7.2 14.6H4z"/>'
+         +'<path d="M15.2 9.6a3.4 3.4 0 010 4.8"/><path d="M17.6 7.4a6.6 6.6 0 010 9.2"/>',
   play:   '<circle cx="12" cy="12" r="8.2"/>'
          +'<path d="M10.2 8.8l5.4 3.2-5.4 3.2z" fill="currentColor" stroke-width="1"/>',
   pic:    '<rect x="3.8" y="5.4" width="16.4" height="13.2" rx="2.4"/>'
@@ -1721,9 +1720,11 @@ const exOf = id => (id==='memo' ? MEMO_EX : EX.find(x=>x.id===id))
 const MEMO_EX = { id:'memo', n:'운동 메모', p:'기타', e:'자유 입력', cardio:0, memo:1,
   vars:[{k:'a', n:'', desc:'', demo:0}] };
 
-/* ── 시범 그림 ── 시작 자세와 끝 자세 두 장을 번갈아 보여준다.
-   그림이 아직 없는 벌은 예전 「자리」 표시를 그대로 둔다.            */
-const DEMOV = '4';   /* 시범 그림을 새로 올릴 때마다 하나씩 올린다 */
+/* ── 시범 ── **우리가 찍은 기구 사용법 영상만** 쓴다 (2026-09-21 대표 지시).
+   ⛔ 예전의 「그림 시범」(GPT 로 만든 시작·끝 두 장을 번갈아 보여주던 것)은 전부 뺐다.
+      캐릭터가 종목마다 달라 보이고 동작이 정석과 멀었다. 다시 넣지 않는다.
+   영상 파일은 저장소 `vid/…` 밑에 있고, 그 밖의 주소는 시범으로 치지 않는다. */
+const DEMOV = '4';   /* 시범 파일을 새로 올릴 때마다 하나씩 올린다 */
 const demoURL = p => SB_URL + '/storage/v1/object/public/media/' + p + '?v=' + DEMOV;
 /* 접고 펴는 표시는 앱 어디서나 이 한 가지 모양으로 쓴다 (2026-09-04 통일).
    예전에는 「보기 ▾」·「자세히 ▾」·「▾ 눌러서 펼치기」가 제각각이었고,
@@ -1731,31 +1732,29 @@ const demoURL = p => SB_URL + '/storage/v1/object/public/media/' + p + '?v=' + D
 const 접개 = 열림 => `<span class="cx">${열림 ? '접기 ▴' : '펼치기 ▾'}</span>`;
 
 /* 접어둠=1 이면 제목 줄만 두고, 눌러야 편다. 운동 중 화면에서 쓴다 */
+const 영상시범 = v => !!(v && v.du && v.du.indexOf('vid/') === 0);
 const demoBox = (e, v, 접어둠) => {
-  /* 아직 그림이 없는 종목 — 운동 중 화면에서는 큰 빈 상자 대신 한 줄로만 알린다 */
-  if(!v.du) return 접어둠
+  /* 시범은 **우리가 찍은 기구 사용법 영상(vid/…)만** 쓴다. (2026-09-21 대표 지시)
+     예전에 GPT 로 만든 그림 두 장을 번갈아 보여 주던 「그림 시범」은 전부 뺐다 —
+     캐릭터가 종목마다 달라 보이고 동작이 정석과 멀었다.
+     영상이 없는 종목은 「준비중」으로 둔다. 억지로 채우지 않는다. */
+  if(!영상시범(v)) return 접어둠
     ? `<div class="foldb"><div class="foldh off">
         <span class="fk">${svg('play',15)}</span>
         <span class="ft">기구 사용법</span>
         <span class="cx off">준비중</span></div></div>`
     : `<div class="demop"><span class="dpt">준비중</span></div>`;
-  const 영상 = v.du.indexOf('vid/') === 0;
   /* 기구 사용법 영상 — 트레이너가 찍은 세로 영상. 눌러야 받아 온다 */
-  const 몸 = 영상
-    ? `<div class="demov">
+  const 몸 = `<div class="demov">
         <video src="${demoURL(v.du + '.mp4')}" poster="${demoURL(v.du + '.jpg')}"
           controls playsinline preload="none" loop
           controlsList="nodownload noremoteplayback" disablePictureInPicture></video>
-        <span class="dvc">기구 사용법 · ${esc(e.n)}</span></div>`
-    : `<div class="demo2" data-act="demotoggle">
-        <img class="a" src="${demoURL(v.du + '_1.png')}" alt="시작 자세">
-        <img class="b" src="${demoURL(v.du + '_2.png')}" alt="끝 자세">
-        <span class="cap">시범 · ${esc(e.n)}${v.n ? ` — ${esc(v.n)}` : ''}</span></div>`;
+        <span class="dvc">기구 사용법 · ${esc(e.n)}</span></div>`;
   if(!접어둠) return 몸;
   return `<div class="foldb">
     <button class="foldh" data-act="demoopen">
       <span class="fk">${svg('play',15)}</span>
-      <span class="ft">기구 사용법 ${영상 ? '영상' : '그림'}</span>
+      <span class="ft">기구 사용법 영상</span>
       ${접개(S.demoOpen)}</button>
     ${S.demoOpen ? 몸 : ''}</div>`;
 };
@@ -1810,7 +1809,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '187';
+const BUILD = '190';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2606,7 +2605,7 @@ function 붙인것(K){
   const fs = att(K).files || [];
   if(!fs.length) return '';
   return `<div class="attrow">${fs.map((x,i)=>`<span class="attth${x.kind==='video'?' v':''}">
-      ${x.kind==='video' ? `<video src="${x.url}#t=0.1" muted playsinline preload="metadata"></video>`
+      ${x.kind==='video' ? `<video src="${x.url}#t=0.1" controls playsinline preload="metadata" muted></video>`
                          : `<img src="${x.url}" alt="">`}
       <b class="no">${i+1}</b>
       <button data-act="attx:f:${K}:${i}" aria-label="빼기">✕</button></span>`).join('')}</div>`;
@@ -2621,7 +2620,8 @@ function 넘겨보기(전부, cid){
       <button class="${f==='video'?'on':''}" data-act="csk:${cid}:video">영상 ${nv}</button></div>` : '';
   return 나눔 + `<div class="cmslide">
     <div class="cs-track">${ms.map(m => `<div class="cs-item">${m.kind==='video'
-      ? `<video src="${esc(phURL(m.path))}" controls playsinline preload="metadata"></video>`
+      ? `<video src="${esc(phURL(m.path))}" controls playsinline preload="metadata" muted></video>
+          <button class="vmute" data-act="vmute" aria-label="소리 켜기">${svg('소리끔',17)}<b>소리 켜기</b></button>`
       : `<img src="${esc(phURL(m.path))}" alt="" onerror="picFail(this)">`}</div>`).join('')}</div>
     ${n > 1 ? `<button class="cs-prev end" data-act="csl:-1" aria-label="앞">‹</button>
       <button class="cs-next" data-act="csl:1" aria-label="다음">›</button>
@@ -2660,7 +2660,7 @@ function 첨부고르기(종, K){
           const d = await shrinkPhoto(f), blob = await (await fetch(d)).blob();
           A.files.push({ kind:'photo', blob, ext:'jpg', url: URL.createObjectURL(blob) }); }
       } else {
-        const r = await 영상줄이기(fs[0]);
+        const r = await 영상줄이기(fs[0], null, true);   /* 코멘트 영상 = 트레이너 목소리가 알맹이 */
         A.files.push({ kind:'video', blob:r.blob, ext:r.ext, url: URL.createObjectURL(r.blob) });
       }
       drawSheet();
@@ -3279,12 +3279,12 @@ function 세칸(e, v, cur, mid, tr, cms, nw, dsc){
   if(isMemo(cur.ex)) return '';
   const p = 직전요약(e, cur, mid);
   const 화 = p.방향==='up' ? '↑' : (p.방향==='down' ? '↓' : '');
-  const 시범 = !v.du ? '준비중' : (v.du.indexOf('vid/')===0 ? '영상' : '그림');
+  const 시범 = 영상시범(v) ? '영상' : '준비중';
   return `<div class="trio">
     <button class="t1" data-act="trio:prev">
       <span class="k">직전기록</span>
       <span class="v">${esc(p.v)}${화?`<i class="${p.방향}">${화}</i>`:''}</span></button>
-    <button class="t2${v.du?'':' off'}" data-act="trio:demo">
+    <button class="t2${영상시범(v)?'':' off'}" data-act="trio:demo">
       <span class="k">기구 사용법</span>
       <span class="v">${시범}</span></button>
     <button class="t3" data-act="exd:${cur.ex}:${cur.va}${tr?':'+mid:''}">
@@ -6929,10 +6929,16 @@ function bpAdd(kind){
 /* ── 영상 넣기 (2026-09-17 대표: 「영상업로드 추가하고 · 직접 올리는거야」) ──
    ⛔ 왜 다시 굽는가 — 폰이 찍은 1080p60 은 1분에 90MB 다. 저장소도 전송량도 못 버틴다.
       긴 변 720 · 1.2Mbps 로 다시 구우면 30초에 4MB 안팎이 된다.
-   ⛔ 소리는 담지 않는다 — 폼을 보는 영상이고, 옆 사람 말소리가 같이 올라가면 안 된다. */
+   ⛔ 소리 규칙이 **둘로 갈린다** (2026-09-21 대표: 「코멘트에 붙이는 영상은 소리가 나야한다」)
+      · **기구 사용법 · 체형분석(비포애프터)** → **무음.** 폼을 보는 영상이고 옆 사람 말소리가 올라가면 안 된다
+      · **트레이너 코멘트 첨부 영상** → **소리 담는다.** 트레이너 목소리가 그 영상의 알맹이다
+      쓰는 법: 영상줄이기(파일, 알림, 소리=true) — 소리를 뺄 곳에서는 셋째 값을 주지 않는다.
+      ⛔ 영상 딱지는 **음소거를 유지한 채** 소리 트랙만 captureStream 으로 뽑는다.
+         음소거를 풀면 브라우저가 자동재생을 막고 굽는 동안 소리가 새어 나온다.
+         (2026-09-21 브라우저 실측: 음소거 상태에서도 소리 트랙 1개가 잡히고 mp4 에 mp4a 로 담긴다) */
 const 영상최대초 = 60;
 const 영상최대MB = 45;
-function 영상줄이기(file, 알림){
+function 영상줄이기(file, 알림, 소리){
   return new Promise((res, rej) => {
     const 판 = document.createElement('div');
     판.className = 'vidwork';
@@ -6958,8 +6964,21 @@ function 영상줄이기(file, 알림){
       const sc = Math.min(1, 720 / Math.max(w, h));
       w = Math.max(2, Math.round(w * sc / 2) * 2);
       h = Math.max(2, Math.round(h * sc / 2) * 2);
+      /* 소리를 담아야 하는 영상(트레이너 코멘트)만 소리 트랙을 뽑는다.
+         못 뽑는 브라우저면 조용히 무음으로 간다 — 올리기 자체가 막히면 안 된다 */
+      let 소리트랙 = [];
+      if(소리){
+        try{
+          const cs = v.captureStream || v.mozCaptureStream;
+          if(cs) 소리트랙 = cs.call(v).getAudioTracks() || [];
+        }catch(e){ 소리트랙 = []; }
+      }
+      const 소리담김 = 소리트랙.length > 0;
+      const 꼴후보 = 소리담김
+        ? ['video/mp4;codecs=avc1,mp4a.40.2', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm']
+        : ['video/mp4;codecs=avc1', 'video/webm;codecs=vp9', 'video/webm'];
       const 꼴 = (typeof MediaRecorder !== 'undefined')
-        ? ['video/mp4;codecs=avc1', 'video/webm;codecs=vp9', 'video/webm'].find(t => MediaRecorder.isTypeSupported(t))
+        ? 꼴후보.find(t => MediaRecorder.isTypeSupported(t))
         : null;
       const 구울수있나 = !!꼴 && !!(HTMLCanvasElement.prototype.captureStream);
       /* 못 굽는 브라우저 — 작은 것만 원본 그대로 받는다 */
@@ -6972,12 +6991,16 @@ function 영상줄이기(file, 알림){
       const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
       const cx = cv.getContext('2d');
       let rec;
-      try{ rec = new MediaRecorder(cv.captureStream(30), { mimeType:꼴, videoBitsPerSecond:1200000 }); }
+      const 흐름 = cv.captureStream(30);
+      소리트랙.forEach(t => { try{ 흐름.addTrack(t); }catch(e){} });
+      try{ rec = new MediaRecorder(흐름, 소리담김
+             ? { mimeType:꼴, videoBitsPerSecond:1200000, audioBitsPerSecond:64000 }
+             : { mimeType:꼴, videoBitsPerSecond:1200000 }); }
       catch(e){ 치우기(); return rej(new Error('영상을 줄이지 못했어요')); }
       const 조각 = [];
       rec.ondataavailable = e => { if(e.data && e.data.size) 조각.push(e.data); };
       rec.onstop = () => { 치우기(); res({ blob:new Blob(조각, { type:꼴.split(';')[0] }),
-                               ext:(꼴.indexOf('mp4') >= 0 ? 'mp4' : 'webm') }); };
+                               ext:(꼴.indexOf('mp4') >= 0 ? 'mp4' : 'webm'), 소리:소리담김 }); };
       let raf = 0, 지난 = -1;
       const 그리기 = () => {
         if(v.ended) return;
@@ -7675,7 +7698,7 @@ function tEx(){
           <div class="sm">${esc(e.e)} · 하는 법 ${vs.length}가지</div></div>
           <button class="chip t" style="margin-left:auto" data-act="newvar:${e.id}">＋ 하는 법</button></div>
           ${vs.map(v=>`<button class="rowc" style="text-align:left;padding:7px 0" data-act="exd:${e.id}:${v.k}">
-            <span class="sm" style="color:${v.desc?'var(--gold-2)':'var(--sub)'}">· ${esc(v.n||'기본')}${v.desc?' — 설명 있음':' — 설명 없음'}${v.demo?' · 시범 ▶':''}</span>
+            <span class="sm" style="color:${v.desc?'var(--gold-2)':'var(--sub)'}">· ${esc(v.n||'기본')}${v.desc?' — 설명 있음':' — 설명 없음'}${영상시범(v)?' · 영상 ▶':''}</span>
             <span class="rt">›</span></button>`).join('')}</div>`; }).join('')
     ).join('<div class="hr"></div>')
     + `<div class="note">잡는 법이나 자극 부위가 달라 <b>따로 기록해야 하는 종목</b>만 나눕니다. 랫풀다운·시티드로우·하이로우·리니어로우·RDL이 그렇게 나뉘어 있습니다.</div>` };
@@ -8222,6 +8245,17 @@ document.addEventListener('click', ev=>{
         updated_at:new Date().toISOString() }], {on:'member_id,variant_id'}), '설명 저장');
       toast('이 회원용 설명으로 저장했습니다'); drawSheet(); return; }
     case 'att': 첨부고르기(rest[0], rest[1]); return;
+    /* 소리 켜기 / 끄기 — 이 영상 하나만 바꾼다 */
+    case 'vmute': {
+      const 칸 = el.parentElement;
+      const v = 칸 && 칸.querySelector('video');
+      if(!v) return;
+      v.muted = !v.muted;
+      el.classList.toggle('on', !v.muted);
+      el.setAttribute('aria-label', v.muted ? '소리 켜기' : '소리 끄기');
+      el.innerHTML = v.muted ? svg('소리끔',17) + '<b>소리 켜기</b>' : svg('소리켬',17) + '<b>소리 끄기</b>';
+      if(!v.muted && v.paused){ v.play().catch(()=>{}); }
+      return; }
     case 'csk': { S.cmf = S.cmf || {};
       S.cmf[rest[0]] = S.cmf[rest[0]]===rest[1] ? '' : rest[1]; drawSheet(); return; }
     case 'attx': { (att(rest[1]).files||[]).splice(+rest[2], 1); drawSheet(); return; }
@@ -8640,7 +8674,6 @@ document.addEventListener('click', ev=>{
     case 'askcancel': sheetCancel(); return;
     /* 시범 그림 — 눌러서 멈추고 다시 눌러 움직이기 */
     case 'demoopen': S.demoOpen = !S.demoOpen; render(); return;
-    case 'demotoggle': el.classList.toggle('off'); return;
     case 'rp': S.rest={sec:+rest[0], until:null}; drawSheet(); return;
     case 'rd': { if(S.rest.until) S.rest.until+=(+rest[0])*1000; else S.rest.sec=Math.max(10,S.rest.sec+(+rest[0])); drawSheet(); return; }
     case 'rgo': S.rest.until=Date.now()+S.rest.sec*1000; drawSheet(); return;
