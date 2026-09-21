@@ -1064,7 +1064,7 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 
 <script>
 "use strict";
-const BUILD = '82';
+const BUILD = '84';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -1441,7 +1441,10 @@ const S = { view:'home', who:'전체', q:'', mid:null, rid:null, tab:'routine',
             bpPose:'정면', bpKind:'body',
             edit:{ record:false, routine:false, body:false, meal:false, plan:false, minfo:false } };
 /* 잠금 도우미 — 수정 버튼을 눌러야 입력칸이 열린다 */
-const canEdit = k => !!S.edit[k];
+/* 건강정보 미동의 회원은 체형 탭을 아예 못 고친다 —
+   칸(input)이 disabled 로 나가므로 「이미 있던 줄 고치기」 구멍도 같이 막힌다.
+   (건강동의함 은 아래에서 정의되지만, 이 함수는 그릴 때 불리므로 문제 없다) */
+const canEdit = k => !!S.edit[k] && !(k === 'body' && typeof 건강동의함 === 'function' && !건강동의함(S.mid));
 const dis = k => canEdit(k) ? '' : ' disabled';
 const editBtn = k => '<button class="editbtn ' + (canEdit(k)?'on':'') + '" data-edit="' + k + '">'
   + (canEdit(k) ? '수정 완료' : '수정') + '</button>';
@@ -1546,6 +1549,68 @@ const vaName = vid => {
   const v=vaOf(vid); if(!v) return vid;
   const e=exOf(v.ex_id); return e.name + (v.name ? ' ('+v.name+')' : ''); };
 const memOf = id => D.m.find(x=>x.id===id) || {name:''};
+
+/* ══ 건강정보 동의 관문 ══ 2026-09-21 대표 지시 「동의요청 이어서해」
+   개인정보 보호법 제23조① — 「건강」은 민감정보라 다른 동의와 **별도로** 받아야 한다.
+   어기면 제71조 4호 5년 이하 징역 또는 5천만원 이하 벌금.
+   ⛔ 동의 전에는 파일을 서버에 미리 올려두지도 않는다. 올리는 것 자체가 「처리」다.
+   트레이너는 members.sensitive_ask_at 만 적고, 회원 앱 알림함이 그걸 보고 동의창을 띄운다.
+   설계 — 약관\동의화면_문구.md · 운영안전_설계.md */
+const 건강동의함 = mid => !!memOf(mid).agree_sensitive_at;
+const 동의종류이름 = { photo:'체형 사진', inbody:'인바디 기록', check:'체형 검사', video:'영상' };
+let 동의요청종류 = 'photo';
+
+function 동의배너(){
+  if(건강동의함(S.mid)) return '';
+  const 보낸 = memOf(S.mid).sensitive_ask_at || '';
+  return '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;'
+    + 'background:#fff4e5;border:1px solid #f0c48a;border-radius:10px;padding:10px 13px;margin-bottom:14px">'
+    + '<span style="font-size:13px;line-height:1.55">⚠ 이 회원은 <b>건강정보 동의</b>를 하지 않았습니다 — '
+    + '인바디·체형 사진·체형 검사를 <b>새로 올리거나 저장할 수 없어요</b>.'
+    + (보낸 ? '<br><span style="color:#8a6a3a">' + esc(dateFull(String(보낸).slice(0,10)))
+              + ' 에 동의 요청을 보냈습니다 · 회원 앱 알림함에 떠 있어요</span>' : '')
+    + '</span>'
+    + '<button class="btn main sm" data-act="agopen" data-k="photo" style="margin-left:auto">'
+    + (보낸 ? '다시 요청 보내기' : '동의 요청 보내기') + '</button></div>';
+}
+
+function 동의관문(kind){            /* 막았으면 true — 부른 쪽은 그대로 return 한다 */
+  if(건강동의함(S.mid)) return false;
+  동의요청종류 = kind || 'photo';
+  const m = memOf(S.mid);
+  const 보낸 = m.sensitive_ask_at || '';
+  popOpen('<div style="padding:20px 22px;max-width:430px">'
+    + '<div style="font-size:15px;font-weight:700;line-height:1.5;margin-bottom:10px">'
+    + '⚠ ' + esc(m.name || '이 회원') + ' 님은 건강정보 동의를 하지 않았습니다</div>'
+    + '<div style="font-size:13px;line-height:1.65;color:#555">'
+    + '<b>' + esc(동의종류이름[동의요청종류] || '건강정보') + '</b>은 「건강에 관한 정보」라서 '
+    + '회원이 앱에서 <b>따로 동의</b>해야 남길 수 있어요.<br>'
+    + '동의 전에는 <b>파일을 서버에 올리지 않습니다.</b> 지금은 이 컴퓨터에만 있어요.</div>'
+    + (보낸 ? '<div style="font-size:12px;color:#8a6a3a;background:#fff4e5;border-radius:8px;'
+              + 'padding:8px 11px;margin-top:11px">이미 ' + esc(dateFull(String(보낸).slice(0,10)))
+              + ' 에 요청을 보냈어요. 회원 앱 알림함에 떠 있습니다.</div>' : '')
+    + '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px">'
+    + '<button class="btn sub" data-act="popclose">취소</button>'
+    + '<button class="btn main" data-act="agask">' + (보낸 ? '다시 요청 보내기' : '동의 요청 보내기')
+    + '</button></div></div>');
+  return true;
+}
+
+async function 동의요청보내기(){
+  const mid = S.mid, 지금 = new Date().toISOString();
+  try{
+    await ssend('members?id=eq.' + encodeURIComponent(mid), 'PATCH',
+      { sensitive_ask_at: 지금, sensitive_ask_kind: 동의요청종류 || 'photo' });
+    const m = D.m.find(x=>x.id===mid);
+    if(m){ m.sensitive_ask_at = 지금; m.sensitive_ask_kind = 동의요청종류 || 'photo'; }
+    popClose(); toast('회원 앱 알림함에 「동의해 주세요」가 떴어요'); render();
+  }catch(e){
+    const msg = (e && e.message) || '';
+    toast(/PGRST204|column/i.test(msg)
+      ? '동의 칸이 아직 서버에 없어요 — 설계서의 8단계_SQL_동의칸.sql 을 먼저 돌려 주세요'
+      : '요청을 보내지 못했어요 — ' + msg);
+  }
+}
 
 /* ── 회원 목록 ── */
 function vMembers(){
@@ -2172,6 +2237,7 @@ function tabMeal(){
 /* 사진 올리기 — 긴 변 1280px JPEG 로 줄여서 */
 async function bpUpload(file){
   if(!file || !S.mid) return;
+  if(!건강동의함(S.mid)){ 동의관문('photo'); return; }   /* 올리는 함수 자체의 마지막 빗장 */
   if(!/^image\//.test(file.type)){ toast('사진 파일만 넣을 수 있어요'); return; }
   toast('사진을 줄이는 중이에요');
   let blob;
@@ -2272,7 +2338,8 @@ function tabBody(){
     + '</div>'; }).join('')
     : '<div class="empty">회차 기록이 없어요</div>';
 
-  return '<div class="sec" style="margin-bottom:20px"><div class="lbl">인바디 ' + bl.length + '회'
+  return 동의배너()
+    + '<div class="sec" style="margin-bottom:20px"><div class="lbl">인바디 ' + bl.length + '회'
     + '<span class="r">'
     + (canEdit('body') ? '<button class="btn sub sm" data-act="blnew">＋ 기록 추가</button>' : '')
     + editBtn('body') + '</span></div>'
@@ -6122,6 +6189,7 @@ async function loadMember(mid){
 
 /* ── 저장 ── */
 async function saveBodyCheck(patch){
+  if(동의관문('check')) return;            /* 체크 단추·메모·불러오기 전부의 마지막 빗장 */
   const base = M.bc || { member_id:S.mid, on_date:TODAY, checks:{}, photos:{}, memo:'' };
   const next = Object.assign({}, base, patch, { member_id:S.mid, on_date: base.on_date || TODAY });
   try{
@@ -6266,7 +6334,9 @@ document.addEventListener('click', async function(ev){
     render(); return; }
 
   const eb = t.closest('[data-edit]');
-  if(eb){ const k = eb.dataset.edit; S.edit[k] = !S.edit[k];
+  if(eb){ const k = eb.dataset.edit;
+    if(k === 'body' && 동의관문('check')) return;      /* 왜 못 고치는지 알려준다 */
+    S.edit[k] = !S.edit[k];
     if(!S.edit[k]) toast('잠갔습니다'); render(); return; }
 
   const cal = t.closest('[data-cal]');
@@ -6361,16 +6431,20 @@ document.addEventListener('click', async function(ev){
   if(a==='toList'){ S.view='members'; render(); return; }
   if(a==='toMember'){ S.view='member'; render(); return; }
   if(a==='popclose'){ popClose(); return; }
+  if(a==='agopen'){ 동의관문(act.dataset.k || 'photo'); return; }
+  if(a==='agask'){ await 동의요청보내기(); return; }
   if(a==='expick'){ S.exq=''; S.part='전체'; S.eq='전체'; popOpen(popPick()); return; }
 
   /* 체형 — 검사 체크 */
   if(a==='bcmemo'){
+    if(동의관문('check')) return;
     const el = $('#bcmemo'); if(!el) return;
     await saveBodyCheck({ memo: el.value });
     S.edit.body = false;
     toast('메모를 저장하고 잠갔어요'); render(); return;
   }
   if(a==='brsave'){
+    if(동의관문('check')) return;
     const bc = M.bc;
     if(!bc || !bc.checks || !Object.keys(bc.checks).length){ toast('먼저 검사를 체크해 주세요'); return; }
     const id = 'br_' + S.mid + '_' + Date.now();
@@ -6384,12 +6458,14 @@ document.addEventListener('click', async function(ev){
     return;
   }
   if(a==='brload'){
+    if(동의관문('check')) return;
     const r0 = M.br.find(x=>x.id===act.dataset.b); if(!r0) return;
     await saveBodyCheck({ checks: r0.checks, memo: r0.note || '' });
     toast('그 회차를 지금 검사로 불러왔어요'); render(); return;
   }
   /* 인바디 */
   if(a==='bpadd'){
+    if(동의관문('photo')) return;            /* 건강정보 미동의 — 파일 고르기 전에 막는다 */
     const f = $('#bpfile'); if(!f) return;
     f.value = ''; f.onchange = () => bpUpload(f.files[0]);
     f.click(); return;
@@ -6409,6 +6485,7 @@ document.addEventListener('click', async function(ev){
     return;
   }
   if(a==='blnew'){
+    if(동의관문('inbody')) return;
     const id = 'bl_' + S.mid + '_' + Date.now();
     try{
       await ssend('body_logs', 'POST', [{ id:id, member_id:S.mid, on_date:TODAY,
@@ -6871,6 +6948,7 @@ document.addEventListener('input', function(ev){
     }, 700);
     return; }
   if(el.dataset.bl){                       /* 인바디 줄 */
+    if(!건강동의함(S.mid)) return;          /* 건강정보 미동의 — 있던 줄도 못 고친다 */
     const id = el.dataset.bl, fld = el.dataset.bf, raw = el.value;
     const row = M.bl.find(x=>x.id===id); if(!row) return;
     let v;
