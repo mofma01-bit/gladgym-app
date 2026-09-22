@@ -1064,7 +1064,7 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 
 <script>
 "use strict";
-const BUILD = '84';
+const BUILD = '85';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -1550,6 +1550,42 @@ const vaName = vid => {
   const e=exOf(v.ex_id); return e.name + (v.name ? ' ('+v.name+')' : ''); };
 const memOf = id => D.m.find(x=>x.id===id) || {name:''};
 
+/* ══ 브로제이 CRM 창구 ══ 2026-09-22 대표 지시
+     1. 데스크 회원목록에 회원추가 검색하게 하고
+     2. 브로제이 CRM 에서 PT수강권 있는 사람 추가 (전화번호·뒷자리 검색 · PT 수강권 있어야 나옴)
+     3. 잔여는 「정규PT n회 · 서비스 n회 남음」 — **운동가이드는 표기 안 함**
+
+   ⛔ 전화번호는 Supabase 에 안 둔다. 우리 서버 안에서만 다룬다.
+   ⛔ 이 창구는 **아무나 못 부른다.** 구글 로그인 증표를 같이 보내고,
+      서버가 Supabase 에 「이거 누구 거냐」고 직접 물어 직원 명단에서 확인한다.
+      트레이너가 더 할 일은 없다 (2026-09-22 대표 「한 번 더 확인할 필요 없이 바로」).
+   만든 곳 — 글래드짐 자동화\대시보드\앱회원.py */
+const GG_API = 'https://dash.gladgym.co.kr';
+let PTST = {};                    /* "이름|뒷4" → {상태, 잔여, 담당, 끝날} */
+let PTST_때 = 0;
+
+async function crm(길, 몸){
+  if(!AUTH || !AUTH.access_token) throw new Error('로그인이 필요해요');
+  const r = await fetch(GG_API + '/app/crm/' + 길, { method:'POST',
+    headers:{ 'Content-Type':'application/json' },
+    body: JSON.stringify(Object.assign({ desk: AUTH.access_token }, 몸||{})) });
+  if(!r.ok) throw new Error('서버에 닿지 못했어요 (' + r.status + ')');
+  const d = await r.json();
+  if(!d.ok) throw new Error(d.why || '안 되었어요');
+  return d;
+}
+
+/* 회원 목록 한 판의 잔여를 한 번에 받아 온다. 실패해도 목록은 그대로 뜬다 */
+async function 잔여받기(){
+  const 목록 = D.m.filter(m => m.phone4).map(m => ({ name:m.name, phone4:m.phone4 }));
+  if(!목록.length){ PTST = {}; return; }
+  try{
+    const d = await crm('states', { 목록 });
+    PTST = d['사람'] || {}; PTST_때 = Date.now();
+  }catch(e){ PTST = {}; console.warn('잔여 못 받음 —', e.message); }
+}
+const 잔여of = m => (m && m.phone4) ? (PTST[m.name + '|' + m.phone4] || null) : null;
+
 /* ══ 건강정보 동의 관문 ══ 2026-09-21 대표 지시 「동의요청 이어서해」
    개인정보 보호법 제23조① — 「건강」은 민감정보라 다른 동의와 **별도로** 받아야 한다.
    어기면 제71조 4호 5년 이하 징역 또는 5천만원 이하 벌금.
@@ -1646,13 +1682,21 @@ function vMembers(){
     + '<div class="sumit teal" title="트레이너가 남긴 코멘트를 회원이 앱에서 아직 안 연 것">'
       + '<span class="k2">회원이 안 본 코멘트</span><span class="v2">' + 안읽음 + '</span></div>'
     + '<div class="sumit warn"><span class="k2">2주 넘게 안 옴</span><span class="v2">' + 뜸한수 + '</span></div>'
+    + (function(){        /* PT 진행중 · 종료 — 브로제이에서 받아온 것이 있을 때만 (칩 하나로 묶는다) */
+        const 값 = rows.map(o=>잔여of(o.m)).filter(Boolean);
+        if(!값.length) return '';
+        const 진 = 값.filter(x=>x['상태']==='진행중'||x['상태']==='홀딩').length;
+        return '<div class="sumit teal" title="브로제이 CRM 기준 · 보여만 줍니다. 기록을 막지 않습니다">'
+          + '<span class="k2">PT 진행중 · 종료</span><span class="v2">' + 진
+          + '<span class="sub3" style="font-weight:600"> · ' + (값.length - 진) + '</span></span></div>'; })()
+    + '<button class="btn main sm" style="align-self:center" data-act="memadd">＋ 회원 추가</button>'
     + '</div>';
 
   if(!rows.length) return 요약 + '<div class="empty">해당하는 회원이 없어요</div>';
 
   const 상태 = i => i.today ? 'gold' : (i.gap===null ? '' : (i.gap>=14 ? 'warn' : (i.gap>=7 ? 'warn' : 'teal')));
   const 표 = '<div class="mwrap"><table class="mtb"><thead><tr>'
-    + '<th style="width:26px"></th><th>이름</th><th>담당</th><th>마지막 운동</th>'
+    + '<th style="width:26px"></th><th>이름</th><th>담당</th><th>PT</th><th>마지막 운동</th>'
     + '<th class="n">이번 주</th><th class="n">루틴</th><th>봐 주세요</th><th>오늘</th>'
     + '<th style="width:1%"></th>'
     + '</tr></thead><tbody>'
@@ -1661,6 +1705,11 @@ function vMembers(){
         + '<td><span class="dot2 ' + 상태(i) + '"></span></td>'
         + '<td><div class="nm2">' + esc(m.name) + '</div></td>'
         + '<td><span class="sub3">' + esc(m.trainer||'담당 없음') + '</span></td>'
+        + '<td>' + (function(){ const s2 = 잔여of(m);
+            if(!s2) return '<span class="sub3">—</span>';
+            const 색 = s2['상태']==='진행중' ? 'teal' : (s2['상태']==='홀딩' ? 'gold' : 'warn');
+            return '<span class="tag ' + 색 + '">' + esc(s2['상태']) + '</span>'
+              + '<div class="sub3" style="margin-top:2px">' + esc(s2['잔여']||'') + '</div>'; })() + '</td>'
         + '<td>' + (i.gap===null
             ? '<span class="sub3">기록 없음</span>'
             : '<span style="font-weight:700">' + dayText(i.last) + '</span>'
@@ -1680,6 +1729,78 @@ function vMembers(){
     + '</tbody></table></div>';
 
   return 요약 + 표;
+}
+
+/* ══ 회원 추가 ══ 브로제이 CRM 에서 찾아 앱 회원으로 만든다 (2026-09-22 대표 지시)
+   · 이름 · 전화번호 전체 · 뒷자리 어느 쪽으로도 찾는다
+   · **PT 수강권 있는 사람만** 나온다 (운동가이드·그룹만 있는 분은 안 나옴)
+   · 전화번호는 앱에 **뒷 4자리만** 남긴다 — 전체 번호는 서버 밖으로 안 나간다 */
+let 추가판 = null;            /* {q, 결과:[], 찾는중, 왜} */
+
+function 회원추가열기(){
+  추가판 = { q:'', 결과:[], 찾는중:false, 왜:'' };
+  추가판그리기();
+}
+
+function 추가판그리기(){
+  if(!추가판) return;
+  const 있는뒤4 = {};
+  D.m.forEach(m => { if(m.phone4) 있는뒤4[m.name + '|' + m.phone4] = 1; });
+  const 줄 = 추가판.결과.map(function(x){
+    const 이미 = 있는뒤4[x.name + '|' + String(x.phone).slice(-4)];
+    const 색 = x['상태']==='진행중' ? 'teal' : (x['상태']==='홀딩' ? 'gold' : 'warn');
+    return '<div class="card rowc" style="margin-bottom:6px"><div>'
+      + '<div class="t1">' + esc(x.name) + ' <span class="tag ' + 색 + '">' + esc(x['상태']) + '</span></div>'
+      + '<div class="t2">' + esc(x['잔여']||'') + (x['담당'] ? ' · 담당 ' + esc(x['담당']) : '') + '</div>'
+      + '<div class="t2" style="opacity:.65">' + esc(마스크(x.phone)) + '</div></div>'
+      + (이미 ? '<span class="tag">이미 있음</span>'
+              : '<button class="btn main sm" data-act="memadd2" data-p="' + esc(x.phone)
+                + '" data-n="' + esc(x.name) + '" data-t="' + esc(x['담당']||'') + '">추가</button>')
+      + '</div>'; }).join('');
+
+  판열기('회원 추가',
+    '<div style="padding:4px 2px">'
+    + '<div class="t2" style="margin-bottom:9px">브로제이에 <b>PT 수강권이 있는 분</b>만 나옵니다. '
+    + '이름이나 전화번호(뒷자리만도 됩니다)로 찾아 주세요.</div>'
+    + '<div style="display:flex;gap:6px;margin-bottom:12px">'
+    + '<input class="inp" id="crmq" placeholder="이름 또는 전화번호 뒷자리" value="' + esc(추가판.q) + '" style="flex:1">'
+    + '<button class="btn main" data-act="memfind">찾기</button></div>'
+    + (추가판.찾는중 ? '<div class="empty">찾는 중이에요…</div>'
+       : 추가판.왜 ? '<div class="empty">' + esc(추가판.왜) + '</div>'
+       : 줄 ? 줄
+       : (추가판.q ? '<div class="empty">그런 분이 없어요 — PT 수강권이 없으면 안 나옵니다</div>'
+                  : '<div class="empty">찾을 말을 넣어 주세요</div>'))
+    + '</div>');
+  setTimeout(function(){ const el = $('#crmq'); if(el){ el.focus();
+    el.onkeydown = function(ev){ if(ev.key==='Enter') 회원찾기(); }; } }, 40);
+}
+const 마스크 = p => { const n = String(p||''); return n.length<8 ? n
+  : n.slice(0,3) + '-****-' + n.slice(-4); };
+
+async function 회원찾기(){
+  if(!추가판) return;
+  const el = $('#crmq'); 추가판.q = el ? el.value.trim() : '';
+  if(추가판.q.length < 2){ toast('두 글자 넘게 넣어 주세요'); return; }
+  추가판.찾는중 = true; 추가판.왜 = ''; 추가판그리기();
+  try{ const d = await crm('search', { q: 추가판.q }); 추가판.결과 = d['사람'] || []; }
+  catch(e){ 추가판.결과 = []; 추가판.왜 = e.message; }
+  추가판.찾는중 = false; 추가판그리기();
+}
+
+async function 회원넣기(전화, 이름, 담당){
+  const 뒤4 = String(전화||'').slice(-4);
+  if(!이름 || !뒤4){ toast('자료가 모자라요'); return; }
+  if(D.m.some(m => m.name===이름 && m.phone4===뒤4)){ toast('이미 있는 회원이에요'); return; }
+  const id = 'm' + Date.now();
+  const 줄 = { id, name:이름, phone4:뒤4, role:'member',
+               trainer: 담당 || (ME && ME.name) || '' };
+  try{
+    await ssend('members', 'POST', [줄]);
+    D.m.push(줄);
+    await 잔여받기();
+    toast(이름 + ' 님을 넣었어요');
+    추가판그리기(); render();
+  }catch(e){ toast('못 넣었어요 — ' + e.message); }
 }
 
 /* ── 회원 줄 버튼 ── 목록에서 바로 그 탭을 사이드 페이지로 연다
@@ -6429,6 +6550,9 @@ document.addEventListener('click', async function(ev){
     회원판 = null; $('#pop').classList.remove('on');
     S.mid = mid; S.view='member'; render(); loadMember(mid); return; }
   if(a==='toList'){ S.view='members'; render(); return; }
+  if(a==='memadd'){ 회원추가열기(); return; }
+  if(a==='memfind'){ await 회원찾기(); return; }
+  if(a==='memadd2'){ await 회원넣기(act.dataset.p, act.dataset.n, act.dataset.t); return; }
   if(a==='toMember'){ S.view='member'; render(); return; }
   if(a==='popclose'){ popClose(); return; }
   if(a==='agopen'){ 동의관문(act.dataset.k || 'photo'); return; }
@@ -7185,6 +7309,10 @@ boot();
 setInterval(async function(){
   if(!ME) return;
   if(S.view==='members'||S.view==='today'||S.view==='cmall') load();
+  /* 회원 목록을 열면 브로제이 잔여를 한 번에 받아 온다 (5분에 한 번이면 넉넉하다).
+     못 받아도 목록은 그대로 뜬다 — PT 칸만 「—」로 남는다 */
+  if(S.view==='members' && Date.now() - PTST_때 > 300000)
+    잔여받기().then(function(){ if(S.view==='members') render(); });
   /* ⛔ 이 줄은 render0 안에 있다. 조건 없이 다시 그리면 끝없이 돈다
      (2026-09-17 배포본에서 확인). 화면에 **들어올 때 한 번만** 읽는다 */
   if(S.view==='trash'){
