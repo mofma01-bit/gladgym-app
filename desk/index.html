@@ -1110,7 +1110,7 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 
 <script>
 "use strict";
-const BUILD = '90';
+const BUILD = '91';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -1615,6 +1615,188 @@ let PTST = {};                    /* "이름|뒷4" → {상태, 잔여, 담당, 
 let DN = [];                      /* dormant_notes [{id, member_id, on_date, reason, trainer}] */
 let DN켜짐 = true;                /* 표가 아직 없으면 꺼 두고 화면은 그대로 돈다 */
 let PTST_때 = 0;
+let 가입대기수 = 0;               /* 승인 기다리는 신청 — 최고 관리자에게만 뜬다 */
+async function 가입대기받기(){
+  if(!최고관리자()){ 가입대기수 = 0; return; }
+  try{ const d = await join('list');
+       가입대기수 = (d['신청']||[]).filter(x => x['상태']==='신청').length; }
+  catch(e){ 가입대기수 = 0; }
+}
+
+/* ══ 직원 가입 신청·승인 ══ 2026-09-22 대표 확정
+     구글로 가입 → **그 자리에서 전화번호 본인확인** → 대표님 승인
+   ⛔ 브로제이 번호와 달라도 **신청은 받는다.** 화면에 빨갛게 띄우고 대표님이 정하신다
+      (「아니다, 승인 거절까지 하는 걸로 하자」). 기계가 자르면 번호 바뀐 선생님이 못 들어온다. */
+/* ══ 가입 승인 (대표님) ══ 2026-09-22 대표 「최고 관리자가 승인해야 가입되게」
+   본인확인(문자 6자리)이 이미 끝난 분들이라 대표님은 **들여보낼지만** 정하시면 된다.
+   ⛔ 번호가 브로제이와 다르거나 퇴사자면 **빨갛게** 뜬다. 막지는 않는다 — 보고 정하신다. */
+let 승인판 = null;
+
+async function 승인판열기(){
+  승인판 = { 신청:[], 받는중:true };
+  승인판그리기();
+  try{ const d = await join('list'); 승인판.신청 = d['신청'] || []; }
+  catch(e){ 승인판.왜 = e.message; }
+  승인판.받는중 = false; 승인판그리기();
+}
+
+function 승인판그리기(){
+  if(!승인판) return;
+  const 기다림 = 승인판.신청.filter(x => x['상태'] === '신청');
+  const 정해짐 = 승인판.신청.filter(x => x['상태'] !== '신청');
+  const 줄 = x => {
+    const 초록 = x['지금브로제이'];
+    return '<div class="card" style="margin-bottom:7px;padding:11px 13px">'
+      + '<div class="rowc"><div style="min-width:0">'
+      + '<div class="t1">' + esc(x['이름'] || '(이름 모름)') + '</div>'
+      + '<div class="t2" style="margin-top:4px">'
+      + '<span style="color:#7fc9d6">✓ 본인확인 ' + esc(마스크번호(x['phone'])) + '</span><br>'
+      + (초록 ? '<span style="color:#7fc9d6">✓ 브로제이 직원 · 재직중 ('
+                + esc(x['지금권한'] || '') + ')</span>'
+              : '<span style="color:#e2796b">⚠ ' + (x['브로제이직원']
+                  ? '브로제이에서 퇴사 처리된 분이에요' : '브로제이 직원 명단에 없는 번호예요') + '</span>')
+      + '<br><span style="opacity:.65">' + esc(x['메일']) + '</span>'
+      + (x['상태'] === '신청' ? '' : '<br><span style="opacity:.65">' + esc(x['상태'])
+          + (x['정한사람'] ? ' · ' + esc(x['정한사람']) : '') + '</span>')
+      + '</div></div>'
+      + (x['상태'] === '신청'
+          ? '<span class="mbtns"><button data-act="japprove" data-e="' + esc(x['메일']) + '">승인</button>'
+            + '<button data-act="jreject" data-e="' + esc(x['메일']) + '">거절</button></span>'
+          : '') + '</div></div>'; };
+
+  판열기('앱 가입 승인',
+    '<div style="padding:4px 2px">'
+    + (승인판.받는중 ? '<div class="empty">불러오는 중이에요…</div>'
+       : 승인판.왜 ? '<div class="empty">' + esc(승인판.왜) + '</div>'
+       : '<div class="lbl">승인을 기다리는 분 ' + 기다림.length + '명</div>'
+         + (기다림.length ? 기다림.map(줄).join('') : '<div class="empty">기다리는 분이 없어요</div>')
+         + (정해짐.length ? '<div class="lbl" style="margin-top:16px">지난 기록 ' + 정해짐.length + '건</div>'
+                            + 정해짐.map(줄).join('') : ''))
+    + '</div>');
+}
+
+async function 가입정하기(메일, 결정){
+  const x = 승인판.신청.find(y => y['메일'] === 메일);
+  if(!x) return;
+  if(결정 === '승인' && !x['지금브로제이']
+     && !confirm('브로제이 직원 명단에 없는 번호예요.' + String.fromCharCode(10,10)
+                 + 마스크번호(x['phone']) + String.fromCharCode(10,10)
+                 + '그래도 승인할까요?')) return;
+  try{
+    await join('decide', { '메일': 메일, '결정': 결정 });
+    x['상태'] = 결정; x['정한사람'] = (ME && ME.name) || '';
+    if(결정 === '승인') await 직원표에넣기(x);
+    toast(결정 + '했습니다'); 승인판그리기(); render();
+  }catch(e){ toast('못 했어요 — ' + e.message); }
+}
+
+/* 승인하면 데스크 직원 표(`staff`)에도 넣는다 — 업무·표 권한이 그 표를 본다.
+   못 넣어도 앱에는 들어올 수 있다(서버가 승인을 기억한다). 그래서 실패해도 안 막는다. */
+async function 직원표에넣기(x){
+  if((W.staff||[]).some(s => (s.email||'').toLowerCase() === (x['메일']||'').toLowerCase())) return;
+  try{
+    await usend('staff', 'POST', [{ name: x['이름'] || x['메일'], email: x['메일'],
+      role: x['지금권한'] === 'trainer' ? 'trainer' : 'admin', active: true }]);
+    await loadWork();
+  }catch(e){ toast('직원 표에는 못 넣었어요 — ' + e.message + ' (앱은 쓸 수 있어요)'); }
+}
+
+/* ── 가입 신청 화면 ── 구글로는 들어왔는데 직원 명단에 없을 때 */
+let 가입 = null;        /* {단계:'번호'|'코드'|'끝', phone, 왜, 보냄, 나} */
+
+function 가입화면(나){
+  가입 = 가입 || { 단계:'번호', phone:'', 왜:'', 나:나 };
+  가입.나 = 나 || 가입.나;
+  const 상태 = (가입.나 && 가입.나['상태']) || '없음';
+  const 머리 = '<div style="text-align:center;margin-bottom:18px">'
+    + '<div style="font-size:19px;font-weight:700">GLAD GYM <span style="color:var(--gold)">트레이너 데스크</span></div>'
+    + '<div class="t2" style="margin-top:6px">' + esc(내메일()) + '</div></div>';
+
+  let 속;
+  if(상태 === '신청'){
+    속 = '<div class="empty" style="padding:22px 12px">'
+       + '<div style="font-size:15px;font-weight:700;margin-bottom:7px">승인을 기다리고 있어요</div>'
+       + '<div class="t2">대표님이 승인하시면 바로 쓰실 수 있어요.</div></div>';
+  } else if(상태 === '거절'){
+    속 = '<div class="empty" style="padding:22px 12px">'
+       + '<div style="font-size:15px;font-weight:700;margin-bottom:7px">가입이 거절되었어요</div>'
+       + '<div class="t2">센터에 문의해 주세요.</div></div>';
+  } else if(가입.단계 === '코드'){
+    속 = '<div class="t2" style="margin-bottom:10px">'
+       + esc(마스크번호(가입.phone)) + ' 로 보낸 <b>6자리</b>를 넣어 주세요</div>'
+       + '<input class="inp" id="jcode" inputmode="numeric" maxlength="6" placeholder="6자리"'
+       + ' style="font-size:20px;letter-spacing:6px;text-align:center">'
+       + (가입.왜 ? '<div class="t2" style="color:var(--warn);margin-top:8px">' + esc(가입.왜) + '</div>' : '')
+       + '<button class="btn main" style="width:100%;margin-top:12px" data-act="jverify">확인</button>'
+       + '<button class="btn sub" style="width:100%;margin-top:7px" data-act="jback">번호 다시 넣기</button>';
+  } else {
+    속 = '<div class="t2" style="margin-bottom:10px">'
+       + '처음이시군요. <b>본인 확인</b>을 한 번만 하면 됩니다.<br>'
+       + '센터에 등록된 전화번호를 넣어 주세요.</div>'
+       + '<input class="inp" id="jphone" inputmode="tel" placeholder="010-1234-5678" value="' + esc(가입.phone) + '">'
+       + (가입.왜 ? '<div class="t2" style="color:var(--warn);margin-top:8px">' + esc(가입.왜) + '</div>' : '')
+       + '<button class="btn main" style="width:100%;margin-top:12px" data-act="jsend">인증번호 받기</button>';
+  }
+  /* 로그인 상자를 **통째로 갈아 끼우고 자리는 고정**한다.
+     처음 한 번 #txlform 안을 비우고 #jbox 를 넣어 두면, 다시 그릴 때 그 안만 바꾸면 된다.
+     (안 그러면 두 번째 그릴 때 상자를 잃어버려 터진다 — 2026-09-22) */
+  const 글틀 = $('#txlerr'); if(글틀) 글틀.textContent = '';
+  $('#txlogin').classList.add('on');
+  let box = $('#jbox');
+  if(!box){
+    const 상자 = $('#txlform') || $('#txlogin').firstElementChild;
+    if(!상자) return;
+    상자.innerHTML = '<div id="jbox"></div>';
+    box = $('#jbox');
+  }
+  box.innerHTML = 머리 + 속
+    + '<button class="btn sub sm" style="width:100%;margin-top:14px" data-act="jout">다른 계정으로</button>';
+  setTimeout(function(){ const el = $('#jcode') || $('#jphone');
+    if(el){ el.focus(); el.onkeydown = function(ev){ if(ev.key==='Enter')
+      (가입.단계==='코드' ? 가입확인() : 가입번호보내기()); }; } }, 50);
+}
+const 마스크번호 = p => { const n = String(p||'').replace(/[^0-9]/g,'');
+  return n.length>7 ? n.slice(0,3)+'-****-'+n.slice(-4) : n; };
+
+async function 가입번호보내기(){
+  const el = $('#jphone'); 가입.phone = el ? el.value.trim() : '';
+  가입.왜 = '';
+  if(가입.phone.replace(/[^0-9]/g,'').length < 10){ 가입.왜 = '전화번호를 다시 확인해 주세요'; 가입화면(); return; }
+  let d;
+  try{ d = await otp('send', { phone: 가입.phone }); }
+  catch(e){ 가입.왜 = e.message; 가입화면(); return; }
+  if(!d.ok){ 가입.왜 = d.why || '보내지 못했어요'; 가입화면(); return; }
+  가입.단계 = '코드'; 가입화면();
+}
+
+async function 가입확인(){
+  const el = $('#jcode'); const 코드 = el ? el.value.trim() : '';
+  가입.왜 = '';
+  if(코드.length !== 6){ 가입.왜 = '6자리를 넣어 주세요'; 가입화면(); return; }
+  try{
+    const d = await join('apply', { phone: 가입.phone, code: 코드 });
+    가입.나 = { 상태: d['이미'] ? '승인' : '신청' };
+    if(d['이미']){ location.reload(); return; }   /* 이미 승인된 계정 — 다시 들어간다 */
+    가입.단계 = '끝';
+  }catch(e){ 가입.왜 = e.message; }
+  가입화면();
+}
+
+async function join(길, 몸){
+  const r = await fetch(GG_API + '/app/join/' + 길, { method:'POST',
+    headers:{ 'Content-Type':'application/json' },
+    body: JSON.stringify(Object.assign({ desk: AUTH && AUTH.access_token }, 몸||{})) });
+  if(!r.ok) throw new Error('서버에 닿지 못했어요 (' + r.status + ')');
+  const d = await r.json();
+  if(!d.ok) throw new Error(d.why || '안 되었어요');
+  return d;
+}
+async function otp(길, 몸){
+  const r = await fetch(GG_API + '/app/otp/' + 길, { method:'POST',
+    headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(몸||{}) });
+  if(!r.ok) throw new Error('서버에 닿지 못했어요 (' + r.status + ')');
+  return await r.json();
+}
 
 async function crm(길, 몸){
   if(!AUTH || !AUTH.access_token) throw new Error('로그인이 필요해요');
@@ -5849,6 +6031,13 @@ function txMe(){
     + '<div class="fld"><span class="fn">'+esc(이번분기())+' 목표</span>'
       + '<input class="inp" id="txg2" value="'+esc(g.quarter||'')+'" placeholder="예: 평균 매출 800 이상"></div>'
     + '<button class="btn sub" data-act="tx:goal">목표 저장</button>'
+    /* 앱 가입 승인 — 최고 관리자만 (2026-09-22 대표 「최고 관리자가 승인해야 가입되게」) */
+    + (최고관리자()
+        ? '<div class="lbl" style="margin-top:18px">앱 가입</div>'
+          + '<button class="btn sub" style="width:100%" data-act="japps">'
+          + '가입 신청 보기' + (가입대기수 ? ' <span class="tag warn">' + 가입대기수 + '</span>' : '')
+          + '</button>'
+        : '')
     + (()=>{ const 지난 = (g.지난||[]).slice().reverse();
         return 지난.length ? '<div class="lbl" style="margin-top:12px">지난 목표 '+지난.length+'개</div>'
           + '<div class="tx-past">' + 지난.map(x=>'<div class="pq"><b>'+esc(x.q)+'</b><span>'+esc(x.tx||'')+'</span></div>').join('') + '</div>'
@@ -6279,9 +6468,18 @@ async function boot(){
   try{
     await loadWork();
     ME = W.staff.find(x=>(x.email||'').toLowerCase()===내메일() && x.active!==false) || null;
-    if(!ME){ $('#txlerr').textContent = '명단에 없는 메일이에요 (' + 내메일() + '). 대표님께 이 주소를 알려 주세요.';
-      try{ await authPost('logout', {}, AUTH.access_token); }catch(e){}
-      authSave(null); $('#txlogin').classList.add('on'); 구글버튼(); return; }
+    if(!ME){
+      /* 명단에 없다 — 바로 내쫓지 않고 **가입 신청**을 받는다 (2026-09-22 대표 지시).
+         승인된 분이면 서버가 알려 주므로 그대로 들여보낸다. */
+      let 나 = null;
+      try{ 나 = await join('me'); }catch(e){ /* 서버에 못 닿으면 아래에서 안내한다 */ }
+      if(나 && 나['상태'] === '승인'){
+        ME = { name: 나['이름'] || 내메일(), role: 나['권한'] === 'trainer' ? 'trainer' : 'admin',
+               email: 내메일(), 승인됨: true };
+      } else {
+        가입화면(나); return;
+      }
+    }
     S.who = 관리자() ? '전체' : ME.name;
     $('#txlogin').classList.remove('on');
     S.view = 'home';
@@ -6819,6 +7017,14 @@ document.addEventListener('click', async function(ev){
     회원판 = null; $('#pop').classList.remove('on');
     S.mid = mid; S.view='member'; render(); loadMember(mid); return; }
   if(a==='toList'){ S.view='members'; render(); return; }
+  if(a==='japps'){ await 승인판열기(); return; }
+  if(a==='japprove'){ await 가입정하기(act.dataset.e, '승인'); return; }
+  if(a==='jreject'){ await 가입정하기(act.dataset.e, '거절'); return; }
+  if(a==='jsend'){ await 가입번호보내기(); return; }
+  if(a==='jverify'){ await 가입확인(); return; }
+  if(a==='jback'){ 가입.단계='번호'; 가입.왜=''; 가입화면(); return; }
+  if(a==='jout'){ try{ await authPost('logout', {}, AUTH.access_token); }catch(e){}
+    authSave(null); location.reload(); return; }
   if(a==='memadd'){ 회원추가열기(); return; }
   if(a==='gosleep'){ S.view='members'; S.st='잠수'; S.q=''; render(); return; }
   if(a==='dnopen'){ 사유판열기(act.dataset.m); return; }
@@ -7591,7 +7797,7 @@ setInterval(async function(){
      못 받아도 목록은 그대로 뜬다 — PT 칸만 「—」로 남는다 */
   /* 홈에도 「잠수 회원」이 있어서 홈에서도 받아 온다 (2026-09-22) */
   if((S.view==='members' || S.view==='home') && Date.now() - PTST_때 > 300000)
-    Promise.all([잔여받기(), 사유받기()]).then(function(){
+    Promise.all([잔여받기(), 사유받기(), 가입대기받기()]).then(function(){
       if(S.view==='members' || S.view==='home') render(); });
   /* ⛔ 이 줄은 render0 안에 있다. 조건 없이 다시 그리면 끝없이 돈다
      (2026-09-17 배포본에서 확인). 화면에 **들어올 때 한 번만** 읽는다 */
