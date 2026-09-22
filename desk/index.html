@@ -1110,7 +1110,7 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 
 <script>
 "use strict";
-const BUILD = '92';
+const BUILD = '93';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -1618,9 +1618,13 @@ let PTST_때 = 0;
 let 가입대기수 = 0;               /* 승인 기다리는 신청 — 최고 관리자에게만 뜬다 */
 async function 가입대기받기(){
   if(!최고관리자()){ 가입대기수 = 0; return; }
+  가입대기수 = 0;
   try{ const d = await join('list');
-       가입대기수 = (d['신청']||[]).filter(x => x['상태']==='신청').length; }
-  catch(e){ 가입대기수 = 0; }
+       가입대기수 += (d['신청']||[]).filter(x => x['상태']==='신청').length; }
+  catch(e){}
+  try{ const d2 = await join('asks');
+       가입대기수 += (d2['요청']||[]).filter(x => !x['처리한때']).length; }
+  catch(e){}
 }
 
 /* ══ 직원 가입 신청·승인 ══ 2026-09-22 대표 확정
@@ -1633,10 +1637,12 @@ async function 가입대기받기(){
 let 승인판 = null;
 
 async function 승인판열기(){
-  승인판 = { 신청:[], 받는중:true };
+  승인판 = { 신청:[], 요청:[], 받는중:true };
   승인판그리기();
   try{ const d = await join('list'); 승인판.신청 = d['신청'] || []; }
   catch(e){ 승인판.왜 = e.message; }
+  try{ const d2 = await join('asks'); 승인판.요청 = d2['요청'] || []; }
+  catch(e){ /* 요청은 없어도 화면은 돈다 */ }
   승인판.받는중 = false; 승인판그리기();
 }
 
@@ -1670,8 +1676,50 @@ function 승인판그리기(){
        : '<div class="lbl">승인을 기다리는 분 ' + 기다림.length + '명</div>'
          + (기다림.length ? 기다림.map(줄).join('') : '<div class="empty">기다리는 분이 없어요</div>')
          + (정해짐.length ? '<div class="lbl" style="margin-top:16px">지난 기록 ' + 정해짐.length + '건</div>'
-                            + 정해짐.map(줄).join('') : ''))
+                            + 정해짐.map(줄).join('') : '')
+         + 요청줄())
     + '</div>');
+}
+
+/* ── 브로제이 등록 요청 ── 2026-09-22 대표 「그냥 직접 직원이 요청하게 할까」
+   ⛔ 이 요청만으로는 아무 권한도 안 생긴다. 대표님이 **브로제이를 고치시면** 그 선생님이
+      다시 가입 신청을 하고, 그때 자동으로 통과한다. */
+function 요청줄(){
+  const 기 = (승인판.요청||[]).filter(x => !x['처리한때']);
+  const 끝 = (승인판.요청||[]).filter(x => x['처리한때']);
+  if(!기.length && !끝.length) return '';
+  const 한줄 = x => '<div class="card" style="margin-bottom:7px;padding:11px 13px">'
+    + '<div class="rowc"><div style="min-width:0">'
+    + '<div class="t1">' + esc(x['이름'] || '(이름 없음)')
+    + (x['지금브로제이'] ? ' <span class="tag teal">이제 브로제이에 있어요</span>' : '') + '</div>'
+    + '<div class="t2" style="margin-top:4px">' + esc(번호보기(x['phone'])) + '<br>'
+    + '<span style="opacity:.65">' + esc(x['메일']) + '</span>'
+    + (x['한마디'] ? '<br><span style="font-style:italic">「' + esc(x['한마디']) + '」</span>' : '')
+    + (x['처리한때'] ? '<br><span style="opacity:.65">' + esc(x['결정']||'')
+        + (x['처리한사람'] ? ' · ' + esc(x['처리한사람']) : '') + '</span>' : '')
+    + '</div></div>'
+    + (x['처리한때'] ? ''
+        : '<span class="mbtns"><button data-act="askdone" data-e="' + esc(x['메일']) + '">처리함</button>'
+          + '<button data-act="askskip" data-e="' + esc(x['메일']) + '">무시</button></span>')
+    + '</div></div>';
+  return '<div class="lbl" style="margin-top:20px">브로제이 등록 요청 ' + 기.length + '건</div>'
+    + '<div class="t2" style="margin-bottom:8px;opacity:.7">브로제이 직원관리에 넣거나 번호를 고쳐 주세요. '
+    + '그 뒤에 그분이 다시 가입하시면 됩니다.</div>'
+    + (기.length ? 기.map(한줄).join('') : '<div class="empty">기다리는 요청이 없어요</div>')
+    + (끝.length ? '<div class="lbl" style="margin-top:14px">지난 요청 ' + 끝.length + '건</div>'
+                   + 끝.map(한줄).join('') : '');
+}
+
+async function 요청정하기(메일, 결정){
+  const x = (승인판.요청||[]).find(y => y['메일'] === 메일);
+  if(!x) return;
+  try{
+    await join('askdone', { '메일': 메일, '결정': 결정 });
+    x['처리한때'] = new Date().toISOString(); x['결정'] = 결정;
+    x['처리한사람'] = (ME && ME.name) || '';
+    toast(결정 === '처리함' ? '처리했습니다' : '무시했습니다');
+    승인판그리기(); 가입대기받기().then(render);
+  }catch(e){ toast('못 했어요 — ' + e.message); }
 }
 
 async function 가입정하기(메일, 결정){
@@ -1729,13 +1777,35 @@ function 가입화면(나){
        + (가입.왜 ? '<div class="t2" style="color:var(--warn);margin-top:8px">' + esc(가입.왜) + '</div>' : '')
        + '<button class="btn main" style="width:100%;margin-top:12px" data-act="jverify">확인</button>'
        + '<button class="btn sub" style="width:100%;margin-top:7px" data-act="jback">번호 다시 넣기</button>';
+  } else if(가입.단계 === '요청'){
+    /* 브로제이에 없거나 번호가 옛것이라 막힌 분 — 막다른 길로 두지 않는다 (2026-09-22 대표) */
+    속 = '<div class="t2" style="margin-bottom:10px">'
+       + '<b>브로제이에 등록해 달라고</b> 요청합니다.<br>'
+       + '대표님이 등록하시면 그때 다시 가입해 주세요.</div>'
+       + '<div class="fld"><span class="fn">이름</span>'
+       + '<input class="inp" id="jrname" value="' + esc(가입.이름||'') + '" placeholder="송영림"></div>'
+       + '<div class="fld"><span class="fn">전화번호</span>'
+       + '<input class="inp" id="jrphone" inputmode="tel" value="' + esc(가입.phone||'') + '" placeholder="010-1234-5678"></div>'
+       + '<div class="fld"><span class="fn">이메일</span>'
+       + '<input class="inp" value="' + esc(내메일()) + '" disabled></div>'
+       + '<div class="fld"><span class="fn">한마디 <span style="opacity:.6">(안 적으셔도 돼요)</span></span>'
+       + '<input class="inp" id="jrmemo" placeholder="예 · 번호가 바뀌었어요 · 이번 주 입사했어요"></div>'
+       + (가입.왜 ? '<div class="t2" style="color:var(--warn);margin-top:8px">' + esc(가입.왜) + '</div>' : '')
+       + '<button class="btn main" style="width:100%;margin-top:12px" data-act="jask">요청 보내기</button>'
+       + '<button class="btn sub" style="width:100%;margin-top:7px" data-act="jback">돌아가기</button>';
+  } else if(가입.단계 === '요청끝'){
+    속 = '<div class="empty" style="padding:22px 12px">'
+       + '<div style="font-size:15px;font-weight:700;margin-bottom:7px">요청했어요</div>'
+       + '<div class="t2">대표님이 브로제이에 등록하시면<br>그때 다시 가입해 주세요.</div></div>';
   } else {
     속 = '<div class="t2" style="margin-bottom:10px">'
        + '처음이시군요. <b>본인 확인</b>을 한 번만 하면 됩니다.<br>'
        + '<b>센터 직원만</b> 가입할 수 있어요 — 브로제이에 등록된 전화번호를 넣어 주세요.</div>'
        + '<input class="inp" id="jphone" inputmode="tel" placeholder="010-1234-5678" value="' + esc(가입.phone) + '">'
        + (가입.왜 ? '<div class="t2" style="color:var(--warn);margin-top:8px">' + esc(가입.왜) + '</div>' : '')
-       + '<button class="btn main" style="width:100%;margin-top:12px" data-act="jsend">인증번호 받기</button>';
+       + '<button class="btn main" style="width:100%;margin-top:12px" data-act="jsend">인증번호 받기</button>'
+       + '<button class="btn sub sm" style="width:100%;margin-top:9px" data-act="jaskform">'
+       + '브로제이에 없다고 나오나요? 등록 요청하기</button>';
   }
   /* 로그인 상자를 **통째로 갈아 끼우고 자리는 고정**한다.
      처음 한 번 #txlform 안을 비우고 #jbox 를 넣어 두면, 다시 그릴 때 그 안만 바꾸면 된다.
@@ -1767,6 +1837,20 @@ async function 가입번호보내기(){
   catch(e){ 가입.왜 = e.message; 가입화면(); return; }
   if(!d.ok){ 가입.왜 = d.why || '보내지 못했어요'; 가입화면(); return; }
   가입.단계 = '코드'; 가입화면();
+}
+
+async function 등록요청보내기(){
+  const nm = $('#jrname'), ph = $('#jrphone'), mo = $('#jrmemo');
+  가입.이름 = nm ? nm.value.trim() : '';
+  가입.phone = ph ? ph.value.trim() : '';
+  가입.왜 = '';
+  try{
+    const d = await join('ask', { '이름': 가입.이름, phone: 가입.phone,
+                                  '한마디': mo ? mo.value.trim() : '' });
+    if(d['이미직원']){ 가입.왜 = d.why; 가입.단계 = '번호'; }
+    else 가입.단계 = '요청끝';
+  }catch(e){ 가입.왜 = e.message; }
+  가입화면();
 }
 
 async function 가입확인(){
@@ -7071,9 +7155,13 @@ document.addEventListener('click', async function(ev){
   if(a==='japps'){ await 승인판열기(); return; }
   if(a==='japprove'){ await 가입정하기(act.dataset.e, '승인'); return; }
   if(a==='jreject'){ await 가입정하기(act.dataset.e, '거절'); return; }
+  if(a==='askdone'){ await 요청정하기(act.dataset.e, '처리함'); return; }
+  if(a==='askskip'){ await 요청정하기(act.dataset.e, '무시'); return; }
   if(a==='jsend'){ await 가입번호보내기(); return; }
   if(a==='jverify'){ await 가입확인(); return; }
   if(a==='jback'){ 가입.단계='번호'; 가입.왜=''; 가입화면(); return; }
+  if(a==='jaskform'){ 가입.단계='요청'; 가입.왜=''; 가입화면(); return; }
+  if(a==='jask'){ await 등록요청보내기(); return; }
   if(a==='jout'){ try{ await authPost('logout', {}, AUTH.access_token); }catch(e){}
     authSave(null); location.reload(); return; }
   if(a==='memadd'){ 회원추가열기(); return; }
