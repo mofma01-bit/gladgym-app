@@ -1110,7 +1110,7 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 
 <script>
 "use strict";
-const BUILD = '88';
+const BUILD = '89';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -1879,6 +1879,37 @@ async function 사유적기(){
       ? '사유 표가 아직 서버에 없어요 — 9단계_SQL_잠수사유.sql 을 돌려 주세요'
       : '못 적었어요 — ' + e.message);
   }
+}
+
+/* ── 홈 「잠수 회원」 ── 2026-09-22 대표 「잠수 회원은 홈 화면에서 보이게」
+   ⭐ 트레이너가 **오늘 연락할 사람**만 보이면 된다. 오래 안 오신 순으로.
+   ⛔ 막는 데 쓰지 않는다 — 보여 주기만 한다. */
+function 잠수줄(){
+  const 내것 = D.m.filter(m => (m.role||'member')==='member'
+    && (S.who==='전체' || !ME || m.trainer===ME.name || !m.trainer));
+  const 잠 = 내것.map(m => ({ m, x: 잔여of(m) }))
+    .filter(o => o.x && o.x['상태']==='잠수')
+    .sort((a,b) => (b.x['안온날']||0) - (a.x['안온날']||0));
+  const 줄 = 잠.slice(0, 8).map(function(o){
+    const 사유 = 사유of(o.m.id);
+    return '<button class="card click rowc" data-m="' + esc(o.m.id) + '" style="width:100%;text-align:left">'
+      + '<div style="min-width:0">'
+      + '<div class="t1">' + esc(o.m.name)
+      + (o.x['안온날'] != null ? ' <span class="tag warn">' + o.x['안온날'] + '일째</span>' : '') + '</div>'
+      + '<div class="t2">' + esc(o.x['잔여']||'') + (o.x['담당'] ? ' · ' + esc(o.x['담당']) : '') + '</div>'
+      + (사유.length ? '<div class="t2" style="opacity:.6;font-style:italic;overflow:hidden;'
+                     + 'text-overflow:ellipsis;white-space:nowrap">' + esc(사유[0].reason||'') + '</div>'
+                     : '<div class="t2" style="opacity:.45">사유가 아직 없어요</div>')
+      + '</div>'
+      + '<span class="dnbtn" data-act="dnopen" data-m="' + esc(o.m.id) + '">'
+      + (사유.length ? '사유 ' + 사유.length : '＋ 사유') + '</span></button>'; }).join('');
+  return '<div class="tx-home one"><div class="sec">'
+    + '<div class="lbl">잠수 회원 ' + 잠.length + '명'
+    + '<span class="r" data-act="gosleep">목록에서 보기 ›</span></div>'
+    + (잠.length ? 줄 + (잠.length > 8
+        ? '<div class="t2" style="margin-top:6px;opacity:.6">그 밖 ' + (잠.length-8) + '명</div>' : '')
+       : '<div class="empty">' + (PTST_때 ? '잠수 회원이 없어요' : '브로제이에서 불러오는 중이에요…') + '</div>')
+    + '</div></div>';
 }
 
 /* ── 회원 상태 막대 ── 홈·목록 위에 한 줄로 (2026-09-22 대표 「막대 그래프로 표기」)
@@ -5486,6 +5517,7 @@ function vHome(){
     leave:  () => '<div class="tx-home one">'
       + 섹('이번 주 연월차'+(대기?' <span class="tx-tag warn">승인 대기 '+대기+'</span>':''), 'leave', 이번주, '이번 주는 없어요')
       + '</div>',
+    sleep:  () => 잠수줄(),
     cold:   () => 끊긴회원줄(N),
     cm:     () => 코멘트줄(N),
     today:  () => vToday(),
@@ -5595,6 +5627,7 @@ const 홈블록 = [
   { k:'nums',  이름:'현황판',           단:'위' },
   { k:'notice',이름:'대표 공지',        단:'우' },
   { k:'tasks', 이름:'내 업무',          단:'우' },
+  { k:'sleep', 이름:'잠수 회원',         단:'좌' },
   { k:'cold',  이름:'코멘트 밀린 회원',  단:'우' },
   { k:'cm',    이름:'코멘트 요청',      단:'우' },
   { k:'leads', 이름:'오늘 상담',        단:'우' },
@@ -6737,6 +6770,7 @@ document.addEventListener('click', async function(ev){
     S.mid = mid; S.view='member'; render(); loadMember(mid); return; }
   if(a==='toList'){ S.view='members'; render(); return; }
   if(a==='memadd'){ 회원추가열기(); return; }
+  if(a==='gosleep'){ S.view='members'; S.st='잠수'; S.q=''; render(); return; }
   if(a==='dnopen'){ 사유판열기(act.dataset.m); return; }
   if(a==='dnsave'){ await 사유적기(); return; }
   if(a==='memfind'){ await 회원찾기(); return; }
@@ -7499,8 +7533,10 @@ setInterval(async function(){
   if(S.view==='members'||S.view==='today'||S.view==='cmall') load();
   /* 회원 목록을 열면 브로제이 잔여를 한 번에 받아 온다 (5분에 한 번이면 넉넉하다).
      못 받아도 목록은 그대로 뜬다 — PT 칸만 「—」로 남는다 */
-  if(S.view==='members' && Date.now() - PTST_때 > 300000)
-    Promise.all([잔여받기(), 사유받기()]).then(function(){ if(S.view==='members') render(); });
+  /* 홈에도 「잠수 회원」이 있어서 홈에서도 받아 온다 (2026-09-22) */
+  if((S.view==='members' || S.view==='home') && Date.now() - PTST_때 > 300000)
+    Promise.all([잔여받기(), 사유받기()]).then(function(){
+      if(S.view==='members' || S.view==='home') render(); });
   /* ⛔ 이 줄은 render0 안에 있다. 조건 없이 다시 그리면 끝없이 돈다
      (2026-09-17 배포본에서 확인). 화면에 **들어올 때 한 번만** 읽는다 */
   if(S.view==='trash'){
