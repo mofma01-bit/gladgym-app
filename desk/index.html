@@ -87,6 +87,35 @@ img{max-width:100%;display:block}
 .findbox .srch{min-width:0;flex:1 1 auto}
 /* 번호·잔여는 접히면 줄이 세 줄이 돼 읽기 나쁘다 — 한 줄로 못 박는다 */
 .mtb .nw{white-space:nowrap}
+
+/* ── 회원 상태 막대 ── 2026-09-22 */
+.stwrap{margin:0 0 14px}
+.stbar{display:flex;height:16px;border-radius:9px;overflow:hidden;background:var(--dark-3);
+       border:1px solid var(--line)}
+.stseg{border:0;padding:0;cursor:pointer;transition:filter .15s,opacity .15s;position:relative;
+       display:flex;align-items:center;justify-content:center;min-width:8px}
+.stseg b{font-size:10px;font-weight:800;color:#0e1517;letter-spacing:-.2px}
+.stseg.teal{background:#7fc9d6} .stseg.warn{background:#e2796b}
+.stseg.gold{background:#e8c27a} .stseg.gray{background:#5b554d}
+.stseg:hover{filter:brightness(1.15)}
+.stbar:hover .stseg:not(:hover){opacity:.55}
+.stseg.on{outline:2px solid #fff;outline-offset:-2px}
+.stkeys{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px;align-items:center}
+.stkey{display:inline-flex;align-items:center;gap:5px;background:var(--dark-3);
+       border:1px solid var(--line);border-radius:999px;padding:4px 11px;font-size:12px;
+       color:var(--t2);cursor:pointer;transition:border-color .15s,color .15s}
+.stkey i{width:8px;height:8px;border-radius:50%;flex:none}
+.stkey.teal i{background:#7fc9d6} .stkey.warn i{background:#e2796b}
+.stkey.gold i{background:#e8c27a} .stkey.gray i{background:#5b554d}
+.stkey b{color:var(--t1);font-weight:800}
+.stkey:hover{border-color:#6b6459;color:var(--t1)}
+.stkey.on{border-color:#fff;color:var(--t1)}
+.stkey.clr{border-style:dashed}
+.dnbtn{margin-left:5px;background:transparent;border:1px dashed #6b6459;border-radius:999px;
+       padding:1px 8px;font-size:11px;color:var(--t2);cursor:pointer;vertical-align:middle}
+.dnbtn:hover{border-color:#e2796b;color:#e2796b;border-style:solid}
+.dnlast{margin-top:2px;opacity:.6;font-style:italic;max-width:210px;overflow:hidden;
+        text-overflow:ellipsis;white-space:nowrap}
 .addmem{position:relative;white-space:nowrap;flex:0 0 auto;flex-direction:row;align-items:center;gap:5px;animation:addpulse 2.6s ease-in-out infinite}
 .addmem .plus{display:inline-block;font-weight:800;transition:transform .18s}
 .addmem:hover{animation:none;transform:translateY(-1px)}
@@ -1081,7 +1110,7 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 
 <script>
 "use strict";
-const BUILD = '86';
+const BUILD = '88';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -1456,6 +1485,7 @@ const S = { view:'home', who:'전체', q:'', mid:null, rid:null, tab:'routine',
             exq:'', part:'전체', eq:'전체', pq:'', ptab:'s', cmex:null, day:null, kind:'수업', asDate:null, calMonth:null,
             cmw:null, cmopen:null, cday:null, mday:null, cmprev:null,
             bpPose:'정면', bpKind:'body',
+            st:'',          /* 회원 상태 거르기 — '' 이면 전체 (2026-09-22) */
             edit:{ record:false, routine:false, body:false, meal:false, plan:false, minfo:false } };
 /* 잠금 도우미 — 수정 버튼을 눌러야 입력칸이 열린다 */
 /* 건강정보 미동의 회원은 체형 탭을 아예 못 고친다 —
@@ -1579,6 +1609,11 @@ const memOf = id => D.m.find(x=>x.id===id) || {name:''};
    만든 곳 — 글래드짐 자동화\대시보드\앱회원.py */
 const GG_API = 'https://dash.gladgym.co.kr';
 let PTST = {};                    /* "이름|뒷4" → {상태, 잔여, 담당, 끝날} */
+/* 잠수 사유 — 한 회원에 **여러 줄이 쌓인다.** 고치지 않고 쌓는다
+   (2026-09-22 대표 「여러 번 잠수가 될 수 있으니 날짜별로 볼 수 있게」).
+   표 만들기 — 설계서\9단계_SQL_잠수사유.sql */
+let DN = [];                      /* dormant_notes [{id, member_id, on_date, reason, trainer}] */
+let DN켜짐 = true;                /* 표가 아직 없으면 꺼 두고 화면은 그대로 돈다 */
 let PTST_때 = 0;
 
 async function crm(길, 몸){
@@ -1602,6 +1637,22 @@ async function 잔여받기(){
   }catch(e){ PTST = {}; console.warn('잔여 못 받음 —', e.message); }
 }
 const 잔여of = m => (m && m.phone4) ? (PTST[m.name + '|' + m.phone4] || null) : null;
+
+/* ══ 회원 상태 표기 ══ 2026-09-22 대표 지시
+   진행중 · 보류 · 종료 · 잠수 — **브로제이 CRM 기준**이고, 막는 데는 쓰지 않는다.
+   잠수 = PT 는 남았는데 **마지막 수업이 30일 넘은 분** (대표 확정).
+   ⚠ 「진행중」을 「유효회원」이라 부르지 않는다 — 노션 유효회원 페이지와 숫자가 갈린다. */
+const 상태차례 = ['진행중','잠수','종료'];   /* 2026-09-22 대표 「보류도 잠수로 통합해」 */
+const 상태빛 = { 진행중:'teal', 잠수:'warn', 종료:'gray' };
+const 상태설명 = { 진행중:'PT 가 남아 있고 최근에 오셨어요',
+                  잠수:'홀딩이거나, PT 는 남았는데 30일 넘게 안 오셨어요 — 연락해 보세요',
+                  종료:'PT 를 다 쓰셨거나 기간이 지났어요' };
+function 상태세기(rows){
+  const c = { 진행중:0, 잠수:0, 종료:0, 모름:0 };
+  rows.forEach(function(m){ const x = 잔여of(m);
+    c[(x && c[x['상태']] !== undefined) ? x['상태'] : '모름'] += 1; });
+  return c;
+}
 
 /* ══ 건강정보 동의 관문 ══ 2026-09-21 대표 지시 「동의요청 이어서해」
    개인정보 보호법 제23조① — 「건강」은 민감정보라 다른 동의와 **별도로** 받아야 한다.
@@ -1669,6 +1720,7 @@ async function 동의요청보내기(){
 function vMembers(){
   const q = S.q.trim().toLowerCase();
   const all = D.m.filter(x => (x.role||'member')==='member');
+  /* 아래에서 상태로 한 번 더 거르므로 let 이다 */
   let list = all.slice();
   if(S.who!=='전체') list = list.filter(x => (x.trainer||'')===S.who);
   if(q) list = list.filter(x => (x.name||'').toLowerCase().includes(q));
@@ -1684,6 +1736,10 @@ function vMembers(){
       ask: D.asks.filter(a => a.member_id===m.id && !a.done_at).length,
       today: D.a.find(a => a.member_id===m.id) || null };
   };
+  /* 상태로 거른다. 막대는 **거르기 전** 전체로 그려야 비율이 안 흔들린다 */
+  const 전체줄 = list.slice();
+  if(S.st) list = list.filter(function(m){ const x = 잔여of(m);
+    return S.st === '모름' ? !x : (x && x['상태'] === S.st); });
   const rows = list.map(m => ({ m, i: info(m) }));
   rows.sort((a,b)=>{ const A=a.i.gap===null?9999:a.i.gap, B=b.i.gap===null?9999:b.i.gap; return B-A; });
 
@@ -1699,14 +1755,7 @@ function vMembers(){
     + '<div class="sumit teal" title="트레이너가 남긴 코멘트를 회원이 앱에서 아직 안 연 것">'
       + '<span class="k2">회원이 안 본 코멘트</span><span class="v2">' + 안읽음 + '</span></div>'
     + '<div class="sumit warn"><span class="k2">2주 넘게 안 옴</span><span class="v2">' + 뜸한수 + '</span></div>'
-    + (function(){        /* PT 진행중 · 종료 — 브로제이에서 받아온 것이 있을 때만 (칩 하나로 묶는다) */
-        const 값 = rows.map(o=>잔여of(o.m)).filter(Boolean);
-        if(!값.length) return '';
-        const 진 = 값.filter(x=>x['상태']==='진행중'||x['상태']==='홀딩').length;
-        return '<div class="sumit teal" title="브로제이 CRM 기준 · 보여만 줍니다. 기록을 막지 않습니다">'
-          + '<span class="k2">PT 진행중 · 종료</span><span class="v2">' + 진
-          + '<span class="sub3" style="font-weight:600"> · ' + (값.length - 진) + '</span></span></div>'; })()
-    + '</div>';
+    + '</div>' + 상태막대(전체줄);
 
   if(!rows.length) return 요약 + '<div class="empty">해당하는 회원이 없어요</div>';
 
@@ -1729,9 +1778,19 @@ function vMembers(){
         + '<td><span class="sub3">' + esc(m.trainer||'담당 없음') + '</span></td>'
         + '<td>' + (function(){ const s2 = 잔여of(m);
             if(!s2) return '<span class="sub3">—</span>';
-            const 색 = s2['상태']==='진행중' ? 'teal' : (s2['상태']==='홀딩' ? 'gold' : 'warn');
+            const 색 = 상태빛[s2['상태']] || '';
+            const 사유 = 사유of(m.id);
             return '<span class="tag ' + 색 + '">' + esc(s2['상태']) + '</span>'
-              + '<div class="sub3 nw" style="margin-top:2px">' + esc(s2['잔여']||'') + '</div>'; })() + '</td>'
+              + (s2['상태']==='잠수'
+                  ? '<button class="dnbtn" data-act="dnopen" data-m="' + esc(m.id) + '"'
+                    + ' title="잠수 사유 적기 · 지난 기록 보기">'
+                    + (사유.length ? '사유 ' + 사유.length : '＋ 사유') + '</button>' : '')
+              + '<div class="sub3 nw" style="margin-top:2px">' + esc(s2['잔여']||'')
+              + (s2['상태']==='잠수' && s2['안온날'] != null ? ' · ' + s2['안온날'] + '일째' : '')
+              + '</div>'
+              + (사유.length ? '<div class="sub3 dnlast" title="' + esc(사유[0].reason||'') + '">'
+                              + esc((사유[0].reason||'').slice(0,18))
+                              + ((사유[0].reason||'').length>18 ? '…' : '') + '</div>' : ''); })() + '</td>'
         + '<td>' + (i.gap===null
             ? '<span class="sub3">기록 없음</span>'
             : '<span style="font-weight:700">' + dayText(i.last) + '</span>'
@@ -1753,6 +1812,96 @@ function vMembers(){
   return 요약 + 표;
 }
 
+/* ══ 잠수 사유 ══ 2026-09-22 대표 「잠수인 경우 사유를 쓸 수 있게 하고,
+   사유를 기록한 날짜별로 볼 수 있게 해줘 (여러 번 잠수가 될 수 있으니)」
+
+   ⭐ **고치지 않고 쌓는다.** 석 달 뒤에 또 잠수하면 그때 또 한 줄 적는다.
+      지난 사유가 남아야 「이 회원은 늘 겨울에 안 오신다」가 보인다.
+   ⛔ 사유가 없어도 **아무것도 막지 않는다.**
+   표 만들기 — 설계서\9단계_SQL_잠수사유.sql */
+async function 사유받기(){
+  if(!DN켜짐) return;
+  try{ DN = await sget('dormant_notes?select=*&order=on_date.desc,created_at.desc&limit=2000'); }
+  catch(e){
+    DN = []; DN켜짐 = false;       /* 표가 아직 없다 — 화면은 그대로 돌고, 적을 때만 알려 준다 */
+    console.warn('잠수 사유 표가 아직 없어요 —', e.message);
+  }
+}
+const 사유of = mid => DN.filter(x => x.member_id === mid);
+
+let 사유판 = null;                 /* {mid} */
+function 사유판열기(mid){ 사유판 = { mid }; 사유판그리기(); }
+
+function 사유판그리기(){
+  if(!사유판) return;
+  const m = memOf(사유판.mid), 이력 = 사유of(사유판.mid), x = 잔여of(m);
+  const 줄 = 이력.length ? 이력.map(function(r){
+      return '<div class="card" style="margin-bottom:6px;padding:10px 12px">'
+        + '<div class="t1">' + esc(dateFull(r.on_date))
+        + (r.trainer ? ' <span class="sub3">· ' + esc(r.trainer) + '</span>' : '') + '</div>'
+        + '<div class="t2" style="margin-top:3px;white-space:pre-wrap">' + esc(r.reason||'') + '</div>'
+        + '</div>'; }).join('')
+    : '<div class="empty">아직 적은 사유가 없어요</div>';
+
+  판열기('잠수 사유 · ' + esc(m.name),
+    '<div style="padding:4px 2px">'
+    + (x ? '<div class="t2" style="margin-bottom:10px">' + esc(x['상태']) + ' · ' + esc(x['잔여']||'')
+           + (x['마지막수업'] ? ' · 마지막 수업 ' + esc(dateFull(x['마지막수업'])) : '')
+           + (x['안온날'] != null ? ' <b>' + x['안온날'] + '일째</b>' : '') + '</div>' : '')
+    + (DN켜짐 ? ''
+       : '<div class="empty" style="margin-bottom:10px">사유를 담을 표가 아직 서버에 없어요 —'
+         + ' 설계서의 9단계_SQL_잠수사유.sql 을 돌려 주세요</div>')
+    + '<div class="fld"><span class="fn">오늘 사유 적기</span>'
+    + '<textarea class="inp" id="dnmemo" placeholder="예: 이직해서 당분간 못 오신다고 하심 · 무릎 통증으로 쉬는 중"'
+    + (DN켜짐 ? '' : ' disabled') + '></textarea>'
+    + '<div style="display:flex;gap:7px;margin-top:8px">'
+    + '<input class="inp" type="date" id="dndate" value="' + TODAY + '" style="width:150px">'
+    + '<button class="btn main" data-act="dnsave"' + (DN켜짐 ? '' : ' disabled') + '>적기</button></div></div>'
+    + '<div class="lbl" style="margin-top:16px">지난 기록 ' + 이력.length + '건</div>'
+    + 줄 + '</div>');
+  setTimeout(function(){ const el = $('#dnmemo'); if(el) el.focus(); }, 40);
+}
+
+async function 사유적기(){
+  if(!사유판) return;
+  const t = $('#dnmemo'), d = $('#dndate');
+  const 글 = t ? t.value.trim() : '';
+  if(!글){ toast('사유를 적어 주세요'); return; }
+  const 줄 = { id: 'dn' + Date.now(), member_id: 사유판.mid,
+               on_date: (d && d.value) || TODAY, reason: 글,
+               trainer: (ME && ME.name) || '' };
+  try{
+    await ssend('dormant_notes', 'POST', [줄]);
+    DN.unshift(줄);                        /* 고치지 않고 쌓는다 */
+    toast('적었습니다'); 사유판그리기(); render();
+  }catch(e){
+    toast(/PGRST|relation|does not exist/i.test(e.message||'')
+      ? '사유 표가 아직 서버에 없어요 — 9단계_SQL_잠수사유.sql 을 돌려 주세요'
+      : '못 적었어요 — ' + e.message);
+  }
+}
+
+/* ── 회원 상태 막대 ── 홈·목록 위에 한 줄로 (2026-09-22 대표 「막대 그래프로 표기」)
+   누르면 그 상태만 걸러 본다. 다시 누르면 풀린다. */
+function 상태막대(mems){
+  const c = 상태세기(mems);
+  const 합 = 상태차례.reduce((a,k)=>a+c[k], 0);
+  if(!합) return '';                       /* 브로제이에서 아직 못 받아왔으면 안 그린다 */
+  const 칸 = 상태차례.filter(k=>c[k]).map(function(k){
+    const w = (c[k] / 합 * 100).toFixed(1);
+    return '<button class="stseg ' + (상태빛[k]||'gray') + (S.st===k ? ' on' : '') + '"'
+      + ' style="width:' + w + '%" data-st="' + k + '"'
+      + ' title="' + esc(k + ' ' + c[k] + '명 · ' + (상태설명[k]||'')) + '">'
+      + (w > 9 ? '<b>' + c[k] + '</b>' : '') + '</button>'; }).join('');
+  const 글 = 상태차례.filter(k=>c[k]).map(k =>
+    '<button class="stkey ' + (상태빛[k]||'gray') + (S.st===k ? ' on' : '') + '" data-st="' + k + '">'
+    + '<i></i>' + k + ' <b>' + c[k] + '</b></button>').join('')
+    + (c['모름'] ? '<span class="stkey gray" title="브로제이에서 못 찾은 회원 — 이름이나 뒷자리가 다를 수 있어요">'
+                   + '<i></i>모름 <b>' + c['모름'] + '</b></span>' : '')
+    + (S.st ? '<button class="stkey clr" data-st="">✕ 전체 보기</button>' : '');
+  return '<div class="stwrap"><div class="stbar">' + 칸 + '</div><div class="stkeys">' + 글 + '</div></div>';
+}
+
 /* ══ 회원 추가 ══ 브로제이 CRM 에서 찾아 앱 회원으로 만든다 (2026-09-22 대표 지시)
    · 이름 · 전화번호 전체 · 뒷자리 어느 쪽으로도 찾는다
    · **PT 수강권 있는 사람만** 나온다 (운동가이드·그룹만 있는 분은 안 나옴)
@@ -1770,7 +1919,7 @@ function 추가판그리기(){
   D.m.forEach(m => { if(m.phone4) 있는뒤4[m.name + '|' + m.phone4] = 1; });
   const 줄 = 추가판.결과.map(function(x){
     const 이미 = 있는뒤4[x.name + '|' + String(x.phone).slice(-4)];
-    const 색 = x['상태']==='진행중' ? 'teal' : (x['상태']==='홀딩' ? 'gold' : 'warn');
+    const 색 = 상태빛[x['상태']] || '';
     return '<div class="card rowc" style="margin-bottom:6px"><div>'
       + '<div class="t1">' + esc(x.name) + ' <span class="tag ' + 색 + '">' + esc(x['상태']) + '</span></div>'
       + '<div class="t2">' + esc(x['잔여']||'') + (x['담당'] ? ' · 담당 ' + esc(x['담당']) : '') + '</div>'
@@ -6485,6 +6634,12 @@ document.addEventListener('click', async function(ev){
     if(w0){ S.cday = w0.on_date; S.calMonth = w0.on_date.slice(0,7); }
     render(); return; }
 
+  /* 회원 상태 막대·칩 — 누르면 그 상태만, 같은 걸 또 누르면 풀린다 (2026-09-22) */
+  const st = t.closest('[data-st]');
+  if(st){ const v = st.dataset.st || '';
+    S.st = (v && S.st === v) ? '' : v;
+    $('#body').innerHTML = vMembers(); return; }
+
   const eb = t.closest('[data-edit]');
   if(eb){ const k = eb.dataset.edit;
     if(k === 'body' && 동의관문('check')) return;      /* 왜 못 고치는지 알려준다 */
@@ -6582,6 +6737,8 @@ document.addEventListener('click', async function(ev){
     S.mid = mid; S.view='member'; render(); loadMember(mid); return; }
   if(a==='toList'){ S.view='members'; render(); return; }
   if(a==='memadd'){ 회원추가열기(); return; }
+  if(a==='dnopen'){ 사유판열기(act.dataset.m); return; }
+  if(a==='dnsave'){ await 사유적기(); return; }
   if(a==='memfind'){ await 회원찾기(); return; }
   if(a==='memadd2'){ await 회원넣기(act.dataset.p, act.dataset.n, act.dataset.t); return; }
   if(a==='toMember'){ S.view='member'; render(); return; }
@@ -7343,7 +7500,7 @@ setInterval(async function(){
   /* 회원 목록을 열면 브로제이 잔여를 한 번에 받아 온다 (5분에 한 번이면 넉넉하다).
      못 받아도 목록은 그대로 뜬다 — PT 칸만 「—」로 남는다 */
   if(S.view==='members' && Date.now() - PTST_때 > 300000)
-    잔여받기().then(function(){ if(S.view==='members') render(); });
+    Promise.all([잔여받기(), 사유받기()]).then(function(){ if(S.view==='members') render(); });
   /* ⛔ 이 줄은 render0 안에 있다. 조건 없이 다시 그리면 끝없이 돈다
      (2026-09-17 배포본에서 확인). 화면에 **들어올 때 한 번만** 읽는다 */
   if(S.view==='trash'){
