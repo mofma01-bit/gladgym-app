@@ -89,6 +89,15 @@ img{max-width:100%;display:block}
 .mtb .nw{white-space:nowrap}
 
 /* ── 회원 상태 막대 ── 2026-09-22 */
+.ktabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 11px}
+.ktab{display:inline-flex;align-items:center;gap:6px;background:var(--dark-2);
+      border:1px solid var(--line);border-radius:999px;padding:6px 13px;font-size:12.5px;
+      color:var(--t2);cursor:pointer;transition:border-color .15s,color .15s}
+.ktab b{font-weight:800;color:var(--t1)}
+.ktab:hover{border-color:#6b6459;color:var(--t1)}
+.ktab.on{border-color:#fff;color:var(--t1)}
+.ktab.teal.on{border-color:#7fc9d6} .ktab.gold.on{border-color:#e8c27a}
+.ktab.warn.on{border-color:#e2796b}
 .stwrap{margin:0 0 14px}
 .stbar{display:flex;height:16px;border-radius:9px;overflow:hidden;background:var(--dark-3);
        border:1px solid var(--line)}
@@ -1110,7 +1119,7 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 
 <script>
 "use strict";
-const BUILD = '94';
+const BUILD = '95';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -1486,6 +1495,7 @@ const S = { view:'home', who:'전체', q:'', mid:null, rid:null, tab:'routine',
             cmw:null, cmopen:null, cday:null, mday:null, cmprev:null,
             bpPose:'정면', bpKind:'body',
             st:'',          /* 회원 상태 거르기 — '' 이면 전체 (2026-09-22) */
+            kind:'',        /* 갈래 거르기 — PT회원·운동가이드·체험수업·일반FC */
             edit:{ record:false, routine:false, body:false, meal:false, plan:false, minfo:false } };
 /* 잠금 도우미 — 수정 버튼을 눌러야 입력칸이 열린다 */
 /* 건강정보 미동의 회원은 체형 탭을 아예 못 고친다 —
@@ -1627,6 +1637,103 @@ async function 가입대기받기(){
      구글로 가입 → **그 자리에서 전화번호 본인확인** → 대표님 승인
    ⛔ 브로제이 번호와 달라도 **신청은 받는다.** 화면에 빨갛게 띄우고 대표님이 정하신다
       (「아니다, 승인 거절까지 하는 걸로 하자」). 기계가 자르면 번호 바뀐 선생님이 못 들어온다. */
+/* ══ 공지 팝업 ══ 2026-09-22 대표
+   「팝업은 빈 페이지로 띄우고 필요할 때마다 공지 / 트레이너별 팝업 갈래를 나눌 거야」
+   「어디에서 써서 송출할지는 **최고 관리자만** 할 수 있어」
+   ⛔ 쓰는 건 super 하나뿐. 오너도 못 쓴다. 지금은 **빈 페이지**로 두고 필요할 때 채운다. */
+let 본팝업 = {};                    /* id → 봤다 (이 기기에서만 · 다시 안 뜨게) */
+try{ 본팝업 = JSON.parse(localStorage.getItem('gg_popup_seen') || '{}'); }catch(e){}
+
+async function 팝업받기(){
+  try{
+    const d = await join('popup');
+    const 아직 = (d['팝업'] || []).filter(x => !본팝업[x.id + '|' + (x['고친때']||'')]);
+    if(아직.length) 팝업보이기(아직[0]);
+  }catch(e){}
+}
+
+function 팝업보이기(x){
+  popOpen('<div style="padding:22px 24px;max-width:460px">'
+    + (x['제목'] ? '<div style="font-size:17px;font-weight:700;line-height:1.45;margin-bottom:12px">'
+                   + esc(x['제목']) + '</div>' : '')
+    + '<div style="font-size:14px;line-height:1.75;white-space:pre-wrap;color:var(--cream)">'
+    + esc(x['내용'] || '') + '</div>'
+    + '<div class="t2" style="margin-top:14px;opacity:.6">'
+    + esc(x['만든이'] || '') + (x['만든때'] ? ' · ' + esc(dateFull(String(x['만든때']).slice(0,10))) : '')
+    + '</div>'
+    + '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px">'
+    + '<button class="btn main" data-act="ppseen" data-i="' + esc(x.id + '|' + (x['고친때']||''))
+    + '">확인했습니다</button></div></div>');
+}
+
+let 팝업판 = null;
+
+async function 팝업판열기(){
+  팝업판 = { 목록:[], 고칠:null, 받는중:true };
+  팝업판그리기();
+  try{ const d = await join('popups'); 팝업판.목록 = d['팝업'] || []; }
+  catch(e){ 팝업판.왜 = e.message; }
+  팝업판.받는중 = false; 팝업판그리기();
+}
+
+function 팝업판그리기(){
+  if(!팝업판) return;
+  const 받을사람 = ['전체'].concat((W.staff||[]).filter(x=>x.active!==false).map(x=>x.name));
+  const 고칠 = 팝업판.고칠;
+  const 새것 = 고칠 === '새것';
+  const x = 새것 ? { 제목:'', 내용:'', 받는이:'전체', 켬:true }
+                 : (팝업판.목록.find(y => y.id === 고칠) || null);
+
+  const 줄 = 팝업판.목록.map(function(y){
+    return '<div class="card" style="margin-bottom:6px;padding:11px 13px"><div class="rowc">'
+      + '<div style="min-width:0">'
+      + '<div class="t1">' + (y['켬'] ? '<span class="tag teal">켜짐</span> ' : '<span class="tag">꺼짐</span> ')
+      + esc(y['제목'] || '제목 없음') + '</div>'
+      + '<div class="t2" style="margin-top:3px">받는이 ' + esc(y['받는이'] || '전체')
+      + (y['고친때'] ? ' · ' + esc(dateFull(String(y['고친때']).slice(0,10))) : '') + '</div></div>'
+      + '<span class="mbtns"><button data-act="ppedit" data-i="' + esc(y.id) + '">고치기</button>'
+      + '<button data-act="ppdel" data-i="' + esc(y.id) + '">지우기</button></span>'
+      + '</div></div>'; }).join('');
+
+  판열기('공지 팝업',
+    '<div style="padding:4px 2px">'
+    + (x ? '<div class="fld"><span class="fn">제목</span>'
+           + '<input class="inp" id="pptitle" value="' + esc(x['제목']||'') + '" placeholder="예 · 이번 주 공지"></div>'
+           + '<div class="fld"><span class="fn">내용</span>'
+           + '<textarea class="inp" id="ppbody" style="min-height:120px">' + esc(x['내용']||'') + '</textarea></div>'
+           + '<div class="g2">'
+           + '<div class="fld"><span class="fn">받는이</span><select class="inp" id="pptarget">'
+           + 받을사람.map(t => '<option value="' + esc(t) + '"'
+               + ((x['받는이']||'전체')===t ? ' selected' : '') + '>' + esc(t) + '</option>').join('')
+           + '</select></div>'
+           + '<div class="fld"><span class="fn">띄우기</span><select class="inp" id="ppon">'
+           + '<option value="1"' + (x['켬'] ? ' selected' : '') + '>켬 — 바로 뜸</option>'
+           + '<option value="0"' + (x['켬'] ? '' : ' selected') + '>끔 — 안 뜸</option></select></div>'
+           + '</div>'
+           + '<div style="display:flex;gap:7px;justify-content:flex-end;margin-top:10px">'
+           + '<button class="btn sub sm" data-act="ppcancel">취소</button>'
+           + '<button class="btn main sm" data-act="ppsave" data-i="' + esc(새것 ? '' : 고칠) + '">저장</button></div>'
+         : '<button class="btn main" style="width:100%" data-act="ppnew">＋ 새 공지 쓰기</button>')
+    + '<div class="lbl" style="margin-top:18px">지난 공지 ' + 팝업판.목록.length + '건</div>'
+    + (팝업판.받는중 ? '<div class="empty">불러오는 중이에요…</div>'
+       : 팝업판.왜 ? '<div class="empty">' + esc(팝업판.왜) + '</div>'
+       : (줄 || '<div class="empty">아직 공지가 없어요</div>'))
+    + '</div>');
+}
+
+async function 팝업저장하기(id){
+  const 제 = $('#pptitle'), 내 = $('#ppbody'), 받 = $('#pptarget'), 켜 = $('#ppon');
+  const 몸 = { id: id || '', '제목': 제 ? 제.value.trim() : '', '내용': 내 ? 내.value.trim() : '',
+               '받는이': 받 ? 받.value : '전체', '켬': 켜 ? 켜.value === '1' : true };
+  if(!몸['제목'] && !몸['내용']){ toast('제목이나 내용을 적어 주세요'); return; }
+  try{
+    await join('popupsave', { '팝업': 몸 });
+    팝업판.고칠 = null;
+    const d = await join('popups'); 팝업판.목록 = d['팝업'] || [];
+    toast('저장했습니다'); 팝업판그리기();
+  }catch(e){ toast('못 저장했어요 — ' + e.message); }
+}
+
 /* ══ 가입 승인 (대표님) ══ 2026-09-22 대표 「최고 관리자가 승인해야 가입되게」
    본인확인(문자 6자리)이 이미 끝난 분들이라 대표님은 **들여보낼지만** 정하시면 된다.
    ⛔ 번호가 브로제이와 다르거나 퇴사자면 **빨갛게** 뜬다. 막지는 않는다 — 보고 정하신다. */
@@ -1829,6 +1936,11 @@ const 잔여of = m => (m && m.phone4) ? (PTST[m.name + '|' + m.phone4] || null) 
    잠수 = PT 는 남았는데 **마지막 수업이 30일 넘은 분** (대표 확정).
    ⚠ 「진행중」을 「유효회원」이라 부르지 않는다 — 노션 유효회원 페이지와 숫자가 갈린다. */
 const 상태차례 = ['진행중','잠수','종료'];   /* 2026-09-22 대표 「보류도 잠수로 통합해」 */
+/* ── 갈래 ── 2026-09-22 대표 「PT회원 운동가이드 체험수업 일반FC 이렇게 구분해」
+   ⛔ 섞이면 안 된다. 한 사람은 한 갈래에만 든다. 판정은 서버(앱회원.py)가 한다 */
+const 갈래차례 = ['PT회원','운동가이드','체험수업','일반FC'];
+const 갈래빛 = { PT회원:'teal', 운동가이드:'gold', 체험수업:'warn', 일반FC:'' };
+const 갈래of = m => (잔여of(m) || {})['갈래'] || '';
 const 상태빛 = { 진행중:'teal', 잠수:'warn', 종료:'gray' };
 const 상태설명 = { 진행중:'PT 가 남아 있고 최근에 오셨어요',
                   잠수:'홀딩이거나, PT 는 남았는데 30일 넘게 안 오셨어요 — 연락해 보세요',
@@ -1922,7 +2034,8 @@ function vMembers(){
       ask: D.asks.filter(a => a.member_id===m.id && !a.done_at).length,
       today: D.a.find(a => a.member_id===m.id) || null };
   };
-  /* 상태로 거른다. 막대는 **거르기 전** 전체로 그려야 비율이 안 흔들린다 */
+  /* 갈래 → 상태 차례로 거른다. 막대는 **갈래로 거른 뒤** 그린다 (그 탭 안의 비율을 봐야 한다) */
+  if(S.kind) list = list.filter(m => S.kind === '모름' ? !갈래of(m) : 갈래of(m) === S.kind);
   const 전체줄 = list.slice();
   if(S.st) list = list.filter(function(m){ const x = 잔여of(m);
     return S.st === '모름' ? !x : (x && x['상태'] === S.st); });
@@ -1941,7 +2054,7 @@ function vMembers(){
     + '<div class="sumit teal" title="트레이너가 남긴 코멘트를 회원이 앱에서 아직 안 연 것">'
       + '<span class="k2">회원이 안 본 코멘트</span><span class="v2">' + 안읽음 + '</span></div>'
     + '<div class="sumit warn"><span class="k2">2주 넘게 안 옴</span><span class="v2">' + 뜸한수 + '</span></div>'
-    + '</div>' + 상태막대(전체줄);
+    + '</div>' + 갈래탭() + 상태막대(전체줄);
 
   if(!rows.length) return 요약 + '<div class="empty">해당하는 회원이 없어요</div>';
 
@@ -2146,6 +2259,28 @@ function 잠수줄(){
         ? '<div class="t2" style="margin-top:6px;opacity:.6">그 밖 ' + (잠.length-8) + '명</div>' : '')
        : '<div class="empty">' + (PTST_때 ? '잠수 회원이 없어요' : '브로제이에서 불러오는 중이에요…') + '</div>')
     + '</div></div>';
+}
+
+/* ── 갈래 탭 ── PT회원 · 운동가이드 · 체험수업 · 일반FC (2026-09-22 대표)
+   ⛔ 「유효 PT 회원과 가이드 고객이 섞이면 안 돼」 — 탭으로 확실히 가른다 */
+function 갈래탭(){
+  const 다 = D.m.filter(x => (x.role||'member')==='member'
+    && (S.who==='전체' || x.trainer===S.who));
+  const 셈 = {}; 갈래차례.forEach(k => 셈[k] = 0); 셈['모름'] = 0;
+  다.forEach(function(m){ const g = 갈래of(m); if(셈[g] !== undefined) 셈[g] += 1; else 셈['모름'] += 1; });
+  if(!다.length) return '';
+  /* ⚠ `data-kind` 는 회원 줄의 「개인운동·수업」 루틴 지정이 이미 쓴다. 겹치면 그 단추가 먹힌다.
+     그래서 갈래 탭은 **`data-mkind`** 로 둔다 (2026-09-22 실측으로 잡음) */
+  const 칸 = k => '<button class="ktab ' + (갈래빛[k]||'') + (S.kind===k ? ' on' : '') + '"'
+    + ' data-mkind="' + esc(k) + '">' + esc(k)
+    + '<b>' + (k ? 셈[k] : 다.length) + '</b></button>';
+  return '<div class="ktabs">'
+    + '<button class="ktab' + (S.kind ? '' : ' on') + '" data-mkind="">전체<b>' + 다.length + '</b></button>'
+    + 갈래차례.filter(k => 셈[k]).map(칸).join('')
+    + (셈['모름'] ? '<button class="ktab' + (S.kind==='모름' ? ' on' : '') + '" data-mkind="모름"'
+        + ' title="브로제이에서 못 찾은 회원 — 이름이나 뒷자리가 다를 수 있어요">모름<b>'
+        + 셈['모름'] + '</b></button>' : '')
+    + '</div>';
 }
 
 /* ── 회원 상태 막대 ── 홈·목록 위에 한 줄로 (2026-09-22 대표 「막대 그래프로 표기」)
@@ -6069,6 +6204,7 @@ function txMe(){
           + '<button class="btn sub" style="width:100%" data-act="japps">'
           + '가입 신청 보기' + (가입대기수 ? ' <span class="tag warn">' + 가입대기수 + '</span>' : '')
           + '</button>'
+          + '<button class="btn sub" style="width:100%;margin-top:7px" data-act="pps">공지 팝업</button>'
         : '')
     + (()=>{ const 지난 = (g.지난||[]).slice().reverse();
         return 지난.length ? '<div class="lbl" style="margin-top:12px">지난 목표 '+지난.length+'개</div>'
@@ -6516,6 +6652,7 @@ async function boot(){
     $('#txlogin').classList.remove('on');
     S.view = 'home';
     document.querySelectorAll('.nav').forEach(x=>x.classList.toggle('on', x.dataset.v==='home'));
+    setTimeout(팝업받기, 1200);          /* 들어오면 공지 팝업을 한 번 본다 */
     await load();
   }catch(e){
     $('#txlerr').textContent = '들어가지 못했어요 — ' + e.message;
@@ -6948,6 +7085,11 @@ document.addEventListener('click', async function(ev){
     render(); return; }
 
   /* 회원 상태 막대·칩 — 누르면 그 상태만, 같은 걸 또 누르면 풀린다 (2026-09-22) */
+  const kt = t.closest('[data-mkind]');
+  if(kt){ const v = kt.dataset.mkind || '';
+    S.kind = (v && S.kind === v) ? '' : v; S.st = '';
+    $('#body').innerHTML = vMembers(); return; }
+
   const st = t.closest('[data-st]');
   if(st){ const v = st.dataset.st || '';
     S.st = (v && S.st === v) ? '' : v;
@@ -7067,6 +7209,21 @@ document.addEventListener('click', async function(ev){
       S.view = 'members'; S.mid = null;
       toast('휴지통으로 보냈습니다 — 60일 안에 되살릴 수 있어요'); render();
     }catch(e){ toast('못 지웠어요 — ' + e.message); }
+    return; }
+  if(a==='ppseen'){ 본팝업[act.dataset.i] = 1;
+    try{ localStorage.setItem('gg_popup_seen', JSON.stringify(본팝업)); }catch(e){}
+    popClose(); setTimeout(팝업받기, 300); return; }
+  if(a==='pps'){ await 팝업판열기(); return; }
+  if(a==='ppnew'){ 팝업판.고칠 = '새것'; 팝업판그리기(); return; }
+  if(a==='ppedit'){ 팝업판.고칠 = act.dataset.i; 팝업판그리기(); return; }
+  if(a==='ppcancel'){ 팝업판.고칠 = null; 팝업판그리기(); return; }
+  if(a==='ppsave'){ await 팝업저장하기(act.dataset.i); return; }
+  if(a==='ppdel'){
+    if(!confirm('이 공지를 지울까요?')) return;
+    try{ await join('popupdel', { id: act.dataset.i });
+      팝업판.목록 = 팝업판.목록.filter(y => y.id !== act.dataset.i);
+      팝업판.고칠 = null; toast('지웠습니다'); 팝업판그리기(); }
+    catch(e){ toast('못 지웠어요 — ' + e.message); }
     return; }
   if(a==='japps'){ await 승인판열기(); return; }
   if(a==='japprove'){ await 가입정하기(act.dataset.e, '승인'); return; }
