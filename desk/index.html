@@ -89,6 +89,7 @@ img{max-width:100%;display:block}
 .mtb .nw{white-space:nowrap}
 
 /* ── 회원 상태 막대 ── 2026-09-22 */
+.chip.none{border-style:dashed}
 .ktabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 11px}
 .ktab{display:inline-flex;align-items:center;gap:6px;background:var(--dark-2);
       border:1px solid var(--line);border-radius:999px;padding:6px 13px;font-size:12.5px;
@@ -1119,7 +1120,7 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 
 <script>
 "use strict";
-const BUILD = '95';
+const BUILD = '96';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -2020,7 +2021,8 @@ function vMembers(){
   const all = D.m.filter(x => (x.role||'member')==='member');
   /* 아래에서 상태로 한 번 더 거르므로 let 이다 */
   let list = all.slice();
-  if(S.who!=='전체') list = list.filter(x => (x.trainer||'')===S.who);
+  if(S.who==='담당없음') list = list.filter(x => !x.trainer);
+  else if(S.who!=='전체') list = list.filter(x => (x.trainer||'')===S.who);
   if(q) list = list.filter(x => (x.name||'').toLowerCase().includes(q));
 
   const info = m => {
@@ -2074,7 +2076,12 @@ function vMembers(){
               return (s2 && s2.phone) ? '<div class="sub3 nw">' + esc(번호보기(s2.phone)) + '</div>'
                    : (m.phone4 ? '<div class="sub3 nw">···' + esc(m.phone4) + '</div>' : ''); })()
           + '</td>'
-        + '<td><span class="sub3">' + esc(m.trainer||'담당 없음') + '</span></td>'
+        + '<td>' + (m.trainer
+            ? '<span class="sub3">' + esc(m.trainer) + '</span>'
+            /* ⚠ `data-m` 은 「회원 줄 누르면 회원 판 열기」가 이미 쓴다. 그쪽이 먼저 가로챈다.
+               그래서 **`data-mm`** 으로 둔다 (2026-09-22 실측으로 잡음 — data-kind 와 같은 사고) */
+            : '<button class="dnbtn" data-act="mymem" data-mm="' + esc(m.id) + '"'
+              + ' title="내 담당으로 가져옵니다">＋ 내가 담당</button>') + '</td>'
         + '<td>' + (function(){ const s2 = 잔여of(m);
             if(!s2) return '<span class="sub3">—</span>';
             const 색 = 상태빛[s2['상태']] || '';
@@ -6787,6 +6794,12 @@ function render0(){
         + all.length + '</button>'
       + trs.map(t => '<button class="chip ' + (S.who===t?'on':'') + '" data-who="' + esc(t) + '">'
           + esc(t) + ' ' + all.filter(x=>x.trainer===t).length + '</button>').join('')
+      /* 담당이 아직 없는 분 — 안 보이면 **아무도 가져갈 수가 없다** (2026-09-22 대표
+         「아직 담당 지정이 안 된 사람은 내가 담당이라고 지정할 수 있고 뜨게 한다는 거지」) */
+      + (function(){ const n = all.filter(x=>!x.trainer).length;
+          return n ? '<button class="chip none' + (S.who==='담당없음'?' on':'') + '"'
+            + ' data-who="담당없음" title="담당이 아직 없는 분 — 「내가 담당」으로 가져갈 수 있어요">'
+            + '담당 없음 ' + n + '</button>' : ''; })()
       + '</div>'
       /* 「사람 찾기」를 한 묶음으로 — 왼쪽은 **있는 회원** 추리기, 오른쪽은 **브로제이에서 데려오기**
          (2026-09-22 대표 「데이터베이스에서 회원 찾는 게 한 묶음으로 보여야 하고 · 더 눈에 띄게」) */
@@ -7039,6 +7052,24 @@ document.addEventListener('click', async function(ev){
     회원판 = null; $('#pop').classList.remove('on');
     S.mid = mid; S.view='member'; S.tab = S.tab || 'routine';
     render(); loadMember(mid); return; }
+
+  /* ⚠ 회원 줄 **안에** 있는 단추는 여기서 먼저 처리한다.
+     아래 `[data-m]` 이 줄 전체를 잡아 버려서, 뒤쪽 data-act 차례까지 못 간다.
+     (2026-09-22 — 「내가 담당」 단추가 안 먹던 이유가 이것이었다) */
+  const 내담당 = t.closest('[data-act="mymem"]');
+  if(내담당){
+    const m = memOf(내담당.dataset.mm);
+    if(!m || !m.id) return;
+    if(m.trainer) return toast('이미 담당이 있어요');
+    const 나 = (ME && ME.name) || '';
+    if(!나) return toast('로그인을 다시 해 주세요');
+    try{
+      await ssend('members?id=eq.' + encodeURIComponent(m.id), 'PATCH', { trainer: 나 });
+      m.trainer = 나;
+      toast(m.name + ' 님을 내 담당으로 가져왔어요'); render();
+    }catch(e){ toast('못 가져왔어요 — ' + e.message); }
+    return;
+  }
 
   const card = t.closest('[data-m]');
   if(card){ await 회원판열기(card.dataset.m, card.dataset.tab); return; }
