@@ -1110,7 +1110,7 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 
 <script>
 "use strict";
-const BUILD = '89';
+const BUILD = '90';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -1829,18 +1829,40 @@ async function 사유받기(){
 }
 const 사유of = mid => DN.filter(x => x.member_id === mid);
 
+/* 누가 고치고 지울 수 있나 — 2026-09-22 대표 「고치거나 삭제도 가능하게 /
+   다른 사람의 페이지도 수정, 삭제 가능하게」
+     · 내가 쓴 것        → 나
+     · 남이 쓴 것        → **최고 관리자만**
+   ⛔ 지운 것은 되살릴 수 없다. 그래서 지울 때 한 번 묻는다. */
+const 사유고칠수있나 = r => !!(r && ((r.trainer || '') === ((ME && ME.name) || '') || 최고관리자()));
+
 let 사유판 = null;                 /* {mid} */
-function 사유판열기(mid){ 사유판 = { mid }; 사유판그리기(); }
+function 사유판열기(mid){ 사유판 = { mid, 고칠:null }; 사유판그리기(); }
 
 function 사유판그리기(){
   if(!사유판) return;
   const m = memOf(사유판.mid), 이력 = 사유of(사유판.mid), x = 잔여of(m);
   const 줄 = 이력.length ? 이력.map(function(r){
+      const 내것 = (r.trainer||'') === ((ME && ME.name)||'');
+      const 고침 = 사유판.고칠 === r.id;
+      if(고침) return '<div class="card" style="margin-bottom:6px;padding:10px 12px">'
+        + '<div class="t1">' + esc(dateFull(r.on_date)) + ' 고치는 중</div>'
+        + '<textarea class="inp" id="dnedit" style="margin-top:6px">' + esc(r.reason||'') + '</textarea>'
+        + '<div style="display:flex;gap:7px;margin-top:8px;justify-content:flex-end">'
+        + '<button class="btn sub sm" data-act="dncancel">취소</button>'
+        + '<button class="btn main sm" data-act="dnupd" data-i="' + esc(r.id) + '">저장</button></div></div>';
       return '<div class="card" style="margin-bottom:6px;padding:10px 12px">'
+        + '<div class="rowc"><div style="min-width:0">'
         + '<div class="t1">' + esc(dateFull(r.on_date))
-        + (r.trainer ? ' <span class="sub3">· ' + esc(r.trainer) + '</span>' : '') + '</div>'
+        + (r.trainer ? ' <span class="sub3">· ' + esc(r.trainer)
+                       + (내것 ? '' : 최고관리자() ? ' <span class="tag gold">남의 기록</span>' : '') + '</span>' : '')
+        + '</div>'
         + '<div class="t2" style="margin-top:3px;white-space:pre-wrap">' + esc(r.reason||'') + '</div>'
-        + '</div>'; }).join('')
+        + '</div>'
+        + (사유고칠수있나(r)
+            ? '<span class="mbtns"><button data-act="dnedit" data-i="' + esc(r.id) + '" title="고치기">고치기</button>'
+              + '<button data-act="dndel" data-i="' + esc(r.id) + '" title="지우기">지우기</button></span>'
+            : '') + '</div></div>'; }).join('')
     : '<div class="empty">아직 적은 사유가 없어요</div>';
 
   판열기('잠수 사유 · ' + esc(m.name),
@@ -1860,6 +1882,34 @@ function 사유판그리기(){
     + '<div class="lbl" style="margin-top:16px">지난 기록 ' + 이력.length + '건</div>'
     + 줄 + '</div>');
   setTimeout(function(){ const el = $('#dnmemo'); if(el) el.focus(); }, 40);
+}
+
+async function 사유고치기(id){
+  const r = DN.find(x => x.id === id);
+  if(!r) return;
+  if(!사유고칠수있나(r)){ toast('남이 쓴 기록은 최고 관리자만 고칠 수 있어요'); return; }
+  const t = $('#dnedit');
+  const 글 = t ? t.value.trim() : '';
+  if(!글){ toast('사유를 적어 주세요'); return; }
+  try{
+    await ssend('dormant_notes?id=eq.' + encodeURIComponent(id), 'PATCH', { reason: 글 });
+    r.reason = 글; 사유판.고칠 = null;
+    toast('고쳤습니다'); 사유판그리기(); render();
+  }catch(e){ toast('못 고쳤어요 — ' + e.message); }
+}
+
+async function 사유지우기(id){
+  const r = DN.find(x => x.id === id);
+  if(!r) return;
+  if(!사유고칠수있나(r)){ toast('남이 쓴 기록은 최고 관리자만 지울 수 있어요'); return; }
+  /* 되살릴 수 없다 — 한 번 묻는다 */
+  if(!confirm(dateFull(r.on_date) + ' 기록을 지울까요?' + String.fromCharCode(10,10)
+    + (r.reason||'') + String.fromCharCode(10,10) + '되돌릴 수 없습니다.')) return;
+  try{
+    await ssend('dormant_notes?id=eq.' + encodeURIComponent(id), 'DELETE');
+    DN = DN.filter(x => x.id !== id);
+    toast('지웠습니다'); 사유판그리기(); render();
+  }catch(e){ toast('못 지웠어요 — ' + e.message); }
 }
 
 async function 사유적기(){
@@ -6773,6 +6823,12 @@ document.addEventListener('click', async function(ev){
   if(a==='gosleep'){ S.view='members'; S.st='잠수'; S.q=''; render(); return; }
   if(a==='dnopen'){ 사유판열기(act.dataset.m); return; }
   if(a==='dnsave'){ await 사유적기(); return; }
+  if(a==='dnedit'){ 사유판.고칠 = act.dataset.i; 사유판그리기();
+    setTimeout(function(){ const el=$('#dnedit'); if(el){ el.focus();
+      el.setSelectionRange(el.value.length, el.value.length); } }, 40); return; }
+  if(a==='dncancel'){ 사유판.고칠 = null; 사유판그리기(); return; }
+  if(a==='dnupd'){ await 사유고치기(act.dataset.i); return; }
+  if(a==='dndel'){ await 사유지우기(act.dataset.i); return; }
   if(a==='memfind'){ await 회원찾기(); return; }
   if(a==='memadd2'){ await 회원넣기(act.dataset.p, act.dataset.n, act.dataset.t); return; }
   if(a==='toMember'){ S.view='member'; render(); return; }
