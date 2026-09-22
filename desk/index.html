@@ -80,6 +80,23 @@ img{max-width:100%;display:block}
 .top h1{font-size:19px;font-weight:800;letter-spacing:-.03em}
 .top .cnt{font-size:12.5px;font-weight:600;color:var(--sub)}
 .top .sp{margin-left:auto;display:flex;gap:9px;align-items:center}
+/* 찾기 묶음 — 있는 회원 추리기 | 브로제이에서 데려오기 를 한 테두리로 묶는다 */
+.findbox{background:var(--dark-2);border:1px solid var(--line);border-radius:12px;padding:5px 6px;gap:6px}
+.findbox .srch{border:0;background:transparent}
+.findbar{width:1px;height:20px;background:var(--line);flex:none}
+.findbox .srch{min-width:0;flex:1 1 auto}
+/* 번호·잔여는 접히면 줄이 세 줄이 돼 읽기 나쁘다 — 한 줄로 못 박는다 */
+.mtb .nw{white-space:nowrap}
+.addmem{position:relative;white-space:nowrap;flex:0 0 auto;flex-direction:row;align-items:center;gap:5px;animation:addpulse 2.6s ease-in-out infinite}
+.addmem .plus{display:inline-block;font-weight:800;transition:transform .18s}
+.addmem:hover{animation:none;transform:translateY(-1px)}
+.addmem:hover .plus{transform:rotate(90deg) scale(1.15)}
+.addmem:active{transform:translateY(0) scale(.97)}
+@keyframes addpulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(160,214,224,.55)}
+  55%    {box-shadow:0 0 0 7px rgba(160,214,224,0)}
+}
+@media (prefers-reduced-motion: reduce){ .addmem{animation:none} }
 .back{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;
   justify-content:center;color:var(--sub);font-size:17px;flex:none}
 .back:hover{background:var(--dark-3);color:var(--cream)}
@@ -1064,7 +1081,7 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 
 <script>
 "use strict";
-const BUILD = '85';
+const BUILD = '86';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -1689,7 +1706,6 @@ function vMembers(){
         return '<div class="sumit teal" title="브로제이 CRM 기준 · 보여만 줍니다. 기록을 막지 않습니다">'
           + '<span class="k2">PT 진행중 · 종료</span><span class="v2">' + 진
           + '<span class="sub3" style="font-weight:600"> · ' + (값.length - 진) + '</span></span></div>'; })()
-    + '<button class="btn main sm" style="align-self:center" data-act="memadd">＋ 회원 추가</button>'
     + '</div>';
 
   if(!rows.length) return 요약 + '<div class="empty">해당하는 회원이 없어요</div>';
@@ -1703,13 +1719,19 @@ function vMembers(){
     + rows.map(function(o){ const m=o.m, i=o.i;
         return '<tr data-m="' + esc(m.id) + '">'
         + '<td><span class="dot2 ' + 상태(i) + '"></span></td>'
-        + '<td><div class="nm2">' + esc(m.name) + '</div></td>'
+        + '<td><div class="nm2">' + esc(m.name) + '</div>'
+          + (function(){ const s2 = 잔여of(m);
+              /* 번호는 **앱에 저장돼 있지 않다.** 서버에서 받아온 것이 있을 때만 보여 준다.
+                 (2026-09-22 대표 「중간 번호 안 나오네」 — 뒷 4자리만으론 사람을 못 가린다) */
+              return (s2 && s2.phone) ? '<div class="sub3 nw">' + esc(번호보기(s2.phone)) + '</div>'
+                   : (m.phone4 ? '<div class="sub3 nw">···' + esc(m.phone4) + '</div>' : ''); })()
+          + '</td>'
         + '<td><span class="sub3">' + esc(m.trainer||'담당 없음') + '</span></td>'
         + '<td>' + (function(){ const s2 = 잔여of(m);
             if(!s2) return '<span class="sub3">—</span>';
             const 색 = s2['상태']==='진행중' ? 'teal' : (s2['상태']==='홀딩' ? 'gold' : 'warn');
             return '<span class="tag ' + 색 + '">' + esc(s2['상태']) + '</span>'
-              + '<div class="sub3" style="margin-top:2px">' + esc(s2['잔여']||'') + '</div>'; })() + '</td>'
+              + '<div class="sub3 nw" style="margin-top:2px">' + esc(s2['잔여']||'') + '</div>'; })() + '</td>'
         + '<td>' + (i.gap===null
             ? '<span class="sub3">기록 없음</span>'
             : '<span style="font-weight:700">' + dayText(i.last) + '</span>'
@@ -1752,7 +1774,7 @@ function 추가판그리기(){
     return '<div class="card rowc" style="margin-bottom:6px"><div>'
       + '<div class="t1">' + esc(x.name) + ' <span class="tag ' + 색 + '">' + esc(x['상태']) + '</span></div>'
       + '<div class="t2">' + esc(x['잔여']||'') + (x['담당'] ? ' · 담당 ' + esc(x['담당']) : '') + '</div>'
-      + '<div class="t2" style="opacity:.65">' + esc(마스크(x.phone)) + '</div></div>'
+      + '<div class="t2" style="opacity:.75">' + esc(번호보기(x.phone)) + '</div></div>'
       + (이미 ? '<span class="tag">이미 있음</span>'
               : '<button class="btn main sm" data-act="memadd2" data-p="' + esc(x.phone)
                 + '" data-n="' + esc(x.name) + '" data-t="' + esc(x['담당']||'') + '">추가</button>')
@@ -1774,8 +1796,11 @@ function 추가판그리기(){
   setTimeout(function(){ const el = $('#crmq'); if(el){ el.focus();
     el.onkeydown = function(ev){ if(ev.key==='Enter') 회원찾기(); }; } }, 40);
 }
-const 마스크 = p => { const n = String(p||''); return n.length<8 ? n
-  : n.slice(0,3) + '-****-' + n.slice(-4); };
+/* 트레이너가 사람을 가려야 하니 **전체 번호**를 보여 준다 (2026-09-22 대표 「중간 번호 안 나오네」).
+   ⛔ 다만 **앱에 저장하는 건 뒷 4자리뿐**이다. 이 번호는 서버에서 그때그때 받아 화면에만 쓴다 */
+const 번호보기 = p => { const n = String(p||'').replace(/[^0-9]/g,'');
+  return n.length===11 ? n.slice(0,3)+'-'+n.slice(3,7)+'-'+n.slice(7)
+       : n.length===10 ? n.slice(0,3)+'-'+n.slice(3,6)+'-'+n.slice(6) : n; };
 
 async function 회원찾기(){
   if(!추가판) return;
@@ -6164,8 +6189,14 @@ function render0(){
       + trs.map(t => '<button class="chip ' + (S.who===t?'on':'') + '" data-who="' + esc(t) + '">'
           + esc(t) + ' ' + all.filter(x=>x.trainer===t).length + '</button>').join('')
       + '</div>'
-      + '<div class="sp"><input class="srch" id="q" type="text" placeholder="회원 이름으로 찾기" value="'
-      + esc(S.q) + '"></div>';
+      /* 「사람 찾기」를 한 묶음으로 — 왼쪽은 **있는 회원** 추리기, 오른쪽은 **브로제이에서 데려오기**
+         (2026-09-22 대표 「데이터베이스에서 회원 찾는 게 한 묶음으로 보여야 하고 · 더 눈에 띄게」) */
+      + '<div class="sp findbox">'
+      + '<input class="srch" id="q" type="text" placeholder="회원 이름으로 찾기" value="' + esc(S.q) + '">'
+      + '<i class="findbar"></i>'
+      + '<button class="btn main sm addmem" data-act="memadd" title="브로제이 CRM 에서 찾아 넣습니다">'
+      + '<span class="plus">＋</span> 회원 추가</button>'
+      + '</div>';
     b.innerHTML = vMembers();
   } else if(S.view==='member'){
     const m = memOf(S.mid);
