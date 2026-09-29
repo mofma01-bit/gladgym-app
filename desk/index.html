@@ -834,6 +834,12 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 .hblk > .homenums .num{border-radius:11px;padding:7px 12px;transition:background .12s}
 .hblk > .homenums .num:hover{background:#232320}
 .hblk > .homenums .num:hover .k{color:var(--gold-2)}
+/* @이름 — 부른 표시 */
+.men{background:var(--gold-dim);color:var(--gold);border-radius:6px;padding:1px 5px;font-weight:800}
+/* 댓글 칸의 부르기 칩 줄 */
+.tx-at{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:9px 0 2px}
+.tx-at .k{font-size:11px;font-weight:700;color:var(--sub);margin-right:2px}
+
 /* 사이드 페이지 줄 — 이름 왼쪽, 단추 오른쪽 */
 .nmrow{gap:9px;margin-bottom:8px}
 .nmrow .btn.sm{flex:none}
@@ -1136,7 +1142,8 @@ body.resizing{cursor:col-resize;user-select:none}
 .tx-menu button:hover{border-color:#4a4a44}
 
 .tx-home{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;align-items:start}
-.tx-home .sec .lbl .r{cursor:pointer;color:var(--gold-2)}
+.tx-home .sec .lbl .r,.sec .lbl .r[data-act]{cursor:pointer;color:var(--gold-2)}
+.sec .lbl .r[data-act]:hover{color:var(--gold)}
 .tx-notice{background:#2b2240;border:1px solid #4a3d6b;border-radius:13px;padding:13px 15px}
 .tx-notice .t1{color:#d9cdf4;font-size:14px;font-weight:800}
 .tx-notice .t2{color:#b8a9de;font-size:12px;margin-top:3px;white-space:pre-wrap}
@@ -1240,7 +1247,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '123';
+const BUILD = '126';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -2675,6 +2682,51 @@ function 지정판그리기(){
     '<div class="tx-fbtns"><span class="tx-stat"></span>'
     + '<button class="btn sub" data-mfull="' + esc(mid) + '">⤢ 회원 전체 페이지</button></div>');
 }
+/* ══ 회원 고르기 ══ 「＋ 루틴 지정」에서 연다. 고르면 그대로 루틴 지정 판으로 넘어간다.
+   (2026-09-29 대표 「루틴이 없어요 하고 끝이 아니라 위에 루틴 지정하기 + 넣고」)
+   ⛔ 서버를 부르지 않는다 — 이미 받아 둔 회원 목록에서 고른다. 그래서 글자마다 바로 걸러진다. */
+let 회원고르기 = null;                              /* {q, kind} */
+function 회원고르기열기(kind){ 회원고르기 = { q:'', kind: kind || '개인운동' }; 회원고르기그리기(); }
+function 고를회원(){
+  const q = ((회원고르기 && 회원고르기.q) || '').trim().toLowerCase();
+  return D.m.filter(m => (m.role||'member') === 'member' && 내담당(m.id))
+    .filter(m => !q || (m.name||'').toLowerCase().indexOf(q) >= 0)
+    .sort((a, b) => (a.name||'').localeCompare(b.name||''));
+}
+function 고를회원줄(){
+  const 목 = 고를회원();
+  if(!목.length) return '<div class="empty">' + (회원고르기.q ? '그런 분이 없어요' : '담당 회원이 없어요') + '</div>';
+  return 목.map(function(m){
+    const 그날 = D.aAll.find(x => x.member_id === m.id && x.on_date === (S.asDate || TODAY));
+    const r0 = 그날 && D.r.find(x => x.id === 그날.routine_id);
+    return '<div class="card rowc nmrow"><div style="flex:1;min-width:0">'
+      + '<div class="t1">' + esc(m.name) + '</div>'
+      + '<div class="t2">' + esc(m.trainer || '담당 없음')
+        + (그날 ? ' · 오늘 ' + (r0 ? '루틴 ' + r0.no : esc(그날.kind||'')) + ' 지정됨' : '') + '</div></div>'
+      + (그날 ? '<span class="tag gold">지정됨</span>' : '')
+      + '<button class="btn gold sm" data-pickm="' + esc(m.id) + '">'
+      + (그날 ? '다시 지정' : '루틴 지정') + '</button></div>'; }).join('');
+}
+function 회원고르기그리기(){
+  if(!회원고르기) return;
+  판열기('루틴 지정할 회원 <span class="who3">' + esc(회원고르기.kind) + '</span>',
+    '<div class="sec">'
+    + '<div class="chips" style="margin:0 0 10px">'
+    + ['개인운동','수업'].map(k => '<button class="chip ' + (회원고르기.kind===k?'on':'') + '"'
+        + ' data-pickkind="' + k + '">' + k + '</button>').join('') + '</div>'
+    + '<input class="inp" id="pickq" placeholder="이름으로 찾기" value="' + esc(회원고르기.q) + '">'
+    + '<div id="picklist" style="margin-top:10px">' + 고를회원줄() + '</div></div>',
+    '<div class="tx-fbtns"><span class="tx-stat"></span>'
+    + '<button class="btn ghost" data-act="popclose">닫기</button></div>');
+  setTimeout(function(){
+    const el = $('#pickq'); if(!el) return;
+    el.focus(); el.setSelectionRange(el.value.length, el.value.length);
+    /* ⛔ 판 전체를 다시 그리면 글자 칸이 초점을 잃는다 — 목록만 갈아 끼운다 */
+    el.oninput = function(){ 회원고르기.q = el.value;
+      const box = $('#picklist'); if(box) box.innerHTML = 고를회원줄(); };
+  }, 40);
+}
+
 async function 지정판열기(mid, kind){
   회원판 = null;
   지정판 = { mid, kind: kind || '개인운동', 새:false };
@@ -4995,6 +5047,33 @@ function txRow(key, r, 고르기){
     + '</span></button>';
 }
 const 댓글수 = (key, id) => W.cm.filter(c => c.tbl===표정의[key].table && c.row_id===id).length;
+
+/* ══ 부름(@이름) ══ 2026-09-29 대표 「페이지에 댓글로 태그를 달았을때 뜨는것」
+   ⛔ 표를 새로 안 만든다 — 읽은 표시는 `staff.home.부름` 에 담는다.
+      { 본때: '이 시각까지는 다 봤다', 읽음: [댓글id …] (최근 200) } */
+const 표키of = tbl => Object.keys(표정의).find(k => 표정의[k].table === tbl) || null;
+function 나부른댓글(){
+  const 나 = (ME && ME.name) || ''; if(!나) return [];
+  return (W.cm || [])
+    .filter(c => c.created_by !== (ME && ME.id) && String(c.body||'').indexOf('@' + 나) >= 0)
+    .sort((a, b) => (a.created_at||'') < (b.created_at||'') ? 1 : -1);
+}
+const 부름상태 = () => { const b = ((ME && ME.home) || {}).부름 || {};
+  return { 본때: b.본때 || null, 읽음: b.읽음 || [] }; };
+function 안읽은부름(){
+  const { 본때, 읽음 } = 부름상태();
+  return 나부른댓글().filter(c =>
+    (!본때 || (c.created_at || '') > 본때) && 읽음.indexOf(c.id) < 0);
+}
+async function 부름읽음(id){
+  const b = 부름상태();
+  if(b.읽음.indexOf(id) >= 0) return;
+  await 내홈저장({ 부름: { 본때: b.본때, 읽음: b.읽음.concat([id]).slice(-200) } });
+}
+async function 부름모두읽음(){
+  await 내홈저장({ 부름: { 본때: new Date().toISOString(), 읽음: [] } });
+  toast('모두 읽음으로 표시했어요');
+}
 /* 연월차 달력 — 이번 달 */
 function txCal(key, rows){
   const t = new Date(TODAY), y = t.getFullYear(), m = t.getMonth();
@@ -5013,11 +5092,20 @@ function txCal(key, rows){
 }
 
 /* ── 페이지 보기 ── 노션 페이지처럼: 제목 · 칩 · 본문 · 첨부 · 댓글. 「고치기」로 폼을 연다 */
+/* @이름 — 직원 이름과 **정확히 맞을 때만** 칩이 된다. 긴 이름부터 맞춰야 「양인」이 「양인수」를 먹지 않는다 */
+const 정규피하기 = t => String(t).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+function 부름정규(){
+  const 들 = (W.staff||[]).map(x => x.name).filter(Boolean)
+    .sort((a, b) => b.length - a.length).map(정규피하기);
+  return 들.length ? new RegExp('@(' + 들.join('|') + ')', 'g') : null;
+}
 function 본문렌더(t){
   if(!t) return '';
+  const 멘 = 부름정규();
   return String(t).split('\n').map((ln, i) => {
     let h = esc(ln);
     h = h.replace(/(https?:\/\/[^\s<]+)/g, u => '<a href="'+u+'" target="_blank" rel="noopener">'+u+'</a>');
+    if(멘) h = h.replace(멘, '<span class="men">@$1</span>');
     if(/^#\s+/.test(ln)) return '<b class="h">'+h.replace(/^#\s+/,'')+'</b>';
     const ck = ln.match(/^\s*[-*]?\s*\[( |x|X)\]\s?(.*)$/);
     if(ck) return '<span class="ck '+(ck[1].trim()?'on':'')+'" data-act="tx:tick" data-line="'+i+'"><i>'+(ck[1].trim()?'✓':'')+'</i><span>'+esc(ck[2])+'</span></span>';
@@ -5100,7 +5188,14 @@ function 댓글칸(key, id){
       + '<div><div class="b">'+본문렌더(c.body)+'</div><div class="m">'+esc(사람(c.created_by).name)+' · '+시각한글(c.created_at)
       + ((관리자() || c.created_by===(ME&&ME.id)) ? '<button data-act="tx:cmdel" data-id="'+c.id+'">지우기</button>' : '')
       + '</div></div></div>').join('') : '<div class="tx-meta">댓글 없음</div>')
-    + '</div><div class="tx-cmtin">'+아바타(ME.id)+'<textarea class="inp" id="txcmin" placeholder="댓글 남기기"></textarea>'
+    + '</div>'
+    /* 부르기 — 누르면 `@이름` 이 들어간다. 부른 사람의 현황판에 뜬다 (2026-09-29 대표) */
+    + '<div class="tx-at"><span class="k">부르기</span>'
+    + (W.staff||[]).filter(x => x.active !== false && x.id !== (ME&&ME.id) && x.name)
+        .map(x => '<button class="tx-pchip" data-act="tx:cmat" data-v2="' + esc(x.name) + '">'
+          + 아바타(x.id) + esc(x.name) + '</button>').join('')
+    + '</div>'
+    + '<div class="tx-cmtin">'+아바타(ME.id)+'<textarea class="inp" id="txcmin" placeholder="댓글 남기기 — 부르면 그 사람 현황판에 떠요"></textarea>'
     + '<button class="btn sub sm" data-act="tx:cmsend">보내기</button></div>';
 }
 /* ── 노션식 속성 줄 ── 페이지에서 바로 고친다. 「속성 고치기」 폼으로 안 들어간다
@@ -6392,6 +6487,7 @@ function 홈배치붙이기(){
       (따로 두면 4를 눌렀는데 3개가 뜬다) */
 const 현황칸 = [
   { k:'밀림', 이름:'코멘트 밀림', 색:'warn' },
+  { k:'부름', 이름:'나를 부른 댓글', 색:'warn' },
   { k:'업무', 이름:'내 업무',     색:'gold' },
   { k:'요청', 이름:'코멘트 요청', 색:'teal' },
   { k:'안봄', 이름:'회원 안 봄',  색:'teal' },
@@ -6400,6 +6496,7 @@ const 현황칸 = [
 ];
 const 현황목록 = {
   밀림: () => 끊긴목록(),
+  부름: () => 안읽은부름(),
   업무: () => W.tasks.filter(r=>!r.done && r.kind!=='대표공지' && 내것(r.owners)).sort(표정의.tasks.정렬),
   요청: () => D.asks.filter(a=>!a.done_at && 내담당(a.member_id)),
   안봄: () => D.c.filter(c=>!c.read_at && 내담당(c.member_id))
@@ -6425,6 +6522,7 @@ function 숫자줄(){
    ⛔ 새 화면을 만들지 않는다. 이미 있는 세부 페이지에 **보기·거르개를 걸어 놓고** 데려간다.
       (아침에 만든 사이드 페이지는 같은 목록을 세 번째로 그린 것이었다 — 걷어냈다) */
 const 현황길 = {
+  부름: () => 가기('tasks'),          /* 부름은 여러 표에 흩어져 있다 — 사이드에서 골라 들어간다 */
   밀림: () => { S.cmOnly = 'cold';   S.cmSort = 'old';    가기('cmall'); },
   업무: () => { 표상태.tasks.보기 = 'mine';  보기얹기('tasks'); 가기('tasks'); },
   요청: () => { S.cmOnly = 'ask';    S.cmSort = 'ask';    가기('cmall'); },
@@ -6451,7 +6549,7 @@ function 현황판그리기(){
   let 목 = [];
   try{ 목 = 현황목록[k](); }catch(e){ 목 = []; }
 
-  const 빈말 = { 밀림:'밀린 코멘트가 없어요 👍', 업무:'남은 업무가 없어요 👍',
+  const 빈말 = { 부름:'나를 부른 댓글이 없어요 👍', 밀림:'밀린 코멘트가 없어요 👍', 업무:'남은 업무가 없어요 👍',
                  요청:'답할 요청이 없어요 👍', 안봄:'회원이 다 읽었어요 👍',
                  운동:'오늘 기록된 운동이 없어요', 상담:'오늘 잡힌 상담이 없어요' }[k] || '지금은 없어요';
 
@@ -6463,6 +6561,19 @@ function 현황판그리기(){
 
   let 속 = '';
   if(!목.length) 속 = '<div class="empty">' + 빈말 + '</div>';
+
+  else if(k === '부름') 속 = 목.map(function(c){
+    const key = 표키of(c.tbl), T = key && 표정의[key];
+    const r = key ? (W[key]||[]).find(x => x.id === c.row_id) : null;
+    const 어디 = (T ? T.제목 : '어딘가') + (r ? ' · ' + esc(T.행(r).제목) : '');
+    return '<div class="card rowc nmrow"><div style="flex:1;min-width:0">'
+      + '<div class="t1">' + 아바타(c.created_by) + ' ' + esc(사람(c.created_by).name)
+        + ' <span class="t2" style="display:inline">· ' + 어디 + '</span></div>'
+      + '<div class="t2" style="margin-top:4px">' + 본문렌더(c.body) + '</div>'
+      + '<div class="t2" style="opacity:.6;margin-top:3px">' + 시각한글(c.created_at) + '</div></div>'
+      + (r ? '<button class="btn gold sm" data-act="tx:cmgo" data-k="' + key + '" data-id="' + esc(c.row_id)
+             + '" data-v2="' + esc(c.id) + '">열기 ›</button>'
+           : '<span class="tag warn">지워진 줄</span>') + '</div>'; }).join('');
 
   else if(k === '밀림') 속 = 목.map(x => 회원줄(x.m.id, esc(x.m.name),
       (x.없음 ? '코멘트 한 번도 없음' : '마지막 ' + dateFull(x.last)) + ' · 운동 ' + x.운동수 + '회 기록',
@@ -6490,7 +6601,9 @@ function 현황판그리기(){
   판열기(esc(칸.이름) + ' <span class="who3">' + 목.length + '건</span>',
     '<div class="sec">' + 속 + '</div>',
     '<div class="tx-fbtns"><span class="tx-stat"></span>'
-    + '<button class="btn sub" data-act="tx:numgo" data-v2="' + k + '">전체 목록 ›</button>'
+    + (k === '부름'
+        ? (목.length ? '<button class="btn sub" data-act="tx:cmallread">모두 읽음으로</button>' : '')
+        : '<button class="btn sub" data-act="tx:numgo" data-v2="' + k + '">전체 목록 ›</button>')
     + '<button class="btn ghost" data-act="popclose">닫기</button></div>');
 }
 
@@ -6579,7 +6692,9 @@ function 내홈(){
   const h = (ME && ME.home) || {};
   const 차례 = (h.차례||[]).filter(k => 홈블록.some(b=>b.k===k));
   홈블록.forEach(b => { if(차례.indexOf(b.k) < 0) 차례.push(b.k); });   /* 새로 생긴 블록은 뒤에 */
-  const o = { 차례, 끔: h.끔||{}, 단: h.단||{} };
+  /* ⛔ 모르는 칸을 **버리지 않는다.** 앞서는 여기서 새로 만들어서, `내홈저장` 이
+     홈 배치(배치2)·부름 같은 칸을 조용히 날렸다 (2026-09-29에 막음) */
+  const o = Object.assign({}, h, { 차례, 끔: h.끔||{}, 단: h.단||{} });
   꾸밈규격.forEach(x => { if(x.기본 != null) o[x.k] = (h[x.k] != null ? h[x.k] : x.기본); });
   return o;
 }
@@ -7114,6 +7229,19 @@ async function txAct(a, el){
   /* ① 숫자 → 사이드 페이지 · ③ 「전체 목록 ›」 → 거르개 걸고 그 페이지로 */
   if(a==='numopen'){ 현황판열기(v2); return; }
   if(a==='numgo'){ const f = 현황길[v2]; popClose(); if(f) f(); return; }
+  /* 부름 — 줄을 열면 **그 하나는 읽음**이 된다 */
+  if(a==='cmgo'){ 현황판 = null; await 부름읽음(v2); await txView(k, id); return; }
+  if(a==='cmallread'){ await 부름모두읽음(); 현황판그리기(); return; }
+  /* 댓글 칸에서 사람을 부른다 — 칩을 누르면 @이름 이 들어간다 */
+  if(a==='cmat'){
+    /* ⚠ 바깥 파라미터도 `el` 이다 — 가리면 헷갈린다. 글자 칸은 `칸` 으로 부른다 */
+    const 칸 = $('#txcmin'); if(!칸) return;
+    const 자리 = (칸.selectionStart == null) ? 칸.value.length : 칸.selectionStart;
+    const 앞 = 칸.value.slice(0, 자리), 뒤 = 칸.value.slice(자리);
+    const 낄 = (앞 && !/\s$/.test(앞) ? ' ' : '') + '@' + v2 + ' ';
+    칸.value = 앞 + 낄 + 뒤;
+    칸.focus(); const n = (앞 + 낄).length; 칸.setSelectionRange(n, n);
+    return; }
   /* ⠿ 를 누르면 옮김판 — 끌 수도 있고 눌러서 옮길 수도 있다 */
   if(a==='hmmove'){ S.hmOpen = (S.hmOpen === v2) ? null : v2; render(); return; }
   if(a==='hmclose'){ S.hmOpen = null; render(); return; }
@@ -7256,13 +7384,19 @@ function vToday(){
         + '<div class="t2">' + esc(w.title||'') + ' · ' + esc(w.kind||'') + '</div></div>'
         + '<span class="tag ' + (w.done?'teal':'gold') + '">' + (w.done?'끝':'하는 중') + '</span></button>').join('')
       : '<div class="empty">아직 없어요</div>') + '</div>'
-    + '<div class="sec"><div class="lbl">오늘 지정한 루틴 ' + 지정.length + '건</div>'
+    /* ⭐ 빈 칸은 **막다른 길이 아니라 시작점**이다 (2026-09-29 대표
+         「루틴이 없어요 하고 끝이 아니라 위에 루틴 지정하기 + 넣고」).
+       이 앱에 이미 있던 좋은 예 — 「아직 루틴이 없어요 — 「＋ 새 루틴 만들기」로 바로 만드세요」 */
+    + '<div class="sec"><div class="lbl">오늘 지정한 루틴 ' + 지정.length + '건'
+    + '<span class="r" data-act="pickm">＋ 루틴 지정</span></div>'
     + (지정.length ? 지정.map(function(a){ const r=D.r.find(x=>x.id===a.routine_id);
         return '<button class="card click rowc gold" data-m="' + esc(a.member_id) + '">'
         + '<div><div class="t1">' + esc(memOf(a.member_id).name) + '</div>'
         + '<div class="t2">' + (r ? '루틴 ' + r.no + ' · ' + esc(r.name) : '루틴 없이 ' + esc(a.kind||''))
         + '</div></div><span class="rt">›</span></button>'; }).join('')
-      : '<div class="empty">지정한 루틴이 없어요</div>') + '</div></div>';
+      : '<div class="empty">지정한 루틴이 없어요<br>'
+        + '<button class="btn gold sm" data-act="pickm" style="margin-top:10px">＋ 루틴 지정하기</button></div>')
+    + '</div></div>';
 }
 
 /* ── 종목 고르기 팝업 ── */
@@ -7451,6 +7585,7 @@ function 판열기(머리, 속, 발){
 function popClose(){ if(typeof 쪽지닫기==='function') 쪽지닫기();
   if(typeof 회원판 !== 'undefined') 회원판 = null;
   if(typeof 지정판 !== 'undefined') 지정판 = null;
+  if(typeof 회원고르기 !== 'undefined') 회원고르기 = null;
   if(typeof 현황판 !== 'undefined') 현황판 = null;
   if(typeof BL!=='undefined' && BL){ try{ 글자넣기(); }catch(e){} }
   if(typeof 고른줄!=='undefined'){ 고른줄 = []; const sb = $('#txselbar'); if(sb) sb.remove(); }
@@ -7586,6 +7721,13 @@ document.addEventListener('click', async function(ev){
   const 빠름 = t.closest('[data-cmquick]');
   if(빠름){ ev.preventDefault(); ev.stopPropagation();
     빠른코멘트 = null; 빠른코멘트열기(빠름.dataset.cmquick); return; }
+
+  /* ── 「＋ 루틴 지정」 → 회원 고르기 → 루틴 지정 ── */
+  const 갈래 = t.closest('[data-pickkind]');
+  if(갈래 && 회원고르기){ 회원고르기.kind = 갈래.dataset.pickkind; 회원고르기그리기(); return; }
+  const 골랐 = t.closest('[data-pickm]');
+  if(골랐){ const kind = (회원고르기 && 회원고르기.kind) || '개인운동';
+    회원고르기 = null; await 지정판열기(골랐.dataset.pickm, kind); return; }
 
   /* ── 회원 줄 「개인운동 · 수업」 → 루틴 지정 사이드 페이지 ── */
   const 지정열기 = t.closest('[data-mas]');
@@ -7849,6 +7991,7 @@ document.addEventListener('click', async function(ev){
     catch(e){ toast('못 지웠어요 — ' + e.message); }
     return; }
   if(a==='japps'){ await 승인판열기(); return; }
+  if(a==='pickm'){ 회원고르기열기('개인운동'); return; }
   if(a==='japprove'){ await 가입정하기(act.dataset.e, '승인'); return; }
   if(a==='jreject'){ await 가입정하기(act.dataset.e, '거절'); return; }
   if(a==='jsend'){ await 가입번호보내기(); return; }
