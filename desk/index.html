@@ -308,6 +308,12 @@ textarea.inp{min-height:76px;resize:vertical;line-height:1.6}
 .sumit.teal{border-color:#2d4750} .sumit.teal .v2{color:var(--teal)}
 .sumit.warn{border-color:#4d2f27} .sumit.warn .v2{color:var(--warn)}
 
+/* 요약 띠는 **거르개**다 — 눌리는 티를 낸다 (2026-09-29) */
+.sumit{text-align:left;transition:border-color .12s,background .12s}
+.sumit:hover{background:var(--dark-3)}
+.sumit.on{background:var(--dark-3);border-color:var(--gold)}
+.sumit.on .k2{color:var(--gold)}
+
 /* 체형 체크 — 세 갈래 버튼 */
 /* 달력 */
 .cal{background:var(--dark-2);border:1px solid var(--line);border-radius:11px;padding:8px 9px}
@@ -827,10 +833,6 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 .hblk > .homenums .num{border-radius:11px;padding:7px 12px;transition:background .12s}
 .hblk > .homenums .num:hover{background:#232320}
 .hblk > .homenums .num:hover .k{color:var(--gold-2)}
-/* 사이드 페이지 줄 — 이름 왼쪽, 단추 오른쪽 */
-.nmrow{gap:9px;margin-bottom:8px}
-.nmrow .btn.sm{flex:none}
-
 /* ══ 덩어리 경계 ══ 2026-09-29 대표 「이거 다 까매서 경계가 어딘지 모르겠어 · 그냥 둥둥 다 떠있는 느낌」
    ⛔ 줄마다 선을 긋지 않는다 — 정신없다. **제목이 붙은 덩어리**만 테두리로 묶는다.
    깊이 세 층 : 바탕 #131312 → 덩어리 #191917 → 그 안의 카드 #232320 */
@@ -1164,10 +1166,6 @@ body.resizing{cursor:col-resize;user-select:none}
   <span class="ev">GLAD</span>
   <span class="msg" id="gnbmsg">트레이너 데스크 · 시험 단계</span>
   <div class="rt2">
-    <button class="gbtn" id="gbell" title="알림">
-      <svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
-        <path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
-      <span class="dot" id="belldot" style="display:none"></span></button>
     <button class="gbtn" id="gnotice" title="공지사항">
       <svg viewBox="0 0 24 24"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
     </button>
@@ -1234,7 +1232,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '115';
+const BUILD = '120';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -2398,32 +2396,72 @@ async function 사유적기(){
 /* ── 홈 「잠수 회원」 ── 2026-09-22 대표 「잠수 회원은 홈 화면에서 보이게」
    ⭐ 트레이너가 **오늘 연락할 사람**만 보이면 된다. 오래 안 오신 순으로.
    ⛔ 막는 데 쓰지 않는다 — 보여 주기만 한다. */
-function 잠수줄(){
-  const 내것 = D.m.filter(m => (m.role||'member')==='member'
-    && (S.who==='전체' || !ME || m.trainer===ME.name || !m.trainer));
-  const 잠 = 내것.map(m => ({ m, x: 잔여of(m) }))
-    .filter(o => o.x && o.x['상태']==='잠수')
-    .sort((a,b) => (b.x['안온날']||0) - (a.x['안온날']||0));
-  const 줄 = 잠.slice(0, 8).map(function(o){
-    const 사유 = 사유of(o.m.id);
-    return '<button class="card click rowc" data-m="' + esc(o.m.id) + '" style="width:100%;text-align:left">'
-      + '<div style="min-width:0">'
-      + '<div class="t1">' + esc(o.m.name)
-      + (o.x['안온날'] != null ? ' <span class="tag warn">' + o.x['안온날'] + '일째</span>' : '') + '</div>'
-      + '<div class="t2">' + esc(o.x['잔여']||'') + (o.x['담당'] ? ' · ' + esc(o.x['담당']) : '') + '</div>'
-      + (사유.length ? '<div class="t2" style="opacity:.6;font-style:italic;overflow:hidden;'
-                     + 'text-overflow:ellipsis;white-space:nowrap">' + esc(사유[0].reason||'') + '</div>'
-                     : '<div class="t2" style="opacity:.45">사유가 아직 없어요</div>')
-      + '</div>'
-      + '<span class="dnbtn" data-act="dnopen" data-m="' + esc(o.m.id) + '">'
-      + (사유.length ? '사유 ' + 사유.length : '＋ 사유') + '</span></button>'; }).join('');
-  return '<div class="tx-home one"><div class="sec">'
-    + '<div class="lbl">잠수 회원 ' + 잠.length + '명'
-    + '<span class="r" data-act="gosleep">목록에서 보기 ›</span></div>'
-    + (잠.length ? 줄 + (잠.length > 8
-        ? '<div class="t2" style="margin-top:6px;opacity:.6">그 밖 ' + (잠.length-8) + '명</div>' : '')
-       : '<div class="empty">' + (PTST_때 ? '잠수 회원이 없어요' : '브로제이에서 불러오는 중이에요…') + '</div>')
-    + '</div></div>';
+/* 잠수 회원 — **브로제이 출입·회원권 기준**이라 이게 맞는 숫자다.
+   (앱 운동기록 기준으로 세면 앱을 안 쓰는 분이 전부 「안 온 회원」이 된다 — 그래서 그 블록은 뺐다) */
+function 잠수목록(){
+  return D.m.filter(m => (m.role||'member') === 'member')
+    .map(m => ({ m, x: 잔여of(m) }))
+    .filter(o => o.x && o.x['상태'] === '잠수')
+    .sort((a, b) => (b.x['안온날']||0) - (a.x['안온날']||0));
+}
+
+/* ══ 매주 업무 데이터베이스에 올라오는 것 ══ 2026-09-29 대표
+     「업무 데이터베이스에 잠수회원, TG진행현황 등 노션에 올리듯 매주 올려주고 보게 하면 되거든」
+   월요일이 지나고 **관리자가 처음 데스크를 열 때** 만든다. 서버 예약작업이 아니라서
+   노트북·서버가 꺼져 있어도 누가 열면 올라온다.
+   ⛔ 두 번 만들지 않는다 — `extra.wk` 에 그 주 월요일을 박고, 있으면 건너뛴다.
+   ⛔ 자료를 못 받았으면 **아무것도 만들지 않는다.** 빈 보고가 올라가면 안 만든 것만 못하다. */
+function 주월요일(){
+  const t = new Date(TODAY + 'T00:00:00');
+  t.setDate(t.getDate() - ((t.getDay() + 6) % 7));        /* 월=0 이 되게 당긴다 */
+  const z = n => String(n).padStart(2, '0');
+  return t.getFullYear() + '-' + z(t.getMonth()+1) + '-' + z(t.getDate());
+}
+const 주이름 = () => {
+  const a = new Date(주월요일() + 'T00:00:00'), b = new Date(a); b.setDate(a.getDate() + 6);
+  return (a.getMonth()+1) + '/' + a.getDate() + '~' + (b.getMonth()+1) + '/' + b.getDate();
+};
+
+/* 넓힐 때는 이 표에 한 줄만 더한다 */
+const 주간거리 = [
+  { k:'잠수', 제목:'잠수 회원', 뽑기: function(){
+      if(!PTST_때) return null;                            /* 브로제이를 아직 못 받았다 */
+      const 목 = 잠수목록();
+      const 줄 = 목.map(o => '· ' + o.m.name
+        + ' — ' + (o.x['담당'] || '담당 없음')
+        + ' · ' + (o.x['안온날'] != null ? o.x['안온날'] + '일째' : '안 온 날 모름')
+        + (o.x['잔여'] ? ' · ' + o.x['잔여'] : ''));
+      return { 수: 목.length,
+        본문: 목.length
+          ? '이번 주에 연락해 볼 분입니다. 사유는 회원 화면에서 남겨 주세요.\n\n' + 줄.join('\n')
+          : '이번 주 잠수 회원은 없습니다.' };
+    } },
+];
+
+let 주간올림 = false;
+async function 주간올리기(){
+  if(주간올림 || !관리자()) return;                        /* 한 사람만 만든다 */
+  주간올림 = true;
+  const 월 = 주월요일();
+  for(const x of 주간거리){
+    const 딱지 = x.k + '-' + 월;
+    if((W.tasks || []).some(r => (r.extra || {}).wk === 딱지)) continue;
+    let d = null;
+    try{ d = x.뽑기(); }catch(e){ d = null; }
+    if(!d) continue;                                       /* 자료를 못 받았으면 건너뛴다 */
+    const body = {
+      title: x.제목 + ' ' + d.수 + '명 — ' + 주이름(),
+      kind: '확인사항', owners: [], due: null,
+      body: d.본문, note: null, done: false, done_at: null, template: null,
+      vis: 'all', viewers: [], extra: { wk: 딱지 },
+    };
+    try{
+      const r = await usend('tr_tasks', 'POST', body, 'return=representation');
+      if(r && r[0]) W.tasks.unshift(r[0]);
+      toast('이번 주 「' + x.제목 + '」을 업무에 올렸어요');
+    }catch(e){ console.warn('주간 업무 못 올림 —', e.message); }
+  }
+  if(S.view === 'home' || S.view === 'tasks') render();
 }
 
 /* ── 갈래 탭 ── PT회원 · 운동가이드 · 체험수업 · 일반FC (2026-09-22 대표)
@@ -3551,7 +3589,18 @@ function vCmAll(){
   const 구분수 = { 신규:0, 재등록:0, 미정:0 };
   rows.forEach(o => { const k = 구분(o.m); if(구분수[k] != null) 구분수[k]++; else 구분수.미정++; });
   const 고른구분 = S.cmReg || '';
-  const 걸러진 = 고른구분 ? rows.filter(o => 구분(o.m) === 고른구분) : rows;
+
+  /* ── 거르개 ── 현황판 숫자에서 오면 여기에 걸린 채로 열린다 (2026-09-29 대표
+       「코멘트 현황판에 요청과, 남겨야하는거 다 나오고」)
+     ⛔ 「남겨야 할 회원」은 **끊긴목록() 하나**로 판정한다. 여기서 다시 세지 않는다 —
+        현황판 숫자와 이 페이지 숫자가 어긋나면 안 된다 */
+  const 밀린ids = new Set(끊긴목록().map(x => x.m.id));
+  const 만 = S.cmOnly || '';
+  const 만걸러 = o => 만==='ask'    ? o.ask > 0
+                    : 만==='unread' ? o.unread > 0
+                    : 만==='cold'   ? 밀린ids.has(o.m.id)
+                    : 만==='none'   ? !o.n : true;
+  const 걸러진 = rows.filter(o => (!고른구분 || 구분(o.m) === 고른구분) && 만걸러(o));
 
   /* ── 차례 ── 기본은 「코멘트 안 남긴 지 오래된 순」 (대표 지시)
      한 번도 안 남긴 회원이 맨 위, 그다음 오래 안 남긴 순 */
@@ -3578,14 +3627,21 @@ function vCmAll(){
     return 마지막(a) < 마지막(b) ? -1 : (마지막(a) > 마지막(b) ? 1 : 0);
   });
 
-  const 요약 = '<div class="sumbar">'
-    + '<div class="sumit warn"><span class="k2">봐 달라는 요청</span><span class="v2">' + asks.length + '</span></div>'
-    + '<div class="sumit teal" title="트레이너가 남긴 코멘트를 회원이 앱에서 아직 안 연 것">'
-      + '<span class="k2">회원이 안 본 코멘트</span><span class="v2">'
-      + cs.filter(c=>!c.read_at).length + '</span></div>'
-    + '<div class="sumit"><span class="k2">전체 코멘트</span><span class="v2">' + cs.length + '</span></div>'
-    + '<div class="sumit gold"><span class="k2">코멘트 없는 회원</span><span class="v2">'
-      + rows.filter(x=>!x.n).length + '</span></div>'
+  const 거르개 = [
+    { k:'',       이름:'전체 회원',        색:'',     수: rows.length },
+    { k:'cold',   이름:'남겨야 할 회원',    색:'gold', 수: 밀린ids.size,
+      귀띔:코멘트밀림일 + '일 넘게 코멘트를 안 남긴 회원' },
+    { k:'ask',    이름:'봐 달라는 요청',    색:'warn', 수: asks.length,
+      귀띔:'회원이 코멘트를 부탁한 것' },
+    { k:'unread', 이름:'회원이 안 본 것',   색:'teal', 수: cs.filter(c=>!c.read_at).length,
+      귀띔:'내가 남긴 코멘트를 회원이 앱에서 아직 안 연 것' },
+    { k:'none',   이름:'한 번도 없음',      색:'',     수: rows.filter(x=>!x.n).length,
+      귀띔:'코멘트가 하나도 없는 회원' },
+  ];
+  const 요약 = '<div class="sumbar">' + 거르개.map(x =>
+      '<button class="sumit ' + x.색 + (만===x.k ? ' on' : '') + '" data-cmonly="' + x.k + '"'
+      + (x.귀띔 ? ' title="' + x.귀띔 + '"' : '') + '>'
+      + '<span class="k2">' + x.이름 + '</span><span class="v2">' + x.수 + '</span></button>').join('')
     + '</div>';
 
   const 줄바 = '<div class="cmbar">'
@@ -3604,7 +3660,7 @@ function vCmAll(){
     + '</tr></thead><tbody>'
     + (정렬된.length ? '' : '<tr><td colspan="7"><div class="empty">해당하는 회원이 없어요</div></td></tr>')
     + 정렬된.map(function(o){ const m=o.m;
-        const 점 = o.ask ? 'warn' : (o.unread ? 'teal' : (o.n ? '' : ''));
+        const 점 = o.ask ? 'warn' : (밀린ids.has(m.id) ? 'gold' : (o.unread ? 'teal' : ''));
         const 지난날 = o.last ? Math.round((new Date(TODAY) - new Date((o.last.created_at||'').slice(0,10)))/864e5) : null;
         const kk = 구분(m);
         return '<tr data-m="' + esc(m.id) + '" data-tab="comment">'
@@ -3651,7 +3707,9 @@ function vCmAll(){
 
   return 요약
     + '<div class="cols">'
-    + '<div class="sec"><div class="lbl">회원별 코멘트 — 줄을 누르면 그 회원 코멘트로 갑니다'
+    + '<div class="sec"><div class="lbl">'
+    + (만 ? esc((거르개.find(x=>x.k===만)||{}).이름 || '') + ' — 줄을 누르면 그 회원 코멘트로 갑니다'
+          : '회원별 코멘트 — 줄을 누르면 그 회원 코멘트로 갑니다')
     + '<span class="r sub3">' + 정렬된.length + '명</span></div>'
     + 표 + '</div>'
     + '<div class="sec"><div class="lbl">봐 달라는 요청 ' + asks.length + '건</div>' + 요청
@@ -6127,9 +6185,6 @@ function vHome(){
   const H = 내홈();
   const N = H.줄수;
   const 공지 = W.tasks.filter(r=>r.kind==='대표공지' && !r.done).slice(0,3);
-  const 내업무 = W.tasks.filter(r=>!r.done && r.kind!=='대표공지' && 내것(r.owners))
-                      .sort(표정의.tasks.정렬).slice(0,N);
-  const 오늘상담 = W.leads.filter(r=>오늘인가(r.at) && !r.done).sort((a,b)=>(a.at||'')>(b.at||'')?1:-1).slice(0,N);
   const 이번주 = W.leave.filter(표정의.leave.보기[0].필터).sort((a,b)=>(a.day||'')>(b.day||'')?1:-1).slice(0,N);
   const 대기 = 관리자() ? W.leave.filter(r=>r.status==='req').length : 0;
 
@@ -6170,19 +6225,9 @@ function vHome(){
     band:   () => 이름표,
     notice: () => 공지판,
     nums:   () => 숫자줄(),
-    /* 카드 줄이 아니라 **표**로 본다 (2026-09-17 대표: 「그 아래 업무 데이터베이스로 바꿔」) */
-    tasks:  () => '<div class="tx-home one"><div class="sec">'
-      + '<div class="lbl">내 업무 ' + 내업무.length + '건'
-        + '<span class="r" data-act="tx:go" data-k="tasks">전부 보기 ›</span></div>'
-      + (내업무.length ? txTable('tasks', 내업무) : '<div class="empty">남은 업무가 없어요</div>')
-      + '</div></div>',
-    leads:  () => '<div class="tx-home one">' + 섹('오늘 상담', 'leads', 오늘상담, '오늘 잡힌 상담이 없어요') + '</div>',
     leave:  () => '<div class="tx-home one">'
       + 섹('이번 주 연월차'+(대기?' <span class="tx-tag warn">승인 대기 '+대기+'</span>':''), 'leave', 이번주, '이번 주는 없어요')
       + '</div>',
-    sleep:  () => 잠수줄(),
-    cold:   () => 끊긴회원줄(N),
-    cm:     () => 코멘트줄(N),
     today:  () => vToday(),
   };
 
@@ -6211,7 +6256,7 @@ function vHome(){
    자유 배치(줄·칸 아무렇게나)는 과했다 — 옮기기가 어려워 못 썼다. */
 const 폭최소 = 20, 폭최대 = 55, 폭기본 = 32;
 /* 처음 자리 — 왼쪽은 「나」와 관련된 것, 오른쪽은 일감 */
-const 좌기본 = ['band', 'sleep', 'leave'];
+const 좌기본 = ['band', 'leave'];
 
 function 배치읽기(){
   const h = (ME && ME.home) || {};
@@ -6345,63 +6390,31 @@ function 숫자줄(){
     const v = 현황셈하기(c.k);
     return '<button class="num' + (v ? ' ' + c.색 : ' zero') + '"'
       + ' data-act="tx:numopen" data-v2="' + c.k + '"'
-      + ' title="' + c.이름 + ' — 눌러서 여기서 바로 처리">'
+      + ' title="' + c.이름 + ' — 눌러서 그 페이지로">'
       + '<span class="v">' + v + '</span><span class="k">' + c.이름 + '</span></button>';
   }).join('') + '</div>';
 }
 
-/* ── 숫자를 누르면 뜨는 사이드 페이지 ──
-   ⛔ 「보기만」 하는 판이 아니다. 줄마다 **그 자리에서 끝낼 수 있는 단추**를 둔다 */
-let 현황판 = null;
-function 현황판열기(k){ if(!현황목록[k]) return; 현황판 = k; 현황판그리기(); }
-function 현황판그리기(){
-  if(!현황판) return;
-  const k = 현황판, 칸 = 현황칸.find(x=>x.k===k) || { 이름:k };
-  let 목 = [];
-  try{ 목 = 현황목록[k](); }catch(e){ 목 = []; }
-
-  const 빈말 = { 밀림:'밀린 코멘트가 없어요 👍', 업무:'남은 업무가 없어요 👍',
-                 요청:'답할 요청이 없어요 👍', 안봄:'회원이 다 읽었어요 👍',
-                 운동:'오늘 기록된 운동이 없어요', 상담:'오늘 잡힌 상담이 없어요' }[k] || '지금은 없어요';
-
-  const 회원줄 = (mid, 제목, 밑, 오른, 단추) =>
-    '<div class="card rowc nmrow"><div style="flex:1;min-width:0">'
-    + '<div class="t1">' + 제목 + '</div><div class="t2">' + 밑 + '</div></div>'
-    + (오른 || '') + (단추 || '')
-    + '<button class="btn ghost sm" data-m="' + esc(mid) + '" data-tab="comment">열기 ›</button></div>';
-
-  let 속 = '';
-  if(!목.length) 속 = '<div class="empty">' + 빈말 + '</div>';
-
-  else if(k === '밀림') 속 = 목.map(x => 회원줄(x.m.id, esc(x.m.name),
-      (x.없음 ? '코멘트 한 번도 없음' : '마지막 ' + dateFull(x.last)) + ' · 운동 ' + x.운동수 + '회 기록',
-      '<span class="tag warn">' + (x.gap == null ? '기간 모름' : x.gap + '일') + '</span>',
-      '<button class="btn gold sm" data-cmquick="' + esc(x.m.id) + '">＋ 남기기</button>')).join('');
-
-  else if(k === '요청') 속 = 목.map(a => 회원줄(a.member_id,
-      esc(memOf(a.member_id).name) + ' <span class="t2" style="display:inline">· ' + esc(vaName(a.variant_id)) + '</span>',
-      esc(a.note || '따로 적은 말은 없습니다'), '',
-      '<button class="btn gold sm" data-cmquick="' + esc(a.member_id) + '">답 남기기</button>')).join('');
-
-  else if(k === '안봄') 속 = 목.map(c => 회원줄(c.member_id,
-      esc(memOf(c.member_id).name) + ' <span class="tag teal">아직 안 읽음</span>',
-      dateFull((c.created_at || '').slice(0, 10)) + ' · ' + esc((c.body || '').slice(0, 60)), '', '')).join('');
-
-  else if(k === '운동') 속 = 목.map(w => 회원줄(w.member_id, esc(memOf(w.member_id).name),
-      esc(w.title || '') + ' · ' + esc(w.kind || ''),
-      '<span class="tag ' + (w.done ? 'teal' : 'gold') + '">' + (w.done ? '끝' : '하는 중') + '</span>',
-      '<button class="btn gold sm" data-cmquick="' + esc(w.member_id) + '">＋ 코멘트</button>')).join('');
-
-  /* 업무·상담은 **표의 줄 그대로** 쓴다 — 오른쪽 끝 ✓ 를 눌러 여기서 바로 완료가 된다 */
-  else 속 = '<div class="tx-home one"><div class="tx-list">'
-      + 목.map(r => txRow(k === '업무' ? 'tasks' : 'leads', r)).join('') + '</div></div>';
-
-  판열기(esc(칸.이름) + ' <span class="who3">' + 목.length + '건</span>',
-    '<div class="sec">' + 속 + '</div>',
-    '<div class="tx-fbtns"><span class="tx-stat"></span>'
-    + '<button class="btn sub" data-act="tx:go" data-k="' + (k === '업무' ? 'tasks' : k === '상담' ? 'leads' : 'cmall') + '">전체 페이지로 ›</button>'
-    + '<button class="btn ghost" data-act="popclose">닫기</button></div>');
+/* ── 숫자를 누르면 **그 페이지로 간다** ──
+   2026-09-29 대표 「사이드페이지가 아닌 상세페이지로 · 해당 페이지 자체로 이동하면 될거고」
+   ⛔ 새 화면을 만들지 않는다. 이미 있는 세부 페이지에 **보기·거르개를 걸어 놓고** 데려간다.
+      (아침에 만든 사이드 페이지는 같은 목록을 세 번째로 그린 것이었다 — 걷어냈다) */
+const 현황길 = {
+  밀림: () => { S.cmOnly = 'cold';   S.cmSort = 'old';    가기('cmall'); },
+  업무: () => { 표상태.tasks.보기 = 'mine';  보기얹기('tasks'); 가기('tasks'); },
+  요청: () => { S.cmOnly = 'ask';    S.cmSort = 'ask';    가기('cmall'); },
+  안봄: () => { S.cmOnly = 'unread'; S.cmSort = 'unread'; 가기('cmall'); },
+  운동: () => 가기('today'),
+  상담: () => { 표상태.leads.보기 = 'today'; 보기얹기('leads'); 가기('leads'); },
+};
+function 가기(v){
+  S.view = v;
+  document.querySelectorAll('.nav').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+  고른행 = { key:null, ids:[] };
+  render();
 }
+function 현황판열기(k){ const f = 현황길[k]; if(f) f(); }
+
 /* ── 코멘트가 밀린 회원 ──
    ⛔ 운동 기록이 아니라 **마지막으로 코멘트를 단 날**이 기준이다
    (2026-09-17 대표: 「기록 끊김 말고 코멘트가 오래된 날 순으로 14일차부터 역순으로 떨어지게」)
@@ -6432,60 +6445,24 @@ function 끊긴목록(){
       if(a.없음 !== b.없음) return a.없음 ? -1 : 1;
       return (b.gap === null ? 99999 : b.gap) - (a.gap === null ? 99999 : a.gap); });
 }
-function 끊긴회원줄(N){
-  const 온 = 끊긴목록();
-  const 다 = 온.slice(0, N);
-  return '<div class="tx-home one"><div class="sec">'
-    + '<div class="lbl">코멘트 밀린 회원 '+온.length+'명'
-    + '<span class="r" data-act="go" data-k="cmall">전부 보기 ›</span></div>'
-    + (다.length ? '<div class="faces">' + 다.map(x =>
-        '<button class="face" data-m="'+esc(x.m.id)+'" data-tab="comment">'
-        + 얼굴(Object.assign({}, x.m, {color:'warn'}), 46)
-        + '<span class="fn2">'+esc(x.m.name)+'</span>'
-        + (x.gap===null ? '<span class="fd none">기간 모름</span>'
-                        : '<span class="fd">'+x.gap+'<small>일</small></span>')
-        + '<span class="fs">'+(x.없음
-            ? (x.gap===null ? '코멘트 없음' : '동안 코멘트 없음')
-            : '마지막 코멘트 '+dayText(x.last))+'</span>'
-        + '<span class="fw'+(x.운동수 ? ' hot' : '')+'">'
-          + (x.운동수 ? '운동 '+x.운동수+'회 기록' : '운동 기록 없음')
-          + '</span>'
-        + '<span class="fgo" data-cmquick="'+esc(x.m.id)+'">＋ 남기기</span>'
-        + '</button>').join('') + '</div>'
-      : '<div class="empty">'+코멘트밀림일+'일 넘게 밀린 회원이 없어요</div>') + '</div></div>';
-}
-/* 코멘트 — 요청과 아직 안 단 것 */
-function 코멘트줄(N){
-  const 요청 = D.asks.filter(a=>!a.done_at && 내담당(a.member_id)).slice(0, N);
-  return '<div class="tx-home one"><div class="sec">'
-    + '<div class="lbl">코멘트 요청 '+요청.length+'건'
-    + '<span class="r" data-act="go" data-k="cmall">전부 보기 ›</span></div>'
-    + (요청.length ? 요청.map(a=>'<button class="bub" data-m="'+esc(a.member_id)+'" data-tab="comment">'
-        + 얼굴(Object.assign({}, memOf(a.member_id), {color:'teal'}), 32)
-        + '<span class="say"><span class="who">'+esc(memOf(a.member_id).name)+' · '+esc(vaName(a.variant_id))+'</span>'
-        + '<span class="tx">'+esc(a.note||'따로 적은 말은 없습니다')+'</span>'
-        + '<span class="act">답 남기기 ›</span></span></button>').join('')
-      : '<div class="empty">지금은 요청이 없어요</div>') + '</div></div>';
-}
-
-/* ══ 내 홈 꾸미기 ══ 사람마다 자기 홈을 다르게 짠다 (2026-09-17 대표: 「개인의 스타일에 맞게 커스텀」)
-   ⛔ 다크+골드 톤앤매너는 확정 항목이라 건드리지 않는다. 바꾸는 것은
-      ① 블록 차례 ② 켜고 끄기 ③ 몇 줄까지 보일지 ④ 내 이름표 강조색 — 넷뿐이다.
-   담기는 곳은 `staff.home`(jsonb) — 기기를 바꿔도 따라온다 */
-/* ⛔ `mine` 은 vCmAll·vToday 안에만 있는 지역 이름이다. 홈은 제 것을 쓴다 */
+/* ⛔ `끊긴회원줄()` · `코멘트줄()` 은 지웠다 (2026-09-29) — 홈 블록을 걷어내면서 부르는 곳이 없어졌다.
+     같은 목록은 **코멘트 페이지 거르개**(남겨야 할 회원 · 봐 달라는 요청)가 보여 준다.
+     ⭐ `끊긴목록()` 은 그대로 둔다 — 현황판 숫자와 그 거르개가 **둘 다 이 하나**를 본다. */
 const 내담당 = mid => S.who === '전체' || (memOf(mid).trainer || '') === S.who;
 /* 단(段) — 왼쪽은 나와 현황, 오른쪽은 해야 할 일. 노션 페이지처럼 나눈다
    (2026-09-17 대표: 「노션처럼 단을 나누면 · 좌측에는 프로필 · 우측에는 할일이나 코멘트」)
    새 블록을 만들 때 `단` 을 적어 두면 그 자리에서 시작한다. 각자 옮길 수 있다 */
+/* ══ 홈 = 입구 ══ 2026-09-29 대표
+     「입구, 세부페이지 이렇게 연결통로로 작용해야지 · 모두가 무겁게 다른 방향을 가리키면 업무가 엉킨다」
+   ⛔ 세부 목록을 홈에 두지 않는다. 홈은 **숫자와 오늘 것**만 두고, 숫자가 그 페이지로 데려간다.
+   걷어낸 블록과 이유
+     · 내 업무 · 코멘트 밀린 회원 · 코멘트 요청 · 오늘 상담 → 현황판 숫자가 같은 목록을 그 페이지에서 연다
+     · 잠수 회원 → 매주 **업무 데이터베이스**에 올라온다 (매일 볼 일이 아니다)
+   되살리려면 이 표에 한 줄 더하고 `그릴것` 에 그리는 식을 붙이면 된다. */
 const 홈블록 = [
   { k:'band',  이름:'내 이름표',        단:'좌' },
-  { k:'nums',  이름:'현황판',           단:'위' },
+  { k:'nums',  이름:'현황판',           단:'우' },
   { k:'notice',이름:'대표 공지',        단:'우' },
-  { k:'tasks', 이름:'내 업무',          단:'우' },
-  { k:'sleep', 이름:'잠수 회원',         단:'좌' },
-  { k:'cold',  이름:'코멘트 밀린 회원',  단:'우' },
-  { k:'cm',    이름:'코멘트 요청',      단:'우' },
-  { k:'leads', 이름:'오늘 상담',        단:'우' },
   { k:'today', 이름:'오늘 수업 · 루틴',  단:'우' },
   { k:'leave', 이름:'이번 주 연월차',   단:'좌' },
 ];
@@ -7053,7 +7030,7 @@ async function txAct(a, el){
   /* 처음 배치로 — 잘못 끌었을 때 되돌리는 길 */
   if(a==='hmreset'){ if(!confirm('홈 배치를 처음으로 되돌릴까요?')) return;
     S.hmOpen = null; 내홈저장({ 배치: null, 배치2: null }); return; }
-  /* 현황판 숫자 → 사이드 페이지 */
+  /* 현황판 숫자 → 그 페이지로 */
   if(a==='numopen'){ 현황판열기(v2); return; }
   /* ⠿ 를 누르면 옮김판 — 끌 수도 있고 눌러서 옮길 수도 있다 */
   if(a==='hmmove'){ S.hmOpen = (S.hmOpen === v2) ? null : v2; render(); return; }
@@ -7166,6 +7143,8 @@ async function boot(){
     document.querySelectorAll('.nav').forEach(x=>x.classList.toggle('on', x.dataset.v==='home'));
     setTimeout(팝업받기, 1200);          /* 들어오면 공지 팝업을 한 번 본다 */
     await load();
+    /* 브로제이 잔여를 받은 뒤라야 잠수 회원을 셀 수 있다 */
+    잔여받기().then(주간올리기).catch(()=>{});
   }catch(e){
     $('#txlerr').textContent = '들어가지 못했어요 — ' + e.message;
     authSave(null); $('#txlogin').classList.add('on');
@@ -7184,12 +7163,10 @@ function vToday(){
   const mine = m => S.who==='전체' || (memOf(m).trainer||'')===S.who;
   const 오늘운동 = D.w.filter(w=>w.on_date===TODAY && mine(w.member_id));
   const 지정 = D.a.filter(a=>mine(a.member_id));
-  const all = D.m.filter(x=>(x.role||'member')==='member' && mine(x.id));
-  const 오래 = all.map(function(m){
-    const ws = D.w.filter(w=>w.member_id===m.id && w.done).sort((a,b)=> a.on_date<b.on_date?1:-1);
-    return { m, gap: ws[0] ? daysAgo(ws[0].on_date) : null };
-  }).filter(x=>x.gap===null || x.gap>=7).sort((a,b)=>(b.gap||9999)-(a.gap||9999));
-
+  /* ⛔ 「일주일 넘게 안 온 회원」은 **뺐다** (2026-09-29).
+       `w.done` 만 세서 **오늘 운동 중인 사람이 「기록 없음」** 으로 떴고,
+       앱을 한 번도 안 쓴 회원까지 전부 들어왔다. 안 온 사람이 아니라 앱을 안 쓰는 사람이었다.
+       진짜 안 오신 분은 **브로제이 출입 기준 「잠수 회원」** 이 맞다 — 매주 업무로 올라온다. */
   return '<div class="cols3">'
     + '<div class="sec"><div class="lbl">오늘 운동 ' + 오늘운동.length + '건</div>'
     + (오늘운동.length ? 오늘운동.map(w=>'<button class="card click rowc" data-m="' + esc(w.member_id) + '">'
@@ -7203,13 +7180,7 @@ function vToday(){
         + '<div><div class="t1">' + esc(memOf(a.member_id).name) + '</div>'
         + '<div class="t2">' + (r ? '루틴 ' + r.no + ' · ' + esc(r.name) : '루틴 없이 ' + esc(a.kind||''))
         + '</div></div><span class="rt">›</span></button>'; }).join('')
-      : '<div class="empty">지정한 루틴이 없어요</div>') + '</div>'
-    + '<div class="sec"><div class="lbl">일주일 넘게 안 온 회원 ' + 오래.length + '명</div>'
-    + (오래.length ? 오래.map(x=>'<button class="card click rowc" data-m="' + esc(x.m.id) + '">'
-        + '<div><div class="t1">' + esc(x.m.name) + '</div>'
-        + '<div class="t2">' + esc(x.m.trainer||'담당 없음') + '</div></div>'
-        + '<span class="tag warn">' + (x.gap===null?'기록 없음':x.gap+'일') + '</span></button>').join('')
-      : '<div class="empty">모두 잘 나오고 있어요</div>') + '</div></div>';
+      : '<div class="empty">지정한 루틴이 없어요</div>') + '</div></div>';
 }
 
 /* ── 종목 고르기 팝업 ── */
@@ -7275,8 +7246,6 @@ function render(){
   /* 회원 사이드 페이지가 열려 있으면 그 안도 같이 새로 그린다 */
   if(typeof 회원판 !== 'undefined' && 회원판 && $('#pop').classList.contains('on')) 회원판그리기();
   if(typeof 지정판 !== 'undefined' && 지정판 && $('#pop').classList.contains('on')) 지정판그리기();
-  /* 현황판 사이드 페이지 — 여기서 완료를 누르면 목록이 **그 자리에서** 줄어야 한다 */
-  if(typeof 현황판 !== 'undefined' && 현황판 && $('#pop').classList.contains('on')) 현황판그리기();
   if(typeof 고른칸다시 === 'function') 고른칸다시();
   return 났;
 }
@@ -7360,6 +7329,9 @@ function render0(){
 }
 
 /* 맨 위 띠 — 누가 보고 있는지 · 알림 개수 */
+/* ⛔ 종 알림은 **없앴다** (2026-09-29 대표 「모두가 무겁게 다른 방향을 가리키면 업무가 엉킨다」).
+     종에 있던 세 가지(요청·안 온 회원·안 읽은 코멘트)가 **현황판 숫자와 하나도 빠짐없이 겹쳤다.**
+     이 함수는 쓰는 곳이 없다 — 되살릴 일이 생기면 여기서 꺼내 쓴다. */
 function alerts(){
   const mine = id => S.who==='전체' || (memOf(id).trainer||'')===S.who;
   const ask = D.asks.filter(a=>!a.done_at && mine(a.member_id));
@@ -7373,10 +7345,6 @@ function alerts(){
   return { ask:ask, cold:cold, unread:unread, today:today };
 }
 function gnbDraw(){
-  const a = alerts();
-  const n = a.ask.length + a.cold.length;
-  const dot = $('#belldot');
-  if(n){ dot.textContent = n>99?'99+':n; dot.style.display=''; } else dot.style.display='none';
   $('#gnm').textContent = ME ? ME.name + (관리자() && S.who!=='전체' ? ' · '+S.who+' 보기' : '') : '—';
   const gav = $('#gav');
   const u = (ME && ME.photo) || '';
@@ -7399,7 +7367,6 @@ function 판열기(머리, 속, 발){
 function popClose(){ if(typeof 쪽지닫기==='function') 쪽지닫기();
   if(typeof 회원판 !== 'undefined') 회원판 = null;
   if(typeof 지정판 !== 'undefined') 지정판 = null;
-  if(typeof 현황판 !== 'undefined') 현황판 = null;
   if(typeof BL!=='undefined' && BL){ try{ 글자넣기(); }catch(e){} }
   if(typeof 고른줄!=='undefined'){ 고른줄 = []; const sb = $('#txselbar'); if(sb) sb.remove(); }
   if(typeof 블록메뉴닫기==='function') 블록메뉴닫기();
@@ -7603,6 +7570,11 @@ document.addEventListener('click', async function(ev){
 
   const card = t.closest('[data-m]');
   if(card){ await 회원판열기(card.dataset.m, card.dataset.tab); return; }
+
+  /* 코멘트 페이지 거르개 — 같은 것을 다시 누르면 풀린다 */
+  const 만누름 = t.closest('[data-cmonly]');
+  if(만누름){ const v = 만누름.dataset.cmonly;
+    S.cmOnly = (S.cmOnly === v || (!v && !S.cmOnly)) ? '' : v; render(); return; }
 
   const day = t.closest('[data-day]');
   if(day){ S.day = day.dataset.day; render(); return; }
@@ -8242,25 +8214,6 @@ document.addEventListener('click', async function(ev){
 });
 
 /* 맨 위 띠 버튼 */
-$('#gbell').addEventListener('click', function(){
-  const a = alerts();
-  popOpen('<h2>알림</h2><div class="sec">'
-    + (a.ask.length ? '<div class="lbl">봐 달라는 요청 ' + a.ask.length + '건</div>'
-        + a.ask.slice(0,6).map(x=>'<button class="card click gold rowc" data-m="' + esc(x.member_id)
-          + '" data-tab="comment"><div><div class="t1">' + esc(memOf(x.member_id).name) + '</div>'
-          + '<div class="t2">' + esc(vaName(x.variant_id)) + '</div></div>'
-          + '<span class="rt">코멘트 &rsaquo;</span></button>').join('') : '')
-    + (a.cold.length ? '<div class="lbl" style="margin-top:8px">일주일 넘게 안 온 회원 '
-        + a.cold.length + '명</div>'
-        + a.cold.slice(0,8).map(m=>'<button class="card click rowc" data-m="' + esc(m.id) + '">'
-          + '<div><div class="t1">' + esc(m.name) + '</div>'
-          + '<div class="t2">' + esc(m.trainer||'담당 없음') + '</div></div>'
-          + '<span class="rt">&rsaquo;</span></button>').join('') : '')
-    + (a.unread.length ? '<div class="note" style="margin-top:8px">회원이 아직 안 읽은 코멘트 <b>'
-        + a.unread.length + '개</b></div>' : '')
-    + (!a.ask.length && !a.cold.length ? '<div class="empty">지금은 볼 것이 없어요</div>' : '')
-    + '</div><button class="btn ghost" data-act="popclose">닫기</button>');
-});
 $('#gnotice').addEventListener('click', function(){
   popOpen('<h2>공지사항</h2>'
     + '<div class="card"><div class="t1">로그인이 붙었습니다</div>'
