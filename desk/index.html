@@ -790,6 +790,16 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 .hblk.dl::before,.hblk.dr::before{content:'';position:absolute;top:0;bottom:0;width:3px;
   background:var(--gold);border-radius:3px;z-index:5}
 .hblk.dl::before{left:-8px} .hblk.dr::before{right:-8px}
+/* 같은 칸 안에서 위/아래로 — 가로선 */
+.hblk.du::after,.hblk.dd::after{content:'';position:absolute;left:0;right:0;height:3px;
+  background:var(--gold);border-radius:3px;z-index:5}
+.hblk.du::after{top:-8px} .hblk.dd::after{bottom:-8px}
+/* 칸 — 블록이 세로로 쌓인다 */
+.hcol{display:flex;flex-direction:column;min-width:0}
+.hcol > .hblk{margin-bottom:14px}
+/* 칸 끝의 빈 곳 — 여기에 놓으면 그 칸 맨 아래로 (긴 블록 옆이 안 비게) */
+.hend{flex:1;min-height:56px;border-radius:10px}
+.hend.on{background:var(--gold-dim);border:2px dashed var(--gold-2);min-height:56px}
 .hgap{height:10px;margin:-7px 0 -3px;border-radius:3px}
 .hrow:first-of-type,.hgap:first-child{margin-top:0}
 .hgap:first-child{height:6px;margin:0 0 -4px}
@@ -1183,7 +1193,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '107';
+const BUILD = '109';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -6135,123 +6145,142 @@ function vHome(){
     today:  () => vToday(),
   };
 
-  /* ══ 노션처럼 — 줄마다 블록이 나란히 서고, 끌어 옮기고 넓이를 바꾼다 ══ */
-  const 배 = 배치읽기().map(r => ({ b: r.b.filter(x => 그릴것[x]), w: r.w })).filter(r => r.b.length);
+  /* ══ 노션처럼 — 줄 안에 칸, 칸 안에 블록이 세로로 쌓인다 ══ */
+  const 배 = 배치읽기()
+      .map(r => ({ w:r.w, c: r.c.map(칸 => 칸.filter(k => 그릴것[k])) }))
+      .map(r => { const keep = r.c.map((x,i)=>[x,i]).filter(([x])=>x.length);
+        return { c: keep.map(([x])=>x), w: keep.map(([,i])=>r.w[i]) }; })
+      .filter(r => r.c.length);
   const 이름of = k => (홈블록.find(x => x.k === k) || {}).이름 || k;
 
-  /* ⛔ 위 띠(안내 글·1단/2단)를 없앴다 — 프로필이 맨 위에 온다 (2026-09-29 대표).
-     끄는 법은 블록에 대면 나오는 ⠿ 가 알려 준다. 되돌리기는 「내 정보」에 넣었다. */
+  const 블록그리기 = (k, ri, ci, bi) =>
+    '<div class="hblk" data-r="' + ri + '" data-c="' + ci + '" data-i="' + bi + '" data-k="' + esc(k) + '">'
+    + '<span class="hgrip" draggable="true">⠿ ' + esc(이름of(k)) + '</span>'
+    + 그릴것[k]() + '</div>';
 
   const 줄그리기 = (r, ri) => {
-    const 칸 = [];
-    r.b.forEach((k, bi) => {
-      if(bi) 칸.push('12px');
-      칸.push(r.w[bi].toFixed(1) + '%');
-    });
+    const 칸틀 = [];
+    r.c.forEach((_, ci) => { if(ci) 칸틀.push('12px'); 칸틀.push(r.w[ci].toFixed(1) + '%'); });
     let 속 = '';
-    r.b.forEach((k, bi) => {
-      if(bi) 속 += '<div class="hwide" data-r="' + ri + '" data-i="' + bi + '"></div>';
-      속 += '<div class="hblk" data-r="' + ri + '" data-i="' + bi + '" data-k="' + esc(k) + '">'
-          + '<span class="hgrip" draggable="true">⠿ ' + esc(이름of(k)) + '</span>'
-          + 그릴것[k]() + '</div>';
+    r.c.forEach((칸, ci) => {
+      if(ci) 속 += '<div class="hwide" data-r="' + ri + '" data-i="' + ci + '"></div>';
+      속 += '<div class="hcol" data-r="' + ri + '" data-c="' + ci + '">'
+          + 칸.map((k, bi) => 블록그리기(k, ri, ci, bi)).join('')
+          + '<div class="hend" data-r="' + ri + '" data-c="' + ci + '"></div></div>';
     });
     return '<div class="hgap" data-r="' + ri + '"></div>'
          + '<div class="hrow" data-r="' + ri + '" style="grid-template-columns:'
-         + 칸.join(' ') + ';gap:0">' + 속 + '</div>';
+         + 칸틀.join(' ') + ';gap:0">' + 속 + '</div>';
   };
 
   return 배.map(줄그리기).join('')
     + '<div class="hgap" data-r="' + 배.length + '"></div>';
 }
 
-/* ══ 배치 ══ 줄(row) 여러 개, 줄마다 블록 1~3개가 나란히. 넓이는 % 로 담는다.
-   staff.home.배치 = [ {b:['band','nums'], w:[30,70]}, {b:['tasks'], w:[100]} , … ]
-   ⛔ 리밋 (2026-09-29 대표 「대신 리밋을 걸면 되잖아」)
-      한 줄 **최대 3개** — 넷이 되면 글자가 뭉개져 못 읽는다
-      블록 최소 **18%** — 더 좁으면 칸이 사라져 되돌릴 길이 없다 */
+/* ══ 배치 ══ 노션과 같은 꼴 — 줄(row) 안에 **칸(column)** 이 나란히, 칸 안에 블록이 세로로 쌓인다.
+   staff.home.배치 = [ { w:[34,66], c:[ ['band'], ['nums','notice','tasks'] ] }, … ]
+   ⛔ 칸 안에 여러 개를 쌓을 수 있어야 한다 — 그래야 **긴 블록 옆이 안 빈다**
+      (2026-09-29 대표 「공지 바로 아래 여백이 많지 그 아래도 넣을 수 있게」).
+   ⛔ 리밋 — 한 줄 **최대 3칸** · 칸 최소 **18%** (대표 「대신 리밋을 걸면 되잖아」) */
 const 줄최대 = 3, 폭최소 = 18;
 
 function 배치읽기(){
   const h = (ME && ME.home) || {};
-  let 배 = Array.isArray(h.배치) ? h.배치.map(r => ({
-    b: (r.b || []).filter(k => 홈블록.some(x => x.k === k)),
-    w: (r.w || []).slice() })).filter(r => r.b.length) : null;
+  let 배 = null;
 
-  if(!배){
-    /* ⛔ 옛 좌/우 두 단을 **짝지어** 줄로 옮기면 뒤죽박죽이 된다 (2026-09-29 대표
-       「갑자기 정렬이 지맘대로 바뀌었어」). 왼쪽 3개·오른쪽 6개를 1:1 로 붙였던 탓이다.
-       기본은 **프로필 + 현황판 한 줄, 나머지는 한 줄에 하나**. 옆에 붙이는 건 사람이 정한다. */
-    const H = 내홈();
-    const 켜진 = H.차례.filter(k => !H.끔[k]);
-    배 = [];
-    const 첫줄 = ['band', 'nums'].filter(k => 켜진.indexOf(k) >= 0);
-    if(첫줄.length === 2) 배.push({ b:첫줄, w:[34, 66] });
-    켜진.forEach(k => { if(첫줄.indexOf(k) < 0) 배.push({ b:[k], w:[100] }); });
-    if(!배.length) 켜진.forEach(k => 배.push({ b:[k], w:[100] }));
+  if(Array.isArray(h.배치)){
+    배 = h.배치.map(r => {
+      /* 옛 꼴({b:[…], w:[…]}) 도 읽는다 — 블록 하나가 칸 하나였다 */
+      const 칸 = Array.isArray(r.c) ? r.c.map(x => (x||[]).filter(k => 홈블록.some(z=>z.k===k)))
+               : (r.b||[]).map(k => [k]).filter(x => 홈블록.some(z=>z.k===x[0]));
+      return { c: 칸.filter(x => x.length), w: (r.w||[]).slice() };
+    }).filter(r => r.c.length);
   }
-  const 든것 = new Set(배.flatMap(r => r.b));
-  홈블록.forEach(x => { if(!든것.has(x.k)) 배.push({ b:[x.k], w:[100] }); });
+
+  if(!배 || !배.length){
+    /* 기본 — 왼쪽은 프로필 하나, 오른쪽 칸에 나머지를 **세로로 쌓는다** */
+    const H = 내홈();
+    const 켜진 = H.차례.filter(k => !H.끔[k] && 홈블록.some(z=>z.k===k));
+    const 왼 = 켜진.filter(k => k === 'band');
+    const 오른 = 켜진.filter(k => k !== 'band');
+    배 = 왼.length && 오른.length
+       ? [{ w:[32, 68], c:[왼, 오른] }]
+       : [{ w:[100], c:[켜진] }];
+  }
+
+  /* 새로 생긴 블록은 제일 긴 칸 끝에 */
+  const 든것 = new Set(배.flatMap(r => r.c.flat()));
+  const 빠진 = 홈블록.filter(x => !든것.has(x.k)).map(x => x.k);
+  if(빠진.length){
+    let 끝 = 배[배.length-1];
+    let 칸 = 끝.c.reduce((a,b) => b.length >= a.length ? b : a, 끝.c[0]);
+    빠진.forEach(k => 칸.push(k));
+  }
+
   배.forEach(r => {
-    r.b = r.b.slice(0, 줄최대);
-    if(!Array.isArray(r.w) || r.w.length !== r.b.length) r.w = r.b.map(() => 100 / r.b.length);
-    const 합 = r.w.reduce((a, x) => a + (+x || 0), 0) || 1;
-    r.w = r.w.map(x => (+x || 0) * 100 / 합);
+    r.c = r.c.slice(0, 줄최대);
+    if(!Array.isArray(r.w) || r.w.length !== r.c.length) r.w = r.c.map(() => 100 / r.c.length);
+    const 합 = r.w.reduce((a,x)=>a+(+x||0), 0) || 1;
+    r.w = r.w.map(x => (+x||0) * 100 / 합);
   });
   return 배;
 }
 
-const 배치저장 = 배 => 내홈저장({ 배치: 배.map(r => ({ b:r.b, w:r.w.map(x => Math.round(x*10)/10) })) });
+const 배치저장 = 배 => 내홈저장({ 배치: 배.map(r => ({ c:r.c, w:r.w.map(x => Math.round(x*10)/10) })) });
 
-/* ══ 끌어 옮기기 ══ 노션처럼 — 블록 옆에 대면 그 줄에 끼고, 줄 사이에 대면 새 줄이 된다.
-   ⛔ 리밋 — 한 줄 최대 3개(줄최대) · 넘으면 안 받는다 (2026-09-29 대표 「리밋을 걸면 되잖아」) */
+/* ══ 끌어 옮기기 ══ 노션과 같다
+     블록 **위/아래** 에 놓으면 그 칸 안에서 자리가 바뀌고
+     블록 **좌/우 가장자리(28px 안)** 에 놓으면 **새 칸**이 생겨 옆에 선다
+     줄과 줄 **사이** 에 놓으면 새 줄
+   ⛔ 리밋 — 한 줄 최대 3칸 · 칸 최소 18% (2026-09-29 대표 「리밋을 걸면 되잖아」) */
 let 끄는것 = null;
+const 가장자리 = 28;
 
 function 홈배치붙이기(){
   const box = document.querySelector('.main .body');
   if(!box || box.dataset.hm) return;
   box.dataset.hm = '1';
 
-  const 지우기 = () => box.querySelectorAll('.dl,.dr,.hgap.on')
-      .forEach(e => e.classList.remove('dl', 'dr', 'on'));
+  const 지우기 = () => box.querySelectorAll('.dl,.dr,.du,.dd,.hgap.on,.hend.on')
+      .forEach(e => e.classList.remove('dl','dr','du','dd','on'));
+
+  /* 마우스가 어디를 가리키나 — {kind:'좌'|'우'|'위'|'아래', el} */
+  const 어디 = (e) => {
+    const end = e.target.closest && e.target.closest('.hend');
+    if(end) return { kind:'끝', el:end };
+    const b = e.target.closest && e.target.closest('.hblk');
+    if(b){
+      const r = b.getBoundingClientRect();
+      if(e.clientX - r.left < 가장자리) return { kind:'좌', el:b };
+      if(r.right - e.clientX < 가장자리) return { kind:'우', el:b };
+      return { kind: (e.clientY < r.top + r.height/2) ? '위' : '아래', el:b };
+    }
+    /* 칸 안의 빈 곳 → 그 칸 끝에 */
+    const col = e.target.closest && e.target.closest('.hcol');
+    if(col){ const end2 = col.querySelector(':scope > .hend'); if(end2) return { kind:'끝', el:end2 }; }
+    return null;
+  };
 
   box.addEventListener('dragstart', e => {
     const g = e.target.closest && e.target.closest('.hgrip');
     if(!g) return;
     const b = g.closest('.hblk');
-    끄는것 = { r: +b.dataset.r, i: +b.dataset.i, k: b.dataset.k };
+    끄는것 = { r:+b.dataset.r, c:+b.dataset.c, i:+b.dataset.i, k:b.dataset.k };
     b.classList.add('drag');
-    try{ e.dataTransfer.setData('text/plain', 끄는것.k); e.dataTransfer.effectAllowed = 'move'; }catch(x){}
+    try{ e.dataTransfer.setData('text/plain', 끄는것.k); e.dataTransfer.effectAllowed='move'; }catch(x){}
   });
-  box.addEventListener('dragend', () => {
-    끄는것 = null; 지우기();
-    box.querySelectorAll('.hblk.drag').forEach(e => e.classList.remove('drag'));
-  });
-
-  /* 줄 안에서 마우스가 어느 블록 곁에 있나 — **빈 공간에 있어도** 제일 가까운 블록을 고른다
-     (2026-09-29 대표 「여기로 안 옮기지잖아」: 블록이 짧아 생긴 여백이 드롭 자리가 아니었다) */
-  const 가까운블록 = (row, x) => {
-    const bs = Array.from(row.querySelectorAll(':scope > .hblk'));
-    if(!bs.length) return null;
-    let 고른 = bs[0], 왼쪽 = true, 제일 = Infinity;
-    bs.forEach(b => {
-      const r = b.getBoundingClientRect();
-      const dL = Math.abs(x - r.left), dR = Math.abs(x - r.right);
-      if(dL < 제일){ 제일 = dL; 고른 = b; 왼쪽 = true; }
-      if(dR < 제일){ 제일 = dR; 고른 = b; 왼쪽 = false; }
-    });
-    return { b: 고른, 왼쪽 };
-  };
+  box.addEventListener('dragend', () => { 끄는것 = null; 지우기();
+    box.querySelectorAll('.hblk.drag').forEach(e => e.classList.remove('drag')); });
 
   box.addEventListener('dragover', e => {
     if(!끄는것) return;
-    e.preventDefault();
-    지우기();
+    e.preventDefault(); 지우기();
     const gap = e.target.closest && e.target.closest('.hgap');
     if(gap){ gap.classList.add('on'); return; }
-    const row = e.target.closest && e.target.closest('.hrow');
-    if(!row) return;
-    const 곳 = 가까운블록(row, e.clientX);
-    if(곳) 곳.b.classList.add(곳.왼쪽 ? 'dl' : 'dr');
+    const w = 어디(e);
+    if(!w) return;
+    if(w.kind === '끝') w.el.classList.add('on');
+    else w.el.classList.add({좌:'dl', 우:'dr', 위:'du', 아래:'dd'}[w.kind]);
   });
 
   box.addEventListener('drop', e => {
@@ -6259,65 +6288,83 @@ function 홈배치붙이기(){
     e.preventDefault();
     const 배 = 배치읽기();
     const 뺀 = 끄는것;
-    /* 어디에 놓나 */
     const gap = e.target.closest && e.target.closest('.hgap');
-    const 놓을줄 = (!gap && e.target.closest) ? e.target.closest('.hrow') : null;
-    let 새줄 = null, 목표 = null, 왼쪽 = false;
-    if(gap) 새줄 = +gap.dataset.r;
-    else if(놓을줄){
-      const 곳 = 가까운블록(놓을줄, e.clientX);
-      if(!곳){ 지우기(); return; }
-      왼쪽 = 곳.왼쪽;
-      목표 = { r: +곳.b.dataset.r, i: +곳.b.dataset.i };
-      if(배[목표.r] && 배[목표.r].b.length >= 줄최대 && 목표.r !== 뺀.r){
-        toast('한 줄에 ' + 줄최대 + '개까지만 놓을 수 있어요'); 지우기(); return; }
-    } else { 지우기(); return; }
+    const w = gap ? null : 어디(e);
+    if(!gap && !w){ 지우기(); return; }
+
+    /* 놓을 곳을 먼저 읽어 둔다 (빼면 번호가 밀린다) */
+    let 새줄 = gap ? +gap.dataset.r : null;
+    let 목표 = null;
+    if(w) 목표 = { r:+w.el.dataset.r, c:+w.el.dataset.c,
+                   i: w.el.dataset.i != null ? +w.el.dataset.i : null, kind:w.kind };
+
+    /* 새 칸을 만드는 경우 리밋 확인 */
+    if(목표 && (목표.kind === '좌' || 목표.kind === '우')){
+      const 줄 = 배[목표.r];
+      const 혼자 = (뺀.r === 목표.r && 줄 && 줄.c[뺀.c] && 줄.c[뺀.c].length === 1);
+      if(줄 && 줄.c.length >= 줄최대 && !혼자){
+        toast('한 줄에 ' + 줄최대 + '칸까지만 놓을 수 있어요'); 지우기(); return; }
+    }
 
     /* 빼기 */
-    const row = 배[뺀.r]; if(!row) { 지우기(); return; }
-    row.b.splice(뺀.i, 1); row.w.splice(뺀.i, 1);
+    const 뺀줄 = 배[뺀.r]; if(!뺀줄){ 지우기(); return; }
+    뺀줄.c[뺀.c].splice(뺀.i, 1);
 
     if(새줄 != null){
-      let 자리 = 새줄;
-      if(뺀.r < 새줄) 자리 = 새줄;              /* 위에서 빠졌어도 gap 번호는 그대로 쓴다 */
-      배.splice(Math.min(자리, 배.length), 0, { b:[뺀.k], w:[100] });
+      배.splice(Math.min(새줄, 배.length), 0, { w:[100], c:[[뺀.k]] });
     } else {
-      /* 같은 줄 안에서 옮겼으면 뺀 뒤 자리가 하나 당겨진다 */
-      let ri = 목표.r, ii = 목표.i;
-      if(목표.r === 뺀.r && 목표.i > 뺀.i) ii -= 1;
-      const t = 배[ri]; if(!t){ 지우기(); return; }
-      t.b.splice(왼쪽 ? ii : ii + 1, 0, 뺀.k);
-      t.w = t.b.map(() => 100 / t.b.length);     /* 새로 끼면 고르게 나눈다 */
+      const 줄 = 배[목표.r];
+      if(!줄){ 지우기(); return; }
+      if(목표.kind === '좌' || 목표.kind === '우'){
+        const ci = 목표.c + (목표.kind === '우' ? 1 : 0);
+        줄.c.splice(ci, 0, [뺀.k]);
+        줄.w = 줄.c.map(() => 100 / 줄.c.length);
+      } else {
+        const 칸 = 줄.c[목표.c]; if(!칸){ 지우기(); return; }
+        let bi = (목표.kind === '끝') ? 칸.length
+               : 목표.i + (목표.kind === '아래' ? 1 : 0);
+        if(뺀.r === 목표.r && 뺀.c === 목표.c && 목표.i != null && 목표.i > 뺀.i) bi -= 1;
+        칸.splice(Math.max(0, Math.min(bi, 칸.length)), 0, 뺀.k);
+      }
     }
-    /* 빈 줄 치우기 · 넓이 다시 고르게 */
-    const 정 = 배.filter(r => r.b.length);
-    정.forEach(r => { if(r.w.length !== r.b.length) r.w = r.b.map(() => 100 / r.b.length);
-      const 합 = r.w.reduce((a,x)=>a+x,0) || 1; r.w = r.w.map(x => x*100/합); });
+
+    /* 빈 칸·빈 줄 치우기 */
+    const 정 = [];
+    배.forEach(r => {
+      const keep = r.c.map((x,i)=>[x,i]).filter(([x])=>x.length);
+      if(!keep.length) return;
+      정.push({ c: keep.map(([x])=>x), w: keep.map(([,i])=>r.w[i]) });
+    });
+    정.forEach(r => {
+      if(r.w.length !== r.c.length) r.w = r.c.map(() => 100 / r.c.length);
+      const 합 = r.w.reduce((a,x)=>a+x, 0) || 1;
+      r.w = r.w.map(x => x*100/합);
+    });
     끄는것 = null; 지우기();
     배치저장(정);
   });
 
-  /* ══ 넓이 바꾸기 ══ 노션처럼 사이를 끈다. 최소 폭 아래로는 안 간다 */
+  /* ══ 칸 넓이 ══ 노션처럼 칸 사이를 끈다. 최소 폭 아래로는 안 간다 */
   let 잡 = null;
   box.addEventListener('pointerdown', e => {
     const w = e.target.closest && e.target.closest('.hwide');
     if(!w) return;
     const row = w.closest('.hrow');
-    잡 = { w, row, r:+w.dataset.r, i:+w.dataset.i, rect: row.getBoundingClientRect() };
+    잡 = { w, row, r:+w.dataset.r, i:+w.dataset.i, rect: row.getBoundingClientRect(), 값:null };
     w.classList.add('on'); document.body.classList.add('resizing');
     try{ w.setPointerCapture(e.pointerId); }catch(x){}
   });
   box.addEventListener('pointermove', e => {
     if(!잡) return;
     const 배 = 배치읽기(); const r = 배[잡.r]; if(!r) return;
-    const 왼쪽합 = r.w.slice(0, 잡.i).reduce((a,x)=>a+x,0);
+    const 왼합 = r.w.slice(0, 잡.i).reduce((a,x)=>a+x, 0);
     const 둘 = r.w[잡.i-1] + r.w[잡.i];
-    let v = (e.clientX - 잡.rect.left) / Math.max(1, 잡.rect.width) * 100 - 왼쪽합 + r.w[잡.i-1];
+    let v = (e.clientX - 잡.rect.left) / Math.max(1, 잡.rect.width) * 100 - 왼합 + r.w[잡.i-1];
     v = Math.min(둘 - 폭최소, Math.max(폭최소, v));
     r.w[잡.i-1] = v; r.w[잡.i] = 둘 - v;
     잡.값 = r.w.slice();
-    const 칸 = []; r.b.forEach((k,bi)=>{ if(bi) 칸.push('12px'); 칸.push(r.w[bi].toFixed(1)+'%'); });
-    잡.row.style.gridTemplateColumns = 칸.join(' ');
+    const 틀 = []; r.c.forEach((k,ci)=>{ if(ci) 틀.push('12px'); 틀.push(r.w[ci].toFixed(1)+'%'); });
+    잡.row.style.gridTemplateColumns = 틀.join(' ');
     e.preventDefault();
   });
   const 놓 = () => {
