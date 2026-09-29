@@ -1205,7 +1205,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '111';
+const BUILD = '113';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -6157,306 +6157,133 @@ function vHome(){
     today:  () => vToday(),
   };
 
-  /* ══ 노션처럼 — 줄 안에 칸, 칸 안에 블록이 세로로 쌓인다 ══ */
-  const 배 = 배치읽기()
-      .map(r => ({ w:r.w, c: r.c.map(칸 => 칸.filter(k => 그릴것[k])) }))
-      .map(r => { const keep = r.c.map((x,i)=>[x,i]).filter(([x])=>x.length);
-        return { c: keep.map(([x])=>x), w: keep.map(([,i])=>r.w[i]) }; })
-      .filter(r => r.c.length);
+  /* ══ 딱 2단 — 왼쪽 / 오른쪽. 각 단 안에서 세로로 쌓인다 ══ */
+  const B = 배치읽기();
   const 이름of = k => (홈블록.find(x => x.k === k) || {}).이름 || k;
+  const 칸그리기 = 단 => '<div class="hcol" data-s="' + 단 + '">'
+    + B[단].filter(k => 그릴것[k]).map((k, i) =>
+        '<div class="hblk" data-s="' + 단 + '" data-i="' + i + '" data-k="' + esc(k) + '">'
+        + '<span class="hgrip" data-act="tx:hmmove" data-v2="' + 단 + '.' + i + '">'
+        + '⠿ ' + esc(이름of(k)) + '</span>'
+        + (S.hmOpen === 단 + '.' + i ? 옮김판(단, i, k) : '')
+        + 그릴것[k]() + '</div>').join('')
+    + '</div>';
 
-  const 블록그리기 = (k, ri, ci, bi) =>
-    '<div class="hblk" data-r="' + ri + '" data-c="' + ci + '" data-i="' + bi + '" data-k="' + esc(k) + '">'
-    + '<span class="hgrip" draggable="true" data-act="tx:hmmove" data-v2="' + ri + '.' + ci + '.' + bi + '">'
-    + '⠿ ' + esc(이름of(k)) + '</span>'
-    + (S.hmOpen === ri + '.' + ci + '.' + bi ? 옮김판(ri, ci, bi, k) : '')
-    + 그릴것[k]() + '</div>';
-
-  const 줄그리기 = (r, ri) => {
-    const 칸틀 = [];
-    r.c.forEach((_, ci) => { if(ci) 칸틀.push('12px'); 칸틀.push(r.w[ci].toFixed(1) + '%'); });
-    let 속 = '';
-    r.c.forEach((칸, ci) => {
-      if(ci) 속 += '<div class="hwide" data-r="' + ri + '" data-i="' + ci + '"></div>';
-      속 += '<div class="hcol" data-r="' + ri + '" data-c="' + ci + '">'
-          + 칸.map((k, bi) => 블록그리기(k, ri, ci, bi)).join('')
-          + '<div class="hend" data-r="' + ri + '" data-c="' + ci + '"></div></div>';
-    });
-    return '<div class="hgap" data-r="' + ri + '"></div>'
-         + '<div class="hrow" data-r="' + ri + '" style="grid-template-columns:'
-         + 칸틀.join(' ') + ';gap:0">' + 속 + '</div>';
-  };
-
-  return 배.map(줄그리기).join('')
-    + '<div class="hgap" data-r="' + 배.length + '"></div>';
+  return '<div class="hrow" style="grid-template-columns:' + B.폭.toFixed(1) + '% 14px 1fr">'
+    + 칸그리기('좌')
+    + '<div class="hwide" title="끌어서 좌우 넓이 바꾸기"></div>'
+    + 칸그리기('우')
+    + '</div>';
 }
 
-/* ══ 배치 ══ 노션과 같은 꼴 — 줄(row) 안에 **칸(column)** 이 나란히, 칸 안에 블록이 세로로 쌓인다.
-   staff.home.배치 = [ { w:[34,66], c:[ ['band'], ['nums','notice','tasks'] ] }, … ]
-   ⛔ 칸 안에 여러 개를 쌓을 수 있어야 한다 — 그래야 **긴 블록 옆이 안 빈다**
-      (2026-09-29 대표 「공지 바로 아래 여백이 많지 그 아래도 넣을 수 있게」).
-   ⛔ 리밋 — 한 줄 **최대 3칸** · 칸 최소 **18%** (대표 「대신 리밋을 걸면 되잖아」) */
-const 줄최대 = 3, 폭최소 = 18;
+/* ══ 배치 ══ 딱 2단 — 좌측 / 우측 (2026-09-29 대표 「그렇게 딱 2단으로만 분류하자」)
+   staff.home.배치2 = { 좌:['band', …], 우:['nums', …], 폭:32 }
+   ⛔ 줄도 칸도 새로 만들지 않는다. 단 안에서 **위/아래**, 그리고 **반대 단으로** 보내기뿐이다.
+   자유 배치(줄·칸 아무렇게나)는 과했다 — 옮기기가 어려워 못 썼다. */
+const 폭최소 = 20, 폭최대 = 55, 폭기본 = 32;
+/* 처음 자리 — 왼쪽은 「나」와 관련된 것, 오른쪽은 일감 */
+const 좌기본 = ['band', 'sleep', 'leave'];
 
 function 배치읽기(){
   const h = (ME && ME.home) || {};
-  let 배 = null;
+  const 다 = 홈블록.map(x => x.k);
+  let 좌 = [], 우 = [];
 
-  if(Array.isArray(h.배치)){
-    배 = h.배치.map(r => {
-      /* 옛 꼴({b:[…], w:[…]}) 도 읽는다 — 블록 하나가 칸 하나였다 */
-      const 칸 = Array.isArray(r.c) ? r.c.map(x => (x||[]).filter(k => 홈블록.some(z=>z.k===k)))
-               : (r.b||[]).map(k => [k]).filter(x => 홈블록.some(z=>z.k===x[0]));
-      return { c: 칸.filter(x => x.length), w: (r.w||[]).slice() };
-    }).filter(r => r.c.length);
+  const b = h.배치2;
+  if(b && (Array.isArray(b.좌) || Array.isArray(b.우))){
+    좌 = (b.좌 || []).filter(k => 다.indexOf(k) >= 0);
+    우 = (b.우 || []).filter(k => 다.indexOf(k) >= 0);
+  } else if(Array.isArray(h.배치)){
+    /* 옛 자유 배치에서 옮겨 온다 — 첫 칸은 왼쪽, 나머지는 오른쪽 */
+    h.배치.forEach(r => {
+      const 칸들 = Array.isArray(r.c) ? r.c : (r.b || []).map(k => [k]);
+      칸들.forEach((칸, ci) => (칸 || []).forEach(k => {
+        if(다.indexOf(k) < 0) return;
+        (ci === 0 && 칸들.length > 1 ? 좌 : 우).push(k); }));
+    });
   }
-
-  if(!배 || !배.length){
-    /* 기본 — 왼쪽은 프로필 하나, 오른쪽 칸에 나머지를 **세로로 쌓는다** */
-    const H = 내홈();
-    const 켜진 = H.차례.filter(k => !H.끔[k] && 홈블록.some(z=>z.k===k));
-    const 왼 = 켜진.filter(k => k === 'band');
-    const 오른 = 켜진.filter(k => k !== 'band');
-    배 = 왼.length && 오른.length
-       ? [{ w:[32, 68], c:[왼, 오른] }]
-       : [{ w:[100], c:[켜진] }];
+  if(!좌.length && !우.length){
+    좌 = 좌기본.slice();
+    우 = 다.filter(k => 좌.indexOf(k) < 0);
   }
+  /* 새로 생긴 블록은 오른쪽 끝에 · 겹치면 한 번만 */
+  const 본 = new Set();
+  좌 = 좌.filter(k => !본.has(k) && 본.add(k));
+  우 = 우.filter(k => !본.has(k) && 본.add(k));
+  다.forEach(k => { if(!본.has(k)) 우.push(k); });
 
-  /* 새로 생긴 블록은 제일 긴 칸 끝에 */
-  const 든것 = new Set(배.flatMap(r => r.c.flat()));
-  const 빠진 = 홈블록.filter(x => !든것.has(x.k)).map(x => x.k);
-  if(빠진.length){
-    let 끝 = 배[배.length-1];
-    let 칸 = 끝.c.reduce((a,b) => b.length >= a.length ? b : a, 끝.c[0]);
-    빠진.forEach(k => 칸.push(k));
-  }
-
-  배.forEach(r => {
-    r.c = r.c.slice(0, 줄최대);
-    if(!Array.isArray(r.w) || r.w.length !== r.c.length) r.w = r.c.map(() => 100 / r.c.length);
-    const 합 = r.w.reduce((a,x)=>a+(+x||0), 0) || 1;
-    r.w = r.w.map(x => (+x||0) * 100 / 합);
-  });
-  return 배;
+  let 폭 = +((b && b.폭) != null ? b.폭 : 폭기본);
+  폭 = Math.min(폭최대, Math.max(폭최소, isNaN(폭) ? 폭기본 : 폭));
+  return { 좌, 우, 폭 };
 }
 
-const 배치저장 = 배 => 내홈저장({ 배치: 배.map(r => ({ c:r.c, w:r.w.map(x => Math.round(x*10)/10) })) });
+const 배치저장 = B => 내홈저장({ 배치2: { 좌:B.좌, 우:B.우, 폭: Math.round(B.폭 * 10) / 10 } });
 
-/* ══ ⠿ 를 누르면 뜨는 판 ══ 2026-09-29 대표 「배치하게 되게 어렵게 해놨네」
-   끄는 게 까다롭고 드래그 중엔 휠도 안 먹는다. 그래서 **단추로 옮기는 길**을 냈다. */
-function 옮김판(ri, ci, bi, k){
-  const 배 = 배치읽기();
-  const 줄 = 배[ri] || { c:[], w:[] };
-  const 칸 = 줄.c[ci] || [];
+/* ⠿ 를 누르면 뜨는 판 — 끌 필요 없이 단추로 옮긴다 */
+function 옮김판(단, 자리, k){
+  const B = 배치읽기();
+  const 목 = B[단];
   const 이름 = (홈블록.find(x => x.k === k) || {}).이름 || k;
-  const b = (act, 글, 막힘) => '<button data-act="tx:hm' + act + '" data-v2="' + ri + '.' + ci + '.' + bi + '"'
+  const v = 단 + '.' + 자리;
+  const b = (act, 글, 막힘) => '<button data-act="tx:hm' + act + '" data-v2="' + v + '"'
       + (막힘 ? ' disabled' : '') + '>' + 글 + '</button>';
   return '<div class="hmove" data-keep="1">'
-    + '<div class="ttl">' + esc(이름) + ' 옮기기</div>'
+    + '<div class="ttl">' + esc(이름) + '</div>'
     + '<div class="g">'
-    + b('up',   '↑ 위로',      bi <= 0)
-    + b('down', '↓ 아래로',    bi >= 칸.length - 1)
-    + b('left', '← 왼쪽 칸',   ci <= 0 && 칸.length <= 1)
-    + b('right','→ 오른쪽 칸', ci >= 줄최대 - 1 && 칸.length <= 1)
-    + b('rowup','⤒ 위에 새 줄', false)
-    + b('rowdn','⤓ 아래 새 줄', false)
+    + b('up', '↑ 위로', 자리 <= 0)
+    + b('down', '↓ 아래로', 자리 >= 목.length - 1)
+    + b('swap', (단 === '좌' ? '→ 오른쪽 단으로' : '← 왼쪽 단으로'), false)
+    + b('top', '⤒ 맨 위로', 자리 <= 0)
     + '</div>'
     + '<button class="x" data-act="tx:hmclose">닫기</button></div>';
 }
 
-/* 블록 하나를 빼서 다른 자리에 넣는다 — 단추와 드래그가 **같은 길**을 쓴다 */
-function 블록옮기기(배, 곳, 할것){
-  const 줄 = 배[곳.r]; if(!줄) return 배;
-  const 칸 = 줄.c[곳.c]; if(!칸) return 배;
-  const k = 칸[곳.i]; if(k == null) return 배;
-  칸.splice(곳.i, 1);
-
-  if(할것 === 'up')        칸.splice(Math.max(0, 곳.i - 1), 0, k);
-  else if(할것 === 'down') 칸.splice(Math.min(칸.length, 곳.i + 1), 0, k);
-  else if(할것 === 'rowup'){ 배.splice(곳.r, 0, { w:[100], c:[[k]] }); }
-  else if(할것 === 'rowdn'){ 배.splice(곳.r + 1, 0, { w:[100], c:[[k]] }); }
-  else if(할것 === 'left' || 할것 === 'right'){
-    const 옆 = 곳.c + (할것 === 'left' ? -1 : 1);
-    if(옆 >= 0 && 옆 < 줄.c.length){         /* 이웃 칸이 있으면 그 칸 끝에 */
-      줄.c[옆].push(k);
-    } else if(줄.c.length < 줄최대){          /* 없으면 새 칸을 만든다 */
-      줄.c.splice(할것 === 'left' ? 곳.c : 곳.c + 1, 0, [k]);
-      줄.w = 줄.c.map(() => 100 / 줄.c.length);
-    } else { 칸.splice(곳.i, 0, k); toast('한 줄에 ' + 줄최대 + '칸까지만 놓을 수 있어요'); return 배; }
-  }
-  return 정돈(배);
+function 블록옮기기(B, 단, 자리, 할것){
+  const 목 = B[단]; if(!목 || 목[자리] == null) return B;
+  const k = 목[자리];
+  if(할것 === 'up' && 자리 > 0){ 목.splice(자리, 1); 목.splice(자리 - 1, 0, k); }
+  else if(할것 === 'down' && 자리 < 목.length - 1){ 목.splice(자리, 1); 목.splice(자리 + 1, 0, k); }
+  else if(할것 === 'top'){ 목.splice(자리, 1); 목.unshift(k); }
+  else if(할것 === 'swap'){ 목.splice(자리, 1); B[단 === '좌' ? '우' : '좌'].push(k); }
+  return B;
 }
 
-function 정돈(배){
-  const 정 = [];
-  배.forEach(r => {
-    const keep = r.c.map((x, i) => [x, i]).filter(([x]) => x.length);
-    if(!keep.length) return;
-    정.push({ c: keep.map(([x]) => x), w: keep.map(([, i]) => r.w[i]) });
-  });
-  정.forEach(r => {
-    if(r.w.length !== r.c.length) r.w = r.c.map(() => 100 / r.c.length);
-    const 합 = r.w.reduce((a, x) => a + x, 0) || 1;
-    r.w = r.w.map(x => x * 100 / 합);
-  });
-  return 정;
-}
-
-/* ══ 끌어 옮기기 ══ 노션과 같다
-     블록 **위/아래** 에 놓으면 그 칸 안에서 자리가 바뀌고
-     블록 **좌/우 가장자리(28px 안)** 에 놓으면 **새 칸**이 생겨 옆에 선다
-     줄과 줄 **사이** 에 놓으면 새 줄
-   ⛔ 리밋 — 한 줄 최대 3칸 · 칸 최소 18% (2026-09-29 대표 「리밋을 걸면 되잖아」) */
-let 끄는것 = null;
-const 가장자리 = 28;
-
+/* ══ 좌우 넓이 ══ 가운데를 끈다. 평소엔 안 보이고 대면 세로 선이 나온다 (노션과 같다).
+   두 번 누르면 기본값. 최소 20% · 최대 55% — 한쪽이 사라지지 않게 막는다. */
 function 홈배치붙이기(){
   const box = document.querySelector('.main .body');
   if(!box || box.dataset.hm) return;
   box.dataset.hm = '1';
-
-  const 지우기 = () => box.querySelectorAll('.dl,.dr,.du,.dd,.hgap.on,.hend.on')
-      .forEach(e => e.classList.remove('dl','dr','du','dd','on'));
-
-  /* 마우스가 어디를 가리키나 — {kind:'좌'|'우'|'위'|'아래', el} */
-  const 어디 = (e) => {
-    const end = e.target.closest && e.target.closest('.hend');
-    if(end) return { kind:'끝', el:end };
-    const b = e.target.closest && e.target.closest('.hblk');
-    if(b){
-      const r = b.getBoundingClientRect();
-      if(e.clientX - r.left < 가장자리) return { kind:'좌', el:b };
-      if(r.right - e.clientX < 가장자리) return { kind:'우', el:b };
-      return { kind: (e.clientY < r.top + r.height/2) ? '위' : '아래', el:b };
-    }
-    /* 칸 안의 빈 곳 → 그 칸 끝에 */
-    const col = e.target.closest && e.target.closest('.hcol');
-    if(col){ const end2 = col.querySelector(':scope > .hend'); if(end2) return { kind:'끝', el:end2 }; }
-    return null;
-  };
-
-  box.addEventListener('dragstart', e => {
-    const g = e.target.closest && e.target.closest('.hgrip');
-    if(!g) return;
-    const b = g.closest('.hblk');
-    끄는것 = { r:+b.dataset.r, c:+b.dataset.c, i:+b.dataset.i, k:b.dataset.k };
-    b.classList.add('drag');
-    try{ e.dataTransfer.setData('text/plain', 끄는것.k); e.dataTransfer.effectAllowed='move'; }catch(x){}
-  });
-  box.addEventListener('dragend', () => { 끄는것 = null; 지우기();
-    box.querySelectorAll('.hblk.drag').forEach(e => e.classList.remove('drag')); });
-
-  /* ⛔ HTML5 드래그 중에는 **휠이 안 먹는다** (2026-09-29 대표).
-     그래서 화면 위·아래 끝에 가면 저절로 밀어 준다. */
-  const 저절로스크롤 = e => {
-    const H = window.innerHeight, 끝 = 110;
-    if(e.clientY < 끝)       window.scrollBy(0, -Math.max(8, (끝 - e.clientY) / 4));
-    else if(e.clientY > H - 끝) window.scrollBy(0,  Math.max(8, (e.clientY - (H - 끝)) / 4));
-  };
-
-  box.addEventListener('dragover', e => {
-    if(!끄는것) return;
-    e.preventDefault(); 저절로스크롤(e); 지우기();
-    const gap = e.target.closest && e.target.closest('.hgap');
-    if(gap){ gap.classList.add('on'); return; }
-    const w = 어디(e);
-    if(!w) return;
-    if(w.kind === '끝') w.el.classList.add('on');
-    else w.el.classList.add({좌:'dl', 우:'dr', 위:'du', 아래:'dd'}[w.kind]);
-  });
-
-  box.addEventListener('drop', e => {
-    if(!끄는것) return;
-    e.preventDefault();
-    const 배 = 배치읽기();
-    const 뺀 = 끄는것;
-    const gap = e.target.closest && e.target.closest('.hgap');
-    const w = gap ? null : 어디(e);
-    if(!gap && !w){ 지우기(); return; }
-
-    /* 놓을 곳을 먼저 읽어 둔다 (빼면 번호가 밀린다) */
-    let 새줄 = gap ? +gap.dataset.r : null;
-    let 목표 = null;
-    if(w) 목표 = { r:+w.el.dataset.r, c:+w.el.dataset.c,
-                   i: w.el.dataset.i != null ? +w.el.dataset.i : null, kind:w.kind };
-
-    /* 새 칸을 만드는 경우 리밋 확인 */
-    if(목표 && (목표.kind === '좌' || 목표.kind === '우')){
-      const 줄 = 배[목표.r];
-      const 혼자 = (뺀.r === 목표.r && 줄 && 줄.c[뺀.c] && 줄.c[뺀.c].length === 1);
-      if(줄 && 줄.c.length >= 줄최대 && !혼자){
-        toast('한 줄에 ' + 줄최대 + '칸까지만 놓을 수 있어요'); 지우기(); return; }
-    }
-
-    /* 빼기 */
-    const 뺀줄 = 배[뺀.r]; if(!뺀줄){ 지우기(); return; }
-    뺀줄.c[뺀.c].splice(뺀.i, 1);
-
-    if(새줄 != null){
-      배.splice(Math.min(새줄, 배.length), 0, { w:[100], c:[[뺀.k]] });
-    } else {
-      const 줄 = 배[목표.r];
-      if(!줄){ 지우기(); return; }
-      if(목표.kind === '좌' || 목표.kind === '우'){
-        const ci = 목표.c + (목표.kind === '우' ? 1 : 0);
-        줄.c.splice(ci, 0, [뺀.k]);
-        줄.w = 줄.c.map(() => 100 / 줄.c.length);
-      } else {
-        const 칸 = 줄.c[목표.c]; if(!칸){ 지우기(); return; }
-        let bi = (목표.kind === '끝') ? 칸.length
-               : 목표.i + (목표.kind === '아래' ? 1 : 0);
-        if(뺀.r === 목표.r && 뺀.c === 목표.c && 목표.i != null && 목표.i > 뺀.i) bi -= 1;
-        칸.splice(Math.max(0, Math.min(bi, 칸.length)), 0, 뺀.k);
-      }
-    }
-
-    /* 빈 칸·빈 줄 치우기 */
-    const 정 = [];
-    배.forEach(r => {
-      const keep = r.c.map((x,i)=>[x,i]).filter(([x])=>x.length);
-      if(!keep.length) return;
-      정.push({ c: keep.map(([x])=>x), w: keep.map(([,i])=>r.w[i]) });
-    });
-    정.forEach(r => {
-      if(r.w.length !== r.c.length) r.w = r.c.map(() => 100 / r.c.length);
-      const 합 = r.w.reduce((a,x)=>a+x, 0) || 1;
-      r.w = r.w.map(x => x*100/합);
-    });
-    끄는것 = null; 지우기();
-    배치저장(정);
-  });
-
-  /* ══ 칸 넓이 ══ 노션처럼 칸 사이를 끈다. 최소 폭 아래로는 안 간다 */
   let 잡 = null;
+
   box.addEventListener('pointerdown', e => {
     const w = e.target.closest && e.target.closest('.hwide');
     if(!w) return;
     const row = w.closest('.hrow');
-    잡 = { w, row, r:+w.dataset.r, i:+w.dataset.i, rect: row.getBoundingClientRect(), 값:null };
+    잡 = { w, row, rect: row.getBoundingClientRect(), 값: null };
     w.classList.add('on'); document.body.classList.add('resizing');
     try{ w.setPointerCapture(e.pointerId); }catch(x){}
   });
   box.addEventListener('pointermove', e => {
     if(!잡) return;
-    const 배 = 배치읽기(); const r = 배[잡.r]; if(!r) return;
-    const 왼합 = r.w.slice(0, 잡.i).reduce((a,x)=>a+x, 0);
-    const 둘 = r.w[잡.i-1] + r.w[잡.i];
-    let v = (e.clientX - 잡.rect.left) / Math.max(1, 잡.rect.width) * 100 - 왼합 + r.w[잡.i-1];
-    v = Math.min(둘 - 폭최소, Math.max(폭최소, v));
-    r.w[잡.i-1] = v; r.w[잡.i] = 둘 - v;
-    잡.값 = r.w.slice();
-    const 틀 = []; r.c.forEach((k,ci)=>{ if(ci) 틀.push('12px'); 틀.push(r.w[ci].toFixed(1)+'%'); });
-    잡.row.style.gridTemplateColumns = 틀.join(' ');
+    let v = (e.clientX - 잡.rect.left) / Math.max(1, 잡.rect.width) * 100;
+    v = Math.min(폭최대, Math.max(폭최소, v));
+    잡.값 = v;
+    잡.row.style.gridTemplateColumns = v.toFixed(1) + '% 14px 1fr';
     e.preventDefault();
   });
   const 놓 = () => {
     if(!잡) return;
-    const w = 잡.w, 값 = 잡.값, ri = 잡.r;
+    const w = 잡.w, 값 = 잡.값;
     잡 = null; w.classList.remove('on'); document.body.classList.remove('resizing');
-    if(값){ const 배 = 배치읽기(); if(배[ri]){ 배[ri].w = 값; 배치저장(배); } }
+    if(값 != null){ const B = 배치읽기(); B.폭 = 값; 배치저장(B); }
   };
   box.addEventListener('pointerup', 놓);
   box.addEventListener('pointercancel', 놓);
+  box.addEventListener('dblclick', e => {
+    if(!(e.target.closest && e.target.closest('.hwide'))) return;
+    const B = 배치읽기(); B.폭 = 폭기본; 배치저장(B);
+  });
 }
 
 /* 숫자 한 줄 */
@@ -6736,9 +6563,10 @@ function txMe(){
       + '</div></div>'
     + '<button class="btn sub" data-act="tx:goal">저장</button>'
     + '<div class="lbl" style="margin-top:16px">홈 배치</div>'
-    + '<div class="note" style="margin-bottom:8px">블록에 마우스를 대면 왼쪽 위에 <b>⠿</b> 가 나옵니다. '
-      + '그걸 잡아 끌면 자리가 바뀌고, 블록 사이를 잡아 끌면 넓이가 바뀝니다.<br>'
-      + '한 줄에 최대 <b>3개</b>까지, 한 칸이 <b>18%</b> 보다 좁아지지 않습니다.</div>'
+    + '<div class="note" style="margin-bottom:8px">홈은 <b>왼쪽 · 오른쪽 두 단</b>입니다. '
+      + '블록에 마우스를 대면 왼쪽 위에 <b>⠿</b> 가 나옵니다. 그걸 <b>누르면</b> '
+      + '위로·아래로·반대 단으로 옮기는 단추가 뜹니다.<br>'
+      + '가운데를 잡아 끌면 좌우 넓이가 바뀝니다 (두 번 누르면 기본값).</div>'
     + '<button class="btn ghost" style="width:100%" data-act="tx:hmreset">홈 배치 처음으로</button>'
     /* 앱 가입 승인 — 최고 관리자만 (2026-09-22 대표 「최고 관리자가 승인해야 가입되게」) */
     + (최고관리자()
@@ -7120,15 +6948,14 @@ async function txAct(a, el){
      판을 그리는 코드(홈꾸미기)는 남겨 두되 **여는 길이 없다** — 되살리려면 이 줄만 풀면 된다. */
   /* 처음 배치로 — 잘못 끌었을 때 되돌리는 길 */
   if(a==='hmreset'){ if(!confirm('홈 배치를 처음으로 되돌릴까요?')) return;
-    S.hmOpen = null; 내홈저장({ 배치: null }); return; }
+    S.hmOpen = null; 내홈저장({ 배치: null, 배치2: null }); return; }
   /* ⠿ 를 누르면 옮김판 — 끌 수도 있고 눌러서 옮길 수도 있다 */
   if(a==='hmmove'){ S.hmOpen = (S.hmOpen === v2) ? null : v2; render(); return; }
   if(a==='hmclose'){ S.hmOpen = null; render(); return; }
-  if(['hmup','hmdown','hmleft','hmright','hmrowup','hmrowdn'].indexOf(a) >= 0){
-    const [r, c, i] = String(v2).split('.').map(Number);
-    const 할것 = a.slice(2);
+  if(['hmup','hmdown','hmswap','hmtop'].indexOf(a) >= 0){
+    const [단, 자리] = String(v2).split('.');
     S.hmOpen = null;
-    배치저장(블록옮기기(배치읽기(), { r, c, i }, 할것));
+    배치저장(블록옮기기(배치읽기(), 단, +자리, a.slice(2)));
     return; }
   /* ② 사진 비율만 따로 — 누르면 바로 저장하고 다시 그린다 */
   if(a==='ratio'){
