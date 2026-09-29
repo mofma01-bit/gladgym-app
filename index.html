@@ -1281,6 +1281,8 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
 .rpt-hd{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:0 0 10px}
 .rpt-hd b{font-size:11.5px;font-weight:800;letter-spacing:.16em;color:var(--gold)}
 .rpt-hd span{font-size:12px;font-weight:600;color:var(--sub)}
+/* 맨 위 제목 — 알림톡으로 들어온 회원이 무엇을 보는지 바로 알게 (2026-09-29) */
+.rpt-title{font-size:19px;font-weight:800;line-height:1.35;color:var(--cream);margin:0 0 12px}
 .rpt-cal .cday{pointer-events:none}
 .btn.dim{opacity:.5}
 .cal2{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
@@ -1891,7 +1893,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '209';
+const BUILD = '210';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -4593,6 +4595,18 @@ const 리포트사진켬 = false;
    「몇 장인지 한눈에」는 나눔 칩과 「1 / 3」이 이미 해 준다. */
 const 코멘트그림 = c => (c.media && c.media.length) ? 넘겨보기(c.media, c.id) : '';
 
+/* 리포트 맨 위 제목 — 「무엇을 보고 있는지」를 한눈에 (2026-09-29 대표
+   「가장 상단에 n월n일 수업기록인지 나타내면 좋겠다」).
+   올해가 아니면 연도도 같이 보인다. 요일도 붙인다 — 회원은 요일로 기억한다. */
+function 수업제목(w){
+  const d = w.date || '';
+  const 올해 = String(new Date().getFullYear());
+  const 해 = d.slice(0,4) !== 올해 ? d.slice(0,4) + '년 ' : '';
+  const 요일 = ['일','월','화','수','목','금','토'][new Date(d + 'T00:00:00').getDay()];
+  const 무엇 = (w.kind || '').includes('개인') ? '개인운동 기록' : '수업 기록';
+  return 해 + dateTxt(d) + (요일 ? ' (' + 요일 + ')' : '') + ' ' + 무엇;
+}
+
 function vReport(){
   const w = D.workouts.find(x=>x.id===S.rw); if(!w) return vHome();
   const mid = w.mid, 이름 = (MEMBERS.find(m=>m.id===mid)||{}).n || '', bw = bwOf(mid);
@@ -4640,7 +4654,8 @@ function vReport(){
   return { top: bar('수업 리포트', `<span class="sub">${esc(이름)} 회원님</span>`,
       만보기 ? null : (tr ? 'fendview:'+w.id : 'tab:home')),
     tabs: (tr || 만보기) ? 0 : 1, body:`
-    <div class="rpt-hd"><b>GLAD GYM</b><span>${dateTxt(w.date)}${w.kind?' · '+esc(w.kind):''}</span></div>
+    <div class="rpt-hd"><b>GLAD GYM</b><span>${esc(이름)} 회원님</span></div>
+    <div class="rpt-title">${esc(수업제목(w))}</div>
     ${끝카드(w)}
     ${줄 ? `<span class="lbl">오늘 한 운동 · 지난번과 견주기</span><div class="card" style="padding:6px 14px">${줄}</div>` : ''}
 
