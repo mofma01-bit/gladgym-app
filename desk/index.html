@@ -1247,7 +1247,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '128';
+const BUILD = '135';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -2186,6 +2186,12 @@ async function 동의요청보내기(){
   }
 }
 
+/* ⭐ 「마지막으로 **마친** 운동」을 찾는 식도 여기 하나다 (`done` 만 센다).
+   ⛔ 이걸로 「안 온 회원」을 재면 **앱을 안 쓰는 분이 전부 잡힌다** — 그래서 그 블록은 뺐다(2026-09-29).
+      출입 기준은 브로제이의 「잠수」다. */
+const 마친운동 = mid => D.w.filter(w => w.member_id === mid && w.done)
+  .sort((a, b) => a.on_date < b.on_date ? 1 : -1);
+
 /* ── 회원 목록 ── */
 function vMembers(){
   const q = S.q.trim().toLowerCase();
@@ -2197,8 +2203,7 @@ function vMembers(){
   if(q) list = list.filter(x => (x.name||'').toLowerCase().includes(q));
 
   const info = m => {
-    const ws = D.w.filter(w => w.member_id===m.id && w.done)
-                  .sort((a,b)=> a.on_date < b.on_date ? 1 : -1);
+    const ws = 마친운동(m.id);
     const last = ws[0] ? ws[0].on_date : null;
     return { last, gap: daysAgo(last),
       week: ws.filter(w => daysAgo(w.on_date) < 7).length,
@@ -3854,7 +3859,7 @@ function vReports(){
         + esc(r.trainer || '') + ' · ' + esc(r.summary || '') + '</div>'
       + '<div class="t2" style="margin-top:2px;opacity:.75">요청 ' + 때(r.queued_at) + ' · ' + 꼬리
         + (r.tried > 1 ? ' · ' + r.tried + '번 시도' : '') + '</div></div>'
-      + (r.state === '실패'
+      + (발송실패(r)
           ? '<button class="btn sub sm" data-act="tx:rsretry" data-i="' + esc(r.id) + '">다시 보내기</button>'
           : '')
       + '</div>';
@@ -3962,6 +3967,15 @@ const 이번주인가 = d => { if(!d) return false;
 /* 늘린 속성이면 extra 안에서 꺼낸다 */
 const 값읽기 = (r, k) => String(k).indexOf('extra.') === 0 ? ((r.extra||{})[String(k).slice(6)]) : r[k];
 
+/* ⭐ 판정은 **여기 하나**다 — 화면마다 다시 적지 않는다 (2026-09-29 대표
+   「하나의 업무가 여러곳에 똑같이 분산되서 기능하지는 않는지」).
+   두 벌로 적으면 한쪽만 고쳐져 **현황판 숫자와 페이지 숫자가 어긋난다** */
+const 승인대기 = r => r.status === 'req';
+const 발송실패 = r => r.state === '실패';
+/* ⛔ 이 셋은 `표정의` **앞**에 있어야 한다. 뒤에 두었더니 보기 필터가 읽는 순간
+   「Cannot access '승인대기' before initialization」로 화면이 통째로 안 떴다.
+   `node --check` 는 통과한다 — **브라우저에서 열어 봐야 잡힌다** (2026-09-29) */
+
 const 표정의 = {
   tasks: {
     table:'tr_tasks', 제목:'업무', 사람열:'owners', 제목열:'title',
@@ -4048,7 +4062,7 @@ const 표정의 = {
     보기:[
       {k:'week',  이름:'이번 주',  필터:r=>{ const d=new Date(r.day), t=new Date(TODAY); const diff=(d-t)/864e5; return diff>=-t.getDay() && diff<7-t.getDay(); }},
       {k:'mine',  이름:'내 것',    필터:r=>ME && r.staff_id===ME.id},
-      {k:'req',   이름:'승인 대기', 필터:r=>r.status==='req'},
+      {k:'req',   이름:'승인 대기', 필터:승인대기},
       {k:'month', 이름:'이번 달',  필터:r=>이달인가(r.day)},
       {k:'all',   이름:'전체'},
     ],
@@ -5048,6 +5062,7 @@ function txRow(key, r, 고르기){
 }
 const 댓글수 = (key, id) => W.cm.filter(c => c.tbl===표정의[key].table && c.row_id===id).length;
 
+
 /* ══ 부름(@이름) ══ 2026-09-29 대표 「페이지에 댓글로 태그를 달았을때 뜨는것」
    ⛔ 표를 새로 안 만든다 — 읽은 표시는 `staff.home.부름` 에 담는다.
       { 본때: '이 시각까지는 다 봤다', 읽음: [댓글id …] (최근 200) } */
@@ -5186,7 +5201,7 @@ function 댓글칸(key, id){
   const cs = W.cm.filter(c => c.tbl===T.table && c.row_id===id);
   return '<div class="tx-cmts" id="txcmts">' + (cs.length ? cs.map(c => '<div class="tx-cmt">'+아바타(c.created_by)
       + '<div><div class="b">'+본문렌더(c.body)+'</div><div class="m">'+esc(사람(c.created_by).name)+' · '+시각한글(c.created_at)
-      + ((관리자() || c.created_by===(ME&&ME.id)) ? '<button data-act="tx:cmdel" data-id="'+c.id+'">지우기</button>' : '')
+      + ((관리자() || c.created_by===(ME&&ME.id)) ? '<button data-act="tx:pgcmdel" data-id="'+c.id+'">지우기</button>' : '')
       + '</div></div></div>').join('') : '<div class="tx-meta">댓글 없음</div>')
     + '</div>'
     /* 부르기 — 누르면 `@이름` 이 들어간다. 부른 사람의 현황판에 뜬다 (2026-09-29 대표) */
@@ -5196,7 +5211,7 @@ function 댓글칸(key, id){
           + 아바타(x.id) + esc(x.name) + '</button>').join('')
     + '</div>'
     + '<div class="tx-cmtin">'+아바타(ME.id)+'<textarea class="inp" id="txcmin" placeholder="댓글 남기기 — 부르면 그 사람 현황판에 떠요"></textarea>'
-    + '<button class="btn sub sm" data-act="tx:cmsend">보내기</button></div>';
+    + '<button class="btn sub sm" data-act="tx:pgcmsend">보내기</button></div>';
 }
 /* ── 노션식 속성 줄 ── 페이지에서 바로 고친다. 「속성 고치기」 폼으로 안 들어간다
    (2026-09-09 대표: 「여기저기 들어가서 수정하는게 헷갈려」) */
@@ -5487,7 +5502,7 @@ document.addEventListener('mouseup', async function(){
 function 속성추가쪽지(key, el){
   쪽지열기(el, '<input class="inp" id="txpn" placeholder="속성 이름">'
     + '<div class="tx-pdiv"></div><div class="tx-pmenu">'
-    + 열타입들.map(t => '<button data-act="tx:pnew" data-k="'+key+'" data-v2="'+t[0]+'"><i>'+(타입아이콘[t[0]]||'≡')+'</i>'+t[1]+'</button>').join('')
+    + 열타입들.map(t => '<button data-act="tx:colnew" data-k="'+key+'" data-v2="'+t[0]+'"><i>'+(타입아이콘[t[0]]||'≡')+'</i>'+t[1]+'</button>').join('')
     + '</div>', 250);
   const inp = $('#txpn'); if(inp) inp.focus();
 }
@@ -6056,7 +6071,7 @@ function txSheet(key, id, 초기){
     + 메타 + '</div>',
     '<div class="tx-fbtns"><span class="tx-stat" id="txstat">'+(편집 ? '' : '읽기 전용')+'</span>'
     + (편집 && id ? '<button class="btn sub" data-act="tx:back">‹ 페이지로</button>' : '')
-    + (편집 && id ? '<button class="btn ghost del" data-act="tx:del">페이지 삭제</button>' : '')
+    + (편집 && id ? '<button class="btn ghost del" data-act="tx:pgdel">페이지 삭제</button>' : '')
     + '</div>');
 }
 /* ── 자동 저장 ── 노션처럼 저장 버튼이 없다. 글자를 치면 0.9초 뒤, 칩·날짜·체크는 바로 */
@@ -6289,7 +6304,7 @@ function vHome(){
   const N = H.줄수;
   const 공지 = W.tasks.filter(r=>r.kind==='대표공지' && !r.done).slice(0,3);
   const 이번주 = W.leave.filter(표정의.leave.보기[0].필터).sort((a,b)=>(a.day||'')>(b.day||'')?1:-1).slice(0,N);
-  const 대기 = 관리자() ? W.leave.filter(r=>r.status==='req').length : 0;
+  const 대기 = 관리자() ? W.leave.filter(승인대기).length : 0;
 
   const 섹 = (제목, key, 목록, 빈말) => '<div class="sec"><div class="lbl">'+제목+' '+목록.length+'건'
     + '<span class="r" data-act="tx:go" data-k="'+key+'">전부 보기 ›</span></div>'
@@ -6412,16 +6427,18 @@ function 옮김판(단, 자리, k){
   const 목 = B[단];
   const 이름 = (홈블록.find(x => x.k === k) || {}).이름 || k;
   const v = 단 + '.' + 자리;
-  const b = (act, 글, 막힘) => '<button data-act="tx:hm' + act + '" data-v2="' + v + '"'
+  /* ⛔ 이름을 이어 붙이지 않는다 (`'tx:hm' + act`). 그러면 **찾기로 안 걸리고**
+     단추 점검기도 못 읽는다. 통째로 적는다 (2026-09-29) */
+  const b = (act, 글, 막힘) => '<button data-act="' + act + '" data-v2="' + v + '"'
       + (막힘 ? ' disabled' : '') + '>' + 글 + '</button>';
   return '<div class="hmove" data-keep="1">'
     + '<div class="ttl">' + esc(이름) + '</div>'
     + '<div class="g">'
-    + b('up', '↑ 위로', 자리 <= 0)
-    + b('down', '↓ 아래로', 자리 >= 목.length - 1)
-    + b('swap', (단 === '좌' ? '→ 오른쪽 단으로' : '← 왼쪽 단으로'),
+    + b('tx:hmup', '↑ 위로', 자리 <= 0)
+    + b('tx:hmdown', '↓ 아래로', 자리 >= 목.length - 1)
+    + b('tx:hmswap', (단 === '좌' ? '→ 오른쪽 단으로' : '← 왼쪽 단으로'),
         !!(홈블록.find(x => x.k === k) || {}).단고정)
-    + b('top', '⤒ 맨 위로', 자리 <= 0)
+    + b('tx:hmtop', '⤒ 맨 위로', 자리 <= 0)
     + '</div>'
     + ((홈블록.find(x => x.k === k) || {}).단고정
         ? '<div class="why">넓어서 이 단에만 둘 수 있어요</div>' : '')
@@ -6505,9 +6522,9 @@ const 현황목록 = {
   부름: () => 안읽은부름(),
   /* 실패 = 알림톡이 안 나갔다 = **회원이 리포트를 못 받았다.** 제일 급한 신호다.
      관리자는 전부, 선생님은 자기가 한 수업만 본다 (리포트 화면과 같은 기준) */
-  실패: () => (RS || []).filter(r => r.state === '실패')
+  실패: () => (RS || []).filter(발송실패)
           .filter(r => 최고관리자() || 관리자() || (r.trainer || '') === ((ME && ME.name) || '')),
-  연월차: () => (W.leave || []).filter(r => r.status === 'req')
+  연월차: () => (W.leave || []).filter(승인대기)
           .sort((a, b) => (a.day || '') > (b.day || '') ? 1 : -1),
   업무: () => W.tasks.filter(r=>!r.done && r.kind!=='대표공지' && 내것(r.owners)).sort(표정의.tasks.정렬),
   요청: () => D.asks.filter(a=>!a.done_at && 내담당(a.member_id)),
@@ -6663,7 +6680,7 @@ function 끊긴목록(){
                   .sort((a,b)=> (a.created_at||'') < (b.created_at||'') ? 1 : -1);
     const 마지막 = cs[0] ? (cs[0].created_at||'').slice(0,10) : null;
     /* 회원이 스스로 한 운동은 따로 잰다 — 성격이 다른 신호라 섞지 않는다 */
-    const ws = D.w.filter(w=>w.member_id===m.id && w.done).sort((a,b)=> a.on_date<b.on_date?1:-1);
+    const ws = 마친운동(m.id);
     const 운동날 = ws[0] ? ws[0].on_date : null;
     /* 코멘트가 한 번도 없으면 「한 번도」가 아니라 **회원 등록일부터 오늘까지**를 센다
        (2026-09-17 대표: 「한번도 x · 00일 동안 없음」) */
@@ -6799,6 +6816,30 @@ document.addEventListener('mouseup', async function(){
   차례.splice(z.까지, 0, 차례.splice(z.부터, 1)[0]);
   await 내홈저장({ 차례 }); 홈꾸미기();
 });
+
+/* ══ 코멘트 남기기 ══ **여기 하나**가 실행한다 (2026-09-29 대표
+     「입구도 여러개 실행도 여러개인 작업은 없는지」).
+   입구는 둘이어도 된다 — 회원판 「보내기」 · 빠른 코멘트 「보내기」.
+   ⛔ 앞서는 식이 두 벌이었고 **빠른 코멘트 쪽만 「봐 달라는 요청」을 안 닫았다.**
+      그래서 ＋남기기로 답해도 「코멘트 요청」 숫자가 안 줄었다. */
+async function 코멘트쓰기(mid, vid, wid, 글, who){
+  const cid = 'c' + Date.now();
+  const 이제 = new Date().toISOString();
+  await ssend('comments', 'POST', [{ id:cid, member_id:mid, variant_id:vid,
+    workout_id: wid || null, trainer:who, body:글, pics:0, vids:0 }]);
+  D.c.unshift({ id:cid, member_id:mid, variant_id:vid, workout_id: wid || null,
+    trainer:who, body:글, read_at:null, created_at:이제 });
+
+  /* 그 종목에 걸린 「봐 달라는 요청」은 답을 남긴 것으로 닫는다 */
+  const 열린 = D.asks.filter(x => x.member_id === mid && x.variant_id === vid && !x.done_at);
+  if(열린.length){
+    try{
+      await ssend('asks?id=in.(' + 열린.map(x => x.id).join(',') + ')', 'PATCH', { done_at: 이제 });
+      열린.forEach(x => x.done_at = 이제);
+    }catch(e){ console.warn('요청을 못 닫았어요 —', e.message); }
+  }
+  return cid;
+}
 
 /* ── 바로 코멘트 남기기 ── 홈 타일의 「＋ 남기기」에서 연다.
    세부는 사이드 페이지에서 보고, 여기서는 **마지막 운동의 종목에 한 줄** 남기는 것만 한다
@@ -7023,7 +7064,6 @@ async function txAct(a, el){
   if(a==='vreset'){ 내것되돌리기(k); return; }
   if(a==='grpmenu'){ 그룹판(k); return; }
   if(a==='grpset'){ 표상태[k].그룹 = v2 || null; 표상태[k].접힘 = {}; popClose(); render(); return; }
-  if(a==='vcolsreset'){ 내것되돌리기(k); popClose(); return; }
   if(a==='gfold'){ const st = 표상태[k]; st.접힘 = st.접힘 || {};
     st.접힘[v2] = !st.접힘[v2]; render(); return; }
   if(a==='sortmenu'){ 정렬판(k); return; }
@@ -7111,7 +7151,8 @@ async function txAct(a, el){
       쪽지닫기(); render();
     }
     return; }
-  if(a==='pnew'){
+  /* 표에 새 속성(열) — ⛔ 회원 화면의 `pnew` 는 **새 준비운동**이다. 이름을 갈랐다 (2026-09-29) */
+  if(a==='colnew'){
     const nm = (($('#txpn')||{}).value || '').trim();
     if(!nm){ toast('속성 이름을 입력하세요'); const q = $('#txpn'); if(q) q.focus(); return; }
     const 있는것 = 늘림열(k);
@@ -7174,15 +7215,16 @@ async function txAct(a, el){
     if(k!=='leave'){ await txSave(); if(시트 && 시트.id) txSheet(k, 시트.id); }   /* 바로 페이지를 만든다 (연월차는 날짜 고르면) */
     return; }
   if(a==='open'){ txView(k, id); return; }
-  if(a==='edit'){ txSheet(시트.key, 시트.id); return; }
   if(a==='back'){ txView(시트.key, 시트.id); return; }
   if(a==='wide'){ 넓게 = !넓게; $('#pop').classList.toggle('tx-wide', 넓게);
     const b = document.querySelector('[data-act="tx:wide"]'); if(b) b.textContent = 넓게?'⤡':'⤢'; return; }
   if(a==='toggle'){ await txToggle(k, id, el.dataset.f); if(el.dataset.stay) txView(k, id); return; }
   if(a==='upload'){ const f = $('#txfile'); if(f) f.click(); return; }
   if(a==='fdel'){ await txFileDel(시트.key, 시트.id, +el.dataset.i); return; }
-  if(a==='cmsend'){ await txCmSend(); return; }
-  if(a==='cmdel'){ await txCmDel(id); return; }
+  /* 페이지 댓글 — ⛔ 회원 화면에도 `cmsend`·`cmdel` 이 있다(회원 코멘트).
+     `tx:` 하나로 갈리면 엉뚱한 것이 지워진다. 그래서 이름을 갈랐다 (2026-09-29) */
+  if(a==='pgcmsend'){ await txCmSend(); return; }
+  if(a==='pgcmdel'){ await txCmDel(id); return; }
   if(a==='tick'){ await txTick(el); return; }
   /* ── 블록 ── */
   if(a==='badd'){ 글자넣기();
@@ -7253,8 +7295,9 @@ async function txAct(a, el){
   if(a==='opt'){ 시트값읽기(); const f = el.dataset.f; 시트.값[f] = (시트.값[f]===v2 && f!=='vis') ? null : v2; txSheet(시트.key, 시트.id, 시트.값); 자동저장(true); return; }
   if(a==='multi'){ 시트값읽기(); const f = el.dataset.f; const arr = (시트.값[f]||[]).slice();
     const i = arr.indexOf(v2); if(i>=0) arr.splice(i,1); else arr.push(v2); 시트.값[f] = arr; txSheet(시트.key, 시트.id, 시트.값); 자동저장(true); return; }
-  if(a==='save'){ await txSave(); return; }
-  if(a==='del'){ await txDel(); return; }
+  /* 페이지 삭제 — ⛔ 회원 화면의 `del` 은 **종목 하나 빼기**다. `tx:` 하나로 갈리면
+     종목 하나 빼려다 페이지가 통째로 지워진다. 그래서 이름을 갈랐다 (2026-09-29) */
+  if(a==='pgdel'){ await txDel(); return; }
   if(a==='me'){ txMe(); return; }
   if(a==='goal'){
     const 앞 = (ME.goal||{}), 이번 = 이번분기();
@@ -7328,13 +7371,11 @@ async function txAct(a, el){
     if(!tx) return toast('내용을 적어 주세요');
     if(!빠른코멘트 || !빠른코멘트.vid) return toast('종목을 골라 주세요');
     const who = (ME && ME.name) || '트레이너';
-    const cid = 'c'+Date.now();
     try{
-      await ssend('comments', 'POST', [{ id:cid, member_id:mid, variant_id:빠른코멘트.vid,
-        workout_id: 빠른코멘트.wid || null, trainer:who, body:tx, pics:0, vids:0 }]);
-      D.c.unshift({ id:cid, member_id:mid, variant_id:빠른코멘트.vid, workout_id:빠른코멘트.wid||null,
-        trainer:who, body:tx, read_at:null, created_at:new Date().toISOString() });
-      빠른코멘트 = null; popClose(); toast('코멘트를 남겼어요'); render();
+      await 코멘트쓰기(mid, 빠른코멘트.vid, 빠른코멘트.wid, tx, who);
+      빠른코멘트 = null; popClose(); toast('코멘트를 남겼어요');
+      if(현황판) 현황판그리기();
+      render();
     }catch(e){ toast('못 남겼어요 — ' + e.message); }
     return; }
   if(a==='hmside'){ const 단 = Object.assign({}, 내홈().단);
@@ -7612,20 +7653,8 @@ function render0(){
 
 /* 맨 위 띠 — 누가 보고 있는지 · 알림 개수 */
 /* ⛔ 종 알림은 **없앴다** (2026-09-29 대표 「모두가 무겁게 다른 방향을 가리키면 업무가 엉킨다」).
-     종에 있던 세 가지(요청·안 온 회원·안 읽은 코멘트)가 **현황판 숫자와 하나도 빠짐없이 겹쳤다.**
-     이 함수는 쓰는 곳이 없다 — 되살릴 일이 생기면 여기서 꺼내 쓴다. */
-function alerts(){
-  const mine = id => S.who==='전체' || (memOf(id).trainer||'')===S.who;
-  const ask = D.asks.filter(a=>!a.done_at && mine(a.member_id));
-  const all = D.m.filter(x=>(x.role||'member')==='member' && mine(x.id));
-  const cold = all.filter(function(m){
-    const ws = D.w.filter(w=>w.member_id===m.id && w.done).sort((a,b)=> a.on_date<b.on_date?1:-1);
-    const g = ws[0] ? daysAgo(ws[0].on_date) : null;
-    return g===null || g>=7; });
-  const unread = D.c.filter(c=>!c.read_at && mine(c.member_id));
-  const today = D.w.filter(w=>w.on_date===TODAY && mine(w.member_id));
-  return { ask:ask, cold:cold, unread:unread, today:today };
-}
+   종의 세 가지(요청·안 온 회원·안 읽은 코멘트)가 **현황판 숫자와 하나도 빠짐없이 겹쳤다.**
+   `alerts()` 도 같이 지웠다 — 거기에 「마친 운동」 사본이 한 벌 더 있었다. 지금은 `현황목록` 하나가 센다. */
 function gnbDraw(){
   $('#gnm').textContent = ME ? ME.name + (관리자() && S.who!=='전체' ? ' · '+S.who+' 보기' : '') : '—';
   const gav = $('#gav');
@@ -8064,7 +8093,6 @@ document.addEventListener('click', async function(ev){
   if(a==='jout'){ try{ await authPost('logout', {}, AUTH.access_token); }catch(e){}
     authSave(null); location.reload(); return; }
   if(a==='memadd'){ 회원추가열기(); return; }
-  if(a==='gosleep'){ S.view='members'; S.st='잠수'; S.q=''; render(); return; }
   if(a==='dnopen'){ 사유판열기(act.dataset.m); return; }
   if(a==='dnsave'){ await 사유적기(); return; }
   if(a==='dnedit'){ 사유판.고칠 = act.dataset.i; 사유판그리기();
@@ -8355,18 +8383,9 @@ document.addEventListener('click', async function(ev){
     const tx = ta ? ta.value.trim() : '';
     if(!vid || !tx){ toast('내용을 적어 주세요'); return; }
     const who = S.who==='전체' ? (memOf(S.mid).trainer||'트레이너') : S.who;
-    const cid = 'c'+Date.now();
+    let cid = null;
     try{
-      await ssend('comments', 'POST', [{ id:cid, member_id:S.mid, variant_id:vid,
-        workout_id: S.cmw || null, trainer:who, body:tx, pics:0, vids:0 }]);
-      D.c.unshift({ id:cid, member_id:S.mid, variant_id:vid, workout_id:S.cmw||null,
-        trainer:who, body:tx, read_at:null, created_at:new Date().toISOString() });
-      const open = D.asks.filter(x=>x.member_id===S.mid && x.variant_id===vid && !x.done_at);
-      if(open.length){
-        await ssend('asks?id=in.(' + open.map(x=>x.id).join(',') + ')', 'PATCH',
-          { done_at: new Date().toISOString() });
-        open.forEach(x=>x.done_at = new Date().toISOString());
-      }
+      cid = await 코멘트쓰기(S.mid, vid, S.cmw, tx, who);
       if(ta) ta.value=''; S.cmopen=null;
       toast('보냈습니다 · 회원 화면에 바로 떠요'); render();
     }catch(e){ toast('보내기 실패 — ' + e.message); }
@@ -8471,42 +8490,16 @@ document.addEventListener('click', async function(ev){
     }catch(e){ toast('만들기 실패 — ' + e.message); }
     return;
   }
+  /* ⛔ 앞서는 여기에 **지정·추천을 하는 식이 통째로 한 벌 더** 있었다.
+     3563줄에 「지정·추천은 한 곳에서만 한다」고 적어 두고도 이쪽을 안 바꿨다 (2026-09-17).
+     입구는 둘이어도 된다 — **실행은 `루틴지정()` · `루틴추천()` 하나씩**이다 (2026-09-29). */
   if(a==='reco'){
     const r = D.r.find(x=>x.id===S.rid); if(!r) return;
-    const mid = r.member_id;
-    const 먼저 = D.aAll.find(x=>x.member_id===mid && x.on_date===RECO1);
-    const 나중 = D.aAll.find(x=>x.member_id===mid && x.on_date===RECO2);
-    if((먼저 && 먼저.routine_id===r.id) || (나중 && 나중.routine_id===r.id)){
-      toast('이미 추천해 둔 루틴이에요'); return; }
-    const 자리 = 먼저 ? RECO2 : RECO1;
-    const 밀림 = (자리===RECO2 && 나중) ? D.r.find(x=>x.id===나중.routine_id) : null;
-    try{
-      await ssend('assignments', 'POST',
-        [{ member_id:mid, on_date:자리, routine_id:r.id, kind:'개인운동', assigned_by:'트레이너' }],
-        'resolution=merge-duplicates');
-      D.aAll = D.aAll.filter(x=>!(x.member_id===mid && x.on_date===자리));
-      D.aAll.push({ member_id:mid, on_date:자리, routine_id:r.id, kind:'개인운동' });
-      toast(밀림 ? '나중 자리를 「' + 밀림.name + '」에서 바꿨어요'
-                 : (자리===RECO1 ? '먼저 추천으로 담았어요' : '나중 추천으로 담았어요'));
-      render();
-    }catch(e){ toast('추천 실패 — ' + e.message); }
-    return;
+    await 루틴추천(r.member_id, r.id); render(); return;
   }
   if(a==='assign'){
     const r = D.r.find(x=>x.id===S.rid); if(!r) return;
-    try{
-      const el = document.getElementById('asdate');
-      const day = (el && el.value) || S.asDate || TODAY;
-      await ssend('assignments', 'POST',
-        [{ member_id:r.member_id, on_date:day, routine_id:r.id, kind:S.kind, assigned_by:'트레이너' }],
-        'resolution=merge-duplicates');
-      D.aAll = D.aAll.filter(x=>!(x.member_id===r.member_id && x.on_date===day));
-      D.aAll.push({ member_id:r.member_id, on_date:day, routine_id:r.id, kind:S.kind });
-      D.a = D.aAll.filter(x=>x.on_date===TODAY);
-      S.asDate = day;
-      toast((day===TODAY?'오늘 ':dateFull(day)+' ') + S.kind + '으로 지정했습니다'); render();
-    }catch(e){ toast('지정 실패 — ' + e.message); }
-    return;
+    await 루틴지정(r.member_id, r.id, S.kind); return;
   }
 });
 
