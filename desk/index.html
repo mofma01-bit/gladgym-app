@@ -1092,6 +1092,9 @@ body.끄는중{user-select:none;-webkit-user-select:none}
     <button class="nav" data-v="today">
       <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
       오늘</button>
+    <button class="nav" data-v="reports">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 13h5"/></svg>
+      리포트<span class="bdg" id="rsbdg" style="display:none"></span></button>
     <button class="nav" data-v="trash" id="navtrash" style="display:none">
       <svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
       휴지통</button>
@@ -1120,7 +1123,7 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 
 <script>
 "use strict";
-const BUILD = '96';
+const BUILD = '99';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -1162,6 +1165,26 @@ const 최고관리자세워짐 = () => (W.staff||[]).some(x => x.super === true 
    ⛔ 휴지통에 담는 데 실패하면 **원본을 지우지 않는다.** 자료가 그냥 없어지면 안 된다.
    (2026-09-17 대표: 「삭제를 하면 바로 데이터가 날아가는게 아니라 휴지통으로 모이게」) */
 const 휴지통일수 = 60;
+/* 수업 리포트 발송 기록 — 2026-09-29 대표
+   「트레이너 대시보드에서 발송한 걸 볼 수 있는 발송기록을 저장하는 페이지를 신설」
+   리포트 **내용**은 어디에도 담지 않는다. 회원이 링크를 열면 그 순간의 기록을 읽어 그린다.
+   여기 쌓이는 건 **발송 기록 한 줄**뿐이다 — 두 번 보내기 막기 · 시간 밖 요청 담아두기 ·
+   발송규칙_검사 대조 · 실패 다시 보내기.
+   보내는 것은 서버 스크립트\리포트발송.py (05:00~24:00 · 10분마다).
+   표 만들기 — 설계서\10단계_SQL_리포트발송.sql */
+let RS = [];
+let RS없음 = false;
+/* 거르개 — 관리자는 선생님별로 본다 (2026-09-29 대표 「관리자는 선생님별로, 검색해서도」) */
+let RS선생 = '';                       /* '' = 전부 */
+let RS찾 = '';                    /* 표가 아직 없으면 true — 화면에 안내만 띄운다 */
+
+async function 발송기록읽기(){
+  try{
+    RS = await sget('report_sends?select=*&order=queued_at.desc&limit=500') || [];
+    RS없음 = false;
+  }catch(e){ RS = []; RS없음 = true; console.warn('리포트 발송 기록 표가 아직 없어요 —', e.message); }
+}
+
 let 휴지통 = [];                       /* 최고 관리자가 열어 볼 때만 채운다 */
 let 휴지통없음 = false;                /* 표가 아직 없으면 true — 그때는 지우기를 막는다 */
 let 휴지통읽음 = false;                /* 화면에 들어올 때 한 번만 읽는다 */
@@ -3504,6 +3527,97 @@ function vCmAll(){
 const 표이름 = { tr_tasks:'업무', tr_leads:'상담', tr_leave:'연월차', tr_comments:'표 코멘트',
                  comments:'회원 코멘트', body_logs:'체형 기록', routines:'루틴',
                  routine_items:'루틴 종목', workout_sets:'운동 세트' };
+function vReports(){
+  if(RS없음)
+    return '<div class="note" style="border-color:var(--warn)">'
+      + '<b style="color:var(--warn)">리포트 발송 기록 표가 아직 없습니다</b>'
+      + '<div style="margin-top:6px;line-height:1.6">'
+      + '<code>앱만들기 › 설계서 › 10단계_SQL_리포트발송.sql</code> 을 Supabase 에서 한 번 돌려 주세요.</div></div>';
+
+  /* 트레이너는 본인이 담당한 것만, 대표·오너는 전부 */
+  const 내이름 = (ME && ME.name) || '';
+  const 전부 = 최고관리자() || (ME && ME.role === 'admin');
+  const 내것 = 전부 ? RS : RS.filter(r => (r.trainer || '') === 내이름);
+
+  /* 관리자만 선생님별로 가른다 — 트레이너는 어차피 본인 것뿐이라 칩이 필요 없다 */
+  const 선생들 = 전부 ? [...new Set(RS.map(r => r.trainer || '').filter(Boolean))].sort() : [];
+  const q = (RS찾 || '').trim().toLowerCase();
+  const 목록 = 내것
+    .filter(r => !RS선생 || (r.trainer || '') === RS선생)
+    .filter(r => !q || [(r.member_name||''), (r.trainer||''), (r.summary||''), (r.lesson_date||'')]
+                        .join(' ').toLowerCase().includes(q));
+
+  const n = k => 목록.filter(r => r.state === k).length;
+  const 요약 = '<div class="sumbar">'
+    + '<div class="sumit"><span class="k2">발송 완료</span><span class="v2">' + n('보냄') + '</span></div>'
+    + '<div class="sumit gold"><span class="k2">발송 전</span><span class="v2">' + n('대기') + '</span></div>'
+    + '<div class="sumit warn"><span class="k2">못 보냄</span><span class="v2">' + n('실패') + '</span></div>'
+    + '<div class="sumit"><span class="k2">보내는 때</span><span class="v2">05~24시</span></div>'
+    + '</div>';
+
+  const 칩 = 전부 && 선생들.length
+    ? '<div class="chips" style="margin-bottom:9px">'
+      + '<button class="chip' + (RS선생 ? '' : ' on') + '" data-act="rsteach" data-i="">전부 '
+        + 내것.length + '</button>'
+      + 선생들.map(t => '<button class="chip' + (RS선생 === t ? ' on' : '') + '" data-act="rsteach" data-i="'
+          + esc(t) + '">' + esc(t) + ' ' + RS.filter(r => (r.trainer||'') === t).length + '</button>').join('')
+      + '</div>'
+    : '';
+  const 찾기 = '<input class="inp" id="rsq" placeholder="회원 이름 · 선생님 · 운동으로 찾기"'
+      + ' value="' + esc(RS찾 || '') + '" style="width:100%;margin-bottom:10px">';
+
+  if(!내것.length)
+    return 요약 + '<div class="empty">아직 보낸 리포트가 없어요<br>'
+      + '<span class="t2">회원 앱에서 수업 기록을 열고 「알림톡 보내기」를 누르면 여기 쌓입니다</span></div>';
+
+  if(!목록.length)
+    return 요약 + 칩 + 찾기 + '<div class="empty">찾는 것이 없어요</div>';
+
+  const 때 = t => { if(!t) return ''; const d = new Date(t);
+    return (d.getMonth()+1) + '/' + d.getDate() + ' ' + String(d.getHours()).padStart(2,'0')
+         + ':' + String(d.getMinutes()).padStart(2,'0'); };
+
+  /* 「기다리는 중」 대신 **몇 시 몇 분에 나가는지**를 보여 준다 (2026-09-29 대표
+     「00시00분 발송예정 이렇게 시간까지 표기되면 좋고」).
+     수업을 마치면 30분 뒤로 잡힌다 (send_at). 옛 줄에 send_at 이 없으면 요청 시각으로 본다. */
+  const 나갈때 = r => {
+    const t = new Date(r.send_at || r.queued_at || Date.now());
+    const 지났나 = t.getTime() <= Date.now();
+    return String(t.getHours()).padStart(2,'0') + '시 ' + String(t.getMinutes()).padStart(2,'0') + '분 '
+         + (지났나 ? '발송 예정 · 곧 나갑니다' : '발송 예정');
+  };
+
+  const 줄 = r => {
+    const 표 = { '보냄':['teal','발송 완료'], '대기':['gold','발송 전'], '실패':['warn','못 보냄'] }[r.state]
+             || ['gray', esc(r.state||'')];
+    const 꼬리 = r.state === '보냄' ? (때(r.sent_at) + ' 나감')
+               : r.state === '대기' ? 나갈때(r)
+               : esc(r.fail_why || '이유를 모릅니다');
+    return '<div class="card rowc">'
+      + '<div style="flex:1;min-width:0">'
+      + '<div class="t1">' + esc(r.member_name || '') + ' 회원님'
+        + '<span class="tag ' + 표[0] + '" style="margin-left:7px">' + 표[1] + '</span></div>'
+      + '<div class="t2" style="margin-top:3px">' + dateFull(r.lesson_date || '') + ' 수업 · '
+        + esc(r.trainer || '') + ' · ' + esc(r.summary || '') + '</div>'
+      + '<div class="t2" style="margin-top:2px;opacity:.75">요청 ' + 때(r.queued_at) + ' · ' + 꼬리
+        + (r.tried > 1 ? ' · ' + r.tried + '번 시도' : '') + '</div></div>'
+      + (r.state === '실패'
+          ? '<button class="btn sub sm" data-act="rsretry" data-i="' + esc(r.id) + '">다시 보내기</button>'
+          : '')
+      + '</div>';
+  };
+
+  const 묶 = {};
+  목록.forEach(r => { const d = (r.lesson_date || '').slice(0,10) || '날짜 없음';
+    (묶[d] = 묶[d] || []).push(r); });
+
+  return 요약 + 칩 + 찾기
+    + (전부 ? '' : '<div class="note" style="margin-bottom:10px">내가 담당한 것만 보입니다</div>')
+    + Object.keys(묶).sort().reverse().map(d => '<div class="sec"><div class="lbl">'
+        + dateFull(d) + ' ' + 묶[d].length + '건</div>'
+        + 묶[d].map(줄).join('') + '</div>').join('');
+}
+
 function vTrash(){
   if(!최고관리자())
     return '<div class="empty">휴지통은 <b>최고 관리자</b>만 볼 수 있어요</div>';
@@ -6238,6 +6352,19 @@ function txMe(){
 /* 손잡이 — 클릭 위임의 맨 앞에서 받는다 */
 async function txAct(a, el){
   const k = el.dataset.k, id = el.dataset.id, v2 = el.dataset.v2;
+  if(a==='rsteach'){ RS선생 = act.dataset.i || ''; render();
+    const q = $('#rsq'); if(q){ q.focus(); q.setSelectionRange(q.value.length, q.value.length); }
+    return; }
+  if(a==='rsretry'){
+    const id = act.dataset.i, r = RS.find(x=>x.id===id);
+    if(!r) return;
+    if(!confirm((r.member_name||'') + ' 회원님께 다시 보낼까요?')) return;
+    try{
+      await spatch('report_sends', 'id=eq.' + encodeURIComponent(id),
+                   { state:'대기', fail_why:null, tried:0, queued_at:new Date().toISOString() });
+      await 발송기록읽기(); toast('보낼 목록에 다시 넣었습니다'); render();
+    }catch(e){ toast('못 넣었어요 — ' + e.message); }
+    return; }
   if(a==='go'){ S.view = k; document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('on', b.dataset.v===k)); render(); return; }
   if(a==='view'){ 표상태[k].보기 = v2; 보기얹기(k);
     고른행 = { key:null, ids:[] }; render(); return; }
@@ -6836,6 +6963,9 @@ function render0(){
   } else if(S.view==='today'){
     top.innerHTML = '<h1>오늘</h1><span class="cnt">' + dateFull(TODAY) + '</span>';
     b.innerHTML = vToday();
+  } else if(S.view==='reports'){
+    top.innerHTML = '<h1>리포트 발송 기록</h1><span class="cnt">수업 기록 알림톡 · 05~24시에 나갑니다</span>';
+    b.innerHTML = vReports();
   } else if(S.view==='trash'){
     top.innerHTML = '<h1>휴지통</h1>';
     b.innerHTML = vTrash();
@@ -6972,6 +7102,15 @@ async function saveItemField(id, f, v){
 }
 
 /* ── 눌림 ── */
+/* 리포트 찾기 칸 — 치는 대로 거른다. 다시 그린 뒤 커서를 끝에 되돌려 놓는다 */
+document.addEventListener('input', ev => {
+  if(!ev.target || ev.target.id !== 'rsq') return;
+  RS찾 = ev.target.value;
+  render();
+  const q = $('#rsq');
+  if(q){ q.focus(); q.setSelectionRange(q.value.length, q.value.length); }
+});
+
 document.addEventListener('click', async function(ev){
   const t = ev.target;
   시프트 = ev.shiftKey;                     /* 목록에서 사이 한꺼번에 고르기 */
@@ -6980,8 +7119,11 @@ document.addEventListener('click', async function(ev){
      && !t.closest('[data-act="tx:pedit"]') && !t.closest('[data-act="tx:pmenu"]') && !t.closest('[data-act="tx:padd"]')) 쪽지닫기();
 
   const nav = t.closest('.nav');
-  if(nav){ S.view = nav.dataset.v;
+  if(nav){ RS선생 = ''; RS찾 = '';     /* 화면을 옮기면 거르개를 푼다 */
+    S.view = nav.dataset.v;
     document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('on', b===nav));
+    /* 리포트 화면은 **들어올 때마다** 새로 읽는다 — 서버가 방금 보냈을 수 있다 */
+    if(S.view === 'reports') 발송기록읽기().then(()=>render()).catch(()=>{});
     render(); return; }
 
   const chip = t.closest('[data-who]');
