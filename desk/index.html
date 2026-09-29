@@ -1247,7 +1247,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '126';
+const BUILD = '128';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -3810,9 +3810,9 @@ function vReports(){
 
   const 칩 = 전부 && 선생들.length
     ? '<div class="chips" style="margin-bottom:9px">'
-      + '<button class="chip' + (RS선생 ? '' : ' on') + '" data-act="rsteach" data-i="">전부 '
+      + '<button class="chip' + (RS선생 ? '' : ' on') + '" data-act="tx:rsteach" data-i="">전부 '
         + 내것.length + '</button>'
-      + 선생들.map(t => '<button class="chip' + (RS선생 === t ? ' on' : '') + '" data-act="rsteach" data-i="'
+      + 선생들.map(t => '<button class="chip' + (RS선생 === t ? ' on' : '') + '" data-act="tx:rsteach" data-i="'
           + esc(t) + '">' + esc(t) + ' ' + RS.filter(r => (r.trainer||'') === t).length + '</button>').join('')
       + '</div>'
     : '';
@@ -3855,7 +3855,7 @@ function vReports(){
       + '<div class="t2" style="margin-top:2px;opacity:.75">요청 ' + 때(r.queued_at) + ' · ' + 꼬리
         + (r.tried > 1 ? ' · ' + r.tried + '번 시도' : '') + '</div></div>'
       + (r.state === '실패'
-          ? '<button class="btn sub sm" data-act="rsretry" data-i="' + esc(r.id) + '">다시 보내기</button>'
+          ? '<button class="btn sub sm" data-act="tx:rsretry" data-i="' + esc(r.id) + '">다시 보내기</button>'
           : '')
       + '</div>';
   };
@@ -6486,17 +6486,29 @@ function 홈배치붙이기(){
    ⛔ 세는 식과 목록을 뽑는 식을 **따로 쓰지 않는다** — 여기 한 곳에서 뽑고 숫자줄은 길이만 센다.
       (따로 두면 4를 눌렀는데 3개가 뜬다) */
 const 현황칸 = [
-  { k:'밀림', 이름:'코멘트 밀림', 색:'warn' },
-  { k:'부름', 이름:'나를 부른 댓글', 색:'warn' },
-  { k:'업무', 이름:'내 업무',     색:'gold' },
-  { k:'요청', 이름:'코멘트 요청', 색:'teal' },
-  { k:'안봄', 이름:'회원 안 봄',  색:'teal' },
-  { k:'운동', 이름:'오늘 운동',   색:'gold' },
-  { k:'상담', 이름:'오늘 상담',   색:'gold' },
+  { k:'부름', 이름:'나를 부른 댓글',   색:'warn' },
+  { k:'실패', 이름:'리포트 발송 실패', 색:'warn' },
+  { k:'밀림', 이름:'코멘트 밀림',      색:'warn' },
+  { k:'업무', 이름:'내 업무',          색:'gold' },
+  { k:'요청', 이름:'코멘트 요청',      색:'teal' },
+  { k:'안봄', 이름:'회원 안 봄',       색:'teal' },
+  { k:'운동', 이름:'오늘 운동',        색:'gold' },
+  { k:'상담', 이름:'오늘 상담',        색:'gold' },
+  /* 아래 둘은 **관리자에게만**. 급한 일이 아니라 색도 죽여 둔다
+     (2026-09-29 대표 「같은 직장에서 일하니까 급한건 아니야」) */
+  { k:'연월차', 이름:'연월차 승인 대기', 색:'', 보임: () => 관리자() },
+  { k:'가입',   이름:'가입 신청 대기',   색:'', 보임: () => 최고관리자(),
+    셈: () => 가입대기수, 직접: () => 승인판열기() },
 ];
 const 현황목록 = {
   밀림: () => 끊긴목록(),
   부름: () => 안읽은부름(),
+  /* 실패 = 알림톡이 안 나갔다 = **회원이 리포트를 못 받았다.** 제일 급한 신호다.
+     관리자는 전부, 선생님은 자기가 한 수업만 본다 (리포트 화면과 같은 기준) */
+  실패: () => (RS || []).filter(r => r.state === '실패')
+          .filter(r => 최고관리자() || 관리자() || (r.trainer || '') === ((ME && ME.name) || '')),
+  연월차: () => (W.leave || []).filter(r => r.status === 'req')
+          .sort((a, b) => (a.day || '') > (b.day || '') ? 1 : -1),
   업무: () => W.tasks.filter(r=>!r.done && r.kind!=='대표공지' && 내것(r.owners)).sort(표정의.tasks.정렬),
   요청: () => D.asks.filter(a=>!a.done_at && 내담당(a.member_id)),
   안봄: () => D.c.filter(c=>!c.read_at && 내담당(c.member_id))
@@ -6505,10 +6517,13 @@ const 현황목록 = {
   상담: () => W.leads.filter(r=>오늘인가(r.at) && !r.done)
               .sort((a,b)=>(a.at||'') > (b.at||'') ? 1 : -1),
 };
-const 현황셈하기 = k => { try{ return (현황목록[k]||(()=>[]))().length; }catch(e){ return 0; } };
+const 현황셈하기 = k => {
+  const c = 현황칸.find(x => x.k === k);
+  try{ return c && c.셈 ? (c.셈() || 0) : (현황목록[k] || (()=>[]))().length; }
+  catch(e){ return 0; } };
 
 function 숫자줄(){
-  return '<div class="homenums">' + 현황칸.map(function(c){
+  return '<div class="homenums">' + 현황칸.filter(c => !c.보임 || c.보임()).map(function(c){
     const v = 현황셈하기(c.k);
     return '<button class="num' + (v ? ' ' + c.색 : ' zero') + '"'
       + ' data-act="tx:numopen" data-v2="' + c.k + '"'
@@ -6523,6 +6538,8 @@ function 숫자줄(){
       (아침에 만든 사이드 페이지는 같은 목록을 세 번째로 그린 것이었다 — 걷어냈다) */
 const 현황길 = {
   부름: () => 가기('tasks'),          /* 부름은 여러 표에 흩어져 있다 — 사이드에서 골라 들어간다 */
+  실패: () => 가기('reports'),
+  연월차: () => { 표상태.leave.보기 = 'req'; 보기얹기('leave'); 가기('leave'); },
   밀림: () => { S.cmOnly = 'cold';   S.cmSort = 'old';    가기('cmall'); },
   업무: () => { 표상태.tasks.보기 = 'mine';  보기얹기('tasks'); 가기('tasks'); },
   요청: () => { S.cmOnly = 'ask';    S.cmSort = 'ask';    가기('cmall'); },
@@ -6542,14 +6559,20 @@ function 가기(v){
    ⛔ 「보기만」 하는 판이 아니다. 줄마다 **그 자리에서 끝낼 수 있는 단추**를 둔다.
    ⛔ 줄의 「열기 ›」는 **회원 전체 페이지**로 간다 — 사이드 안에서 또 사이드를 열지 않는다. */
 let 현황판 = null;
-function 현황판열기(k){ if(!현황목록[k]) return; 현황판 = k; 현황판그리기(); }
+function 현황판열기(k){
+  const c = 현황칸.find(x => x.k === k);
+  if(c && c.직접){ 현황판 = null; c.직접(); return; }   /* 이미 있는 판을 그대로 연다 (가입 승인) */
+  if(!현황목록[k]) return;
+  현황판 = k; 현황판그리기(); }
 function 현황판그리기(){
   if(!현황판) return;
   const k = 현황판, 칸 = 현황칸.find(x=>x.k===k) || { 이름:k };
   let 목 = [];
   try{ 목 = 현황목록[k](); }catch(e){ 목 = []; }
 
-  const 빈말 = { 부름:'나를 부른 댓글이 없어요 👍', 밀림:'밀린 코멘트가 없어요 👍', 업무:'남은 업무가 없어요 👍',
+  const 빈말 = { 부름:'나를 부른 댓글이 없어요 👍', 실패:'못 보낸 리포트가 없어요 👍',
+                 연월차:'승인할 신청이 없어요 👍',
+                 밀림:'밀린 코멘트가 없어요 👍', 업무:'남은 업무가 없어요 👍',
                  요청:'답할 요청이 없어요 👍', 안봄:'회원이 다 읽었어요 👍',
                  운동:'오늘 기록된 운동이 없어요', 상담:'오늘 잡힌 상담이 없어요' }[k] || '지금은 없어요';
 
@@ -6574,6 +6597,27 @@ function 현황판그리기(){
       + (r ? '<button class="btn gold sm" data-act="tx:cmgo" data-k="' + key + '" data-id="' + esc(c.row_id)
              + '" data-v2="' + esc(c.id) + '">열기 ›</button>'
            : '<span class="tag warn">지워진 줄</span>') + '</div>'; }).join('');
+
+  /* 리포트 발송 실패 — 왜 못 갔는지 보이고, 그 자리에서 다시 넣는다 */
+  else if(k === '실패') 속 = 목.map(r =>
+      '<div class="card rowc nmrow"><div style="flex:1;min-width:0">'
+      + '<div class="t1">' + esc(r.member_name || '이름 없음')
+        + ' <span class="t2" style="display:inline">· ' + esc(r.trainer || '담당 없음') + '</span></div>'
+      + '<div class="t2">' + esc(r.lesson_date || '') + ' · ' + esc(r.summary || '') + '</div>'
+      + '<div class="t2" style="color:var(--warn);margin-top:3px">' + esc(r.fail_why || '왜인지 안 적혔어요')
+        + (r.tried ? ' · ' + r.tried + '번 해 봄' : '') + '</div></div>'
+      + '<button class="btn gold sm" data-act="tx:rsretry" data-i="' + esc(r.id) + '">다시 보내기</button></div>').join('');
+
+  /* 연월차 승인 대기 — ⛔ 앞서는 승인 단추가 없어 줄을 열고 「속성」까지 들어가야 했다 */
+  else if(k === '연월차') 속 = 목.map(r =>
+      '<div class="card rowc nmrow"><div style="flex:1;min-width:0">'
+      + '<div class="t1">' + 아바타(r.staff_id) + ' ' + esc(사람(r.staff_id).name)
+        + ' <span class="tag gold">' + esc(r.kind || '') + '</span></div>'
+      + '<div class="t2">' + esc(날짜한글(r.day)) + (r.day_end ? ' ~ ' + esc(날짜한글(r.day_end)) : '')
+        + (r.days ? ' · ' + r.days + '일' : '') + '</div>'
+      + (r.reason ? '<div class="t2" style="opacity:.75">' + esc(r.reason) + '</div>' : '') + '</div>'
+      + '<button class="btn gold sm" data-act="tx:lvok" data-id="' + esc(r.id) + '">승인</button>'
+      + '<button class="btn ghost sm" data-act="tx:lvno" data-id="' + esc(r.id) + '">반려</button></div>').join('');
 
   else if(k === '밀림') 속 = 목.map(x => 회원줄(x.m.id, esc(x.m.name),
       (x.없음 ? '코멘트 한 번도 없음' : '마지막 ' + dateFull(x.last)) + ' · 운동 ' + x.운동수 + '회 기록',
@@ -6878,17 +6922,21 @@ function txMe(){
 /* 손잡이 — 클릭 위임의 맨 앞에서 받는다 */
 async function txAct(a, el){
   const k = el.dataset.k, id = el.dataset.id, v2 = el.dataset.v2;
-  if(a==='rsteach'){ RS선생 = act.dataset.i || ''; render();
+  /* ⛔ 앞서 `data-act="rsteach"` 였다 — `tx:` 가 없으면 이 함수로 안 온다.
+       게다가 여기 없는 `act` 를 봐서, 눌러도 아무 일도 안 나고 오류도 안 났다 (2026-09-29에 살림) */
+  if(a==='rsteach'){ RS선생 = el.dataset.i || ''; render();
     const q = $('#rsq'); if(q){ q.focus(); q.setSelectionRange(q.value.length, q.value.length); }
     return; }
   if(a==='rsretry'){
-    const id = act.dataset.i, r = RS.find(x=>x.id===id);
+    const id = el.dataset.i, r = RS.find(x=>x.id===id);
     if(!r) return;
     if(!confirm((r.member_name||'') + ' 회원님께 다시 보낼까요?')) return;
     try{
       await spatch('report_sends', 'id=eq.' + encodeURIComponent(id),
                    { state:'대기', fail_why:null, tried:0, queued_at:new Date().toISOString() });
-      await 발송기록읽기(); toast('보낼 목록에 다시 넣었습니다'); render();
+      await 발송기록읽기(); toast('보낼 목록에 다시 넣었습니다');
+      if(현황판) 현황판그리기();
+      render();
     }catch(e){ toast('못 넣었어요 — ' + e.message); }
     return; }
   if(a==='go'){ S.view = k; document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('on', b.dataset.v===k)); render(); return; }
@@ -7232,6 +7280,19 @@ async function txAct(a, el){
   /* 부름 — 줄을 열면 **그 하나는 읽음**이 된다 */
   if(a==='cmgo'){ 현황판 = null; await 부름읽음(v2); await txView(k, id); return; }
   if(a==='cmallread'){ await 부름모두읽음(); 현황판그리기(); return; }
+  /* 연월차 승인·반려 — 그 자리에서 끝낸다 */
+  if(a==='lvok' || a==='lvno'){
+    const r = (W.leave||[]).find(x => x.id === id); if(!r) return;
+    const 새 = (a === 'lvok') ? 'ok' : 'no';
+    if(새 === 'no' && !confirm(사람(r.staff_id).name + ' 님의 ' + (r.kind||'') + ' 신청을 반려할까요?')) return;
+    try{
+      const o2 = await usend('tr_leave?id=eq.' + r.id, 'PATCH', { status: 새 }, 'return=representation');
+      if(o2 && o2[0]){ const i2 = W.leave.findIndex(x => x.id === r.id); if(i2 >= 0) W.leave[i2] = o2[0]; }
+      else r.status = 새;
+      toast(새 === 'ok' ? '승인했습니다' : '반려했습니다');
+      현황판그리기(); render();
+    }catch(e){ toast('못 바꿨어요 — ' + e.message); }
+    return; }
   /* 댓글 칸에서 사람을 부른다 — 칩을 누르면 @이름 이 들어간다 */
   if(a==='cmat'){
     /* ⚠ 바깥 파라미터도 `el` 이다 — 가리면 헷갈린다. 글자 칸은 `칸` 으로 부른다 */
@@ -7252,7 +7313,8 @@ async function txAct(a, el){
     return; }
   /* ② 사진 비율만 따로 — 누르면 바로 저장하고 다시 그린다 */
   if(a==='ratio'){
-    const goal = Object.assign({}, ME.goal||{}, { ratio: act.dataset.v2 });
+    /* ⛔ 여기도 없는 `act` 를 보고 있었다 — 사진 비율 단추가 안 먹었다 (2026-09-29에 살림) */
+    const goal = Object.assign({}, ME.goal||{}, { ratio: v2 });
     try{ await usend('staff?id=eq.'+ME.id, 'PATCH', { goal }); ME.goal = goal;
       const i = W.staff.findIndex(x=>x.id===ME.id); if(i>=0) W.staff[i].goal = goal;
       txMe(); render(); }
@@ -7355,6 +7417,8 @@ async function boot(){
     await load();
     /* 브로제이 잔여를 받은 뒤라야 잠수 회원을 셀 수 있다 */
     잔여받기().then(주간올리기).catch(()=>{});
+    /* ⛔ 앞서는 리포트 화면에 들어가야만 읽었다 — 그래서 홈에서 「발송 실패」를 셀 수 없었다 */
+    발송기록읽기().then(()=>{ if(S.view === 'home') render(); }).catch(()=>{});
   }catch(e){
     $('#txlerr').textContent = '들어가지 못했어요 — ' + e.message;
     authSave(null); $('#txlogin').classList.add('on');
