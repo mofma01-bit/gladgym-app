@@ -823,6 +823,14 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 .hwide:hover::before,.hwide.on::before{background:var(--gold-2)}
 .hmbar .reset{color:var(--sub)}
 
+/* 현황판 숫자 — 눌리는 것이라는 티를 낸다 */
+.hblk > .homenums .num{border-radius:11px;padding:7px 12px;transition:background .12s}
+.hblk > .homenums .num:hover{background:#232320}
+.hblk > .homenums .num:hover .k{color:var(--gold-2)}
+/* 사이드 페이지 줄 — 이름 왼쪽, 단추 오른쪽 */
+.nmrow{gap:9px;margin-bottom:8px}
+.nmrow .btn.sm{flex:none}
+
 /* ══ 덩어리 경계 ══ 2026-09-29 대표 「이거 다 까매서 경계가 어딘지 모르겠어 · 그냥 둥둥 다 떠있는 느낌」
    ⛔ 줄마다 선을 긋지 않는다 — 정신없다. **제목이 붙은 덩어리**만 테두리로 묶는다.
    깊이 세 층 : 바탕 #131312 → 덩어리 #191917 → 그 안의 카드 #232320 */
@@ -1226,7 +1234,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '114';
+const BUILD = '115';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -6161,7 +6169,7 @@ function vHome(){
   const 그릴것 = {
     band:   () => 이름표,
     notice: () => 공지판,
-    nums:   () => 숫자줄(내업무.length, 오늘상담.length),
+    nums:   () => 숫자줄(),
     /* 카드 줄이 아니라 **표**로 본다 (2026-09-17 대표: 「그 아래 업무 데이터베이스로 바꿔」) */
     tasks:  () => '<div class="tx-home one"><div class="sec">'
       + '<div class="lbl">내 업무 ' + 내업무.length + '건'
@@ -6308,16 +6316,91 @@ function 홈배치붙이기(){
 }
 
 /* 숫자 한 줄 */
-function 숫자줄(업무수, 상담수){
-  const 밀 = 끊긴목록().length;
-  const 요청 = D.asks.filter(a=>!a.done_at && 내담당(a.member_id)).length;
-  const 안본 = D.c.filter(c=>!c.read_at && 내담당(c.member_id)).length;
-  const 오늘운동 = D.w.filter(w=>w.on_date===TODAY && 내담당(w.member_id)).length;
-  const it = (v, k, c) => '<button class="num'+(v?' '+c:' zero')+'"><span class="v">'+v+'</span><span class="k">'+k+'</span></button>';
-  return '<div class="homenums">'
-    + it(밀,'코멘트 밀림','warn') + it(업무수,'내 업무','gold') + it(요청,'코멘트 요청','teal')
-    + it(안본,'회원 안 봄','teal') + it(오늘운동,'오늘 운동','gold') + it(상담수,'오늘 상담','gold')
-    + '</div>';
+/* ══ 현황판 ══ 숫자를 누르면 **그 일감이 사이드 페이지로 뜬다** (2026-09-29 대표
+     「누르면 사이페이지에서 업무 할 수 있도록 띄워 · 현황판에 숫자만 뜨고 업무를 찾아다녀야 하잖아」)
+   ⛔ 세는 식과 목록을 뽑는 식을 **따로 쓰지 않는다** — 여기 한 곳에서 뽑고 숫자줄은 길이만 센다.
+      (따로 두면 4를 눌렀는데 3개가 뜬다) */
+const 현황칸 = [
+  { k:'밀림', 이름:'코멘트 밀림', 색:'warn' },
+  { k:'업무', 이름:'내 업무',     색:'gold' },
+  { k:'요청', 이름:'코멘트 요청', 색:'teal' },
+  { k:'안봄', 이름:'회원 안 봄',  색:'teal' },
+  { k:'운동', 이름:'오늘 운동',   색:'gold' },
+  { k:'상담', 이름:'오늘 상담',   색:'gold' },
+];
+const 현황목록 = {
+  밀림: () => 끊긴목록(),
+  업무: () => W.tasks.filter(r=>!r.done && r.kind!=='대표공지' && 내것(r.owners)).sort(표정의.tasks.정렬),
+  요청: () => D.asks.filter(a=>!a.done_at && 내담당(a.member_id)),
+  안봄: () => D.c.filter(c=>!c.read_at && 내담당(c.member_id))
+              .sort((a,b)=>(a.created_at||'') < (b.created_at||'') ? 1 : -1),
+  운동: () => D.w.filter(w=>w.on_date===TODAY && 내담당(w.member_id)),
+  상담: () => W.leads.filter(r=>오늘인가(r.at) && !r.done)
+              .sort((a,b)=>(a.at||'') > (b.at||'') ? 1 : -1),
+};
+const 현황셈하기 = k => { try{ return (현황목록[k]||(()=>[]))().length; }catch(e){ return 0; } };
+
+function 숫자줄(){
+  return '<div class="homenums">' + 현황칸.map(function(c){
+    const v = 현황셈하기(c.k);
+    return '<button class="num' + (v ? ' ' + c.색 : ' zero') + '"'
+      + ' data-act="tx:numopen" data-v2="' + c.k + '"'
+      + ' title="' + c.이름 + ' — 눌러서 여기서 바로 처리">'
+      + '<span class="v">' + v + '</span><span class="k">' + c.이름 + '</span></button>';
+  }).join('') + '</div>';
+}
+
+/* ── 숫자를 누르면 뜨는 사이드 페이지 ──
+   ⛔ 「보기만」 하는 판이 아니다. 줄마다 **그 자리에서 끝낼 수 있는 단추**를 둔다 */
+let 현황판 = null;
+function 현황판열기(k){ if(!현황목록[k]) return; 현황판 = k; 현황판그리기(); }
+function 현황판그리기(){
+  if(!현황판) return;
+  const k = 현황판, 칸 = 현황칸.find(x=>x.k===k) || { 이름:k };
+  let 목 = [];
+  try{ 목 = 현황목록[k](); }catch(e){ 목 = []; }
+
+  const 빈말 = { 밀림:'밀린 코멘트가 없어요 👍', 업무:'남은 업무가 없어요 👍',
+                 요청:'답할 요청이 없어요 👍', 안봄:'회원이 다 읽었어요 👍',
+                 운동:'오늘 기록된 운동이 없어요', 상담:'오늘 잡힌 상담이 없어요' }[k] || '지금은 없어요';
+
+  const 회원줄 = (mid, 제목, 밑, 오른, 단추) =>
+    '<div class="card rowc nmrow"><div style="flex:1;min-width:0">'
+    + '<div class="t1">' + 제목 + '</div><div class="t2">' + 밑 + '</div></div>'
+    + (오른 || '') + (단추 || '')
+    + '<button class="btn ghost sm" data-m="' + esc(mid) + '" data-tab="comment">열기 ›</button></div>';
+
+  let 속 = '';
+  if(!목.length) 속 = '<div class="empty">' + 빈말 + '</div>';
+
+  else if(k === '밀림') 속 = 목.map(x => 회원줄(x.m.id, esc(x.m.name),
+      (x.없음 ? '코멘트 한 번도 없음' : '마지막 ' + dateFull(x.last)) + ' · 운동 ' + x.운동수 + '회 기록',
+      '<span class="tag warn">' + (x.gap == null ? '기간 모름' : x.gap + '일') + '</span>',
+      '<button class="btn gold sm" data-cmquick="' + esc(x.m.id) + '">＋ 남기기</button>')).join('');
+
+  else if(k === '요청') 속 = 목.map(a => 회원줄(a.member_id,
+      esc(memOf(a.member_id).name) + ' <span class="t2" style="display:inline">· ' + esc(vaName(a.variant_id)) + '</span>',
+      esc(a.note || '따로 적은 말은 없습니다'), '',
+      '<button class="btn gold sm" data-cmquick="' + esc(a.member_id) + '">답 남기기</button>')).join('');
+
+  else if(k === '안봄') 속 = 목.map(c => 회원줄(c.member_id,
+      esc(memOf(c.member_id).name) + ' <span class="tag teal">아직 안 읽음</span>',
+      dateFull((c.created_at || '').slice(0, 10)) + ' · ' + esc((c.body || '').slice(0, 60)), '', '')).join('');
+
+  else if(k === '운동') 속 = 목.map(w => 회원줄(w.member_id, esc(memOf(w.member_id).name),
+      esc(w.title || '') + ' · ' + esc(w.kind || ''),
+      '<span class="tag ' + (w.done ? 'teal' : 'gold') + '">' + (w.done ? '끝' : '하는 중') + '</span>',
+      '<button class="btn gold sm" data-cmquick="' + esc(w.member_id) + '">＋ 코멘트</button>')).join('');
+
+  /* 업무·상담은 **표의 줄 그대로** 쓴다 — 오른쪽 끝 ✓ 를 눌러 여기서 바로 완료가 된다 */
+  else 속 = '<div class="tx-home one"><div class="tx-list">'
+      + 목.map(r => txRow(k === '업무' ? 'tasks' : 'leads', r)).join('') + '</div></div>';
+
+  판열기(esc(칸.이름) + ' <span class="who3">' + 목.length + '건</span>',
+    '<div class="sec">' + 속 + '</div>',
+    '<div class="tx-fbtns"><span class="tx-stat"></span>'
+    + '<button class="btn sub" data-act="tx:go" data-k="' + (k === '업무' ? 'tasks' : k === '상담' ? 'leads' : 'cmall') + '">전체 페이지로 ›</button>'
+    + '<button class="btn ghost" data-act="popclose">닫기</button></div>');
 }
 /* ── 코멘트가 밀린 회원 ──
    ⛔ 운동 기록이 아니라 **마지막으로 코멘트를 단 날**이 기준이다
@@ -6970,6 +7053,8 @@ async function txAct(a, el){
   /* 처음 배치로 — 잘못 끌었을 때 되돌리는 길 */
   if(a==='hmreset'){ if(!confirm('홈 배치를 처음으로 되돌릴까요?')) return;
     S.hmOpen = null; 내홈저장({ 배치: null, 배치2: null }); return; }
+  /* 현황판 숫자 → 사이드 페이지 */
+  if(a==='numopen'){ 현황판열기(v2); return; }
   /* ⠿ 를 누르면 옮김판 — 끌 수도 있고 눌러서 옮길 수도 있다 */
   if(a==='hmmove'){ S.hmOpen = (S.hmOpen === v2) ? null : v2; render(); return; }
   if(a==='hmclose'){ S.hmOpen = null; render(); return; }
@@ -7190,6 +7275,8 @@ function render(){
   /* 회원 사이드 페이지가 열려 있으면 그 안도 같이 새로 그린다 */
   if(typeof 회원판 !== 'undefined' && 회원판 && $('#pop').classList.contains('on')) 회원판그리기();
   if(typeof 지정판 !== 'undefined' && 지정판 && $('#pop').classList.contains('on')) 지정판그리기();
+  /* 현황판 사이드 페이지 — 여기서 완료를 누르면 목록이 **그 자리에서** 줄어야 한다 */
+  if(typeof 현황판 !== 'undefined' && 현황판 && $('#pop').classList.contains('on')) 현황판그리기();
   if(typeof 고른칸다시 === 'function') 고른칸다시();
   return 났;
 }
@@ -7312,6 +7399,7 @@ function 판열기(머리, 속, 발){
 function popClose(){ if(typeof 쪽지닫기==='function') 쪽지닫기();
   if(typeof 회원판 !== 'undefined') 회원판 = null;
   if(typeof 지정판 !== 'undefined') 지정판 = null;
+  if(typeof 현황판 !== 'undefined') 현황판 = null;
   if(typeof BL!=='undefined' && BL){ try{ 글자넣기(); }catch(e){} }
   if(typeof 고른줄!=='undefined'){ 고른줄 = []; const sb = $('#txselbar'); if(sb) sb.remove(); }
   if(typeof 블록메뉴닫기==='function') 블록메뉴닫기();
