@@ -812,6 +812,7 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 .hmove button:hover{border-color:var(--gold-2);color:var(--gold)}
 .hmove button[disabled]{opacity:.3;pointer-events:none}
 .hmove .wide{grid-column:1/-1}
+.hmove .why{margin-top:7px;font-size:11px;color:var(--sub);line-height:1.5;padding:0 3px}
 .hmove .x{margin-top:6px;width:100%;color:var(--sub);font-weight:600}
 .hcol{display:flex;flex-direction:column;min-width:0}
 .hcol > .hblk{margin-bottom:14px}
@@ -833,6 +834,10 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 .hblk > .homenums .num{border-radius:11px;padding:7px 12px;transition:background .12s}
 .hblk > .homenums .num:hover{background:#232320}
 .hblk > .homenums .num:hover .k{color:var(--gold-2)}
+/* 사이드 페이지 줄 — 이름 왼쪽, 단추 오른쪽 */
+.nmrow{gap:9px;margin-bottom:8px}
+.nmrow .btn.sm{flex:none}
+
 /* ══ 덩어리 경계 ══ 2026-09-29 대표 「이거 다 까매서 경계가 어딘지 모르겠어 · 그냥 둥둥 다 떠있는 느낌」
    ⛔ 줄마다 선을 긋지 않는다 — 정신없다. **제목이 붙은 덩어리**만 테두리로 묶는다.
    깊이 세 층 : 바탕 #131312 → 덩어리 #191917 → 그 안의 카드 #232320 */
@@ -846,9 +851,12 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 /* 덩어리를 감싸기만 하는 껍데기 — 아래 여백은 칸(hcol)이 준다 */
 .hblk .tx-home.one{margin-bottom:0}
 .hblk .cols3{gap:14px}
-/* 현황판 — 제목이 없다. 숫자는 오른쪽에 붙인다 (2026-09-29 대표 「간격이 불필요하게 넓으니까 우측에 밀고」) */
-.hblk > .homenums{display:flex;justify-content:flex-end;gap:34px;
-  background:#191917;border:1px solid #30302b;border-radius:14px;padding:16px 20px;margin:0}
+/* 현황판 — 제목이 없다. 숫자는 오른쪽에 붙인다 (2026-09-29 대표 「간격이 불필요하게 넓으니까 우측에 밀고」)
+   ⛔ `flex-end` 는 칸보다 넓어지면 **왼쪽으로 넘쳐** 메뉴바를 덮는다 (2026-09-29 대표 지적).
+      `flex-wrap:wrap` 으로 좁을 때 줄을 바꾸게 해 어떤 폭에서도 칸 밖으로 안 나가게 한다. */
+.hblk > .homenums{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:16px 34px;
+  background:#191917;border:1px solid #30302b;border-radius:14px;padding:16px 20px;margin:0;
+  min-width:0;max-width:100%}
 .hblk > .homenums .v{font-size:34px}
 .hblk > .homenums .k{font-size:11.5px;white-space:nowrap}
 /* 내 이름표는 이미 카드다 — 테두리만 또렷하게 */
@@ -1232,7 +1240,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '120';
+const BUILD = '123';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -6286,6 +6294,16 @@ function 배치읽기(){
   우 = 우.filter(k => !본.has(k) && 본.add(k));
   다.forEach(k => { if(!본.has(k)) 우.push(k); });
 
+  /* ⛔ 못박힌 블록은 제 단으로 돌려놓는다 — 옛 배치에 잘못 들어 있어도 여기서 바로잡힌다
+     (현황판이 왼쪽 단에 있으면 메뉴바를 덮는다) */
+  홈블록.forEach(function(b){
+    if(!b.단고정) return;
+    const 남 = b.단고정 === '좌' ? '우' : '좌';
+    const 목 = b.단고정 === '좌' ? 좌 : 우, 딴 = b.단고정 === '좌' ? 우 : 좌;
+    const i = 딴.indexOf(b.k);
+    if(i >= 0){ 딴.splice(i, 1); if(목.indexOf(b.k) < 0) 목.unshift(b.k); }
+  });
+
   let 폭 = +((b && b.폭) != null ? b.폭 : 폭기본);
   폭 = Math.min(폭최대, Math.max(폭최소, isNaN(폭) ? 폭기본 : 폭));
   return { 좌, 우, 폭 };
@@ -6306,15 +6324,22 @@ function 옮김판(단, 자리, k){
     + '<div class="g">'
     + b('up', '↑ 위로', 자리 <= 0)
     + b('down', '↓ 아래로', 자리 >= 목.length - 1)
-    + b('swap', (단 === '좌' ? '→ 오른쪽 단으로' : '← 왼쪽 단으로'), false)
+    + b('swap', (단 === '좌' ? '→ 오른쪽 단으로' : '← 왼쪽 단으로'),
+        !!(홈블록.find(x => x.k === k) || {}).단고정)
     + b('top', '⤒ 맨 위로', 자리 <= 0)
     + '</div>'
+    + ((홈블록.find(x => x.k === k) || {}).단고정
+        ? '<div class="why">넓어서 이 단에만 둘 수 있어요</div>' : '')
     + '<button class="x" data-act="tx:hmclose">닫기</button></div>';
 }
 
 function 블록옮기기(B, 단, 자리, 할것){
   const 목 = B[단]; if(!목 || 목[자리] == null) return B;
   const k = 목[자리];
+  /* 못박힌 블록은 단을 못 바꾼다 — 판에서도 막지만, 여기서 한 번 더 막는다 */
+  if(할것 === 'swap' && (홈블록.find(x => x.k === k) || {}).단고정){
+    toast('「' + ((홈블록.find(x => x.k === k)||{}).이름 || k) + '」은 넓어서 이 단에만 둘 수 있어요');
+    return B; }
   if(할것 === 'up' && 자리 > 0){ 목.splice(자리, 1); 목.splice(자리 - 1, 0, k); }
   else if(할것 === 'down' && 자리 < 목.length - 1){ 목.splice(자리, 1); 목.splice(자리 + 1, 0, k); }
   else if(할것 === 'top'){ 목.splice(자리, 1); 목.unshift(k); }
@@ -6413,7 +6438,61 @@ function 가기(v){
   고른행 = { key:null, ids:[] };
   render();
 }
-function 현황판열기(k){ const f = 현황길[k]; if(f) f(); }
+
+/* ── ① 숫자를 누르면 **사이드 페이지** ──
+   2026-09-29 대표 「바로 넘어가지말고 일단 사이드페이지를 띄우라고」
+   ⛔ 「보기만」 하는 판이 아니다. 줄마다 **그 자리에서 끝낼 수 있는 단추**를 둔다.
+   ⛔ 줄의 「열기 ›」는 **회원 전체 페이지**로 간다 — 사이드 안에서 또 사이드를 열지 않는다. */
+let 현황판 = null;
+function 현황판열기(k){ if(!현황목록[k]) return; 현황판 = k; 현황판그리기(); }
+function 현황판그리기(){
+  if(!현황판) return;
+  const k = 현황판, 칸 = 현황칸.find(x=>x.k===k) || { 이름:k };
+  let 목 = [];
+  try{ 목 = 현황목록[k](); }catch(e){ 목 = []; }
+
+  const 빈말 = { 밀림:'밀린 코멘트가 없어요 👍', 업무:'남은 업무가 없어요 👍',
+                 요청:'답할 요청이 없어요 👍', 안봄:'회원이 다 읽었어요 👍',
+                 운동:'오늘 기록된 운동이 없어요', 상담:'오늘 잡힌 상담이 없어요' }[k] || '지금은 없어요';
+
+  const 회원줄 = (mid, 제목, 밑, 오른, 단추) =>
+    '<div class="card rowc nmrow"><div style="flex:1;min-width:0">'
+    + '<div class="t1">' + 제목 + '</div><div class="t2">' + 밑 + '</div></div>'
+    + (오른 || '') + (단추 || '')
+    + '<button class="btn ghost sm" data-mfull="' + esc(mid) + '" data-tab="comment">열기 ›</button></div>';
+
+  let 속 = '';
+  if(!목.length) 속 = '<div class="empty">' + 빈말 + '</div>';
+
+  else if(k === '밀림') 속 = 목.map(x => 회원줄(x.m.id, esc(x.m.name),
+      (x.없음 ? '코멘트 한 번도 없음' : '마지막 ' + dateFull(x.last)) + ' · 운동 ' + x.운동수 + '회 기록',
+      '<span class="tag warn">' + (x.gap == null ? '기간 모름' : x.gap + '일') + '</span>',
+      '<button class="btn gold sm" data-cmquick="' + esc(x.m.id) + '">＋ 남기기</button>')).join('');
+
+  else if(k === '요청') 속 = 목.map(a => 회원줄(a.member_id,
+      esc(memOf(a.member_id).name) + ' <span class="t2" style="display:inline">· ' + esc(vaName(a.variant_id)) + '</span>',
+      esc(a.note || '따로 적은 말은 없습니다'), '',
+      '<button class="btn gold sm" data-cmquick="' + esc(a.member_id) + '">답 남기기</button>')).join('');
+
+  else if(k === '안봄') 속 = 목.map(c => 회원줄(c.member_id,
+      esc(memOf(c.member_id).name) + ' <span class="tag teal">아직 안 읽음</span>',
+      dateFull((c.created_at || '').slice(0, 10)) + ' · ' + esc((c.body || '').slice(0, 60)), '', '')).join('');
+
+  else if(k === '운동') 속 = 목.map(w => 회원줄(w.member_id, esc(memOf(w.member_id).name),
+      esc(w.title || '') + ' · ' + esc(w.kind || ''),
+      '<span class="tag ' + (w.done ? 'teal' : 'gold') + '">' + (w.done ? '끝' : '하는 중') + '</span>',
+      '<button class="btn gold sm" data-cmquick="' + esc(w.member_id) + '">＋ 코멘트</button>')).join('');
+
+  /* 업무·상담은 **표의 줄 그대로** 쓴다 — 오른쪽 끝 ✓ 를 눌러 여기서 바로 완료가 된다 */
+  else 속 = '<div class="tx-home one"><div class="tx-list">'
+      + 목.map(r => txRow(k === '업무' ? 'tasks' : 'leads', r)).join('') + '</div></div>';
+
+  판열기(esc(칸.이름) + ' <span class="who3">' + 목.length + '건</span>',
+    '<div class="sec">' + 속 + '</div>',
+    '<div class="tx-fbtns"><span class="tx-stat"></span>'
+    + '<button class="btn sub" data-act="tx:numgo" data-v2="' + k + '">전체 목록 ›</button>'
+    + '<button class="btn ghost" data-act="popclose">닫기</button></div>');
+}
 
 /* ── 코멘트가 밀린 회원 ──
    ⛔ 운동 기록이 아니라 **마지막으로 코멘트를 단 날**이 기준이다
@@ -6461,7 +6540,9 @@ const 내담당 = mid => S.who === '전체' || (memOf(mid).trainer || '') === S.
    되살리려면 이 표에 한 줄 더하고 `그릴것` 에 그리는 식을 붙이면 된다. */
 const 홈블록 = [
   { k:'band',  이름:'내 이름표',        단:'좌' },
-  { k:'nums',  이름:'현황판',           단:'우' },
+  /* 현황판은 숫자 여섯 칸이라 **좁은 단에 안 들어간다** — 오른쪽 단에 못박는다
+     (2026-09-29 대표 「우측에 있는 메뉴는 우측 안에서만 움직이게」) */
+  { k:'nums',  이름:'현황판',           단:'우', 단고정:'우' },
   { k:'notice',이름:'대표 공지',        단:'우' },
   { k:'today', 이름:'오늘 수업 · 루틴',  단:'우' },
   { k:'leave', 이름:'이번 주 연월차',   단:'좌' },
@@ -7030,8 +7111,9 @@ async function txAct(a, el){
   /* 처음 배치로 — 잘못 끌었을 때 되돌리는 길 */
   if(a==='hmreset'){ if(!confirm('홈 배치를 처음으로 되돌릴까요?')) return;
     S.hmOpen = null; 내홈저장({ 배치: null, 배치2: null }); return; }
-  /* 현황판 숫자 → 그 페이지로 */
+  /* ① 숫자 → 사이드 페이지 · ③ 「전체 목록 ›」 → 거르개 걸고 그 페이지로 */
   if(a==='numopen'){ 현황판열기(v2); return; }
+  if(a==='numgo'){ const f = 현황길[v2]; popClose(); if(f) f(); return; }
   /* ⠿ 를 누르면 옮김판 — 끌 수도 있고 눌러서 옮길 수도 있다 */
   if(a==='hmmove'){ S.hmOpen = (S.hmOpen === v2) ? null : v2; render(); return; }
   if(a==='hmclose'){ S.hmOpen = null; render(); return; }
@@ -7246,6 +7328,8 @@ function render(){
   /* 회원 사이드 페이지가 열려 있으면 그 안도 같이 새로 그린다 */
   if(typeof 회원판 !== 'undefined' && 회원판 && $('#pop').classList.contains('on')) 회원판그리기();
   if(typeof 지정판 !== 'undefined' && 지정판 && $('#pop').classList.contains('on')) 지정판그리기();
+  /* 현황판 사이드 페이지 — 여기서 완료를 누르면 목록이 **그 자리에서** 줄어야 한다 */
+  if(typeof 현황판 !== 'undefined' && 현황판 && $('#pop').classList.contains('on')) 현황판그리기();
   if(typeof 고른칸다시 === 'function') 고른칸다시();
   return 났;
 }
@@ -7367,6 +7451,7 @@ function 판열기(머리, 속, 발){
 function popClose(){ if(typeof 쪽지닫기==='function') 쪽지닫기();
   if(typeof 회원판 !== 'undefined') 회원판 = null;
   if(typeof 지정판 !== 'undefined') 지정판 = null;
+  if(typeof 현황판 !== 'undefined') 현황판 = null;
   if(typeof BL!=='undefined' && BL){ try{ 글자넣기(); }catch(e){} }
   if(typeof 고른줄!=='undefined'){ 고른줄 = []; const sb = $('#txselbar'); if(sb) sb.remove(); }
   if(typeof 블록메뉴닫기==='function') 블록메뉴닫기();
@@ -7490,7 +7575,10 @@ document.addEventListener('click', async function(ev){
     render(); return; }
 
   const tab = t.closest('[data-tab]');
-  if(tab && !tab.dataset.m){ S.tab = tab.dataset.tab;
+  /* ⚠ `data-tab` 만 달린 것은 **회원 화면의 탭 단추**다.
+     회원을 같이 일러 주는 것(data-m · data-mfull)은 여기서 가로채면 안 된다 —
+     현황판 사이드의 「열기 ›」가 탭만 바뀌고 안 열리던 이유가 이것이었다 (2026-09-29) */
+  if(tab && !tab.dataset.m && !tab.dataset.mfull){ S.tab = tab.dataset.tab;
     S.edit = { record:false, routine:false, body:false, meal:false, plan:false, minfo:false };
     render(); return; }
 
@@ -7546,8 +7634,10 @@ document.addEventListener('click', async function(ev){
 
   const 전체 = t.closest('[data-mfull]');
   if(전체){ const mid = 전체.dataset.mfull;
-    회원판 = null; $('#pop').classList.remove('on');
-    S.mid = mid; S.view='member'; S.tab = S.tab || 'routine';
+    회원판 = null; 현황판 = null; $('#pop').classList.remove('on');
+    S.mid = mid; S.view='member';
+    /* 어느 탭으로 갈지 일러 주면 그 탭으로 연다 (현황판 사이드의 「열기 ›」) */
+    S.tab = 전체.dataset.tab || S.tab || 'routine';
     render(); loadMember(mid); return; }
 
   /* ⚠ 회원 줄 **안에** 있는 단추는 여기서 먼저 처리한다.
