@@ -776,7 +776,8 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 .mc-note.empty{color:#4a4741}
 
 /* ══ 홈 블록 — 노션처럼 끌어 옮기고 넓이를 바꾼다 (2026-09-29 대표) ══ */
-.hrow{display:grid;align-items:start;margin-bottom:14px}
+.hrow{display:grid;align-items:start;margin-bottom:14px;min-height:38px}
+/* 나란히 선 블록이 키가 달라 아래가 휑해도, 그 빈 곳에 놓을 수 있다 (줄 전체가 드롭 자리) */
 .hblk{position:relative;min-width:0}
 .hblk > .hgrip{position:absolute;left:-2px;top:-2px;z-index:4;display:none;
   align-items:center;gap:5px;padding:3px 9px 3px 6px;border-radius:8px;
@@ -1182,7 +1183,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '106';
+const BUILD = '107';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -6176,19 +6177,17 @@ function 배치읽기(){
     b: (r.b || []).filter(k => 홈블록.some(x => x.k === k)),
     w: (r.w || []).slice() })).filter(r => r.b.length) : null;
 
-  if(!배){                                   /* 처음이면 옛 차례·단에서 만든다 */
+  if(!배){
+    /* ⛔ 옛 좌/우 두 단을 **짝지어** 줄로 옮기면 뒤죽박죽이 된다 (2026-09-29 대표
+       「갑자기 정렬이 지맘대로 바뀌었어」). 왼쪽 3개·오른쪽 6개를 1:1 로 붙였던 탓이다.
+       기본은 **프로필 + 현황판 한 줄, 나머지는 한 줄에 하나**. 옆에 붙이는 건 사람이 정한다. */
     const H = 내홈();
-    const 좌 = [], 우 = [], 위 = [];
-    H.차례.filter(k => !H.끔[k]).forEach(k => ({위:위, 좌:좌, 우:우}[블록단(k, H)] || 우).push(k));
+    const 켜진 = H.차례.filter(k => !H.끔[k]);
     배 = [];
-    위.forEach(k => 배.push({ b:[k], w:[100] }));
-    const n = Math.max(좌.length, 우.length);
-    for(let i=0; i<n; i++){
-      const row = [];
-      if(좌[i]) row.push(좌[i]);
-      if(우[i]) row.push(우[i]);
-      if(row.length) 배.push({ b:row, w: row.length===2 ? [30,70] : [100] });
-    }
+    const 첫줄 = ['band', 'nums'].filter(k => 켜진.indexOf(k) >= 0);
+    if(첫줄.length === 2) 배.push({ b:첫줄, w:[34, 66] });
+    켜진.forEach(k => { if(첫줄.indexOf(k) < 0) 배.push({ b:[k], w:[100] }); });
+    if(!배.length) 켜진.forEach(k => 배.push({ b:[k], w:[100] }));
   }
   const 든것 = new Set(배.flatMap(r => r.b));
   홈블록.forEach(x => { if(!든것.has(x.k)) 배.push({ b:[x.k], w:[100] }); });
@@ -6228,16 +6227,31 @@ function 홈배치붙이기(){
     box.querySelectorAll('.hblk.drag').forEach(e => e.classList.remove('drag'));
   });
 
+  /* 줄 안에서 마우스가 어느 블록 곁에 있나 — **빈 공간에 있어도** 제일 가까운 블록을 고른다
+     (2026-09-29 대표 「여기로 안 옮기지잖아」: 블록이 짧아 생긴 여백이 드롭 자리가 아니었다) */
+  const 가까운블록 = (row, x) => {
+    const bs = Array.from(row.querySelectorAll(':scope > .hblk'));
+    if(!bs.length) return null;
+    let 고른 = bs[0], 왼쪽 = true, 제일 = Infinity;
+    bs.forEach(b => {
+      const r = b.getBoundingClientRect();
+      const dL = Math.abs(x - r.left), dR = Math.abs(x - r.right);
+      if(dL < 제일){ 제일 = dL; 고른 = b; 왼쪽 = true; }
+      if(dR < 제일){ 제일 = dR; 고른 = b; 왼쪽 = false; }
+    });
+    return { b: 고른, 왼쪽 };
+  };
+
   box.addEventListener('dragover', e => {
     if(!끄는것) return;
     e.preventDefault();
     지우기();
     const gap = e.target.closest && e.target.closest('.hgap');
     if(gap){ gap.classList.add('on'); return; }
-    const b = e.target.closest && e.target.closest('.hblk');
-    if(!b) return;
-    const r = b.getBoundingClientRect();
-    b.classList.add(e.clientX < r.left + r.width / 2 ? 'dl' : 'dr');
+    const row = e.target.closest && e.target.closest('.hrow');
+    if(!row) return;
+    const 곳 = 가까운블록(row, e.clientX);
+    if(곳) 곳.b.classList.add(곳.왼쪽 ? 'dl' : 'dr');
   });
 
   box.addEventListener('drop', e => {
@@ -6247,13 +6261,14 @@ function 홈배치붙이기(){
     const 뺀 = 끄는것;
     /* 어디에 놓나 */
     const gap = e.target.closest && e.target.closest('.hgap');
-    const b = (!gap && e.target.closest) ? e.target.closest('.hblk') : null;
+    const 놓을줄 = (!gap && e.target.closest) ? e.target.closest('.hrow') : null;
     let 새줄 = null, 목표 = null, 왼쪽 = false;
     if(gap) 새줄 = +gap.dataset.r;
-    else if(b){
-      const r = b.getBoundingClientRect();
-      왼쪽 = e.clientX < r.left + r.width / 2;
-      목표 = { r: +b.dataset.r, i: +b.dataset.i };
+    else if(놓을줄){
+      const 곳 = 가까운블록(놓을줄, e.clientX);
+      if(!곳){ 지우기(); return; }
+      왼쪽 = 곳.왼쪽;
+      목표 = { r: +곳.b.dataset.r, i: +곳.b.dataset.i };
       if(배[목표.r] && 배[목표.r].b.length >= 줄최대 && 목표.r !== 뺀.r){
         toast('한 줄에 ' + 줄최대 + '개까지만 놓을 수 있어요'); 지우기(); return; }
     } else { 지우기(); return; }
