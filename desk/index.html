@@ -44,7 +44,10 @@ img{max-width:100%;display:block}
 .gme .sub2{font-size:11.5px;font-weight:500;color:var(--sub)}
 
 .wrap{display:flex;flex-direction:column;min-height:100vh}
-.app{display:flex;flex:1;min-height:0}
+/* ⑥ 창을 줄이면 **최소 기준까지만** 줄고 그 아래로는 레이아웃이 안 바뀐다 (2026-09-29 대표
+   「어느정도까지만 줄어들면 더이상 레이아웃의 변화는 없고 창만 줄어들게」 — 홈페이지와 같게).
+   1040 = 왼쪽 메뉴 216 + 본문 최소 824. 이보다 좁으면 가로로 밀어 본다. */
+.app{display:flex;flex:1;min-height:0;min-width:1040px}
 
 /* 좌측 메뉴 */
 .side{width:216px;flex:none;background:var(--dark-2);border-right:1px solid var(--line);
@@ -740,7 +743,9 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 .hc-r .homenums .v{font-size:32px}
 /* 맨 윗줄 — 두 단을 가로지른다. 현황판이 여기 산다 */
 .hc-t{margin-bottom:16px}
-.hc-t .homenums{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;
+/* ① 여섯 칸을 폭 가득 펼치면 사이가 휑하다 → **오른쪽에 붙이고** 간격을 좁힌다
+   (2026-09-29 대표 「간격이 불필요하게 넓으니까 우측에 밀고」) */
+.hc-t .homenums{display:flex;justify-content:flex-end;gap:34px;
   background:var(--dark-2);border:1px solid var(--line);border-radius:14px;
   padding:16px 20px;margin:0;border-bottom:1px solid var(--line)}
 .hc-t .homenums .v{font-size:36px}
@@ -753,10 +758,39 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 .hc-l .faces{grid-template-columns:repeat(auto-fill,minmax(118px,1fr))}
 .hmrow .side{font-size:14px;padding:3px 7px;flex:none;color:var(--gold)}
 .hmrow .side:hover{background:var(--gold-dim);border-radius:7px}
-@media(max-width:1100px){ .homecols{grid-template-columns:1fr !important}
-  .hc-l .homenums,.hc-t .homenums{grid-template-columns:repeat(3,1fr);row-gap:14px} }
+/* ⛔ 접히는 미디어쿼리를 뺐다 — 최소 폭(1040)에서 멈추므로 접힐 일이 없다 (2026-09-29) */
 .hometop{display:grid;grid-template-columns:minmax(212px,0.85fr) 2.1fr;gap:14px;
   align-items:stretch;margin-bottom:18px}
+/* ② 내 이름표 — 사진을 **칸 폭 가득 정사각**으로 (2026-09-29 대표
+   「좌측에 내 프로필 칸을 위로 더 늘리고 사진을 더 크게, 정사각이나 인스타 피드 사이즈 정도로」) */
+.mycard.big .mc-top{display:block}
+.mycard.big .mc-ph{display:block;width:100%;aspect-ratio:var(--phr,1);
+  border-radius:12px;overflow:hidden;background:var(--dark-4);margin-bottom:11px}
+.mycard.big .mc-ph img{width:100%;height:100%;object-fit:cover;display:block}
+.mycard.big .mc-ph.none{display:flex;align-items:center;justify-content:center;
+  font-size:34px;font-weight:800;color:var(--sub)}
+.mycard.big .mc-nm{display:block;font-size:17px}
+/* ③ 사진 아래 자유 글 */
+.mc-note{font-size:12.5px;line-height:1.65;color:var(--cream);white-space:pre-wrap;
+  padding-top:9px;margin-top:2px;border-top:1px solid var(--line)}
+.mc-note.empty{color:#4a4741}
+
+/* ⑤ 노션식 비율 손잡이 — 평소엔 안 보이고 **사이에 대면** 세로 선이 나온다 */
+.hc-split{position:relative;width:14px;margin:0 -7px;cursor:col-resize;
+  align-self:stretch;z-index:3;touch-action:none}
+.hc-split::before{content:'';position:absolute;left:50%;top:6px;bottom:6px;width:3px;
+  transform:translateX(-50%);border-radius:3px;background:transparent;transition:background .12s}
+.hc-split:hover::before,.hc-split.on::before{background:var(--gold-2)}
+.hc-split.on{cursor:col-resize}
+body.resizing{cursor:col-resize;user-select:none}
+
+/* ⑤ 1단 / 2단 — 홈 오른쪽 위 작은 단추 */
+.hmbar{display:flex;align-items:center;gap:6px;justify-content:flex-end;margin:0 0 10px}
+.hmbar button{padding:5px 11px;border-radius:8px;border:1px solid var(--line);
+  background:var(--dark-2);color:var(--sub);font-size:12px;font-weight:700}
+.hmbar button.on{border-color:var(--gold-2);color:var(--gold);background:var(--gold-dim)}
+.hmbar .hint{font-size:11.5px;color:#5f5b55;margin-right:auto}
+
 .mycard{display:flex;flex-direction:column;gap:7px;text-align:left;padding:13px 15px;
   background:var(--dark-2);border:1px solid var(--line);border-radius:14px;min-width:0}
 .mycard:hover{border-color:var(--gold-2)}
@@ -787,7 +821,7 @@ body.끄는중{user-select:none;-webkit-user-select:none}
   padding:14px 18px;margin:0;border-bottom:1px solid var(--line);align-content:center}
 .hometop .homenums .v{font-size:34px}
 .hometop .homenums .k{font-size:11.5px;white-space:nowrap}
-@media(max-width:1100px){ .hometop{grid-template-columns:1fr} .hometop .homenums{grid-template-columns:repeat(3,1fr);row-gap:14px} }
+
 .tx-past{display:flex;flex-direction:column;gap:6px}
 .tx-past .pq{display:flex;gap:10px;background:var(--dark-3);border-radius:9px;padding:8px 11px}
 .tx-past .pq b{font-size:11px;font-weight:800;color:var(--gold-2);flex:none;min-width:66px}
@@ -1123,7 +1157,7 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 
 <script>
 "use strict";
-const BUILD = '100';
+const BUILD = '103';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -6029,16 +6063,24 @@ function vHome(){
   /* 내 이름표 — 슬로건과 이번 분기 목표를 출근하면 늘 본다 */
   const g = (ME && ME.goal) || {};
   /* 왼쪽 = 나 · 오른쪽 = 현황판. 1:1 이 아니라 현황판이 넓다 (2026-09-17 대표 지시) */
-  const 사진크기 = H.사진 || 88;
-  const 이름표 = ME ? '<button class="mycard c-'+esc(H.색)+(사진크기>=88?' big':'')+'" data-act="tx:me">'
-      + '<span class="mc-top">' + 얼굴(ME, 사진크기)
+  /* ② 사진은 **칸 폭 가득**. 비율만 고른다 — 1(정사각) 또는 0.8(4:5 인스타 세로) */
+  const 사진비 = (g.ratio === '4:5') ? '0.8' : '1';
+  const 얼굴칸 = (ME && ME.photo)
+      ? '<span class="mc-ph" style="--phr:' + 사진비 + '"><img src="' + esc(ME.photo) + '" alt=""></span>'
+      : '<span class="mc-ph none" style="--phr:' + 사진비 + '">' + esc((ME.name||'?').slice(-2)) + '</span>';
+  const 이름표 = ME ? '<button class="mycard big c-'+esc(H.색)+'" data-act="tx:me">'
+      + '<span class="mc-top">' + 얼굴칸
         + '<span class="mc-nm">' + esc(ME.name)
         + '<i>' + ({admin:'관리자',trainer:'트레이너',fc:'FC'}[ME.role]||ME.role) + '</i></span></span>'
       + '<span class="mc-s' + (g.value ? '' : ' empty') + '">' + (g.value ? esc(g.value) : '슬로건') + '</span>'
       + '<span class="mc-q' + (g.quarter ? '' : ' none') + '">'
       + '<b>' + esc(이번분기()) + '</b>'
       + '<span>' + (g.quarter ? esc(g.quarter) : '＋ 목표 적기') + '</span>'
-      + '</span></button>' : '';
+      + '</span>'
+      /* ③ 사진 아래 자유 글 */
+      + '<span class="mc-note' + (g.note ? '' : ' empty') + '">'
+      + (g.note ? esc(g.note) : '＋ 소개 글 적기') + '</span>'
+      + '</button>' : '';
 
   const 공지없음 = 관리자() ? '<div class="sec" style="margin-bottom:14px">'
     + '<button class="tx-notice none" data-act="tx:new" data-k="tasks">＋ 공지 쓰기</button></div>' : '';
@@ -6068,15 +6110,67 @@ function vHome(){
   };
 
   const 살아있는 = H.차례.filter(k => !H.끔[k] && 그릴것[k]);
-  const 단그리기 = 쪽 => 살아있는.filter(k => 블록단(k, H) === 쪽).map(k => 그릴것[k]()).join('');
-  const 왼폭 = Math.max(260, 사진크기 + 150);
-  const 윗줄 = 단그리기('위');
-  return (윗줄 ? '<div class="hc-t">' + 윗줄 + '</div>' : '')
-    + '<div class="homecols" style="grid-template-columns:minmax('+왼폭+'px,1fr) 2.2fr">'
-    + '<div class="hc-l">' + 단그리기('좌')
-      + '<button class="hmbtn" data-act="tx:hm">⚙ 내 홈 꾸미기</button></div>'
+  const 한단 = H.단수 === 1;
+  /* ⑤ 1단이면 위·좌·우를 차례대로 한 줄에 쏟는다 */
+  const 단그리기 = 쪽 => 살아있는.filter(k => 한단 ? true : 블록단(k, H) === 쪽)
+      .map(k => 그릴것[k]()).join('');
+
+  const 바 = '<div class="hmbar">'
+    + '<span class="hint">' + (한단 ? '' : '가운데를 잡아 끌면 좌우 넓이가 바뀝니다 · 두 번 누르면 기본값') + '</span>'
+    + '<button class="' + (한단 ? 'on' : '') + '" data-act="tx:hmcol" data-v2="1">1단</button>'
+    + '<button class="' + (한단 ? '' : 'on') + '" data-act="tx:hmcol" data-v2="2">2단</button></div>';
+
+  if(한단) return 바 + '<div class="hc-t">' + 단그리기() + '</div>';
+
+  const 윗줄 = 살아있는.filter(k => 블록단(k, H) === '위').map(k => 그릴것[k]()).join('');
+  /* ⑤ 좌우 비율 — 노션처럼 **퍼센트**로 잡고 최소·최대를 둔다.
+     기본 30%. 좌측을 최대 58% 까지 넓힐 수 있다 (2026-09-29 대표
+     「무조건 좁아지게 하는 게 아니라 최대로 넓어지게 할 수 있는 간격」). */
+  const 비 = Math.min(비율최대, Math.max(비율최소, +H.비율 || 비율기본));
+  return 바
+    + (윗줄 ? '<div class="hc-t">' + 윗줄 + '</div>' : '')
+    + '<div class="homecols" id="homecols" style="grid-template-columns:'
+      + 비.toFixed(1) + '% 14px 1fr">'
+    + '<div class="hc-l">' + 단그리기('좌') + '</div>'
+    + '<div class="hc-split" id="hcsplit" title="끌어서 넓이 바꾸기 · 두 번 누르면 기본값"></div>'
     + '<div class="hc-r">' + 단그리기('우') + '</div>'
     + '</div>';
+}
+
+/* ⑤ 좌우 비율 — 노션 방식 (실제 확인: 평소엔 선이 안 보이고, 사이에 대면 세로 선이 나온다.
+   드래그로 조절 · 최소 폭 제한 · 기본값 있음). 여기서는 **퍼센트**로 담는다.
+   ⛔ 최소·최대를 두는 까닭 — 한쪽을 0 으로 끌어 칸이 사라지면 되돌릴 길이 없다. */
+const 비율기본 = 30, 비율최소 = 20, 비율최대 = 58;
+
+function 비율끌기(){
+  const bar = document.getElementById('hcsplit'), box = document.getElementById('homecols');
+  if(!bar || !box || bar.dataset.on) return;
+  bar.dataset.on = '1';
+  let 잡음 = false;
+  const 놓기 = () => { 잡음 = false; bar.classList.remove('on');
+    document.body.classList.remove('resizing'); 저장(); };
+  let 마지막 = null;
+  const 저장 = () => { if(마지막 != null && Math.abs(마지막 - (내홈().비율 || 비율기본)) > 0.4)
+      내홈저장({ 비율: Math.round(마지막 * 10) / 10 }); 마지막 = null; };
+  const 옮기기 = e => {
+    if(!잡음) return;
+    const r = box.getBoundingClientRect();
+    const x = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
+    let v = Math.min(비율최대, Math.max(비율최소, x / Math.max(1, r.width) * 100));
+    마지막 = v;
+    box.style.gridTemplateColumns = v.toFixed(1) + '% 14px 1fr';
+    e.preventDefault();
+  };
+  bar.addEventListener('pointerdown', e => { 잡음 = true; bar.classList.add('on');
+    document.body.classList.add('resizing'); bar.setPointerCapture(e.pointerId); });
+  bar.addEventListener('pointermove', 옮기기);
+  bar.addEventListener('pointerup', 놓기);
+  bar.addEventListener('pointercancel', 놓기);
+  /* 두 번 누르면 기본값 — 잘못 끌었을 때 되돌리는 길 */
+  bar.addEventListener('dblclick', () => {
+    box.style.gridTemplateColumns = 비율기본 + '% 14px 1fr';
+    내홈저장({ 비율: 비율기본 });
+  });
 }
 
 /* 숫자 한 줄 */
@@ -6197,6 +6291,8 @@ const 블록단 = (k, h) => (h.단 && h.단[k]) || (홈블록.find(x=>x.k===k)||
      숫자  몇 개 중 하나 (칩, 숫자) */
 const 꾸밈규격 = [
   { k:'차례', 꼴:'차례', 이름:'블록', 기본:null },
+  { k:'단수', 꼴:'숫자', 이름:'단', 값:[1,2], 기본:2 },
+  { k:'비율', 꼴:'숫자', 이름:'좌측 넓이', 값:[20,30,40,50], 기본:30, 단위:'%' },
   { k:'줄수', 꼴:'숫자', 이름:'줄 수', 값:[3,5,8,12], 기본:5 },
   { k:'사진', 꼴:'숫자', 이름:'내 사진 크기', 값:[44,64,88,120,160], 기본:88, 단위:'px' },
   { k:'색',   꼴:'고름', 이름:'내 이름표 색',
@@ -6342,7 +6438,17 @@ function txMe(){
     + '<div class="fld"><span class="fn">슬로건</span><input class="inp" id="txg1" value="'+esc(g.value||'')+'" placeholder="예: 변하지 않는 진정성으로 회원님의 도전을 서포트한다"></div>'
     + '<div class="fld"><span class="fn">'+esc(이번분기())+' 목표</span>'
       + '<input class="inp" id="txg2" value="'+esc(g.quarter||'')+'" placeholder="예: 평균 매출 800 이상"></div>'
-    + '<button class="btn sub" data-act="tx:goal">목표 저장</button>'
+    /* ③ 사진 아래에 붙는 자유 글 (2026-09-29 대표 「그다음 아래 글을 넣을 수 있게」) */
+    + '<div class="fld"><span class="fn">소개 글 <span style="font-weight:500">홈 사진 아래에 붙습니다</span></span>'
+      + '<textarea class="inp" id="txg3" style="min-height:76px" placeholder="회원분들께 하고 싶은 말, 전문 분야, 자격 같은 것">'
+      + esc(g.note||'') + '</textarea></div>'
+    /* ② 사진 비율 — 칸 폭 가득 채우고 비율만 고른다 */
+    + '<div class="fld"><span class="fn">홈 사진 비율</span><div class="tx-pchips">'
+      + [['1:1','정사각'],['4:5','세로 (인스타 피드)']].map(x =>
+          '<button class="tx-pchip ' + ((g.ratio||'1:1')===x[0] ? 'on' : '') + '"'
+          + ' data-act="tx:ratio" data-v2="' + x[0] + '">' + x[1] + '</button>').join('')
+      + '</div></div>'
+    + '<button class="btn sub" data-act="tx:goal">저장</button>'
     /* 앱 가입 승인 — 최고 관리자만 (2026-09-22 대표 「최고 관리자가 승인해야 가입되게」) */
     + (최고관리자()
         ? '<div class="lbl" style="margin-top:18px">앱 가입</div>'
@@ -6712,12 +6818,24 @@ async function txAct(a, el){
     /* 분기가 바뀌었는데 앞 분기 목표가 아직 안 옮겨졌으면 옮긴다 */
     if(앞.quarter && 앞.qat && 앞.qat !== 이번 && !지난.some(x=>x.q===앞.qat))
       지난.push({ q: 앞.qat, tx: 앞.quarter });
-    const goal = { value:$('#txg1').value, quarter:$('#txg2').value, qat: 이번, 지난: 지난.slice(-16) };
+    const goal = { value:$('#txg1').value, quarter:$('#txg2').value, qat: 이번, 지난: 지난.slice(-16),
+      note: ($('#txg3') ? $('#txg3').value : (앞.note||'')),        /* ③ 홈 사진 아래 글 */
+      ratio: 앞.ratio || '1:1' };                                    /* ② 홈 사진 비율 */
     try{ await usend('staff?id=eq.'+ME.id, 'PATCH', { goal }); ME.goal = goal;
       const i = W.staff.findIndex(x=>x.id===ME.id); if(i>=0) W.staff[i].goal = goal;
       toast('목표를 저장했어요'); txMe(); render(); }
     catch(e){ toast('못 저장했어요 — '+e.message); } return; }
-  if(a==='hm'){ 홈꾸미기(); return; }
+  /* ④ 「홈 꾸미기」는 없앴다 (2026-09-29 대표). 배치는 1단/2단 단추와 비율 드래그로만 한다.
+     판을 그리는 코드(홈꾸미기)는 남겨 두되 **여는 길이 없다** — 되살리려면 이 줄만 풀면 된다. */
+  if(a==='hmcol'){ 내홈저장({ 단수: +act.dataset.v2 === 1 ? 1 : 2 }); return; }
+  /* ② 사진 비율만 따로 — 누르면 바로 저장하고 다시 그린다 */
+  if(a==='ratio'){
+    const goal = Object.assign({}, ME.goal||{}, { ratio: act.dataset.v2 });
+    try{ await usend('staff?id=eq.'+ME.id, 'PATCH', { goal }); ME.goal = goal;
+      const i = W.staff.findIndex(x=>x.id===ME.id); if(i>=0) W.staff[i].goal = goal;
+      txMe(); render(); }
+    catch(e){ toast('못 저장했어요 — '+e.message); }
+    return; }
   if(a==='qcv'){ 빠른코멘트.vid = v2; 빠른코멘트열기(el.dataset.id); return; }
   if(a==='qcfull'){ popClose(); 회원판열기(el.dataset.id, 'comment'); return; }
   if(a==='qcsend'){
@@ -6777,7 +6895,8 @@ async function txAct(a, el){
 }
 function txRender(){
   const top = $('#top'), line = $('#topline'), b = $('#body');
-  if(S.view==='home'){ top.innerHTML = '<h1>홈</h1><span class="cnt">'+dateFull(TODAY)+' · '+esc(ME?ME.name:'')+'</span>'; line.innerHTML=''; b.innerHTML = vHome(); return true; }
+  if(S.view==='home'){ top.innerHTML = '<h1>홈</h1><span class="cnt">'+dateFull(TODAY)+' · '+esc(ME?ME.name:'')+'</span>';
+    line.innerHTML=''; b.innerHTML = vHome(); 비율끌기(); return true; }
   if(표정의[S.view]){ top.innerHTML = txTop(S.view); line.innerHTML=''; b.innerHTML = txList(S.view); return true; }
   return false;
 }
