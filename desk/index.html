@@ -892,10 +892,20 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 /* 현황판 — 제목이 없다. 숫자는 오른쪽에 붙인다 (2026-09-29 대표 「간격이 불필요하게 넓으니까 우측에 밀고」)
    ⛔ `flex-end` 는 칸보다 넓어지면 **왼쪽으로 넘쳐** 메뉴바를 덮는다 (2026-09-29 대표 지적).
       `flex-wrap:wrap` 으로 좁을 때 줄을 바꾸게 해 어떤 폭에서도 칸 밖으로 안 나가게 한다. */
-.hblk > .homenums{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:16px 34px;
+/* ⭐ 두 단 — 윗줄은 할 일, 아랫줄은 0 인 것 (2026-09-30).
+   ⛔ 칸 크기를 **고정**한다 — 레퍼런스(gladgym.co.kr)처럼 「폭이 줄어도 안의 내용은 안 줄어든다」.
+      좁아지면 글씨가 작아지는 게 아니라 **줄이 늘어난다.** */
+.hblk > .homenums{display:block;
   background:#191917;border:1px solid #30302b;border-radius:14px;padding:16px 20px;margin:0;
   min-width:0;max-width:100%}
-.hblk > .homenums .v{font-size:34px}
+.homenums .nrow{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px 8px}
+.homenums .nrow + .nrow{margin-top:13px;padding-top:13px;border-top:1px solid #2a2a26}
+.homenums .nrow.dead{opacity:.55}
+.homenums .nrow.none{font-size:13px;font-weight:700;color:var(--sub);padding:4px 6px}
+.hblk > .homenums .num{flex:none;min-width:104px;text-align:right}
+.hblk > .homenums .nrow.live .v{font-size:34px}
+.hblk > .homenums .nrow.dead .v{font-size:21px}
+.hblk > .homenums .nrow.dead .k{font-size:11px}
 .hblk > .homenums .k{font-size:11.5px;white-space:nowrap}
 /* 내 이름표는 이미 카드다 — 테두리만 또렷하게 */
 .hblk > .mycard{margin-bottom:0;border-color:#3a3a33}
@@ -1337,7 +1347,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '151';
+const BUILD = '152';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -6801,13 +6811,20 @@ const 현황셈하기 = k => {
   catch(e){ return 0; } };
 
 function 숫자줄(){
-  return '<div class="homenums">' + 현황칸.filter(c => !c.보임 || c.보임()).map(function(c){
-    const v = 현황셈하기(c.k);
-    return '<button class="num' + (v ? ' ' + c.색 : ' zero') + '"'
-      + ' data-act="tx:numopen" data-v2="' + c.k + '"'
-      + ' title="' + c.이름 + ' — 눌러서 그 페이지로">'
-      + '<span class="v">' + v + '</span><span class="k">' + c.이름 + '</span></button>';
-  }).join('') + '</div>';
+  /* ⭐ 두 단 — **할 일이 있는 것이 윗줄**, 0 인 것은 아랫줄로 내린다
+       (2026-09-30 대표 「죽어있는건 아래줄 · 살아있는건 윗줄로」).
+     아침마다 보는 화면이라 **눈이 윗줄에서 멈춰야** 한다. */
+  const 다 = 현황칸.filter(c => !c.보임 || c.보임()).map(c => ({ c, v: 현황셈하기(c.k) }));
+  const 칸 = x => '<button class="num' + (x.v ? ' ' + x.c.색 : ' zero') + '"'
+    + ' data-act="tx:numopen" data-v2="' + x.c.k + '"'
+    + ' title="' + x.c.이름 + ' — 눌러서 그 페이지로">'
+    + '<span class="v">' + x.v + '</span><span class="k">' + x.c.이름 + '</span></button>';
+  const 산 = 다.filter(x => x.v), 죽 = 다.filter(x => !x.v);
+  return '<div class="homenums">'
+    + (산.length ? '<div class="nrow live">' + 산.map(칸).join('') + '</div>'
+                 : '<div class="nrow none">오늘 볼 것이 없습니다 👍</div>')
+    + (죽.length ? '<div class="nrow dead">' + 죽.map(칸).join('') + '</div>' : '')
+    + '</div>';
 }
 
 /* ── 숫자를 누르면 **그 페이지로 간다** ──
