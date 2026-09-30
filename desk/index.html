@@ -49,6 +49,19 @@ img{max-width:100%;display:block}
   color:var(--gold);display:flex;align-items:center;justify-content:center;
   font-size:11px;font-weight:800;flex:none}
 .gme .sub2{font-size:11.5px;font-weight:500;color:var(--sub)}
+/* 이름 아래로 내려오는 메뉴 — 팝업 하나에 다 담지 않는다 (2026-09-30 대표) */
+.gnb .rt2{position:relative}
+.gmenu{display:none;position:absolute;right:0;top:40px;z-index:70;min-width:196px;
+  background:var(--dark-2);border:1px solid var(--line);border-radius:12px;padding:6px;
+  box-shadow:0 14px 40px rgba(0,0,0,.55)}
+.gmenu.on{display:block}
+.gmi{display:flex;align-items:center;gap:9px;width:100%;text-align:left;
+  padding:9px 10px;border-radius:9px;font-size:13px;font-weight:600;color:var(--cream)}
+.gmi:hover{background:var(--dark-3)}
+.gmi .ic{width:17px;flex:none;text-align:center;font-size:13px;opacity:.85}
+.gmi .nm{flex:1;min-width:0}
+.gmi.del{color:#c98d84}
+.gmi.del:hover{background:#2e1c18}
 
 .wrap{display:flex;flex-direction:column;min-height:100vh}
 /* ⑥ 창을 줄이면 **최소 기준까지만** 줄고 그 아래로는 레이아웃이 안 바뀐다 (2026-09-29 대표
@@ -1296,6 +1309,7 @@ body.resizing{cursor:col-resize;user-select:none}
       <span class="av" id="gav">—</span>
       <span id="gnm">전체 보기</span>
       <span class="sub2">▾</span></button>
+    <div class="gmenu" id="gmenu"></div>
   </div>
 </header>
 <div class="app">
@@ -1360,7 +1374,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '157';
+const BUILD = '159';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -7213,67 +7227,112 @@ async function 프로필올리기(file){
 }
 
 /* 내 정보 */
-function txMe(){
+/* ── 내 메뉴 ── 2026-09-30 대표 「이름 누르면 바로 팝업 하나가 뜨는 게 아니라
+   프로필 보기 / 로그아웃 등 메뉴를 나눠서 들어갈 수 있게 · 한 페이지에 너무 많아 보기 힘들어」
+
+   ⛔ 팝업 하나에 아홉 가지(프로필·목표·소개글·사진비율·홈배치·가입승인·담당·직원·비밀번호)를
+      다 담고 있었다. 이제 **메뉴로 고르고 그 하나만 연다.** */
+const 내메뉴 = () => [
+  { k:'profile', 이름:'프로필 보기',     ic:'👤' },
+  { k:'home',    이름:'홈 배치',         ic:'▦'  },
+  { k:'who',     이름:'담당 보기',       ic:'👥', 보임: () => 관리자() },
+  { k:'staff',   이름:'직원 관리',       ic:'🗂', 보임: () => 관리자() },
+  { act:'japps', 이름:'가입 신청',       ic:'✉', 보임: () => 최고관리자(),
+    배지: () => 가입대기수 },
+  { act:'pps',   이름:'공지 팝업',       ic:'📢', 보임: () => 최고관리자() },
+  { k:'pw',      이름:'비밀번호 바꾸기', ic:'🔑' },
+  { act:'tx:out', 이름:'로그아웃',       ic:'⎋', 빨강:true },
+].filter(x => !x.보임 || x.보임());
+
+function 내메뉴닫기(){ const b = $('#gmenu'); if(b) b.classList.remove('on'); }
+function 내메뉴열기(){
+  const box = $('#gmenu'); if(!box) return;
+  if(box.classList.contains('on')){ 내메뉴닫기(); return; }
+  box.innerHTML = 내메뉴().map(function(x){
+    const n = x.배지 ? x.배지() : 0;
+    return '<button class="gmi' + (x.빨강 ? ' del' : '') + '" '
+      + (x.act ? 'data-act="' + x.act + '"' : 'data-act="tx:mego" data-v2="' + x.k + '"') + '>'
+      + '<span class="ic">' + x.ic + '</span><span class="nm">' + esc(x.이름) + '</span>'
+      + (n ? '<span class="tag warn">' + n + '</span>' : '') + '</button>';
+  }).join('');
+  box.classList.add('on');
+}
+
+/* 내 정보 — **갈래 하나만** 그린다 */
+function txMe(갈래){
+  갈래 = 갈래 || 'profile';
   const g = (ME && ME.goal) || {};
-  popOpen('<h2>내 정보</h2>'
-    + '<div class="card rowc">' + 얼굴(ME, 52)
-      + '<div style="flex:1"><div class="t1">'+esc(ME.name)+'</div><div class="t2">'
-      + ({admin:'관리자',trainer:'트레이너',fc:'FC'}[ME.role]||ME.role)+' · '+esc((AUTH.user||{}).email||'')+'</div></div>'
-      + '<button class="btn ghost sm" data-act="tx:photo">'+(ME.photo?'사진 바꾸기':'＋ 사진')+'</button>'
+  const 제목 = { profile:'프로필', home:'홈 배치', who:'담당 보기',
+                 staff:'직원 관리', pw:'비밀번호 바꾸기' }[갈래] || '내 정보';
+  let 속 = '';
+
+  if(갈래 === 'profile'){
+    속 = '<div class="card rowc">' + 얼굴(ME, 52)
+      + '<div style="flex:1"><div class="t1">' + esc(ME.name) + '</div><div class="t2">'
+      + ({admin:'관리자',trainer:'트레이너',fc:'FC'}[ME.role]||ME.role) + ' · ' + esc((AUTH.user||{}).email||'') + '</div></div>'
+      + '<button class="btn ghost sm" data-act="tx:photo">' + (ME.photo?'사진 바꾸기':'＋ 사진') + '</button>'
       + (ME.photo ? '<button class="btn ghost sm" data-act="tx:photox">빼기</button>' : '') + '</div>'
-    + '<div class="fld"><span class="fn">슬로건</span><input class="inp" id="txg1" value="'+esc(g.value||'')+'" placeholder="예: 변하지 않는 진정성으로 회원님의 도전을 서포트한다"></div>'
-    + '<div class="fld"><span class="fn">'+esc(이번분기())+' 목표</span>'
-      + '<input class="inp" id="txg2" value="'+esc(g.quarter||'')+'" placeholder="예: 평균 매출 800 이상"></div>'
-    /* ③ 사진 아래에 붙는 자유 글 (2026-09-29 대표 「그다음 아래 글을 넣을 수 있게」) */
-    + '<div class="fld"><span class="fn">소개 글 <span style="font-weight:500">홈 사진 아래에 붙습니다</span></span>'
-      + '<textarea class="inp" id="txg3" style="min-height:76px" placeholder="회원분들께 하고 싶은 말, 전문 분야, 자격 같은 것">'
-      + esc(g.note||'') + '</textarea></div>'
-    /* ② 사진 비율 — 칸 폭 가득 채우고 비율만 고른다 */
-    + '<div class="fld"><span class="fn">홈 사진 비율</span><div class="tx-pchips">'
-      + [['1:1','정사각'],['4:5','세로 (인스타 피드)']].map(x =>
-          '<button class="tx-pchip ' + ((g.ratio||'1:1')===x[0] ? 'on' : '') + '"'
-          + ' data-act="tx:ratio" data-v2="' + x[0] + '">' + x[1] + '</button>').join('')
-      + '</div></div>'
-    + '<button class="btn sub" data-act="tx:goal">저장</button>'
-    + '<div class="lbl" style="margin-top:16px">홈 배치</div>'
-    + '<div class="note" style="margin-bottom:8px">홈은 <b>왼쪽 · 오른쪽 두 단</b>입니다. '
+      + '<div class="fld"><span class="fn">슬로건</span><input class="inp" id="txg1" value="' + esc(g.value||'') + '" placeholder="예: 변하지 않는 진정성으로 회원님의 도전을 서포트한다"></div>'
+      + '<div class="fld"><span class="fn">' + esc(이번분기()) + ' 목표</span>'
+        + '<input class="inp" id="txg2" value="' + esc(g.quarter||'') + '" placeholder="예: 평균 매출 800 이상"></div>'
+      + '<div class="fld"><span class="fn">소개 글 <span style="font-weight:500">홈 사진 아래에 붙습니다</span></span>'
+        + '<textarea class="inp" id="txg3" style="min-height:76px" placeholder="회원분들께 하고 싶은 말, 전문 분야, 자격 같은 것">'
+        + esc(g.note||'') + '</textarea></div>'
+      + '<div class="fld"><span class="fn">홈 사진 비율</span><div class="tx-pchips">'
+        + [['1:1','정사각'],['4:5','세로 (인스타 피드)']].map(function(x){
+            return '<button class="tx-pchip ' + ((g.ratio||'1:1')===x[0] ? 'on' : '') + '"'
+            + ' data-act="tx:ratio" data-v2="' + x[0] + '">' + x[1] + '</button>'; }).join('')
+        + '</div></div>'
+      + '<button class="btn sub" data-act="tx:goal">저장</button>'
+      + (function(){ const 지난 = (g.지난||[]).slice().reverse();
+          return 지난.length ? '<div class="lbl" style="margin-top:14px">지난 목표 ' + 지난.length + '개</div>'
+            + '<div class="tx-past">' + 지난.map(function(x){ return '<div class="pq"><b>'+esc(x.q)+'</b><span>'+esc(x.tx||'')+'</span></div>'; }).join('') + '</div>'
+            : ''; })();
+
+  } else if(갈래 === 'home'){
+    속 = '<div class="note" style="margin-bottom:10px">홈은 <b>왼쪽 · 오른쪽 두 단</b>입니다. '
       + '블록에 마우스를 대면 왼쪽 위에 <b>⠿</b> 가 나옵니다. 그걸 <b>누르면</b> '
       + '위로·아래로·반대 단으로 옮기는 단추가 뜹니다.<br>'
       + '가운데를 잡아 끌면 좌우 넓이가 바뀝니다 (두 번 누르면 기본값).</div>'
-    + '<button class="btn ghost" style="width:100%" data-act="tx:hmreset">홈 배치 처음으로</button>'
-    /* 앱 가입 승인 — 최고 관리자만 (2026-09-22 대표 「최고 관리자가 승인해야 가입되게」) */
-    + (최고관리자()
-        ? '<div class="lbl" style="margin-top:18px">앱 가입</div>'
-          + '<button class="btn sub" style="width:100%" data-act="japps">'
-          + '가입 신청 보기' + (가입대기수 ? ' <span class="tag warn">' + 가입대기수 + '</span>' : '')
-          + '</button>'
-          + '<button class="btn sub" style="width:100%;margin-top:7px" data-act="pps">공지 팝업</button>'
-        : '')
-    + (()=>{ const 지난 = (g.지난||[]).slice().reverse();
-        return 지난.length ? '<div class="lbl" style="margin-top:12px">지난 목표 '+지난.length+'개</div>'
-          + '<div class="tx-past">' + 지난.map(x=>'<div class="pq"><b>'+esc(x.q)+'</b><span>'+esc(x.tx||'')+'</span></div>').join('') + '</div>'
-          : ''; })()
-    + (관리자() ? '<div class="lbl" style="margin-top:6px">담당 보기</div><div class="tx-pchips">'
-        + ['전체'].concat([...new Set(D.m.map(x=>x.trainer).filter(Boolean))]).map(t=>'<button class="tx-pchip '+(S.who===t?'on':'')+'" data-setwho="'+esc(t)+'">'+esc(t==='전체'?'전체 보기':t)+'</button>').join('')+'</div>' : '')
-    + (관리자() ? '<div class="lbl" style="margin-top:8px">직원 관리 <span class="r" style="color:var(--sub);font-weight:500">구글 메일을 넣으면 그 사람이 들어올 수 있어요</span></div>'
-        + '<div class="tx-staff">' + W.staff.map(p => '<div class="card rowc '+(p.active===false?'off':'')+'">'+아바타(p.id)
-            + '<div><div class="t1">'+esc(p.name)+' <span class="tx-tag">'+({admin:'관리자',trainer:'트레이너',fc:'FC'}[p.role]||p.role)+'</span></div>'
-            + '<div class="t2">'+esc(p.email||'')+'</div></div>'
-            + (p.id===ME.id ? '<span class="tx-tag gold">나</span>'
-               : '<button class="btn ghost sm" data-act="tx:staffoff" data-id="'+p.id+'">'+(p.active===false?'다시 켜기':'끄기')+'</button>')
-            + '</div>').join('')
-        + '<div class="tx-sadd"><input class="inp" id="txsmail" type="email" placeholder="구글 메일"><input class="inp" id="txsname" placeholder="이름">'
-        + '<select class="inp" id="txsrole"><option value="trainer">트레이너</option><option value="fc">FC</option><option value="admin">관리자</option></select>'
-        + '<button class="btn gold sm" data-act="tx:staffadd">넣기</button></div></div>' : '')
-    + '<div class="fld" style="margin-top:6px"><span class="fn">비밀번호 바꾸기 <span style="font-weight:500">(이메일로 들어온 계정만)</span></span><input class="inp" id="txpw" type="password" placeholder="새 비밀번호 (8자 이상)" autocomplete="new-password"></div>'
-    + '<div class="tx-fbtns"><button class="btn ghost" data-act="tx:pw">비밀번호 바꾸기</button><button class="btn ghost del" data-act="tx:out">로그아웃</button></div>'
-    + '<div class="tx-meta">데스크 BUILD '+BUILD+'</div>'
+      + '<button class="btn ghost" style="width:100%" data-act="tx:hmreset">홈 배치 처음으로</button>';
+
+  } else if(갈래 === 'who'){
+    속 = '<div class="note" style="margin-bottom:10px">고른 사람의 회원·수업만 보입니다.</div>'
+      + '<div class="tx-pchips">'
+      + ['전체'].concat([...new Set(D.m.map(function(x){ return x.trainer; }).filter(Boolean))]).map(function(t){
+          return '<button class="tx-pchip ' + (S.who===t?'on':'') + '" data-setwho="' + esc(t) + '">'
+          + esc(t==='전체'?'전체 보기':t) + '</button>'; }).join('') + '</div>';
+
+  } else if(갈래 === 'staff'){
+    속 = '<div class="note" style="margin-bottom:10px">구글 메일을 넣으면 그 사람이 들어올 수 있어요.</div>'
+      + '<div class="tx-staff">' + W.staff.map(function(p){ return '<div class="card rowc ' + (p.active===false?'off':'') + '">' + 아바타(p.id)
+          + '<div><div class="t1">' + esc(p.name) + ' <span class="tx-tag">' + ({admin:'관리자',trainer:'트레이너',fc:'FC'}[p.role]||p.role) + '</span></div>'
+          + '<div class="t2">' + esc(p.email||'') + '</div></div>'
+          + (p.id===ME.id ? '<span class="tx-tag gold">나</span>'
+             : '<button class="btn ghost sm" data-act="tx:staffoff" data-id="' + p.id + '">' + (p.active===false?'다시 켜기':'끄기') + '</button>')
+          + '</div>'; }).join('')
+      + '<div class="tx-sadd"><input class="inp" id="txsmail" type="email" placeholder="구글 메일"><input class="inp" id="txsname" placeholder="이름">'
+      + '<select class="inp" id="txsrole"><option value="trainer">트레이너</option><option value="fc">FC</option><option value="admin">관리자</option></select>'
+      + '<button class="btn gold sm" data-act="tx:staffadd">넣기</button></div></div>';
+
+  } else if(갈래 === 'pw'){
+    속 = '<div class="note" style="margin-bottom:10px">이메일로 들어온 계정만 바꿀 수 있어요. '
+      + '구글로 들어오셨으면 구글에서 바꾸시면 됩니다.</div>'
+      + '<div class="fld"><span class="fn">새 비밀번호</span>'
+      + '<input class="inp" id="txpw" type="password" placeholder="8자 이상" autocomplete="new-password"></div>'
+      + '<button class="btn sub" style="width:100%" data-act="tx:pw">비밀번호 바꾸기</button>';
+  }
+
+  popOpen('<h2>' + 제목 + '</h2>' + 속
+    + '<div class="tx-meta">데스크 BUILD ' + BUILD + '</div>'
     + '<button class="btn ghost" data-act="popclose">닫기</button>');
 }
 
 /* 손잡이 — 클릭 위임의 맨 앞에서 받는다 */
 async function txAct(a, el){
   const k = el.dataset.k, id = el.dataset.id, v2 = el.dataset.v2;
+  /* 내 메뉴에서 고른 갈래 하나만 연다 (2026-09-30) */
+  if(a==='mego'){ 내메뉴닫기(); txMe(v2); return; }
   /* ⛔ 앞서 `data-act="rsteach"` 였다 — `tx:` 가 없으면 이 함수로 안 온다.
        게다가 여기 없는 `act` 를 봐서, 눌러도 아무 일도 안 나고 오류도 안 났다 (2026-09-29에 살림) */
   if(a==='rsteach'){ RS선생 = el.dataset.i || ''; render();
@@ -7719,13 +7778,14 @@ async function txAct(a, el){
     if(!name){ toast('이름을 입력하세요'); return; }
     const 색 = ['red','green','pink','yellow','orange','blue','purple','gray'][W.staff.length % 8];
     try{ const r = await usend('staff', 'POST', { email, name, role, color:색 }, 'return=representation');
-      if(r && r[0]) W.staff.push(r[0]); toast(name+' 넣었어요'); txMe(); }
+      /* ⛔ 갈래를 적어 준다 — 안 적으면 프로필로 튄다 (2026-09-30 메뉴로 나눈 뒤) */
+      if(r && r[0]) W.staff.push(r[0]); toast(name+' 넣었어요'); txMe('staff'); }
     catch(e){ toast('못 넣었어요 — '+(/duplicate|unique/i.test(e.message)?'이미 있는 메일이에요':e.message)); }
     return; }
   if(a==='staffoff'){
     const p = W.staff.find(x=>x.id===id); if(!p) return;
     try{ const r = await usend('staff?id=eq.'+id, 'PATCH', { active: p.active===false }, 'return=representation');
-      if(r && r[0]) Object.assign(p, r[0]); toast(p.name+(p.active===false?' 껐어요':' 켰어요')); txMe(); }
+      if(r && r[0]) Object.assign(p, r[0]); toast(p.name+(p.active===false?' 껐어요':' 켰어요')); txMe('staff'); }
     catch(e){ toast('바꾸지 못했습니다 — '+e.message); }
     return; }
 }
@@ -9065,8 +9125,10 @@ $('#gnotice').addEventListener('click', function(){
     + '회원이 운동한 기록도 여기서 그대로 봅니다.</div></div>'
     + '<button class="btn ghost" data-act="popclose">닫기</button>');
 });
-$('#gme').addEventListener('click', function(){
-  if(ME){ txMe(); return; }
+$('#gme').addEventListener('click', function(e){
+  /* ⛔ 바깥 손잡이가 이 클릭을 다시 받아 **바로 닫지 않게** 한다 */
+  e.stopPropagation();
+  if(ME){ 내메뉴열기(); return; }
   const trs = [...new Set(D.m.map(x=>x.trainer).filter(Boolean))];
   popOpen('<h2>내 정보</h2>'
     + '<div class="note">로그인은 <b>아직 붙이지 않았습니다.</b> 지금은 누구로 볼지 고르는 방식입니다.</div>'
@@ -9316,6 +9378,13 @@ document.addEventListener('change', function(ev){
 });
 $('#whosel').addEventListener('change', function(e){ S.who = e.target.value;
   if(S.view!=='member' && S.view!=='routine') render(); });
+/* 메뉴 바깥을 누르거나 Esc 를 누르면 닫힌다 */
+document.addEventListener('click', function(e){
+  const b = $('#gmenu');
+  if(b && b.classList.contains('on') && !e.target.closest('#gmenu') && !e.target.closest('#gme'))
+    내메뉴닫기();
+}, true);
+
 document.addEventListener('keydown', function(e){ if(e.key==='Escape') popClose(); });
 $('#pop').addEventListener('click', function(e){ if(e.target.id==='pop') popClose(); });
 $('#toast').addEventListener('click', function(ev){
