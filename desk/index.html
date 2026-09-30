@@ -1289,7 +1289,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '143';
+const BUILD = '144';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -7818,6 +7818,7 @@ const kitOf = mid => KITS.find(k => k.member_id === mid) || null;
    자료 목록은 **전원**을 한눈에 봐야 하므로, 이 화면에 들어올 때 한 번에 받는다.
    무거워 봐야 몇백 줄이라 한 번이면 된다 — 그릴 때마다 묻지 않는다. */
 let 자료받음 = 0;
+let 자료읽음 = false;          /* 이 화면에 들어와 한 번 읽었나 — 끝없이 도는 것을 막는다 */
 async function 자료읽기(다시){
   if(!다시 && Date.now() - 자료받음 < 60000) return;
   자료받음 = Date.now();
@@ -7960,12 +7961,20 @@ function render0(){
     b.innerHTML = vKit();
   } else if(S.view==='kits'){
     top.innerHTML = '<h1>자료</h1><span class="cnt">블로그 · 릴스에 쓸 회원 자료</span>';
-    자료읽기().then(()=>{ if(S.view==='kits') render0(); }).catch(()=>{});
+    /* ⛔ 이 줄은 render0 안에 있다. **조건 없이 다시 그리면 끝없이 돈다** —
+         render0 → 자료읽기 → render0 → … (1분 캐시가 있어도 바로 끝나서 더 빨리 돈다).
+       바로 아래 휴지통에 같은 경고를 적어 두고도 2026-09-30 에 그대로 밟았다.
+       **화면에 들어올 때 한 번만** 읽는다. */
+    if(!자료읽음){ 자료읽음 = true;
+      자료읽기().then(()=>{ if(S.view==='kits') render0(); }).catch(()=>{}); }
     b.innerHTML = vKits();
   } else if(S.view==='trash'){
     top.innerHTML = '<h1>휴지통</h1>';
     b.innerHTML = vTrash();
   }
+
+  /* 자료 화면 밖으로 나가면 깃발을 내린다 — 다시 들어올 때 새로 읽는다 (휴지통과 같은 꼴) */
+  if(S.view !== 'kits' && S.view !== 'kit') 자료읽음 = false;
 
   const n2 = W.tasks.filter(r=>!r.done && 내것(r.owners)).length, bd2 = $('#txbdg');
   if(n2){ bd2.textContent = n2; bd2.style.display=''; } else bd2.style.display='none';
