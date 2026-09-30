@@ -1944,7 +1944,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '218';
+const BUILD = '222';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2359,14 +2359,14 @@ function sheetAgreeOff(){
   const ib = ((D.body && D.body[mid]) || []).length;
   const ph = (D.bph || []).filter(x=>x.mid===mid).length;
   openSheet(()=>`
-    <div class="h2">건강정보 동의를 철회하시겠습니까?</div>
+    <div class="h2">건강정보 동의를 취소하시겠어요?</div>
     <div class="agbody" style="margin:2px 0 10px">
-      철회하시면 지금까지 쌓인 아래 기록이 <b>모두 삭제</b>됩니다. 되돌릴 수 없습니다.<br><br>
+      취소하시면 지금까지 모은 아래 기록이 <b>모두 지워집니다.</b> 되돌릴 수 없어요.<br><br>
       · 인바디·몸 기록 <b>${ib}건</b><br>
       · 체형 사진 <b>${ph}장</b><br><br>
       운동기록·식단·루틴은 그대로 유지됩니다.
     </div>
-    <button class="btn warn" data-act="agoff">철회하고 삭제</button>
+    <button class="btn warn" data-act="agoff">동의 취소하고 지우기</button>
     <button class="btn ghost sm" data-act="close">취소</button>`);
 }
 async function 건강동의끄기(){
@@ -2376,7 +2376,7 @@ async function 건강동의끄기(){
     await saveAgree(mid, { aS:'' });
     if(D.body) D.body[mid] = [];
     D.bph = (D.bph || []).filter(x=>x.mid!==mid);
-    closeSheet(); toast('철회했어요 · 건강정보를 지웠습니다'); render();
+    closeSheet(); toast('취소했어요 · 건강정보를 지웠어요'); render();
   }catch(e){ console.error(e); toast('지우는 중 문제가 생겼어요 — 다시 시도해 주세요'); }
 }
 
@@ -3185,8 +3185,8 @@ function sheetSensitive(왜){
       · 회원님과 담당 트레이너만 볼 수 있습니다<br>
       · 사진은 비공개 저장소에 두고 1시간만 열리는 임시 주소로만 보여드립니다<br>
       · 회원님 동의 없이 홍보·광고에 쓰지 않습니다<br>
-      · 언제든 「내 정보 → 약관 및 동의」에서 철회하실 수 있습니다<br>
-      · 철회하시면 저장된 기록과 사진은 삭제됩니다<br><br>
+      · 언제든 「내 정보 → 약관 및 동의」에서 취소하실 수 있습니다<br>
+      · 취소하시면 저장된 기록과 사진은 지워집니다<br><br>
       동의하지 않으셔도 <b>운동기록·식단·루틴·출석은 그대로</b> 쓰실 수 있습니다.
     </div>
     <button class="btn main" data-act="agsens:1">동의하고 시작</button>
@@ -3217,7 +3217,7 @@ function vTerms(){
            '센터 이벤트·프로그램 안내를 받습니다')}
     <div class="note">회원권 만료 안내처럼 꼭 필요한 안내는 동의와 관계없이 보내 드립니다.</div>
 
-    <div class="hr"></div><span class="lbl">전문 보기</span>
+    <div class="hr"></div><span class="lbl">전체 글 보기</span>
     <button class="card rowc" data-act="agopen2:privacy"><div><div class="nm">개인정보처리방침</div>
       <div class="sm">무엇을 모으고 어떻게 지키는지</div></div><span class="rt">›</span></button>
     <button class="card rowc" data-act="agopen2:trust"><div><div class="nm">개인정보 처리위탁</div>
@@ -3328,7 +3328,7 @@ function 뱃지주기(mid){
     if(r && r.p >= 1 && !g.badges.some(b => b.k === r.키)){ const b = { k:r.키, 이름:r.뱃지, at:TODAY }; g.badges.push(b); 새것.push(b); } });
   if(!새것.length) return;
   목표뱃지저장(mid);
-  setTimeout(() => toast('🏅 뱃지를 받았어요 — ' + 새것.map(b=>b.이름).join(', ')), 300);
+  setTimeout(() => toast('🏅 배지를 받았어요 — ' + 새것.map(b=>b.이름).join(', ')), 300);
 }
 function 목표칸(mid){
   const my = 내목표(mid), bs = 내뱃지(mid).slice().reverse();
@@ -3340,7 +3340,7 @@ function 목표칸(mid){
       <i class="bar"><b style="width:${Math.round(r.p*100)}%"></b></i></button>`; }).join('');
   return `<div class="gl-hd"><b>내 목표</b>${my.length && my.length < 5 ? '<button data-act="goal:new">＋ 목표</button>' : ''}</div>
     ${my.length ? 줄 : '<button class="gl-add" data-act="goal:new">＋ 내 목표 정하기</button>'}
-    ${bs.length ? `<div class="gl-hd"><b>뱃지 ${bs.length}개</b></div>
+    ${bs.length ? `<div class="gl-hd"><b>배지 ${bs.length}개</b></div>
       <div class="bdgs">${bs.map(b => `<span class="bdg">🏅<i>${esc(b.이름)}</i></span>`).join('')}</div>` : ''}`;
 }
 /* 목표 정하기 · 고치기 창 */
@@ -3364,7 +3364,7 @@ function sheetGoal(id){
         <input class="search" type="number" inputmode="decimal" data-k="gl:n" value="${n}"></div>
       ${T.말 ? `<div class="note">${T.말}</div>` : ''}
       <div style="display:flex;gap:9px">
-        ${옛 ? `<button class="btn ghost" data-act="goaldel:${옛.id}" style="color:var(--warn);border-color:#5a3a33">삭제</button>` : ''}
+        ${옛 ? `<button class="btn ghost" data-act="goaldel:${옛.id}" style="color:var(--warn);border-color:#5a3a33">지우기</button>` : ''}
         <button class="btn main" data-act="goalsave">저장</button></div>
       <button class="btn ghost sm" data-act="close">닫기</button>`; });
 }
@@ -3545,7 +3545,7 @@ function vRoutines(){
       <div class="sm">${esc(r.purpose)}<br>${r.items.length}종목 · 예상 ${estMin(r)}분</div></div>
       ${t&&t.rid===r.id?`<span class="pill">오늘 ${esc(t.kind)}</span>`:'<span class="rt">›</span>'}</button>`; }).join('')
     : 빔('routine','아직 받은 루틴이 없어요','트레이너가 담아 두면 여기에 보여요'))
-    + `<div class="note">루틴은 수업 전에 방향성에 맞춰 미리 짜 둡니다. <b>수업용과 혼자 할 때 쓰는 루틴</b>을 트레이너가 지정하거나, 직접 골라 시작할 수 있어요.</div>` };
+    + `<div class="note">루틴은 수업 전에 운동 방향에 맞춰 미리 짜 둡니다. <b>수업용과 혼자 할 때 쓰는 루틴</b>을 트레이너가 지정하거나, 직접 골라 시작할 수 있어요.</div>` };
 }
 function vRoutine(){
   const r=rOf(S.rid); if(!r) return vRoutines();
@@ -3643,7 +3643,7 @@ function vPick(){
            <span class="c">${추가중?'추가한':'담은'} 종목 ${담은}개 ›</span>
            <span class="l">${esc(w.items.slice(처음).map(it=>exName(it.ex,it.va)).join(' · '))}</span></button>
          <button class="btn main" style="flex:1" data-act="askstart">${추가중?'추가하기':'운동 시작'}</button>`
-      : `<button class="btn ghost" data-act="${(w&&w.begun)?'go:workout':'go:start'}">그만두기</button>` };
+      : `<button class="btn ghost" data-act="${(w&&w.begun)?'go:workout':'go:start'}">취소</button>` };
 }
 
 /* 담은 순서 확인 → 시작 */
@@ -3664,7 +3664,7 @@ function sheetStart(){
         <div class="sm">${esc(exOf(it.ex).p)}${isMemo(it.ex)?' · 메모':''}</div></div>
         ${mv?`<button class="ordbtn" data-act="sordmv:${i}:-1" ${i===0?'disabled':''}>▲</button>
               <button class="ordbtn" data-act="sordmv:${i}:1" ${i===w.items.length-1?'disabled':''}>▼</button>
-              <button class="chip t" data-act="sordend" style="flex:none;padding:6px 10px">놓기</button>`
+              <button class="chip t" data-act="sordend" style="flex:none;padding:6px 10px">여기에 놓기</button>`
             :`<button class="chip" data-act="spdel:${i}" style="flex:none;padding:6px 10px">빼기</button>`}
       </div>`; }).join('')}
     <button class="btn main" data-act="startgo">${추가중 ? '추가하기' : '시작하기'}</button>
@@ -3680,7 +3680,7 @@ function sheetMemoAdd(){
       .map(x=>`<button class="chip" data-act="memofill:${x}">${x}</button>`).join('')}</div>
     <div class="note">볼륨·그래프에는 안 들어갑니다</div>
     <button class="btn main sm" data-act="memogo">담기</button>
-    <button class="btn ghost sm" data-act="close">그만두기</button>`);
+    <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 
 function sheetPickVar(exid){
@@ -4192,7 +4192,7 @@ function vWorkout(){
       : cur.sets.map((s,i)=> (!cur.locked && i===보일칸) ? '' :
         `<button class="set ${cur.locked?'lock':(s.done?'done':(i===openIdx?'now':''))}" data-act="edit:${i}">
       <span class="i">${i+1}${e.cardio?'구간':'세트'}</span>
-      ${cur.locked ? '' : '<span class="setedit">수정</span>'}
+      ${cur.locked ? '' : '<span class="setedit">고치기</span>'}
       ${e.cardio
         ? `<span class="n">${s.reps}</span><span class="u">분</span><span class="sl">/</span>
            <span class="n" style="margin-left:0">${s.spd||0}</span><span class="u">km/h</span>`
@@ -4226,7 +4226,7 @@ function vWorkout(){
       ${mv
         ? `<button class="ordbtn" data-act="ordmv:${i}:-1" ${i===0?'disabled':''}>▲</button>
            <button class="ordbtn" data-act="ordmv:${i}:1" ${i===w.items.length-1?'disabled':''}>▼</button>
-           <button class="chip t" data-act="ordend" style="flex:none;padding:6px 10px">놓기</button>`
+           <button class="chip t" data-act="ordend" style="flex:none;padding:6px 10px">여기에 놓기</button>`
         : `${on&&!it.locked?'<span class="pill t">지금</span>':(it.locked?'<span class="pill q">완료</span>':'')}
            <button class="chip" data-act="wdel:${i}" style="flex:none;padding:6px 10px">빼기</button>`}
       </div>${(on && !S.fold) ? 펼침() : ''}`;
@@ -4325,7 +4325,7 @@ function sheetExDesc(exid, vk, mid){
       <textarea class="tall" data-k="desc:${K}">${esc(dsc)}</textarea>
       <div style="display:flex;gap:9px">
         <button class="btn main sm" data-act="savedesc:${exid}:${vk}:${mid}">저장</button>
-        <button class="btn ghost sm" data-act="canceldesc">그만두기</button></div>`;
+        <button class="btn ghost sm" data-act="canceldesc">취소</button></div>`;
     if(tr) return head + `
       ${askOf(mid, exid, vk).length?`<div class="note" style="border-color:var(--gold-2)">
         <b style="color:var(--gold)">회원이 이 종목을 봐 달라고 했어요</b>
@@ -4847,7 +4847,7 @@ function vReport(){
     <div class="rpt-hd"><b>GLAD GYM</b><span>${esc(이름)} 회원님</span></div>
     <div class="rpt-title">${esc(수업제목(w))}</div>
     ${끝카드(w)}
-    ${줄 ? `<span class="lbl">오늘 한 운동 · 지난번과 견주기</span><div class="card" style="padding:6px 14px">${줄}</div>` : ''}
+    ${줄 ? `<span class="lbl">오늘 한 운동 · 지난번과 비교</span><div class="card" style="padding:6px 14px">${줄}</div>` : ''}
 
     <span class="lbl">${m}월 운동</span>
     <div class="gsum">
@@ -5047,8 +5047,8 @@ function vRecord(){
       </div>`).join('')
     ,
     foot: ed
-      ? `<button class="btn ghost" data-act="reccancel">그만두기</button>
-         <button class="btn blue" data-act="recask">수정 완료</button>`
+      ? `<button class="btn ghost" data-act="reccancel">취소</button>
+         <button class="btn blue" data-act="recask">고치기 끝</button>`
       : (canEdit ? `<button class="btn blue go" data-act="recedit:${w.id}">기록 수정하기</button>` : '') };
 }
 
@@ -5072,7 +5072,7 @@ function sheetSetEdit(i, j){
     </div>
     <button class="btn blue sm" data-act="rsetsave:${i}:${j}">이 세트 고치기</button>
     <button class="btn ghost sm" data-act="rsetdel:${i}:${j}" style="color:var(--warn)">이 세트 빼기</button>
-    <button class="btn ghost sm" data-act="close">그만두기</button>`);
+    <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 
 /* 고친 것 서버에 쓰기 */
@@ -5092,7 +5092,7 @@ async function recSave(){
         item_id: it._id, sort:k, kg:x.kg, reps:x.reps, spd: x.spd==null?null:x.spd, done:true }))), '세트 저장');
     }
   }
-  save(); toast('고쳤습니다'); render();
+  save(); toast('고쳤어요'); render();
 }
 
 /* ── 피드백 · 날짜로 보기 ── */
@@ -5234,7 +5234,7 @@ function sheetAskFor(ex, va){
     <div class="h2">${esc(exName(ex,va))} <small>코멘트 요청</small></div>
     <textarea data-k="ask:${ex}|${va}" placeholder="어디가 궁금한지 한 줄 적어 주세요 (안 적어도 돼요)"></textarea>
     <button class="btn blue" data-act="ask:${ex}:${va}:x">요청 보내기</button>
-    <button class="btn ghost sm" data-act="close">그만두기</button>`);
+    <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 
 /* ── 피드백 탭 — 최근 / 수업별 / 종목별 ── */
@@ -5442,7 +5442,7 @@ function sheetTagPhoto(mealId){
       <button class="btn sub sm" data-act="fadd:${m.id}">사진에 없는 음식 담기</button>
       ${미리
         ? `<button class="btn main" data-act="tagnext">다음 — 언제 먹었나요 ›</button>
-           <button class="btn ghost sm" data-act="shotcancel">그만두기</button>`
+           <button class="btn ghost sm" data-act="shotcancel">취소</button>`
         : `<button class="btn main" data-act="tagdone">다 됐어요</button>`}`;
   });
 }
@@ -5644,7 +5644,7 @@ function vDiet(){
      : 빔('bowl','이 날은 올린 식단이 없어요','사진을 찍거나 검색해서 담아 보세요')}
     ${tr||!seqs.length?'':`<button class="btn ghost sm" data-act="fadd:new">＋ 식사 추가하기</button>`}
     <div class="hr"></div>
-    <span class="lbl">쌓인 것</span>
+    <span class="lbl">지금까지 모은 것</span>
     ${kcalSummary(mid)}
     <div class="note">사진은 <b>긴 변 1600px</b> 로 줄여 올라갑니다. 아래에 글래드짐 표시와 찍은 날짜·시간이 찍힙니다.
       <br>음식 정보 출처 · <b>식품영양성분 데이터베이스</b> (식품의약품안전처)</div>` };
@@ -6265,7 +6265,7 @@ function sheetShot(){
     <div style="display:flex;gap:9px">
       <button class="btn main" data-act="shotup">올리기</button>
       <button class="btn ghost" data-act="tagback">뒤로</button></div>
-    <button class="btn ghost sm" data-act="shotcancel">그만두기</button>`;
+    <button class="btn ghost sm" data-act="shotcancel">취소</button>`;
   });
 }
 
@@ -6404,7 +6404,7 @@ function vProfile(){
   const 나 = MEMBERS.find(m=>m.id===mid) || {};
   const 첫자 = (나.n || '').slice(0,1) || '회';
   const 내것 = (S.who !== 'tr');
-  return { top: bar('프로필', 내것?`<button class="tbtn" data-act="profedit">꾸미기</button>`:'',
+  return { top: bar('프로필', 내것?`<button class="tbtn" data-act="profedit">고치기</button>`:'',
       S.who==='tr' ? 'tm:'+mid : 'tab:me'), tabs: 내것?1:0, body:`
     <div class="pf">
       <span class="pfa">${pf.avatar
@@ -6441,7 +6441,7 @@ function sheetOotdView(id){
 function sheetProfEdit(){
   const mid = S.mid, pf = profOf(mid);
   openSheet(()=>`
-    <div class="h2">프로필 꾸미기</div>
+    <div class="h2">프로필 고치기</div>
     <div class="fld"><span class="fn">한 줄 소개</span>
       <input class="search" type="text" data-k="pf:bio" maxlength="40"
         value="${esc(pf.bio||'')}" placeholder="예) 주 3회 · 하체 집중"></div>
@@ -6527,7 +6527,7 @@ function vMe(){
         <span class="gi">${svg(x[0])}</span>
         <span class="gt"><span class="nm">${x[1]}</span><span class="sm">${x[2]}</span></span>
         <span class="ga">›</span></button>`).join('')}
-    <div class="hr"></div><span class="lbl">프로토타입 도구</span>
+    <div class="hr"></div><span class="lbl">시험용 도구</span>
     <button class="card rowc" data-act="as:tr"><div><div class="nm">트레이너 화면 보기</div>
       <div class="sm">루틴 지정 · 코멘트 · 설명 고치기</div></div><span class="rt">›</span></button>
     <button class="card rowc" data-act="reset"><div><div class="nm">처음 상태로 되돌리기</div>
@@ -6588,7 +6588,7 @@ const INTAKE_FIELDS = [
   {k:'hist',     n:'과거 병력·질환', t:'many', o:['최근 수술','천식','무릎부상','목디스크','골절','고혈압','심근경색','폐질환','허리디스크','무월경','저혈압','갑상선기능','관절염','허리부상','다낭성난소증후군','당뇨']},
   {k:'time',     n:'운동 가능 요일', t:'many', o:['월','화','수','목','금','토','일']},
   {k:'timeTxt',  n:'시간대',      t:'text'},
-  {k:'needs',    n:'회원님 니즈', t:'area'},
+  {k:'needs',    n:'회원님이 원하는 것', t:'area'},
   {k:'notes',    n:'특이사항 (트레이너만 봅니다)', t:'area'},
 ];
 const MEAL_KEYS = ['아침','점심','저녁','간식','영양제','취침'];
@@ -6628,7 +6628,7 @@ function vIntake(){
     <div class="card"><div class="chips">${['월','화','수','목','금','토','일'].map(x=>
       `<span class="chip ${(d.time||[]).includes(x)?'on':''}">${x}</span>`).join('')}</div>
       <div class="sm">${esc(d.timeTxt||'')}</div></div>
-    <span class="lbl">회원님 니즈</span>
+    <span class="lbl">회원님이 원하는 것</span>
     <div class="card"><div class="fv">${esc(d.needs||'아직 안 적음')}</div></div>
     ${tr?`<span class="lbl">특이사항 — 트레이너만 봅니다</span>
       <div class="card"><div class="fv">${esc(d.notes||'없음')}</div></div>
@@ -7426,7 +7426,7 @@ function sheetBlAdd(mid){
       가장 최근 기록은 <b>칼로리 계산</b>의 현재 몸무게로도 들어갑니다.</div>
     <button class="btn blue sm" data-act="blgo:${mid}">저장</button>
     ${cur?`<button class="btn ghost sm" data-act="bldel:${cur.id}" style="color:var(--warn)">이 날 기록 지우기</button>`:''}
-    <button class="btn ghost sm" data-act="close">그만두기</button>`);
+    <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 
 async function blSave(mid){
@@ -7534,19 +7534,19 @@ function sheetBpMark(id){
   S.bpMark = { id, pts: ((x.marks && x.marks.pts) || []).map(q=>({x:q.x, y:q.y})) };
   openSheet(()=>{
     const M = S.bpMark, n = M.pts.length;
-    return `<div class="h2">기준선 긋기 <small>${esc(dateTxt(x.date))} · ${esc(x.pose)}</small></div>
+    return `<div class="h2">기준선 그리기 <small>${esc(dateTxt(x.date))} · ${esc(x.pose)}</small></div>
       <div class="mkwrap" onclick="markTap(event,this)">
         <img src="${esc(phURL(x.path))}" alt="" onerror="picFail(this)">
         ${markSvg(M.pts)}</div>
       <div class="note" style="text-align:center;font-size:13.5px">
         ${n < MARKS.length ? `사진에서 <b style="color:var(--gold)">${MARKS[n]}</b> 를 눌러 주세요 <span style="color:#75706a">(${n+1}/${MARKS.length})</span>`
-          : '다 찍었습니다. 저장하시면 견주기 화면에도 같이 그려집니다.'}</div>
+          : '다 찍었습니다. 저장하시면 비교 화면에도 같이 그려집니다.'}</div>
       ${markTxt(M.pts)}
       <div style="display:flex;gap:8px">
-        <button class="btn ghost sm" data-act="mkundo" ${n?'':'disabled'}>한 점 빼기</button>
+        <button class="btn ghost sm" data-act="mkundo" ${n?'':'disabled'}>마지막 점 지우기</button>
         <button class="btn ghost sm" data-act="mkclear" ${n?'':'disabled'}>모두 지우기</button></div>
       <button class="btn blue sm" data-act="mksave">저장</button>
-      <button class="btn ghost sm" data-act="close">그만두기</button>`;
+      <button class="btn ghost sm" data-act="close">닫기</button>`;
   });
 }
 
@@ -7594,7 +7594,7 @@ function bodyPane(mid){
     <div class="note" style="margin-top:-2px">전면 · 후면 · 좌측 · 우측을 같은 자리에서 찍으면
       <b>변화가 한눈에</b> 보이고, 리포트에도 그대로 들어갑니다.</div>
 
-    <span class="lbl">비포 · 애프터 견주기</span>
+    <span class="lbl">비포 · 애프터 비교</span>
     <div class="seg">${POSES.map(x=>
       `<button class="${pose===x?'on':''}" data-act="bppose:${x}">${x}</button>`).join('')}</div>
     ${ds.length
@@ -7604,7 +7604,7 @@ function bodyPane(mid){
             : '사진이 하루치뿐입니다. 다음에 한 장 더 넣으면 나란히 견줍니다.'}</div>`
       : `<div class="empty">${esc(pose)} 사진이 아직 없어요</div>`}
     <button class="btn blue sm" data-act="bpadd:body">＋ ${esc(pose)} 사진 넣기</button>
-    ${tr?'':'<div class="note">집에서 찍으실 때는 <b>같은 자리 · 같은 옷 · 같은 밝기</b>로 찍어야 견주기 좋습니다.</div>'}
+    ${tr?'':'<div class="note">집에서 찍으실 때는 <b>같은 자리 · 같은 옷 · 같은 밝기</b>로 찍어야 비교하기 좋습니다.</div>'}
 
     <div class="hr"></div>
     <span class="lbl">AI 체형분석 장비 사진 · ${ai.length}장</span>
@@ -7810,7 +7810,7 @@ function sheetBpVid(){
     <div class="fld" style="margin-top:10px"><span class="fn">찍은 날</span>
       <input class="search" type="date" data-k="bp:d" value="${S.bpNewDate||TODAY}"></div>
     <button class="btn blue sm" data-act="bpvgo">넣기</button>
-    <button class="btn ghost sm" data-act="close">그만두기</button>`);
+    <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 async function bpVidUpload(){
   const V = S.bpVid; if(!V) return;
@@ -7857,7 +7857,7 @@ function sheetBpAdd(){
     <div class="fld" style="margin-top:10px"><span class="fn">찍은 날</span>
       <input class="search" type="date" data-k="bp:d" value="${S.bpNewDate||TODAY}"></div>
     <button class="btn blue sm" data-act="bpgo">넣기</button>
-    <button class="btn ghost sm" data-act="close">그만두기</button>`);
+    <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 
 async function bpUpload(){
@@ -7892,7 +7892,7 @@ function sheetBpView(id){
       ? `<div class="mkwrap"><img src="${esc(phURL(x.path))}" alt="" onerror="picFail(this)">${markSvg(x.marks.pts)}</div>`
         + markTxt(x.marks.pts)
       : `<img class="shot" src="${esc(phURL(x.path))}" alt="" onerror="picFail(this)">`}
-    ${(x.kind!=='ai' && x.kind!=='vid')?`<button class="btn sub sm" data-act="bpmark:${x.id}">기준선 긋기</button>`:''}
+    ${(x.kind!=='ai' && x.kind!=='vid')?`<button class="btn sub sm" data-act="bpmark:${x.id}">기준선 그리기</button>`:''}
     ${own?`<button class="btn ghost sm" data-act="bpdel:${x.id}" style="color:var(--warn)">이 ${x.kind==='vid'?'영상':'사진'} 지우기</button>`:''}
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
@@ -8230,7 +8230,7 @@ function sheetRAdd(){
         <div>${[...new Set(cart)].map(id=>{ const r=rOf(id);
           return r?`${esc(r.n)}${cart.filter(x=>x===id).length>1?` ×${cart.filter(x=>x===id).length}`:''}`:''; }).join(' · ')}</div>
         <div style="display:flex;gap:8px;margin-top:9px">
-          <button class="btn main sm" data-act="raddask">추가하기</button>
+          <button class="btn main sm" data-act="raddask">추가</button>
           <button class="btn ghost sm" data-act="rcartclr">비우기</button></div></div>`:''}
       ${mine.length?`<span class="lbl">이 회원 루틴 — 같은 것을 하나 더</span>
         ${mine.map(r=>row(r,'')).join('')}`:''}
@@ -8254,7 +8254,7 @@ function sheetRDel(rid){
     <div class="note">${t&&t.rid===r.id?'<b style="color:var(--warn)">오늘 지정된 루틴입니다 — 지정도 함께 풀립니다.</b><br>':''}
       <b>되돌릴 수 없습니다.</b> 이 루틴으로 이미 한 운동 기록은 그대로 남습니다.</div>
     <button class="btn main" data-act="rdelgo:${rid}" style="background:var(--warn);color:#241310">지우기</button>
-    <button class="btn ghost sm" data-act="close">그만두기</button>`);
+    <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 
 function sheetGrpMan(){
@@ -8266,7 +8266,7 @@ function sheetGrpMan(){
       <input class="search" type="text" data-k="grprenv" value="${esc(S.grpRen)}">
       <div class="note">이 그룹에 든 루틴 ${myRoutines(mid).filter(r=>(r.grp||'').trim()===S.grpRen).length}개가 함께 바뀝니다.</div>
       <button class="btn main sm" data-act="grprendo">바꾸기</button>
-      <button class="btn ghost sm" data-act="grprencancel">그만두기</button>`;
+      <button class="btn ghost sm" data-act="grprencancel">취소</button>`;
     return `
     <div class="h2">루틴 그룹 만들기 <small>${esc((MEMBERS.find(x=>x.id===mid)||{}).n||'')} 회원</small></div>
     ${gs.length?`<span class="lbl">지금 있는 그룹</span>
@@ -8274,7 +8274,7 @@ function sheetGrpMan(){
         <div><div class="nm">${esc(g)}</div>
         <div class="sm">루틴 ${myRoutines(mid).filter(r=>(r.grp||'').trim()===g).length}개</div></div>
         <button class="chip t" data-act="grpren:${g}">이름 바꾸기</button>
-        <button class="chip" data-act="grpdel:${g}">없애기</button></div>`).join('')}
+        <button class="chip" data-act="grpdel:${g}">지우기</button></div>`).join('')}
       <div class="hr"></div>`:''}
     <span class="lbl">그룹 이름 만들기</span>
     <input class="search" type="text" data-k="grpnew" placeholder="예 · 근지구력, 황체기">
@@ -8293,7 +8293,7 @@ function tRedit(){
       <input class="search" type="text" inputmode="numeric" data-k="rno:${r.id}" value="${r.no}"></div>
     <div class="fld"><span class="fn">루틴 이름</span>
       <input class="search" type="text" data-k="rn:${r.id}" value="${esc(r.n)}"></div>
-    <div class="fld"><span class="fn">방향성 · 목적</span>
+    <div class="fld"><span class="fn">운동 방향 · 목적</span>
       <input class="search" type="text" data-k="rp:${r.id}" value="${esc(r.purpose||'')}"></div>
     <div class="fld"><span class="fn">그룹 — 목록 위 칩으로 나뉩니다</span>
       <div class="chips">
@@ -8319,7 +8319,7 @@ function tRedit(){
     <div class="hr"></div>
     <button class="btn ghost sm" data-act="rdel:${r.id}" style="color:var(--warn)">이 루틴 지우기</button>`,
     foot: r.items.length ? `<button class="btn sub" data-act="tstart:${r.mid}:${r.id}:수업">지금 이 루틴으로 수업</button>
-      <button class="btn main" data-act="rdone:${r.id}">저장하기</button>` : '' };
+      <button class="btn main" data-act="rdone:${r.id}">저장</button>` : '' };
 }
 
 /* 오늘 지정 — 누르면 확인, 이미 지정돼 있으면 풀지 물어본다 */
@@ -8333,14 +8333,14 @@ function sheetAssign(rid, kind){
       <div class="note">지금 <b>오늘 · ${esc(kind)} · 루틴 ${r.no} ${esc(r.n)}</b>으로 지정돼 있어요.
         풀면 회원 홈에서 사라집니다. <b>이미 한 기록은 그대로 남습니다.</b></div>
       <button class="btn main" data-act="assigno:${rid}:${kind}:off">지정 풀기</button>
-      <button class="btn ghost sm" data-act="close">그만두기</button>`;
+      <button class="btn ghost sm" data-act="close">닫기</button>`;
     return `
       <div class="h2">오늘 ${esc(kind)}으로 지정할까요? <small>${esc(m.n)} 회원</small></div>
       <div class="note">회원 홈 큰 칸에 <b>「트레이너 지정루틴 하기 · ${esc(kind)} · 루틴 ${r.no} ${esc(r.n)}」</b>로 뜹니다.
         ${(t && !(t.rid===r.id && t.kind===kind)) ? `<br><b style="color:var(--warn)">지금 지정된
           ${rOf(t.rid)?`루틴 ${rOf(t.rid).no} · ${esc(t.kind)}`:'다른 루틴'}은 이 루틴으로 바뀝니다.</b>` : ''}</div>
       <button class="btn main" data-act="assigno:${rid}:${kind}:on">이 루틴으로 지정</button>
-      <button class="btn ghost sm" data-act="close">그만두기</button>`;
+      <button class="btn ghost sm" data-act="close">닫기</button>`;
   });
 }
 
@@ -8619,7 +8619,7 @@ document.addEventListener('click', async ev=>{
   if(S.rpOnly && !['noop','close','sheet','rpcm','csl','csk','vmute'].includes(k)){
     toast('수업 기록만 보실 수 있어요'); return; }
   switch(k){
-    case 'kakao': toast('실제 연동은 다음 단계입니다'); return;
+    case 'kakao': toast('실제 연동은 다음 단계예요'); return;
     case 'retry': S.screen='boot'; render(); start(); return;
     case 'switch': S.stack=[]; S.who=null; go('login'); return;
     case 'back': goBack(); return;
@@ -8733,7 +8733,7 @@ document.addEventListener('click', async ev=>{
       const el=document.querySelector('[data-k="mn:'+id+'"]'); const txt=el?el.value.trim():'';
       m.note=txt;
       sv(spatch('meals','id=eq.'+id,{ trainer_note:txt }), '식단 코멘트');
-      toast('보냈습니다'); drawSheet(); render(); return; }
+      toast('보냈어요'); drawSheet(); render(); return; }
     case 'mealdel': { const id=rest[0], m=(D.meals||[]).find(x=>x.id===id); if(!m) return;
       D.meals=D.meals.filter(x=>x.id!==id);
       sv(sdel('meals','id=eq.'+id), '식단 지우기');
@@ -8775,7 +8775,7 @@ document.addEventListener('click', async ev=>{
       MEAL_KEYS.forEach(k=>{ const el=document.querySelector('[data-k="ikm:'+k+'"]'); if(el) d.meals[k]=el.value.trim(); });
       if(S.draft) Object.keys(S.draft).forEach(k=>{ if(k.startsWith('ik:')||k.startsWith('ikm:')) delete S.draft[k]; });
       sv(spost('intake',[{ member_id:mid, data:d, updated_at:new Date().toISOString() }], {on:'member_id'}), '상담일지 저장');
-      toast('저장했습니다'); S.subj=mid; go('intake'); return; }
+      toast('저장했어요'); S.subj=mid; go('intake'); return; }
     case 'kcalstep': {
       const g=GOALS[subj()]||(GOALS[subj()]={}); g.calc=g.calc||{};
       calcSync();
@@ -8818,7 +8818,7 @@ document.addEventListener('click', async ev=>{
       g.promises = gv('pg:promises').split('\n').map(x=>x.trim()).filter(Boolean);
       if(S.draft) Object.keys(S.draft).forEach(k=>{ if(k.startsWith('pg:')||k.startsWith('plnow:')||k.startsWith('plto:')||k.startsWith('pc:')) delete S.draft[k]; });
       sv(spost('plans',[{ member_id:mid, data:g, updated_at:new Date().toISOString() }], {on:'member_id'}), '운동계획 저장');
-      toast('저장했습니다'); S.subj=mid; go('plan'); return; }
+      toast('저장했어요'); S.subj=mid; go('plan'); return; }
 
     /* 루틴 만들기 · 고치기 */
     case 'rblank': { const mid=S.tmid||'m1', rs=myRoutines(mid), id='r'+Date.now(), no=rs.length+1;
@@ -8841,7 +8841,7 @@ document.addEventListener('click', async ev=>{
       }
       if(S.draft){ delete S.draft['rn:'+r.id]; delete S.draft['rp:'+r.id]; delete S.draft['rno:'+r.id]; }
       sv(spatch('routines','id=eq.'+r.id,{ name:r.n, purpose:r.purpose, no:r.no }), '루틴 저장');
-      toast('저장했습니다'); render(); return; }
+      toast('저장했어요'); render(); return; }
     case 'raddex': S.redit=rest[0]; go('t_pickex'); return;
     case 'rpart': S.pickPart=rest[0]; render(); return;
     case 'raddv': { const [rid,ex,va]=rest, r=rOf(rid); if(!r) return;
@@ -8897,7 +8897,7 @@ document.addEventListener('click', async ev=>{
       else { S.who='m'; S.mid=rest[0]; S.tab='home';
         /* 잠근 채로 앱을 껐다면 운동 화면으로 바로 되돌린다 */
         if(D.live && D.live.mid===rest[0] && D.live.lock) go('workout'); else go('home'); } return;
-    case 'reset': reset(); toast('처음 상태로 되돌렸습니다'); return;
+    case 'reset': reset(); toast('처음 상태로 되돌렸어요'); return;
     case 'go': { if(rest[0]==='workout' && !D.live) adoptLive(S.mid);
       /* 이미 하는 중에 종목을 담으러 가면 「여기서부터가 새로 담은 것」을 표시해 둔다 */
       if(rest[0]==='pick'){ const lw = live(); S.addFrom = (lw && lw.begun) ? lw.items.length : null; }
@@ -8977,9 +8977,9 @@ document.addEventListener('click', async ev=>{
     case 'goalsave': 목표저장(); return;
     case 'goaldel': { const g = GOALS[S.mid]; if(!g) return;
       openSheet(()=>`<div class="h2">이 목표를 지울까요?</div>
-        <div class="note">이미 받은 뱃지는 그대로 남아요.</div>
+        <div class="note">이미 받은 배지는 그대로 남아요.</div>
         <button class="btn main" data-act="goaldelgo:${rest[0]}" style="background:var(--warn);color:#241310">지우기</button>
-        <button class="btn ghost sm" data-act="close">그만두기</button>`); return; }
+        <button class="btn ghost sm" data-act="close">닫기</button>`); return; }
     case 'goaldelgo': { const g = GOALS[S.mid]; if(!g) return;
       g.my = (g.my||[]).filter(x => x.id !== rest[0]); closeSheet();
       toast('지웠어요'); render();
@@ -9038,7 +9038,7 @@ document.addEventListener('click', async ev=>{
           코멘트나 사진을 나중에 올리셔도 됩니다.</p>
         <div style="display:flex;gap:9px">
           <button class="btn main" data-act="rsend2:${w.id}">보내기</button>
-          <button class="btn ghost" data-act="close">그만두기</button></div>`);
+          <button class="btn ghost" data-act="close">닫기</button></div>`);
       return; }
     case 'rsend2': { const w = D.workouts.find(x=>x.id===rest[0]); if(!w) return;
       closeSheet();
@@ -9087,7 +9087,7 @@ document.addEventListener('click', async ev=>{
       S.editDesc=null;
       sv(spost('member_desc',[{ member_id:mid, variant_id:VID(ex,va), descr:txt,
         updated_at:new Date().toISOString() }], {on:'member_id,variant_id'}), '설명 저장');
-      toast('이 회원용 설명으로 저장했습니다'); drawSheet(); return; }
+      toast('이 회원용 설명으로 저장했어요'); drawSheet(); return; }
     case 'att': 첨부고르기(rest[0], rest[1]); return;
     /* ── 동의 · 알림 (2026-09-21) ── */
     case 'agchk': { S.ag = S.ag || {}; S.ag[rest[0]] = !S.ag[rest[0]]; render(); return; }
@@ -9190,7 +9190,7 @@ document.addEventListener('click', async ev=>{
             open.forEach(a => a.done = true);
             sv(spatch('asks','id=in.('+open.map(a=>a.id).join(',')+')', { done_at: new Date().toISOString() }), '요청 처리');
           }
-          toast('보냈습니다 · 회원 화면에 바로 떠요');
+          toast('보냈어요 · 회원 화면에 바로 떠요');
         }catch(e){ console.error('코멘트 보내기', e); toast('못 보냈어요 — ' + (e.message||'').slice(0,60)); }
         finally{ S.보내는중 = false; drawSheet(); }
       })();
@@ -9199,7 +9199,7 @@ document.addEventListener('click', async ev=>{
       const i=D.cm.findIndex(c=>c.id===cid); if(i<0) return;
       D.cm.splice(i,1);
       sv(sdel('comments','id=eq.'+cid), '코멘트 지우기');
-      save(); toast('지웠습니다'); drawSheet(); render(); return; }
+      save(); toast('지웠어요'); drawSheet(); render(); return; }
     case 'ask': {
       const [ex,va]=rest, K=ex+'|'+va;
       const ta=document.querySelector('textarea[data-k="ask:'+K+'"]');
@@ -9209,7 +9209,7 @@ document.addEventListener('click', async ev=>{
       D.asks=D.asks||[]; D.asks.unshift({ id, mid:S.mid, ex, va, wid:last, note, ts:new Date().toISOString(), done:false });
       if(S.draft) delete S.draft['ask:'+K];
       sv(spost('asks',[{ id, member_id:S.mid, variant_id:VID(ex,va), workout_id:last, note }]), '코멘트 요청');
-      toast('요청했습니다 · 트레이너에게 바로 떠요');
+      toast('요청했어요 · 트레이너에게 바로 떠요');
       if(rest[2]==='x'){ closeSheet(); render(); } else drawSheet();
       return; }
     case 'unask': {
@@ -9283,7 +9283,7 @@ document.addEventListener('click', async ev=>{
       openSheet(()=>`<div class="h2">이 ${x.kind==='vid'?'영상':'사진'}을 지울까요?</div>
         <div class="note">${esc(dateTxt(x.date))} · ${x.kind==='ai'?'AI 체형분석':esc(x.pose)} — 되돌릴 수 없습니다.</div>
         <button class="btn main" data-act="bpdelgo:${x.id}" style="background:var(--warn);color:#241310">지우기</button>
-        <button class="btn ghost sm" data-act="close">그만두기</button>`);
+        <button class="btn ghost sm" data-act="close">닫기</button>`);
       return; }
     case 'bpdelgo': { const id=rest[0], x=(D.bph||[]).find(y=>y.id===id); closeSheet(); if(!x) return;
       D.bph = D.bph.filter(y=>y.id!==id);
@@ -9295,7 +9295,7 @@ document.addEventListener('click', async ev=>{
       openSheet(()=>`<div class="h2">체형 메모</div>
         <textarea data-k="bmemo" style="min-height:130px" placeholder="예) 거북목 · 라운드숄더 · 골반 전방경사. 흉추 폄과 둔근 활성화 먼저.">${esc(b.memo||'')}</textarea>
         <button class="btn blue sm" data-act="bmemogo:${mid}">저장</button>
-        <button class="btn ghost sm" data-act="close">그만두기</button>`);
+        <button class="btn ghost sm" data-act="close">닫기</button>`);
       return; }
     case 'bmemogo': { const mid=rest[0];
       const el=document.querySelector('[data-k="bmemo"]'), v=el?el.value.trim():'';
@@ -9326,7 +9326,7 @@ document.addEventListener('click', async ev=>{
             <b>풀린 것만 눌러서 끄시면</b> 됩니다.`:'지금 표시한 것이 첫 회차로 들어갑니다.'}
           <br>지난 회차는 <b>그대로 남습니다.</b></div>
         <button class="btn blue" data-act="bnewgo:${mid}">시작하기</button>
-        <button class="btn ghost sm" data-act="close">그만두기</button>`);
+        <button class="btn ghost sm" data-act="close">닫기</button>`);
       return; }
     case 'bnewgo': { const mid=rest[0]; closeSheet();
       D.rounds=D.rounds||{}; const rs=D.rounds[mid]=D.rounds[mid]||[];
@@ -9354,7 +9354,7 @@ document.addEventListener('click', async ev=>{
       svCycle(mid); toast('주기를 켰어요'); render(); return; }
     case 'cycoff': { const mid=rest[0];
       if(D.cycle&&D.cycle[mid]) D.cycle[mid].on=false;
-      svCycle(mid); toast('껐어요 — 트레이너에게도 안 보입니다'); render(); return; }
+      svCycle(mid); toast('껐어요 — 트레이너에게도 안 보여요'); render(); return; }
     case 'cycstart': { const mid=rest[0]; D.cycle=D.cycle||{};
       const c=D.cycle[mid]||(D.cycle[mid]={on:true,len:28,period:5});
       c.last=TODAY; c.on=true; svCycle(mid); toast('오늘로 기록했어요'); render(); return; }
@@ -9373,7 +9373,7 @@ document.addEventListener('click', async ev=>{
       if(S.draft){ delete S.draft['vn:'+ex]; delete S.draft['vd:'+ex]; }
       sv(spost('variants',[{ id:VID(ex,vk), ex_id:ex, vkey:vk, name:n, descr:desc,
         demo:false, sort:(e0?e0.vars.length:0) }]), '하는 법 추가');
-      toast('추가했습니다'); closeSheet(); render(); return; }
+      toast('추가했어요'); closeSheet(); render(); return; }
 
     case 'startr': { const r=rOf(rest[0]), t=D.today[r.mid];
       newLive(`루틴 ${r.no} · ${r.n}`, itemsFromRoutine(r), (t&&t.rid===r.id)?t.kind:'개인운동', r.id); return; }
@@ -9440,7 +9440,7 @@ document.addEventListener('click', async ev=>{
       openSheet(()=>`<div class="h2">이 종목을 뺄까요? <small>${esc(exName(it.ex,it.va))}</small></div>
         <div class="note">${it.sets.filter(x=>x.done).length?`적어 둔 <b>${it.sets.filter(x=>x.done).length}세트</b>도 함께 사라집니다.`:'아직 적은 것이 없습니다.'}</div>
         <button class="btn main" data-act="wdelgo:${i}" style="background:var(--warn);color:#241310">빼기</button>
-        <button class="btn ghost sm" data-act="close">그만두기</button>`);
+        <button class="btn ghost sm" data-act="close">닫기</button>`);
       return; }
     case 'wdelgo': { const i=+rest[0]; closeSheet();
       const it = w && w.items[i]; if(!it) return;
@@ -9578,7 +9578,7 @@ document.addEventListener('click', async ev=>{
         const doneIdx=w.cur;
         const nxt=w.items.findIndex(it=>!it.locked);
         svItem(doneIdx);
-        if(nxt>=0){ w.cur=nxt; w.items[nxt].startAt = w.startAt ? Date.now() : null; save(); toast('잠갔습니다 · 다음 종목'); render(); return; }
+        if(nxt>=0){ w.cur=nxt; w.items[nxt].startAt = w.startAt ? Date.now() : null; save(); toast('잠갔어요 · 다음 종목'); render(); return; }
         save(); render();
       }
       sheetFinish(); return; }
@@ -9624,11 +9624,11 @@ document.addEventListener('click', async ev=>{
       if(exOf(it.ex).cardio){ st.reps = nnum(g('reps')); st.spd = g('spd')===''? undefined : nnum(g('spd'));
         if(경사최대(it.ex)) st.kg = Math.min(경사최대(it.ex), nnum(g('kg'))); }
       else { st.kg = nnum(g('kg')); st.reps = nnum(g('reps')); }
-      closeSheet(); toast('바꿨어요 · 아직 저장 전입니다'); render(); return; }
+      closeSheet(); toast('바꿨어요 · 아직 저장 전이에요'); render(); return; }
     case 'rsetdel': {
       const [i,j] = rest.map(Number);
       S.recEdit.items[i].sets.splice(j,1);
-      closeSheet(); toast('뺐어요 · 아직 저장 전입니다'); render(); return; }
+      closeSheet(); toast('뺐어요 · 아직 저장 전이에요'); render(); return; }
     case 'raddset': {
       const i = Number(rest[0]), it = S.recEdit.items[i];
       const last = it.sets[it.sets.length-1] || { kg:0, reps:10 };
@@ -9641,8 +9641,8 @@ document.addEventListener('click', async ev=>{
         <div class="card">${E.items.map(it=>`<div class="frow"><span class="fk">${esc(exName(it.ex,it.va))}</span>
           <span class="fv">${it.sets.map(x=>setTxt(it.ex,x)).join(' · ')||'세트 없음'}</span></div>`).join('')}</div>
         <div class="note">세트 ${n}개로 바꿉니다. <b>운동이 다시 시작되지 않습니다</b> — 기록만 고칩니다.</div>
-        <button class="btn blue" data-act="recsavego">수정하기</button>
-        <button class="btn ghost sm" data-act="close">그만두기</button>`);
+        <button class="btn blue" data-act="recsavego">고치기</button>
+        <button class="btn ghost sm" data-act="close">닫기</button>`);
       return; }
     case 'recsavego': recSave(); return;
     case 'resume': {
@@ -9751,7 +9751,7 @@ document.addEventListener('click', async ev=>{
       const g = rest.join(':');
       myRoutines(S.tmid||'m1').filter(r=>(r.grp||'').trim()===g).forEach(r=>setGrp(r.id, ''));
       if(S.rgrp===g) S.rgrp='전체';
-      toast('그룹을 없앴어요 · 루틴은 그대로 있습니다'); drawSheet(); render(); return; }
+      toast('그룹을 없앴어요 · 루틴은 그대로 있어요'); drawSheet(); render(); return; }
     case 'rsetgrp': { const rid=rest[0], g=rest.slice(1).join(':');
       setGrp(rid, g); toast(g?`「${g}」 그룹으로`:'그룹에서 뺐어요'); render(); return; }
     case 'assign': sheetAssign(rest[0], rest[1]); return;
@@ -9767,12 +9767,12 @@ document.addEventListener('click', async ev=>{
       } else {
         delete D.today[r.mid];
         sv(sdel('assignments','member_id=eq.'+r.mid+'&on_date=eq.'+TODAY), '지정 풀기');
-        toast('지정을 풀었습니다');
+        toast('지정을 풀었어요');
       }
       S.tmid = r.mid; go('t_routines'); return; }
     case 'unassign': { const mid=rest[0]; delete D.today[mid];
       sv(sdel('assignments','member_id=eq.'+mid+'&on_date=eq.'+TODAY), '지정 풀기');
-      toast('지정을 풀었습니다'); render(); return; }
+      toast('지정을 풀었어요'); render(); return; }
     case 'rnew': { const mid=S.tmid||'m1', rs=myRoutines(mid), src=rs[0];
       if(!src){ toast('복제할 루틴이 없어요'); return; }
       const id='r'+Date.now(), nm=src.n+' (복제)';
@@ -9781,7 +9781,7 @@ document.addEventListener('click', async ev=>{
       sv(spost('routines',[{ id, member_id:mid, no:rs.length+1, name:nm, purpose:src.purpose||'' }])
         .then(()=>spost('routine_items', items.map((it,i)=>({ routine_id:id, sort:i,
           variant_id:VID(it.ex,it.va), kg:it.kg, reps:it.reps, sets:it.sets, rest:it.rest })))), '루틴 만들기');
-      S.redit=id; toast('복제했습니다'); go('t_redit'); return; }
+      S.redit=id; toast('하나 더 만들었어요'); go('t_redit'); return; }
   }
 });
 
