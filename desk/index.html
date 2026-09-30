@@ -327,6 +327,9 @@ textarea.inp{min-height:76px;resize:vertical;line-height:1.6}
 /* 코멘트 거부 동의서 — 눈에 띄게 (2026-09-30 대표 「박스 더 눈에 띄게 · 설명이 너무 길어」) */
 .card.cmoffbox{border-color:var(--gold-2);background:linear-gradient(180deg,var(--gold-dim),var(--dark-2))}
 .card.cmoffbox .t1{color:var(--gold)}
+/* 보냈는데 아직 안 누른 상태 — 금색과 **다른 색**이라야 한눈에 갈린다 */
+.card.cmoffbox.wait{border-color:var(--teal);background:linear-gradient(180deg,var(--teal-dim),var(--dark-2))}
+.card.cmoffbox.wait .t1{color:var(--teal)}
 
 /* 위 요약 띠 */
 .sumbar{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:13px}
@@ -1374,7 +1377,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '159';
+const BUILD = '160';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -3207,6 +3210,16 @@ function tabComment(){
       + '<div class="t2">「코멘트 밀림」·「남겨야 할 회원」에 이 회원은 안 뜹니다.'
       + (나.cm_optout_at ? ' · ' + esc(String(나.cm_optout_at).slice(0,10)) : '') + '</div>'
       + '<button class="btn ghost sm" data-act="cmoffx" style="margin-top:8px">다시 받기로 되돌리기</button></div>'
+    : 보냄대기(나)
+    ? /* ⭐ 보냈는데 아직 안 누른 상태 — 이게 안 보여서 트레이너가 또 만들었다 (2026-09-30) */
+      '<div class="card cmoffbox wait" style="margin-bottom:10px">'
+      + '<div class="t1">📮 동의서를 보냈습니다'
+      + (보낸날(나) ? ' <span class="t2" style="font-weight:600">' + 보낸날(나) + '</span>' : '') + '</div>'
+      + '<div class="t2">아직 안 누르셨어요 — 누르셔야 적용됩니다</div>'
+      + '<div style="display:flex;gap:7px;margin-top:10px;flex-wrap:wrap">'
+      + '<button class="btn sub sm" data-act="cmoffcopy">링크 다시 복사</button>'
+      + '<button class="btn ghost sm" data-act="cmofflink">새 링크로 다시</button>'
+      + '<button class="btn ghost sm" data-act="cmoffcancel">보내기 취소</button></div></div>'
     : '<div class="card cmoffbox" style="margin-bottom:10px">'
       + '<div class="t1">📮 코멘트 거부 동의서</div>'
       + '<div class="t2">회원이 링크를 눌러야 적용됩니다</div>'
@@ -6989,9 +7002,22 @@ function 현황판그리기(){
       거기서 한 번만 빼면 현황판 숫자 · 거르개 · 표의 점이 같이 빠진다.
    ⛔ 칸이 아직 없어도 안 터진다 — undefined 면 「안 껐다」다. */
 const 코멘트끔 = m => !!(m && m.cm_optout_at);
+/* 동의서를 보낸 때 — **열쇠 앞머리에 심어 둔 시각**을 읽는다 (표에 칸을 더하지 않는다).
+   열쇠 = Date.now().toString(36)(8자) + 무작위 8자 (2026-09-30) */
+const 보낸때 = m => {
+  const k = (m && m.cm_optout_key) || '';
+  const t = parseInt(k.slice(0, 8), 36);
+  return (t > 1.6e12 && t < 4e12) ? new Date(t) : null;
+};
+const 보냄대기 = m => !코멘트끔(m) && !!(m && m.cm_optout_key);
+const 보낸날 = m => { const d = 보낸때(m); if(!d) return '';
+  const 지난 = Math.floor((Date.now() - d.getTime()) / 864e5);
+  return (d.getMonth()+1) + '월 ' + d.getDate() + '일' + (지난 >= 1 ? ' · ' + 지난 + '일째' : ''); };
 const 끔어떻게 = m => (m && m.cm_optout_by) || '';
 /* 트레이너가 대신 끈 것은 **회원이 직접 누른 것이 아니다** — 화면에서 갈라 보여 준다 */
-const 끔딱지 = m => !코멘트끔(m) ? ''
+const 끔딱지 = m => 보냄대기(m)
+  ? '<span class="tag" title="동의서를 보냈고 아직 안 누르셨습니다">동의서 보냄</span>'
+  : !코멘트끔(m) ? ''
   : '<span class="tag ' + (끔어떻게(m) === '트레이너' ? '' : 'teal') + '" title="'
     + esc(끔어떻게(m) === '트레이너' ? '트레이너가 껐습니다 — 회원 동의가 아닙니다'
                                     : '회원이 ' + 끔어떻게(m) + '에서 동의했습니다')
@@ -8683,22 +8709,43 @@ document.addEventListener('click', async function(ev){
     }catch(e){ toast('못 지웠어요 — ' + e.message); }
     return; }
 
-  if(a==='cmofflink'){
+  if(a==='cmofflink' || a==='cmoffcopy' || a==='cmoffcancel'){
     const m = memOf(S.mid); if(!m) return;
-    /* 1회용 열쇠 — 회원 번호를 링크에 그대로 싣지 않는다. 남이 대신 눌러 주면 안 된다 */
-    const key = 'ck' + Date.now().toString(36)
-      + Array.from(crypto.getRandomValues(new Uint8Array(9))).map(x=>x.toString(36)).join('');
+    /* 보내기 취소 — 열쇠만 지운다. 보낸 링크는 그 자리에서 죽는다 */
+    if(a==='cmoffcancel'){
+      if(!confirm('보낸 링크를 못 쓰게 합니다. 회원님이 이미 받으셨다면 눌러도 안 열립니다.\n\n취소할까요?')) return;
+      try{
+        await ssend('members?id=eq.' + encodeURIComponent(m.id), 'PATCH', { cm_optout_key: null });
+        m.cm_optout_key = null; toast('취소했습니다'); render();
+      }catch(e){ toast('못 취소했어요 — ' + e.message); }
+      return; }
+    /* 1회용 열쇠 — 회원 번호를 링크에 그대로 싣지 않는다. 남이 대신 눌러 주면 안 된다.
+       ⭐ 앞 8자는 **보낸 때**(36진수). 표에 칸을 더하지 않고 「언제 보냈나」를 안다.
+       ⛔ 다시 복사할 때는 **새로 만들지 않는다** — 그러면 먼저 보낸 링크가 죽는다 */
+    const key = (a==='cmoffcopy' && m.cm_optout_key) ? m.cm_optout_key
+      : Date.now().toString(36)
+        + Array.from(crypto.getRandomValues(new Uint8Array(8))).map(x=>x.toString(36).slice(-1)).join('');
     try{
-      await ssend('members?id=eq.' + encodeURIComponent(m.id), 'PATCH', { cm_optout_key: key });
-      m.cm_optout_key = key;
-      const 링크 = 'https://mofma01-bit.github.io/gladgym-app/?cmoff=' + encodeURIComponent(key);
-      try{ await navigator.clipboard.writeText(링크); }catch(x){}
+      if(a !== 'cmoffcopy'){
+        await ssend('members?id=eq.' + encodeURIComponent(m.id), 'PATCH', { cm_optout_key: key });
+        m.cm_optout_key = key;
+      }
+      /* ⭐ 짧은 주소 — `?cmoff=` 를 `?c=` 로, 열쇠도 19자 → 16자.
+         회원이 받는 글자 수가 줄고 눈에 덜 걸린다 (2026-09-30 대표 「더 줄이거나」).
+         ⛔ 웹앱은 `cmoff` 도 계속 받는다 — 전에 보낸 링크가 안 죽게. */
+      const 링크 = 'https://mofma01-bit.github.io/gladgym-app/?c=' + encodeURIComponent(key);
+      /* 링크만 덜렁 보내면 회원이 「뭐지?」 한다. **문구까지 통째로** 복사해 준다 */
+      const 문구 = m.name + '님, 글래드짐입니다.\n'
+        + '코멘트 안내를 그만 받고 싶으시면 아래에서 눌러 주세요.\n'
+        + '(수업 기록은 그대로 남습니다)\n' + 링크;
+      try{ await navigator.clipboard.writeText(문구); }catch(x){}
       판열기('동의 링크', '<div class="sec">'
-        + '<div class="t2">이 링크를 ' + esc(m.name) + ' 회원님께 보내 주세요. '
+        + '<div class="t2"><b>문구까지 복사해 뒀습니다.</b> ' + esc(m.name) + ' 회원님께 그대로 붙여넣어 보내 주세요. '
         + '누르면 확인 화면이 뜨고, <b>회원이 「동의합니다」를 눌러야</b> 꺼집니다.</div>'
-        + '<div class="card" style="margin-top:10px;word-break:break-all">' + esc(링크) + '</div>'
-        + '<div class="t2" style="margin-top:8px">주소는 복사해 뒀습니다 · <b>한 번 쓰면 못 씁니다</b> — '
-        + '잘못 보냈으면 여기서 다시 만드세요.</div></div>',
+        + '<div class="card" style="margin-top:10px;white-space:pre-wrap;word-break:break-all">' + esc(문구) + '</div>'
+        + '<div class="t2" style="margin-top:8px"><b>한 번 쓰면 못 씁니다.</b> '
+        + '보낸 뒤에는 이 회원 칸에 <b>「동의서 보냄」</b>으로 남습니다 — '
+        + '회원이 누르시면 1분 안에 저절로 바뀝니다.</div></div>',
         '<div class="tx-fbtns"><span class="tx-stat"></span>'
         + '<button class="btn ghost" data-act="popclose">닫기</button></div>');
     }catch(e){
