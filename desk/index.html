@@ -54,7 +54,9 @@ img{max-width:100%;display:block}
 /* ⑥ 창을 줄이면 **최소 기준까지만** 줄고 그 아래로는 레이아웃이 안 바뀐다 (2026-09-29 대표
    「어느정도까지만 줄어들면 더이상 레이아웃의 변화는 없고 창만 줄어들게」 — 홈페이지와 같게).
    1040 = 왼쪽 메뉴 216 + 본문 최소 824. 이보다 좁으면 가로로 밀어 본다. */
-.app{display:flex;flex:1;min-height:0;min-width:1040px}
+/* ⭐ 최소 창 너비 — 이보다 좌은아지면 **배치를 바꾸지 않고** 페이지를 통째로 미는다.
+   1240 = 왼쪽메뉴 230 + 여백 28 + 회원표 940 — 표가 자기 안에서 또 밀리지 않는 값. */
+.app{display:flex;flex:1;min-height:0;min-width:1240px}
 
 /* 좌측 메뉴 */
 .side{width:216px;flex:none;background:var(--dark-2);border-right:1px solid var(--line);
@@ -286,8 +288,12 @@ textarea.inp{min-height:76px;resize:vertical;line-height:1.6}
 .tb tbody tr:hover{background:var(--dark-2)}
 
 /* 회원 표 */
-.mwrap{background:var(--dark-2);border:1px solid var(--line);border-radius:13px;overflow:hidden}
-.mtb{width:100%;border-collapse:collapse;font-size:13px}
+.mwrap{background:var(--dark-2);border:1px solid var(--line);border-radius:13px;
+  overflow-x:auto;overflow-y:hidden}
+/* ⭐ 창이 좁아도 **글자를 접지 않는다.** 자리가 모자라면 표만 가로로 민다
+   (2026-09-30 대표 「창을 줄이면 다 찌그러지잖아」 — 담당 칸 이름이 세로로 쪼개졌다).
+   ⛔ .mwrap 이 overflow:hidden 이면 밀려날 데가 없어 글자가 접힌다. */
+.mtb{width:100%;min-width:880px;border-collapse:collapse;font-size:13px}
 .mtb th{text-align:left;font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.02em;
   padding:10px 12px;border-bottom:1px solid var(--line);background:#191917;white-space:nowrap}
 .mtb th.n,.mtb td.n{text-align:right;font-variant-numeric:tabular-nums}
@@ -295,8 +301,8 @@ textarea.inp{min-height:76px;resize:vertical;line-height:1.6}
 .mtb tbody tr:last-child td{border-bottom:0}
 .mtb tbody tr{cursor:pointer}
 .mtb tbody tr:hover{background:var(--dark-3)}
-.mtb .nm2{font-size:14px;font-weight:800;letter-spacing:-.01em}
-.mtb .sub3{font-size:11.5px;color:var(--sub);font-weight:600}
+.mtb .nm2{font-size:14px;font-weight:800;letter-spacing:-.01em;white-space:nowrap}
+.mtb .sub3{font-size:11.5px;color:var(--sub);font-weight:600;white-space:nowrap}
 .dot2{width:7px;height:7px;border-radius:50%;flex:none;display:inline-block;background:#4a463f}
 .dot2.gold{background:var(--gold);box-shadow:0 0 0 3px var(--gold-dim)}
 .dot2.teal{background:var(--teal);box-shadow:0 0 0 3px var(--teal-dim)}
@@ -304,6 +310,10 @@ textarea.inp{min-height:76px;resize:vertical;line-height:1.6}
 .numbig{font-size:14px;font-weight:800}
 .numbig.zero{color:#5d5952;font-weight:600}
 .mtb .tag{font-size:10.5px;padding:2px 7px}
+
+/* 코멘트 거부 동의서 — 눈에 띄게 (2026-09-30 대표 「박스 더 눈에 띄게 · 설명이 너무 길어」) */
+.card.cmoffbox{border-color:var(--gold-2);background:linear-gradient(180deg,var(--gold-dim),var(--dark-2))}
+.card.cmoffbox .t1{color:var(--gold)}
 
 /* 위 요약 띠 */
 .sumbar{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:13px}
@@ -898,11 +908,14 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 .hblk > .homenums{display:block;
   background:#191917;border:1px solid #30302b;border-radius:14px;padding:16px 20px;margin:0;
   min-width:0;max-width:100%}
-.homenums .nrow{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px 8px}
+/* ⛔ 오른쪽에만 붙이면 **왼쪽이 통째로 빈다** (2026-09-30 대표 「여백을 왜 남기는거야?」).
+   두 줄이 **같은 칸 틀**을 쓰게 해서 폭을 꽉 채우고 세로로도 맞춘다.
+   `auto-fit` 이라 줄마다 칸 수가 같아진다 — 위아래가 어긋나지 않는다. */
+.homenums .nrow{display:grid;gap:10px 6px}
 .homenums .nrow + .nrow{margin-top:13px;padding-top:13px;border-top:1px solid #2a2a26}
 .homenums .nrow.dead{opacity:.55}
 .homenums .nrow.none{font-size:13px;font-weight:700;color:var(--sub);padding:4px 6px}
-.hblk > .homenums .num{flex:none;min-width:104px;text-align:right}
+.hblk > .homenums .num{min-width:0;text-align:center}
 .hblk > .homenums .nrow.live .v{font-size:34px}
 .hblk > .homenums .nrow.dead .v{font-size:21px}
 .hblk > .homenums .nrow.dead .k{font-size:11px}
@@ -1347,7 +1360,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '152';
+const BUILD = '157';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -3180,13 +3193,12 @@ function tabComment(){
       + '<div class="t2">「코멘트 밀림」·「남겨야 할 회원」에 이 회원은 안 뜹니다.'
       + (나.cm_optout_at ? ' · ' + esc(String(나.cm_optout_at).slice(0,10)) : '') + '</div>'
       + '<button class="btn ghost sm" data-act="cmoffx" style="margin-top:8px">다시 받기로 되돌리기</button></div>'
-    : '<div class="card" style="margin-bottom:10px">'
-      + '<div class="t2">이 회원이 코멘트 안내를 그만 받기로 하셨다면 —</div>'
-      + '<div style="display:flex;gap:7px;margin-top:8px;flex-wrap:wrap">'
-      + '<button class="btn sub sm" data-act="cmofflink">동의 링크 만들기</button>'
-      + '<button class="btn ghost sm" data-act="cmoffnow">트레이너가 끄기</button></div>'
-      + '<div class="t2" style="margin-top:7px;opacity:.75">동의 링크를 보내 <b>회원이 직접</b> 누르는 것이 원칙입니다. '
-      + '앱 설치가 어려운 분께는 링크만 보내면 됩니다.</div></div>';
+    : '<div class="card cmoffbox" style="margin-bottom:10px">'
+      + '<div class="t1">📮 코멘트 거부 동의서</div>'
+      + '<div class="t2">회원이 링크를 눌러야 적용됩니다</div>'
+      + '<div style="display:flex;gap:7px;margin-top:10px;flex-wrap:wrap">'
+      + '<button class="btn gold sm" data-act="cmofflink">발송하기</button>'
+      + '<button class="btn ghost sm" data-act="cmoffnow">트레이너가 끄기</button></div></div>';
 
   const 요청 = asks.length ? '<div class="card gold" style="margin-bottom:10px">'
     + '<div class="t1">봐 달라는 요청 ' + asks.length + '건</div>'
@@ -6820,10 +6832,16 @@ function 숫자줄(){
     + ' title="' + x.c.이름 + ' — 눌러서 그 페이지로">'
     + '<span class="v">' + x.v + '</span><span class="k">' + x.c.이름 + '</span></button>';
   const 산 = 다.filter(x => x.v), 죽 = 다.filter(x => !x.v);
+  /* ⭐ 두 줄이 **같은 칸 수**를 쓴다 — 그래야 위아래가 세로로 맞고 한 줄이 안 접힌다.
+     `auto-fit` 은 줄마다 칸 수가 달라져 아랫줄이 접혔다 (2026-09-30). */
+  /* ⭐ 줄마다 **자기 칸 수**로 폭을 꽉 채운다 (2026-09-30 대표 「여백을 왜 남기는거야?」).
+     두 줄에 같은 칸 수를 주면 짧은 줄 오른쪽에 빈 칸이 남는다 — 그게 그 여백이었다.
+     ⛔ `auto-fit` 은 쓰지 않는다. 줄마다 칸 수가 제멋대로 달라져 아랫줄이 접혔다. */
+  const 틀 = n => ' style="grid-template-columns:repeat(' + n + ',minmax(0,1fr))"';
   return '<div class="homenums">'
-    + (산.length ? '<div class="nrow live">' + 산.map(칸).join('') + '</div>'
+    + (산.length ? '<div class="nrow live"' + 틀(산.length) + '>' + 산.map(칸).join('') + '</div>'
                  : '<div class="nrow none">오늘 볼 것이 없습니다 👍</div>')
-    + (죽.length ? '<div class="nrow dead">' + 죽.map(칸).join('') + '</div>' : '')
+    + (죽.length ? '<div class="nrow dead"' + 틀(죽.length) + '>' + 죽.map(칸).join('') + '</div>' : '')
     + '</div>';
 }
 
