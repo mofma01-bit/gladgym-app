@@ -1195,6 +1195,41 @@ body.resizing{cursor:col-resize;user-select:none}
 .pwabar button{flex:none;padding:8px 13px;border-radius:9px;border:1px solid var(--gold-2);
   background:var(--gold);color:#1b1a17;font-size:12.5px;font-weight:800}
 .pwabar button.x{background:transparent;color:var(--sub);border-color:transparent;padding:8px 6px}
+/* ☰ — 기본은 숨김. 좁을 때만 아래 미디어쿼리가 켠다.
+   ⛔ 이 줄이 미디어쿼리 **뒤**에 있으면 좁은 창에서도 안 보인다 (2026-09-30에 그랬다). */
+.menubtn{display:none;align-items:center;justify-content:center;width:34px;height:34px;
+  border-radius:9px;color:var(--cream);font-size:17px;flex:none}
+.menubtn:hover{background:var(--dark-3)}
+
+/* ══ 폰·좁은 창 ══ 2026-09-30 대표 「폰에서도 쓸거야 · 지금 노션도 일부 쓰는 것처럼」
+   ⛔ 951px 위에서는 **한 픽셀도 안 바뀐다** — PC 는 2026-09-29 에 정한 그대로다.
+      그 아래에서만 왼쪽 메뉴를 접는다(노션이 폰에서 하는 것과 같다). */
+@media (max-width: 950px){
+  .app{min-width:0}
+  .side{position:fixed;left:0;top:46px;z-index:60;width:230px;height:calc(100vh - 46px);
+    transform:translateX(-102%);transition:transform .18s ease;box-shadow:0 0 40px rgba(0,0,0,.6)}
+  .side.on{transform:none}
+  .sideveil{display:none;position:fixed;inset:46px 0 0;z-index:55;background:rgba(0,0,0,.5)}
+  .sideveil.on{display:block}
+  .menubtn{display:inline-flex}
+  .top{padding:12px 14px;gap:9px}
+  .body{padding:14px 14px 40px}
+  .cols,.cols3{grid-template-columns:1fr}
+  .hrow{grid-template-columns:1fr !important}
+  .hwide{display:none}
+  .mwrap{overflow-x:auto}
+  .sumbar .sumit{min-width:calc(50% - 5px)}
+  .kitgrid{grid-template-columns:1fr 1fr}
+}
+@media (max-width: 560px){
+  .sumbar .sumit{min-width:100%}
+  .kitgrid{grid-template-columns:1fr}
+  .top h1{font-size:19px}
+}
+/* ⛔ 이 덩이는 **스타일 맨 끝**에 있어야 한다.
+   미디어쿼리는 특이도를 더해 주지 않는다 — 앞에 두면 뒤에 오는 기본 규칙(.side · .menubtn)이 이긴다.
+   2026-09-30 에 앞에 뒀다가 ☰ 가 안 보이고 메뉴가 안 나왔다. */
+
 </style></head><body>
 
 <div class="tx-login" id="txlogin">
@@ -1215,6 +1250,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <div class="wrap">
 <header class="gnb">
+  <button class="menubtn" id="menubtn" title="메뉴">☰</button>
   <span class="ev">GLAD</span>
   <span class="msg" id="gnbmsg">트레이너 데스크 · 시험 단계</span>
   <div class="rt2">
@@ -1229,7 +1265,8 @@ body.resizing{cursor:col-resize;user-select:none}
   </div>
 </header>
 <div class="app">
-  <aside class="side">
+  <div class="sideveil" id="sideveil"></div>
+  <aside class="side" id="side">
     <div class="brand"><b>GLAD GYM</b><span>트레이너 데스크</span></div>
     <button class="nav on" data-v="home">
       <svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v9a2 2 0 0 1-2 2h-4v-6H9v6H5a2 2 0 0 1-2-2z"/></svg>
@@ -1289,7 +1326,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '144';
+const BUILD = '148';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -9310,6 +9347,20 @@ function 바로가기띠(){
   if(x) x.onclick = () => { try{ localStorage.setItem('pwabar_off','1'); }catch(e){} el.classList.remove('on'); };
 }
 setTimeout(바로가기띠, 800);
+
+/* ══ 폰에서 메뉴 여닫기 ══ 2026-09-30 대표 「폰에서도 쓸거야」
+   ⛔ 넓은 창(951px 이상)에서는 ☰ 가 아예 안 보인다 — PC 는 지금 그대로다. */
+(function(){
+  const side = document.getElementById('side'), veil = document.getElementById('sideveil'),
+        btn = document.getElementById('menubtn');
+  if(!side || !veil || !btn) return;
+  const 닫 = () => { side.classList.remove('on'); veil.classList.remove('on'); };
+  btn.onclick = () => { const 열림 = side.classList.toggle('on'); veil.classList.toggle('on', 열림); };
+  veil.onclick = 닫;
+  /* 메뉴를 고르면 저절로 닫힌다 — 폰에서 두 번 누르게 하지 않는다 */
+  side.addEventListener('click', e => { if(e.target.closest('.nav')) 닫(); });
+  window.addEventListener('resize', () => { if(window.innerWidth > 950) 닫(); });
+})();
 
 /* 자료 한 장에 파일 붙이기 */
 (function(){ const f = document.getElementById('kitfile');
