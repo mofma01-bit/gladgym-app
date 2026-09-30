@@ -334,6 +334,12 @@ textarea.inp{min-height:76px;resize:vertical;line-height:1.6}
 .kf button{color:var(--sub);font-size:12px;padding:0 2px}
 .kf button:hover{color:var(--warn)}
 
+/* 초상권 체크칸의 풀이 한 줄 */
+.kitchk .nm small{display:block;font-size:11px;font-weight:600;color:var(--sub);margin-top:2px}
+.kitchk.on .nm small{color:var(--teal)}
+/* 동의 링크 — 맨 아래에 길게 (2026-09-30 대표 「가장 아래 길게 빼」) */
+.kitlink{display:block;width:100%;margin-top:12px;padding:13px;text-align:center;font-size:13.5px}
+
 /* 요약 띠는 **거르개**다 — 눌리는 티를 낸다 (2026-09-29) */
 .sumit{text-align:left;transition:border-color .12s,background .12s}
 .sumit:hover{background:var(--dark-3)}
@@ -1331,7 +1337,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '149';
+const BUILD = '151';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -3970,7 +3976,7 @@ function vKit(){
       + (갯수 ? '<span class="tag">앱 ' + 갯수 + '</span>' : '')
       + (붙.length ? '<span class="tag teal">올림 ' + 붙.length + '</span>' : '')
       + '<button class="btn ghost sm" data-act="kitup" data-v2="' + esc(tag) + '">'
-      + (됐나 ? '＋ 더' : '＋ 올리기') + '</button></div>';
+      + (됐나 ? '＋ 추가' : '＋ 올리기') + '</button></div>';
   };
   const 찍 = '<div class="sec"><div class="lbl">촬영사진 — 회원앱에서 찍은 것이 저절로 켜집니다</div>'
     + '<div class="kitgrid">' + 사진칸.map(t => 체크(t, (있.방향||{})[t] || 0, t)).join('') + '</div>'
@@ -3998,18 +4004,30 @@ function vKit(){
     + '</div></div>';
 
   /* 초상권 — 회원이 직접 고르는 것이 원칙 */
-  const 초 = '<div class="sec"><div class="lbl">초상권 협의</div><div class="kitbox">'
+  /* 초상권 — 셋 중 하나. 촬영사진과 **같은 체크칸 꼴**로 맞춘다 (2026-09-30 대표)
+     ⛔ 트레이너가 누르는 것은 **회원 동의가 아니다.** 아래에 그렇게 적는다. */
+  const 초칸 = (v, 풀이) => {
+    const 켬 = k.portrait === v;
+    return '<button class="kitchk ' + (켬 ? 'on' : '') + '" data-act="kitport" data-v2="' + v + '">'
+      + '<span class="bx">' + (켬 ? '☑' : '☐') + '</span>'
+      + '<span class="nm">' + v + '<small>' + 풀이 + '</small></span></button>';
+  };
+  const 초 = '<div class="sec"><div class="lbl">초상권 협의</div>'
     + (k.portrait
-      ? 칸('회원이 고른 것', '<span class="tag ' + (k.portrait === '미협의' ? 'warn' : 'teal') + '">'
+      ? '<div class="kitbox" style="margin-bottom:9px">'
+        + 칸('고른 것', '<span class="tag ' + (k.portrait === '미협의' ? 'warn' : 'teal') + '">'
           + esc(k.portrait) + '</span> <span class="sub3">'
-          + esc(k.portrait_by === '트레이너' ? '트레이너가 대신 적음 — 동의가 아닙니다'
-                                             : (String(k.portrait_at||'').slice(0,10) + ' 회원이 직접')) + '</span>')
-      : '<div class="t2">아직 안 물어봤습니다. <b>회원이 직접 고르게</b> 링크를 보내 주세요.</div>')
+          + esc(k.portrait_by === '트레이너' ? '트레이너가 적음 — 회원 동의가 아닙니다'
+                                             : (String(k.portrait_at||'').slice(0,10) + ' 회원이 직접 고름')) + '</span>')
+        + '</div>'
+      : '')
+    + '<div class="kitgrid">'
+    + 초칸('노출', '얼굴이 보여도 됨') + 초칸('모자이크', '얼굴을 가림') + 초칸('미협의', '쓰지 않음')
     + '</div>'
-    + '<div style="display:flex;gap:7px;margin-top:9px;flex-wrap:wrap">'
-    + '<button class="btn sub sm" data-act="kitpkey">동의 링크 만들기</button>'
-    + ['노출','모자이크','미협의'].map(v => '<button class="btn ghost sm" data-act="kitport" data-v2="'
-        + v + '">' + v + ' (트레이너가 적기)</button>').join('') + '</div></div>';
+    + '<div class="t2" style="margin-top:7px;opacity:.75">여기서 누르면 <b>트레이너가 적은 것</b>으로 남습니다. '
+    + '회원이 직접 고르게 하시려면 아래 링크를 보내 주세요.</div>'
+    + '<button class="btn sub kitlink" data-act="kitpkey">🔗 회원에게 동의 링크 보내기</button>'
+    + '</div>';
 
   const 완 = k.state === '완료';
   return '<div class="cols">'
@@ -8421,7 +8439,10 @@ document.addEventListener('click', async function(ev){
 
   const act = t.closest('[data-act]');
   if(!act){ if(t.id==='pop') popClose(); return; }
-  const a = act.dataset.act, id = +act.dataset.i;
+  /* ⭐ `v2` 를 여기서도 꺼내 둔다 — txAct 와 **같은 이름**으로 (2026-09-30).
+     앞서는 이쪽에 없어서, 바깥 손잡이에서 v2 를 쓰면 `v2 is not defined` 로 조용히 죽었다.
+     두 손잡이가 같은 이름을 쓰면 어느 쪽에 적든 돈다. */
+  const a = act.dataset.act, id = +act.dataset.i, v2 = act.dataset.v2;
   if(a.indexOf('tx:')===0){ ev.preventDefault(); await txAct(a.slice(3), act); return; }
 
   if(a==='mfull'){ const mid = (회원판 && 회원판.mid) || S.mid;
