@@ -1,5 +1,12 @@
 <!doctype html><html lang="ko"><head>
 <meta charset="utf-8">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="img/icon-192.png">
+<meta name="theme-color" content="#131312">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="트레이너 데스크">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>글래드짐 트레이너 데스크</title>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -1158,6 +1165,17 @@ body.resizing{cursor:col-resize;user-select:none}
 .tx-cd .lv{font-size:10.5px;font-weight:700;border-radius:5px;padding:1px 5px;background:var(--gold-dim);
   color:var(--gold);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tx-cd .lv.no{background:#2e1c18;color:var(--warn)}.tx-cd .lv.req{background:var(--dark-3);color:var(--sub)}
+
+/* ══ 바로가기 만들기 띠 ══ 2026-09-30 대표
+   「바탕화면에 빼고 이렇게 저렇게 하세요를 줄이고」 — 눌러서 설치되게 한다 */
+.pwabar{display:none;align-items:center;gap:10px;margin:0 0 12px;padding:11px 13px;
+  background:var(--gold-dim);border:1px solid var(--gold-2);border-radius:13px}
+.pwabar.on{display:flex}
+.pwabar .t{flex:1;min-width:0;font-size:12.5px;font-weight:700;line-height:1.55;color:var(--gold)}
+.pwabar .t small{display:block;font-weight:600;color:var(--sub);margin-top:2px;font-size:11.5px}
+.pwabar button{flex:none;padding:8px 13px;border-radius:9px;border:1px solid var(--gold-2);
+  background:var(--gold);color:#1b1a17;font-size:12.5px;font-weight:800}
+.pwabar button.x{background:transparent;color:var(--sub);border-color:transparent;padding:8px 6px}
 </style></head><body>
 
 <div class="tx-login" id="txlogin">
@@ -1234,6 +1252,7 @@ body.resizing{cursor:col-resize;user-select:none}
   </aside>
 
   <div class="main">
+<div class="pwabar" id="pwabar" style="margin:14px 26px 0"></div>
     <div class="top" id="top"></div>
     <div class="topline" id="topline"></div>
     <div class="body" id="body"><div class="empty">불러오는 중…</div></div>
@@ -1247,7 +1266,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '135';
+const BUILD = '136';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -8823,5 +8842,39 @@ setInterval(async function(){
   } else 휴지통읽음 = false;
   if(S.view==='home'||표정의[S.view]){ try{ await loadWork(); if(!$('#pop').classList.contains('on')) render(); }catch(e){} }
 }, 60000);
+
+/* ══ 바로가기 만들기 ══ 2026-09-30 대표
+   크롬 계열(안드로이드·PC)은 `beforeinstallprompt` 를 잡아 뒀다가 **한 번 눌러 설치**한다.
+   아이폰 사파리는 그 신호가 없다 — 「공유 → 홈 화면에 추가」를 **글로 알려 준다.**
+   ⛔ 이미 설치해 쓰는 중이면(standalone) 안 띄운다. 닫으면 그 기기에서 다시 안 띄운다. */
+let 설치신호 = null;
+const 설치됨 = () => window.matchMedia('(display-mode: standalone)').matches
+              || window.navigator.standalone === true;
+/* ⚠ 회원앱엔 이미 `아이폰` 이 있다 — 겹치면 스크립트가 통째로 죽는다 (2026-09-30 브라우저에서 잡음) */
+const 아이폰사파리 = () => /iphone|ipad|ipod/i.test(navigator.userAgent);
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); 설치신호 = e; 바로가기띠(); });
+window.addEventListener('appinstalled', () => { 설치신호 = null; 바로가기띠(); });
+
+function 바로가기띠(){
+  const el = document.getElementById('pwabar'); if(!el) return;
+  let 껐나 = false;
+  try{ 껐나 = localStorage.getItem('pwabar_off') === '1'; }catch(e){}
+  if(설치됨() || 껐나 || (!설치신호 && !아이폰사파리())){ el.classList.remove('on'); return; }
+  el.innerHTML = 설치신호
+    ? '<span class="t">바로가기를 만들어 두세요<small>다음부터 주소를 찾지 않고 바로 열립니다</small></span>'
+      + '<button id="pwago">＋ 바로가기 만들기</button><button class="x" id="pwax">✕</button>'
+    : '<span class="t">홈 화면에 추가하세요<small>아래 <b>공유</b> ⬆ → <b>홈 화면에 추가</b> 를 누르시면 됩니다</small></span>'
+      + '<button class="x" id="pwax">✕</button>';
+  el.classList.add('on');
+  const go = document.getElementById('pwago');
+  if(go) go.onclick = async () => {
+    const p = 설치신호; 설치신호 = null;
+    try{ p.prompt(); await p.userChoice; }catch(e){}
+    바로가기띠();
+  };
+  const x = document.getElementById('pwax');
+  if(x) x.onclick = () => { try{ localStorage.setItem('pwabar_off','1'); }catch(e){} el.classList.remove('on'); };
+}
+setTimeout(바로가기띠, 800);
 </script>
 </body></html>
