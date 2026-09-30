@@ -1944,7 +1944,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '216';
+const BUILD = '217';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2159,7 +2159,9 @@ async function boot(){
        「앱 설치를 어려워하면 거기서 막히니까 … 동의 누르면 분류하는 거야」
      설치도 로그인도 없이 열리는 **한 장**이다. 리포트 링크와 같은 구조.
      ⛔ 열쇠로만 찾는다 — 회원 번호를 링크에 싣지 않는다. 한 번 쓰면 못 쓴다. */
-  const 끔열쇠 = new URLSearchParams(location.search).get('cmoff');
+  /* ⛔ `cmoff` 도 계속 받는다 — 짧게 바꾸기 전에 보낸 링크가 안 죽게 (2026-09-30) */
+  const 끔열쇠 = new URLSearchParams(location.search).get('c')
+              || new URLSearchParams(location.search).get('cmoff');
   if(끔열쇠){ 끔동의화면(끔열쇠); return; }
   /* ══ 초상권 협의 (?pt=열쇠) ══ 2026-09-30
      블로그·릴스에 쓸 때 **회원이 직접** 노출 · 모자이크 · 미협의를 고른다.
