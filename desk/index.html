@@ -1377,7 +1377,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '160';
+const BUILD = '162';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -3206,26 +3206,26 @@ function tabComment(){
   const 나 = memOf(S.mid) || {};
   const 끔칸 = 코멘트끔(나)
     ? '<div class="card" style="margin-bottom:10px;border-color:var(--teal)">'
-      + '<div class="t1">코멘트 안내 끔 ' + 끔딱지(나) + '</div>'
+      + '<div class="t1">코멘트 안내 안 보냄 ' + 끔출처(나) + '</div>'
       + '<div class="t2">「코멘트 밀림」·「남겨야 할 회원」에 이 회원은 안 뜹니다.'
       + (나.cm_optout_at ? ' · ' + esc(String(나.cm_optout_at).slice(0,10)) : '') + '</div>'
-      + '<button class="btn ghost sm" data-act="cmoffx" style="margin-top:8px">다시 받기로 되돌리기</button></div>'
+      + '<button class="btn ghost sm" data-act="cmoffx" style="margin-top:8px">다시 안내하기로 되돌리기</button></div>'
     : 보냄대기(나)
     ? /* ⭐ 보냈는데 아직 안 누른 상태 — 이게 안 보여서 트레이너가 또 만들었다 (2026-09-30) */
       '<div class="card cmoffbox wait" style="margin-bottom:10px">'
-      + '<div class="t1">📮 동의서를 보냈습니다'
+      + '<div class="t1">📮 확인 요청을 보냈습니다'
       + (보낸날(나) ? ' <span class="t2" style="font-weight:600">' + 보낸날(나) + '</span>' : '') + '</div>'
-      + '<div class="t2">아직 안 누르셨어요 — 누르셔야 적용됩니다</div>'
+      + '<div class="t2">회원님이 아직 안 누르셨어요 — 누르셔야 적용됩니다</div>'
       + '<div style="display:flex;gap:7px;margin-top:10px;flex-wrap:wrap">'
       + '<button class="btn sub sm" data-act="cmoffcopy">링크 다시 복사</button>'
       + '<button class="btn ghost sm" data-act="cmofflink">새 링크로 다시</button>'
-      + '<button class="btn ghost sm" data-act="cmoffcancel">보내기 취소</button></div></div>'
+      + '<button class="btn ghost sm" data-act="cmoffcancel">요청 취소</button></div></div>'
     : '<div class="card cmoffbox" style="margin-bottom:10px">'
-      + '<div class="t1">📮 코멘트 거부 동의서</div>'
-      + '<div class="t2">회원이 링크를 눌러야 적용됩니다</div>'
+      + '<div class="t1">📮 코멘트 안내 그만 보내기</div>'
+      + '<div class="t2">이 회원에게 「코멘트를 남겨주세요」 안내를 보내지 않습니다</div>'
       + '<div style="display:flex;gap:7px;margin-top:10px;flex-wrap:wrap">'
-      + '<button class="btn gold sm" data-act="cmofflink">발송하기</button>'
-      + '<button class="btn ghost sm" data-act="cmoffnow">트레이너가 끄기</button></div></div>';
+      + '<button class="btn gold sm" data-act="cmofflink">회원에게 확인받기</button>'
+      + '<button class="btn ghost sm" data-act="cmoffnow">확인 없이 바로 적용</button></div></div>';
 
   const 요청 = asks.length ? '<div class="card gold" style="margin-bottom:10px">'
     + '<div class="t1">봐 달라는 요청 ' + asks.length + '건</div>'
@@ -7015,13 +7015,19 @@ const 보낸날 = m => { const d = 보낸때(m); if(!d) return '';
   return (d.getMonth()+1) + '월 ' + d.getDate() + '일' + (지난 >= 1 ? ' · ' + 지난 + '일째' : ''); };
 const 끔어떻게 = m => (m && m.cm_optout_by) || '';
 /* 트레이너가 대신 끈 것은 **회원이 직접 누른 것이 아니다** — 화면에서 갈라 보여 준다 */
+/* 표에 붙는 딱지 — **짧게**. 길면 이름 칸이 넓어진다 */
 const 끔딱지 = m => 보냄대기(m)
-  ? '<span class="tag" title="동의서를 보냈고 아직 안 누르셨습니다">동의서 보냄</span>'
+  ? '<span class="tag" title="확인 요청을 보냈고 회원님이 아직 안 누르셨습니다">확인 요청함</span>'
   : !코멘트끔(m) ? ''
   : '<span class="tag ' + (끔어떻게(m) === '트레이너' ? '' : 'teal') + '" title="'
-    + esc(끔어떻게(m) === '트레이너' ? '트레이너가 껐습니다 — 회원 동의가 아닙니다'
-                                    : '회원이 ' + 끔어떻게(m) + '에서 동의했습니다')
-    + '">코멘트 안내 끔' + (끔어떻게(m) === '트레이너' ? ' (트레이너)' : '') + '</span>';
+    + esc(끔어떻게(m) === '트레이너' ? '회원 확인 없이 트레이너가 적용했습니다'
+                                    : '회원이 ' + 끔어떻게(m) + '에서 확인하셨습니다')
+    + '">안내 안 함' + (끔어떻게(m) === '트레이너' ? ' · 확인 없이' : '') + '</span>';
+/* 상세 카드용 — 제목이 이미 「코멘트 안내 안 보냄」이라 **누가 정했는지만** 붙인다
+   (2026-09-30 같은 말이 두 번 찍혔다) */
+const 끔출처 = m => !코멘트끔(m) ? ''
+  : '<span class="tag ' + (끔어떻게(m) === '트레이너' ? '' : 'teal') + '">'
+    + (끔어떻게(m) === '트레이너' ? '확인 없이' : '회원이 확인함') + '</span>';
 
 const 코멘트밀림일 = 14;
 function 끊긴목록(){
@@ -8619,9 +8625,9 @@ document.addEventListener('click', async function(ev){
   if(a==='cmoffnow' || a==='cmoffx'){
     const m = memOf(S.mid); if(!m) return;
     const 끈다 = (a === 'cmoffnow');
-    if(끈다 && !confirm(m.name + ' 회원님의 코멘트 안내를 끌까요?\n\n'
-        + '회원 동의가 아니라 **트레이너가 끈 것**으로 남습니다.\n'
-        + '가능하면 「동의 링크 만들기」로 회원이 직접 누르게 해 주세요.')) return;
+    if(끈다 && !confirm(m.name + ' 회원님께 코멘트 안내를 그만 보낼까요?\n\n'
+        + '회원님 확인 없이 적용하는 것이라 「확인 없이」로 남습니다.\n'
+        + '가능하면 「회원에게 확인받기」로 회원님이 직접 누르시게 해 주세요.')) return;
     try{
       await ssend('members?id=eq.' + encodeURIComponent(m.id), 'PATCH',
         끈다 ? { cm_optout_at: new Date().toISOString(), cm_optout_by: '트레이너' }
@@ -8713,7 +8719,7 @@ document.addEventListener('click', async function(ev){
     const m = memOf(S.mid); if(!m) return;
     /* 보내기 취소 — 열쇠만 지운다. 보낸 링크는 그 자리에서 죽는다 */
     if(a==='cmoffcancel'){
-      if(!confirm('보낸 링크를 못 쓰게 합니다. 회원님이 이미 받으셨다면 눌러도 안 열립니다.\n\n취소할까요?')) return;
+      if(!confirm('보낸 링크를 못 쓰게 합니다. 회원님이 이미 받으셨다면 눌러도 안 열립니다.\n\n확인 요청을 취소할까요?')) return;
       try{
         await ssend('members?id=eq.' + encodeURIComponent(m.id), 'PATCH', { cm_optout_key: null });
         m.cm_optout_key = null; toast('취소했습니다'); render();
@@ -8739,12 +8745,12 @@ document.addEventListener('click', async function(ev){
         + '코멘트 안내를 그만 받고 싶으시면 아래에서 눌러 주세요.\n'
         + '(수업 기록은 그대로 남습니다)\n' + 링크;
       try{ await navigator.clipboard.writeText(문구); }catch(x){}
-      판열기('동의 링크', '<div class="sec">'
+      판열기('회원에게 확인받기', '<div class="sec">'
         + '<div class="t2"><b>문구까지 복사해 뒀습니다.</b> ' + esc(m.name) + ' 회원님께 그대로 붙여넣어 보내 주세요. '
         + '누르면 확인 화면이 뜨고, <b>회원이 「동의합니다」를 눌러야</b> 꺼집니다.</div>'
         + '<div class="card" style="margin-top:10px;white-space:pre-wrap;word-break:break-all">' + esc(문구) + '</div>'
         + '<div class="t2" style="margin-top:8px"><b>한 번 쓰면 못 씁니다.</b> '
-        + '보낸 뒤에는 이 회원 칸에 <b>「동의서 보냄」</b>으로 남습니다 — '
+        + '보낸 뒤에는 이 회원 칸에 <b>「확인 요청함」</b>으로 남습니다 — '
         + '회원이 누르시면 1분 안에 저절로 바뀝니다.</div></div>',
         '<div class="tx-fbtns"><span class="tx-stat"></span>'
         + '<button class="btn ghost" data-act="popclose">닫기</button></div>');
