@@ -9,6 +9,8 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="글래드짐">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="img/icon-192.png">
 <title>글래드짐 운동기록</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@600;700&display=swap"
@@ -1315,6 +1317,9 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
 .trow{display:flex;align-items:baseline;gap:9px;padding:9px 2px;border-bottom:1px solid var(--line)}
 .trow:last-child{border-bottom:none}
 /* 리포트 종목 줄 밑의 코멘트 — 있을 때만 나온다 (2026-09-29 대표 「없으면 줄을 안 만드는 것으로」) */
+.rpcm.none{border-color:var(--gold-2);background:var(--gold-dim)}
+.rpcm.none .ic{color:var(--gold)}
+.rpcm.none .tx{color:var(--gold)}
 .rpcm{display:flex;align-items:center;gap:7px;width:100%;text-align:left;
   background:#201e1b;border:1px solid var(--line);border-radius:9px;
   padding:8px 11px;margin:-2px 0 9px;color:var(--cream);font-size:12.5px;line-height:1.5}
@@ -1564,10 +1569,22 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
   border:1px solid var(--line);border-radius:11px;padding:11px 17px;font-size:13.5px;font-weight:700;
   white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .22s;z-index:30}
 #toast.on{opacity:1}
+
+/* ══ 바로가기 만들기 띠 ══ 2026-09-30 대표
+   「바탕화면에 빼고 이렇게 저렇게 하세요를 줄이고」 — 눌러서 설치되게 한다 */
+.pwabar{display:none;align-items:center;gap:10px;margin:0 0 12px;padding:11px 13px;
+  background:var(--gold-dim);border:1px solid var(--gold-2);border-radius:13px}
+.pwabar.on{display:flex}
+.pwabar .t{flex:1;min-width:0;font-size:12.5px;font-weight:700;line-height:1.55;color:var(--gold)}
+.pwabar .t small{display:block;font-weight:600;color:var(--sub);margin-top:2px;font-size:11.5px}
+.pwabar button{flex:none;padding:8px 13px;border-radius:9px;border:1px solid var(--gold-2);
+  background:var(--gold);color:#1b1a17;font-size:12.5px;font-weight:800}
+.pwabar button.x{background:transparent;color:var(--sub);border-color:transparent;padding:8px 6px}
 </style>
 
 </head>
 <body>
+<div class="pwabar" id="pwabar"></div>
 <div id="frame">
   <div id="splash">
     <div class="logo">GLAD GYM</div>
@@ -1893,7 +1910,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '210';
+const BUILD = '212';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -4504,7 +4521,7 @@ function vSummary(){
          <div class="note" style="margin-top:-4px">사진을 찍으면 <b>오늘 한 종목·세트·총 무게</b>가 얹힌 한 장이 만들어집니다.
            ${S.who==='tr' ? '찍은 사진은 <b>회원 프로필 오운완</b>에 남습니다.' : '그대로 인스타에 올리거나 내 프로필에 남겨 두세요.'}</div>`
       : `<div class="note">오운완은 <b>기록한 날에만</b> 찍을 수 있어요.</div>`}
-    ${S.who==='tr' ? `<button class="btn sub" data-act="rpt:${w.id}">오늘 수업 리포트 보내기</button>` : ''}
+    ${S.who==='tr' ? `<button class="btn sub" data-act="rpt:${w.id}">오늘 수업 리포트 보기</button>` : ''}
 
     <div class="grid2">${Object.entries(times).slice(0,4).map(([k,v])=>
       `<div class="tile"><span class="k">${esc(k)}</span><span class="v">${parseInt(durTxt(v))}<small> ${durTxt(v).slice(-1)}</small></span></div>`).join('')}</div>
@@ -4588,6 +4605,16 @@ function 수업코멘트(w, it){
    켤 때 고칠 곳은 여기 한 줄뿐이다 — 그리는 코드는 이미 다 있다. */
 const 리포트사진켬 = false;
 
+/* 리포트 발송 상태 — 화면에 보여 주려고 한 번 읽어 담아 둔다 (2026-09-30).
+   ⛔ 그릴 때마다 서버에 묻지 않는다. 같은 수업이면 담아 둔 것을 쓴다. */
+async function 리포트상태받기(wid){
+  if(!wid || (S.rpSt && S.rpSt.wid === wid)) return;
+  S.rpSt = { wid, 읽는중: true };
+  const r = await 리포트상태(wid);
+  S.rpSt = Object.assign({ wid }, r || { 없음: true });
+  render();
+}
+
 /* 사진·영상은 앱에 이미 있는 `넘겨보기()` 를 그대로 쓴다 — 새로 만들지 않는다.
    거기에 이미 있는 것: 사진/영상 나눔 칩 · 「1 / 3」 표시 · 좌우 화살표 ·
    **영상 자동재생 안 함**(누르고 소리도 따로 켠다) · 지나간 영상 멈춤.
@@ -4626,7 +4653,13 @@ function vReport(){
     const d = 전==null ? null : Math.round((오늘-전)*10)/10;
     const cl = d==null ? 'eq' : d>0 ? 'up' : d<0 ? 'dn' : 'eq';
     const 글 = d==null ? '처음' : d>0 ? `▲${kgfmt(d)}` : d<0 ? `▼${kgfmt(-d)}` : '그대로';
-    /* 코멘트가 없으면 **줄을 안 만든다** — 「코멘트 없음」도 안 쓴다 (2026-09-29 대표) */
+    /* 코멘트가 없으면 **줄을 안 만든다** — 「코멘트 없음」도 안 쓴다 (2026-09-29 대표)
+       ⭐ 딱 하나 예외 (2026-09-30 대표 「첫 코멘트 없음이 강조되어야 하고」):
+          그 종목에 코멘트가 **한 번도 없으면** 트레이너에게만 「첫 코멘트 없음」을 띄운다.
+          코멘트는 있는데 이번 회차에만 없는 것은 **지금 그대로** 아무 줄도 안 만든다.
+          회원 화면에는 안 띄운다 — 트레이너 사정이지 회원이 볼 것이 아니다. */
+    const 다코멘트 = cmOf(w.mid, it.ex, it.va);
+    const 첫없음 = tr && !다코멘트.length;
     const cs = 수업코멘트(w, it);
     const 장 = cs.reduce((a,c)=> a + (+c.pics||0), 0), 영 = cs.reduce((a,c)=> a + (+c.vids||0), 0);
     const 붙 = 리포트사진켬 ? [장 ? '사진 ' + 장 : '', 영 ? '영상 ' + 영 : ''].filter(Boolean).join(' · ') : '';
@@ -4638,7 +4671,10 @@ function vReport(){
       + (cs.length ? `<button class="rpcm" data-act="rpcm:${it.ex}:${it.va}">
           <span class="ic">💬</span><span class="tx">${esc(cs[0].tx || '')}</span>
           ${붙 ? `<span class="at">${esc(붙)}</span>` : ''}
-          ${cs.length > 1 ? `<span class="at">＋${cs.length-1}</span>` : ''}</button>` : '');
+          ${cs.length > 1 ? `<span class="at">＋${cs.length-1}</span>` : ''}</button>`
+        : 첫없음 ? `<button class="rpcm none" data-act="rpcm:${it.ex}:${it.va}">
+          <span class="ic">✎</span><span class="tx"><b>첫 코멘트 없음</b> — 이 종목은 아직 하나도 없어요</span>
+          <span class="at">남기기 ›</span></button>` : '');
     }).join('');
 
   /* 부위 균형 — 그 달 안에서만 센다 */
@@ -4674,12 +4710,44 @@ function vReport(){
       <div class="gbox">${bodyMap(ps, Math.max(1, 끝날/7))}</div>` : ''}`,
     foot: tr
       ? `<button class="btn sub" data-act="rcopy:${w.id}">링크 복사</button>
-         <button class="btn main" data-act="rsend:${w.id}">알림톡 보내기</button>`
+         ${리포트발(w)}`
       : 만보기
       ? `<div class="note" style="margin:0">회원님의 수업 기록입니다.
            앱에서 지난 기록과 코멘트를 함께 보실 수 있어요.</div>`
       : `<button class="btn main" data-act="tab:home">홈으로</button>` };
 }
+/* ══ 리포트 발 ══ 2026-09-30 대표
+     「리포트가 자동발송인데 수업 마치면 발송하기가 있어서 헷갈려 · 리포트는 자동발송 됩니다 이렇게 해놔」
+     「실패한 경우에만 다시보내기 할 수 있게」
+   ⛔ 「보내기」 단추를 없앴다. 수업을 마치면 **30분 뒤 저절로** 나가는데 단추가 같이 있으면
+      「내가 눌러야 하나」 하고 헷갈린다. 상태만 보여 주고, **실패했을 때만** 다시 보내기를 낸다. */
+function 리포트발(w){
+  const 대상 = (w.kind || '') === '수업' && 운동요약(w);
+  if(!대상) return `<div class="note" style="margin:0">개인운동은 리포트를 보내지 않습니다.</div>`;
+  const st = (S.rpSt && S.rpSt.wid === w.id) ? S.rpSt : null;
+  if(!st){ 리포트상태받기(w.id); return `<div class="note" style="margin:0">발송 상태를 확인하는 중…</div>`; }
+  if(st.읽는중) return `<div class="note" style="margin:0">발송 상태를 확인하는 중…</div>`;
+
+  if(st.state === '보냄')
+    return `<div class="note" style="margin:0;border-color:var(--teal)">
+      <b style="color:var(--teal)">보냈습니다</b>${st.sent_at ? ' · ' + esc(시각글(new Date(st.sent_at))) : ''}
+      <br>같은 수업은 한 번만 나갑니다.</div>`;
+
+  if(st.state === '실패')
+    return `<div class="note" style="margin:0 0 8px;border-color:var(--warn)">
+        <b style="color:var(--warn)">못 보냈어요</b>${st.fail_why ? ' — ' + esc(st.fail_why) : ''}</div>
+      <button class="btn main" data-act="rsend2:${w.id}">다시 보내기</button>`;
+
+  if(st.state === '대기')
+    return `<div class="note" style="margin:0;border-color:var(--gold-2)">
+      <b style="color:var(--gold)">리포트는 자동 발송됩니다</b>
+      ${st.send_at ? '<br>' + esc(시각글(new Date(st.send_at))) + ' 에 나갑니다.' : ''}
+      <br>그 사이 코멘트나 사진을 올리시면 함께 보입니다.</div>`;
+
+  /* 예약 줄이 아직 없다 — 수업을 마치는 순간 저절로 잡힌다 */
+  return `<div class="note" style="margin:0">수업을 마치면 <b>30분 뒤 자동으로</b> 나갑니다.</div>`;
+}
+
 function anaMid(){ return (S.who==='tr') ? (S.tmid || S.subj || S.mid) : S.mid; }
 function vRecords(){
   const mid = anaMid(), from = anaFrom(), bw = bwOf(mid);
@@ -8809,6 +8877,7 @@ document.addEventListener('click', async ev=>{
       return; }
     case 'rsend2': { const w = D.workouts.find(x=>x.id===rest[0]); if(!w) return;
       closeSheet();
+      S.rpSt = null;                       /* 다시 읽어 상태가 바뀌게 */
       /* 손으로 누른 것은 **바로** 나간다 (자동만 30분 뒤).
          실패했던 건 「대기」로 돌아가고 시도 횟수도 0 이 된다 — 그래야 다시 나간다 */
       let at = null;
@@ -9667,6 +9736,40 @@ setInterval(async ()=>{
 
 render();
 start();
+
+/* ══ 바로가기 만들기 ══ 2026-09-30 대표
+   크롬 계열(안드로이드·PC)은 `beforeinstallprompt` 를 잡아 뒀다가 **한 번 눌러 설치**한다.
+   아이폰 사파리는 그 신호가 없다 — 「공유 → 홈 화면에 추가」를 **글로 알려 준다.**
+   ⛔ 이미 설치해 쓰는 중이면(standalone) 안 띄운다. 닫으면 그 기기에서 다시 안 띄운다. */
+let 설치신호 = null;
+const 설치됨 = () => window.matchMedia('(display-mode: standalone)').matches
+              || window.navigator.standalone === true;
+/* ⚠ 회원앱엔 이미 `아이폰` 이 있다 — 겹치면 스크립트가 통째로 죽는다 (2026-09-30 브라우저에서 잡음) */
+const 아이폰사파리 = () => /iphone|ipad|ipod/i.test(navigator.userAgent);
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); 설치신호 = e; 바로가기띠(); });
+window.addEventListener('appinstalled', () => { 설치신호 = null; 바로가기띠(); });
+
+function 바로가기띠(){
+  const el = document.getElementById('pwabar'); if(!el) return;
+  let 껐나 = false;
+  try{ 껐나 = localStorage.getItem('pwabar_off') === '1'; }catch(e){}
+  if(설치됨() || 껐나 || (!설치신호 && !아이폰사파리())){ el.classList.remove('on'); return; }
+  el.innerHTML = 설치신호
+    ? '<span class="t">바로가기를 만들어 두세요<small>다음부터 주소를 찾지 않고 바로 열립니다</small></span>'
+      + '<button id="pwago">＋ 바로가기 만들기</button><button class="x" id="pwax">✕</button>'
+    : '<span class="t">홈 화면에 추가하세요<small>아래 <b>공유</b> ⬆ → <b>홈 화면에 추가</b> 를 누르시면 됩니다</small></span>'
+      + '<button class="x" id="pwax">✕</button>';
+  el.classList.add('on');
+  const go = document.getElementById('pwago');
+  if(go) go.onclick = async () => {
+    const p = 설치신호; 설치신호 = null;
+    try{ p.prompt(); await p.userChoice; }catch(e){}
+    바로가기띠();
+  };
+  const x = document.getElementById('pwax');
+  if(x) x.onclick = () => { try{ localStorage.setItem('pwabar_off','1'); }catch(e){} el.classList.remove('on'); };
+}
+setTimeout(바로가기띠, 800);
 </script>
 </body>
 </html>
