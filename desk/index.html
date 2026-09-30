@@ -1377,7 +1377,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '163';
+const BUILD = '168';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -1991,7 +1991,7 @@ function 팝업판그리기(){
       + '<div style="min-width:0">'
       + '<div class="t1">' + (y['켬'] ? '<span class="tag teal">켜짐</span> ' : '<span class="tag">꺼짐</span> ')
       + esc(y['제목'] || '제목 없음') + '</div>'
-      + '<div class="t2" style="margin-top:3px">받는이 ' + esc(y['받는이'] || '전체')
+      + '<div class="t2" style="margin-top:3px">받는 사람 ' + esc(y['받는이'] || '전체')
       + (y['고친때'] ? ' · ' + esc(dateFull(String(y['고친때']).slice(0,10))) : '') + '</div></div>'
       + '<span class="mbtns"><button data-act="ppedit" data-i="' + esc(y.id) + '">고치기</button>'
       + '<button data-act="ppdel" data-i="' + esc(y.id) + '">지우기</button></span>'
@@ -2004,11 +2004,11 @@ function 팝업판그리기(){
            + '<div class="fld"><span class="fn">내용</span>'
            + '<textarea class="inp" id="ppbody" style="min-height:120px">' + esc(x['내용']||'') + '</textarea></div>'
            + '<div class="g2">'
-           + '<div class="fld"><span class="fn">받는이</span><select class="inp" id="pptarget">'
+           + '<div class="fld"><span class="fn">받는 사람</span><select class="inp" id="pptarget">'
            + 받을사람.map(t => '<option value="' + esc(t) + '"'
                + ((x['받는이']||'전체')===t ? ' selected' : '') + '>' + esc(t) + '</option>').join('')
            + '</select></div>'
-           + '<div class="fld"><span class="fn">띄우기</span><select class="inp" id="ppon">'
+           + '<div class="fld"><span class="fn">언제 보일까요</span><select class="inp" id="ppon">'
            + '<option value="1"' + (x['켬'] ? ' selected' : '') + '>켬 — 바로 뜸</option>'
            + '<option value="0"' + (x['켬'] ? '' : ' selected') + '>끔 — 안 뜸</option></select></div>'
            + '</div>'
@@ -2032,7 +2032,7 @@ async function 팝업저장하기(id){
     await join('popupsave', { '팝업': 몸 });
     팝업판.고칠 = null;
     const d = await join('popups'); 팝업판.목록 = d['팝업'] || [];
-    toast('저장했습니다'); 팝업판그리기();
+    toast('저장했어요'); 팝업판그리기();
   }catch(e){ toast('못 저장했어요 — ' + e.message); }
 }
 
@@ -2506,7 +2506,7 @@ async function 사유고치기(id){
   try{
     await ssend('dormant_notes?id=eq.' + encodeURIComponent(id), 'PATCH', { reason: 글 });
     r.reason = 글; 사유판.고칠 = null;
-    toast('고쳤습니다'); 사유판그리기(); render();
+    toast('고쳤어요'); 사유판그리기(); render();
   }catch(e){ toast('못 고쳤어요 — ' + e.message); }
 }
 
@@ -2520,7 +2520,7 @@ async function 사유지우기(id){
   try{
     await ssend('dormant_notes?id=eq.' + encodeURIComponent(id), 'DELETE');
     DN = DN.filter(x => x.id !== id);
-    toast('지웠습니다'); 사유판그리기(); render();
+    toast('지웠어요'); 사유판그리기(); render();
   }catch(e){ toast('못 지웠어요 — ' + e.message); }
 }
 
@@ -2535,7 +2535,7 @@ async function 사유적기(){
   try{
     await ssend('dormant_notes', 'POST', [줄]);
     DN.unshift(줄);                        /* 고치지 않고 쌓는다 */
-    toast('적었습니다'); 사유판그리기(); render();
+    toast('적었어요'); 사유판그리기(); render();
   }catch(e){
     toast(/PGRST|relation|does not exist/i.test(e.message||'')
       ? '사유 표가 아직 서버에 없어요 — 9단계_SQL_잠수사유.sql 을 돌려 주세요'
@@ -2983,10 +2983,10 @@ function tabStat(){
         + (x.단위==='kg'?kgfmt(x.지금):(+x.지금).toLocaleString()) + '<small>/' + (x.단위==='kg'?kgfmt(x.n):(+x.n).toLocaleString()) + x.단위 + '</small></span></div>'
         + 막대(x.p*100) + '</div>').join('')
       : '<div class="empty">아직 정한 목표가 없어요</div>')
-    + '<div class="lbl" style="margin-top:12px">뱃지 ' + a.뱃지.length + '개</div>'
+    + '<div class="lbl" style="margin-top:12px">배지 ' + a.뱃지.length + '개</div>'
     + (a.뱃지.length ? '<div class="st-bdgs">' + a.뱃지.map(b => '<span class="st-bdg">🏅 ' + esc(b.이름)
         + '<i>' + esc((b.at||'').slice(5).replace('-','.')) + '</i></span>').join('') + '</div>'
-      : '<div class="empty">아직 받은 뱃지가 없어요</div>')
+      : '<div class="empty">아직 받은 배지가 없어요</div>')
     + '<div class="lbl" style="margin-top:12px">몸 목표</div>'
     + (a.몸 ? '<div class="card"><div class="rowc"><span class="t1">' + a.몸.이름 + ' ' + kgfmt(a.몸.a) + ' → <b>' + kgfmt(a.몸.c)
         + '</b> → ' + kgfmt(a.몸.b) + a.몸.단위 + '</span><span class="st-v">' + a.몸.p + '<small>%</small></span></div>' + 막대(a.몸.p) + '</div>'
@@ -3380,8 +3380,8 @@ async function bpUpload(file){
       [{ id, member_id:S.mid, kind, pose, on_date:날, path, memo:'' }]);
     M.bph = M.bph || [];
     M.bph.push({ id, member_id:S.mid, kind, pose, on_date:날, path, memo:'' });
-    toast('넣었습니다'); render();
-  }catch(e){ toast('사진 올리기 실패 — ' + String(e.message||e).slice(0,60)); }
+    toast('넣었어요'); render();
+  }catch(e){ toast('사진을 못 올렸어요 — ' + String(e.message||e).slice(0,60)); }
 }
 function 줄이기(file){
   return new Promise(function(ok, no){
@@ -3557,7 +3557,7 @@ function tabInfo(){
     + '<div class="g3">'
       + f('wk', '주당', pl.wk, '0.4kg') + f('mo', '월간', pl.mo, '1.6kg')
       + f('diet', '식단 방향', pl.diet) + '</div>'
-    + (canEdit('plan') ? '<button class="btn main sm" data-act="plsave">저장하기</button>' : '')
+    + (canEdit('plan') ? '<button class="btn main sm" data-act="plsave">저장</button>' : '')
     + '</div>';
 
   /* 회원 정보 — 담당 · 이름 · 문진까지 모두 고칠 수 있다 */
@@ -3606,7 +3606,7 @@ function tabInfo(){
         + '<span class="fn">평소 ' + esc(k) + '</span>'
         + '<input class="inp" data-ikm="' + esc(k) + '" value="' + esc(ik.meals[k]) + '"'
         + dis('minfo') + '></div>').join('') + '</div>' : '')
-    + (canEdit('minfo') ? '<button class="btn main sm" data-act="msave">저장하기</button>' : '')
+    + (canEdit('minfo') ? '<button class="btn main sm" data-act="msave">저장</button>' : '')
     /* 회원 지우기 — **최고 관리자만.** 기록이 딸려 있어 휴지통으로 담고 지운다 (60일 안에 되살림) */
     + (최고관리자()
         ? '<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line);'
@@ -3684,7 +3684,7 @@ function vRoutine(){
       + '<input class="inp" type="text" inputmode="numeric" data-r="no" value="' + r.no + '"' + dis('routine') + '></div>')
     + '<div class="fld"><span class="fn">이름</span>'
       + '<input class="inp" type="text" data-r="name" value="' + esc(r.name) + '"' + dis('routine') + '></div>'
-    + '<div class="fld"><span class="fn">방향성 · 목적</span>'
+    + '<div class="fld"><span class="fn">운동 방향 · 목적</span>'
       + '<input class="inp" type="text" data-r="purpose" value="' + esc(r.purpose||'') + '"' + dis('routine') + '></div>'
     + (준비
         ? '<div class="note">이 묶음은 <b>준비운동</b>으로 저장됩니다. 회원 앱의'
@@ -3693,7 +3693,7 @@ function vRoutine(){
         : '<div class="fld"><span class="fn">그룹</span>'
       + '<input class="inp" type="text" data-r="grp" value="' + esc(r.grp||'') + '" placeholder="근지구력 · 파워 …"'
       + dis('routine') + '></div>')
-    + (canEdit('routine') ? '<button class="btn main" data-act="rsave">저장하기</button>' : '') + '</div>'
+    + (canEdit('routine') ? '<button class="btn main" data-act="rsave">저장</button>' : '') + '</div>'
     + (준비 ? '' : '<div class="card" style="display:flex;flex-direction:column;gap:9px">'
     + '<div class="lbl" style="margin:0">이 루틴 지정 · 예약</div>'
     + '<div class="fld"><span class="fn">언제 — 앞날을 고르면 예약이 됩니다</span>'
@@ -3731,7 +3731,7 @@ async function 루틴지정(mid, rid, kind, day){
     S.asDate = 날;
     toast((날===TODAY?'오늘 ':dateFull(날)+' ') + (kind||'개인운동') + '으로 「' + r.name + '」 지정했습니다');
     render();
-  }catch(e){ toast('지정 실패 — ' + e.message); }
+  }catch(e){ toast('지정 못 했어요 — ' + e.message); }
 }
 async function 루틴추천(mid, rid){
   const r = D.r.find(x=>x.id===rid); if(!r) return;
@@ -3750,7 +3750,7 @@ async function 루틴추천(mid, rid){
     toast(밀림 ? '나중 자리를 「' + 밀림.name + '」에서 바꿨어요'
                : (자리===RECO1 ? '먼저 추천으로 담았어요' : '나중 추천으로 담았어요'));
     render();
-  }catch(e){ toast('추천 실패 — ' + e.message); }
+  }catch(e){ toast('추천 못 했어요 — ' + e.message); }
 }
 
 /* 이 회원에게 이미 지정된 날들 */
@@ -3915,13 +3915,13 @@ function vCmAll(){
       + (c.read_at?'':'new') + '">'
       + '<div class="who2">' + esc(memOf(c.member_id).name) + ' · '
       + dateFull((c.created_at||'').slice(0,10)) + (c.read_at?'':' · 회원이 아직 안 봤어요')
-      + '<button class="del" data-act="cmedit" data-c="' + esc(c.id) + '">수정하기</button></div>'
+      + '<button class="del" data-act="cmedit" data-c="' + esc(c.id) + '">고치기</button></div>'
       + '<div class="ex">' + esc(vaName(c.variant_id)) + '</div>'
       + (S.cmEdit === c.id
         ? '<textarea class="inp cmta" id="cmedit_' + esc(c.id) + '">' + esc(c.body||'') + '</textarea>'
           + '<div class="cmacts">'
-          + '<button class="btn gold sm" data-act="cmfix" data-c="' + esc(c.id) + '">수정</button>'
-          + '<button class="btn ghost sm wn" data-act="cmdel" data-c="' + esc(c.id) + '">삭제</button>'
+          + '<button class="btn gold sm" data-act="cmfix" data-c="' + esc(c.id) + '">고치기</button>'
+          + '<button class="btn ghost sm wn" data-act="cmdel" data-c="' + esc(c.id) + '">지우기</button>'
           + '<button class="btn ghost sm" data-act="cmeditx">취소</button></div>'
         : '<div class="tx">' + esc(c.body||'') + '</div>') + '</div>').join('') + '</div>'
     : '<div class="empty">아직 코멘트가 없어요</div>';
@@ -4220,7 +4220,7 @@ function vTrash(){
         + (t.deleted_name ? ' · ' + esc(t.deleted_name) : '') + ' 지움</div></div>'
       + '<span class="tag ' + (d <= 7 ? 'warn' : '') + '">' + (d > 0 ? d + '일 남음' : '곧 사라짐') + '</span>'
       + '<button class="btn sub sm" data-trrs="' + t.id + '">되살리기</button>'
-      + '<button class="btn ghost sm" data-trdel="' + t.id + '">영구 삭제</button></div>';
+      + '<button class="btn ghost sm" data-trdel="' + t.id + '">영영 지우기</button></div>';
   };
   return 요약
     + '<div class="sec"><div class="lbl">전부 비우기'
@@ -4630,7 +4630,7 @@ function txList(key){
         + esc(x.이름) + '<b>' + W[key].filter(r => 보기맞나(x, r, key)).length + '</b></button>').join('')
     + (관리자() ? '<button class="tx-vplus" data-act="tx:views" data-k="'+key+'" title="새 보기 추가">＋</button>' : '')
     + '</div><div class="sp2">'
-    + '<span class="tx-pchips"><button class="tx-pchip '+(!st.사람?'on':'')+'" data-act="tx:who" data-k="'+key+'" data-v2="">전원</button>'
+    + '<span class="tx-pchips"><button class="tx-pchip '+(!st.사람?'on':'')+'" data-act="tx:who" data-k="'+key+'" data-v2="">모두</button>'
     + W.staff.filter(p=>p.active!==false).map(p => '<button class="tx-pchip '+(st.사람===p.id?'on':'')+'" data-act="tx:who" data-k="'+key+'" data-v2="'+p.id+'">'+아바타(p.id)+esc(p.name)+'</button>').join('')
     + '</span></div></div>';
   const 달력 = T.달력 ? txCal(key, rows) : '';
@@ -4773,7 +4773,7 @@ document.addEventListener('mouseup', async function(){
   let at = z.까지 + (z.아래 ? 1 : 0); if(z.부터 < at) at--;
   다.splice(Math.max(0, Math.min(at, 다.length)), 0, m);
   if(z.종류 === '탭') await 보기순서저장(z.key, 다);
-  else if(await 보기칸바꾸기(z.key, 다)) toast('칸 순서를 바꿨습니다');
+  else if(await 보기칸바꾸기(z.key, 다)) toast('칸 순서를 바꿨어요');
 });
 
 /* 끌고 놓은 직후의 click 은 삼킨다 — 탭이 눌려 보기가 바뀌면 안 된다 */
@@ -4789,7 +4789,7 @@ document.addEventListener('keydown', function(ev){
 async function 보기순서저장(key, 차례){
   if(!바꿀수있나(key)){ toast('잠겨 있어요 — 자물쇠를 풀어 주세요'); return; }
   내설정[key] = 내설정[key] || {}; 내설정[key].보기순 = 차례; 내설정저장(); render();
-  toast('순서를 바꿨습니다 — 모두에게 적용하려면 「모두에게 저장」');
+  toast('순서를 바꿨어요 — 모두에게 적용하려면 「모두에게 저장」');
 }
 
 /* ── 표 보기 ── 노션 데이터베이스처럼 속성마다 칸이 나뉜다 (2026-09-09 대표 지시:
@@ -5133,14 +5133,14 @@ async function 모두에게저장(key){
   const 내순 = (내설정[key] || {}).보기순;
   if(내순) for(let i = 0; i < 내순.length; i++) await 덮어쓰기(key, 내순[i], { sort: i });
   내것지우기(key, v.k);
-  render(); toast('모두에게 저장했습니다');
+  render(); toast('모두에게 저장했어요');
 }
 /* ⛔ 이름이 겹치면 나중에 선언된 쪽이 이긴다 — 뒤로가기용 되돌리기(st) 가 이미 있었다.
    그래서 「내것되돌리기」로 바꿨다 (2026-09-09 확인하다 찾음) */
 function 내것되돌리기(key){
   const v = 지금보기(key); if(!v) return;
   내것지우기(key, v.k);
-  보기얹기(key); render(); toast('원래대로 되돌렸습니다');
+  보기얹기(key); render(); toast('원래대로 되돌렸어요');
 }
 function txFilterBar(key, v, 순){
   const st = 표상태[key];
@@ -5154,7 +5154,7 @@ function txFilterBar(key, v, 순){
         ? '<button class="tx-fop" data-act="tx:fop" data-k="'+key+'" title="그리고 = 모두 맞아야 · 또는 = 하나만 맞아도">'
           + (st.op==='or' ? '또는' : '그리고') + '</button>' : '')
     + 조건
-    + ((st.규칙||[]).length ? '<button class="tx-fclr" data-act="tx:fclr" data-k="'+key+'">필터 삭제</button>' : '')
+    + ((st.규칙||[]).length ? '<button class="tx-fclr" data-act="tx:fclr" data-k="'+key+'">필터 지우기</button>' : '')
     + '<span class="sp3">'
     + (바뀜.length
         ? '<button class="tx-freset" data-act="tx:vreset" data-k="'+key+'" '
@@ -5215,7 +5215,7 @@ function 그룹판(key){
   const cs = 열들(key).filter(c => ['select','multi','person','people','check'].indexOf(c.타입) >= 0);
   판열기('그룹화',
     '<div class="tx-menu">'
-    + '<button data-act="tx:grpset" data-k="'+key+'" data-v2="">그룹화 제거</button>'
+    + '<button data-act="tx:grpset" data-k="'+key+'" data-v2="">묶음 풀기</button>'
     + cs.map(c => '<button data-act="tx:grpset" data-k="'+key+'" data-v2="'+esc(c.k)+'">'+esc(c.이름)
         + (st.그룹===c.k ? '<small style="margin-left:auto;color:var(--gold)">지금 이것</small>' : '') + '</button>').join('')
     + '</div><button class="btn ghost" data-act="popclose">닫기</button>');
@@ -5225,7 +5225,7 @@ function 정렬판(key){
   const cs = 열들(key).filter(c => c.타입 !== 'long');
   판열기('정렬',
     '<div class="tx-menu">'
-    + '<button data-act="tx:sortset" data-k="'+key+'" data-v2="">정렬 삭제</button>'
+    + '<button data-act="tx:sortset" data-k="'+key+'" data-v2="">정렬 지우기</button>'
     + cs.map(c => '<button data-act="tx:sortset" data-k="'+key+'" data-v2="'+esc(c.k)+'">'+esc(c.이름)
         + (순.k===c.k ? '<small style="margin-left:auto;color:var(--gold)">'+(순.dir==='desc'?'내림차순':'오름차순')+'</small>' : '')
         + '</button>').join('')
@@ -5268,7 +5268,7 @@ async function 덮어쓰기(key, vk, body){
       if(o && o[0]){ const i = W.views.findIndex(z => z.id === x.뷰.id); if(i>=0) W.views[i] = o[0]; }
     }
     render(); return true;
-  }catch(e){ toast('바꾸지 못했습니다 — '+e.message); return false; }
+  }catch(e){ toast('못 바꿨어요 — '+e.message); return false; }
 }
 /* 보기 순서를 ⠿ 로 끌어 바꾼다 */
 let 보기끌기 = null;
@@ -5304,7 +5304,7 @@ document.addEventListener('mouseup', async function(){
   if(at === z.부터) return;
   목록.splice(Math.max(0, Math.min(at, 목록.length)), 0, m);
   for(let i = 0; i < 목록.length; i++){ if(목록[i].sort !== i) await 덮어쓰기(z.key, 목록[i].k, { sort:i }); }
-  보기판(z.key); toast('순서를 바꿨습니다');
+  보기판(z.key); toast('순서를 바꿨어요');
 });
 
 /* ── 목록 고르기 ── 왼쪽 체크상자 · 전체선택 · 고른 것 한꺼번에 (2026-09-08 대표 지시) */
@@ -5320,11 +5320,11 @@ function txPickBar(key, rows, 표다){
   let acts = '';
   if(고름.length){
     if(체크열[key]) acts += '<button data-act="tx:bulkck" data-k="'+key+'" data-v2="1">완료</button>'
-                          + '<button data-act="tx:bulkck" data-k="'+key+'" data-v2="">완료 해제</button>';
+                          + '<button data-act="tx:bulkck" data-k="'+key+'" data-v2="">완료 풀기</button>';
     if(key === 'leave' && 관리자()) acts += '<button data-act="tx:bulkst" data-k="'+key+'" data-v2="ok">승인</button>'
                                           + '<button data-act="tx:bulkst" data-k="'+key+'" data-v2="no">반려</button>';
     if(T.사람열) acts += '<button data-act="tx:bulkwho" data-k="'+key+'">담당</button>';
-    acts += '<button class="wn" data-act="tx:bulkdel" data-k="'+key+'">삭제</button>';
+    acts += '<button class="wn" data-act="tx:bulkdel" data-k="'+key+'">지우기</button>';
   }
   if(표다 && !고름.length) return '';
   return '<div class="tx-selall">'
@@ -5573,8 +5573,8 @@ function 속성줄들(key, r, 편집){
       + '<button class="tx-pval'+(편집?'':' ro')+'"'+(편집 ? ' data-act="tx:pedit" data-k="'+key+'" data-v2="vis"' : '')+'>'
       + esc(VIS[r.vis||'owners'])
       + (r.vis === 'picked' ? ' <span class="tx-pmut">'+((r.viewers||[]).length)+'명</span>' : '') + '</button></div>'
-    + (빈속성숨김 && 빈수 ? '<button class="tx-padd" data-act="tx:pempty">빈 속성 '+빈수+'개 표시</button>'
-       : 빈수 ? '<button class="tx-padd" data-act="tx:pempty">빈 속성 '+빈수+'개 숨기기</button>' : '')
+    + (빈속성숨김 && 빈수 ? '<button class="tx-padd" data-act="tx:pempty">값이 빈 칸 '+빈수+'개 표시</button>'
+       : 빈수 ? '<button class="tx-padd" data-act="tx:pempty">값이 빈 칸 '+빈수+'개 숨기기</button>' : '')
     + (관리자() ? '<button class="tx-padd" data-act="tx:padd" data-k="'+key+'">＋ 속성 추가</button>' : '')
     + '</div>';
 }
@@ -5742,7 +5742,7 @@ function 속성이름메뉴(key, k, el){
       + '<button data-act="tx:chide" data-k="'+key+'" data-id="'+id+'"><i>'+(c.숨김?'👁':'🙈')+'</i>'+(c.숨김?'목록에 표시':'목록에서 숨기기')+'</button>'
       + '<button data-act="tx:clock" data-k="'+key+'" data-id="'+id+'"><i>'+(c.관리자만?'🔓':'🔒')+'</i>'+(c.관리자만?'잠금 해제':'잠그기')+'</button>'
       + '<div class="tx-pdiv"></div>'
-      + '<button class="wn" data-act="tx:cdel" data-k="'+key+'" data-id="'+id+'"><i>✕</i>삭제</button>'
+      + '<button class="wn" data-act="tx:cdel" data-k="'+key+'" data-id="'+id+'"><i>✕</i>지우기</button>'
       : '<div class="mut">'+(c.시스템 ? '자동으로 적히는 속성' : '기본 속성')+'</div>')
     + '<div class="tx-pdiv"></div>'
     + (관리자() ? '<button data-act="tx:vhidecol" data-k="'+key+'" data-v2="'+esc(c.k)+'"><i>🙈</i>이 보기에서 숨기기</button>' : '')
@@ -5805,7 +5805,7 @@ document.addEventListener('mouseup', async function(){
   const m = 보임.splice(z.부터, 1)[0];
   let at = z.까지 + (z.아래 ? 1 : 0); if(z.부터 < at) at--;
   보임.splice(Math.max(0, Math.min(at, 보임.length)), 0, m);
-  if(await 보기칸바꾸기(z.key, 보임)){ 보기칸판(z.key); toast('순서를 바꿨습니다'); }
+  if(await 보기칸바꾸기(z.key, 보임)){ 보기칸판(z.key); toast('순서를 바꿨어요'); }
 });
 
 function 속성추가쪽지(key, el){
@@ -5893,8 +5893,8 @@ async function txFileDel(key, id, i){
   try{ const o = await usend(T.table+'?id=eq.'+id, 'PATCH', { files }, 'return=representation');
     if(o && o[0]) Object.assign(r, o[0]);
     토큰().then(t => fetch(SB_URL+'/storage/v1/object/tr/'+f.path, { method:'DELETE', headers:{ apikey:SB_KEY, Authorization:'Bearer '+t } })).catch(()=>{});
-    toast('삭제했습니다'); }
-  catch(e){ toast('삭제하지 못했습니다 — '+e.message); }
+    toast('지웠어요'); }
+  catch(e){ toast('못 지웠어요 — '+e.message); }
   txView(key, id);
 }
 async function txCmSend(){
@@ -5908,7 +5908,7 @@ async function txCmDel(cid){
   const { key, id } = 시트;
   const c0 = W.cm.find(c=>c.id===cid);
   try{ await 휴지통으로('tr_comments', c0, (c0&&c0.body)||'코멘트');
-    W.cm = W.cm.filter(c=>c.id!==cid); txView(key, id); toast('휴지통으로 보냈습니다'); }
+    W.cm = W.cm.filter(c=>c.id!==cid); txView(key, id); toast('휴지통으로 보냈어요'); }
   catch(e){ toast(e.message); }
 }
 /* 본문 속 체크박스 누르면 그 줄만 바꿔 저장 */
@@ -5919,7 +5919,7 @@ async function txTick(el){
   lines[i] = /\[( )\]/.test(lines[i]) ? lines[i].replace('[ ]','[x]') : lines[i].replace(/\[(x|X)\]/,'[ ]');
   try{ const o = await usend(T.table+'?id=eq.'+id, 'PATCH', { [f]: lines.join('\n') }, 'return=representation');
     if(o && o[0]) Object.assign(r, o[0]); txView(key, id); }
-  catch(e){ toast('바꾸지 못했습니다 — '+e.message); }
+  catch(e){ toast('못 바꿨어요 — '+e.message); }
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -6075,7 +6075,7 @@ function 고른줄표시(){
   if(고른줄.length < 2) return;
   고른줄.forEach(pth => { const e = document.querySelector('#txblocks .tx-b[data-i="'+pth+'"]'); if(e) e.classList.add('tx-sel'); });
   const d = document.createElement('div'); d.className = 'tx-selbar'; d.id = 'txselbar';
-  d.innerHTML = '<b>'+고른줄.length+'개</b> 선택 <button data-act="tx:bdelsel">삭제</button>';
+  d.innerHTML = '<b>'+고른줄.length+'개</b> 선택 <button data-act="tx:bdelsel">지우기</button>';
   document.body.appendChild(d);
 }
 /* ⛔ 블록마다 편집 영역(contenteditable)이 따로라, 브라우저는 여러 줄에 걸친 선택을 첫 줄에서 자른다.
@@ -6444,7 +6444,7 @@ async function txDel(){
   if(!id || !confirm('이 페이지를 휴지통으로 보낼까요?\n60일 동안 휴지통에 있다가 사라집니다')) return;
   const r = W[key].find(x=>x.id===id);
   try{ await 휴지통으로(T.table, r, (r && r[T.제목열]) || T.제목);
-    W[key] = W[key].filter(x=>x.id!==id); popClose(); toast('휴지통으로 보냈습니다'); render(); }
+    W[key] = W[key].filter(x=>x.id!==id); popClose(); toast('휴지통으로 보냈어요'); render(); }
   catch(e){ toast(e.message); }
 }
 async function txToggle(key, id, f){
@@ -6473,7 +6473,7 @@ function 속성판(key){
         + cs.map((c,i) => '<div class="tx-cl" data-ci="'+i+'">'
             + '<span class="g" data-cgrip="'+i+'" title="끌어서 순서 바꾸기">⠿</span>'
             + '<b data-act="tx:cname" data-k="'+key+'" data-id="'+c.늘림.id+'" title="이름 바꾸기">'+esc(c.이름)+'</b>'
-            + '<small data-act="tx:ctype" data-k="'+key+'" data-id="'+c.늘림.id+'" title="타입 바꾸기">'+타입이름(c.타입)
+            + '<small data-act="tx:ctype" data-k="'+key+'" data-id="'+c.늘림.id+'" title="종류 바꾸기">'+타입이름(c.타입)
               + (['select','multi'].indexOf(c.타입)>=0 ? ' '+(c.옵션||[]).length+'개' : '') + '</small>'
             + '<button data-act="tx:chide" data-k="'+key+'" data-id="'+c.늘림.id+'" title="'+(c.숨김?'목록에서 숨김 — 눌러서 보이기':'목록에 보임 — 눌러서 숨기기')+'">'+(c.숨김?'🙈':'👁')+'</button>'
             + '<button data-act="tx:clock" data-k="'+key+'" data-id="'+c.늘림.id+'" title="'+(c.관리자만?'관리자만 고침 — 눌러서 풀기':'누구나 고침 — 눌러서 잠그기')+'">'+(c.관리자만?'🔒':'🔓')+'</button>'
@@ -6496,7 +6496,7 @@ function 속성타입판(key, id){
         + t[1] + (c.type===t[0] ? ' <small style="margin-left:auto;color:var(--gold)">지금 이것</small>' : '') + '</button>').join('')
     + '</div>'
     + (['select','multi'].indexOf(c.type) >= 0
-      ? '<div class="fld" style="margin-top:10px"><span class="fn">옵션 (쉼표로 구분)</span>'
+      ? '<div class="fld" style="margin-top:10px"><span class="fn">고를 항목 (쉼표로 구분)</span>'
         + '<input class="inp" id="txcopts" value="'+esc((c.opts||[]).join(', '))+'" placeholder="높음, 보통, 낮음">'
         + '<button class="btn sub sm" data-act="tx:copts" data-k="'+key+'" data-id="'+id+'" style="margin-top:8px">저장</button></div>'
       : '')
@@ -6555,7 +6555,7 @@ async function 속성고치기(id, body){
     const o = await usend('tr_cols?id=eq.'+id, 'PATCH', body, 'return=representation');
     if(o && o[0]){ const i = W.cols.findIndex(x => x.id === id); if(i>=0) W.cols[i] = o[0]; }
     render(); return true;
-  }catch(e){ toast('바꾸지 못했습니다 — '+e.message); return false; }
+  }catch(e){ toast('못 바꿨어요 — '+e.message); return false; }
 }
 /* 속성 순서를 ⠿ 로 끌어 바꾼다 (블록 옮기기와 같은 방식) */
 let 열끌기 = null;
@@ -6594,7 +6594,7 @@ document.addEventListener('mouseup', async function(){
     cs.forEach((c,i) => { const j = W.cols.findIndex(x => x.id === c.id); if(j>=0) W.cols[j].sort = i; });
     속성판(z.key);
     await Promise.all(cs.map((c,i) => usend('tr_cols?id=eq.'+c.id, 'PATCH', { sort:i })));
-    toast('순서를 바꿨습니다');
+    toast('순서를 바꿨어요');
   }catch(e){ toast('순서를 못 바꿨어요 — '+e.message); }
 });
 
@@ -7376,7 +7376,7 @@ async function txAct(a, el){
     try{
       await spatch('report_sends', 'id=eq.' + encodeURIComponent(id),
                    { state:'대기', fail_why:null, tried:0, queued_at:new Date().toISOString() });
-      await 발송기록읽기(); toast('보낼 목록에 다시 넣었습니다');
+      await 발송기록읽기(); toast('보낼 목록에 다시 넣었어요');
       if(현황판) 현황판그리기();
       render();
     }catch(e){ toast('못 넣었어요 — ' + e.message); }
@@ -7434,7 +7434,7 @@ async function txAct(a, el){
         if(td){ 칸고르기(k, o[0].id, T2.제목열);
           td.scrollIntoView({ block:'nearest' });
           칸안편집(k, o[0].id, T2.제목열, td); } }
-    }catch(e){ toast('못 만들었습니다 — '+e.message); }
+    }catch(e){ toast('못 만들었어요 — '+e.message); }
     return; }
   /* ── 필터 · 정렬 ── */
   if(a==='fnew'){ 새규칙 = { k:null, cmp:null, v:null }; 조건판(k); return; }
@@ -7459,7 +7459,7 @@ async function txAct(a, el){
       if(o && o[0]){ const i = W.meta.findIndex(x=>x.tbl===표정의[k].table);
         if(i>=0) W.meta[i] = o[0]; else W.meta.push(o[0]); }
       render(); toast(!m.locked ? '잠갔습니다 — 순서·칸을 못 바꿉니다' : '풀었습니다 — 끌어서 옮길 수 있습니다');
-    }catch(e){ toast('못 바꿨습니다 — '+e.message); }
+    }catch(e){ toast('못 바꿨어요 — '+e.message); }
     return; }
   if(a==='vpush'){ await 모두에게저장(k); return; }
   if(a==='vreset'){ 내것되돌리기(k); return; }
@@ -7482,7 +7482,7 @@ async function txAct(a, el){
         { tbl:표정의[k].table, name:nm, rules:[], op:'and', sort:sort }, 'return=representation');
       if(o && o[0]){ W.views.push(o[0]); 표상태[k].보기 = 'v'+o[0].id; }
       보기판(k); render(); toast('「'+nm+'」 보기를 만들었어요'); }
-    catch(e){ toast('추가하지 못했습니다 — '+e.message); }
+    catch(e){ toast('못 추가했어요 — '+e.message); }
     return; }
   if(a==='vsave'){ const st = 표상태[k];
     const 지금 = 보기들(k).find(x => x.k === st.보기);
@@ -7492,7 +7492,7 @@ async function txAct(a, el){
         { tbl:표정의[k].table, name:nm.trim(), sort:보기들(k).length }, 담기), 'return=representation');
       if(o && o[0]){ W.views.push(o[0]); st.보기 = 'v'+o[0].id; 내것지우기(k, 지금 ? 지금.k : ''); 보기얹기(k); }
       render(); toast('「'+nm.trim()+'」 보기를 만들었어요'); }
-    catch(e){ toast('추가하지 못했습니다 — '+e.message); }
+    catch(e){ toast('못 추가했어요 — '+e.message); }
     return; }
   if(a==='vname'){ const x = 보기들(k).find(z => z.k === v2); if(!x) return;
     const nm = prompt('보기 이름', x.이름); if(nm == null || !nm.trim()) return;
@@ -7507,8 +7507,8 @@ async function txAct(a, el){
     try{ await usend('tr_views?id=eq.'+x.뷰.id, 'DELETE');
       W.views = W.views.filter(z => z.id !== x.뷰.id);
       if(표상태[k].보기 === v2) 표상태[k].보기 = (보기들(k).filter(z=>!z.숨김)[0]||{}).k;
-      보기판(k); render(); toast('삭제했습니다'); }
-    catch(e){ toast('삭제하지 못했습니다 — '+e.message); }
+      보기판(k); render(); toast('지웠어요'); }
+    catch(e){ toast('못 지웠어요 — '+e.message); }
     return; }
   /* ── 노션식 속성 줄 ── */
   if(a==='pedit'){ 속성편집(k, 시트.id, v2, el); return; }
@@ -7562,13 +7562,13 @@ async function txAct(a, el){
       const o = await usend('tr_cols', 'POST',
         { tbl:표정의[k].table, k:'p'+Date.now().toString(36), name:nm, type:v2, sort:sort }, 'return=representation');
       if(o && o[0]) W.cols.push(o[0]);
-      쪽지닫기(); if(시트) 속성줄다시(k, 시트.id); render(); toast('속성을 추가했습니다');
-    }catch(e){ toast('추가하지 못했습니다 — '+e.message); }
+      쪽지닫기(); if(시트) 속성줄다시(k, 시트.id); render(); toast('속성을 추가했어요');
+    }catch(e){ toast('못 추가했어요 — '+e.message); }
     return; }
   /* ── 속성(열) 관리 ── */
   if(a==='cols'){ 속성판(k); return; }
   if(a==='vcols'){ 쪽지닫기(); 보기칸판(k); return; }
-  if(a==='vhidecol'){ 쪽지닫기(); if(await 보기칸숨기기(k, v2)) toast('이 보기에서 숨겼습니다'); return; }
+  if(a==='vhidecol'){ 쪽지닫기(); if(await 보기칸숨기기(k, v2)) toast('이 보기에서 숨겼어요'); return; }
   if(a==='vcol'){ const 보임 = 표칸들(k).map(c => c.k);
     const 됐 = 보임.indexOf(v2) >= 0 ? await 보기칸숨기기(k, v2) : await 보기칸보이기(k, v2);
     if(됐) 보기칸판(k); return; }
@@ -7583,8 +7583,8 @@ async function txAct(a, el){
       const o = await usend('tr_cols', 'POST',
         { tbl:표정의[k].table, k:'p'+Date.now().toString(36), name:nm, type:t, sort:sort }, 'return=representation');
       if(o && o[0]) W.cols.push(o[0]);
-      속성판(k); render(); toast('속성을 추가했습니다');
-    }catch(e){ toast('추가하지 못했습니다 — '+e.message); }
+      속성판(k); render(); toast('속성을 추가했어요');
+    }catch(e){ toast('못 추가했어요 — '+e.message); }
     return; }
   if(a==='cname'){ const c = W.cols.find(x => x.id === el.dataset.id); if(!c) return;
     const nm = prompt('속성 이름', c.name); if(nm == null || !nm.trim()) return;
@@ -7595,12 +7595,12 @@ async function txAct(a, el){
         { tbl:c.tbl, k:'p'+Date.now().toString(36), name:c.name+' 사본', type:c.type,
           opts:c.opts||[], sort:(c.sort||0)+1, hidden:c.hidden, locked:c.locked }, 'return=representation');
       if(o && o[0]) W.cols.push(o[0]);
-      속성다시(k); render(); toast('복제했습니다'); }
-    catch(e){ toast('복제하지 못했습니다 — '+e.message); }
+      속성다시(k); render(); toast('하나 더 만들었어요'); }
+    catch(e){ toast('하나 더 못 만들었어요 — '+e.message); }
     return; }
   if(a==='ctset'){ if(await 속성고치기(el.dataset.id, { type:v2 })) 속성타입판(k, el.dataset.id); return; }
   if(a==='copts'){ const v = ($('#txcopts').value || '').split(',').map(x => x.trim()).filter(Boolean);
-    if(await 속성고치기(el.dataset.id, { opts:v })) { 속성타입판(k, el.dataset.id); toast('저장했습니다'); } return; }
+    if(await 속성고치기(el.dataset.id, { opts:v })) { 속성타입판(k, el.dataset.id); toast('저장했어요'); } return; }
   if(a==='chide'){ const c = W.cols.find(x => x.id === el.dataset.id); if(!c) return;
     if(await 속성고치기(c.id, { hidden: !c.hidden })) 속성다시(k); return; }
   if(a==='clock'){ const c = W.cols.find(x => x.id === el.dataset.id); if(!c) return;
@@ -7608,8 +7608,8 @@ async function txAct(a, el){
   if(a==='cdel'){ const c = W.cols.find(x => x.id === el.dataset.id); if(!c) return;
     if(!confirm('「'+c.name+'」 속성을 지울까요?\n이미 적어 둔 값은 안 보이게 돼요')) return;
     try{ await usend('tr_cols?id=eq.'+c.id, 'DELETE');
-      W.cols = W.cols.filter(x => x.id !== c.id); 속성다시(k); render(); toast('삭제했습니다'); }
-    catch(e){ toast('삭제하지 못했습니다 — '+e.message); }
+      W.cols = W.cols.filter(x => x.id !== c.id); 속성다시(k); render(); toast('지웠어요'); }
+    catch(e){ toast('못 지웠어요 — '+e.message); }
     return; }
   if(a==='tpl'){ const t = 표정의[k].템플릿[+el.dataset.i];
     txSheet(k, null, Object.assign({template:t.이름}, t.값));     /* 기본값을 채우고 */
@@ -7801,7 +7801,7 @@ async function txAct(a, el){
       toast('사진을 뺐어요'); txMe(); render(); }
     catch(e){ toast('못 뺐어요 — '+e.message); } return; }
   if(a==='pw'){ const pw = $('#txpw').value; if(pw.length<8){ toast('8자 이상이어야 해요'); return; }
-    try{ await 비번바꾸기(pw); toast('비밀번호를 바꿨어요'); $('#txpw').value=''; }catch(e){ toast('바꾸지 못했습니다 — '+e.message); } return; }
+    try{ await 비번바꾸기(pw); toast('비밀번호를 바꿨어요'); $('#txpw').value=''; }catch(e){ toast('못 바꿨어요 — '+e.message); } return; }
   if(a==='out'){ await signOut(); return; }
   if(a==='staffadd'){
     const email = ($('#txsmail').value||'').trim().toLowerCase(), name = ($('#txsname').value||'').trim(), role = $('#txsrole').value;
@@ -7817,7 +7817,7 @@ async function txAct(a, el){
     const p = W.staff.find(x=>x.id===id); if(!p) return;
     try{ const r = await usend('staff?id=eq.'+id, 'PATCH', { active: p.active===false }, 'return=representation');
       if(r && r[0]) Object.assign(p, r[0]); toast(p.name+(p.active===false?' 껐어요':' 켰어요')); txMe('staff'); }
-    catch(e){ toast('바꾸지 못했습니다 — '+e.message); }
+    catch(e){ toast('못 바꿨어요 — '+e.message); }
     return; }
 }
 function txRender(){
@@ -7986,7 +7986,7 @@ async function 자료올리기(files){
                 'resolution=merge-duplicates');
     const i = KITS.findIndex(x => x.member_id === mid);
     if(i >= 0) KITS[i].files = 담을; else KITS.push({ member_id: mid, files: 담을 });
-    toast('붙였습니다'); render();
+    toast('붙였어요'); render();
   }catch(e){
     toast(/media_kits/.test(String(e.message)) ? '자료 표가 아직 없어요 — 12단계 SQL 을 먼저 돌려 주세요'
                                                : '못 저장했어요 — ' + e.message); }
@@ -8275,13 +8275,13 @@ async function saveBodyCheck(patch){
     else await ssend('body_checks', 'POST', [{ member_id:S.mid, on_date:next.on_date,
       checks:next.checks, photos:next.photos||{}, memo:next.memo||'' }]);
     M.bc = next;
-  }catch(e){ toast('체형 저장 실패 — ' + e.message); }
+  }catch(e){ toast('체형을 못 저장했어요 — ' + e.message); }
 }
 async function saveItemField(id, f, v){
   const it = D.ri.find(x=>x.id===id); if(!it) return;
   it[f] = v; const body = {}; body[f] = v;
   try{ await ssend('routine_items?id=eq.'+id, 'PATCH', body); }
-  catch(e){ toast('저장 실패 — ' + e.message); }
+  catch(e){ toast('못 저장했어요 — ' + e.message); }
 }
 
 /* ── 눌림 ── */
@@ -8364,9 +8364,9 @@ document.addEventListener('click', async function(ev){
   if(되살){ const it = 휴지통.find(x=>String(x.id)===되살.dataset.trrs); if(!it) return;
     (async ()=>{ try{ await 되살리기(it);
         휴지통 = 휴지통.filter(x=>x.id!==it.id);
-        toast('되살렸습니다 — 화면을 새로 고치면 보입니다');
+        toast('되살렸어요 — 화면을 새로 고치면 보여요');
         await 휴지통읽기(); render(); }
-      catch(e){ toast('되살리지 못했습니다 — ' + e.message); } })();
+      catch(e){ toast('못 되살렸어요 — ' + e.message); } })();
     return; }
   const 영구 = t.closest('[data-trdel]');
   if(영구){ const it = 휴지통.find(x=>String(x.id)===영구.dataset.trdel); if(!it) return;
@@ -8480,7 +8480,7 @@ document.addEventListener('click', async function(ev){
   if(eb){ const k = eb.dataset.edit;
     if(k === 'body' && 동의관문('check')) return;      /* 왜 못 고치는지 알려준다 */
     S.edit[k] = !S.edit[k];
-    if(!S.edit[k]) toast('잠갔습니다'); render(); return; }
+    if(!S.edit[k]) toast('잠갔어요'); render(); return; }
 
   const cal = t.closest('[data-cal]');
   if(cal){
@@ -8519,7 +8519,7 @@ document.addEventListener('click', async function(ev){
       D.w.unshift({ id:wid, member_id:S.mid, on_date:TODAY, done:false,
         title: r0 ? ('루틴 '+r0.no+' · '+r0.name) : '빈 운동', kind:S.kind });
       S.tab='record'; S.day=wid; render(); await loadMember(S.mid);
-    }catch(e){ toast('만들기 실패 — ' + e.message); }
+    }catch(e){ toast('못 만들었어요 — ' + e.message); }
     return;
   }
 
@@ -8543,7 +8543,7 @@ document.addEventListener('click', async function(ev){
            kg:null, reps:null, sets:1, rest:0 }], 'return=representation');
       if(back && back[0]) D.ri.push(back[0]);
       toast((사전[key]||{}).n + ' 담았어요'); popOpen(popPrep()); render();
-    }catch(e){ toast('담기 실패 — ' + e.message); }
+    }catch(e){ toast('못 담았어요 — ' + e.message); }
     return;
   }
 
@@ -8559,7 +8559,7 @@ document.addEventListener('click', async function(ev){
         [{ routine_id:S.rid, sort:items.length, variant_id:vid, kg:20, reps:10, sets:3, rest:60 }],
         'return=representation');
       D.ri.push(made[0]); toast(vaName(vid) + ' 담았어요'); render();
-    }catch(e){ toast('추가 실패 — ' + e.message); }
+    }catch(e){ toast('못 추가했어요 — ' + e.message); }
     return;
   }
 
@@ -8591,7 +8591,7 @@ document.addEventListener('click', async function(ev){
       await 휴지통으로('members', m, m.name, ssend);
       D.m = D.m.filter(x => x.id !== m.id);
       S.view = 'members'; S.mid = null;
-      toast('휴지통으로 보냈습니다 — 60일 안에 되살릴 수 있어요'); render();
+      toast('휴지통으로 보냈어요 — 60일 안에 되살릴 수 있어요'); render();
     }catch(e){ toast('못 지웠어요 — ' + e.message); }
     return; }
   if(a==='ppseen'){ 본팝업[act.dataset.i] = 1;
@@ -8606,7 +8606,7 @@ document.addEventListener('click', async function(ev){
     if(!confirm('이 공지를 지울까요?')) return;
     try{ await join('popupdel', { id: act.dataset.i });
       팝업판.목록 = 팝업판.목록.filter(y => y.id !== act.dataset.i);
-      팝업판.고칠 = null; toast('지웠습니다'); 팝업판그리기(); }
+      팝업판.고칠 = null; toast('지웠어요'); 팝업판그리기(); }
     catch(e){ toast('못 지웠어요 — ' + e.message); }
     return; }
   if(a==='japps'){ await 승인판열기(); return; }
@@ -8710,7 +8710,7 @@ document.addEventListener('click', async function(ev){
       /* 저장소에서도 지운다 — 남겨 두면 용량만 먹는다 */
       if(f.path) 토큰().then(t2 => fetch(SB_URL + '/storage/v1/object/tr/' + f.path,
         { method:'DELETE', headers:{ apikey:SB_KEY, Authorization:'Bearer ' + t2 } })).catch(()=>{});
-      toast('지웠습니다'); render();
+      toast('지웠어요'); render();
     }catch(e){ toast('못 지웠어요 — ' + e.message); }
     return; }
 
@@ -8721,7 +8721,7 @@ document.addEventListener('click', async function(ev){
       if(!confirm('보낸 링크를 못 쓰게 합니다. 회원님이 이미 받으셨다면 눌러도 안 열립니다.\n\n확인 요청을 취소할까요?')) return;
       try{
         await ssend('members?id=eq.' + encodeURIComponent(m.id), 'PATCH', { cm_optout_key: null });
-        m.cm_optout_key = null; toast('취소했습니다'); render();
+        m.cm_optout_key = null; toast('취소했어요'); render();
       }catch(e){ toast('못 취소했어요 — ' + e.message); }
       return; }
     /* 1회용 열쇠 — 회원 번호를 링크에 그대로 싣지 않는다. 남이 대신 눌러 주면 안 된다.
@@ -8783,7 +8783,7 @@ document.addEventListener('click', async function(ev){
       M.br.push({ id:id, member_id:S.mid, on_date:TODAY, checks:bc.checks, note:bc.memo||'' });
       S.edit.body = false;
       toast('오늘 회차로 남기고 잠갔어요'); render();
-    }catch(e){ toast('저장 실패 — ' + e.message); }
+    }catch(e){ toast('못 저장했어요 — ' + e.message); }
     return;
   }
   if(a==='brload'){
@@ -8809,8 +8809,8 @@ document.addEventListener('click', async function(ev){
       fetch(SB_URL+'/storage/v1/object/media/'+x.path,
         { method:'DELETE', headers:{ apikey:SB_KEY, Authorization:'Bearer '+SB_KEY } }).catch(()=>{});
       M.bph = M.bph.filter(y=>y.id!==id);
-      toast('지웠습니다'); render();
-    }catch(e){ toast('지우기 실패 — ' + e.message); }
+      toast('지웠어요'); render();
+    }catch(e){ toast('못 지웠어요 — ' + e.message); }
     return;
   }
   if(a==='blnew'){
@@ -8821,15 +8821,15 @@ document.addEventListener('click', async function(ev){
         w:null, m:null, f:null, fp:null, note:'' }]);
       M.bl.push({ id:id, member_id:S.mid, on_date:TODAY, w:null, m:null, f:null, fp:null, note:'' });
       toast('줄을 하나 만들었어요 · 숫자를 적어 주세요'); render();
-    }catch(e){ toast('만들기 실패 — ' + e.message); }
+    }catch(e){ toast('못 만들었어요 — ' + e.message); }
     return;
   }
   if(a==='bldel'){
     const bid = act.dataset.b;
     if(!confirm('이 인바디 기록을 지울까요?')) return;
     try{ await 휴지통으로('body_logs', M.bl.find(x=>String(x.id)===String(bid)), '체형 기록', ssend);
-      M.bl = M.bl.filter(x=>x.id!==bid); toast('지웠습니다'); render(); }
-    catch(e){ toast('지우기 실패 — ' + e.message); }
+      M.bl = M.bl.filter(x=>x.id!==bid); toast('지웠어요'); render(); }
+    catch(e){ toast('못 지웠어요 — ' + e.message); }
     return;
   }
   /* 운동계획 */
@@ -8848,7 +8848,7 @@ document.addEventListener('click', async function(ev){
       M.plan = { member_id:S.mid, data:data };
       S.edit.plan = false;
       toast('운동계획을 저장하고 잠갔어요'); render();
-    }catch(e){ toast('저장 실패 — ' + e.message); }
+    }catch(e){ toast('못 저장했어요 — ' + e.message); }
     return;
   }
   /* 회원 정보 */
@@ -8881,7 +8881,7 @@ document.addEventListener('click', async function(ev){
       }
       S.edit.minfo = false;
       toast('회원 정보를 저장하고 잠갔어요'); render();
-    }catch(e){ toast('저장 실패 — ' + e.message); }
+    }catch(e){ toast('못 저장했어요 — ' + e.message); }
     return;
   }
 
@@ -8926,7 +8926,7 @@ document.addEventListener('click', async function(ev){
       const made = await ssend('workout_sets', 'POST', [{ item_id:itId, sort:sets.length,
         kg:last?last.kg:20, reps:last?last.reps:10, spd:null, done:true }], 'return=representation');
       M.ws.push(made[0]); toast('세트를 넣었어요'); render();
-    }catch(e){ toast('넣기 실패 — ' + e.message); }
+    }catch(e){ toast('못 넣었어요 — ' + e.message); }
     return;
   }
   if(a==='setdel'){
@@ -8944,8 +8944,8 @@ document.addEventListener('click', async function(ev){
       await ssend('assignments?member_id=eq.'+r.member_id+'&on_date=eq.'+day, 'DELETE');
       D.aAll = D.aAll.filter(x=>!(x.member_id===r.member_id && x.on_date===day));
       D.a = D.aAll.filter(x=>x.on_date===TODAY);
-      toast('지정을 풀었습니다'); render();
-    }catch(e){ toast('풀기 실패 — ' + e.message); }
+      toast('지정을 풀었어요'); render();
+    }catch(e){ toast('못 풀었어요 — ' + e.message); }
     return;
   }
   if(a==='cmopen'){
@@ -8966,8 +8966,8 @@ document.addEventListener('click', async function(ev){
     const tid = act.dataset.i;
     try{ await usend('tr_trash?id=eq.'+tid, 'DELETE');
       휴지통 = 휴지통.filter(x=>String(x.id)!==String(tid));
-      popClose(); toast('영구히 지웠습니다'); render(); }
-    catch(e){ toast('지우기 실패 — ' + e.message); }
+      popClose(); toast('영영 지웠어요'); render(); }
+    catch(e){ toast('못 지웠어요 — ' + e.message); }
     return; }
   if(a==='trsweep'){
     if(!최고관리자()) return toast('최고 관리자만 할 수 있어요');
@@ -8983,8 +8983,8 @@ document.addEventListener('click', async function(ev){
     if(!최고관리자()) return toast('최고 관리자만 할 수 있어요');
     const 끊는날 = new Date(Date.now() - 휴지통일수*864e5).toISOString();
     try{ await usend('tr_trash?deleted_at=lt.'+끊는날, 'DELETE');
-      await 휴지통읽기(); popClose(); toast('비웠습니다'); render(); }
-    catch(e){ toast('비우기 실패 — ' + e.message); }
+      await 휴지통읽기(); popClose(); toast('비웠어요'); render(); }
+    catch(e){ toast('못 비웠어요 — ' + e.message); }
     return; }
   if(a==='cmedit'){ S.cmEdit = (S.cmEdit === act.dataset.c) ? null : act.dataset.c; render();
     setTimeout(()=>{ const el = document.getElementById('cmedit_'+S.cmEdit); if(el){ el.focus();
@@ -9010,8 +9010,8 @@ document.addEventListener('click', async function(ev){
     const cid = act.dataset.c, 새글 = S.cmTmp || '';
     try{ await ssend('comments?id=eq.'+cid, 'PATCH', { body: 새글 });
       const c = D.c.find(x=>x.id===cid); if(c) c.body = 새글;
-      S.cmEdit = null; S.cmTmp = null; popClose(); toast('고쳤습니다'); render(); }
-    catch(e){ toast('고치기 실패 — ' + e.message); }
+      S.cmEdit = null; S.cmTmp = null; popClose(); toast('고쳤어요'); render(); }
+    catch(e){ toast('못 고쳤어요 — ' + e.message); }
     return; }
   if(a==='cmdel'){
     const cid = act.dataset.c;
@@ -9028,7 +9028,7 @@ document.addEventListener('click', async function(ev){
     const c0 = D.c.find(x=>x.id===cid);
     try{ await 휴지통으로('comments', c0, memOf(c0.member_id).name + ' · ' + (c0.body||''), ssend);
       D.c = D.c.filter(x=>x.id!==cid); S.cmEdit=null; popClose();
-      toast('휴지통으로 보냈습니다 — 60일 안에 되살릴 수 있어요'); render(); }
+      toast('휴지통으로 보냈어요 — 60일 안에 되살릴 수 있어요'); render(); }
     catch(e){ toast(e.message); }
     return;
   }
@@ -9042,8 +9042,8 @@ document.addEventListener('click', async function(ev){
     try{
       cid = await 코멘트쓰기(S.mid, vid, S.cmw, tx, who);
       if(ta) ta.value=''; S.cmopen=null;
-      toast('보냈습니다 · 회원 화면에 바로 떠요'); render();
-    }catch(e){ toast('보내기 실패 — ' + e.message); }
+      toast('보냈어요 · 회원 화면에 바로 떠요'); render();
+    }catch(e){ toast('못 보냈어요 — ' + e.message); }
     return;
   }
 
@@ -9056,7 +9056,7 @@ document.addEventListener('click', async function(ev){
     try{
       await ssend('routine_items?id=eq.'+items[i].id, 'PATCH', {sort:items[i].sort});
       await ssend('routine_items?id=eq.'+items[j].id, 'PATCH', {sort:items[j].sort});
-    }catch(e){ toast('순서 저장 실패'); }
+    }catch(e){ toast('순서를 못 저장했어요'); }
     return;
   }
   if(a==='del'){
@@ -9080,7 +9080,7 @@ document.addEventListener('click', async function(ev){
         { no:r.no, name:r.name, purpose:r.purpose, grp:r.grp });
       S.edit.routine = false;
       toast('저장하고 잠갔어요'); render();
-    }catch(e){ toast('저장 실패 — ' + e.message); }
+    }catch(e){ toast('못 저장했어요 — ' + e.message); }
     return;
   }
   if(a==='rnew'){
@@ -9092,7 +9092,7 @@ document.addEventListener('click', async function(ev){
         [{ id:id2, member_id:S.mid, no:no, name:'새 루틴 '+no, purpose:'', grp:'' }]);
       D.r.push({ id:id2, member_id:S.mid, no:no, name:'새 루틴 '+no, purpose:'', grp:'' });
       S.rid = id2; S.view='routine'; toast('새 루틴을 만들었어요'); render();
-    }catch(e){ toast('만들기 실패 — ' + e.message); }
+    }catch(e){ toast('못 만들었어요 — ' + e.message); }
     return;
   }
   if(a==='pnew'){
@@ -9106,7 +9106,7 @@ document.addEventListener('click', async function(ev){
       D.r.push({ id:id2, member_id:S.mid, no:no, name:nm, purpose:'', grp:'준비운동' });
       S.rid = id2; S.view='routine'; S.edit.routine = true;
       toast('새 준비운동을 만들었어요 — 동작을 담아 주세요'); render();
-    }catch(e){ toast('만들기 실패 — ' + e.message); }
+    }catch(e){ toast('못 만들었어요 — ' + e.message); }
     return;
   }
   if(a==='ppick'){ S.pq=''; S.ptab='s'; popOpen(popPrep()); return; }
@@ -9121,8 +9121,8 @@ document.addEventListener('click', async function(ev){
       await 휴지통으로('routines', r, '루틴 ' + r.no + ' · ' + (r.name||''), ssend);
       D.ri = D.ri.filter(x=>x.routine_id!==r.id);
       D.r = D.r.filter(x=>x.id!==r.id);
-      S.view='member'; S.tab='routine'; toast('지웠습니다'); render();
-    }catch(e){ toast('지우기 실패 — ' + e.message); }
+      S.view='member'; S.tab='routine'; toast('지웠어요'); render();
+    }catch(e){ toast('못 지웠어요 — ' + e.message); }
     return;
   }
   if(a==='asnew'){ if(지정판){ 지정판.새 = true; 지정판그리기();
@@ -9142,7 +9142,7 @@ document.addEventListener('click', async function(ev){
       D.r.push({ id:id2, member_id:mid, no:no, name:nm, purpose:'', grp:'' });
       지정판.새 = false; toast('「'+nm+'」 루틴을 만들었어요 — 종목을 담아 주세요');
       지정판그리기();
-    }catch(e){ toast('만들기 실패 — ' + e.message); }
+    }catch(e){ toast('못 만들었어요 — ' + e.message); }
     return;
   }
   /* ⛔ 앞서는 여기에 **지정·추천을 하는 식이 통째로 한 벌 더** 있었다.
@@ -9225,7 +9225,7 @@ document.addEventListener('input', function(ev){
       try{ await ssend('meals?id=eq.'+id, 'PATCH', { trainer_note: v });
         const m = M.meals.find(x=>x.id===id); if(m) m.trainer_note = v;
         toast('한마디 저장했어요');
-      }catch(e){ toast('저장 실패'); }
+      }catch(e){ toast('못 저장했어요'); }
     }, 700);
     return; }
   if(el.dataset.bl){                       /* 인바디 줄 */
@@ -9239,7 +9239,7 @@ document.addEventListener('input', function(ev){
     clearTimeout(mnT);
     mnT = setTimeout(async function(){
       const body = {}; body[fld] = v;
-      try{ await ssend('body_logs?id=eq.'+id, 'PATCH', body); }catch(e){ toast('저장 실패'); }
+      try{ await ssend('body_logs?id=eq.'+id, 'PATCH', body); }catch(e){ toast('못 저장했어요'); }
     }, 600);
     return;
   }
@@ -9251,7 +9251,7 @@ document.addEventListener('input', function(ev){
     clearTimeout(mnT);
     mnT = setTimeout(async function(){
       const body = {}; body[fld] = v; body.done = true;
-      try{ await ssend('workout_sets?id=eq.'+id, 'PATCH', body); }catch(e){ toast('저장 실패'); }
+      try{ await ssend('workout_sets?id=eq.'+id, 'PATCH', body); }catch(e){ toast('못 저장했어요'); }
     }, 600);
     return;
   }
@@ -9263,7 +9263,7 @@ document.addEventListener('input', function(ev){
     clearTimeout(mnT);
     mnT = setTimeout(async function(){
       const body = {}; body[fld] = v;
-      try{ await ssend('meals?id=eq.'+id, 'PATCH', body); }catch(e){ toast('저장 실패'); }
+      try{ await ssend('meals?id=eq.'+id, 'PATCH', body); }catch(e){ toast('못 저장했어요'); }
     }, 600);
     return;
   }
