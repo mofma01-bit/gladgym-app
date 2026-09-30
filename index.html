@@ -1944,7 +1944,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '215';
+const BUILD = '216';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2091,7 +2091,12 @@ async function boot(){
     /* 동의 칸 — 설계서\8단계_SQL_동의칸.sql (없으면 undefined 로 들어와 「미동의」로 본다) */
     aT:m.agree_terms_at||'', aP:m.agree_privacy_at||'', aS:m.agree_sensitive_at||'',
     aM:m.agree_marketing_at||'', aV:m.agree_version||'',
-    askAt:m.sensitive_ask_at||'', askKind:m.sensitive_ask_kind||'', seenAt:m.noti_seen_at||'' }));
+    askAt:m.sensitive_ask_at||'', askKind:m.sensitive_ask_kind||'', seenAt:m.noti_seen_at||'',
+    /* ⛔ 코멘트 거부 — 이걸 빠뜨리면 거부한 회원인데 「코멘트를 남겨주세요」가 **다시 살아난다.**
+       MEMBERS 는 칸을 골라 담는 자리다. 판정에 쓰는 칸은 반드시 여기에 실어야 한다
+       (2026-09-30 대표 「거부했는데 다시 살아난다거나」 — 실제로 빠져 있었다).
+       막는 기계 = _도구\회원칸점검.py */
+    cmOff:m.cm_optout_at||'' }));
   const t = mems.find(m => m.role === 'trainer'); if(t) TRAINER = t.name;
 
   D.routines = rts.map(r => ({ id:r.id, mid:r.member_id, no:r.no, n:r.name, purpose:r.purpose||'', grp:r.grp||'',
@@ -2307,7 +2312,7 @@ const 수업횟수 = mid => D.workouts.filter(w => w.mid===mid && w.done && (w.k
 const 코멘트수 = mid => D.cm.filter(c => c.mid===mid).length;
 /* 코멘트 안내 그만 받기 — 회원이 동의해서 껐으면 **재촉을 안 띄운다** (2026-09-30 대표).
    ⛔ 칸이 아직 없어도 안 터진다 — undefined 면 「안 껐다」다. */
-const 코멘트끔 = mid => { const m = MEMBERS.find(x => x.id === mid); return !!(m && m.cm_optout_at); };
+const 코멘트끔 = mid => { const m = MEMBERS.find(x => x.id === mid); return !!(m && m.cmOff); };
 const 코멘트0개 = mid => !코멘트끔(mid) && 수업횟수(mid) >= 2 && 코멘트수(mid) === 0;
 function unreadOf(mid){ return D.cm.filter(c=>c.mid===mid && !c.read).length; }
 
