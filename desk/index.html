@@ -1289,7 +1289,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '142';
+const BUILD = '143';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -3924,12 +3924,14 @@ function vKit(){
     return '<div class="kitchk ' + (됐나 ? 'on' : '') + '">'
       + '<span class="bx">' + (됐나 ? '☑' : '☐') + '</span>'
       + '<span class="nm">' + esc(이름) + '</span>'
+      /* 앱에서 온 것과 따로 올린 것을 갈라 보여 준다 — 어디서 왔는지 알아야 한다 */
+      + (갯수 ? '<span class="tag">앱 ' + 갯수 + '</span>' : '')
       + (붙.length ? '<span class="tag teal">올림 ' + 붙.length + '</span>' : '')
       + '<button class="btn ghost sm" data-act="kitup" data-v2="' + esc(tag) + '">'
       + (됐나 ? '＋ 더' : '＋ 올리기') + '</button></div>';
   };
-  const 찍 = '<div class="sec"><div class="lbl">촬영사진 — 없는 것만 올리시면 됩니다</div>'
-    + '<div class="kitgrid">' + 사진칸.map(t => 체크(t, 0, t)).join('') + '</div>'
+  const 찍 = '<div class="sec"><div class="lbl">촬영사진 — 회원앱에서 찍은 것이 저절로 켜집니다</div>'
+    + '<div class="kitgrid">' + 사진칸.map(t => 체크(t, (있.방향||{})[t] || 0, t)).join('') + '</div>'
     + '<div class="lbl" style="margin-top:12px">평가 영상</div>'
     + '<div class="kitgrid">' + 영상칸.map(t => 체크(t, 0, t)).join('') + '</div>'
     + '<div class="lbl" style="margin-top:12px">그 밖의 자료</div>'
@@ -7827,8 +7829,11 @@ async function 자료읽기(다시){
       sget('body_rounds?select=member_id,on_date').catch(()=>[]),
       sget('comment_media?select=comment_id,kind,path').catch(()=>[]),
       sget('meals?select=member_id,on_date&limit=2000').catch(()=>[]),
+      /* 회원앱이 찍은 **네 방향 체형 사진** — 자료 한 장의 「촬영사진」 칸이 이걸 본다 */
+      sget('body_photos?select=member_id,kind,pose,on_date,path&limit=2000').catch(()=>[]),
     ]);
     D.bl = g[0] || []; D.br = g[1] || []; D.cmedia = g[2] || []; D.meals = g[3] || [];
+    D.bph = g[4] || [];
   }catch(e){ console.warn('자료 목록을 못 받았어요 —', e.message); }
 }
 
@@ -7849,6 +7854,9 @@ function 자료있는것(mid){
     영상: cm.filter(x => (x.kind||'') === 'video').length,
     식단: (D.meals || []).filter(x => x.member_id === mid).length,
     수업: D.w.filter(w => w.member_id === mid && (w.kind||'') === '수업').length,
+    /* 네 방향 — 리포트 양식 그대로. 회원앱에서 찍으면 여기가 저절로 켜진다 */
+    방향: 사진칸.reduce((o, t) => (o[t] = (D.bph || []).filter(
+      x => x.member_id === mid && (x.kind||'body') === 'body' && x.pose === t).length, o), {}),
   };
 }
 
