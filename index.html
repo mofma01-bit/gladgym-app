@@ -1570,6 +1570,16 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
   white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .22s;z-index:30}
 #toast.on{opacity:1}
 
+/* 네 방향 찍기 — 뭐가 없는지 한눈에 */
+.posechk{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:2px 0 10px}
+.posechk .pc{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px;
+  border-radius:11px;border:1px solid var(--line,#33332f);background:var(--card,#1a1a18);
+  font-size:12px;font-weight:700;color:var(--sub,#8f8a83)}
+.posechk .pc.on{border-color:var(--teal,#4a8f95);color:var(--cream,#fdfaf6)}
+.posechk .pc .bx{font-size:15px}
+.posechk .pc.on .bx{color:var(--teal,#4a8f95)}
+.posechk .pc small{font-size:10.5px;opacity:.7}
+
 /* 코멘트 안내 그만 받기 — 한 장짜리 동의 화면 (설치 없이 열린다) */
 .cmoffwrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:22px}
 .cmoffbox{width:100%;max-width:420px;background:var(--card,#1a1a18);border:1px solid var(--line,#33332f);
@@ -1934,7 +1944,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '214';
+const BUILD = '215';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -7042,7 +7052,11 @@ function vPlan(){
 }
 
 /* ── 체형분석 ── */
-const POSES = ['정면','측면','후면'];
+/* ⭐ 리포트 양식 그대로 **네 방향** (2026-09-30 대표 「채워」).
+   레퍼런스 — 이채현님 자료.hwp 「촬영사진 : 전면( ) 후면( ) 좌측( ) 우측( )」
+   ⛔ 앞서는 3방향(정면·측면·후면)이라 **좌측·우측을 못 채웠다.**
+      `body_photos` 가 0줄이라 바꿔도 잃을 자료가 없었다(2026-09-29 백업 확인). */
+const POSES = ['전면','후면','좌측','우측'];
 const phURL = p => 사진주소(p);
 function bphOf(mid, kind, pose){
   return (D.bph||[]).filter(x => x.mid===mid && x.kind===(kind||'body') && (!pose || x.pose===pose))
@@ -7566,6 +7580,13 @@ function bodyPane(mid){
     ${blPane(mid)}
 
     <div class="hr"></div>
+    <span class="lbl">네 방향 다 찍으면 좋아요</span>
+    <div class="posechk">${POSES.map(x => { const n = bphOf(mid,'body',x).length;
+      return `<button class="pc ${n?'on':''}" data-act="bppose:${x}">
+        <span class="bx">${n?'☑':'☐'}</span><span>${x}</span>${n?`<small>${n}</small>`:''}</button>`; }).join('')}</div>
+    <div class="note" style="margin-top:-2px">전면 · 후면 · 좌측 · 우측을 같은 자리에서 찍으면
+      <b>변화가 한눈에</b> 보이고, 리포트에도 그대로 들어갑니다.</div>
+
     <span class="lbl">비포 · 애프터 견주기</span>
     <div class="seg">${POSES.map(x=>
       `<button class="${pose===x?'on':''}" data-act="bppose:${x}">${x}</button>`).join('')}</div>
@@ -7836,7 +7857,7 @@ async function bpUpload(){
   const el = document.querySelector('[data-k="bp:d"]');
   const date = (el && el.value) || S.bpNewDate || TODAY;
   const mid = S.bpMid, kind = S.bpKind || 'body';
-  const pose = kind==='ai' ? '장비' : (S.bpNewPose || '정면');
+  const pose = kind==='ai' ? '장비' : (S.bpNewPose || '전면');
   const id = 'bp' + Date.now();
   const path = `body/${mid}/${id}.jpg`;
   const blob = await (await fetch(S.bpShot)).blob();
