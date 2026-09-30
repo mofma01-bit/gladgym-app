@@ -1204,8 +1204,13 @@ body.resizing{cursor:col-resize;user-select:none}
 /* ══ 폰·좁은 창 ══ 2026-09-30 대표 「폰에서도 쓸거야 · 지금 노션도 일부 쓰는 것처럼」
    ⛔ 951px 위에서는 **한 픽셀도 안 바뀐다** — PC 는 2026-09-29 에 정한 그대로다.
       그 아래에서만 왼쪽 메뉴를 접는다(노션이 폰에서 하는 것과 같다). */
-@media (max-width: 950px){
-  .app{min-width:0}
+/* ⛔ **폭만 보고 접으면 안 된다.** PC 에서 창을 좁히면 레이아웃이 찌그러진다
+     (2026-09-30 대표 「이렇게 무한정 조절되게 하지말고 최소 크기 정하라니까 · 다 찌그러지잖아」).
+   손가락으로 쓰는 기기(pointer:coarse · hover:none)에서만 접는다 —
+     폰·태블릿  → 접힌다. 바닥은 360px
+     PC         → 2026-09-29 그대로. 1040px 까지만 줄고 그 아래는 **가로로 민다** */
+@media (max-width: 950px) and (pointer: coarse) and (hover: none){
+  .app{min-width:360px}
   .side{position:fixed;left:0;top:46px;z-index:60;width:230px;height:calc(100vh - 46px);
     transform:translateX(-102%);transition:transform .18s ease;box-shadow:0 0 40px rgba(0,0,0,.6)}
   .side.on{transform:none}
@@ -1221,7 +1226,7 @@ body.resizing{cursor:col-resize;user-select:none}
   .sumbar .sumit{min-width:calc(50% - 5px)}
   .kitgrid{grid-template-columns:1fr 1fr}
 }
-@media (max-width: 560px){
+@media (max-width: 560px) and (pointer: coarse) and (hover: none){
   .sumbar .sumit{min-width:100%}
   .kitgrid{grid-template-columns:1fr}
   .top h1{font-size:19px}
@@ -1326,7 +1331,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '148';
+const BUILD = '149';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
