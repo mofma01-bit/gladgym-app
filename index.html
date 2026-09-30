@@ -1585,6 +1585,15 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
 .cmoffgo:disabled{opacity:.5}
 .cmoffbox .sub{text-align:center;font-size:12px;color:var(--sub,#8f8a83);margin-top:10px}
 
+/* 초상권 고르기 — 세 갈래를 큼직하게 (어르신도 누르기 쉽게) */
+.ptpick{display:flex;flex-direction:column;gap:10px;margin:4px 0 14px}
+.ptbtn{display:block;width:100%;text-align:left;padding:16px 16px;border-radius:13px;
+  border:1px solid var(--line,#33332f);background:var(--dark-3,#222220);color:var(--cream,#fdfaf6)}
+.ptbtn b{display:block;font-size:15.5px;font-weight:800;margin-bottom:4px}
+.ptbtn small{font-size:12.5px;color:var(--sub,#8f8a83);font-weight:600}
+.ptbtn:hover{border-color:var(--gold,#d4af6e)}
+.ptbtn:disabled{opacity:.45}
+
 /* ══ 바로가기 만들기 띠 ══ 2026-09-30 대표
    「바탕화면에 빼고 이렇게 저렇게 하세요를 줄이고」 — 눌러서 설치되게 한다 */
 .pwabar{display:none;align-items:center;gap:10px;margin:0 0 12px;padding:11px 13px;
@@ -1925,7 +1934,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '213';
+const BUILD = '214';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2137,6 +2146,11 @@ async function boot(){
      ⛔ 열쇠로만 찾는다 — 회원 번호를 링크에 싣지 않는다. 한 번 쓰면 못 쓴다. */
   const 끔열쇠 = new URLSearchParams(location.search).get('cmoff');
   if(끔열쇠){ 끔동의화면(끔열쇠); return; }
+  /* ══ 초상권 협의 (?pt=열쇠) ══ 2026-09-30
+     블로그·릴스에 쓸 때 **회원이 직접** 노출 · 모자이크 · 미협의를 고른다.
+     말로 하는 협의가 아니라 **시스템에 남는다.** 설치도 로그인도 없다. */
+  const 초상열쇠 = new URLSearchParams(location.search).get('pt');
+  if(초상열쇠){ 초상동의화면(초상열쇠); return; }
 
   /* 알림톡 리포트 링크(?rp=운동id)로 들어왔으면 그 리포트를 바로 연다.
      읽고 나면 주소에서 지운다 — 안 지우면 새로고침할 때마다 리포트로 돌아온다 */
@@ -4677,6 +4691,55 @@ async function 끔동의화면(key){
       그리기(판.innerHTML + '<div class="cmoffbox warn">잠시 뒤 다시 눌러 주세요 — ' + esc(e.message) + '</div>');
     }
   };
+}
+
+/* ── 초상권 협의 · 회원이 고르는 한 장 ── 2026-09-30 */
+async function 초상동의화면(key){
+  const 판 = document.body;
+  const 그리기 = h => { 판.innerHTML = '<div class="cmoffwrap">' + h + '</div>'; };
+  그리기('<div class="cmoffbox"><div class="ttl">확인하는 중…</div></div>');
+
+  let k = null;
+  try{ k = (await sget('media_kits?select=member_id,portrait&portrait_key=eq.'
+                       + encodeURIComponent(key) + '&limit=1'))[0] || null; }catch(e){}
+  if(!k){
+    그리기('<div class="cmoffbox"><div class="ttl">이미 처리되었거나 만료된 주소입니다</div>'
+      + '<p>이 링크는 <b>한 번만</b> 쓸 수 있어요.<br>다시 하시려면 담당 트레이너에게 말씀해 주세요.</p></div>');
+    return; }
+
+  let 이름 = '';
+  try{ 이름 = ((await sget('members?select=name&id=eq.' + encodeURIComponent(k.member_id)))[0]||{}).name || ''; }catch(e){}
+
+  const 고르기 = [
+    ['노출',   '얼굴이 보여도 괜찮아요',   '사진·영상을 그대로 씁니다'],
+    ['모자이크','얼굴은 가려 주세요',      '얼굴에 모자이크를 넣어 씁니다'],
+    ['미협의', '쓰지 말아 주세요',        '블로그·릴스에 쓰지 않습니다'],
+  ];
+  그리기('<div class="cmoffbox"><div class="ttl">사진 · 영상 사용 동의</div>'
+    + '<p><b>' + esc(이름) + '</b> 회원님,<br>'
+    + '수업 중 찍은 사진과 영상을 <b>글래드짐 블로그·릴스</b>에 쓸 수 있을까요?</p>'
+    + '<div class="ptpick">' + 고르기.map(([v, t, sub]) =>
+        '<button class="ptbtn" data-v="' + v + '"><b>' + t + '</b><small>' + sub + '</small></button>').join('')
+    + '</div><div class="sub">언제든 담당 트레이너에게 말씀하시면 바꿀 수 있어요</div></div>');
+
+  판.querySelectorAll('.ptbtn').forEach(b => b.onclick = async function(){
+    판.querySelectorAll('.ptbtn').forEach(x => x.disabled = true);
+    this.textContent = '처리 중…';
+    const v = this.dataset.v;
+    try{
+      /* 열쇠를 **조건으로 걸어** 고친다 — 그 사이 누가 썼으면 아무것도 안 바뀐다 */
+      await spatch('media_kits?portrait_key=eq.' + encodeURIComponent(key),
+        { portrait: v, portrait_at: new Date().toISOString(), portrait_by: '회원', portrait_key: null });
+      그리기('<div class="cmoffbox ok"><div class="ttl">고맙습니다</div>'
+        + '<p><b>' + esc(v) + '</b> 로 남겼습니다.<br>'
+        + (v === '미협의' ? '사진·영상을 쓰지 않습니다.'
+           : v === '모자이크' ? '얼굴을 가려서 씁니다.' : '사진·영상을 그대로 씁니다.')
+        + '<br>바꾸고 싶으시면 담당 트레이너에게 말씀해 주세요.</p></div>');
+    }catch(e){
+      판.querySelectorAll('.ptbtn').forEach(x => x.disabled = false);
+      그리기(판.innerHTML + '<div class="cmoffbox warn">잠시 뒤 다시 눌러 주세요 — ' + esc(e.message) + '</div>');
+    }
+  });
 }
 
 /* 리포트 발송 상태 — 화면에 보여 주려고 한 번 읽어 담아 둔다 (2026-09-30).
