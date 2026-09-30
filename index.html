@@ -1944,7 +1944,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '217';
+const BUILD = '218';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -4678,7 +4678,7 @@ async function 끔동의화면(key){
     return;
   }
   if(m.cm_optout_at){
-    그리기('<div class="cmoffbox ok"><div class="ttl">이미 꺼져 있어요</div>'
+    그리기('<div class="cmoffbox ok"><div class="ttl">이미 그만 받고 계세요</div>'
       + '<p>' + esc(m.name) + ' 회원님은 코멘트 안내를 받지 않습니다.<br>'
       + '다시 받고 싶으시면 담당 트레이너에게 말씀해 주세요.</p></div>');
     return;
