@@ -1377,7 +1377,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '170';
+const BUILD = '171';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -1993,7 +1993,7 @@ function 팝업판그리기(){
       + esc(y['제목'] || '제목 없음') + '</div>'
       + '<div class="t2" style="margin-top:3px">받는 사람 ' + esc(y['받는이'] || '전체')
       + (y['고친때'] ? ' · ' + esc(dateFull(String(y['고친때']).slice(0,10))) : '') + '</div></div>'
-      + '<span class="mbtns"><button data-act="ppedit" data-i="' + esc(y.id) + '">고치기</button>'
+      + '<span class="mbtns"><button data-act="ppedit" data-i="' + esc(y.id) + '">수정</button>'
       + '<button data-act="ppdel" data-i="' + esc(y.id) + '">지우기</button></span>'
       + '</div></div>'; }).join('');
 
@@ -2472,7 +2472,7 @@ function 사유판그리기(){
         + '<div class="t2" style="margin-top:3px;white-space:pre-wrap">' + esc(r.reason||'') + '</div>'
         + '</div>'
         + (사유고칠수있나(r)
-            ? '<span class="mbtns"><button data-act="dnedit" data-i="' + esc(r.id) + '" title="고치기">고치기</button>'
+            ? '<span class="mbtns"><button data-act="dnedit" data-i="' + esc(r.id) + '" title="수정">수정</button>'
               + '<button data-act="dndel" data-i="' + esc(r.id) + '" title="지우기">지우기</button></span>'
             : '') + '</div></div>'; }).join('')
     : '<div class="empty">아직 적은 사유가 없어요</div>';
@@ -3915,12 +3915,12 @@ function vCmAll(){
       + (c.read_at?'':'new') + '">'
       + '<div class="who2">' + esc(memOf(c.member_id).name) + ' · '
       + dateFull((c.created_at||'').slice(0,10)) + (c.read_at?'':' · 회원이 아직 안 봤어요')
-      + '<button class="del" data-act="cmedit" data-c="' + esc(c.id) + '">고치기</button></div>'
+      + '<button class="del" data-act="cmedit" data-c="' + esc(c.id) + '">수정</button></div>'
       + '<div class="ex">' + esc(vaName(c.variant_id)) + '</div>'
       + (S.cmEdit === c.id
         ? '<textarea class="inp cmta" id="cmedit_' + esc(c.id) + '">' + esc(c.body||'') + '</textarea>'
           + '<div class="cmacts">'
-          + '<button class="btn gold sm" data-act="cmfix" data-c="' + esc(c.id) + '">고치기</button>'
+          + '<button class="btn gold sm" data-act="cmfix" data-c="' + esc(c.id) + '">수정</button>'
           + '<button class="btn ghost sm wn" data-act="cmdel" data-c="' + esc(c.id) + '">지우기</button>'
           + '<button class="btn ghost sm" data-act="cmeditx">취소</button></div>'
         : '<div class="tx">' + esc(c.body||'') + '</div>') + '</div>').join('') + '</div>'
@@ -9003,7 +9003,7 @@ document.addEventListener('click', async function(ev){
       + '<br>회원 앱에도 바로 바뀐 글이 보입니다</div>'
       + '<div class="qbox">' + esc(새글) + '</div>'
       + '<div class="qbtns"><button class="btn ghost" data-act="popclose">아니요</button>'
-      + '<button class="btn gold" data-act="cmfixok" data-c="' + esc(cid) + '">고치기</button></div></div>');
+      + '<button class="btn gold" data-act="cmfixok" data-c="' + esc(cid) + '">수정</button></div></div>');
     return; }
   if(a==='cmfixok'){
     const cid = act.dataset.c, 새글 = S.cmTmp || '';
