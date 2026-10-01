@@ -1559,7 +1559,8 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
 .cyc{display:flex;gap:3px;height:34px;border-radius:9px;overflow:hidden}
 .cyc div{flex:1;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#6f6a63;background:var(--dark-3)}
 .cyc div.p{background:#2a1d1a;color:var(--warn)}
-.cyc div.g{background:var(--gold-dim);color:var(--gold)}
+.cyc div.f{background:var(--gold-dim);color:var(--gold)}
+.cyc div.o{background:#2d2440;color:#b9a3e8}                 /* 배란기 — 따로 보이게 */
 .cyc div.l{background:var(--teal-dim);color:var(--teal)}
 .cyc div.now{outline:2px solid var(--gold);outline-offset:-2px}
 .cyclbl{display:flex;gap:3px}
@@ -1944,7 +1945,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '222';
+const BUILD = '224';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -5189,6 +5190,23 @@ function sheetDayCal(){
       <button class="btn ghost sm" data-act="dcalp:${TODAY}">오늘로</button>`;
   });
 }
+/* 생리 시작일을 **달력에서** 고른다 (2026-10-01 대표).
+   ● 은 지난 시작일과 다음 예정일. 앞날은 고를 수 없다. */
+function sheetCycCal(mid){
+  openSheet(()=>{
+    const c=cycOf(mid)||{}, t=c.on?cycToday(c):null;
+    const sel=c.last||TODAY;
+    const { y, m, cells } = 달칸(S.cycMon || sel.slice(0,7), sel,
+      ds => ds===c.last || (t && ds===t.다음), 'cycpick:'+mid);
+    return `<div class="h2">생리 시작일 고르기 <small>시작한 날을 눌러 주세요</small></div>
+      <div class="wkhd"><button data-act="cycmon:-1">‹</button>
+        <span class="d">${y}년 ${m}월</span>
+        <button data-act="cycmon:1">›</button></div>
+      <div class="cal2">${cells}</div>
+      <div class="note">고르신 날부터 다시 셉니다. 지난번 시작일과의 사이가
+        <b>21~40일</b>이면 주기 길이도 그에 맞춰 조금씩 따라갑니다.</div>`;
+  });
+}
 function sheetDietCal(){
   openSheet(()=>{
     const sel = S.dietDay || TODAY;
@@ -6541,23 +6559,63 @@ function svCycle(mid){
     cyc_len:c.len, period_len:c.period, updated_at:new Date().toISOString() }], {on:'member_id'}), '생리주기 저장');
 }
 function cycOf(mid){ return (D.cycle&&D.cycle[mid]) || null; }
+/* 시작일을 새로 잡는다.
+   ⭐ 지난 시작일과의 사이가 **21~40일**이면 그것을 이번 달 주기로 보고
+      기존 길이와 **반씩 섞어** 따라간다 — 한 달 들쭉날쭉에 확 흔들리지 않게.
+      (2026-10-01 대표 「빨리 시작했다면 … 그 시점에 맞춰 주기가 다시 바뀌기도 하는」) */
+function 주기시작(mid, 날){
+  D.cycle = D.cycle || {};
+  const c = D.cycle[mid] || (D.cycle[mid] = { on:true, len:28, period:5 });
+  const 앞 = c.last;
+  c.last = 날; c.on = true;
+  let 말 = dateTxt(날) + ' 로 기록했어요';
+  if(앞 && 앞 < 날){
+    const 사이 = Math.round((new Date(날+'T00:00:00') - new Date(앞+'T00:00:00')) / 86400000);
+    if(사이 >= 21 && 사이 <= 40){
+      const 새 = Math.round((c.len + 사이) / 2);
+      if(새 !== c.len){ 말 += ' · 주기를 ' + c.len + '일 → ' + 새 + '일로 맞췄어요'; c.len = 새; }
+    }
+  }
+  svCycle(mid); toast(말); render();
+}
+/* 주기를 네 토막으로 나눈다 — **배란은 「다음 생리 14일 전」** 이라
+   주기가 길어지면 난포기가 늘고 황체기는 14일 그대로다 (2026-10-01 대표 「4단계로 … 찾아보고」).
+   ⛔ 주기가 짧으면 토막이 뒤집힌다 — 겹치지 않게 눌러 맞춘다. */
+function cycSeg(c){
+  const ovul = Math.max(c.period + 2, c.len - 14);       /* 배란일 */
+  const 배란시작 = Math.max(c.period + 1, ovul - 1);
+  const 배란끝   = Math.min(c.len, ovul + 1);
+  const 난포끝   = 배란시작 - 1;
+  return [
+    ['월경기', 1, Math.min(c.period, c.len), 'p'],
+    ['난포기', c.period + 1, 난포끝, 'f'],
+    ['배란기', 배란시작, 배란끝, 'o'],
+    ['황체기', 배란끝 + 1, c.len, 'l'],
+  ].filter(x => x[2] >= x[1]);
+}
 function cycToday(c){
   if(!c||!c.on) return null;
-  const base=new Date(c.last+'T00:00:00'), now=new Date('2026-08-28T00:00:00');
+  /* ⛔ 2026-10-01 — 여기에 `new Date('2026-08-28')` 이 박혀 있었다.
+     날짜가 그날에 멈춰, 오늘이 며칠이든 같은 일차가 나왔다. **오늘을 쓴다.** */
+  const base=new Date(c.last+'T00:00:00'), now=new Date(TODAY+'T00:00:00');
   const diff=Math.floor((now-base)/86400000);
   const day=((diff % c.len)+c.len)%c.len + 1;
-  const ovul=c.len-14;
-  let ph, why;
-  if(day<=c.period){ ph='생리기'; why='가볍게 · 컨디션 우선'; }
-  else if(day<=ovul+1){ ph='황금기'; why='힘이 가장 잘 나는 때 · 증량하기 좋아요'; }
-  else { ph='황체기'; why='붓고 무거운 때 · 무게보다 횟수로'; }
+  const seg=cycSeg(c);
+  const 지금=seg.find(x=>day>=x[1]&&day<=x[2]) || seg[seg.length-1];
+  const ph=지금[0];
+  const why={ '월경기':'가볍게 · 컨디션 우선',
+              '난포기':'힘이 붙는 때 · 증량하기 좋아요',
+              '배란기':'힘은 가장 좋지만 인대가 느슨해지는 때',
+              '황체기':'붓고 무거운 때 · 무게보다 횟수로' }[ph];
   const left=c.len-day+1;
-  return {day, ph, why, left, ovul};
+  /* 다음 생리 예정일 — 달력에 ● 로 찍는다 */
+  const 다음=new Date(base); 다음.setDate(다음.getDate()+Math.ceil((diff+1)/c.len)*c.len);
+  return {day, ph, why, left, ovul:c.len-14, 다음: ymd(다음)};
 }
 function cycBar(c){
   const t=cycToday(c); if(!t) return '';
   let cells='', labels='';
-  const seg=[['생리기',1,c.period,'p'],['황금기',c.period+1,t.ovul+1,'g'],['황체기',t.ovul+2,c.len,'l']];
+  const seg=cycSeg(c);
   seg.forEach(([nm,a,b,cls])=>{
     const w=b-a+1, now=(t.day>=a&&t.day<=b);
     cells+=`<div class="${cls}${now?' now':''}" style="flex:${w}">${nm}</div>`;
@@ -6566,9 +6624,10 @@ function cycBar(c){
   return `<div class="cyc">${cells}</div><div class="cyclbl">${labels}</div>`;
 }
 const CYC_TIP = {
-  '생리기':['가벼운 유산소와 스트레칭 위주로','무게는 평소의 60~70%로 낮춰서','아프면 그날은 쉬어도 괜찮아요'],
-  '황금기':['증량하기 제일 좋은 때예요','고중량·복합운동을 이 시기에 몰아 주세요','새 기록 노려볼 만합니다'],
-  '황체기':['무게보다 횟수로 채우는 편이 편해요','붓기 때문에 몸무게가 늘어 보일 수 있어요 — 정상입니다','수분·염분만 조금 신경 써 주세요'],
+  '월경기':['가벼운 유산소와 스트레칭 위주로','무게는 평소의 60~70%로 낮춰서','아프면 그날은 쉬어도 괜찮아요'],
+  '난포기':['증량하기 제일 좋은 때예요','고중량·복합운동을 이 시기에 몰아 주세요','새 기록 노려볼 만합니다'],
+  '배란기':['힘은 가장 잘 나는 때예요','다만 인대가 느슨해져 삐끗하기 쉬워요','무릎·발목 쓰는 동작은 자세를 먼저 챙겨 주세요'],
+  '황체기':['무게보다 횟수로 채우는 편이 편해요','붓기 때문에 몸무게가 늘어 보일 수 있어요 — 괜찮아요','수분·염분만 조금 신경 써 주세요'],
 };
 
 /* ── 상담일지 · 운동계획 편집 서식 ── */
@@ -7916,10 +7975,14 @@ function vCycle(){
     ${!tr?`<div class="hr"></div><span class="lbl">내 주기</span>
       <div class="card"><div class="frow"><span class="fk">최근 시작일</span><span class="fv">${esc(c.last)}</span></div>
         <div class="frow"><span class="fk">주기</span><span class="fv">${c.len}일</span></div>
-        <div class="frow"><span class="fk">생리 기간</span><span class="fv">${c.period}일</span></div></div>
-      <div style="display:flex;gap:9px">
-        <button class="btn sub sm" data-act="cycstart:${mid}">오늘 시작했어요</button>
+        <div class="frow"><span class="fk">생리 기간</span><span class="fv">${c.period}일</span></div>
+        <div class="frow"><span class="fk">다음 예정</span><span class="fv">${esc(dateTxt(t.다음))}</span></div></div>
+      <div style="display:flex;gap:9px;flex-wrap:wrap">
+        <button class="btn main sm" data-act="cycstart:${mid}">오늘 시작했어요</button>
+        <button class="btn sub sm" data-act="cyccal:${mid}">달력에서 고르기</button>
         <button class="btn ghost sm" data-act="cycoff:${mid}">주기 끄기</button></div>
+      <div class="note">생각보다 <b>빨리 시작하셨으면 그 날짜를 골라 주세요.</b>
+        고르신 날에 맞춰 주기를 다시 잡아 드립니다.</div>
       <div class="note">회원님만 고칠 수 있습니다. 트레이너는 <b>오늘 어느 시기인지만</b> 봅니다 — 날짜는 안 보입니다.</div>`
     :`<div class="note">회원님이 켜 둬서 보입니다. <b>시기만</b> 보이고 날짜는 보이지 않습니다. 루틴을 지정할 때 참고하세요.</div>`}` };
 }
@@ -9355,9 +9418,16 @@ document.addEventListener('click', async ev=>{
     case 'cycoff': { const mid=rest[0];
       if(D.cycle&&D.cycle[mid]) D.cycle[mid].on=false;
       svCycle(mid); toast('껐어요 — 트레이너에게도 안 보여요'); render(); return; }
-    case 'cycstart': { const mid=rest[0]; D.cycle=D.cycle||{};
-      const c=D.cycle[mid]||(D.cycle[mid]={on:true,len:28,period:5});
-      c.last=TODAY; c.on=true; svCycle(mid); toast('오늘로 기록했어요'); render(); return; }
+    case 'cycstart': { 주기시작(rest[0], TODAY); return; }
+    case 'cyccal':   { sheetCycCal(rest[0]); return; }
+    /* ⛔ `openSheet()` 를 빈 채로 부르면 **시트가 꺼진다** (sheetRender 가 지워진다).
+       다시 그릴 때는 `drawSheet()` 다 — dmon 손잡이와 같은 꼴로 맞췄다 (2026-10-01). */
+    case 'cycmon':   { const b=(S.cycMon||(cycOf(subj())||{}).last||TODAY).slice(0,7);
+      const d=new Date(+b.slice(0,4), +b.slice(5,7)-1 + Number(rest[0]), 1);
+      S.cycMon=ymd(d).slice(0,7); drawSheet(); return; }
+    case 'cycpick':  { const mid=rest[0], 날=rest[1];
+      if(날 > TODAY){ toast('앞날은 고를 수 없어요'); return; }
+      closeSheet(); 주기시작(mid, 날); return; }
     case 'qa': go('qa'); return;
     case 'fbp': S.fbPart=rest[0]; render(); return;
     case 'newvar': sheetNewVar(rest[0]); return;
