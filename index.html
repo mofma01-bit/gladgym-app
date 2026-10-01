@@ -1950,7 +1950,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '226';
+const BUILD = '227';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -6891,7 +6891,7 @@ function calcBrief(g, ed){
   const c = g.calc || {};
   const kg = v => (Math.round(v*100)/100).toFixed(1);
   return `<div class="calc" style="gap:12px">
-    <div class="crow" style="border:none;padding:0"><span class="ck" style="font-size:14px;font-weight:700;color:var(--cream)">이렇게 잡았어요</span></div>
+    <div class="crow" style="border:none;padding:0"><span class="ck" style="font-size:14px;font-weight:700;color:var(--cream)">이렇게 계획했어요</span></div>
     <div class="krow"><span class="k">① 하루에 쓰는 양</span><span class="v">${r.total.toLocaleString()} kcal</span></div>
     <div class="krow"><span class="k">② 이만큼 드시면</span>${ed
       ? `<span class="kedit">
@@ -7102,7 +7102,7 @@ function vPlan(){
     <span class="lbl">나의 운동 목적</span>
     <div class="chips">${['다이어트','근육증가','교정운동','건강','그 밖에'].map(x=>
       `<button class="chip ${(g.purpose||[]).includes(x)?'on':''}" ${tr?`data-act="editplan:${mid}"`:''}>${x}</button>`).join('')}</div>
-    <span class="lbl">목표 — 지금에서 언제까지</span>
+    <span class="lbl">목표 설정</span>
     <div class="card">
       <div class="sm">${esc(g.now.date||'—')} → ${esc(g.to.date||'—')}${
         (()=>{ const n=dLeft(g.to.date); return n!=null&&n>=0?` · ${n}일 남음`:''; })()}</div>
