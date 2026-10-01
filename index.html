@@ -640,6 +640,9 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .b3nav{position:absolute;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;
   background:rgba(0,0,0,.45);color:var(--cream,#eee);font-size:20px;line-height:34px;text-align:center}
 .b3nav.l{left:-6px}.b3nav.r{right:-6px}
+/* 모바일(손가락)에서는 버튼 없이 끌어서만 돌린다 (2026-10-01 대표) */
+@media (hover:none),(pointer:coarse){.b3nav{display:none}}
+.b3{cursor:grab}.b3:active{cursor:grabbing}
 .b3cap{position:absolute;left:50%;bottom:6px;transform:translateX(-50%);font-size:11px;font-weight:700;
   color:#c9c2b9;background:rgba(0,0,0,.45);padding:2px 9px;border-radius:9px}
 .b3cred{text-align:center;font-size:10px;color:#75706a;margin:6px 0 2px}
@@ -1958,7 +1961,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '235';
+const BUILD = '236';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2787,8 +2790,11 @@ const 등급 = 주당 => 등급표.find(g => 주당 >= g.최소) || 등급표[�
 /* ── 2.5D 해부 모델 그리기 ── (2026-10-01)
    img/body3/<성>/몸_<각>.webp = 회색 음영 몸 · 부위_<각>.png = 부위마다 단색 ID맵.
    ID맵 픽셀 색으로 부위를 알아내, 그 부위의 세기만큼 색을 얹는다 → **근육 모양 그대로** 칠해진다.
-   각도는 8개(45°씩). 그림은 각도마다 그때 받고(≈34KB) 한 번 받은 건 기억해 둔다. */
-const 몸3각 = ['앞','앞우','우','뒤우','뒤','뒤좌','좌','앞좌'];
+   각도는 24개(15°씩 · 파일 이름 = 도수 000~345). 그림은 각도마다 그때 받고 한 번 받은 건 기억해 둔다.
+   (2026-10-01 8장 → 24장: 45°씩은 끊겨 보였다) */
+const 몸3각 = Array.from({length:24}, (_, i) => String(i * 15).padStart(3, '0'));
+const 몸3N = 몸3각.length;
+const 몸3이름 = a => ['앞','앞우','우','뒤우','뒤','뒤좌','좌','앞좌'][Math.round(a * 360 / 몸3N / 45) % 8];
 const 몸3ID = { 가슴:[255,0,0], 어깨:[0,255,0], 등:[0,0,255], 팔:[255,255,0], 복근:[255,0,255], 하체:[0,255,255] };
 const 몸3저장 = {};                                   /* '남/앞' → {몸:Image, 부위:ImageData} */
 function 몸3받기(성, 각){
@@ -2809,9 +2815,9 @@ async function 몸3그리기(id){
   let box = null;
   for(let t = 0; t < 8 && !(box = document.getElementById(id)); t++) await new Promise(z => setTimeout(z, 120));
   if(!box) return;
-  const 성 = box.dataset.sex || '남', a = ((+box.dataset.a || 0) % 8 + 8) % 8, 각 = 몸3각[a];
+  const 성 = box.dataset.sex || '남', a = ((+box.dataset.a || 0) % 몸3N + 몸3N) % 몸3N, 각 = 몸3각[a];
   const p = JSON.parse(box.dataset.p || '{}');
-  const cap = box.querySelector('.b3cap'); if(cap) cap.textContent = 각;
+  const cap = box.querySelector('.b3cap'); if(cap) cap.textContent = 몸3이름(a);
   const r = await 몸3받기(성, 각); if(!r) return;
   box = document.getElementById(id) || box;                    /* 받는 사이 다시 그려졌으면 새 상자에 */
   const cv = box.querySelector('canvas'); if(!cv) return;
@@ -2831,16 +2837,16 @@ async function 몸3그리기(id){
   const ov = document.createElement('canvas'); ov.width = W; ov.height = H; ov.getContext('2d').putImageData(덮, 0, 0);
   x.drawImage(ov, 0, 0);
   /* 이웃 각도는 미리 받아 둔다 — 쓸었을 때 바로 돈다 */
-  몸3받기(성, 몸3각[(a + 1) % 8]); 몸3받기(성, 몸3각[(a + 7) % 8]);
+  for(const k of [1, -1, 2, -2]) 몸3받기(성, 몸3각[(a + k + 몸3N) % 몸3N]);
 }
-/* 좌우로 쓸어 돌리기 */
+/* 좌우로 끌어 돌리기 — 손가락(터치)·마우스 같이. 14px 끌면 15° (그림 폭만큼 끌면 한 바퀴) */
 let 몸3끌 = null;
 document.addEventListener('pointerdown', ev => { const b = ev.target.closest && ev.target.closest('.b3'); if(!b || ev.target.closest('.b3nav')) return;
   몸3끌 = { id: b.id, x: ev.clientX, a: +b.dataset.a || 0, 움직임: 0 }; });
 document.addEventListener('pointermove', ev => { if(!몸3끌) return;
-  const d = ev.clientX - 몸3끌.x, 칸 = Math.round(d / 48);
+  const d = ev.clientX - 몸3끌.x, 칸 = Math.round(d / 14);
   if(칸 !== 몸3끌.움직임){ 몸3끌.움직임 = 칸; const b = document.getElementById(몸3끌.id); if(!b) return;
-    b.dataset.a = String(((몸3끌.a - 칸) % 8 + 8) % 8); 몸3그리기(b.id); } });
+    b.dataset.a = String(((몸3끌.a - 칸) % 몸3N + 몸3N) % 몸3N); 몸3그리기(b.id); } });
 document.addEventListener('pointerup', () => { 몸3끌 = null; });
 document.addEventListener('pointercancel', () => { 몸3끌 = null; });
 
@@ -2880,7 +2886,7 @@ function bodyMap(o, 주수, sex){
       <button class="b3nav r" data-act="b3:${b3id}:1" title="오른쪽으로 돌리기">›</button>
       <span class="b3cap">앞</span>
     </div>
-    <div class="b3cred">좌우로 쓸어 돌려 보세요 · 근육 모델 Z-Anatomy · BodyParts3D (CC BY-SA 4.0)</div>
+    <div class="b3cred">좌우로 끌어 돌려 보세요 · 근육 모델 Z-Anatomy · BodyParts3D (CC BY-SA 4.0) · 머리·손·발 MHR (Apache-2.0)</div>
     <div class="bchips">${칩}</div>
   </div>`;
 }
@@ -8775,7 +8781,7 @@ document.addEventListener('click', async ev=>{
   switch(k){
     case 'kakao': toast('실제 연동은 다음 단계예요'); return;
     case 'b3': { const b = document.getElementById(rest[0]); if(!b) return;
-      b.dataset.a = String((((+b.dataset.a || 0) + Number(rest[1])) % 8 + 8) % 8); 몸3그리기(b.id); return; }
+      b.dataset.a = String((((+b.dataset.a || 0) + Number(rest[1]) * 2) % 몸3N + 몸3N) % 몸3N); 몸3그리기(b.id); return; }
     case 'retry': S.screen='boot'; render(); start(); return;
     case 'switch': S.stack=[]; S.who=null; go('login'); return;
     case 'back': goBack(); return;
