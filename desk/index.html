@@ -1377,7 +1377,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '171';
+const BUILD = '172';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -6754,7 +6754,10 @@ function 옮김판(단, 자리, k){
     + '<button class="x" data-act="tx:hmclose">닫기</button></div>';
 }
 
-function 블록옮기기(B, 단, 자리, 할것){
+/* ⛔ 2026-10-01 — 이 함수 이름이 페이지 블록용 `블록옮기기(부터, 까지, 아래)` 와 **겹쳤다.**
+   JS 는 나중 선언이 이기므로, 페이지에서 블록을 끌어 옮기면 **이 홈 배치용이 불려** 조용히 안 먹었다.
+   홈 배치용은 이름을 갈랐다. (같은 이름 두 번 선언은 `앱배포.py` 관문 `중복정의점검` 이 막는다) */
+function 홈블록옮기기(B, 단, 자리, 할것){
   const 목 = B[단]; if(!목 || 목[자리] == null) return B;
   const k = 목[자리];
   /* 못박힌 블록은 단을 못 바꾼다 — 판에서도 막지만, 여기서 한 번 더 막는다 */
@@ -7752,7 +7755,7 @@ async function txAct(a, el){
   if(['hmup','hmdown','hmswap','hmtop'].indexOf(a) >= 0){
     const [단, 자리] = String(v2).split('.');
     S.hmOpen = null;
-    배치저장(블록옮기기(배치읽기(), 단, +자리, a.slice(2)));
+    배치저장(홈블록옮기기(배치읽기(), 단, +자리, a.slice(2)));
     return; }
   /* ② 사진 비율만 따로 — 누르면 바로 저장하고 다시 그린다 */
   if(a==='ratio'){
