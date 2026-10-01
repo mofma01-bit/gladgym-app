@@ -1958,7 +1958,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '234';
+const BUILD = '235';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2795,7 +2795,8 @@ function 몸3받기(성, 각){
   const k = 성 + '/' + 각;
   if(몸3저장[k]) return 몸3저장[k];
   const 하나 = src => new Promise(ok => { const im = new Image(); im.onload = () => ok(im); im.onerror = () => ok(null); im.src = src; });
-  return 몸3저장[k] = Promise.all([하나(`img/body3/${성}/몸_${각}.webp`), 하나(`img/body3/${성}/부위_${각}.png`)])
+  /* 그림 파일 이름은 같고 내용만 바뀐다 — BUILD 를 붙여 옛 그림이 캐시에 남지 않게 (2026-10-01 모델 교체) */
+  return 몸3저장[k] = Promise.all([하나(`img/body3/${성}/몸_${각}.webp?b=${BUILD}`), 하나(`img/body3/${성}/부위_${각}.png?b=${BUILD}`)])
     .then(([몸, 부]) => { if(!몸 || !부) return null;
       const c = document.createElement('canvas'); c.width = 부.naturalWidth; c.height = 부.naturalHeight;
       const x = c.getContext('2d', { willReadFrequently:true }); x.drawImage(부, 0, 0);
