@@ -1377,7 +1377,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '169';
+const BUILD = '170';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -1806,7 +1806,7 @@ const S = { view:'home', who:'전체', q:'', mid:null, rid:null, tab:'routine',
 const canEdit = k => !!S.edit[k] && !(k === 'body' && typeof 건강동의함 === 'function' && !건강동의함(S.mid));
 const dis = k => canEdit(k) ? '' : ' disabled';
 const editBtn = k => '<button class="editbtn ' + (canEdit(k)?'on':'') + '" data-edit="' + k + '">'
-  + (canEdit(k) ? '고치기 끝' : '고치기') + '</button>';
+  + (canEdit(k) ? '수정 완료' : '수정') + '</button>';
 let toastT = null;
 let 되돌리기함 = null;
 function toast(msg, 되돌리기){                 /* 되돌리기를 주면 알림에 「되돌리기」가 붙는다 */
@@ -4204,7 +4204,7 @@ function vTrash(){
     + '<div class="sumit"><span class="k2">휴지통에 있는 것</span><span class="v2">' + 휴지통.length + '</span></div>'
     + '<div class="sumit warn"><span class="k2">7일 안에 사라짐</span><span class="v2">'
       + 휴지통.filter(t => 남은날(t) <= 7).length + '</span></div>'
-    + '<div class="sumit gold"><span class="k2">' + 휴지통일수 + '일 뒤 저절로 지워짐</span>'
+    + '<div class="sumit gold"><span class="k2">' + 휴지통일수 + '일 뒤 자동 삭제</span>'
       + '<span class="v2">켜짐</span></div>'
     + '</div>';
 
@@ -4576,7 +4576,7 @@ const 시스템열 = key => [
 ].concat(표정의[key].열.some(c => c.k === 'done')
       ? [{ k:'done_at', 이름:'완료일',      타입:'datetime', 시스템:true }] : [])
  .concat([
-  { k:'updated_at', 이름:'마지막 고친 때',  타입:'datetime', 시스템:true },
+  { k:'updated_at', 이름:'최종 편집 일시',  타입:'datetime', 시스템:true },
   { k:'created_by', 이름:'만든 사람',       타입:'person',   시스템:true },
 ]);
 const 열들 = key => 기본열(key).concat(늘림열(key)).concat(시스템열(key));
