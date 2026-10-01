@@ -635,6 +635,14 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .bwrap{display:flex;flex-direction:column;gap:13px;align-items:center;width:100%}
 /* 앞·뒤 키를 같게 — 그림 폭 비(267:342)를 flex 로 준다 */
 .bpair{display:flex;gap:8px;justify-content:center;align-items:flex-end;width:100%}
+.b3{position:relative;width:min(100%,236px);margin:0 auto;touch-action:pan-y;user-select:none}
+.b3 canvas{display:block;width:100%;height:auto}
+.b3nav{position:absolute;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;
+  background:rgba(0,0,0,.45);color:var(--cream,#eee);font-size:20px;line-height:34px;text-align:center}
+.b3nav.l{left:-6px}.b3nav.r{right:-6px}
+.b3cap{position:absolute;left:50%;bottom:6px;transform:translateX(-50%);font-size:11px;font-weight:700;
+  color:#c9c2b9;background:rgba(0,0,0,.45);padding:2px 9px;border-radius:9px}
+.b3cred{text-align:center;font-size:10px;color:#75706a;margin:6px 0 2px}
 .bfig{position:relative;min-width:0}
 .bfig.fr{flex:0 1 267px}
 .bfig.bk{flex:0 1 342px}
@@ -1950,7 +1958,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '231';
+const BUILD = '234';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2776,7 +2784,66 @@ const 등급표 = [
 ];
 const 등급 = 주당 => 등급표.find(g => 주당 >= g.최소) || 등급표[등급표.length-1];
 
-function bodyMap(o, 주수){
+/* ── 2.5D 해부 모델 그리기 ── (2026-10-01)
+   img/body3/<성>/몸_<각>.webp = 회색 음영 몸 · 부위_<각>.png = 부위마다 단색 ID맵.
+   ID맵 픽셀 색으로 부위를 알아내, 그 부위의 세기만큼 색을 얹는다 → **근육 모양 그대로** 칠해진다.
+   각도는 8개(45°씩). 그림은 각도마다 그때 받고(≈34KB) 한 번 받은 건 기억해 둔다. */
+const 몸3각 = ['앞','앞우','우','뒤우','뒤','뒤좌','좌','앞좌'];
+const 몸3ID = { 가슴:[255,0,0], 어깨:[0,255,0], 등:[0,0,255], 팔:[255,255,0], 복근:[255,0,255], 하체:[0,255,255] };
+const 몸3저장 = {};                                   /* '남/앞' → {몸:Image, 부위:ImageData} */
+function 몸3받기(성, 각){
+  const k = 성 + '/' + 각;
+  if(몸3저장[k]) return 몸3저장[k];
+  const 하나 = src => new Promise(ok => { const im = new Image(); im.onload = () => ok(im); im.onerror = () => ok(null); im.src = src; });
+  return 몸3저장[k] = Promise.all([하나(`img/body3/${성}/몸_${각}.webp`), 하나(`img/body3/${성}/부위_${각}.png`)])
+    .then(([몸, 부]) => { if(!몸 || !부) return null;
+      const c = document.createElement('canvas'); c.width = 부.naturalWidth; c.height = 부.naturalHeight;
+      const x = c.getContext('2d', { willReadFrequently:true }); x.drawImage(부, 0, 0);
+      return { 몸, 부위: x.getImageData(0, 0, c.width, c.height) }; });
+}
+const 몸3색 = h => [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)];
+async function 몸3그리기(id){
+  /* 리포트는 발송 상태를 받은 뒤 **한 번 더 그려진다** — 그 사이 상자가 바뀌면 옛 것에 그리게 된다.
+     그래서 상자를 그리기 직전에 다시 찾고, 아직 없으면 잠깐 기다렸다 다시 본다 (2026-10-01 실측). */
+  let box = null;
+  for(let t = 0; t < 8 && !(box = document.getElementById(id)); t++) await new Promise(z => setTimeout(z, 120));
+  if(!box) return;
+  const 성 = box.dataset.sex || '남', a = ((+box.dataset.a || 0) % 8 + 8) % 8, 각 = 몸3각[a];
+  const p = JSON.parse(box.dataset.p || '{}');
+  const cap = box.querySelector('.b3cap'); if(cap) cap.textContent = 각;
+  const r = await 몸3받기(성, 각); if(!r) return;
+  box = document.getElementById(id) || box;                    /* 받는 사이 다시 그려졌으면 새 상자에 */
+  const cv = box.querySelector('canvas'); if(!cv) return;
+  if(box.dataset.a !== String(a)) return;                      /* 그 사이 다른 각도로 넘어갔으면 버린다 */
+  const W = r.부위.width, H = r.부위.height; cv.width = W; cv.height = H;
+  const x = cv.getContext('2d'); x.clearRect(0, 0, W, H); x.drawImage(r.몸, 0, 0, W, H);
+  /* 부위 → 색·세기 를 미리 풀어 둔다 */
+  const 표 = Object.entries(몸3ID).map(([k, c]) => ({ c, 세기: (p.세기||{})[k] || 0, 색: 몸3색((p.색||{})[k] || '#000') }));
+  const 덮 = x.createImageData(W, H), d = r.부위.data, e = 덮.data;
+  for(let i = 0; i < d.length; i += 4){
+    if(d[i+3] < 128) continue;
+    let 맞 = null;
+    for(const t of 표){ if(Math.abs(d[i]-t.c[0]) < 40 && Math.abs(d[i+1]-t.c[1]) < 40 && Math.abs(d[i+2]-t.c[2]) < 40){ 맞 = t; break; } }
+    if(!맞 || !맞.세기) continue;
+    e[i] = 맞.색[0]; e[i+1] = 맞.색[1]; e[i+2] = 맞.색[2]; e[i+3] = Math.round(255 * Math.min(0.85, 맞.세기));
+  }
+  const ov = document.createElement('canvas'); ov.width = W; ov.height = H; ov.getContext('2d').putImageData(덮, 0, 0);
+  x.drawImage(ov, 0, 0);
+  /* 이웃 각도는 미리 받아 둔다 — 쓸었을 때 바로 돈다 */
+  몸3받기(성, 몸3각[(a + 1) % 8]); 몸3받기(성, 몸3각[(a + 7) % 8]);
+}
+/* 좌우로 쓸어 돌리기 */
+let 몸3끌 = null;
+document.addEventListener('pointerdown', ev => { const b = ev.target.closest && ev.target.closest('.b3'); if(!b || ev.target.closest('.b3nav')) return;
+  몸3끌 = { id: b.id, x: ev.clientX, a: +b.dataset.a || 0, 움직임: 0 }; });
+document.addEventListener('pointermove', ev => { if(!몸3끌) return;
+  const d = ev.clientX - 몸3끌.x, 칸 = Math.round(d / 48);
+  if(칸 !== 몸3끌.움직임){ 몸3끌.움직임 = 칸; const b = document.getElementById(몸3끌.id); if(!b) return;
+    b.dataset.a = String(((몸3끌.a - 칸) % 8 + 8) % 8); 몸3그리기(b.id); } });
+document.addEventListener('pointerup', () => { 몸3끌 = null; });
+document.addEventListener('pointercancel', () => { 몸3끌 = null; });
+
+function bodyMap(o, 주수, sex){
   const W = Math.max(1, 주수 || 1);
   const 주당 = k => (o[k] || 0) / W;
   const 색 = k => 등급(주당(k)).색;
@@ -2787,12 +2854,14 @@ function bodyMap(o, 주수){
     const 위 = 등급표[등급표.indexOf(g) - 1];
     const 폭 = (위 ? 위.최소 : g.최소 * 2) - g.최소;
     return 0.42 + 0.38 * Math.min(1, 폭 > 0 ? (v - g.최소) / 폭 : 1); };
-  const 덮개 = (면, 넓이, 그림) => `<svg class="bhit" viewBox="0 0 ${넓이} 560" aria-hidden="true"
-      style="--m:url(img/${그림})">`
-    + Object.entries(몸자리[면]).map(([k, rs]) => { const a = 세기(k);
-        return a ? rs.map(r => `<rect x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}"
-          fill="${몸칠(k)}" opacity="${a.toFixed(3)}"/>`).join('') : ''; }).join('')
-    + `</svg>`;
+  /* 2.5D 해부 모델 — 부위별 세기와 색을 캔버스에 넘긴다 (2026-10-01). 그리는 건 몸3그리기() */
+  const 몸3 = { 세기:{}, 색:{} };
+  PARTS8.forEach(k => { 몸3.세기[k] = 세기(k); 몸3.색[k] = 몸칠(k); });
+  const 성 = (sex === '여') ? '여' : '남';
+  const b3id = 'b3_' + Math.random().toString(36).slice(2, 8);
+  /* ⛔ requestAnimationFrame 은 **탭이 가려져 있으면 안 돈다** — 백그라운드에서 열면 그림이 안 그려졌다 (2026-10-01 실측).
+     setTimeout 은 가려져도 돈다. 상자가 아직 없으면 몸3그리기 안에서 잠깐 기다렸다 다시 찾는다. */
+  setTimeout(() => 몸3그리기(b3id), 0);
 
   const 칩 = PARTS8.map(k => { const g = 등급(주당(k));
     return `<span class="bchip ${o[k]?'on':''}">
@@ -2804,14 +2873,13 @@ function bodyMap(o, 주수){
 
   return `<div class="bwrap">
     <div class="blegend">주당 평균 세트 ${범례}</div>
-    <div class="bpair">
-      <div class="bfig fr">
-        <img src="img/body-front.webp" alt="앞모습" width="267" height="560">
-        ${덮개('앞', 267, 'body-front.webp')}<span class="bcap">앞</span></div>
-      <div class="bfig bk">
-        <img src="img/body-back.webp" alt="뒷모습" width="342" height="560">
-        ${덮개('뒤', 342, 'body-back.webp')}<span class="bcap">뒤</span></div>
+    <div class="b3" id="${b3id}" data-sex="${성}" data-a="0" data-p='${esc(JSON.stringify(몸3))}'>
+      <button class="b3nav l" data-act="b3:${b3id}:-1" title="왼쪽으로 돌리기">‹</button>
+      <canvas class="b3c" width="275" height="640" aria-label="부위별 운동량을 칠한 몸 그림"></canvas>
+      <button class="b3nav r" data-act="b3:${b3id}:1" title="오른쪽으로 돌리기">›</button>
+      <span class="b3cap">앞</span>
     </div>
+    <div class="b3cred">좌우로 쓸어 돌려 보세요 · 근육 모델 Z-Anatomy · BodyParts3D (CC BY-SA 4.0)</div>
     <div class="bchips">${칩}</div>
   </div>`;
 }
@@ -4883,7 +4951,7 @@ function vReport(){
       <div class="gbox">${lineChart(점들, 'kg')}</div>` : ''}
 
     ${합.sets ? `<span class="lbl">${m}월 운동 균형 · 부위별 세트</span>
-      <div class="gbox">${bodyMap(ps, Math.max(1, 끝날/7))}</div>` : ''}`,
+      <div class="gbox">${bodyMap(ps, Math.max(1, 끝날/7), (D.intake[mid]||{}).sex)}</div>` : ''}`,
     foot: tr
       ? `<button class="btn sub" data-act="rcopy:${w.id}">링크 복사</button>
          ${리포트발(w)}`
@@ -4978,7 +5046,7 @@ function vRecords(){
 
     <span class="lbl">운동 균형 · 부위별 세트</span>
     <div class="gbox">
-      ${tot.sets ? bodyMap(ps, anaWeeks(mid, per)) : 빔('chart','이 기간에 기록이 없어요','위에서 기간을 넓혀 보세요')}
+      ${tot.sets ? bodyMap(ps, anaWeeks(mid, per), (D.intake[mid]||{}).sex) : 빔('chart','이 기간에 기록이 없어요','위에서 기간을 넓혀 보세요')}
       ${tot.sets ? (()=>{ const W = anaWeeks(mid, per);
         const g1 = 등급(ps[hi]/W), g2 = 등급(ps[lo]/W);
         return `<div class="note" style="margin-top:4px">
@@ -8705,6 +8773,8 @@ document.addEventListener('click', async ev=>{
     toast('수업 기록만 보실 수 있어요'); return; }
   switch(k){
     case 'kakao': toast('실제 연동은 다음 단계예요'); return;
+    case 'b3': { const b = document.getElementById(rest[0]); if(!b) return;
+      b.dataset.a = String((((+b.dataset.a || 0) + Number(rest[1])) % 8 + 8) % 8); 몸3그리기(b.id); return; }
     case 'retry': S.screen='boot'; render(); start(); return;
     case 'switch': S.stack=[]; S.who=null; go('login'); return;
     case 'back': goBack(); return;
