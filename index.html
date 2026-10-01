@@ -1556,7 +1556,10 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
 .slot .ic{font-size:19px}
 
 /* 주기 막대 */
-.cyc{display:flex;gap:3px;height:34px;border-radius:9px;overflow:hidden}
+/* ⛔ `overflow:hidden` 이면 세로 flex 안에서 **min-height 가 0 으로 풀린다.**
+   폰처럼 내용이 길면 이 막대가 **납작하게 눌려 사라졌다** (2026-10-01 폰에서 실측).
+   `flex:none` 으로 못 줄이게 박는다. */
+.cyc{display:flex;gap:3px;height:34px;flex:none;border-radius:9px;overflow:hidden}
 .cyc div{flex:1;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#6f6a63;background:var(--dark-3)}
 .cyc div.p{background:#2a1d1a;color:var(--warn)}
 .cyc div.f{background:var(--gold-dim);color:var(--gold)}
@@ -1564,7 +1567,9 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
 .cyc div.l{background:var(--teal-dim);color:var(--teal)}
 .cyc div.now{outline:2px solid var(--gold);outline-offset:-2px}
 .cyclbl{display:flex;gap:3px}
-.cyclbl span{flex:1;text-align:center;font-size:10.5px;color:#75726c;font-weight:500}
+/* 「13~15일」 이 좁은 칸에서 두 줄로 접혔다 — 「일」을 떼고 안 접히게 한다 (폰 실측) */
+.cyclbl span{flex:1;min-width:0;text-align:center;font-size:10px;color:#75726c;
+  font-weight:500;white-space:nowrap}
 
 #toast{position:absolute;left:50%;bottom:88px;transform:translateX(-50%);background:var(--dark-4);
   border:1px solid var(--line);border-radius:11px;padding:11px 17px;font-size:13.5px;font-weight:700;
@@ -1945,7 +1950,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '224';
+const BUILD = '226';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2579,7 +2584,7 @@ function 코멘트칸(mid){
   const act = 한종목 ? `exd:${u[0].ex}:${u[0].va}` : 'tab:feedback';
   const 최근 = (u[0] || cs[0]);
   return `<button class="cmcell${u.length?' new':''}" data-act="${act}">
-    ${u.length ? '<b class="nwx">NEW!</b>' : ''}
+    ${u.length ? '<b class="nwx">새 글</b>' : ''}
     <span class="k">운동 코멘트</span>
     <span class="v">${u.length || cs.length}<small>개</small></span>
     <span class="s">${최근 ? esc(최근.tr) + ' · ' + esc(최근.at) : '아직 없어요'}</span></button>`;
@@ -2618,7 +2623,7 @@ function dayDetail(mid, date, 제목){
         <div class="dl2">${it.sets.map(x => setShort(it.ex,x)).join(' · ')}</div>
       </div>`).join('')}
       ${vol?`<div class="drow dtot"><div class="dl1">
-        <span class="de">이 운동 총 볼륨</span>
+        <span class="de">이 운동 총 무게</span>
         <span class="dn g">${Math.round(vol).toLocaleString()} kg</span></div></div>`:''}
       ${S.who==='tr' ? '' : `<button class="dstart" data-act="again:${w.id}">이 루틴으로 시작하기</button>`}
       <button class="dmore" data-act="rec:${w.id}">기록 자세히 보기 ›</button>
@@ -3281,7 +3286,7 @@ const 목표종류 = {
   식단기록: { 이름:'이번 달 식단 기록',   단위:'일', 기간:'달', 기본:20 },
   칼로리이하:{ 이름:'칼로리 이하로 먹은 날', 단위:'일', 기간:'달', 기본:15, kcal:1800, 말:'식단을 기록한 날만 셉니다' },
   칼로리이상:{ 이름:'칼로리 이상 먹은 날',  단위:'일', 기간:'달', 기본:15, kcal:2500, 말:'식단을 기록한 날만 셉니다' },
-  볼륨:     { 이름:'이번 달 총 볼륨',     단위:'톤', 기간:'달', 기본:20 },
+  볼륨:     { 이름:'이번 달 총 무게',     단위:'톤', 기간:'달', 기본:20 },
   종목무게: { 이름:'종목 무게',           단위:'kg', 기간:'없음', 기본:60, 말:'목표를 정한 날부터 든 가장 무거운 세트' },
 };
 const 내목표 = mid => ((GOALS[mid]||{}).my) || [];
@@ -4980,7 +4985,7 @@ function vRecords(){
           <span class="d ${t.diff===null?'eq':cl}">${ar}</span></div>`; }).join('')
       : '<div class="empty">이 부위 기록이 없어요</div>'}
     </div>
-    <div class="note">기간 안 <b>처음과 마지막</b>의 가장 무거운 세트를 견줍니다. 기간에 한 번만 했다면 <b>그 직전 기록</b>과 견줍니다.</div>` };
+    <div class="note">기간 안 <b>처음과 마지막</b>의 가장 무거운 세트를 비교합니다. 기간에 한 번만 했다면 <b>그 직전 기록</b>과 비교합니다.</div>` };
 }
 
 /* ── 지난 운동기록 — 날짜로 보기 ──
@@ -6432,7 +6437,7 @@ function vProfile(){
       <span class="pfb">${pf.bio ? esc(pf.bio) : (내것 ? '한 줄 소개를 적어 보세요' : '')}</span>
       <span class="pfs">
         <i><b>${수(st.일수)}</b>운동한 날</i>
-        <i><b>${수(Math.round(st.vol/1000)*1||0)}</b>총 볼륨(톤)</i>
+        <i><b>${수(Math.round(st.vol/1000)*1||0)}</b>총 무게(톤)</i>
         <i><b>${수(st.오운완)}</b>오운완</i>
       </span>
       ${st.연속>1?`<span class="pfstreak">🔥 ${st.연속}일 이어서 운동 중</span>`:''}
@@ -6535,7 +6540,7 @@ function vMe(){
     <div class="card rowc"><div><div class="nm">화면 꺼짐 방지</div><div class="sm">운동 중에만 켭니다</div></div>${스위치(1)}</div>
     <div class="hr"></div><span class="lbl">내 기록장</span>
     ${[['note','상담일지','첫 상담 때 트레이너가 적은 내용','sub:intake'],
-       ['plan','운동계획','목표 선언 · 맞춤 칼로리 · 다짐','sub:plan'],
+       ['plan','운동계획','목표 · 맞춤 칼로리 · 다짐','sub:plan'],
        ['chart','인/아웃바디','인바디 · 비포애프터 · 체형분석','sub:body'],
        ['moon','생리주기', (cycOf(S.mid)&&cycOf(S.mid).on)
           ? `오늘 ${cycToday(cycOf(S.mid)).day}일차 · ${esc(cycToday(cycOf(S.mid)).ph)}`
@@ -6619,7 +6624,7 @@ function cycBar(c){
   seg.forEach(([nm,a,b,cls])=>{
     const w=b-a+1, now=(t.day>=a&&t.day<=b);
     cells+=`<div class="${cls}${now?' now':''}" style="flex:${w}">${nm}</div>`;
-    labels+=`<span style="flex:${w}">${a}~${b}일</span>`;
+    labels+=`<span style="flex:${w}">${a}~${b}</span>`;
   });
   return `<div class="cyc">${cells}</div><div class="cyclbl">${labels}</div>`;
 }
@@ -6886,7 +6891,7 @@ function calcBrief(g, ed){
   const c = g.calc || {};
   const kg = v => (Math.round(v*100)/100).toFixed(1);
   return `<div class="calc" style="gap:12px">
-    <div class="crow" style="border:none;padding:0"><span class="ck" style="font-size:14px;font-weight:700;color:var(--cream)">회원님께 이렇게 설명합니다</span></div>
+    <div class="crow" style="border:none;padding:0"><span class="ck" style="font-size:14px;font-weight:700;color:var(--cream)">이렇게 잡았어요</span></div>
     <div class="krow"><span class="k">① 하루에 쓰는 양</span><span class="v">${r.total.toLocaleString()} kcal</span></div>
     <div class="krow"><span class="k">② 이만큼 드시면</span>${ed
       ? `<span class="kedit">
@@ -6939,7 +6944,7 @@ function calcHTML(g, ed){
       <span class="cv">${r.bmr||'—'}<span class="cs"> kcal</span></span></div>
     <div class="crow"><span class="ck">유지 칼로리</span>
       <span class="cv">${r.total||'—'}<span class="cs"> kcal</span></span></div>
-    <div class="crow"><span class="ck">주당 감량치</span>
+    <div class="crow"><span class="ck">한 주에 줄어드는 양</span>
       <span class="cv">${r.week>0?r.week.toLocaleString():0}<span class="cs"> kcal · ${kg(r.wkKg)}kg</span></span></div>
     <div class="crow"><span class="ck">한 달 예상</span>
       <span class="cv g">${r.month>0?Math.round(r.month).toLocaleString():0}<span class="cs"> kcal · ${kg(r.moKg)}kg</span></span></div>
@@ -7030,7 +7035,7 @@ function vPlanEdit(){
     <div class="fld"><span class="fn">운동 약속</span><input class="search" type="text" data-k="pg:work" value="${esc(g.work||'')}"></div>
     <div class="fld"><span class="fn">식단 약속</span><input class="search" type="text" data-k="pg:diet" value="${esc(g.diet||'')}"></div>
     <div class="fld"><span class="fn">운동 목적</span>
-      <div class="chips">${['다이어트','근육증가','교정운동','건강','기타목적'].map(x=>
+      <div class="chips">${['다이어트','근육증가','교정운동','건강','그 밖에'].map(x=>
         `<button class="chip ${(g.purpose||[]).includes(x)?'on':''}" data-act="pickn:pg:purpose:${x}">${x}</button>`).join('')}</div></div>
     <div class="hr"></div><span class="lbl">현재 몸 상태</span>
     ${intakeNote(mid)}
@@ -7071,13 +7076,13 @@ function vPlanEdit(){
     <div class="grid2">
       <div class="fld"><span class="fn">최소 섭취 kcal</span>
         <input class="search" type="text" inputmode="numeric" data-k="pc:floor" value="${esc(c.floor||'')}" placeholder="${c.sex==='남'?1500:1200}"></div>
-      <div class="fld"><span class="fn">주당 감량 상한 %</span>
+      <div class="fld"><span class="fn">한 주에 줄일 수 있는 한도 %</span>
         <input class="search" type="text" inputmode="decimal" data-k="pc:wkmax" value="${esc(c.wkmax||'')}" placeholder="1"></div>
     </div>
     <div class="note">이 선을 넘어도 <b>막지 않습니다.</b> 경고와 추천 날짜만 띄웁니다 — 필요하면 그대로 진행하세요.</div>
 
     <div id="calcout">${calcBrief(g,1)}${calcHTML(g,1)}</div>
-    <div class="fld"><span class="fn">스스로의 다짐 — 줄바꿈으로 여러 개</span>
+    <div class="fld"><span class="fn">내가 지킬 약속 — 줄바꿈으로 여러 개</span>
       <textarea data-k="pg:vows">${esc((g.vows||[]).join('\n'))}</textarea></div>
     <div class="fld"><span class="fn">회원님, 이건 꼭 약속해요</span>
       <textarea data-k="pg:promises">${esc((g.promises||[]).join('\n'))}</textarea></div>
@@ -7095,14 +7100,14 @@ function vPlan(){
   return { top: bar('운동계획', `<span class="sub">${esc(subjName())}</span>`, tr?'tm:'+mid:'tab:me'), body:`
     ${tr?`<button class="btn main" data-act="editplan:${mid}">계획 고치기 · 칼로리 계산</button>`:''}
     <span class="lbl">나의 운동 목적</span>
-    <div class="chips">${['다이어트','근육증가','교정운동','건강','기타목적'].map(x=>
+    <div class="chips">${['다이어트','근육증가','교정운동','건강','그 밖에'].map(x=>
       `<button class="chip ${(g.purpose||[]).includes(x)?'on':''}" ${tr?`data-act="editplan:${mid}"`:''}>${x}</button>`).join('')}</div>
-    <span class="lbl">목표 선언 — 현재에서 미래로</span>
+    <span class="lbl">목표 — 지금에서 언제까지</span>
     <div class="card">
       <div class="sm">${esc(g.now.date||'—')} → ${esc(g.to.date||'—')}${
         (()=>{ const n=dLeft(g.to.date); return n!=null&&n>=0?` · ${n}일 남음`:''; })()}</div>
       ${cmp('몸무게','w')}${cmp('근육량','m')}${cmp('체지방량','f')}${cmp('체지방률','fp')}</div>
-    <span class="lbl">맞춤 칼로리 · 예상 감량치</span>
+    <span class="lbl">맞춤 칼로리 · 얼마나 빠질까</span>
     ${(g.calc && (g.now.w||g.calc.bmr)) ? calcBrief(g)+calcHTML(g) : ''}
     <span class="lbl" style="opacity:.6">직접 적어 둔 값</span>
     <div class="grid2">
@@ -7110,7 +7115,7 @@ function vPlan(){
       <div class="tile"><span class="k">탄 / 단 / 지</span><span class="v" style="font-size:19px">${esc(g.ratio||'—')}</span></div>
       <div class="tile"><span class="k">1주 감량 예상</span><span class="v">${esc(g.wk||'—')}</span></div>
       <div class="tile"><span class="k">한 달 감량 예상</span><span class="v">${esc(g.mo||'—')}</span></div></div>
-    <span class="lbl">스스로의 다짐</span>
+    <span class="lbl">내가 지킬 약속</span>
     <div class="card">${(g.vows||[]).map(v=>`<div class="frow"><span class="fk" style="min-width:20px;color:var(--gold)">✓</span><span class="fv">${esc(v)}</span></div>`).join('')}</div>
     <span class="lbl">회원님, 이건 꼭 약속해요</span>
     <div class="card">${(g.promises||[]).map(v=>`<div class="frow"><span class="fk" style="min-width:20px;color:var(--teal)">✓</span><span class="fv">${esc(v)}</span></div>`).join('')}</div>
@@ -7413,7 +7418,7 @@ function sheetIbPick(mid, side){
         <span class="c">${x.m?ib수(x.m):'—'}</span>
         <span class="c">${x.fp?ib수(x.fp):'—'}</span></button>`).join('')}
     </div>
-    <div class="note">${side==='F' ? '누르면 그 날을 <b>최근</b> 칸에 놓고, 바로 앞 기록과 견줍니다.' : '누르면 그 날짜로 바꿉니다.'}
+    <div class="note">${side==='F' ? '누르면 그 날을 <b>최근</b> 칸에 놓고, 바로 앞 기록과 비교합니다.' : '누르면 그 날짜로 바꿉니다.'}
       <br><i class="ibdot"></i> 인바디 기계로 잰 기록</div>
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
@@ -7540,7 +7545,7 @@ function roundPane(mid){
       ${came.map(x=>row(x,'nw','새로 생김')).join('')}
       ${(!gone.length&&!stay.length&&!came.length)?'<div class="empty">달라진 것이 없어요</div>':''}</div>
       <div class="note">${esc(dateTxt(A.date))}(${Object.keys(A.checks||{}).length}개) →
-        ${esc(dateTxt(B.date))}(${Object.keys(B.checks||{}).length}개) 견줌.
+        ${esc(dateTxt(B.date))}(${Object.keys(B.checks||{}).length}개) 비교.
         <b style="color:#8fc4a2">${gone.length}개 풀리고</b> ${came.length?`<b style="color:var(--warn)">${came.length}개 새로 생겼습니다.</b>`:'새로 생긴 것은 없습니다.'}</div>`;
   }
   return `
@@ -7659,8 +7664,8 @@ function bodyPane(mid){
     ${ds.length
       ? `<div class="bcmp" style="margin-top:9px">${cel(L,'비포','L')}${cel(R,'애프터','R')}</div>
          <div class="note">${ds.length>1
-            ? `날짜를 눌러 다른 날과 견줍니다. <b>${esc(pose)}</b> 사진이 <b>${ds.length}일치</b> 있어요.`
-            : '사진이 하루치뿐입니다. 다음에 한 장 더 넣으면 나란히 견줍니다.'}</div>`
+            ? `날짜를 눌러 다른 날과 비교합니다. <b>${esc(pose)}</b> 사진이 <b>${ds.length}일치</b> 있어요.`
+            : '사진이 하루치뿐입니다. 다음에 한 장 더 넣으면 나란히 비교합니다.'}</div>`
       : `<div class="empty">${esc(pose)} 사진이 아직 없어요</div>`}
     <button class="btn blue sm" data-act="bpadd:body">＋ ${esc(pose)} 사진 넣기</button>
     ${tr?'':'<div class="note">집에서 찍으실 때는 <b>같은 자리 · 같은 옷 · 같은 밝기</b>로 찍어야 비교하기 좋습니다.</div>'}
@@ -7969,6 +7974,7 @@ function vCycle(){
     <div class="card gold">
       <div class="nm g">오늘 ${t.day}일차 · ${esc(t.ph)}</div>
       <div class="sm">${esc(t.why)}<br>다음 생리 예정까지 ${t.left}일</div></div>
+    <span class="lbl">주기 ${c.len}일 — 오늘은 ${t.day}일차</span>
     ${cycBar(c)}
     <span class="lbl">${esc(t.ph)}에는 이렇게</span>
     <div class="card">${CYC_TIP[t.ph].map(x=>`<div class="frow"><span class="fk" style="min-width:20px;color:var(--gold)">·</span><span class="fv">${esc(x)}</span></div>`).join('')}</div>
