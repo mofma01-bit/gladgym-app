@@ -1377,7 +1377,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '168';
+const BUILD = '169';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -1806,7 +1806,7 @@ const S = { view:'home', who:'전체', q:'', mid:null, rid:null, tab:'routine',
 const canEdit = k => !!S.edit[k] && !(k === 'body' && typeof 건강동의함 === 'function' && !건강동의함(S.mid));
 const dis = k => canEdit(k) ? '' : ' disabled';
 const editBtn = k => '<button class="editbtn ' + (canEdit(k)?'on':'') + '" data-edit="' + k + '">'
-  + (canEdit(k) ? '수정 완료' : '수정') + '</button>';
+  + (canEdit(k) ? '고치기 끝' : '고치기') + '</button>';
 let toastT = null;
 let 되돌리기함 = null;
 function toast(msg, 되돌리기){                 /* 되돌리기를 주면 알림에 「되돌리기」가 붙는다 */
@@ -2269,7 +2269,7 @@ function 동의배너(){
   const 보낸 = memOf(S.mid).sensitive_ask_at || '';
   return '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;'
     + 'background:#fff4e5;border:1px solid #f0c48a;border-radius:10px;padding:10px 13px;margin-bottom:14px">'
-    + '<span style="font-size:13px;line-height:1.55">⚠ 이 회원은 <b>건강정보 동의</b>를 하지 않았습니다 — '
+    + '<span style="font-size:13px;line-height:1.55">⚠ 이 회원은 <b>건강정보 동의</b>를 아직 안 하셨어요 — '
     + '인바디·체형 사진·체형 검사를 <b>새로 올리거나 저장할 수 없어요</b>.'
     + (보낸 ? '<br><span style="color:#8a6a3a">' + esc(dateFull(String(보낸).slice(0,10)))
               + ' 에 동의 요청을 보냈습니다 · 회원 앱 알림함에 떠 있어요</span>' : '')
@@ -2285,7 +2285,7 @@ function 동의관문(kind){            /* 막았으면 true — 부른 쪽은 �
   const 보낸 = m.sensitive_ask_at || '';
   popOpen('<div style="padding:20px 22px;max-width:430px">'
     + '<div style="font-size:15px;font-weight:700;line-height:1.5;margin-bottom:10px">'
-    + '⚠ ' + esc(m.name || '이 회원') + ' 님은 건강정보 동의를 하지 않았습니다</div>'
+    + '⚠ ' + esc(m.name || '이 회원') + ' 님은 건강정보 동의를 아직 안 하셨어요</div>'
     + '<div style="font-size:13px;line-height:1.65;color:#555">'
     + '<b>' + esc(동의종류이름[동의요청종류] || '건강정보') + '</b>은 「건강에 관한 정보」라서 '
     + '회원이 앱에서 <b>따로 동의</b>해야 남길 수 있어요.<br>'
@@ -3871,7 +3871,7 @@ function vCmAll(){
        ['미정','미정',구분수.미정]]
         .map(x => '<button class="chip ' + (고른구분===x[0]?'on':'') + '" data-cmreg="' + x[0] + '">'
           + x[1] + '<i>' + x[2] + '</i></button>').join('') + '</span>'
-    + '<span class="cmg"><b>차례</b>'
+    + '<span class="cmg"><b>순서</b>'
     + 차례들.map(x => '<button class="chip ' + (차례===x[0]?'on':'') + '" data-cmsort="' + x[0] + '">'
         + x[1] + '</button>').join('') + '</span></div>';
 
@@ -4201,10 +4201,10 @@ function vTrash(){
   휴지통.forEach(t => { (묶음[t.tbl] = 묶음[t.tbl] || []).push(t); });
 
   const 요약 = '<div class="sumbar">'
-    + '<div class="sumit"><span class="k2">담긴 것</span><span class="v2">' + 휴지통.length + '</span></div>'
-    + '<div class="sumit warn"><span class="k2">이레 안에 사라짐</span><span class="v2">'
+    + '<div class="sumit"><span class="k2">휴지통에 있는 것</span><span class="v2">' + 휴지통.length + '</span></div>'
+    + '<div class="sumit warn"><span class="k2">7일 안에 사라짐</span><span class="v2">'
       + 휴지통.filter(t => 남은날(t) <= 7).length + '</span></div>'
-    + '<div class="sumit gold"><span class="k2">' + 휴지통일수 + '일 뒤 자동 삭제</span>'
+    + '<div class="sumit gold"><span class="k2">' + 휴지통일수 + '일 뒤 저절로 지워짐</span>'
       + '<span class="v2">켜짐</span></div>'
     + '</div>';
 
@@ -4572,12 +4572,12 @@ const 기본열 = key => { const d = 덧붙임(key);
   }); };
 /* 노션의 「생성 일시 · 최종 편집 일시 · 생성자」 — 자동으로 적히고 못 고친다 (2026-09-09 대표 지적) */
 const 시스템열 = key => [
-  { k:'created_at', 이름:'생성일',          타입:'datetime', 시스템:true },
+  { k:'created_at', 이름:'만든 날',         타입:'datetime', 시스템:true },
 ].concat(표정의[key].열.some(c => c.k === 'done')
       ? [{ k:'done_at', 이름:'완료일',      타입:'datetime', 시스템:true }] : [])
  .concat([
-  { k:'updated_at', 이름:'최종 편집 일시',  타입:'datetime', 시스템:true },
-  { k:'created_by', 이름:'생성자',          타입:'person',   시스템:true },
+  { k:'updated_at', 이름:'마지막 고친 때',  타입:'datetime', 시스템:true },
+  { k:'created_by', 이름:'만든 사람',       타입:'person',   시스템:true },
 ]);
 const 열들 = key => 기본열(key).concat(늘림열(key)).concat(시스템열(key));
 /* 노션 표에 늘 보이는 생성일·완료일 — 목록 줄 끝에 옅게 */
@@ -5164,8 +5164,8 @@ function txFilterBar(key, v, 순){
               + 'title="'+esc(바뀜.join(' · '))+'을 모두에게 적용합니다">모두에게 저장</button>' : '')
         : '')
     + (관리자() ? '<button class="tx-fadd '+(잠겼나(key)?'on':'')+'" data-act="tx:lock" data-k="'+key+'" '
-        + 'title="'+(잠겼나(key)?'잠김 — 순서·칸을 못 바꿉니다':'풀림 — 끌어서 옮길 수 있습니다')+'">'
-        + (잠겼나(key)?'🔒 잠김':'🔓 풀림') + '</button>' : '')
+        + 'title="'+(잠겼나(key)?'잠겨 있어요 — 순서·칸을 못 바꿉니다':'풀려 있어요 — 끌어서 옮길 수 있어요')+'">'
+        + (잠겼나(key)?'🔒 잠금':'🔓 잠금 풀림') + '</button>' : '')
     + '<button class="tx-fadd" data-act="tx:layout" data-k="'+key+'" title="목록 ↔ 표">'
       + (모양(key)==='table' ? '▤ 표' : '☰ 목록') + '</button>'
     + '<button class="tx-fadd '+(st.그룹?'on':'')+'" data-act="tx:grpmenu" data-k="'+key+'">⊞ '
@@ -7321,10 +7321,9 @@ function txMe(갈래){
             : ''; })();
 
   } else if(갈래 === 'home'){
-    속 = '<div class="note" style="margin-bottom:10px">홈은 <b>왼쪽 · 오른쪽 두 단</b>입니다. '
-      + '블록에 마우스를 대면 왼쪽 위에 <b>⠿</b> 가 나옵니다. 그걸 <b>누르면</b> '
-      + '위로·아래로·반대 단으로 옮기는 단추가 뜹니다.<br>'
-      + '가운데를 잡아 끌면 좌우 넓이가 바뀝니다 (두 번 누르면 기본값).</div>'
+    속 = '<div class="note" style="margin-bottom:10px">홈은 <b>왼쪽 · 오른쪽 두 단</b>이에요.<br>'
+      + '· 칸에 마우스를 올리면 왼쪽 위에 <b>⠿</b> 가 나와요 — 누르면 <b>위·아래·옆 단</b>으로 옮깁니다<br>'
+      + '· 두 단 사이를 <b>잡아 끌면</b> 좌우 넓이가 바뀌어요 (두 번 누르면 원래대로)</div>'
       + '<button class="btn ghost" style="width:100%" data-act="tx:hmreset">홈 배치 처음으로</button>';
 
   } else if(갈래 === 'who'){
