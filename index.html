@@ -363,6 +363,9 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .ibfd .blrow{text-align:left}
 .ibfd .d0{white-space:nowrap}
 /* 홈 오운완 — 오늘 기록을 마쳤는데 아직 안 찍었을 때만 (2026-09-19 대표: 「놓칠 수 있으니까 메인 화면에도」) */
+.pg{position:relative}.pg.hid img{opacity:.45}
+.pg .pgk{position:absolute;left:5px;top:5px;font-size:12px;background:rgba(0,0,0,.45);border-radius:8px;padding:1px 5px}
+.pg .pgw{position:absolute;left:5px;bottom:22px;font-size:10px;font-weight:700;color:#fff;background:rgba(200,70,50,.85);border-radius:6px;padding:1px 6px}
 .ootdnudge{display:flex;align-items:center;gap:12px;width:100%;text-align:left;flex:none;
   background:linear-gradient(135deg,#3a2f1c,#2a2419);border:1.5px solid var(--gold);border-radius:16px;padding:13px 14px}
 .ootdnudge .ic{font-size:26px;line-height:1}
@@ -1961,7 +1964,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '237';
+const BUILD = '238';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2144,7 +2147,9 @@ async function boot(){
   GOALS = {}; plns.forEach(r => GOALS[r.member_id] = r.data || {});
   D.body = {}; bdy.forEach(r => D.body[r.member_id] = { date:r.on_date, checks:r.checks||{}, photos:r.photos||{}, memo:r.memo||'' });
   D.bph = (bphs||[]).map(r => ({ id:r.id, mid:r.member_id, kind:r.kind||'body',
-    pose:r.pose||'정면', date:r.on_date, path:r.path, memo:r.memo||'', marks:r.marks||null }));
+    pose:r.pose||'정면', date:r.on_date, path:r.path, memo:r.memo||'', marks:r.marks||null,
+    /* 인증샷(2026-10-02) — 찍은 사람 · 회원이 숨긴 때 · 삭제 요청한 때 */
+    by:r.taken_by||'', hid:r.hidden_at||'', dreq:r.del_req_at||'' }));
   D.blog = {}; (blgs||[]).forEach(r => (D.blog[r.member_id] = D.blog[r.member_id] || []).push({
     id:r.id, mid:r.member_id, date:r.on_date, w:num0(r.w), m:num0(r.m), f:num0(r.f), fp:num0(r.fp), note:r.note||'' }));
   Object.values(D.blog).forEach(a => a.sort((x,y)=> x.date<y.date?-1:1));
@@ -3569,6 +3574,7 @@ function vHome(){
         ${svg('종',20)}${알림수?`<b>${알림수>9?'9+':알림수}</b>`:''}</button>`), tabs:1, body:`
     ${(뱃지주기(S.mid), 현황판(S.mid))}
     ${오운완홈(S.mid)}
+    ${인증샷홈(S.mid)}
     <div class="homerec">
       <div class="hr-l">
         ${최근카드(S.mid)}
@@ -4666,7 +4672,9 @@ function vSummary(){
     ${w.date === TODAY
       ? `<button class="btn gold" data-act="ootd:${w.id}">📷 ${ootd찍었나(w) ? '오운완 다시 찍기' : '오운완 찍기'}</button>
          <div class="note" style="margin-top:-4px">사진을 찍으면 <b>오늘 한 종목·세트·총 무게</b>가 얹힌 한 장이 만들어집니다.
-           ${S.who==='tr' ? '찍은 사진은 <b>회원 프로필 오운완</b>에 남습니다.' : '그대로 인스타에 올리거나 내 프로필에 남겨 두세요.'}</div>`
+           ${S.who==='tr' ? '찍은 사진은 <b>회원 프로필 오운완</b>에 남습니다.' : '그대로 인스타에 올리거나 내 프로필에 남겨 두세요.'}</div>
+         ${S.who==='tr' ? `<button class="btn sub" data-act="pair:${w.id}">🤝 회원과 같이 찍기</button>
+         <div class="note" style="margin-top:-4px">찍고 <b>저장</b>만 누르면 됩니다. 회원 프로필과 트레이너 화면 <b>양쪽</b>에 남고, 양쪽 다 내려받을 수 있어요.</div>` : ''}`
       : `<div class="note">오운완은 <b>기록한 날에만</b> 찍을 수 있어요.</div>`}
     ${S.who==='tr' ? `<button class="btn sub" data-act="rpt:${w.id}">오늘 수업 리포트 보기</button>` : ''}
 
@@ -6191,6 +6199,79 @@ function 오운완홈(mid){
 const ootdsOf = mid => (D.bph||[]).filter(x => x.mid===mid && x.kind==='ootd')
   .slice().sort((a,b)=> a.date<b.date ? 1 : -1);
 
+/* ── 트레이너 인증샷 ── (2026-10-02 대표 「찍고 저장 누르면 일단 앱에 저장 … 회원이 지워도 트레이너는 볼 수 있게」)
+   오운완과 같은 표(body_photos)·같은 저장소. kind='pair'. 숫자 판을 얹지 않고 **원본**을 남긴다 (나중에 스토리 영상 재료).
+   회원 「내 화면에서 숨기기」= hidden_at 만 적는다 → 트레이너는 계속 본다. 「완전히 삭제 요청」= del_req_at → 트레이너가 보고 지운다. */
+function pairPick(wid){
+  const w = D.workouts.find(z => z.id === wid); if(!w) return;
+  if(w.date !== TODAY){ toast('지난 날짜 기록에는 찍을 수 없어요'); return; }
+  const inp = document.createElement('input');
+  inp.type='file'; inp.accept='image/*'; inp.setAttribute('capture','environment');
+  inp.style.display='none'; document.body.appendChild(inp);
+  inp.addEventListener('change', () => {
+    const f = inp.files && inp.files[0];
+    inp.remove(); if(!f) return;
+    const img = new Image();
+    img.onload = async () => { try{
+      /* 긴 변 1600 으로만 줄인다 — 원본 느낌은 지키고 용량만 (사진 한 장 ≈ 300KB) */
+      const N = 1600, 비 = Math.min(1, N / Math.max(img.naturalWidth, img.naturalHeight));
+      const cv = document.createElement('canvas'); cv.width = Math.round(img.naturalWidth*비); cv.height = Math.round(img.naturalHeight*비);
+      cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+      URL.revokeObjectURL(img.src);
+      const blob = await new Promise(r => cv.toBlob(r, 'image/jpeg', 0.9));
+      S.pair = { wid, blob, url: URL.createObjectURL(blob) }; sheetPair();
+    }catch(e){ console.error(e); toast('사진을 만들지 못했어요'); } };
+    img.onerror = () => toast('사진을 읽지 못했어요');
+    img.src = URL.createObjectURL(f);
+  });
+  inp.click();
+}
+function sheetPair(){
+  openSheet(()=>`
+    <div class="h2">같이 찍은 사진 <small>저장하면 양쪽에 남습니다</small></div>
+    <img class="shot ootdimg" src="${S.pair.url}" alt="">
+    <button class="btn main" data-act="pairsave">저장</button>
+    <button class="btn ghost sm" data-act="pairre:${S.pair.wid}">다시 찍기</button>
+    <button class="btn ghost sm" data-act="close">닫기</button>`);
+}
+async function pairSave(){
+  if(!S.pair) return;
+  const w = D.workouts.find(z => z.id === S.pair.wid);
+  const mid = w ? w.mid : (S.tmid || S.mid);
+  const id = 'pr' + Date.now();
+  const path = `pair/${mid}/${id}.jpg`;
+  closeSheet(); toast('올리는 중이에요');
+  const r = await fetch(SB_URL+'/storage/v1/object/media/'+path, {
+    method:'POST', headers:{ apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'image/jpeg' }, body: S.pair.blob });
+  if(!r.ok){ toast('사진을 못 올렸어요'); console.error(await r.text()); return; }
+  const 날 = (w && w.date) || TODAY, by = (S.who==='tr') ? (TRAINER || '트레이너') : '회원';
+  await sv(spost('body_photos',[{ id, member_id:mid, kind:'pair', pose:'인증샷', on_date:날, path, memo:S.pair.wid||'', taken_by:by }]), '인증샷 저장');
+  D.bph = D.bph || [];
+  D.bph.push({ id, mid, kind:'pair', pose:'인증샷', date:날, path, memo:S.pair.wid||'', by, hid:'', dreq:'' });
+  try{ URL.revokeObjectURL(S.pair.url); }catch(e){}
+  S.pair = null; toast('남겼어요 — 회원 프로필에서도 보입니다'); render();
+}
+/* 프로필 격자에 올릴 사진 — 오운완 + 인증샷. 회원은 숨긴 것을 못 보고, 트레이너는 다 본다 */
+const 사진모음 = (mid, 회원눈) => (D.bph||[]).filter(x => x.mid===mid && (x.kind==='ootd' || x.kind==='pair') && !(회원눈 && x.hid))
+  .slice().sort((a,b)=> a.date<b.date ? 1 : -1);
+/* 홈 — 최근 7일 안에 트레이너가 찍어 준 사진이 있으면 알려 준다 */
+function 인증샷홈(mid){
+  const 기준 = ymd(new Date(Date.now() - 7*864e5));
+  const n = (D.bph||[]).filter(x => x.mid===mid && x.kind==='pair' && !x.hid && (x.date||'') >= 기준).length;
+  if(!n) return '';
+  return `<button class="ootdnudge" data-act="go:profile">
+    <span class="ic">🤝</span>
+    <span><div class="t">트레이너와 찍은 사진 ${n}장</div>
+      <div class="s">프로필에서 보고 갤러리에 저장할 수 있어요</div></span>
+    <span class="go">›</span></button>`;
+}
+async function 사진표시(id, 칸, 값){
+  const x = (D.bph||[]).find(y=>y.id===id); if(!x) return;
+  const 열 = 칸==='hid' ? 'hidden_at' : 'del_req_at';
+  x[칸] = 값;
+  await sv(spatch('body_photos','id=eq.'+id, { [열]: 값 || null }), 칸==='hid' ? '사진 숨기기' : '삭제 요청');
+}
+
 /* 사진 찍기 → 글래드짐 프레임 → 올리기 */
 function shotPick(){
   const inp = document.createElement('input');
@@ -6517,10 +6598,10 @@ function profStat(mid){
 }
 function vProfile(){
   const mid = (S.who==='tr') ? (S.tmid || S.mid) : S.mid;
-  const pf = profOf(mid), st = profStat(mid), 사진 = ootdsOf(mid);
+  const 내것 = (S.who !== 'tr');
+  const pf = profOf(mid), st = profStat(mid), 사진 = 사진모음(mid, 내것);
   const 나 = MEMBERS.find(m=>m.id===mid) || {};
   const 첫자 = (나.n || '').slice(0,1) || '회';
-  const 내것 = (S.who !== 'tr');
   return { top: bar('프로필', 내것?`<button class="tbtn" data-act="profedit">수정</button>`:'',
       S.who==='tr' ? 'tm:'+mid : 'tab:me'), tabs: 내것?1:0, body:`
     <div class="pf">
@@ -6537,22 +6618,37 @@ function vProfile(){
       ${st.연속>1?`<span class="pfstreak">🔥 ${st.연속}일 이어서 운동 중</span>`:''}
     </div>
 
-    <span class="lbl">오운완 ${사진.length?`· ${사진.length}장`:''}</span>
+    <span class="lbl">오운완 · 인증샷 ${사진.length?`· ${사진.length}장`:''}</span>
     ${사진.length
-      ? `<div class="pgrid">${사진.map(x=>`<button class="pg" data-act="ootdview:${x.id}">
+      ? `<div class="pgrid">${사진.map(x=>`<button class="pg ${x.hid?'hid':''}" data-act="ootdview:${x.id}">
           <img src="${esc(phURL(x.path))}" alt="" loading="lazy" onerror="picFail(this)">
+          ${x.kind==='pair' ? '<span class="pgk">🤝</span>' : ''}
+          ${!내것 && x.dreq ? '<span class="pgw">삭제 요청</span>' : (!내것 && x.hid ? '<span class="pgw">숨김</span>' : '')}
           <span class="pgd">${(x.date||'').slice(5).replace('-','.')}</span></button>`).join('')}</div>`
-      : 빔('pic','아직 오운완이 없어요', 내것?'운동을 마치고 사진을 남겨 보세요':'')}` };
+      : 빔('pic','아직 사진이 없어요', 내것?'운동을 마치고 오운완을 남겨 보세요':'')}` };
 }
 function sheetOotdView(id){
   const x = (D.bph||[]).find(y=>y.id===id); if(!x) return;
   const w = D.workouts.find(z=>z.id===x.memo);
+  const 인증 = x.kind==='pair', 트 = S.who==='tr';
   openSheet(()=>`
-    <div class="h2">${esc(dateTxt(x.date))} <small>오운완</small></div>
+    <div class="h2">${esc(dateTxt(x.date))} <small>${인증 ? '인증샷' + (x.by ? ' · ' + esc(x.by) + ' 찍음' : '') : '오운완'}</small></div>
     <img class="shot ootdimg" src="${esc(phURL(x.path))}" alt="" onerror="picFail(this)">
+    ${트 && x.dreq ? `<div class="note" style="color:var(--warn)">회원이 <b>완전 삭제</b>를 요청했어요 (${esc(dateTxt(String(x.dreq).slice(0,10)))}). 아래 「지우기」로 들어 주세요.</div>`
+      : (트 && x.hid ? `<div class="note">회원이 자기 화면에서 숨겼어요 — 트레이너 화면에만 보입니다.</div>` : '')}
     <button class="btn main sm" data-act="ootddl2:${x.id}">갤러리에 저장</button>
     ${w?`<button class="btn sub sm" data-act="orec:${w.id}">그날 기록 보기</button>`:''}
-    ${S.who==='tr'?'':`<button class="btn ghost sm" data-act="ootddel:${x.id}" style="color:var(--warn)">이 사진 지우기</button>`}
+    ${트
+      ? `<button class="btn ghost sm" data-act="ootddel:${x.id}" style="color:var(--warn)">이 사진 지우기</button>`
+      : (인증
+        ? `${x.hid
+            ? `<button class="btn ghost sm" data-act="phshow:${x.id}">다시 보이기</button>`
+            : `<button class="btn ghost sm" data-act="phhide:${x.id}">내 화면에서 숨기기</button>`}
+           ${x.dreq
+            ? `<div class="note">완전 삭제를 요청했어요 — 트레이너가 확인하고 지웁니다.</div>`
+            : `<button class="btn ghost sm" data-act="phdreq:${x.id}" style="color:var(--warn)">완전히 삭제 요청</button>
+               <div class="note">숨기기는 내 화면에서만 사라지고 트레이너의 지도 기록에는 남습니다. 완전히 지우려면 삭제를 요청해 주세요.</div>`}`
+        : `<button class="btn ghost sm" data-act="ootddel:${x.id}" style="color:var(--warn)">이 사진 지우기</button>`)}
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 function sheetProfEdit(){
@@ -8283,6 +8379,9 @@ function tMember(){
       <div class="sm">${(g.now&&g.now.w)?`${g.now.w}kg → ${(g.to&&g.to.w)||'?'}kg`:'아직 없음'}</div></div><span class="rt">›</span></button>
     <button class="card rowc plan" data-act="tsub:diet:${m.id}"><div><div class="nm">식단</div>
       <div class="sm">${mealsOf(m.id).length?`${mealsOf(m.id).length}장 · 최근 ${dateTxt(mealsOf(m.id)[0].date)}`:'아직 없음'}</div></div><span class="rt">›</span></button>
+    ${(()=>{ const 모 = 사진모음(m.id, false), 요 = 모.filter(x=>x.dreq).length;
+      return `<button class="card rowc ${요?'teal':'plan'}" data-act="tprof:${m.id}"><div><div class="nm">오운완 · 인증샷</div>
+        <div class="sm">${모.length ? `${모.length}장${요 ? ` · <b>삭제 요청 ${요}</b>` : ''}` : '아직 없음 — 수업 마친 화면에서 「같이 찍기」'}</div></div><span class="rt">›</span></button>`; })()}
     <button class="card rowc plan" data-act="tsub:body:${m.id}"><div><div class="nm">인/아웃바디</div>
       <div class="sm">${Object.keys(checksOf(m.id)).length}개 표시 · ${roundsOf(m.id).length}회차 · 사진 ${((D.bph||[]).filter(x=>x.mid===m.id)).length}장</div></div><span class="rt">›</span></button>
     ${(()=>{ const c=cycOf(m.id); if(!c||!c.on) return `<div class="card rowc dim"><div><div class="nm">생리주기</div>
@@ -9762,6 +9861,7 @@ document.addEventListener('click', async ev=>{
     case 'orec': closeSheet(); S.wid = rest[0]; go('summary'); return;
     case 'ootddel': {
       const x = (D.bph||[]).find(y=>y.id===rest[0]); if(!x) return;
+      if(S.who==='tr' && !confirm('이 사진을 지울까요? 회원 화면에서도 사라지고 되돌릴 수 없습니다.')) return;
       D.bph = D.bph.filter(y=>y.id!==x.id);
       sv(sdel('body_photos','id=eq.'+x.id), '오운완 지우기');
       fetch(SB_URL+'/storage/v1/object/media/'+x.path,
@@ -9774,6 +9874,13 @@ document.addEventListener('click', async ev=>{
       profSave(S.mid, { bio: el ? el.value.trim() : '' });   /* 저장은 뒤에서 마저 */
       closeSheet(); toast('저장했어요'); render(); return; }
     case 'ootdre': closeSheet(); ootdPick(rest[0]); return;
+    case 'pair': pairPick(rest[0]); return;
+    case 'pairre': closeSheet(); pairPick(rest[0]); return;
+    case 'pairsave': pairSave(); return;
+    case 'tprof': S.tmid=rest[0]; S.subj=rest[0]; go('profile'); return;
+    case 'phhide': await 사진표시(rest[0], 'hid', new Date().toISOString()); toast('내 화면에서 숨겼어요'); closeSheet(); render(); return;
+    case 'phshow': await 사진표시(rest[0], 'hid', ''); toast('다시 보여요'); closeSheet(); render(); return;
+    case 'phdreq': await 사진표시(rest[0], 'dreq', new Date().toISOString()); toast('트레이너에게 삭제를 요청했어요'); drawSheet(); return;
     case 'ootdshare': ootdShare(); return;
     case 'ootddl': if(S.ootd) ootdDL(S.ootd.url, ootd날(S.ootd.wid)); return;
     case 'ootddl2': { const x=(D.bph||[]).find(y=>y.id===rest[0]); if(!x) return;
