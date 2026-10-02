@@ -1964,7 +1964,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '240';
+const BUILD = '241';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2147,7 +2147,7 @@ async function boot(){
   GOALS = {}; plns.forEach(r => GOALS[r.member_id] = r.data || {});
   D.body = {}; bdy.forEach(r => D.body[r.member_id] = { date:r.on_date, checks:r.checks||{}, photos:r.photos||{}, memo:r.memo||'' });
   D.bph = (bphs||[]).map(r => ({ id:r.id, mid:r.member_id, kind:r.kind||'body',
-    pose:r.pose||'정면', date:r.on_date, path:r.path, memo:r.memo||'', marks:r.marks||null,
+    pose:r.pose||'전면', date:r.on_date, path:r.path, memo:r.memo||'', marks:r.marks||null,
     /* 인증샷(2026-10-02) — 찍은 사람 · 회원이 숨긴 때 · 삭제 요청한 때 */
     by:r.taken_by||'', hid:r.hidden_at||'', dreq:r.del_req_at||'' }));
   D.blog = {}; (blgs||[]).forEach(r => (D.blog[r.member_id] = D.blog[r.member_id] || []).push({
@@ -7816,7 +7816,7 @@ function bodyPane(mid){
   const tr = (S.who==='tr');
   const b0 = (D.body && D.body[mid]) || {checks:{}, photos:{}, memo:''};
   const b = { checks: checksOf(mid), photos: b0.photos||{}, memo: b0.memo||'' };
-  const pose = S.bpPose || '정면';
+  const pose = S.bpPose || '전면';
   const list = bphOf(mid, 'body', pose);
   const ds = [...new Set(list.map(x=>x.date))];
   const L = (S.bpL && ds.includes(S.bpL)) ? S.bpL : ds[0];
@@ -7929,7 +7929,7 @@ function bpAdd(kind){
     toast('사진을 다듬는 중이에요');
     try{
       S.bpShot = await shrinkPhoto(f);
-      S.bpKind = kind; S.bpNewPose = S.bpPose || '정면'; S.bpNewDate = TODAY;
+      S.bpKind = kind; S.bpNewPose = S.bpPose || '전면'; S.bpNewDate = TODAY;
       sheetBpAdd();
     }catch(e){ console.error(e); toast('사진을 읽지 못했어요'); }
   });
@@ -9525,7 +9525,7 @@ document.addEventListener('click', async ev=>{
       toast('지웠어요'); render(); return; }
     case 'bppose': S.bpPose = rest[0]; S.bpL=null; S.bpR=null; render(); return;
     case 'bpsel': { const side = rest[0], mid = (S.screen==='body') ? subj() : anaMid();
-      const pose = S.bpPose || '정면';
+      const pose = S.bpPose || '전면';
       const lst = bphOf(mid,'body',pose);
       const ds = [...new Set(lst.map(x=>x.date))];
       if(!ds.length){ toast('사진이 없어요'); return; }
@@ -9539,7 +9539,7 @@ document.addEventListener('click', async ev=>{
       return; }
     case 'bpstep': { const side = rest[0], dir = +rest[1];
       const mid = (S.screen==='body') ? subj() : anaMid();
-      const ds = [...new Set(bphOf(mid,'body',S.bpPose||'정면').map(x=>x.date))];
+      const ds = [...new Set(bphOf(mid,'body',S.bpPose||'전면').map(x=>x.date))];
       if(!ds.length) return;
       const 지금 = side==='L' ? ((S.bpL && ds.includes(S.bpL)) ? S.bpL : ds[0])
                               : ((S.bpR && ds.includes(S.bpR)) ? S.bpR : ds[ds.length-1]);
