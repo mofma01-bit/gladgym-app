@@ -1983,7 +1983,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '242';
+const BUILD = '243';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -3150,7 +3150,7 @@ function render(){
     t_members:tMembers,t_member:tMember,t_live:tLive,t_write:tWrite,t_routines:tRoutines,t_redit:tRedit,t_ex:tEx,
     intake:vIntake, plan:vPlan, body:vBody, cycle:vCycle, qa:vQa, boot:vBoot, err:vErr,
     newmem:vNewMem, intake_edit:vIntakeEdit, plan_edit:vPlanEdit, t_pickex:tPickEx,
-    t_today:tToday, t_feed:tFeed, t_tools:tTools, diet:vDiet, days:vDays, t_meals:tMeals,
+    t_today:tToday, t_feed:tFeed, t_tools:tTools, t_community:vCommunity, diet:vDiet, days:vDays, t_meals:tMeals,
     noti:vNoti, agree:vAgree, terms:vTerms};
   /* ── 관문 (2026-09-21) ─────────────────────────────────────────────
      · 필수 둘(이용약관·개인정보)에 동의하기 전에는 **동의 화면만** 보인다
@@ -3236,7 +3236,7 @@ function tabBarTr(){
   const t=(id,ic,nm,bd)=>`<button data-act="ttab:${id}" class="${S.ttab===id?'on':''}">
     <span class="ic">${ic}${bd?'<span class="bd"></span>':''}</span><span>${nm}</span></button>`;
   return t('t_today',svg('clock',22),'오늘')+t('t_members',svg('grid',22),'회원')
-       +t('t_feed',svg('pen',22),'피드백',n>0)+t('t_tools',svg('flag',22),'자료');
+       +t('t_feed',svg('pen',22),'피드백',n>0)+t('t_community',svg('pic',22),'커뮤니티')+t('t_tools',svg('flag',22),'자료');
 }
 
 /* ── 불러오는 중 · 오류 ── */
@@ -6150,7 +6150,8 @@ function vCommunity(){
     <div class="seg" style="margin-bottom:4px">${(내것?['전체','내 글']:['전체']).map(k=>`<button class="${f===k?'on':''}" data-act="cfilt:${k}">${k}</button>`).join('')}</div>
     ${ps.length ? ps.map(글카드).join('')
       : 빔('pic', f==='내 글' ? '아직 올린 글이 없어요' : '아직 글이 없어요', 내것 ? '오운완이나 인증샷을 올려 보세요' : '')}
-    <div class="note">같은 센터 회원끼리만 보는 공간이에요. 올린 글은 언제든 내리거나 지울 수 있습니다.</div>` };
+    <div class="note">${내것 ? '같은 센터 회원끼리만 보는 공간이에요. 올린 글은 언제든 내리거나 지울 수 있습니다.'
+      : '회원들이 올린 오운완·인증샷이에요. 댓글은 「○○ 트레이너」로 남고, 문제 글은 ⋯ 에서 지울 수 있습니다.'}</div>` };
 }
 function 글카드(p){
   const n댓 = 댓글들(p.id).length, n좋 = 좋아요수(p.id), 내글 = p.mid===S.mid && S.who!=='tr';
@@ -9075,7 +9076,9 @@ document.addEventListener('click', async ev=>{
     case 'retry': S.screen='boot'; render(); start(); return;
     case 'switch': S.stack=[]; S.who=null; go('login'); return;
     case 'back': goBack(); return;
-    case 'ttab': S.ttab=rest[0]; goRoot(rest[0]); return;
+    case 'ttab': S.ttab=rest[0]; goRoot(rest[0]);
+      if(rest[0]==='t_community') 커뮤니티받기().then(()=>{ if(S.screen==='t_community') render(); });
+      return;
     case 'tfm': S.tfeed=rest[0]; render(); return;
     case 'tfm2': S.tfeed=rest[0]; S.ttab='t_feed'; go('t_feed'); return;
     case 'pickmem': sheetPickMember(); return;
