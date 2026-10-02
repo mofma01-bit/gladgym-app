@@ -1964,7 +1964,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '238';
+const BUILD = '240';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -4225,6 +4225,13 @@ async function svItem(i){
     if(si){ si.sec=Math.round(it.sec||0); si.locked=!!it.locked;
       si.sets = it.sets.filter(x=>x.done).map(x=>({kg:x.kg,reps:x.reps,spd:x.spd})); } }
   save();
+}
+/* 지난 기록으로 시작 — 종목·순서는 그대로, 세트는 그날 마지막 세트의 무게·횟수를 첫 세트 목표로 (2026-10-02 대표
+   「정해진 루틴 선택 외에도 지난 수업기록에서 바로 선택할 수 있게 · 최근 5~8개 · 수업이든 개인운동이든」) */
+function itemsFromWorkout(w){
+  return (w.items||[]).filter(it=>it.sets && it.sets.length).map(it=>{ const 끝=it.sets[it.sets.length-1];
+    return { ex:it.ex, va:it.va, rest:60, locked:false, sec:0, startAt:Date.now(),
+      sets:[{kg:끝.kg||0, reps:끝.reps||0, spd:exOf(it.ex).cardio?(끝.spd||6.5):undefined, done:false}] }; });
 }
 function itemsFromRoutine(r){
   return r.items.map(it=>({ ex:it.ex, va:it.va, rest:it.rest||60, locked:false, sec:0, startAt:Date.now(),
@@ -7841,16 +7848,10 @@ function bodyPane(mid){
     ${blPane(mid)}
 
     <div class="hr"></div>
-    <span class="lbl">네 방향 다 찍으면 좋아요</span>
-    <div class="posechk">${POSES.map(x => { const n = bphOf(mid,'body',x).length;
-      return `<button class="pc ${n?'on':''}" data-act="bppose:${x}">
-        <span class="bx">${n?'☑':'☐'}</span><span>${x}</span>${n?`<small>${n}</small>`:''}</button>`; }).join('')}</div>
-    <div class="note" style="margin-top:-2px">전면 · 후면 · 좌측 · 우측을 같은 자리에서 찍으면
-      <b>변화가 한눈에</b> 보이고, 리포트에도 그대로 들어갑니다.</div>
-
     <span class="lbl">비포 · 애프터 비교</span>
-    <div class="seg">${POSES.map(x=>
-      `<button class="${pose===x?'on':''}" data-act="bppose:${x}">${x}</button>`).join('')}</div>
+    <!-- 방향 체크 줄은 뺐다 (2026-10-02 대표 「체크박스와 알약탭 두 개가 있는 이유는? 불필요한 건 지워」) — 장수는 알약에 작게 -->
+    <div class="seg">${POSES.map(x=>{ const n = bphOf(mid,'body',x).length;
+      return `<button class="${pose===x?'on':''}" data-act="bppose:${x}">${x}${n?`<small style="opacity:.7;margin-left:3px">${n}</small>`:''}</button>`; }).join('')}</div>
     ${ds.length
       ? `<div class="bcmp" style="margin-top:9px">${cel(L,'비포','L')}${cel(R,'애프터','R')}</div>
          <div class="note">${ds.length>1
@@ -8647,6 +8648,13 @@ function sheetStartSession(mid){
       <div><div class="nm">루틴 ${r.no} · ${esc(r.n)}</div>
       <div class="sm">${r.items.length}종목 · 예상 ${estMin(r)}분</div></div>
       <span class="rt">시작 ›</span></button>`).join('') : '<div class="empty">만들어 둔 루틴이 없어요</div>'}
+    ${(()=>{ const ws = workoutsOf(mid).filter(w=>세트있나(w)).slice(0,8); if(!ws.length) return '';
+      return `<span class="lbl" style="margin-top:6px">지난 기록에서 고르기 <small>최근 ${ws.length}회 · 그날 종목과 무게 그대로</small></span>`
+        + ws.map(w=>{ const its = w.items.filter(it=>it.sets.length);
+          return `<button class="card rowc" data-act="tstartrec:${mid}:${w.id}:수업">
+            <div><div class="nm">${esc(dateTxt(w.date))} · ${w.kind==='수업'?'PT 수업':'개인운동'}</div>
+            <div class="sm">${its.slice(0,3).map(it=>esc(exName(it.ex,it.va))).join(' · ')}${its.length>3?` 외 ${its.length-3}`:''} · ${its.length}종목 · ${Math.round(totalKg(w)).toLocaleString()}kg</div></div>
+            <span class="rt">시작 ›</span></button>`; }).join(''); })()}
     <div class="hr"></div>
     <button class="card rowc" data-act="tstart:${mid}:0:수업">
       <div><div class="nm">빈 운동으로 시작</div><div class="sm">종목을 그때그때 담습니다</div></div>
@@ -9010,6 +9018,11 @@ document.addEventListener('click', async ev=>{
       if(rid && rid!=='0'){ const r=rOf(rid);
         newLive(`루틴 ${r.no} · ${r.n}`, itemsFromRoutine(r), kind, r.id, mid, '트레이너'); }
       else newLive('수업', [], kind, null, mid, '트레이너');
+      return; }
+    case 'tstartrec': {
+      const [mid, wid, kind] = rest; const w = D.workouts.find(x=>x.id===wid); if(!w) return;
+      closeSheet(); S.tmid=mid; S.subj=mid;
+      newLive(`${dateTxt(w.date)} ${w.kind==='수업'?'수업':'개인운동'} 다시`, itemsFromWorkout(w), kind, null, mid, '트레이너');
       return; }
     case 'tgo': { const mid=rest[0];
       if(!adoptLive(mid)){ toast('진행 중인 운동이 없어요'); return; }
