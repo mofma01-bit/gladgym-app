@@ -378,6 +378,20 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .pacts{display:flex;gap:4px;padding:8px 8px 10px}
 .pacts button{flex:none;padding:6px 10px;border-radius:9px;background:var(--dark-3);color:var(--cream,#eee);font-size:12.5px;font-weight:600}
 .pacts button.on{color:var(--gold)}
+.trio.four{grid-template-columns:repeat(4,1fr)}.trio .t4 .k{color:var(--gold)}
+.rmplan{display:flex;flex-direction:column;gap:5px}
+.rmrow{display:grid;grid-template-columns:18px 1fr auto auto;gap:8px;align-items:center;background:var(--dark-3);border-radius:9px;padding:7px 10px;font-size:12.5px}
+.rmrow b{color:var(--gold)}.rmrow span{font-weight:600}.rmrow span small{color:var(--sub);margin-left:5px;font-weight:500}
+.rmrow em{font-style:normal;font-weight:700}.rmrow i{font-style:normal;color:var(--sub);font-size:11px}
+.rmrow.opt{opacity:.7;border:1px dashed var(--line);background:none}
+.rmgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;width:100%}
+.rmc{background:var(--dark-2);border:1px solid var(--line);border-radius:11px;padding:9px 8px;display:flex;flex-direction:column;gap:2px;align-items:flex-start}
+.rmc b{font-size:19px;color:var(--gold)}.rmc b small{font-size:11px;margin-left:2px;color:var(--sub)}
+.rmc span{font-size:12px;font-weight:600;line-height:1.2}.rmc i{font-style:normal;font-size:10.5px;color:var(--sub)}
+.rkbox{background:var(--dark-2);border:1px solid var(--line);border-radius:13px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;flex:none}
+.rkt{font-size:12.5px;font-weight:700;color:var(--sub);margin-bottom:2px}
+.rkr{display:flex;align-items:center;gap:9px;font-size:13.5px}.rkr b{width:20px;color:var(--gold)}.rkr span{flex:1;font-weight:600}.rkr em{font-style:normal;font-weight:700}
+.rkr em small{color:var(--sub);font-weight:500;margin-left:4px}.rkr.me{background:rgba(230,196,135,.08);border-radius:8px;padding:3px 6px;margin:0 -6px}
 .ptc.done{opacity:.6}
 .ptst{font-size:11px;font-weight:700;color:#0e0e0d;background:var(--gold);border-radius:8px;padding:2px 8px;flex:none}
 .ptst.off{background:var(--dark-3);color:var(--sub)}
@@ -1992,7 +2006,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '244';
+const BUILD = '246';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2109,7 +2123,7 @@ function mapWorkouts(wks, witems, wsets){
 }
 
 async function boot(){
-  const [exs, vrs, mems, rts, ritems, asg, wks, witems, wsets, cms, mdesc, intk, plns, bdy, cyc, mls, mits, aks, bphs, blgs, brds, psts, pcms, plks] = await Promise.all([
+  const [exs, vrs, mems, rts, ritems, asg, wks, witems, wsets, cms, mdesc, intk, plns, bdy, cyc, mls, mits, aks, bphs, blgs, brds, psts, pcms, plks, rms] = await Promise.all([
     sget('exercises?select=*&order=sort'),
     sget('variants?select=*&order=sort'),
     sget('members?select=*'),
@@ -2135,8 +2149,11 @@ async function boot(){
     sget('posts?select=*&order=created_at.desc&limit=200').catch(()=>[]),
     sget('post_comments?select=*&order=created_at&limit=3000').catch(()=>[]),
     sget('post_likes?select=*&limit=8000').catch(()=>[]),
+    sget('one_rm?select=*&order=on_date').catch(()=>[]),
   ]);
   커뮤니티담기(psts, pcms, plks);
+  D.rm = (rms||[]).map(r => { const [ex,va] = splitV(r.variant_id);
+    return { id:r.id, mid:r.member_id, ex, va, kg:Number(r.kg||0), reps:Number(r.reps||1), kind:r.kind||'추정', date:r.on_date, wid:r.workout_id||'', by:r.by||'' }; });
 
   EX = exs.map(e => ({ id:e.id, n:e.name, p:e.part, e:e.equip, cardio: e.cardio ? 1 : 0,
     vars: vrs.filter(v => v.ex_id === e.id).map(v => ({ k:v.vkey, n:v.name||'', desc:v.descr||'', demo: v.demo?1:0, du: v.demo_url||'' })) }));
@@ -3842,7 +3859,8 @@ function 세칸(e, v, cur, mid, tr, cms, nw, dsc){
   const p = 직전요약(e, cur, mid);
   const 화 = p.방향==='up' ? '↑' : (p.방향==='down' ? '↓' : '');
   const 시범 = 영상시범(v) ? '영상' : '준비중';
-  return `<div class="trio">
+  const rm가능 = tr && rm종목인가(cur.ex), rmb = rm가능 ? rm최고(mid, cur.ex) : null;
+  return `<div class="trio ${rm가능?'four':''}">
     <button class="t1" data-act="trio:prev">
       <span class="k">직전기록</span>
       <span class="v">${esc(p.v)}${화?`<i class="${p.방향}">${화}</i>`:''}</span></button>
@@ -3852,7 +3870,8 @@ function 세칸(e, v, cur, mid, tr, cms, nw, dsc){
     <button class="t3" data-act="exd:${cur.ex}:${cur.va}${tr?':'+mid:''}">
       <span class="k">${tr?'코멘트 남기기':'설명 · 코멘트'}</span>
       <span class="v">${cms.length?`${cms.length}개`:(dsc?'설명 있음':'—')}</span>
-      ${(!tr&&nw)?'<b class="nw">NEW</b>':''}</button></div>`;
+      ${(!tr&&nw)?'<b class="nw">NEW</b>':''}</button>
+    ${rm가능 ? `<button class="t4" data-act="rm"><span class="k">1RM 재기</span><span class="v">${rmb ? 수(rmb.kg,1)+'kg' : '—'}</span></button>` : ''}</div>`;
 }
 /* 창 — 지금 하는 종목을 그때그때 다시 읽는다 */
 function 지금종목(){ const w=live(); if(!w) return null;
@@ -6154,15 +6173,33 @@ const 언제 = ts => { if(!ts) return ''; const d = new Date(ts), m = (Date.now(
 
 const 파트너경력 = ['6개월 미만','6개월~1년','1~3년','3~5년','5년 이상'];
 const 파트너부위 = ['가슴','등','어깨','팔','하체','복근','유산소','전신'];
+function 랭킹판(){
+  const 기간 = S.rkp || '주';
+  const 시작 = 기간==='주' ? ymd(new Date(Date.now()-6*864e5)) : TODAY.slice(0,7)+'-01';
+  const row = (mid, v) => ({ mid, v });
+  const 운동 = MEMBERS.map(m => row(m.id, D.workouts.filter(w=>w.mid===m.id && w.done && w.date>=시작 && 세트있나(w)).length));
+  const 오운완 = MEMBERS.map(m => row(m.id, (D.bph||[]).filter(x=>x.mid===m.id && x.kind==='ootd' && (x.date||'')>=시작).length));
+  const 연속 = MEMBERS.map(m => row(m.id, profStat(m.id).연속||0));
+  const 삼대 = MEMBERS.map(m => { const s = ['sq','bp','dl'].map(e => { const b = rm최고(m.id, e); return b ? Number(b.kg) : 0; });
+    return Object.assign(row(m.id, s.reduce((a,b)=>a+b,0)), { 상세:s }); });
+  const 판 = (제목, 단위, arr, fmt) => { const top = arr.filter(r=>r.v>0).sort((a,b)=>b.v-a.v).slice(0,5);
+    return `<div class="rkbox"><div class="rkt">${제목}</div>${top.length
+      ? top.map((r,i)=>`<div class="rkr ${r.mid===S.mid?'me':''}"><b>${i+1}</b><span>${esc(이름of(r.mid))}</span><em>${fmt ? fmt(r) : 수(r.v)+단위}</em></div>`).join('')
+      : '<div class="empty">아직 없어요</div>'}</div>`; };
+  return `<div class="seg" style="margin-bottom:8px">${[['주','이번 주'],['달','이번 달']].map(k=>`<button class="${기간===k[0]?'on':''}" data-act="rkp:${k[0]}">${k[1]}</button>`).join('')}</div>
+    ${판('오운완', '장', 오운완)}${판('운동 횟수', '회', 운동)}${판('이어서 운동 중 (오늘 기준)', '일', 연속)}
+    ${판('3대 중량 — 스쿼트 + 벤치 + 데드 1RM', 'kg', 삼대, r => 수(r.v)+'kg <small>'+r.상세.map(x=>수(x)).join(' / ')+'</small>')}
+    <div class="note">같은 센터 회원끼리 보는 순위예요. 3대 중량은 1RM 실측·추정 중 높은 값으로 셉니다.</div>`;
+}
 function vCommunity(){
   const f = S.cfilt || '전체', 모드 = S.cmode || '피드';
   const 내것 = S.who !== 'tr';
   let ps = (D.posts||[]).filter(글볼수있나).filter(p => 모드==='파트너' ? p.kind==='파트너' : p.kind!=='파트너');
   if(f==='내 글') ps = ps.filter(p=>p.mid===S.mid);
-  return { top: bar('커뮤니티', 내것 ? (모드==='파트너' ? `<button class="tbtn" data-act="partnew">＋ 모집 글</button>` : `<button class="tbtn" data-act="postnew">＋ 올리기</button>`) : ''), tabs:1, body:`
-    <div class="seg" style="margin-bottom:6px">${[['피드','피드'],['파트너','운동 파트너 모집']].map(k=>`<button class="${모드===k[0]?'on':''}" data-act="cmode:${k[0]}">${k[1]}</button>`).join('')}</div>
-    <div class="chips" style="margin-bottom:4px">${(내것?['전체','내 글']:['전체']).map(k=>`<button class="chip ${f===k?'on':''}" data-act="cfilt:${k}">${k}</button>`).join('')}</div>
-    ${ps.length ? ps.map(p => p.kind==='파트너' ? 파트너카드(p) : 글카드(p)).join('')
+  return { top: bar('커뮤니티', 내것 && 모드!=='랭킹' ? (모드==='파트너' ? `<button class="tbtn" data-act="partnew">＋ 모집 글</button>` : `<button class="tbtn" data-act="postnew">＋ 올리기</button>`) : ''), tabs:1, body:`
+    <div class="seg" style="margin-bottom:6px">${[['피드','피드'],['파트너','파트너 모집'],['랭킹','랭킹']].map(k=>`<button class="${모드===k[0]?'on':''}" data-act="cmode:${k[0]}">${k[1]}</button>`).join('')}</div>
+    ${모드==='랭킹' ? 랭킹판() : `<div class="chips" style="margin-bottom:4px">${(내것?['전체','내 글']:['전체']).map(k=>`<button class="chip ${f===k?'on':''}" data-act="cfilt:${k}">${k}</button>`).join('')}</div>`}
+    ${모드==='랭킹' ? '' : ps.length ? ps.map(p => p.kind==='파트너' ? 파트너카드(p) : 글카드(p)).join('')
       : (모드==='파트너'
           ? 빔('user', f==='내 글' ? '아직 올린 모집 글이 없어요' : '아직 모집 글이 없어요', 내것 ? '같이 운동할 파트너를 찾아 보세요' : '')
           : 빔('pic', f==='내 글' ? '아직 올린 글이 없어요' : '아직 글이 없어요', 내것 ? '오운완이나 인증샷을 올려 보세요' : ''))}
@@ -6322,6 +6359,69 @@ async function postShareSave(id, 공유){
     }
     내려받기(blob, file.name); toast(공유 ? '공유를 못 열어 내려받았어요' : '갤러리에 저장했어요');
   }catch(e){ console.error(e); toast('사진을 꾹 눌러 저장해 주세요'); }
+}
+
+/* ══ 1RM ══ 추정 = 세트 완료 때 자동(Epley · 12회 이하 · 유산소 제외) · 실측 = 트레이너 「1RM 재기」 */
+const rm추정식 = (kg, reps) => reps<=1 ? kg : (reps>12 ? 0 : kg*(1+reps/30));
+const rm최고 = (mid, ex) => { let b=null;
+  (D.rm||[]).forEach(r=>{ if(r.mid!==mid || r.ex!==ex) return; if(!b || r.kg>b.kg || (r.kg===b.kg && r.kind==='실측')) b=r; }); return b; };
+const rm종목 = mid => { const m={};
+  (D.rm||[]).forEach(r=>{ if(r.mid!==mid) return; const b=m[r.ex]; if(!b || r.kg>b.kg || (r.kg===b.kg && r.kind==='실측')) m[r.ex]=r; });
+  return Object.values(m).sort((a,b)=>b.kg-a.kg); };
+async function rm기록(mid, ex, va, kg, reps, kind, wid, by){
+  const id = 'rm'+Date.now()+Math.random().toString(36).slice(2,5);
+  const row = { id, mid, ex, va, kg, reps, kind, date:TODAY, wid:wid||'', by:by||'' };
+  (D.rm=D.rm||[]).push(row);
+  await sv(spost('one_rm',[{ id, member_id:mid, variant_id:VID(ex,va), kg, reps, kind, on_date:TODAY, workout_id:wid||null, by:by||null }]), '1RM');
+  return row;
+}
+/* 세트를 끝낼 때 — 종목 최고치가 오를 때만 한 줄 남기고 알려 준다 */
+function rm추정확인(w, cur, set){
+  const e = exOf(cur.ex); if(!e || e.cardio || isMemo(cur.ex)) return;
+  const kg = Number(set.kg)||0, reps = Number(set.reps)||0; if(kg<=0 || reps<=0 || reps>12) return;
+  const est = Math.round(rm추정식(kg, reps)*2)/2;
+  const b = rm최고(w.mid, cur.ex); if(b && est <= Number(b.kg)) return;
+  rm기록(w.mid, cur.ex, cur.va, est, reps, '추정', w.id, '자동');
+  toast(`🏆 ${exName(cur.ex,cur.va)} 1RM 추정 ${est}kg${b ? ' — 신기록!' : ''}`);
+}
+/* 1RM 을 재는 종목 — 바벨 큰 운동만 (대표 「일반적으로 1RM 을 측정하는 종목만」) */
+const RM종목 = { sq:'하체', fsq:'하체', dl:'하체', bk01:'하체', bk02:'하체', bp:'상체', ibp:'상체', ohp:'상체' };
+const rm종목인가 = ex => !!RM종목[ex];
+/* 측정 계획 — NSCA 절차. 목표 1RM 에 맞춰 무게는 2.5kg 단위로 반올림 */
+function rm계획(목표, ex){
+  const 상체 = RM종목[ex]==='상체', r = x => Math.max(20, Math.round(x/2.5)*2.5);
+  return [
+    { 단계:'워밍업',  pct:0.50, reps:8, 쉼:'1분',   kg:r(목표*0.50) },
+    { 단계:'준비 1',  pct:0.72, reps:4, 쉼:'2분',   kg:r(목표*0.72) },
+    { 단계:'준비 2',  pct:0.87, reps:2, 쉼:'3분',   kg:r(목표*0.87) },
+    { 단계:'준비 3',  pct:0.95, reps:1, 쉼:'3~4분', kg:r(목표*0.95) },
+    { 단계:'본 시도', pct:1.00, reps:1, 쉼:'3~4분', kg:r(목표) },
+    { 단계:'성공하면', pct: 상체 ? 1.025 : 1.05, reps:1, 쉼:'3~4분', kg:r(목표*(상체 ? 1.025 : 1.05)), 선택:true },
+  ];
+}
+function sheetRM(){
+  const z = 지금종목(); if(!z) return;
+  if(!rm종목인가(z.cur.ex)){ toast('1RM 은 스쿼트·벤치·데드리프트·오버헤드 프레스 같은 바벨 종목에서만 잽니다'); return; }
+  const b = rm최고(z.mid, z.cur.ex);
+  const 성공1회 = z.cur.sets.filter(x=>x.done && Number(x.reps)===1 && Number(x.kg)>0).map(x=>Number(x.kg));
+  const 오늘최고 = 성공1회.length ? Math.max(...성공1회) : 0;
+  S.rmGoal = S.rmGoal || (b ? Number(b.kg) : 0);
+  const 계획 = S.rmGoal > 0 ? rm계획(S.rmGoal, z.cur.ex) : null;
+  openSheet(()=>`
+    <div class="h2">1RM 재기 <small>${esc(exName(z.cur.ex,z.cur.va))}</small></div>
+    ${b ? `<div class="note">지금까지 최고 <b>${수(b.kg,1)}kg</b> (${b.kind} · ${esc(dateTxt(b.date))})</div>` : ''}
+    <div class="fld"><span class="fn">목표 1RM (kg) <small>워밍업부터 본 시도까지 자동으로 깔아 줘요</small></span>
+      <div class="pcmin"><input class="search" type="number" inputmode="decimal" data-k="rmgoal" placeholder="예) 100" value="${S.rmGoal||''}">
+        <button class="btn sub sm" data-act="rmgoal">계획 보기</button></div></div>
+    ${계획 ? `<div class="rmplan">${계획.map((p,i)=>`<div class="rmrow ${p.선택?'opt':''}"><b>${i+1}</b><span>${p.단계}<small>${Math.round(p.pct*100)}%</small></span><em>${수(p.kg,1)}kg × ${p.reps}회</em><i>쉬기 ${p.쉼}</i></div>`).join('')}</div>
+      <button class="btn main" data-act="rmplan">이 계획으로 세트 깔기</button>
+      <div class="note">세트는 평소처럼 「이번 세트 완료」로 기록하세요. 본 시도에서 성공하면 ${RM종목[z.cur.ex]==='상체'?'2.5':'5'}%를 올려 한 번 더, 실패하면 그만큼 내려 다시. <b>시도는 3~5번 안</b>에서 끝냅니다 (근거: NSCA 1RM 측정 절차).</div>` : ''}
+    <div class="hr"></div>
+    <div class="fld"><span class="fn">실측 결과 — 한 번 든 최고 무게 (kg)</span>
+      <input class="search" type="number" inputmode="decimal" data-k="rmkg" placeholder="0" value="${오늘최고 || ''}"></div>
+    <button class="btn ${계획?'sub':'main'}" data-act="rmsave">실측으로 남기기</button>
+    <button class="btn ghost sm" data-act="close">닫기</button>
+    <div class="note">실측은 트레이너가 보는 앞에서 <b>한 번</b> 성공한 무게예요. 오늘 1회 성공 세트가 있으면 그 최고 무게가 미리 들어갑니다. 추정은 세트를 끝낼 때 자동으로 계산됩니다.</div>`);
 }
 
 function ootdPick(wid){
@@ -6862,6 +6962,9 @@ function vProfile(){
       ${st.연속>1?`<span class="pfstreak">🔥 ${st.연속}일 이어서 운동 중</span>`:''}
     </div>
 
+    ${(()=>{ const rs = rm종목(mid).slice(0,6); if(!rs.length) return '';
+      return `<span class="lbl">1RM <small>종목별 최고 · ✓ 실측</small></span>
+      <div class="rmgrid">${rs.map(r=>`<div class="rmc"><b>${수(r.kg,1)}<small>kg</small></b><span>${esc(exName(r.ex,r.va))}</span><i>${r.kind==='실측'?'✓ 실측':'추정'} · ${esc(dateTxt(r.date))}</i></div>`).join('')}</div>`; })()}
     <span class="lbl">오운완 · 인증샷 ${사진.length?`· ${사진.length}장`:''}</span>
     ${사진.length
       ? `<div class="pgrid">${사진.map(x=>`<button class="pg ${x.hid?'hid':''}" data-act="ootdview:${x.id}">
@@ -10036,6 +10139,11 @@ document.addEventListener('click', async ev=>{
     case 'rep': { const cur=w.items[w.cur], last=cur.sets[cur.sets.length-1];
       if(!last || last.done) return;
       last.done=true; last.at=Date.now(); save();
+      try{ rm추정확인(w, cur, last); }catch(e){ console.warn('1RM 추정', e); }
+      /* 1RM 측정 계획 중이면 다음 단계를 바로 깐다 */
+      if(cur.rmPlan){ const nx = cur.rmPlan[cur.sets.length];
+        if(nx){ cur.sets.push({ kg:nx.kg, reps:nx.reps, done:false }); save(); toast('다음 '+nx.단계+' — '+nx.kg+'kg × '+nx.reps+'회 · 쉬기 '+nx.쉼); }
+        else toast('본 시도까지 끝 — 「1RM 재기」에서 실측으로 남기세요'); }
       render(); return; }
     case 'nextset': { const cur=w.items[w.cur], last=cur.sets[cur.sets.length-1];
       if(!last || !last.done) return toast('이번 세트를 먼저 완료해 주세요');
@@ -10148,6 +10256,20 @@ document.addEventListener('click', async ev=>{
       closeSheet(); toast('저장했어요'); render(); return; }
     case 'ootdre': closeSheet(); ootdPick(rest[0]); return;
     /* ── 커뮤니티 ── */
+    case 'rm': S.rmGoal = 0; sheetRM(); return;
+    case 'rmgoal': { const el=document.querySelector('[data-k="rmgoal"]'); S.rmGoal = el ? Number(el.value)||0 : 0;
+      if(!(S.rmGoal>0)){ toast('목표 1RM 을 적어 주세요'); return; } sheetRM(); return; }
+    case 'rmplan': { const z=지금종목(); if(!z || !(S.rmGoal>0)) return;
+      const 계획 = rm계획(S.rmGoal, z.cur.ex).filter(p=>!p.선택);
+      if(z.cur.sets.some(x=>x.done)){ toast('이미 끝낸 세트가 있어요 — 새 종목으로 넣어 재 주세요'); return; }
+      z.cur.sets = [{ kg:계획[0].kg, reps:계획[0].reps, done:false }];     /* 첫 세트만 — 완료할 때마다 다음 단계가 자동으로 온다 */
+      z.cur.rmPlan = 계획; z.cur.rmGoal = S.rmGoal; save(); closeSheet();
+      toast('워밍업 '+계획[0].kg+'kg × '+계획[0].reps+'회부터 — 완료하면 다음 단계가 자동으로 깔려요'); render(); return; }
+    case 'rmsave': { const z=지금종목(); if(!z) return; const el=document.querySelector('[data-k="rmkg"]'); const kg=el?Number(el.value):0;
+      if(!(kg>0)){ toast('무게를 적어 주세요'); return; }
+      rm기록(z.mid, z.cur.ex, z.cur.va, kg, 1, '실측', z.w.id, S.who==='tr' ? (TRAINER||'트레이너') : '회원');
+      closeSheet(); toast('1RM 실측 '+kg+'kg 남겼어요'); render(); return; }
+    case 'rkp': S.rkp=rest[0]; render(); return;
     case 'cfilt': S.cfilt=rest[0]; render(); return;
     case 'cmode': S.cmode=rest[0]; S.cfilt='전체'; render(); return;
     case 'partnew': S.part=null; sheetPartnerWrite(); return;
