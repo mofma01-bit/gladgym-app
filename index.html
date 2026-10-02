@@ -363,6 +363,25 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .ibfd .blrow{text-align:left}
 .ibfd .d0{white-space:nowrap}
 /* 홈 오운완 — 오늘 기록을 마쳤는데 아직 안 찍었을 때만 (2026-09-19 대표: 「놓칠 수 있으니까 메인 화면에도」) */
+.pickbox{max-height:52vh;overflow-y:auto;display:flex;flex-direction:column;gap:9px;padding:2px 0}
+.dim2{color:var(--sub);font-weight:500;margin-left:6px;font-size:12px}
+/* 커뮤니티 */
+.pcard{background:var(--dark-2);border:1px solid var(--line);border-radius:14px;overflow:hidden;flex:none}
+.phead{display:flex;align-items:center;gap:9px;padding:10px 12px}
+.pav{width:30px;height:30px;border-radius:50%;background:var(--dark-3);color:var(--gold);font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
+.pwho{flex:1;font-weight:700;font-size:13px;display:flex;flex-direction:column;line-height:1.25}
+.pwho small{font-weight:500;color:var(--sub);font-size:11px}
+.pmore{color:var(--sub);font-size:18px;padding:0 4px}
+.pimgw{display:block;width:100%;padding:0;background:#000}
+.pimg{display:block;width:100%;max-height:420px;object-fit:cover}
+.pcap{padding:9px 12px 0;font-size:13px;line-height:1.5;white-space:pre-wrap}
+.pacts{display:flex;gap:4px;padding:8px 8px 10px}
+.pacts button{flex:none;padding:6px 10px;border-radius:9px;background:var(--dark-3);color:var(--cream,#eee);font-size:12.5px;font-weight:600}
+.pacts button.on{color:var(--gold)}
+.pcms{display:flex;flex-direction:column;gap:7px}
+.pcm{font-size:13px;line-height:1.45}.pcm b{color:var(--gold);margin-right:4px}.pcm small{display:block;color:var(--sub);font-size:11px}
+.pcm small button{color:var(--sub);text-decoration:underline}
+.pcmin{display:flex;gap:7px}.pcmin input{flex:1}
 .pg{position:relative}.pg.hid img{opacity:.45}
 .pg .pgk{position:absolute;left:5px;top:5px;font-size:12px;background:rgba(0,0,0,.45);border-radius:8px;padding:1px 5px}
 .pg .pgw{position:absolute;left:5px;bottom:22px;font-size:10px;font-weight:700;color:#fff;background:rgba(200,70,50,.85);border-radius:6px;padding:1px 6px}
@@ -1964,7 +1983,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '241';
+const BUILD = '242';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2081,7 +2100,7 @@ function mapWorkouts(wks, witems, wsets){
 }
 
 async function boot(){
-  const [exs, vrs, mems, rts, ritems, asg, wks, witems, wsets, cms, mdesc, intk, plns, bdy, cyc, mls, mits, aks, bphs, blgs, brds] = await Promise.all([
+  const [exs, vrs, mems, rts, ritems, asg, wks, witems, wsets, cms, mdesc, intk, plns, bdy, cyc, mls, mits, aks, bphs, blgs, brds, psts, pcms, plks] = await Promise.all([
     sget('exercises?select=*&order=sort'),
     sget('variants?select=*&order=sort'),
     sget('members?select=*'),
@@ -2103,7 +2122,12 @@ async function boot(){
     sget('body_photos?select=*&order=on_date').catch(()=>[]),
     sget('body_logs?select=*&order=on_date').catch(()=>[]),
     sget('body_rounds?select=*&order=on_date').catch(()=>[]),
+    /* 커뮤니티 (2026-10-02) — 표가 아직 없어도 앱은 뜬다 */
+    sget('posts?select=*&order=created_at.desc&limit=200').catch(()=>[]),
+    sget('post_comments?select=*&order=created_at&limit=3000').catch(()=>[]),
+    sget('post_likes?select=*&limit=8000').catch(()=>[]),
   ]);
+  커뮤니티담기(psts, pcms, plks);
 
   EX = exs.map(e => ({ id:e.id, n:e.name, p:e.part, e:e.equip, cardio: e.cardio ? 1 : 0,
     vars: vrs.filter(v => v.ex_id === e.id).map(v => ({ k:v.vkey, n:v.name||'', desc:v.descr||'', demo: v.demo?1:0, du: v.demo_url||'' })) }));
@@ -3121,7 +3145,7 @@ function render(){
   else { S.draft = {}; S.exq = ''; }   /* 화면이 바뀌면 찾던 말도 비운다 */
   const V={login:vLogin,home:vHome,routines:vRoutines,routine:vRoutine,start:vStart,pick:vPick,
     workout:vWorkout,summary:vSummary,report:vReport,records:vRecords,record:vRecord,feedback:vFeedback,me:vMe,
-    profile:vProfile,
+    profile:vProfile, community:vCommunity,
     prep:vPrep, prep2:vPrep2, prep3:vPrep3,
     t_members:tMembers,t_member:tMember,t_live:tLive,t_write:tWrite,t_routines:tRoutines,t_redit:tRedit,t_ex:tEx,
     intake:vIntake, plan:vPlan, body:vBody, cycle:vCycle, qa:vQa, boot:vBoot, err:vErr,
@@ -3192,6 +3216,7 @@ function tabBar(){
     <span class="ic">${ic}${bd?'<span class="bd"></span>':''}</span><span>${nm}</span></button>`;
   return t('home',svg('home',22),'홈')+t('records',svg('bars',22),'분석')
        +t('diet',svg('bowl',22),'식단')
+       +t('community',svg('grid',22),'커뮤니티')
        +t('feedback',svg('mail',22),'피드백',u>0)+t('me',svg('user',22),'내 정보');
 }
 /* 코멘트를 아직 안 단 운동인가 */
@@ -6087,6 +6112,144 @@ function ootdDraw(img, w){
   return cv.toDataURL('image/jpeg', 0.92);
 }
 
+/* ══ 커뮤니티 ══ (2026-10-02 대표 「로그인 전이라도 미리 붙여놔 — 생성 · 게시 올리기 · 공유 · 저장 · 댓글」)
+   표: posts(글) · post_comments(댓글) · post_likes(좋아요). 사진은 body_photos 와 같은 저장소.
+   ⛔ 로그인이 없어 글쓴이는 「지금 고른 회원」이다. 전화 인증이 붙으면 그 사람으로 묶는다. */
+function 커뮤니티담기(psts, pcms, plks){
+  D.posts = (psts||[]).map(p => ({ id:p.id, mid:p.member_id, kind:p.kind||'오운완', photo_id:p.photo_id||'', path:p.path,
+    cap:p.caption||'', vis:p.visibility||'센터', by:p.taken_by||'', hid:p.hidden_at||'', ts:p.created_at||'' }));
+  D.pcm = (pcms||[]).map(c => ({ id:c.id, pid:c.post_id, mid:c.member_id||'', who:c.author||'', body:c.body||'', ts:c.created_at||'' }));
+  D.plk = (plks||[]).map(l => ({ pid:l.post_id, mid:l.member_id }));
+}
+async function 커뮤니티받기(){
+  try{
+    const [a,b,c] = await Promise.all([
+      sget('posts?select=*&order=created_at.desc&limit=200'),
+      sget('post_comments?select=*&order=created_at&limit=3000'),
+      sget('post_likes?select=*&limit=8000')]);
+    커뮤니티담기(a,b,c);
+  }catch(e){ console.warn('커뮤니티 받기', e); }
+}
+const 글쓴이 = () => (S.who==='tr') ? { mid:'', who:(TRAINER||'트레이너') + ' 트레이너' } : { mid:S.mid, who:(MEMBERS.find(m=>m.id===S.mid)||{}).n||'회원' };
+const 이름of = mid => (MEMBERS.find(m=>m.id===mid)||{}).n || '회원';
+/* 내 글은 내려 둔 것도 본다(다시 올리거나 지우려면 보여야 한다) · 남의 글은 센터 범위이고 안 내린 것만 · 트레이너는 안 내린 것 전부 */
+const 글볼수있나 = p => (p.mid===S.mid && S.who!=='tr') ? true : (!p.hid && (p.vis==='센터' || S.who==='tr'));
+const 좋아요수 = pid => (D.plk||[]).filter(l=>l.pid===pid).length;
+const 내좋아요 = pid => S.who!=='tr' && (D.plk||[]).some(l=>l.pid===pid && l.mid===S.mid);
+const 댓글들 = pid => (D.pcm||[]).filter(c=>c.pid===pid);
+const 언제 = ts => { if(!ts) return ''; const d = new Date(ts), m = (Date.now()-d)/60000;
+  if(m < 1) return '방금'; if(m < 60) return Math.round(m)+'분 전'; if(m < 1440) return Math.round(m/60)+'시간 전';
+  return (d.getMonth()+1)+'월 '+d.getDate()+'일'; };
+
+function vCommunity(){
+  const f = S.cfilt || '전체';
+  const 내것 = S.who !== 'tr';
+  let ps = (D.posts||[]).filter(글볼수있나);
+  if(f==='내 글') ps = ps.filter(p=>p.mid===S.mid);
+  return { top: bar('커뮤니티', 내것 ? `<button class="tbtn" data-act="postnew">＋ 올리기</button>` : ''), tabs:1, body:`
+    <div class="seg" style="margin-bottom:4px">${(내것?['전체','내 글']:['전체']).map(k=>`<button class="${f===k?'on':''}" data-act="cfilt:${k}">${k}</button>`).join('')}</div>
+    ${ps.length ? ps.map(글카드).join('')
+      : 빔('pic', f==='내 글' ? '아직 올린 글이 없어요' : '아직 글이 없어요', 내것 ? '오운완이나 인증샷을 올려 보세요' : '')}
+    <div class="note">같은 센터 회원끼리만 보는 공간이에요. 올린 글은 언제든 내리거나 지울 수 있습니다.</div>` };
+}
+function 글카드(p){
+  const n댓 = 댓글들(p.id).length, n좋 = 좋아요수(p.id), 내글 = p.mid===S.mid && S.who!=='tr';
+  return `<div class="pcard">
+    <div class="phead"><span class="pav">${esc(이름of(p.mid).slice(0,1))}</span>
+      <span class="pwho">${esc(이름of(p.mid))}<small>${esc(p.kind)}${p.by && p.kind==='인증샷' ? ' · '+esc(p.by)+' 찍음' : ''} · ${언제(p.ts)}${p.hid ? ' · <b style="color:var(--warn)">내려둠</b>' : (p.vis==='나만' ? ' · 나만 보기' : '')}</small></span>
+      ${내글 || S.who==='tr' ? `<button class="pmore" data-act="pmore:${p.id}">⋯</button>` : ''}</div>
+    <button class="pimgw" data-act="popen:${p.id}"><img class="pimg" src="${esc(phURL(p.path))}" alt="" loading="lazy" onerror="picFail(this)"></button>
+    ${p.cap ? `<div class="pcap">${esc(p.cap)}</div>` : ''}
+    <div class="pacts">
+      <button class="${내좋아요(p.id)?'on':''}" data-act="plike:${p.id}">${내좋아요(p.id)?'❤️':'🤍'} ${n좋||''}</button>
+      <button data-act="popen:${p.id}">💬 ${n댓||''}</button>
+      <button data-act="pshare:${p.id}">공유</button>
+      <button data-act="psave:${p.id}">저장</button>
+    </div></div>`;
+}
+/* 올리기 — ① 어디서 : 내 오운완·인증샷 중에서 / 새 사진 ② 한마디 + 범위 */
+function sheetPostNew(){
+  const 사진 = 사진모음(S.mid, true).filter(x => !(D.posts||[]).some(p=>p.photo_id===x.id)).slice(0, 12);
+  openSheet(()=>`
+    <div class="h2">올리기 <small>내 사진 중에서 고르거나 새로 찍어요</small></div>
+    ${사진.length ? `<div class="pgrid">${사진.map(x=>`<button class="pg" data-act="postfrom:${x.id}">
+        <img src="${esc(phURL(x.path))}" alt="" loading="lazy" onerror="picFail(this)">${x.kind==='pair'?'<span class="pgk">🤝</span>':''}
+        <span class="pgd">${(x.date||'').slice(5).replace('-','.')}</span></button>`).join('')}</div>` : '<div class="empty">올릴 수 있는 오운완·인증샷이 아직 없어요</div>'}
+    <button class="btn sub" data-act="postpick">📷 새 사진 고르기</button>
+    <button class="btn ghost sm" data-act="close">닫기</button>`);
+}
+function sheetPostWrite(){
+  const n = S.pnew; if(!n) return;
+  openSheet(()=>`
+    <div class="h2">한마디 <small>안 적어도 돼요</small></div>
+    <img class="shot ootdimg" src="${esc(n.url)}" alt="">
+    <textarea class="search" data-k="pcap" rows="2" maxlength="140" placeholder="예) 오늘 스쿼트 50kg 성공!">${esc(n.cap||'')}</textarea>
+    <div class="seg">${['센터','나만'].map(v=>`<button class="${(n.vis||'센터')===v?'on':''}" data-act="postvis:${v}">${v==='센터'?'센터 회원끼리':'나만 보기'}</button>`).join('')}</div>
+    <button class="btn main" data-act="postsend">올리기</button>
+    <button class="btn ghost sm" data-act="close">닫기</button>`);
+}
+function postPick(){
+  const inp = document.createElement('input');
+  inp.type='file'; inp.accept='image/*'; inp.style.display='none'; document.body.appendChild(inp);
+  inp.addEventListener('change', () => {
+    const f = inp.files && inp.files[0]; inp.remove(); if(!f) return;
+    const img = new Image();
+    img.onload = async () => { try{
+      const N = 1600, 비 = Math.min(1, N / Math.max(img.naturalWidth, img.naturalHeight));
+      const cv = document.createElement('canvas'); cv.width = Math.round(img.naturalWidth*비); cv.height = Math.round(img.naturalHeight*비);
+      cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height); URL.revokeObjectURL(img.src);
+      const blob = await new Promise(r => cv.toBlob(r, 'image/jpeg', 0.9));
+      S.pnew = { kind:'사진', blob, url:URL.createObjectURL(blob), vis:'센터', cap:'' }; sheetPostWrite();
+    }catch(e){ console.error(e); toast('사진을 만들지 못했어요'); } };
+    img.onerror = () => toast('사진을 읽지 못했어요');
+    img.src = URL.createObjectURL(f);
+  });
+  inp.click();
+}
+async function postSend(){
+  const n = S.pnew; if(!n) return;
+  const ta = document.querySelector('[data-k="pcap"]'); n.cap = ta ? ta.value.trim() : (n.cap||'');
+  const id = 'po' + Date.now(); let path = n.path;
+  closeSheet(); toast('올리는 중이에요');
+  if(!path){
+    path = `posts/${S.mid}/${id}.jpg`;
+    const r = await fetch(SB_URL+'/storage/v1/object/media/'+path, {
+      method:'POST', headers:{ apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'image/jpeg' }, body: n.blob });
+    if(!r.ok){ toast('사진을 못 올렸어요'); console.error(await r.text()); return; }
+  }
+  const row = { id, member_id:S.mid, kind:n.kind||'사진', photo_id:n.photo_id||null, path, caption:n.cap||'', visibility:n.vis||'센터', taken_by:n.by||null };
+  await sv(spost('posts',[row]), '글 올리기');
+  D.posts = D.posts || []; D.posts.unshift({ id, mid:S.mid, kind:row.kind, photo_id:row.photo_id||'', path, cap:row.caption, vis:row.visibility, by:row.taken_by||'', hid:'', ts:new Date().toISOString() });
+  try{ if(n.url && n.url.startsWith('blob:')) URL.revokeObjectURL(n.url); }catch(e){}
+  S.pnew = null; S.tab='community'; S.cfilt='전체'; toast('올렸어요'); goRoot('community');
+}
+function sheetPost(id){
+  const p = (D.posts||[]).find(x=>x.id===id); if(!p) return;
+  const 트 = S.who==='tr';
+  openSheet(()=>{ const cs = 댓글들(id); return `
+    <div class="h2">${esc(이름of(p.mid))} <small>${esc(p.kind)} · ${언제(p.ts)}</small></div>
+    <img class="shot ootdimg" src="${esc(phURL(p.path))}" alt="" onerror="picFail(this)">
+    ${p.cap ? `<div class="pcap">${esc(p.cap)}</div>` : ''}
+    <div class="pacts">
+      <button class="${내좋아요(id)?'on':''}" data-act="plike:${id}">${내좋아요(id)?'❤️':'🤍'} ${좋아요수(id)||''}</button>
+      <button data-act="pshare:${id}">공유</button><button data-act="psave:${id}">저장</button></div>
+    <span class="lbl">댓글 ${cs.length ? '· '+cs.length : ''}</span>
+    ${cs.length ? `<div class="pcms">${cs.map(c=>`<div class="pcm"><b>${esc(c.who)}</b> ${esc(c.body)}<small>${언제(c.ts)}${(c.mid && c.mid===S.mid && !트) || 트 ? ` · <button data-act="pcdel:${c.id}">지우기</button>` : ''}</small></div>`).join('')}</div>` : '<div class="note">첫 댓글을 남겨 보세요</div>'}
+    <div class="pcmin"><input class="search" type="text" data-k="pcm" maxlength="120" placeholder="응원 한마디"><button class="btn main sm" data-act="pcsend:${id}">남기기</button></div>
+    <button class="btn ghost sm" data-act="close">닫기</button>`; });
+}
+async function postShareSave(id, 공유){
+  const p = (D.posts||[]).find(x=>x.id===id); if(!p) return;
+  try{
+    const blob = await (await fetch(phURL(p.path))).blob();
+    const file = new File([blob], '글래드짐_'+(p.ts||'').slice(0,10)+'.jpg', { type:'image/jpeg' });
+    if((공유 || 아이폰()) && navigator.canShare && navigator.canShare({ files:[file] })){
+      try{ await navigator.share({ files:[file], text:p.cap||'' }); return; }catch(e){ if(e.name==='AbortError') return; }
+    }
+    내려받기(blob, file.name); toast(공유 ? '공유를 못 열어 내려받았어요' : '갤러리에 저장했어요');
+  }catch(e){ console.error(e); toast('사진을 꾹 눌러 저장해 주세요'); }
+}
+
 function ootdPick(wid){
   const w = D.workouts.find(z => z.id === wid); if(!w) return;
   if(w.date !== TODAY){ toast('지난 날짜 기록은 오운완을 찍을 수 없어요'); return; }
@@ -6644,6 +6807,7 @@ function sheetOotdView(id){
     ${트 && x.dreq ? `<div class="note" style="color:var(--warn)">회원이 <b>완전 삭제</b>를 요청했어요 (${esc(dateTxt(String(x.dreq).slice(0,10)))}). 아래 「지우기」로 들어 주세요.</div>`
       : (트 && x.hid ? `<div class="note">회원이 자기 화면에서 숨겼어요 — 트레이너 화면에만 보입니다.</div>` : '')}
     <button class="btn main sm" data-act="ootddl2:${x.id}">갤러리에 저장</button>
+    ${!트 && !(D.posts||[]).some(p=>p.photo_id===x.id) ? `<button class="btn sub sm" data-act="postfrom:${x.id}">커뮤니티에 올리기</button>` : ''}
     ${w?`<button class="btn sub sm" data-act="orec:${w.id}">그날 기록 보기</button>`:''}
     ${트
       ? `<button class="btn ghost sm" data-act="ootddel:${x.id}" style="color:var(--warn)">이 사진 지우기</button>`
@@ -8648,19 +8812,35 @@ function sheetStartSession(mid){
       <div><div class="nm">루틴 ${r.no} · ${esc(r.n)}</div>
       <div class="sm">${r.items.length}종목 · 예상 ${estMin(r)}분</div></div>
       <span class="rt">시작 ›</span></button>`).join('') : '<div class="empty">만들어 둔 루틴이 없어요</div>'}
-    ${(()=>{ const ws = workoutsOf(mid).filter(w=>세트있나(w)).slice(0,8); if(!ws.length) return '';
-      return `<span class="lbl" style="margin-top:6px">지난 기록에서 고르기 <small>최근 ${ws.length}회 · 그날 종목과 무게 그대로</small></span>`
-        + ws.map(w=>{ const its = w.items.filter(it=>it.sets.length);
-          return `<button class="card rowc" data-act="tstartrec:${mid}:${w.id}:수업">
-            <div><div class="nm">${esc(dateTxt(w.date))} · ${w.kind==='수업'?'PT 수업':'개인운동'}</div>
-            <div class="sm">${its.slice(0,3).map(it=>esc(exName(it.ex,it.va))).join(' · ')}${its.length>3?` 외 ${its.length-3}`:''} · ${its.length}종목 · ${Math.round(totalKg(w)).toLocaleString()}kg</div></div>
-            <span class="rt">시작 ›</span></button>`; }).join(''); })()}
+    ${(()=>{ const ws = workoutsOf(mid).filter(w=>세트있나(w)); if(!ws.length) return '';
+      const w = ws[0];
+      return `<button class="card rowc teal" data-act="tstartrecs:${mid}">
+        <div><div class="nm t">지난 기록에서 고르기</div>
+        <div class="sm">최근 ${esc(dateTxt(w.date))} ${w.kind==='수업'?'수업':'개인운동'} 등 ${Math.min(ws.length,12)}회 · 그날 종목과 무게 그대로</div></div>
+        <span class="rt">›</span></button>`; })()}
     <div class="hr"></div>
     <button class="card rowc" data-act="tstart:${mid}:0:수업">
       <div><div class="nm">빈 운동으로 시작</div><div class="sm">종목을 그때그때 담습니다</div></div>
       <span class="rt">＋</span></button>
     <button class="btn ghost sm" data-act="close">닫기</button>
     <div class="note">트레이너가 시작해도 <b>회원 기록으로</b> 남습니다. 회원 폰에서도 같은 운동이 보입니다.</div>`);
+}
+
+/* 지난 기록 고르기 — 시트 안에서 스크롤 (2026-10-02 대표 「쭉 나열 말고 창 선택하고 스크롤로」) */
+function sheetRecentPick(mid){
+  const m = MEMBERS.find(x=>x.id===mid) || {n:''};
+  const f = S.trf || '전체';
+  const all = workoutsOf(mid).filter(w=>세트있나(w));
+  const ws = all.filter(w => f==='전체' || w.kind===f).slice(0, 12);
+  openSheet(()=>`
+    <div class="h2">지난 기록에서 고르기 <small>${esc(m.n)} 회원 · 그날 종목과 무게 그대로</small></div>
+    <div class="seg">${['전체','수업','개인운동'].map(k=>`<button class="${f===k?'on':''}" data-act="trf:${mid}:${k}">${k==='수업'?'PT 수업':k}</button>`).join('')}</div>
+    <div class="pickbox">${ws.length ? ws.map(w=>{ const its = w.items.filter(it=>it.sets.length);
+      return `<button class="card rowc" data-act="tstartrec:${mid}:${w.id}:수업">
+        <div><div class="nm">${esc(dateTxt(w.date))} <small class="dim2">${w.kind==='수업'?'PT 수업':'개인운동'} · ${its.length}종목 · ${Math.round(totalKg(w)).toLocaleString()}kg</small></div>
+        <div class="sm">${its.slice(0,4).map(it=>esc(exName(it.ex,it.va))).join(' · ')}${its.length>4?` 외 ${its.length-4}`:''}</div></div>
+        <span class="rt">시작 ›</span></button>`; }).join('') : '<div class="empty">그런 기록이 없어요</div>'}</div>
+    <button class="btn ghost sm" data-act="tstartask:${mid}">‹ 루틴으로 돌아가기</button>`);
 }
 
 /* ── 루틴에 담을 종목 고르기 ── */
@@ -9019,6 +9199,8 @@ document.addEventListener('click', async ev=>{
         newLive(`루틴 ${r.no} · ${r.n}`, itemsFromRoutine(r), kind, r.id, mid, '트레이너'); }
       else newLive('수업', [], kind, null, mid, '트레이너');
       return; }
+    case 'tstartrecs': S.tmid=rest[0]; S.trf='전체'; sheetRecentPick(rest[0]); return;
+    case 'trf': S.trf=rest[1]; sheetRecentPick(rest[0]); return;
     case 'tstartrec': {
       const [mid, wid, kind] = rest; const w = D.workouts.find(x=>x.id===wid); if(!w) return;
       closeSheet(); S.tmid=mid; S.subj=mid;
@@ -9240,7 +9422,9 @@ document.addEventListener('click', async ev=>{
       S.day = n; render(); return; }
     case 'tab': {
       if(live() && S.screen==='workout'){ sheetLeave(rest[0]); return; }
-      S.tab=rest[0]; goRoot(rest[0]); return; }
+      S.tab=rest[0]; goRoot(rest[0]);
+      if(rest[0]==='community') 커뮤니티받기().then(()=>{ if(S.screen==='community') render(); });
+      return; }
     case 'close': S.editDesc=null; closeSheet(); return;
 
     case 'rt': S.rid=rest[0]; go('routine'); return;
@@ -9887,6 +10071,43 @@ document.addEventListener('click', async ev=>{
       profSave(S.mid, { bio: el ? el.value.trim() : '' });   /* 저장은 뒤에서 마저 */
       closeSheet(); toast('저장했어요'); render(); return; }
     case 'ootdre': closeSheet(); ootdPick(rest[0]); return;
+    /* ── 커뮤니티 ── */
+    case 'cfilt': S.cfilt=rest[0]; render(); return;
+    case 'postnew': sheetPostNew(); return;
+    case 'postpick': closeSheet(); postPick(); return;
+    case 'postfrom': { const x=(D.bph||[]).find(y=>y.id===rest[0]); if(!x) return;
+      S.pnew = { kind: x.kind==='pair'?'인증샷':'오운완', photo_id:x.id, path:x.path, url:phURL(x.path), vis:'센터', cap:'', by:x.by||'' };
+      sheetPostWrite(); return; }
+    case 'postvis': { if(!S.pnew) return; const ta=document.querySelector('[data-k="pcap"]'); if(ta) S.pnew.cap=ta.value; S.pnew.vis=rest[0]; drawSheet(); return; }
+    case 'postsend': postSend(); return;
+    case 'popen': sheetPost(rest[0]); return;
+    case 'plike': { if(S.who==='tr'){ toast('좋아요는 회원끼리만'); return; }
+      const pid=rest[0], i=(D.plk||[]).findIndex(l=>l.pid===pid && l.mid===S.mid);
+      if(i>=0){ D.plk.splice(i,1); sv(sdel('post_likes','post_id=eq.'+pid+'&member_id=eq.'+S.mid), '좋아요 취소'); }
+      else { (D.plk=D.plk||[]).push({pid, mid:S.mid}); sv(spost('post_likes',[{post_id:pid, member_id:S.mid}]), '좋아요'); }
+      render(); if(sheetRender) drawSheet(); return; }
+    case 'pshare': postShareSave(rest[0], true); return;
+    case 'psave': postShareSave(rest[0], false); return;
+    case 'pmore': { const p=(D.posts||[]).find(x=>x.id===rest[0]); if(!p) return;
+      openSheet(()=>`<div class="h2">이 글</div>
+        ${p.mid===S.mid && S.who!=='tr' ? `<button class="btn sub" data-act="phide:${p.id}">${p.hid?'다시 올리기':'내리기 (나만 보기)'}</button>` : ''}
+        <button class="btn ghost" data-act="pdel:${p.id}" style="color:var(--warn)">지우기</button>
+        <button class="btn ghost sm" data-act="close">닫기</button>`); return; }
+    case 'phide': { const p=(D.posts||[]).find(x=>x.id===rest[0]); if(!p) return;
+      p.hid = p.hid ? '' : new Date().toISOString(); p.vis = p.hid ? '나만' : '센터';
+      sv(spatch('posts','id=eq.'+p.id, { hidden_at:p.hid||null, visibility:p.vis }), '글 내리기'); closeSheet(); render(); return; }
+    case 'pdel': { const p=(D.posts||[]).find(x=>x.id===rest[0]); if(!p) return;
+      if(!confirm('이 글을 지울까요? 댓글도 같이 지워집니다.')) return;
+      D.posts = D.posts.filter(x=>x.id!==p.id); D.pcm = (D.pcm||[]).filter(c=>c.pid!==p.id); D.plk = (D.plk||[]).filter(l=>l.pid!==p.id);
+      sv(sdel('posts','id=eq.'+p.id), '글 지우기');
+      if(p.path.startsWith('posts/')) fetch(SB_URL+'/storage/v1/object/media/'+p.path, {method:'DELETE',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}}).catch(()=>{});
+      closeSheet(); toast('지웠어요'); render(); return; }
+    case 'pcsend': { const el=document.querySelector('[data-k="pcm"]'); const body=el?el.value.trim():''; if(!body){ toast('한마디를 적어 주세요'); return; }
+      const g=글쓴이(), id='pc'+Date.now(), ts=new Date().toISOString();
+      (D.pcm=D.pcm||[]).push({ id, pid:rest[0], mid:g.mid, who:g.who, body, ts });
+      sv(spost('post_comments',[{ id, post_id:rest[0], member_id:g.mid||null, author:g.who, body }]), '댓글');
+      drawSheet(); render(); return; }
+    case 'pcdel': { D.pcm=(D.pcm||[]).filter(c=>c.id!==rest[0]); sv(sdel('post_comments','id=eq.'+rest[0]), '댓글 지우기'); drawSheet(); render(); return; }
     case 'pair': pairPick(rest[0]); return;
     case 'pairre': closeSheet(); pairPick(rest[0]); return;
     case 'pairsave': pairSave(); return;
