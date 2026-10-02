@@ -378,6 +378,15 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .pacts{display:flex;gap:4px;padding:8px 8px 10px}
 .pacts button{flex:none;padding:6px 10px;border-radius:9px;background:var(--dark-3);color:var(--cream,#eee);font-size:12.5px;font-weight:600}
 .pacts button.on{color:var(--gold)}
+.ptc.done{opacity:.6}
+.ptst{font-size:11px;font-weight:700;color:#0e0e0d;background:var(--gold);border-radius:8px;padding:2px 8px;flex:none}
+.ptst.off{background:var(--dark-3);color:var(--sub)}
+.ptbody{display:block;width:100%;text-align:left;padding:0 12px 4px}
+.ptgrid{display:grid;grid-template-columns:auto 1fr auto 1fr;gap:5px 10px;font-size:12.5px;align-items:center}
+.ptgrid i{color:var(--sub);font-style:normal;font-size:11.5px}.ptgrid b{font-weight:600}
+.ptgrid i:nth-last-child(2){grid-column:1}.ptgrid b:last-child{grid-column:2/5}
+.big3{display:flex;gap:7px}.big3 label{flex:1;display:flex;flex-direction:column;gap:3px;font-size:11.5px;color:var(--sub)}
+.fld .fn em{font-style:normal;color:var(--gold);font-size:11px;margin-left:4px}
 .pcms{display:flex;flex-direction:column;gap:7px}
 .pcm{font-size:13px;line-height:1.45}.pcm b{color:var(--gold);margin-right:4px}.pcm small{display:block;color:var(--sub);font-size:11px}
 .pcm small button{color:var(--sub);text-decoration:underline}
@@ -1983,7 +1992,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '243';
+const BUILD = '244';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -6117,7 +6126,9 @@ function ootdDraw(img, w){
    ⛔ 로그인이 없어 글쓴이는 「지금 고른 회원」이다. 전화 인증이 붙으면 그 사람으로 묶는다. */
 function 커뮤니티담기(psts, pcms, plks){
   D.posts = (psts||[]).map(p => ({ id:p.id, mid:p.member_id, kind:p.kind||'오운완', photo_id:p.photo_id||'', path:p.path,
-    cap:p.caption||'', vis:p.visibility||'센터', by:p.taken_by||'', hid:p.hidden_at||'', ts:p.created_at||'' }));
+    cap:p.caption||'', vis:p.visibility||'센터', by:p.taken_by||'', hid:p.hidden_at||'', ts:p.created_at||'',
+    /* 파트너 모집 (2026-10-02) */
+    sex:p.sex||'', career:p.career||'', ptime:p.ptime||'', big3:p.big3||'', parts:p.parts||'', state:p.state||'' }));
   D.pcm = (pcms||[]).map(c => ({ id:c.id, pid:c.post_id, mid:c.member_id||'', who:c.author||'', body:c.body||'', ts:c.created_at||'' }));
   D.plk = (plks||[]).map(l => ({ pid:l.post_id, mid:l.member_id }));
 }
@@ -6141,15 +6152,20 @@ const 언제 = ts => { if(!ts) return ''; const d = new Date(ts), m = (Date.now(
   if(m < 1) return '방금'; if(m < 60) return Math.round(m)+'분 전'; if(m < 1440) return Math.round(m/60)+'시간 전';
   return (d.getMonth()+1)+'월 '+d.getDate()+'일'; };
 
+const 파트너경력 = ['6개월 미만','6개월~1년','1~3년','3~5년','5년 이상'];
+const 파트너부위 = ['가슴','등','어깨','팔','하체','복근','유산소','전신'];
 function vCommunity(){
-  const f = S.cfilt || '전체';
+  const f = S.cfilt || '전체', 모드 = S.cmode || '피드';
   const 내것 = S.who !== 'tr';
-  let ps = (D.posts||[]).filter(글볼수있나);
+  let ps = (D.posts||[]).filter(글볼수있나).filter(p => 모드==='파트너' ? p.kind==='파트너' : p.kind!=='파트너');
   if(f==='내 글') ps = ps.filter(p=>p.mid===S.mid);
-  return { top: bar('커뮤니티', 내것 ? `<button class="tbtn" data-act="postnew">＋ 올리기</button>` : ''), tabs:1, body:`
-    <div class="seg" style="margin-bottom:4px">${(내것?['전체','내 글']:['전체']).map(k=>`<button class="${f===k?'on':''}" data-act="cfilt:${k}">${k}</button>`).join('')}</div>
-    ${ps.length ? ps.map(글카드).join('')
-      : 빔('pic', f==='내 글' ? '아직 올린 글이 없어요' : '아직 글이 없어요', 내것 ? '오운완이나 인증샷을 올려 보세요' : '')}
+  return { top: bar('커뮤니티', 내것 ? (모드==='파트너' ? `<button class="tbtn" data-act="partnew">＋ 모집 글</button>` : `<button class="tbtn" data-act="postnew">＋ 올리기</button>`) : ''), tabs:1, body:`
+    <div class="seg" style="margin-bottom:6px">${[['피드','피드'],['파트너','운동 파트너 모집']].map(k=>`<button class="${모드===k[0]?'on':''}" data-act="cmode:${k[0]}">${k[1]}</button>`).join('')}</div>
+    <div class="chips" style="margin-bottom:4px">${(내것?['전체','내 글']:['전체']).map(k=>`<button class="chip ${f===k?'on':''}" data-act="cfilt:${k}">${k}</button>`).join('')}</div>
+    ${ps.length ? ps.map(p => p.kind==='파트너' ? 파트너카드(p) : 글카드(p)).join('')
+      : (모드==='파트너'
+          ? 빔('user', f==='내 글' ? '아직 올린 모집 글이 없어요' : '아직 모집 글이 없어요', 내것 ? '같이 운동할 파트너를 찾아 보세요' : '')
+          : 빔('pic', f==='내 글' ? '아직 올린 글이 없어요' : '아직 글이 없어요', 내것 ? '오운완이나 인증샷을 올려 보세요' : ''))}
     <div class="note">${내것 ? '같은 센터 회원끼리만 보는 공간이에요. 올린 글은 언제든 내리거나 지울 수 있습니다.'
       : '회원들이 올린 오운완·인증샷이에요. 댓글은 「○○ 트레이너」로 남고, 문제 글은 ⋯ 에서 지울 수 있습니다.'}</div>` };
 }
@@ -6168,6 +6184,61 @@ function 글카드(p){
       <button data-act="psave:${p.id}">저장</button>
     </div></div>`;
 }
+/* ── 운동 파트너 모집 ── 카톡 번개 · 당근 모임처럼. 필수 다섯 + 본문 자유 */
+function 파트너카드(p){
+  const n댓 = 댓글들(p.id).length, 내글 = p.mid===S.mid && S.who!=='tr', 마감 = p.state==='마감';
+  return `<div class="pcard ptc ${마감?'done':''}">
+    <div class="phead"><span class="pav">${esc(이름of(p.mid).slice(0,1))}</span>
+      <span class="pwho">${esc(이름of(p.mid))}<small>${언제(p.ts)}${p.hid ? ' · <b style="color:var(--warn)">내려둠</b>' : ''}</small></span>
+      <span class="ptst ${마감?'off':''}">${마감?'마감':'모집중'}</span>
+      ${내글 || S.who==='tr' ? `<button class="pmore" data-act="pmore:${p.id}">⋯</button>` : ''}</div>
+    <button class="ptbody" data-act="popen:${p.id}">
+      <div class="ptgrid">
+        <i>성별</i><b>${esc(p.sex)}</b><i>운동경력</i><b>${esc(p.career)}</b>
+        <i>운동시간</i><b>${esc(p.ptime)}</b><i>3대 중량</i><b>${esc(p.big3)}</b>
+        <i>운동부위</i><b>${esc(p.parts)}</b></div>
+      ${p.cap ? `<div class="pcap">${esc(p.cap)}</div>` : ''}</button>
+    <div class="pacts"><button data-act="popen:${p.id}">💬 ${n댓||''} 댓글</button>${내글 ? `<button data-act="partclose:${p.id}">${마감?'다시 모집':'마감하기'}</button>` : ''}</div></div>`;
+}
+function sheetPartnerWrite(){
+  const n = S.part || (S.part = { sex:'', career:'', ptime:'', sq:'', bp:'', dl:'', parts:[], body:'' });
+  openSheet(()=>`
+    <div class="h2">운동 파트너 모집 <small>필수 다섯 가지와 하고 싶은 말</small></div>
+    <div class="fld"><span class="fn">성별 <em>필수</em></span><div class="chips">${['남','여'].map(v=>`<button class="chip ${n.sex===v?'on':''}" data-act="partk:sex:${v}">${v}</button>`).join('')}</div></div>
+    <div class="fld"><span class="fn">운동경력 <em>필수</em></span><div class="chips">${파트너경력.map(v=>`<button class="chip ${n.career===v?'on':''}" data-act="partk:career:${v}">${v}</button>`).join('')}</div></div>
+    <div class="fld"><span class="fn">파트너 운동시간 <em>필수</em></span>
+      <input class="search" type="text" data-k="pt:ptime" maxlength="40" value="${esc(n.ptime)}" placeholder="예) 평일 저녁 7~9시 · 주말 오전"></div>
+    <div class="fld"><span class="fn">3대 중량 (kg) <em>필수</em></span>
+      <div class="big3"><label>스쿼트<input class="search" type="number" inputmode="numeric" data-k="pt:sq" value="${esc(n.sq)}" placeholder="0"></label>
+        <label>벤치<input class="search" type="number" inputmode="numeric" data-k="pt:bp" value="${esc(n.bp)}" placeholder="0"></label>
+        <label>데드<input class="search" type="number" inputmode="numeric" data-k="pt:dl" value="${esc(n.dl)}" placeholder="0"></label></div></div>
+    <div class="fld"><span class="fn">운동부위 <em>필수</em> <small>여러 개 가능</small></span><div class="chips">${파트너부위.map(v=>`<button class="chip ${n.parts.includes(v)?'on':''}" data-act="partk:parts:${v}">${v}</button>`).join('')}</div></div>
+    <div class="fld"><span class="fn">하고 싶은 말</span>
+      <textarea class="search" data-k="pt:body" rows="3" maxlength="400" placeholder="예) 하체 날 같이 하실 분! 스쿼트 보조 서로 봐 드려요. 센터에서 뵙고 맞으면 꾸준히 해요.">${esc(n.body)}</textarea></div>
+    <button class="btn main" data-act="partsend">모집 글 올리기</button>
+    <button class="btn ghost sm" data-act="close">닫기</button>
+    <div class="note">같은 센터 회원끼리만 보여요. 연락은 댓글로 주고받고, 모집이 끝나면 「마감하기」를 눌러 주세요.</div>`);
+}
+function 파트너입력담기(){
+  const n = S.part; if(!n) return;
+  ['ptime','sq','bp','dl','body'].forEach(k => { const el = document.querySelector('[data-k="pt:'+k+'"]'); if(el) n[k] = el.value.trim(); });
+}
+async function partnerSend(){
+  파트너입력담기(); const n = S.part; if(!n) return;
+  const 빠짐 = [];
+  if(!n.sex) 빠짐.push('성별'); if(!n.career) 빠짐.push('운동경력'); if(!n.ptime) 빠짐.push('파트너 운동시간');
+  if(!(Number(n.sq)>0 || Number(n.bp)>0 || Number(n.dl)>0)) 빠짐.push('3대 중량'); if(!n.parts.length) 빠짐.push('운동부위');
+  if(빠짐.length){ toast(빠짐.join(' · ') + ' 을(를) 적어 주세요'); return; }
+  const id = 'pp' + Date.now();
+  const big3 = `스쿼트 ${Number(n.sq)||0} · 벤치 ${Number(n.bp)||0} · 데드 ${Number(n.dl)||0}`;
+  const row = { id, member_id:S.mid, kind:'파트너', photo_id:null, path:'', caption:n.body||'', visibility:'센터',
+    sex:n.sex, career:n.career, ptime:n.ptime, big3, parts:n.parts.join(' · '), state:'모집중' };
+  closeSheet(); await sv(spost('posts',[row]), '모집 글');
+  D.posts = D.posts || []; D.posts.unshift({ id, mid:S.mid, kind:'파트너', photo_id:'', path:'', cap:row.caption, vis:'센터', by:'', hid:'', ts:new Date().toISOString(),
+    sex:row.sex, career:row.career, ptime:row.ptime, big3, parts:row.parts, state:'모집중' });
+  S.part = null; S.cmode = '파트너'; S.cfilt = '전체'; toast('올렸어요'); render();
+}
+
 /* 올리기 — ① 어디서 : 내 오운완·인증샷 중에서 / 새 사진 ② 한마디 + 범위 */
 function sheetPostNew(){
   const 사진 = 사진모음(S.mid, true).filter(x => !(D.posts||[]).some(p=>p.photo_id===x.id)).slice(0, 12);
@@ -6227,13 +6298,15 @@ async function postSend(){
 function sheetPost(id){
   const p = (D.posts||[]).find(x=>x.id===id); if(!p) return;
   const 트 = S.who==='tr';
+  const 파 = p.kind==='파트너';
   openSheet(()=>{ const cs = 댓글들(id); return `
-    <div class="h2">${esc(이름of(p.mid))} <small>${esc(p.kind)} · ${언제(p.ts)}</small></div>
-    <img class="shot ootdimg" src="${esc(phURL(p.path))}" alt="" onerror="picFail(this)">
+    <div class="h2">${esc(이름of(p.mid))} <small>${파 ? '운동 파트너 모집 · '+(p.state==='마감'?'마감':'모집중') : esc(p.kind)} · ${언제(p.ts)}</small></div>
+    ${파 ? `<div class="ptgrid"><i>성별</i><b>${esc(p.sex)}</b><i>운동경력</i><b>${esc(p.career)}</b><i>운동시간</i><b>${esc(p.ptime)}</b><i>3대 중량</i><b>${esc(p.big3)}</b><i>운동부위</i><b>${esc(p.parts)}</b></div>`
+        : `<img class="shot ootdimg" src="${esc(phURL(p.path))}" alt="" onerror="picFail(this)">`}
     ${p.cap ? `<div class="pcap">${esc(p.cap)}</div>` : ''}
-    <div class="pacts">
+    ${파 ? '' : `<div class="pacts">
       <button class="${내좋아요(id)?'on':''}" data-act="plike:${id}">${내좋아요(id)?'❤️':'🤍'} ${좋아요수(id)||''}</button>
-      <button data-act="pshare:${id}">공유</button><button data-act="psave:${id}">저장</button></div>
+      <button data-act="pshare:${id}">공유</button><button data-act="psave:${id}">저장</button></div>`}
     <span class="lbl">댓글 ${cs.length ? '· '+cs.length : ''}</span>
     ${cs.length ? `<div class="pcms">${cs.map(c=>`<div class="pcm"><b>${esc(c.who)}</b> ${esc(c.body)}<small>${언제(c.ts)}${(c.mid && c.mid===S.mid && !트) || 트 ? ` · <button data-act="pcdel:${c.id}">지우기</button>` : ''}</small></div>`).join('')}</div>` : '<div class="note">첫 댓글을 남겨 보세요</div>'}
     <div class="pcmin"><input class="search" type="text" data-k="pcm" maxlength="120" placeholder="응원 한마디"><button class="btn main sm" data-act="pcsend:${id}">남기기</button></div>
@@ -10076,6 +10149,15 @@ document.addEventListener('click', async ev=>{
     case 'ootdre': closeSheet(); ootdPick(rest[0]); return;
     /* ── 커뮤니티 ── */
     case 'cfilt': S.cfilt=rest[0]; render(); return;
+    case 'cmode': S.cmode=rest[0]; S.cfilt='전체'; render(); return;
+    case 'partnew': S.part=null; sheetPartnerWrite(); return;
+    case 'partk': { 파트너입력담기(); const n=S.part; if(!n) return;
+      if(rest[0]==='parts'){ const i=n.parts.indexOf(rest[1]); if(i>=0) n.parts.splice(i,1); else n.parts.push(rest[1]); }
+      else n[rest[0]] = (n[rest[0]]===rest[1]) ? '' : rest[1];
+      drawSheet(); return; }
+    case 'partsend': partnerSend(); return;
+    case 'partclose': { const p=(D.posts||[]).find(x=>x.id===rest[0]); if(!p || p.mid!==S.mid) return;
+      p.state = p.state==='마감' ? '모집중' : '마감'; sv(spatch('posts','id=eq.'+p.id,{ state:p.state }), '모집 상태'); render(); return; }
     case 'postnew': sheetPostNew(); return;
     case 'postpick': closeSheet(); postPick(); return;
     case 'postfrom': { const x=(D.bph||[]).find(y=>y.id===rest[0]); if(!x) return;
@@ -10103,7 +10185,7 @@ document.addEventListener('click', async ev=>{
       if(!confirm('이 글을 지울까요? 댓글도 같이 지워집니다.')) return;
       D.posts = D.posts.filter(x=>x.id!==p.id); D.pcm = (D.pcm||[]).filter(c=>c.pid!==p.id); D.plk = (D.plk||[]).filter(l=>l.pid!==p.id);
       sv(sdel('posts','id=eq.'+p.id), '글 지우기');
-      if(p.path.startsWith('posts/')) fetch(SB_URL+'/storage/v1/object/media/'+p.path, {method:'DELETE',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}}).catch(()=>{});
+      if(p.path && p.path.startsWith('posts/')) fetch(SB_URL+'/storage/v1/object/media/'+p.path, {method:'DELETE',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}}).catch(()=>{});
       closeSheet(); toast('지웠어요'); render(); return; }
     case 'pcsend': { const el=document.querySelector('[data-k="pcm"]'); const body=el?el.value.trim():''; if(!body){ toast('한마디를 적어 주세요'); return; }
       const g=글쓴이(), id='pc'+Date.now(), ts=new Date().toISOString();
