@@ -1377,7 +1377,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '172';
+const BUILD = '173';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -3485,8 +3485,9 @@ const media2 = p => media(p);
 function bodyPhotos(){
   const kind = S.bpKind || 'body';
   const pose = S.bpPose || '정면';
-  const all = (M.bph||[]).filter(x=>x.kind===kind);
-  const list = (kind==='ai' ? all : all.filter(x=>x.pose===pose))
+  /* 인증샷(pair)·오운완(ootd) 은 한 갈래로 — 자세 구분이 없다 (2026-10-02) */
+  const all = (M.bph||[]).filter(x=> kind==='pair' ? (x.kind==='pair'||x.kind==='ootd') : x.kind===kind);
+  const list = ((kind==='ai'||kind==='pair') ? all : all.filter(x=>x.pose===pose))
     .slice().sort((a,b)=> a.on_date < b.on_date ? -1 : 1);
   const 비포 = list[0] || null, 애프터 = list.length>1 ? list[list.length-1] : null;
 
@@ -3505,8 +3506,9 @@ function bodyPhotos(){
   const 모두 = list.length ? '<div class="bpstrip">' + list.slice().reverse().map(x=>
       '<div class="bpth"><a href="' + esc(media2(x.path)) + '" target="_blank" rel="noopener">'
       + '<img src="' + esc(media2(x.path)) + '" alt="" loading="lazy" onerror="phBad(this)"></a>'
-      + '<span class="d">' + (x.on_date||'').slice(5).replace('-','.') + '</span>'
-      + (canEdit('body') ? '<button class="x" data-act="bpdel" data-b="' + esc(x.id) + '">✕</button>' : '')
+      + '<span class="d">' + (x.on_date||'').slice(5).replace('-','.') + (x.kind==='pair' ? ' 🤝' : '') + '</span>'
+      + (x.del_req_at ? '<span class="d" style="color:var(--warn);font-weight:700">회원 삭제 요청</span>' : (x.hidden_at ? '<span class="d">회원 숨김</span>' : ''))
+      + ((canEdit('body') || kind==='pair') ? '<button class="x" data-act="bpdel" data-b="' + esc(x.id) + '">✕</button>' : '')
       + '</div>').join('') + '</div>'
     : '<div class="empty">아직 사진이 없어요</div>';
 
@@ -3518,13 +3520,13 @@ function bodyPhotos(){
           + '<button class="btn sub sm" data-act="bpadd">＋ 사진 넣기</button>' : '')
     + editBtn('body') + '</span></div>'
     + '<div class="seg" style="margin-bottom:9px">'
-    + [['body','체형 사진'],['ai','AI 장비 사진']].map(k=>'<button class="' + (kind===k[0]?'on':'')
+    + [['body','체형 사진'],['ai','AI 장비 사진'],['pair','인증샷 · 오운완']].map(k=>'<button class="' + (kind===k[0]?'on':'')
         + '" data-bpk="' + k[0] + '">' + k[1] + '</button>').join('') + '</div>'
-    + (kind==='ai' ? '' : '<div class="seg" style="margin-bottom:10px">'
+    + ((kind==='ai'||kind==='pair') ? '' : '<div class="seg" style="margin-bottom:10px">'
         + POSES.map(x=>'<button class="' + (pose===x?'on':'') + '" data-bpp="' + x + '">' + x + '</button>').join('')
         + '</div>')
-    + 견주기
-    + '<div class="lbl" style="margin-top:12px">' + (kind==='ai'?'장비 사진':esc(pose) + ' 사진') + ' 모두</div>'
+    + (kind==='pair' ? '<div class="t2" style="margin-bottom:8px">수업 마친 뒤 트레이너가 「같이 찍기」로 남긴 사진과 회원 오운완입니다. 회원이 숨겨도 여기엔 남고, <b>회원 삭제 요청</b>이 뜨면 ✕ 로 들어 주세요(휴지통 60일).</div>' : 견주기)
+    + '<div class="lbl" style="margin-top:12px">' + (kind==='ai'?'장비 사진':(kind==='pair'?'인증샷 · 오운완':esc(pose) + ' 사진')) + ' 모두</div>'
     + 모두
     + '<input type="file" id="bpfile" accept="image/*" style="display:none">';
 }
