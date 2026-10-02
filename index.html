@@ -1961,7 +1961,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '236';
+const BUILD = '237';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -3102,6 +3102,9 @@ setInterval(()=>{
 
 /* ═══ 그리기 ═══ */
 function render(){
+  /* ⛔ 동의 한 장(?c= · ?pt=)은 body 를 통째로 갈아 끼운다 — 그 뒤 start() 가 render() 를 부르면 #main 이 없어
+     「Cannot read properties of null (reading 'querySelectorAll')」 가 났다 (2026-10-02 전수 시험에서 잡음). 그릴 자리가 없으면 안 그린다. */
+  if(!$('#main')) return;
   /* 임시로 친 값은 같은 화면·같은 회원일 때만 이어 붙인다 (다른 회원에게 새어 나가지 않게) */
   const dctx = S.screen + '|' + subj();
   const sameView = (S.dctx === dctx);
