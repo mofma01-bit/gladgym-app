@@ -379,6 +379,9 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .pacts button{flex:none;padding:6px 10px;border-radius:9px;background:var(--dark-3);color:var(--cream,#eee);font-size:12.5px;font-weight:600}
 .pacts button.on{color:var(--gold)}
 .trio.four{grid-template-columns:repeat(4,1fr)}.trio .t4 .k{color:var(--gold)}
+.cycline{display:flex;flex-direction:column;gap:4px;width:100%;text-align:left;flex:none;background:var(--dark-2);border:1px solid var(--line);border-left:4px solid var(--cc);border-radius:12px;padding:10px 12px}
+.cycline .ch{font-size:14.5px;font-weight:600}.cycline .ch b{color:var(--cc);font-weight:800}.cycline .ch small{display:block;font-size:11px;color:var(--sub);font-weight:500;margin-top:1px}
+.cycline .cw{font-size:12.5px;line-height:1.5;color:var(--cream,#ddd)}
 .rmnow{background:var(--gold-dim,rgba(230,196,135,.08));border:1px solid var(--gold-2,#8a7350);border-radius:12px;padding:9px 10px;display:flex;flex-direction:column;gap:5px;margin-bottom:8px}
 .rmnow .rmt{font-weight:700;font-size:13px;color:var(--gold)}.rmnow .rmt small{color:var(--sub);font-weight:500;margin-left:6px}
 .rmnow .rmrow.ok{opacity:.45}.rmnow .rmrow.now{outline:1.5px solid var(--gold);background:var(--dark-2)}
@@ -2020,7 +2023,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '250';
+const BUILD = '252';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -3641,6 +3644,7 @@ function vHome(){
       `<button class="notibell" data-act="go:noti" aria-label="알림${알림수?' '+알림수+'개':''}">
         ${svg('종',20)}${알림수?`<b>${알림수>9?'9+':알림수}</b>`:''}</button>`), tabs:1, body:`
     ${(뱃지주기(S.mid), 현황판(S.mid))}
+    ${주기줄(S.mid, 'sub:cycle')}
     ${오운완홈(S.mid)}
     ${인증샷홈(S.mid)}
     <div class="homerec">
@@ -4395,6 +4399,7 @@ function vWorkout(){
   return {
     top: bar('운동 중', 윗시계(w), 'askleave'),
     keepScroll:true, body:`
+    ${tr ? 주기줄(wmid, 'tsub:cycle:'+wmid) : ''}
     ${tr?`<button class="card teal" data-act="tlive:${wmid}">
       <div class="nm t">${esc((MEMBERS.find(m=>m.id===wmid)||{}).n||'')} 회원 수업 기록 중</div>
       <div class="sm">종목별로 코멘트를 남기려면 여기 ›</div></button>`:''}
@@ -7234,9 +7239,9 @@ function vMe(){
     ${[['note','상담일지','첫 상담 때 트레이너가 적은 내용','sub:intake'],
        ['plan','운동계획','목표 · 맞춤 칼로리 · 다짐','sub:plan'],
        ['chart','인/아웃바디','인바디 · 비포애프터 · 체형분석','sub:body'],
-       ['moon','생리주기', (cycOf(S.mid)&&cycOf(S.mid).on)
-          ? `오늘 ${cycToday(cycOf(S.mid)).day}일차 · ${esc(cycToday(cycOf(S.mid)).ph)}`
-          : '켜면 시기에 맞춰 운동을 조절합니다 — 선택이에요', 'sub:cycle'],
+       ...(여성인가(S.mid) ? [['moon','생리주기', (cycOf(S.mid)&&cycOf(S.mid).on)
+          ? `현재 ${esc(cycToday(cycOf(S.mid)).ph)} · ${cycToday(cycOf(S.mid)).day}일차`
+          : '켜면 시기에 맞춰 운동을 조절합니다 — 선택이에요', 'sub:cycle']] : []),
        ['chat','자주 묻는 질문','식사 · 유산소 · 빈도','sub:qa']]
       .map(x=>`<button class="gocard" data-act="${x[3]}">
         <span class="gi">${svg(x[0])}</span>
@@ -7308,6 +7313,35 @@ function cycToday(c){
   /* 다음 생리 예정일 — 달력에 ● 로 찍는다 */
   const 다음=new Date(base); 다음.setDate(다음.getDate()+Math.ceil((diff+1)/c.len)*c.len);
   return {day, ph, why, left, ovul:c.len-14, 다음: ymd(다음)};
+}
+/* 오늘 주기 한 줄 — 회원 홈 · 트레이너 루틴 고르기에 같이 쓴다 (2026-10-02 대표) */
+const 주기색 = { '월경기':'#c8605a', '난포기':'#5aa97a', '배란기':'#d9a441', '황체기':'#7f74c7' };
+/* 단계마다 권장 — 트레이너가 루틴을 고를 때 바로 쓰는 말 */
+const 주기권장 = {
+  '월경기': '강도를 낮추고 가볍게 — 무게는 평소의 70~80%, 복부 압박이 큰 동작·거꾸로 매달리는 동작은 피하고 스트레칭·유산소 위주로',
+  '난포기': '힘이 붙는 때 — 증량·새 종목·1RM 측정에 좋아요. 고강도 근력 운동을 계획하세요',
+  '배란기': '힘은 가장 좋지만 인대가 느슨해지는 때 — 점프·방향 전환·무릎 비틀림은 조심, 무거운 하체는 자세를 먼저 봐 주세요',
+  '황체기': '붓고 무겁게 느끼는 때 — 무게보다 횟수·템포로, 쉬는 시간을 조금 늘리고 수분을 챙기세요',
+};
+function 주기줄(mid, act){
+  const c = cycOf(mid), t = cycToday(c); if(!t || !여성인가(mid)) return '';
+  return `<button class="cycline" data-act="${act}" style="--cc:${주기색[t.ph]||'var(--gold)'}">
+    <span class="ch">현재 <b>${esc(t.ph)}</b>입니다 <small>${t.day}일차 · 다음 생리 ${t.left}일 뒤 ›</small></span>
+    <span class="cw">${esc(주기권장[t.ph]||t.why)}</span></button>`;
+}
+const 여성인가 = mid => (((D.intake||{})[mid]||{}).sex || '') === '여';
+/* 트레이너가 회원을 고를 때 — 주기를 켠 여성 회원이면 하루 한 번 팝업으로 */
+function 주기팝업(mid){
+  if(S.who!=='tr' || !여성인가(mid)) return false;
+  const c = cycOf(mid), t = cycToday(c); if(!t) return false;
+  const 키 = 'cycpop_' + mid + '_' + TODAY;
+  try{ if(sessionStorage.getItem(키)) return false; sessionStorage.setItem(키, '1'); }catch(e){}
+  const m = MEMBERS.find(x=>x.id===mid) || {n:''};
+  openSheet(()=>`
+    <div class="h2">${esc(m.n)} 회원 <small>생리주기</small></div>
+    ${주기줄(mid, 'tsub:cycle:'+mid)}
+    <button class="btn main" data-act="close">확인</button>`);
+  return true;
 }
 function cycBar(c){
   const t=cycToday(c); if(!t) return '';
@@ -8887,11 +8921,10 @@ function tMember(){
         <div class="sm">${모.length ? `${모.length}장${요 ? ` · <b>삭제 요청 ${요}</b>` : ''}` : '아직 없음 — 수업 마친 화면에서 「같이 찍기」'}</div></div><span class="rt">›</span></button>`; })()}
     <button class="card rowc plan" data-act="tsub:body:${m.id}"><div><div class="nm">인/아웃바디</div>
       <div class="sm">${Object.keys(checksOf(m.id)).length}개 표시 · ${roundsOf(m.id).length}회차 · 사진 ${((D.bph||[]).filter(x=>x.mid===m.id)).length}장</div></div><span class="rt">›</span></button>
-    ${(()=>{ const c=cycOf(m.id); if(!c||!c.on) return `<div class="card rowc dim"><div><div class="nm">생리주기</div>
+    ${(()=>{ if(!여성인가(m.id)) return '';
+      const c=cycOf(m.id); if(!c||!c.on) return `<div class="card rowc dim"><div><div class="nm">생리주기</div>
         <div class="sm">회원님이 켜지 않았어요</div></div></div>`;
-      const ct=cycToday(c);
-      return `<button class="card rowc teal" data-act="tsub:cycle:${m.id}"><div><div class="nm t">오늘 ${esc(ct.ph)}</div>
-        <div class="sm">${esc(ct.why)}</div></div><span class="rt">›</span></button>`; })()}
+      return 주기줄(m.id, 'tsub:cycle:'+m.id); })()}
     <div class="hr"></div><span class="lbl">운동 기록</span>
     ${ws.map(w=>`<button class="card rowc" data-act="tw:${w.id}">
       <div><div class="nm">${dateTxt(w.date)} · ${esc(w.kind||'')}</div>
@@ -8938,6 +8971,7 @@ function tRoutines(){
   return { top: bar('루틴',
       `<button class="chip t" data-act="rmpick">${esc((MEMBERS.find(x=>x.id===mid)||{}).n||'')} ▾</button>`,
       'go:t_members'), body:`
+    ${주기줄(mid, 'tsub:cycle:'+mid)}
     <div class="chips">
       <button class="chip ${sel==='전체'?'on':''}" data-act="rgrp:전체">전체 ${all.length}</button>
       ${gs.map(g=>`<button class="chip ${sel===g?'on':''}" data-act="rgrp:${g}">${esc(g)} ${all.filter(r=>(r.grp||'').trim()===g).length}</button>`).join('')}
@@ -9142,6 +9176,7 @@ function sheetStartSession(mid){
   const rs = myRoutines(mid), t = D.today[mid];
   openSheet(()=>`
     <div class="h2">${esc(m.n)} 회원 <small>무엇으로 시작할까요</small></div>
+    ${주기줄(mid, 'tsub:cycle:'+mid)}
     <button class="card rowc gold" data-act="rmstart:${mid}"><div><div class="nm g">🏋️ 1RM 측정으로 시작</div>
       <div class="sm">스쿼트 · 벤치 · 데드 등 측정 종목만 · 워밍업부터 자동</div></div><span class="rt">›</span></button>
     ${t && rOf(t.rid) ? `<button class="card gold" data-act="tstart:${mid}:${t.rid}:${t.kind}">
@@ -9422,7 +9457,7 @@ document.addEventListener('click', async ev=>{
     case 'tfm2': S.tfeed=rest[0]; S.ttab='t_feed'; go('t_feed'); return;
     case 'pickmem': sheetPickMember(); return;
     case 'pickasg': sheetPickAssign(); return;
-    case 'tassign': S.tmid=rest[0]; closeSheet(); go('t_routines'); return;
+    case 'tassign': S.tmid=rest[0]; closeSheet(); go('t_routines'); 주기팝업(rest[0]); return;
     case 'shot': shotPick(); return;
     case 'fadd': S.fpQ=''; S.fpRes=null; sheetFoodPick(rest[0]); return;
     case 'fsearch': {
@@ -9533,7 +9568,9 @@ document.addEventListener('click', async ev=>{
       sv(sdel('meals','id=eq.'+id), '식단 지우기');
       if(m.path) fetch(SB_URL+'/storage/v1/object/media/'+m.path,{method:'DELETE',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}}).catch(()=>{});
       closeSheet(); toast('지웠어요'); render(); return; }
-    case 'tstartask': S.tmid=rest[0]; sheetStartSession(rest[0]); return;
+    case 'tstartask': S.tmid=rest[0]; sheetStartSession(rest[0]);
+      try{ sessionStorage.setItem('cycpop_'+rest[0]+'_'+TODAY, '1'); }catch(e){}
+      return;
     case 'tstart': {
       const [mid, rid, kind] = rest;
       closeSheet(); S.tmid=mid; S.subj=mid;
@@ -10575,7 +10612,7 @@ document.addEventListener('click', async ev=>{
       if(S.who==='tr'){ go('t_member'); } else go('home');
       return; }
 
-    case 'tm': S.tmid=rest[0]; go('t_member'); return;
+    case 'tm': S.tmid=rest[0]; go('t_member'); 주기팝업(rest[0]); return;
     case 'tlive': S.tmid=rest[0]; go('t_live'); return;
     case 'tw': S.twid=rest[0]; go('t_write'); return;
     case 'rm': S.tmid=rest[0]; S.rgrp='전체'; closeSheet(); go('t_routines'); return;
