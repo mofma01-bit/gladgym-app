@@ -2006,7 +2006,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '246';
+const BUILD = '247';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -6188,7 +6188,13 @@ function 랭킹판(){
       : '<div class="empty">아직 없어요</div>'}</div>`; };
   return `<div class="seg" style="margin-bottom:8px">${[['주','이번 주'],['달','이번 달']].map(k=>`<button class="${기간===k[0]?'on':''}" data-act="rkp:${k[0]}">${k[1]}</button>`).join('')}</div>
     ${판('오운완', '장', 오운완)}${판('운동 횟수', '회', 운동)}${판('이어서 운동 중 (오늘 기준)', '일', 연속)}
-    ${판('3대 중량 — 스쿼트 + 벤치 + 데드 1RM', 'kg', 삼대, r => 수(r.v)+'kg <small>'+r.상세.map(x=>수(x)).join(' / ')+'</small>')}
+    ${(()=>{ /* 3대 중량은 남/여 따로 (2026-10-02 대표) — 성별은 상담일지 */
+      const 성 = mid => ((D.intake||{})[mid]||{}).sex || '';
+      const fmt = r => 수(r.v)+'kg <small>'+r.상세.map(x=>수(x)).join(' / ')+'</small>';
+      const 미입력 = 삼대.filter(r=>r.v>0 && !성(r.mid)).length;
+      return 판('3대 중량 (남) — 스쿼트 + 벤치 + 데드 1RM', 'kg', 삼대.filter(r=>성(r.mid)==='남'), fmt)
+           + 판('3대 중량 (여) — 스쿼트 + 벤치 + 데드 1RM', 'kg', 삼대.filter(r=>성(r.mid)==='여'), fmt)
+           + (미입력 ? `<div class="note">성별이 상담일지에 없는 ${미입력}명은 3대 순위에서 빠져 있어요.</div>` : ''); })()}
     <div class="note">같은 센터 회원끼리 보는 순위예요. 3대 중량은 1RM 실측·추정 중 높은 값으로 셉니다.</div>`;
 }
 function vCommunity(){
