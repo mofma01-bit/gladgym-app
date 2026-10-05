@@ -2023,7 +2023,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '254';
+const BUILD = '255';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -3798,6 +3798,10 @@ function vPick(){
         <button class="pbtn etc" data-act="memoadd">
           <span class="ic">＋</span>
           <span class="tx"><b>기타운동 추가</b><span>검색에 없는 것</span></span>
+          <span class="ar">›</span></button>
+        <button class="pbtn etc" data-act="rmaddpick">
+          <span class="ic">🏋️</span>
+          <span class="tx"><b>1RM 종목 추가</b><span>스쿼트 · 벤치 · 데드 등 측정 종목</span></span>
           <span class="ar">›</span></button></div>
     </div>
     <button class="card rowc gold" data-exrow="1rm 원알엠 일알엠 원rm 1알엠 1rm측정 측정 최대중량 맥스 max onerepmax" data-part="__1rm" data-eq="" style="display:none" data-act="rmaddpick">
