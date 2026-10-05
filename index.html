@@ -2023,7 +2023,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '253';
+const BUILD = '254';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -8875,8 +8875,6 @@ function tTools(){
   return { top: bar('자료'), body:`
     <button class="card rowc" data-act="go:t_routines"><div><div class="nm">루틴 만들기 · 지정</div>
       <div class="sm">회원별 루틴 세트</div></div><span class="rt">›</span></button>
-    <button class="card rowc gold" data-act="rmpickmem"><div><div class="nm g">🏋️ 1RM 측정</div>
-      <div class="sm">회원 고르고 → 측정 종목 고르고 → 워밍업부터 본 시도까지 자동</div></div><span class="rt">›</span></button>
     <button class="card rowc" data-act="go:t_ex"><div><div class="nm">종목 사전</div>
       <div class="sm">${EX.length}종목 · 하는 법 ${EX.reduce((a,e)=>a+vars(e.id).length,0)}가지 · 기본 설명</div></div><span class="rt">›</span></button>
     <button class="card rowc" data-act="qa"><div><div class="nm">자주 묻는 질문</div>
@@ -9197,8 +9195,6 @@ function sheetStartSession(mid){
   openSheet(()=>`
     <div class="h2">${esc(m.n)} 회원 <small>무엇으로 시작할까요</small></div>
     ${주기줄(mid, 'tsub:cycle:'+mid)}
-    <button class="card rowc gold" data-act="rmstart:${mid}"><div><div class="nm g">🏋️ 1RM 측정으로 시작</div>
-      <div class="sm">스쿼트 · 벤치 · 데드 등 측정 종목만 · 워밍업부터 자동</div></div><span class="rt">›</span></button>
     ${t && rOf(t.rid) ? `<button class="card gold" data-act="tstart:${mid}:${t.rid}:${t.kind}">
       <div class="nm g">오늘 지정 · ${esc(t.kind)}</div>
       <div class="sm">루틴 ${rOf(t.rid).no} · ${esc(rOf(t.rid).n)}</div></button>` : ''}
