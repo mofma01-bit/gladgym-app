@@ -2023,7 +2023,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '255';
+const BUILD = '256';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -4355,7 +4355,7 @@ function 윗시계(w){
 }
 
 function vWorkout(){
-  const w=live(); if(!w) return vHome();
+  const w=live(); if(!w) return (S.who==='tr' ? tToday() : vHome());
   if(!w.items.length) return {
     top: bar('운동 중', 윗시계(w), 'go:home'),
     body:`<div class="empty">종목을 담아 주세요</div>
@@ -4768,7 +4768,7 @@ function 끝카드(w){
     </div>`;
 }
 function vSummary(){
-  const w=D.workouts.find(x=>x.id===S.wid); if(!w) return vHome();
+  const w=D.workouts.find(x=>x.id===S.wid); if(!w) return (S.who==='tr' ? tToday() : vHome());
   const times=partTimes(w);
   return { top: bar('오늘 운동', `<span class="sub">${dateTxt(w.date)}</span>`, S.who==='tr'?'ttab:t_today':'tab:home'), body:`
     ${끝카드(w)}
@@ -4991,7 +4991,7 @@ function 수업제목(w){
 }
 
 function vReport(){
-  const w = D.workouts.find(x=>x.id===S.rw); if(!w) return vHome();
+  const w = D.workouts.find(x=>x.id===S.rw); if(!w) return (S.who==='tr' ? tToday() : vHome());
   const mid = w.mid, 이름 = (MEMBERS.find(m=>m.id===mid)||{}).n || '', bw = bwOf(mid);
   /* ⛔ `tr` 은 **맨 위**에 둔다 (2026-10-01). 아래 `줄` 을 만드는 map 안에서 쓰는데(첫없음, 2026-09-30),
      선언이 그 뒤에 있어 「Cannot access 'tr' before initialization」 으로 **리포트 화면이 통째로 죽었다.**
@@ -8947,11 +8947,26 @@ function tMember(){
       const c=cycOf(m.id); if(!c||!c.on) return `<div class="card rowc dim"><div><div class="nm">생리주기</div>
         <div class="sm">회원님이 켜지 않았어요</div></div></div>`;
       return 주기줄(m.id, 'tsub:cycle:'+m.id); })()}
-    <div class="hr"></div><span class="lbl">운동 기록</span>
-    ${ws.map(w=>`<button class="card rowc" data-act="tw:${w.id}">
+    <div class="hr"></div><span class="lbl">운동 기록 <small>최근 ${Math.min(ws.length,5)}회${ws.length>5?` · 전체 ${ws.length}회`:''}</small></span>
+    ${ws.slice(0,5).map(기록줄).join('') || '<div class="empty">아직 기록이 없어요</div>'}
+    ${ws.length>5 ? `<button class="card rowc teal" data-act="twall:${m.id}"><div><div class="nm t">지난 운동 기록 모두 보기</div>
+      <div class="sm">전체 ${ws.length}회 · 수업 / 개인운동으로 골라 보기</div></div><span class="rt">›</span></button>` : ''}` };
+}
+/* 트레이너 회원 화면의 기록 한 줄 — 화면·전체 보기 창이 같이 쓴다 */
+const 기록줄 = w => `<button class="card rowc" data-act="tw:${w.id}">
       <div><div class="nm">${dateTxt(w.date)} · ${esc(w.kind||'')}</div>
       <div class="sm">${w.items.length}종목 · ${durTxt(w.dur)} · 총 ${Math.round(totalKg(w)).toLocaleString()}kg</div></div>
-      <span class="pill q">코멘트 ›</span></button>`).join('')}` };
+      <span class="pill q">코멘트 ›</span></button>`;
+/* 지난 운동 기록 모두 — 화면에 끝없이 늘어놓지 않고 창 안에서 스크롤 (2026-10-05 대표) */
+function sheetTWAll(mid){
+  const m = MEMBERS.find(x=>x.id===mid) || {n:''};
+  const f = S.twf || '전체';
+  const ws = workoutsOf(mid).filter(w => f==='전체' || w.kind===f);
+  openSheet(()=>`
+    <div class="h2">지난 운동 기록 <small>${esc(m.n)} 회원 · ${ws.length}회</small></div>
+    <div class="seg">${['전체','수업','개인운동'].map(k=>`<button class="${f===k?'on':''}" data-act="twf:${mid}:${k}">${k==='수업'?'PT 수업':k}</button>`).join('')}</div>
+    <div class="pickbox">${ws.map(기록줄).join('') || '<div class="empty">그런 기록이 없어요</div>'}</div>
+    <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 function tLive(){
   const lv=liveOf(S.tmid); if(!lv) return tMembers();
@@ -10648,12 +10663,16 @@ document.addEventListener('click', async ev=>{
       D.live=null; save();
       if(id){ D.workouts=D.workouts.filter(x=>x.id!==id); sv(sdel('workouts','id=eq.'+id), '운동 지우기'); }
       toast('운동을 취소했어요');
-      if(S.who==='tr'){ go('t_member'); } else go('home');
+      /* ⛔ 자취에 「운동 중」 화면이 남아 있으면 뒤로가기가 거기로 가고, 기록이 없으니 **회원 홈**이 그려졌다(2026-10-05 대표).
+         지운 기록으로 돌아갈 일은 없다 — 자취를 비우고 트레이너 「오늘」 위에 회원 화면을 올린다 */
+      if(S.who==='tr'){ S.stack=[]; S.screen='t_today'; S.ttab='t_today'; go('t_member'); } else { S.stack=[]; S.screen='home'; S.tab='home'; render(); }
       return; }
 
     case 'tm': S.tmid=rest[0]; go('t_member'); 주기팝업(rest[0]); return;
     case 'tlive': S.tmid=rest[0]; go('t_live'); return;
-    case 'tw': S.twid=rest[0]; go('t_write'); return;
+    case 'tw': S.twid=rest[0]; closeSheet(); go('t_write'); return;
+    case 'twall': S.twf='전체'; sheetTWAll(rest[0]); return;
+    case 'twf': S.twf=rest[1]; sheetTWAll(rest[0]); return;
     case 'rm': S.tmid=rest[0]; S.rgrp='전체'; closeSheet(); go('t_routines'); return;
     case 're': S.redit=rest[0]; go('t_redit'); return;
     case 'raddpick': S.rcart = []; sheetRAdd(); return;
@@ -10776,7 +10795,7 @@ async function finish(){
     await sv(sdel('workouts','id=eq.'+w.id), '운동 지우기');
     D.workouts=D.workouts.filter(x=>x.id!==w.id);
     D.live=null; save(); toast('기록할 세트가 없어요');
-    if(S.who==='tr'){ S.tmid=w.mid; S.subj=w.mid; go('t_member'); } else go('home');
+    if(S.who==='tr'){ S.tmid=w.mid; S.subj=w.mid; S.stack=[]; S.screen='t_today'; S.ttab='t_today'; go('t_member'); } else go('home');
     return; }
   done.forEach(it=>{ if(!it.locked){ it.locked=true; it.sec=(it.sec||0)+(it.startAt ? (Date.now()-it.startAt)/1000 : 0); } });
   w.items.forEach(it=>{ it.sec = capSec(it.sec, CAP_EX); });
