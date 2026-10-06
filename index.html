@@ -841,6 +841,41 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .hero2.tall{min-height:214px}
 /* 홈 정리 (2026-10-06) — 반쪽 카드 둘 · 바로 가기 3칸 · 주기 한 줄 */
 .home2{display:grid;grid-template-columns:1fr 1fr;gap:9px;width:100%;flex:none}
+/* 홈 — GPT 시안 (2026-10-06) */
+.hero.photo{position:relative;overflow:hidden;isolation:isolate;min-height:176px;border-color:rgba(240,211,160,.45);
+  background:#17120d url(img/hero-rack.jpg) right center/cover no-repeat}
+.hero.photo::before{content:'';position:absolute;inset:0;z-index:-1;
+  background:linear-gradient(90deg,rgba(22,16,10,.98) 0%,rgba(26,18,11,.95) 52%,rgba(34,22,12,.62) 80%,rgba(40,26,14,.4) 100%)}
+.hero.photo .ht{font-size:24px}
+.hrow{display:grid;grid-template-columns:1fr 1fr;gap:9px;width:100%;flex:none;align-items:stretch}
+.hrow.wide{grid-template-columns:1.5fr 1fr}.hrow.solo{grid-template-columns:1fr}
+.hcard{display:flex;flex-direction:column;gap:7px;min-width:0;text-align:left;padding:13px 13px 12px;border-radius:17px;
+  background:linear-gradient(180deg,#201f1c,#181816);border:1px solid #34332d}
+.hcard.teal{background:linear-gradient(160deg,#1d3a43,#12242a);border-color:#3f7281}
+.hcard .hh{display:flex;align-items:center;gap:6px;width:100%;color:var(--gold)}
+.hcard .hh b{font-size:13.5px;font-weight:800;color:var(--cream);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hcard.teal .hh,.hcard.teal .hh b{color:var(--teal)}
+.hcard .hh i{font-style:normal;color:var(--sub);font-size:16px;flex:none}
+.hcard .h3{display:grid;grid-template-columns:repeat(3,1fr);width:100%}
+.hcard .h3>span{display:flex;flex-direction:column;gap:1px;padding-left:9px;border-left:1px solid #34332d;color:var(--gold);min-width:0}
+.hcard .h3>span:first-child{padding-left:0;border-left:0}
+.hcard .h3 small{font-size:10.5px;color:var(--sub);white-space:nowrap}
+.hcard .h3 b{font-size:21px;font-weight:800;color:var(--gold);line-height:1.15}.hcard .h3 b i{font-style:normal;font-size:11px;margin-left:1px;color:var(--cream)}
+.hcard .hb{font-size:16px;font-weight:800;color:var(--teal)}.hcard .hb em{font-style:normal;font-size:12px;color:var(--cream);margin-left:3px}.hcard .hb.dim{color:var(--sub)}
+.hcard .hbar{display:block;height:6px;border-radius:3px;background:rgba(255,255,255,.12);overflow:hidden;width:100%}.hcard .hbar u{display:block;height:100%;background:var(--teal);border-radius:3px}
+.hcard .hs{font-size:11.5px;color:var(--sub);line-height:1.45}.hcard.teal .hs{color:#b9d3db}.hcard .hs.big{font-size:12.5px}
+.hcard .hpill{display:flex;flex-direction:column;gap:1px;padding:8px 10px;border-radius:11px;background:color-mix(in srgb,var(--cc) 20%,#1a1917);border-left:3px solid var(--cc)}
+.hcard .hpill b{font-size:14px;color:var(--cc)}.hcard .hpill small{font-size:11px;color:var(--sub)}
+.hcard .r3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:100%}
+.hcard .r3 button{display:flex;flex-direction:column;gap:1px;text-align:left;padding:8px 8px 7px;border-radius:11px;background:#252420;border:1px solid #34332d;min-width:0}
+.hcard .r3 b{font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hcard .r3 small{font-size:10px;color:var(--sub)}
+.hcard .r3 em{font-style:normal;font-size:12px;font-weight:700;color:var(--teal);margin-top:2px}
+.hcard .hq{font-size:12.5px;line-height:1.5;color:var(--cream)}
+.hcard.hcm.new{border-color:var(--teal)}.hcard.hcm .hh b{flex:none;overflow:visible}.hcard.hcm .hh .nw,.hcard.hcm .hh i{margin-left:auto}.hcard button.hh{text-align:left}
+.hslim{width:100%;flex:none;padding:9px;border-radius:13px;border:1px dashed #5a4c33;color:var(--gold);font-size:13px;font-weight:700;background:none}.hcard .nw{font-style:normal;font-size:10.5px;font-weight:800;color:#0d2027;background:var(--teal);border-radius:20px;padding:2px 8px;flex:none}
+.hgoal{width:100%;flex:none;display:flex;flex-direction:column;gap:6px}
+.hero2.half .hic{position:relative;z-index:3;color:var(--gold);display:flex;margin-bottom:auto}.hero2.half .hic.t{color:var(--teal)}
+.btn.main.go{display:flex;align-items:center;justify-content:center;gap:8px}
 .hero2.half{min-height:118px;padding:13px 14px;border-radius:16px}
 .hero2.half .tt{font-size:16.5px}.hero2.half .dd{font-size:11.5px;line-height:1.45;margin-top:3px}
 .go3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;flex:none}
@@ -1967,6 +2002,17 @@ function 세어올리기(){
     setTimeout(() => { clearInterval(타); el.textContent = 꾸밈(끝); }, 걸림 + 400);
   });
 }
+Object.assign(아이콘, {
+  h_cam:'<path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.4"/>',
+  h_dumb:'<path d="M3 9.5v5M6 7v10M18 7v10M21 9.5v5M6 12h12"/>',
+  h_crown:'<path d="M3 8l4.5 4L12 5l4.5 7L21 8l-1.6 10H4.6z"/><path d="M5 21h14"/>',
+  h_drop:'<path d="M12 3s6 6.2 6 10.5A6 6 0 0 1 6 13.5C6 9.2 12 3 12 3z"/>',
+  h_target:'<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/>',
+  h_user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/>',
+  h_clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  h_note:'<path d="M14 3H6v18h6M14 3l4 4v5M14 3v4h4M9 11h5M9 15h3M18 15v6M15 18h6"/>',
+  h_roll:'<path d="M4 9a3 3 0 0 1 3-3h10a3 3 0 0 1 0 6H7a3 3 0 0 0 0 6h13"/>',
+});
 const svg = (k, s2) => '<svg class="ic2" viewBox="0 0 24 24" width="' + (s2||20) + '" height="'
   + (s2||20) + '" fill="none" stroke="currentColor" stroke-width="1.7"'
   + ' stroke-linecap="round" stroke-linejoin="round">' + (아이콘[k]||'') + '</svg>';
@@ -2068,7 +2114,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '258';
+const BUILD = '259';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -3667,6 +3713,58 @@ function 현황판(mid){
     </div>
     ${목표칸(mid)}</div>`;
 }
+/* ── 홈 칸 (2026-10-06 GPT 시안) — 머리줄(아이콘 · 이름 · ›) 하나에 알맹이 하나 ── */
+const 홈머리 = (ic, 이름) => `<span class="hh">${svg(ic,18)}<b>${이름}</b><i>›</i></span>`;
+function 홈현황(mid){
+  const 달 = TODAY.slice(0,7), ws = workoutsOf(mid).filter(w => w.date.slice(0,7)===달 && 세트있나(w));
+  const 개인 = new Set(ws.filter(w=>w.kind!=='수업').map(w=>w.date)).size, 수업 = ws.filter(w=>w.kind==='수업').length;
+  const 분 = Math.round(ws.reduce((a,w)=>a+(+w.dur||0),0)/60);
+  return `<button class="hcard" data-act="attend"><span class="hh"><b>${+달.slice(5)}월 현황</b><i>›</i></span>
+    <span class="h3">${[['h_dumb','개인운동',개인,'회'],['h_user','PT 수업',수업,'회'],['h_clock','운동시간',분.toLocaleString(),'분']]
+      .map(x=>`<span>${svg(x[0],17)}<small>${x[1]}</small><b>${x[2]}<i>${x[3]}</i></b></span>`).join('')}</span></button>`;
+}
+function 홈목표(mid){
+  const g = GOALS[mid]||{}, now = g.now||{}, to = g.to||{}, 있다 = v => v!=null && v!=='';
+  const k = ['w','fp','m'].find(u => 있다(to[u]) && 있다(now[u]));
+  if(!k) return `<button class="hcard teal" data-act="sub:plan">${홈머리('h_target','몸 목표')}
+    <span class="hb dim">아직 없어요</span><span class="hs">목표를 정해 보세요</span></button>`;
+  const logs = ((D.blog||{})[mid]||[]).filter(x => +x[k]), first = logs[0], last = logs[logs.length-1];
+  const a = first ? +first[k] : +now[k], b = +to[k], c = last ? +last[k] : a;
+  const p = a===b ? 100 : Math.max(0, Math.min(100, Math.round((a-c)/(a-b)*100)));
+  const 단위 = k==='fp' ? '%' : 'kg';
+  return `<button class="hcard teal" data-act="sub:plan">${홈머리('h_target','몸 목표')}
+    <span class="hb">${k==='w' ? '체중' : k==='fp' ? '체지방률' : '근육량'} <em>${p}%</em></span>
+    <i class="hbar"><u style="width:${p}%"></u></i>
+    <span class="hs">${kgfmt(c)}${단위} / ${kgfmt(b)}${단위}</span></button>`;
+}
+function 홈주기(mid){
+  const c = cycOf(mid), t = cycToday(c); if(!t || !여성인가(mid)) return '';
+  return `<button class="hcard hcy" data-act="sub:cycle" style="--cc:${주기색[t.ph]||'var(--gold)'}">${홈머리('h_drop','생리주기')}
+    <span class="hpill"><b>${esc(t.ph)} · ${t.day}일차</b><small>다음 생리 ${t.left}일 뒤</small></span></button>`;
+}
+function 홈오운완(mid){
+  const w = 오운완남음(mid); if(!w) return '';
+  return `<button class="hcard teal" data-act="ootd:${w.id}">${홈머리('h_cam','오늘 오운완 찍기')}
+    <span class="hs big">${w.kind==='수업' ? 'PT 수업' : '오늘 운동'}을 마쳤어요<br>오늘만 찍을 수 있어요</span></button>`;
+}
+function 홈최근(mid){
+  const 날 = [...new Set(D.workouts.filter(w => w.mid===mid && w.done && 세트있나(w)).map(w=>w.date))].sort().reverse().slice(0,3);
+  if(!날.length) return `<div class="hcard"><span class="hh">${svg('h_dumb',18)}<b>최근 운동기록</b></span><span class="hs">아직 기록이 없어요</span></div>`;
+  return `<div class="hcard"><button class="hh" data-act="days">${svg('h_dumb',18)}<b>최근 운동기록</b><i>›</i></button>
+    <span class="r3">${날.map(d => { const ws = D.workouts.filter(w => w.mid===mid && w.date===d && w.done && 세트있나(w));
+      const 부위 = [...new Set(ws.flatMap(w => w.items.filter(i=>i.sets.length).map(i => (exOf(i.ex)||{}).p).filter(Boolean)))].slice(0,2).join('·') || '운동';
+      const 분 = Math.round(ws.reduce((a,w)=>a+(+w.dur||0),0)/60);
+      return `<button data-act="${ws.length===1 ? 'rec:'+ws[0].id : 'dayat:'+d}"><b>${esc(부위)}</b><small>${dateTxt(d)}</small><em>${분}분 ›</em></button>`; }).join('')}</span></div>`;
+}
+function 홈코멘트(mid){
+  const cs = (D.cm||[]).filter(c => c.mid===mid), u = cs.filter(c => !c.read);
+  const 한종목 = u.length && new Set(u.map(c=>c.ex+':'+c.va)).size === 1;
+  const 최근 = u[0] || cs[0];
+  return `<button class="hcard hcm${u.length?' new':''}" data-act="${한종목 ? `exd:${u[0].ex}:${u[0].va}` : 'tab:feedback'}">
+    <span class="hh">${svg('h_user',18)}<b>${u.length ? '코멘트' : '트레이너 코멘트'}</b>${u.length ? `<em class="nw">새 글 ${u.length}</em>` : '<i>›</i>'}</span>
+    ${최근 ? `<span class="hq">“${esc(String(최근.tx||'').replace(/\s+/g,' ').slice(0,38))}${String(최근.tx||'').length>38?'…':''}”</span>
+      <span class="hs">– ${esc(최근.tr)} · ${esc(최근.at)}</span>` : `<span class="hs">아직 없어요</span>`}</button>`;
+}
 function vHome(){
   const u = unreadOf(S.mid), t = D.today[S.mid], r = t ? rOf(t.rid) : null;
   const lw = liveOf(S.mid), g = GOALS[S.mid] || {};
@@ -3688,7 +3786,7 @@ function vHome(){
   return { top: bar('글래드짐',
       `<button class="notibell" data-act="go:noti" aria-label="알림${알림수?' '+알림수+'개':''}">
         ${svg('종',20)}${알림수?`<b>${알림수>9?'9+':알림수}</b>`:''}</button>`), tabs:1, body:`
-    <button class="hero" data-act="${hero.act}">
+    <button class="hero photo" data-act="${hero.act}">
       <span class="tag">${hero.tag}</span>
       <div class="ht">${hero.ht}</div>
       <div class="hs">${hero.hs}</div>
@@ -3697,20 +3795,15 @@ function vHome(){
     ${lw && r ? `<button class="card rowc" data-act="rt:${r.id}">
       <div><div class="nm">오늘 지정 · 루틴 ${r.no} ${esc(r.n)}</div>
       <div class="sm">${esc(t.by)}가 지정했어요</div></div><span class="rt">›</span></button>` : ''}
-    ${(뱃지주기(S.mid), 현황판(S.mid))}
-    ${주기줄(S.mid, 'sub:cycle', true)}
-    ${오운완홈(S.mid)}
+    ${(뱃지주기(S.mid), '')}
+    <div class="hrow wide">${홈현황(S.mid)}${홈목표(S.mid)}</div>
+    ${(내목표(S.mid).length || 내뱃지(S.mid).length) ? `<div class="hgoal">${목표칸(S.mid)}</div>` : `<button class="hslim" data-act="goal:new">＋ 내 목표 정하기</button>`}
+    ${(()=>{ const a = 홈주기(S.mid), b = 홈오운완(S.mid); return (a || b) ? `<div class="hrow${a && b ? '' : ' solo'}">${a}${b}</div>` : ''; })()}
     ${인증샷홈(S.mid)}
-    <div class="homerec">
-      <div class="hr-l">
-        ${최근카드(S.mid)}
-        <button class="btn sub sm dayslink" data-act="days">지난 운동기록 ›</button>
-      </div>
-      ${코멘트칸(S.mid)}
-    </div>
-
+    <div class="hrow wide">${홈최근(S.mid)}${홈코멘트(S.mid)}</div>
     <div class="home2">
       <button class="hero2 half rm" data-act="rmstart:${S.mid}">
+        <span class="hic">${svg('h_crown',19)}</span>
         <span class="tt">1RM 측정</span>
         <span class="dd">목표만 넣으면 무게 · 횟수 · 쉬는 시간 자동</span></button>
       <button class="hero2 half shot" data-act="go:prep"
@@ -3738,7 +3831,7 @@ function vHome(){
       const doneToday = D.workouts.some(w=>w.mid===S.mid && w.done && w.date===TODAY && w.items.some(i=>i.sets.length));
       const cls = 'btn main go' + (lw?' live':'') + (!lw && doneToday?' calm':'');
       const txt = lw ? '운동기록 계속하기' : (doneToday ? '오늘 하나 더 기록하기' : hero.ht);
-      return `<button class="${cls}" data-act="${hero.act}">${lw?'<span class="gdot"></span>':''}${txt}</button>`;
+      return `<button class="${cls}" data-act="${hero.act}">${lw?'<span class="gdot"></span>':svg('h_note',19)}${txt}</button>`;
     })() };
 }
 function recRow(w){
