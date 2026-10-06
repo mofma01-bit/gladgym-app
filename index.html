@@ -991,6 +991,13 @@ body .figbox2{background:radial-gradient(80% 50% at 50% 30%,rgba(240,211,160,.09
 .tmb .t{background:linear-gradient(160deg,#24434c,#162a30);color:var(--teal);border:1px solid #3f7281}
 .tmf{grid-column:1/-1;font-size:11.5px;color:var(--sub);padding-top:10px;border-top:1px solid #34332d}
 .mrow2 .nb.w{background:var(--warn,#e58b7b);color:#2a1410}
+.home2.st3 .hero2.half{min-height:132px}.home2.st3 .hero2.half.wide2{grid-column:1/-1;min-height:96px}
+.sspick{display:flex;align-items:center;gap:10px;width:100%;flex:none;text-align:left;padding:15px 15px;border-radius:18px;border:1px solid #6b5a33;
+  background:radial-gradient(110% 120% at 0% 0%,rgba(240,211,160,.22),transparent 62%),linear-gradient(180deg,#241f17,#171614);box-shadow:inset 0 1px 0 rgba(240,211,160,.22)}
+.sst{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}.sst small{font-size:11.5px;font-weight:700;color:var(--gold)}.sst b{font-size:18px;font-weight:800}.sst i{font-style:normal;font-size:12px;color:var(--sub)}
+.sspick em{font-style:normal;flex:none;font-size:13.5px;font-weight:800;color:#2a1c14;background:linear-gradient(180deg,#f3d9a8,#e2c184);border-radius:999px;padding:8px 14px}
+.mrow2 .mi.pt{font-size:11.5px;font-weight:800;letter-spacing:-.03em}
+.mrow2 em.go{font-style:normal;font-size:12.5px;font-weight:700;color:var(--gold);flex:none}
 .megoal{width:100%;flex:none;display:flex;flex-direction:column;gap:8px;text-align:left;padding:14px 14px 13px;border-radius:18px;border:1px solid #34332d;background:linear-gradient(180deg,#201f1c,#171615);box-shadow:inset 0 1px 0 rgba(240,211,160,.14)}
 .mgh{display:grid;grid-template-columns:1fr auto;align-items:center;width:100%}.mgh small{grid-column:1/-1;font-size:11.5px;color:var(--sub)}
 .mgh b{font-size:17px;font-weight:800}.mgh i{font-style:normal;color:var(--sub);font-size:17px}
@@ -2284,7 +2291,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '276';
+const BUILD = '277';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -4058,31 +4065,33 @@ function vStart(){
         + `<div class="note">트레이너가 <b>다음 개인운동</b>에 하시라고 담아 둔 루틴이에요. 개인운동을 한 번 기록하면 사라집니다.</div>`;
     })()}
 
-    <button class="hero2 ${사진있나('routines')}" data-act="go:routines"
-        style="${사진꾸밈('routines','#33304a','#131217')}">
+    ${/* 큰 사진 카드는 맨 위 하나만. 지정 루틴이 없는 날은 「내 루틴」이 그 자리에 온다 (2026-10-06 융합) */''}
+    ${r ? '' : `<button class="hero2 tall ${사진있나('routines')}" data-act="go:routines"
+        style="order:-1;${사진꾸밈('routines','#33304a','#131217')}">
       <span class="art g5"></span>
       <span class="tag2">${myRoutines(S.mid).length}개</span>
       <span class="tt">내 루틴에서 고르기</span>
-      <span class="dd">미리 짜 둔 루틴 중에서 직접 고릅니다</span></button>
-
-    ${/* 지난 기록이 없어도 자리는 지킨다 — 카드가 통째로 사라지면 어디 갔나 싶다 */''}
-    ${ws[0]
-      ? `<button class="hero2 ${사진있나('again')}" data-act="again:${ws[0].id}"
-          style="${사진꾸밈('again','#3a2a20','#15110d')}">
-        <span class="art w6"></span>
-        <span class="tt">지난 운동 그대로</span>
-        <span class="dd">${dateTxt(ws[0].date)} · ${ws[0].items.filter(i=>i.sets&&i.sets.length)
-          .map(i=>exName(i.ex,i.va)).slice(0,2).join(', ')}${ws[0].items.length>2?' 외':''}</span></button>`
-      : `<button class="hero2 dimc" data-act="noprev" style="--h1:#2b2a26;--h2:#141311">
-        <span class="art w6"></span>
-        <span class="tt">지난 운동 그대로</span>
-        <span class="dd">아직 지난 기록이 없어요 — 한 번 하고 나면 여기서 그대로 다시 할 수 있어요</span></button>`}
-
-    <button class="hero2 ${사진있나('pickex')}" data-act="empty"
-        style="${사진꾸밈('pickex','#4a3b1c','#17130b')}">
-      <span class="art d1"></span>
-      <span class="tt">자유 운동 시작</span>
-      <span class="dd">원하는 종목을 골라 마음대로 시작합니다</span></button>` };
+      <span class="dd">미리 짜 둔 루틴 중에서 직접 고릅니다</span></button>`}
+    <span class="lbl">${r ? '다른 방법으로 시작' : '또는'}</span>
+    <div class="home2 st3">
+      ${r ? `<button class="hero2 half ${사진있나('routines')}" data-act="go:routines"
+          style="${사진꾸밈('routines','#33304a','#131217')}">
+        <span class="tt">내 루틴</span>
+        <span class="dd">${myRoutines(S.mid).length}개 중에서 고르기</span></button>` : ''}
+      ${ws[0]
+        ? `<button class="hero2 half ${사진있나('again')}" data-act="again:${ws[0].id}"
+            style="${사진꾸밈('again','#3a2a20','#15110d')}">
+          <span class="tt">지난 운동 그대로</span>
+          <span class="dd">${dateTxt(ws[0].date)} · ${ws[0].items.filter(i=>i.sets&&i.sets.length)
+            .map(i=>exName(i.ex,i.va)).slice(0,1).join('')}${ws[0].items.length>1?' 외':''}</span></button>`
+        : `<button class="hero2 half dimc" data-act="noprev" style="--h1:#2b2a26;--h2:#141311">
+          <span class="tt">지난 운동 그대로</span>
+          <span class="dd">한 번 하고 나면 여기서 다시</span></button>`}
+      <button class="hero2 half ${r ? 'wide2' : ''} ${사진있나('pickex')}" data-act="empty"
+          style="${사진꾸밈('pickex','#4a3b1c','#17130b')}">
+        <span class="tt">자유 운동</span>
+        <span class="dd">원하는 종목을 골라 시작</span></button>
+    </div>` };
 }
 
 /* ── 종목 고르기 ── 담기만 하고, 「운동 시작」을 눌러야 진행 화면으로 간다 */
@@ -9663,24 +9672,23 @@ function sheetStartSession(mid){
   openSheet(()=>`
     <div class="h2">${esc(m.n)} 회원 <small>무엇으로 시작할까요</small></div>
     ${주기줄(mid, 'tsub:cycle:'+mid)}
-    ${t && rOf(t.rid) ? `<button class="card gold" data-act="tstart:${mid}:${t.rid}:${t.kind}">
-      <div class="nm g">오늘 지정 · ${esc(t.kind)}</div>
-      <div class="sm">루틴 ${rOf(t.rid).no} · ${esc(rOf(t.rid).n)}</div></button>` : ''}
+    ${t && rOf(t.rid) ? `<button class="sspick" data-act="tstart:${mid}:${t.rid}:${t.kind}">
+      <span class="sst"><small>오늘 지정 · ${esc(t.kind)}</small><b>루틴 ${rOf(t.rid).no} · ${esc(rOf(t.rid).n)}</b>
+        <i>${rOf(t.rid).items.length}종목 · 예상 ${estMin(rOf(t.rid))}분</i></span><em>시작 ›</em></button>` : ''}
     <span class="lbl">루틴에서 고르기</span>
-    ${rs.length ? rs.map(r=>`<button class="card rowc" data-act="tstart:${mid}:${r.id}:수업">
-      <div><div class="nm">루틴 ${r.no} · ${esc(r.n)}</div>
-      <div class="sm">${r.items.length}종목 · 예상 ${estMin(r)}분</div></div>
-      <span class="rt">시작 ›</span></button>`).join('') : '<div class="empty">만들어 둔 루틴이 없어요</div>'}
-    ${(()=>{ const ws = workoutsOf(mid).filter(w=>세트있나(w)); if(!ws.length) return '';
-      const w = ws[0];
-      return `<button class="card rowc teal" data-act="tstartrecs:${mid}">
-        <div><div class="nm t">지난 기록에서 고르기</div>
-        <div class="sm">최근 ${esc(dateTxt(w.date))} ${w.kind==='수업'?'수업':'개인운동'} 등 ${Math.min(ws.length,12)}회 · 그날 종목과 무게 그대로</div></div>
-        <span class="rt">›</span></button>`; })()}
-    <div class="hr"></div>
-    <button class="card rowc" data-act="tstart:${mid}:0:수업">
-      <div><div class="nm">빈 운동으로 시작</div><div class="sm">종목을 그때그때 담습니다</div></div>
-      <span class="rt">＋</span></button>
+    ${rs.length ? `<div class="megrp">${rs.map(r=>{ /* 고리 속 글자 = 그 루틴에 가장 많은 부위 (실제 종목에서 센다) */
+        const 셈 = {}; r.items.forEach(it => { const p = (exOf(it.ex)||{}).p; if(p) 셈[p] = (셈[p]||0) + 1; });
+        const 부위 = Object.keys(셈).sort((a,b)=>셈[b]-셈[a])[0] || '';
+        return `<button class="mrow2" data-act="tstart:${mid}:${r.id}:수업"><span class="mi pt">${esc(부위.slice(0,2) || '–')}</span>
+          <span class="mt"><b>루틴 ${r.no} · ${esc(r.n)}</b><small>${r.items.length}종목 · 예상 ${estMin(r)}분</small></span><em class="go">시작 ›</em></button>`; }).join('')}</div>`
+      : '<div class="empty">만들어 둔 루틴이 없어요</div>'}
+    <div class="hrow">
+      ${(()=>{ const ws = workoutsOf(mid).filter(w=>세트있나(w)); if(!ws.length) return '';
+        return `<button class="hcard teal" data-act="tstartrecs:${mid}">${홈머리('h_clock','지난 기록에서')}
+          <span class="hs">최근 ${esc(dateTxt(ws[0].date))} 등 ${Math.min(ws.length,12)}회<br>그날 종목과 무게 그대로</span></button>`; })()}
+      <button class="hcard" data-act="tstart:${mid}:0:수업">${홈머리('h_note','빈 운동으로')}
+        <span class="hs">종목을 그때그때<br>담습니다</span></button>
+    </div>
     <button class="btn ghost sm" data-act="close">닫기</button>
     <div class="note">트레이너가 시작해도 <b>회원 기록으로</b> 남습니다. 회원 폰에서도 같은 운동이 보입니다.</div>`);
 }
