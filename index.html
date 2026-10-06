@@ -2222,7 +2222,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '271';
+const BUILD = '272';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -5406,7 +5406,7 @@ function vRecords(){
           .reduce((a,w) => { const t = wStat(w, bw); return { n:a.n+1, vol:a.vol+t.vol, min:a.min+t.min }; }, {n:0, vol:0, min:0}); })();
       const 칩 = (지금, 전) => { if(!앞) return ''; if(!전) return 지금 ? '<em class="up">새로 시작</em>' : '';
         const p = Math.round((지금 - 전) / 전 * 100); return p > 0 ? `<em class="up">▲ ${p}%</em>` : p < 0 ? `<em class="dn">▼ ${-p}%</em>` : '<em>그대로</em>'; };
-      const 선 = m => 작은선(anaSeries(mid, m).map(p=>p.v), m==='vol' ? '#a9d8e6' : '#e2c184');
+      const 선 = () => '';      /* 칸마다 작은 그래프는 뺐다 — 「주식 창 같다」(2026-10-06 대표). 흐름은 아래 큰 그래프 하나로 본다 */
       return `<div class="sstat3">
         <div>${선('n')}<span class="k">운동 횟수</span><span class="v">${ws.length}<small>회</small></span>${칩(ws.length, 앞 && 앞.n)}</div>
         <div class="t">${선('vol')}<span class="k">총 무게</span><span class="v">${(tot.vol/1000).toFixed(1)}<small>톤</small></span>${칩(tot.vol, 앞 && 앞.vol)}</div>
@@ -8311,6 +8311,16 @@ const 체형자리 = {
   '다리': ['앞', 166, 400, 38],
   '발':   ['앞', 166, 618, 70],
 };
+/* 항목마다 따로 잡은 자리 — 좌우를 고르지 않는 다리·발 항목은 묶음 가운데(두 다리 사이 빈 곳)에 떠 있었다(2026-10-06 대표 「이 점들은 뭐야?」).
+   그 항목이 실제로 보는 곳에 찍는다: 골반 · 고관절 · 무릎 · 허벅지 앞 · 발 */
+const 항목자리 = {
+  l1: ['앞', 166, 296],     /* 골반 형태 → 골반 가운데 */
+  l2: ['앞', 136, 326],     /* 크레이그 테스트 → 고관절 */
+  l3: ['앞', 128, 478],     /* 무릎 방향 → 무릎 */
+  l4: ['앞', 204, 478],     /* O / X 다리 → 반대쪽 무릎 */
+  l5: ['앞', 200, 392],     /* 토마스 테스트 → 허벅지 앞 */
+  f1: ['앞', 106, 610],     /* 발 아치 → 발 */
+};
 const 뒤로갈것 = { l6:1, l7:1 };          /* 중둔근은 뒷면에 찍는다 */
 const 뒷자리 = { '다리': [166, 292, 44] };
 
@@ -8321,6 +8331,7 @@ function bodyFig(checks){
     const v = c[t.k]; if(!v) return;
     let [면, x, y, 폭] = 체형자리[t.g] || ['앞', 166, 330, 30];
     if(뒤로갈것[t.k] && 뒷자리[t.g]) { 면 = '뒤'; [x, y, 폭] = 뒷자리[t.g]; }
+    if(항목자리[t.k]) { [면, x, y] = 항목자리[t.k]; 폭 = 0; }
     /* 왼쪽/오른쪽을 고르는 항목이면 그 쪽으로 옮긴다 */
     const 쪽 = (t.a === 'L' && t.b === 'R') ? (v === 'a' ? -1 : 1) : 0;
     점[면].push({ k: t.k, t: t.t, x: x + 쪽*폭, y, 쪽 });
