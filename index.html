@@ -847,8 +847,15 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .hero.photo::before{content:'';position:absolute;inset:0;z-index:-1;
   background:linear-gradient(90deg,rgba(22,16,10,.98) 0%,rgba(26,18,11,.95) 52%,rgba(34,22,12,.62) 80%,rgba(40,26,14,.4) 100%)}
 .hero.photo .ht{font-size:24px}
-.hero .tag.new{display:inline-flex;align-items:center;gap:6px;background:rgba(240,211,160,.16);border-color:var(--gold);color:var(--gold)}
-.hero .tag.new b{font-size:10px;font-weight:900;letter-spacing:.04em;color:#2a1c14;background:var(--gold);border-radius:20px;padding:1px 7px}
+/* NEW 알림 — 바깥 알약은 없다(알약 안에 알약이라 과했다 · 2026-10-06 대표). 글자에 빛이 지나간다 */
+.hero .tag.new{display:inline-flex;align-items:center;gap:7px;background:none;border:0;padding:0;color:var(--gold);font-size:13px;font-weight:700}
+.hero .tag.new b{font-size:10.5px;font-weight:900;letter-spacing:.05em;color:#2a1c14;background:var(--gold);border-radius:20px;padding:2px 8px}
+/* 글자 위로 빛이 한 번씩 지나간다 (깜빡임보다 차분하다 · 2026-10-06 대표) */
+.hero .tag.new em{font-style:normal;color:transparent;-webkit-background-clip:text;background-clip:text;
+  background-image:linear-gradient(100deg,#cfa868 0%,#cfa868 34%,#fff 50%,#cfa868 66%,#cfa868 100%);
+  background-size:260% 100%;animation:newShine 2.4s linear infinite}
+@keyframes newShine{0%{background-position:130% 0}60%,100%{background-position:-30% 0}}
+@media (prefers-reduced-motion:reduce){.hero .tag.new em{animation:none;color:var(--gold);background:none}}
 .hero2.half.wide{min-height:104px;background-position:center 38%}
 .hrow{display:grid;grid-template-columns:1fr 1fr;gap:9px;width:100%;flex:none;align-items:stretch}
 .hrow.wide{grid-template-columns:1.5fr 1fr}.hrow.solo{grid-template-columns:1fr}
@@ -2120,7 +2127,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '262';
+const BUILD = '263';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -3793,7 +3800,7 @@ function vHome(){
       `<button class="notibell" data-act="go:noti" aria-label="알림${알림수?' '+알림수+'개':''}">
         ${svg('종',20)}${알림수?`<b>${알림수>9?'9+':알림수}</b>`:''}</button>`), tabs:1, body:`
     <button class="hero photo" data-act="${hero.act}">
-      ${hero.새 ? `<span class="tag new"><b>NEW</b>${hero.새}</span>` : `<span class="tag">${hero.tag}</span>`}
+      ${hero.새 ? `<span class="tag new"><b>NEW</b><em>${hero.새}</em></span>` : `<span class="tag">${hero.tag}</span>`}
       <div class="ht">${hero.ht}</div>
       <div class="hs">${hero.hs}</div>
       <span class="hgo">${hero.go} ›</span></button>
