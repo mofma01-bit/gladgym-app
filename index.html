@@ -933,6 +933,12 @@ body .seg button.on{background:linear-gradient(180deg,#f3d9a8,#e2c184);color:#2a
 .lcleg{display:flex;align-items:center;gap:6px;justify-content:flex-end;font-size:10.5px;color:var(--sub);margin-top:2px}
 .lcleg i{display:inline-block;width:16px;height:0;border-top:2px solid var(--gold);margin-left:8px}.lcleg i.b{border-top:1.5px dashed var(--teal);opacity:.7}
 body .gbox{box-shadow:inset 0 1px 0 rgba(240,211,160,.16)}
+/* 분석 위 큰 탭 셋 → 금테 한 줄 (2026-10-06 대표가 고른 조합: 위 탭 = 3단 · 기간·숫자 카드·그래프 = 2단) */
+.anatab{gap:0 !important;border:1px solid #4a3f2a;border-radius:16px;overflow:hidden;background:#171614}
+.anatab button{border-radius:0 !important;border:0 !important;border-left:1px solid #34332d !important;background:none !important;box-shadow:none !important;min-height:0 !important;padding:14px 4px !important;flex-direction:row !important;justify-content:center !important;align-items:center !important;gap:6px !important;font-size:14px !important;color:var(--sub) !important}
+.anatab button:first-child{border-left:0 !important}
+.anatab button.on{color:var(--gold) !important;background:linear-gradient(180deg,rgba(240,211,160,.2),rgba(240,211,160,.04)) !important;box-shadow:inset 0 -2px 0 var(--gold) !important}
+.anatab .ic3{display:none !important}
 .sstatn{font-size:10.5px;color:#6f6c66;text-align:right;width:100%;flex:none;margin-top:-4px}
 body .gbox{background:linear-gradient(180deg,#201f1c,#171615);border-color:#34332d;border-radius:18px;padding:14px 12px 12px}
 .bfig.b3d{flex:0 1 332px}.b3src{font-size:9.5px;color:#6f6c66;text-align:center}
@@ -2216,7 +2222,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '270';
+const BUILD = '271';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
