@@ -969,6 +969,32 @@ body .figbox2{background:radial-gradient(80% 50% at 50% 30%,rgba(240,211,160,.09
 .big2.row{min-height:0;flex-direction:row;align-items:center;gap:11px;padding:13px 12px}
 .big2.row .ic.ring{width:42px;height:42px;margin:0;flex:none}
 .big2.row .bt{display:flex;flex-direction:column;gap:1px;min-width:0}.big2.row b{font-size:14.5px}.big2.row i{font-size:11px}
+/* 내 정보 융합 (2026-10-06) */
+.mehead{position:relative;width:100%;flex:none;display:grid;grid-template-columns:1fr auto;align-items:center;gap:6px 10px;padding:16px 15px 12px;border-radius:20px;border:1px solid #5a4c33;
+  background:radial-gradient(110% 90% at 0% 0%,rgba(240,211,160,.17),transparent 62%),linear-gradient(180deg,#221e17,#161513);box-shadow:inset 0 1px 0 rgba(240,211,160,.2)}
+.mh1{display:flex;align-items:center;gap:13px;text-align:left;min-width:0}
+.mha{width:58px;height:58px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;overflow:hidden;border:2px solid var(--gold);background:#1a1917}
+.mha img{width:100%;height:100%;object-fit:cover}.mha b{font-size:23px;color:var(--gold)}
+.mht{display:flex;flex-direction:column;gap:1px;min-width:0}.mht b{font-size:19px;font-weight:800;letter-spacing:-.02em}
+.mht small{font-size:11.5px;color:var(--sub)}.mht em{font-style:normal;font-size:11.5px;font-weight:700;color:var(--gold);margin-top:3px}
+.mring{position:relative;width:78px;height:78px;flex:none}.mring svg{width:100%;height:100%;filter:drop-shadow(0 0 8px rgba(240,211,160,.25))}
+.mring i{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-style:normal;line-height:1.1}
+.mring b{font-size:19px;font-weight:800;color:var(--gold);letter-spacing:-.02em}.mring small{font-size:9.5px;color:var(--sub)}
+.mhf{grid-column:1/-1;font-size:11.5px;color:var(--sub);padding-top:10px;border-top:1px solid #34332d}.mhf b{color:var(--cream)}
+.megoal{width:100%;flex:none;display:flex;flex-direction:column;gap:8px;text-align:left;padding:14px 14px 13px;border-radius:18px;border:1px solid #34332d;background:linear-gradient(180deg,#201f1c,#171615);box-shadow:inset 0 1px 0 rgba(240,211,160,.14)}
+.mgh{display:grid;grid-template-columns:1fr auto;align-items:center;width:100%}.mgh small{grid-column:1/-1;font-size:11.5px;color:var(--sub)}
+.mgh b{font-size:17px;font-weight:800}.mgh i{font-style:normal;color:var(--sub);font-size:17px}
+.mgc{display:block;width:100%;height:auto}
+.mgl{display:grid;grid-template-columns:repeat(3,1fr);width:100%}.mgl span{display:flex;flex-direction:column}
+.mgl small{font-size:10.5px;color:var(--sub)}.mgl b{font-size:15px;font-weight:800;color:var(--cream)}
+.mgl .now{align-items:center}.mgl .now b{color:var(--gold)}.mgl .to{align-items:flex-end}.mgl .to b{color:var(--teal)}
+.megoal .gbar{display:block;width:100%}
+.megrp{width:100%;flex:none;border-radius:18px;border:1px solid #34332d;background:linear-gradient(180deg,#1f1e1b,#171615);overflow:hidden}
+.mrow2{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px 14px;border-top:1px solid #2c2b27}.mrow2:first-child{border-top:0}
+.mrow2 .mi{width:36px;height:36px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;color:var(--gold);border:1.2px solid rgba(240,211,160,.4);background:rgba(240,211,160,.05)}
+.mrow2 .mt{flex:1;min-width:0;display:flex;flex-direction:column}.mrow2 .mt b{font-size:14.5px;font-weight:700}.mrow2 .mt small{font-size:11.5px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mrow2>i{font-style:normal;color:var(--sub);font-size:17px;flex:none}
+.mrow2 .nb{font-style:normal;font-size:11px;font-weight:800;color:#2a1c14;background:var(--gold);border-radius:20px;padding:2px 8px;flex:none}
 .hrow{display:grid;grid-template-columns:1fr 1fr;gap:9px;width:100%;flex:none;align-items:stretch}
 .hrow.wide{grid-template-columns:1.5fr 1fr}.hrow.solo{grid-template-columns:1fr}
 .hcard{display:flex;flex-direction:column;gap:7px;min-width:0;text-align:left;padding:13px 13px 12px;border-radius:17px;
@@ -2248,7 +2274,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '274';
+const BUILD = '275';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -7596,45 +7622,69 @@ function vMe(){
   const 진 = (r.w && r.gw && 시작 && 시작 !== r.gw)
     ? Math.max(0, Math.min(1, (시작 - r.w) / (시작 - r.gw))) : 0;
   return { top: bar('내 정보', `<span class="sub">${esc(me().n)} 회원님</span>`), tabs:1, body:`
-    <button class="gocard pfrow" data-act="go:profile">
-      <span class="gi pfmini">${profOf(S.mid).avatar
-        ? `<img src="${esc(phURL(profOf(S.mid).avatar))}" alt="" onerror="picFail(this)">`
-        : svg('user')}</span>
-      <span class="gt"><span class="nm">${esc(me().n)} 님의 프로필</span>
-        <span class="sm">${(()=>{ const t=profStat(S.mid);
-          return `오운완 ${t.오운완}장 · 운동한 날 ${t.일수}일`; })()}</span></span>
-      <span class="ga">›</span></button>
+    <div class="mehead">
+      <button class="mh1" data-act="go:profile">
+        <span class="mha">${profOf(S.mid).avatar
+          ? `<img src="${esc(phURL(profOf(S.mid).avatar))}" alt="" onerror="picFail(this)">`
+          : `<b>${esc((me().n||'회').slice(0,1))}</b>`}</span>
+        <span class="mht"><b>${esc(me().n)}</b>
+          <small>${(()=>{ const t=profStat(S.mid); return `오운완 ${t.오운완}장 · 운동한 날 ${t.일수}일`; })()}</small>
+          <em>프로필 보기 ›</em></span></button>
+      ${(()=>{ const R = 31, C = 2*Math.PI*R, p = Math.max(0, Math.min(1, 남은/90));
+        return `<span class="mring"><svg viewBox="0 0 76 76" aria-hidden="true">
+          <circle cx="38" cy="38" r="${R}" fill="none" stroke="#34332d" stroke-width="5"/>
+          <circle cx="38" cy="38" r="${R}" fill="none" stroke="var(--gold)" stroke-width="5" stroke-linecap="round"
+            stroke-dasharray="${(C*p).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 38 38)"/></svg>
+          <i><b>D-${남은}</b><small>회원권</small></i></span>`; })()}
+      <div class="mhf">회원권 <b>${끝날.slice(0,4)}년 ${+끝날.slice(5,7)}월 ${+끝날.slice(8)}일</b>까지</div>
+    </div>
 
-    <div class="tile mtile">
-      <div class="mt1"><span class="k">회원권</span>
-        <span class="v">D-<span style="color:var(--gold)">${남은}</span></span>
-        <span class="k">${끝날.slice(0,4)}년 ${+끝날.slice(5,7)}월 ${+끝날.slice(8)}일까지</span></div>
-      ${dRing(남은, 90)}
+    <button class="megoal" data-act="sub:plan">
+      <span class="mgh"><small>우리의 목표</small><b>${esc(g.goal||'목표를 정해 보세요')}</b><i>›</i></span>
+      ${(()=>{ if(!(r.w && r.gw)) return '';
+        /* 실제 인바디 체중 기록으로 곡선을 그린다. 기록이 둘 미만이면 막대로 */
+        const logs = ((D.blog||{})[S.mid]||[]).filter(x => +x.w).map(x => +x.w);
+        const 줄 = `<span class="mgl"><span><small>시작</small><b>${kgfmt(시작)}kg</b></span><span class="now"><small>지금</small><b>${kgfmt(r.w)}kg</b></span><span class="to"><small>목표</small><b>${kgfmt(r.gw)}kg</b></span></span>`;
+        if(logs.length < 2) return `<span class="gbar"><span style="width:${(진*100).toFixed(1)}%"></span></span>${줄}`;
+        /* 곡선이 인바디 기록이니 아래 숫자도 같은 기록에서 — 계획에 적힌 값(r.w)과 섞으면 말풍선과 「지금」이 서로 달라진다 */
+        const 줄2 = `<span class="mgl"><span><small>처음 기록</small><b>${kgfmt(logs[0])}kg</b></span><span class="now"><small>지금</small><b>${kgfmt(logs[logs.length-1])}kg</b></span><span class="to"><small>목표</small><b>${kgfmt(r.gw)}kg</b></span></span>`;
+        const W = 300, H = 92, PL = 8, PR = 8, PT = 24, PB = 10;
+        const lo = Math.min(r.gw, ...logs) - 0.6, hi = Math.max(r.gw, ...logs) + 0.6, n = logs.length;
+        const x = i => PL + i*(W-PL-PR)/(n-1), y = v => PT + (1 - (v-lo)/(hi-lo))*(H-PT-PB);
+        const xs = logs.map((_,i)=>x(i)), ys = logs.map(y), d = 곡선길(xs, ys), lx = xs[n-1], ly = ys[n-1];
+        const 글 = kgfmt(logs[n-1]) + ' kg', bw = 글.length*5.6 + 14, bx = Math.min(W-bw-2, lx-bw+10), by = Math.max(2, ly-25);
+        return `<svg class="mgc" viewBox="0 0 ${W} ${H}" aria-hidden="true">
+          <defs><linearGradient id="mgcf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0d3a0" stop-opacity=".3"/><stop offset="1" stop-color="#f0d3a0" stop-opacity="0"/></linearGradient></defs>
+          <line x1="${PL}" x2="${W-PR}" y1="${y(r.gw).toFixed(1)}" y2="${y(r.gw).toFixed(1)}" stroke="var(--teal)" stroke-width="1.1" stroke-dasharray="3 3.5" opacity=".7"/>
+          <text x="${PL}" y="${(y(r.gw)-4).toFixed(1)}" font-size="8" font-weight="700" fill="var(--teal)">목표 ${kgfmt(r.gw)}kg</text>
+          <path d="${d} L ${lx.toFixed(1)} ${H-PB} L ${xs[0].toFixed(1)} ${H-PB} Z" fill="url(#mgcf)"/>
+          <path d="${d}" fill="none" stroke="var(--gold)" stroke-width="2.2" stroke-linecap="round"/>
+          ${logs.slice(0,-1).map((_,i)=>`<circle cx="${xs[i].toFixed(1)}" cy="${ys[i].toFixed(1)}" r="2" fill="#1b1a18" stroke="var(--gold-2)" stroke-width="1.2"/>`).join('')}
+          <circle cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" r="7" fill="#f0d3a0" opacity=".16"/>
+          <circle cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" r="4" fill="#1b1a18" stroke="var(--gold)" stroke-width="2.2"/>
+          <rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${bw.toFixed(1)}" height="17" rx="8.5" fill="#241f17" stroke="var(--gold-2)" stroke-width=".9"/>
+          <text x="${(bx+bw/2).toFixed(1)}" y="${(by+12).toFixed(1)}" text-anchor="middle" font-size="9.5" font-weight="800" fill="var(--gold)">${글}</text></svg>${줄2}`; })()}
+    </button>
+
+    <div class="megrp">
+      <div class="mrow2"><span class="mi">${svg('h_user',19)}</span><span class="mt"><b>담당 트레이너</b><small>${esc(me().tr)}</small></span></div>
+      <button class="mrow2" data-act="go:noti"><span class="mi">${svg('종',19)}</span><span class="mt"><b>알림</b>
+        <small>${notiCount(S.mid)?notiCount(S.mid)+'개의 새 알림':'새 알림 없음'}</small></span>${notiCount(S.mid)?`<em class="nb">${notiCount(S.mid)}</em>`:''}<i>›</i></button>
+      <button class="mrow2" data-act="go:terms"><span class="mi">${svg('note',19)}</span><span class="mt"><b>약관 및 동의</b>
+        <small>${건강동의함(S.mid)?'건강정보 동의함':'건강정보 동의 안 함'} · 마케팅 ${agreeOf(S.mid).aM?'받음':'안 받음'}</small></span><i>›</i></button>
+      <div class="mrow2"><span class="mi">${svg('h_clock',19)}</span><span class="mt"><b>화면 꺼짐 방지</b><small>운동 중에만 켭니다</small></span>${스위치(1)}</div>
     </div>
-    <div class="card">
-      <div class="sm">우리의 목표</div><div class="nm">${esc(g.goal)}</div>
-      ${r.w && r.gw ? `<div class="gbar"><span style="width:${(진*100).toFixed(1)}%"></span></div>
-        <div class="gbl"><b>${r.w}kg</b> 지금<span>목표 ${r.gw}kg</span></div>` : ''}
-    </div>
-    <div class="card rowc"><span class="gi sm2">${svg('user',18)}</span>
-      <div><div class="nm">담당 트레이너</div><div class="sm">${esc(me().tr)}</div></div></div>
-    <button class="card rowc" data-act="go:terms"><div><div class="nm">약관 및 동의</div>
-      <div class="sm">${건강동의함(S.mid)?'건강정보 동의함':'건강정보 동의 안 함'} · 마케팅 ${agreeOf(S.mid).aM?'받음':'안 받음'}</div></div><span class="rt">›</span></button>
-    <button class="card rowc" data-act="go:noti"><div><div class="nm">알림</div>
-      <div class="sm">${notiCount(S.mid)?notiCount(S.mid)+'개의 새 알림':'새 알림 없음'}</div></div><span class="rt">›</span></button>
-    <div class="card rowc"><div><div class="nm">화면 꺼짐 방지</div><div class="sm">운동 중에만 켭니다</div></div>${스위치(1)}</div>
-    <div class="hr"></div><span class="lbl">내 기록장</span>
-    ${[['note','상담일지','첫 상담 때 트레이너가 적은 내용','sub:intake'],
+
+    <span class="lbl">내 기록장</span>
+    <div class="megrp">${[['note','상담일지','첫 상담 때 트레이너가 적은 내용','sub:intake'],
        ['plan','운동계획','목표 · 맞춤 칼로리 · 다짐','sub:plan'],
        ['chart','인/아웃바디','인바디 · 비포애프터 · 체형분석','sub:body'],
        ...(여성인가(S.mid) ? [['moon','생리주기', (cycOf(S.mid)&&cycOf(S.mid).on)
           ? `현재 ${esc(cycToday(cycOf(S.mid)).ph)} · ${cycToday(cycOf(S.mid)).day}일차`
           : '켜면 시기에 맞춰 운동을 조절합니다 — 선택이에요', 'sub:cycle']] : []),
        ['chat','자주 묻는 질문','식사 · 유산소 · 빈도','sub:qa']]
-      .map(x=>`<button class="gocard" data-act="${x[3]}">
-        <span class="gi">${svg(x[0])}</span>
-        <span class="gt"><span class="nm">${x[1]}</span><span class="sm">${x[2]}</span></span>
-        <span class="ga">›</span></button>`).join('')}
+      .map(x=>`<button class="mrow2" data-act="${x[3]}"><span class="mi">${svg(x[0],19)}</span>
+        <span class="mt"><b>${x[1]}</b><small>${x[2]}</small></span><i>›</i></button>`).join('')}</div>
     <div class="hr"></div><span class="lbl">시험용 도구</span>
     <button class="card rowc" data-act="as:tr"><div><div class="nm">트레이너 화면 보기</div>
       <div class="sm">루틴 지정 · 코멘트 · 설명 수정</div></div><span class="rt">›</span></button>
