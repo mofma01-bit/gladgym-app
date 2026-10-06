@@ -1016,6 +1016,7 @@ body .cm2 .tx{font-size:14px;line-height:1.6;color:var(--cream)}
 .tmsum>div.t{border-color:#3f7281;background:linear-gradient(170deg,#1b2d33,#171a19 70%)}.tmsum>div.t b{color:var(--teal)}
 .mrow2 .mi.nm1{font-size:15px;font-weight:800}.mrow2 .mi.lv{color:var(--teal);border-color:rgba(169,216,230,.6);background:rgba(169,216,230,.08)}
 .mrow2 .pill{flex:none}
+.hcard.gold2{background:radial-gradient(110% 130% at 0% 0%,rgba(240,211,160,.18),transparent 62%),linear-gradient(180deg,#241f17,#171614);border-color:#6b5a33}
 .megoal{width:100%;flex:none;display:flex;flex-direction:column;gap:8px;text-align:left;padding:14px 14px 13px;border-radius:18px;border:1px solid #34332d;background:linear-gradient(180deg,#201f1c,#171615);box-shadow:inset 0 1px 0 rgba(240,211,160,.14)}
 .mgh{display:grid;grid-template-columns:1fr auto;align-items:center;width:100%}.mgh small{grid-column:1/-1;font-size:11.5px;color:var(--sub)}
 .mgh b{font-size:17px;font-weight:800}.mgh i{font-style:normal;color:var(--sub);font-size:17px}
@@ -2309,7 +2310,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '278';
+const BUILD = '279';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -9229,27 +9230,25 @@ function tToday(){
   const live = MEMBERS.map(m=>({m, w:liveOf(m.id)})).filter(x=>x.w);
   const todo = D.workouts.filter(w=>w.done && unseen(w)).sort(byDateDesc);
   return { top: bar('오늘', `<span class="sub">${TODAY.slice(5).replace('-','월 ')}일</span>`), body:`
-    <span class="lbl">현재 기록 중인 수업</span>
-    ${live.length? live.map(x=>`<button class="card teal" data-act="tgo:${x.m.id}">
-        <div class="nm t">${esc(x.m.n)} · 기록 중</div>
-        <div class="sm">${esc((it=>it?exName(it.ex,it.va):'')(x.w.items[x.w.cur]||x.w.items[0]))} · 이어서 기록하기 ›</div></button>`).join('')
-     : '<div class="empty">지금 기록 중인 수업이 없어요</div>'}
-    <div class="hr"></div>
-    <button class="hero" data-act="pickmem">
+    ${/* 2026-10-06 융합 — 큰 카드는 「오늘 수업 기록하기」 하나 · 숫자 셋(실제 수) · 나머지 둘은 반쪽 카드 */''}
+    <button class="hero photo" data-act="pickmem">
       <span class="tag">수업</span>
       <div class="ht">오늘 수업 기록하기</div>
-      <div class="hs">회원을 찾아 루틴을 골라<br>지금 바로 기록을 시작합니다</div>
+      <div class="hs">회원을 찾아 루틴을 골라 바로 시작합니다</div>
       <span class="hgo">회원 찾기 ›</span></button>
-    <button class="hero blue" data-act="pickasg">
-      <span class="tag">개인운동</span>
-      <div class="ht">루틴 지정하기</div>
-      <div class="hs">회원을 찾아 오늘 할 루틴을<br>미리 정해 둡니다</div>
-      <span class="hgo">회원 찾기 ›</span></button>
-    <button class="hero rm" data-act="rmpickmem">
-      <span class="tag">1RM</span>
-      <div class="ht">1RM 측정하기</div>
-      <div class="hs">스쿼트 · 벤치 · 데드 등 측정 종목만<br>워밍업부터 무게 · 횟수 · 쉬는 시간 자동</div>
-      <span class="hgo">회원 찾기 ›</span></button>
+    ${live.map(x=>`<button class="hline" data-act="tgo:${x.m.id}">${svg('h_clock',18)}<b>${esc(x.m.n)} · 기록 중</b>
+        <small>${esc((it=>it?exName(it.ex,it.va):'')(x.w.items[x.w.cur]||x.w.items[0]))}</small><i>›</i></button>`).join('')}
+    <div class="tmsum">
+      <div class="t"><small>기록 중인 수업</small><b>${live.length}<i>명</i></b></div>
+      <div><small>코멘트 안 단 기록</small><b>${todo.length}<i>건</i></b></div>
+      <div><small>오늘 올라온 식단</small><b>${(D.meals||[]).filter(m=>m.date===TODAY).length}<i>장</i></b></div>
+    </div>
+    <div class="hrow">
+      <button class="hcard teal" data-act="pickasg">${홈머리('h_cal','루틴 지정하기')}
+        <span class="hs">회원이 오늘 할 루틴을<br>미리 정해 둡니다</span></button>
+      <button class="hcard gold2" data-act="rmpickmem">${홈머리('h_crown','1RM 측정하기')}
+        <span class="hs">워밍업부터 무게 · 횟수 ·<br>쉬는 시간 자동</span></button>
+    </div>
     ${(()=>{ const md=(D.meals||[]).filter(m=>m.date===TODAY);
       if(!md.length) return '';
       const nm2 = id => (MEMBERS.find(x=>x.id===id)||{}).n || '?';
