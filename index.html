@@ -872,6 +872,8 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .hcard .r3 em{font-style:normal;font-size:12px;font-weight:700;color:var(--teal);margin-top:2px}
 .hcard .hq{font-size:12.5px;line-height:1.5;color:var(--cream)}
 .hcard.hcm.new{border-color:var(--teal)}.hcard.hcm .hh b{flex:none;overflow:visible}.hcard.hcm .hh .nw,.hcard.hcm .hh i{margin-left:auto}.hcard button.hh{text-align:left}
+.hline{display:flex;align-items:center;gap:8px;width:100%;flex:none;text-align:left;padding:10px 12px;border-radius:13px;background:linear-gradient(160deg,#1d3a43,#12242a);border:1px solid #3f7281;color:var(--teal)}
+.hline b{font-size:13.5px;font-weight:800}.hline small{font-size:11.5px;color:#b9d3db;flex:1}.hline i{font-style:normal;font-size:16px}
 .hslim{width:100%;flex:none;padding:9px;border-radius:13px;border:1px dashed #5a4c33;color:var(--gold);font-size:13px;font-weight:700;background:none}.hcard .nw{font-style:normal;font-size:10.5px;font-weight:800;color:#0d2027;background:var(--teal);border-radius:20px;padding:2px 8px;flex:none}
 .hgoal{width:100%;flex:none;display:flex;flex-direction:column;gap:6px}
 .hero2.half .hic{position:relative;z-index:3;color:var(--gold);display:flex;margin-bottom:auto}.hero2.half .hic.t{color:var(--teal)}
@@ -2114,7 +2116,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '259';
+const BUILD = '260';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -3780,7 +3782,7 @@ function vHome(){
           hs:`${esc(t.kind)} · 루틴 ${r.no} ${esc(r.n)}<br>${r.items.length}종목 · 예상 ${estMin(r)}분 · ${esc(t.by)}가 지정했어요`,
           go:'시작하기' }
       : { act:'go:start', tag:'오늘', ht:'오늘 운동 기록하기',
-          hs:'지정된 루틴이 없어요<br>내 루틴에서 골라 시작합니다', go:'루틴 고르기' };
+          hs:(n => n ? `트레이너 추천 루틴 ${n}개가 있어요<br>골라서 바로 시작합니다` : '지정된 루틴이 없어요<br>내 루틴에서 골라 시작합니다')(recosOf(S.mid).filter(x=>rOf(x.rid)).length), go:'루틴 고르기' };
 
   const 알림수 = notiCount(S.mid);
   return { top: bar('글래드짐',
@@ -3796,9 +3798,10 @@ function vHome(){
       <div><div class="nm">오늘 지정 · 루틴 ${r.no} ${esc(r.n)}</div>
       <div class="sm">${esc(t.by)}가 지정했어요</div></div><span class="rt">›</span></button>` : ''}
     ${(뱃지주기(S.mid), '')}
+    ${주기줄(S.mid, 'sub:cycle', true)}
+    ${(w => w ? `<button class="hline" data-act="ootd:${w.id}">${svg('h_cam',18)}<b>오늘 오운완 찍기</b><small>오늘만 찍을 수 있어요</small><i>›</i></button>` : '')(오운완남음(S.mid))}
     <div class="hrow wide">${홈현황(S.mid)}${홈목표(S.mid)}</div>
-    ${(내목표(S.mid).length || 내뱃지(S.mid).length) ? `<div class="hgoal">${목표칸(S.mid)}</div>` : `<button class="hslim" data-act="goal:new">＋ 내 목표 정하기</button>`}
-    ${(()=>{ const a = 홈주기(S.mid), b = 홈오운완(S.mid); return (a || b) ? `<div class="hrow${a && b ? '' : ' solo'}">${a}${b}</div>` : ''; })()}
+    ${내목표(S.mid).length ? `<div class="hgoal">${목표칸(S.mid)}</div>` : ''}
     ${인증샷홈(S.mid)}
     <div class="hrow wide">${홈최근(S.mid)}${홈코멘트(S.mid)}</div>
     <div class="home2">
@@ -3810,29 +3813,9 @@ function vHome(){
           style="--h1:#22424b;--h2:#101719;--img:url(img/card-both.jpg)">
         <span class="tt">준비운동</span>
         <span class="dd">스트레칭 · 셀프 마사지</span></button>
-    </div>
-
-    ${(()=>{ const rc=recosOf(S.mid).filter(x=>rOf(x.rid)); if(!rc.length) return '';
-      return `<span class="lbl">다음 개인운동 추천</span>`
-        + rc.map(x=>{ const r0=rOf(x.rid);
-          return `<button class="card gold rowc" data-act="rt:${r0.id}">
-            <div><div class="nm g">${esc(x.slot)} · 루틴 ${r0.no} ${esc(r0.n)}</div>
-            <div class="sm">${r0.purpose?esc(r0.purpose)+' · ':''}${r0.items.length}종목 · 예상 ${estMin(r0)}분</div></div>
-            <span class="rt">›</span></button>`; }).join('')
-        + `<div class="note">트레이너가 <b>다음 개인운동</b>에 하시라고 담아 둔 루틴이에요. 개인운동을 한 번 기록하면 사라집니다.</div>`;
-    })()}
-
-
-    <div class="go3">${[['routine','내 루틴', myRoutines(S.mid).length+'개','go:routines'],
-       ['plan','운동계획', esc(g.goal||'목표 · 다짐'),'sub:plan'],
-       ['chart','기록 분석','그래프 · 균형','tab:records']]
-      .map(x=>`<button data-act="${x[3]}"><span class="gi">${svg(x[0])}</span><b>${x[1]}</b><small>${x[2]}</small></button>`).join('')}</div>`,
-    foot:(()=>{
-      const doneToday = D.workouts.some(w=>w.mid===S.mid && w.done && w.date===TODAY && w.items.some(i=>i.sets.length));
-      const cls = 'btn main go' + (lw?' live':'') + (!lw && doneToday?' calm':'');
-      const txt = lw ? '운동기록 계속하기' : (doneToday ? '오늘 하나 더 기록하기' : hero.ht);
-      return `<button class="${cls}" data-act="${hero.act}">${lw?'<span class="gdot"></span>':svg('h_note',19)}${txt}</button>`;
-    })() };
+    </div>`,
+    /* 맨 아래 고정 단추 — 기록 중일 때만. 평소엔 맨 위 큰 카드가 같은 일을 한다 (2026-10-06 홈 줄이기) */
+    foot: lw ? `<button class="btn main go live" data-act="go:workout"><span class="gdot"></span>운동기록 계속하기</button>` : undefined };
 }
 function recRow(w){
   const parts=[...new Set(w.items.map(i=>exOf(i.ex).p))].join(' · ');
@@ -3876,6 +3859,16 @@ function vStart(){
       <span class="tag2">${r.items.length}종목 · ${estMin(r)}분</span>
       <span class="tt">트레이너 지정루틴 시작하기</span>
       <span class="dd">${esc(t.kind)} · 루틴 ${r.no} · ${esc(r.n)}</span></button>`:''}
+
+    ${(()=>{ const rc=recosOf(S.mid).filter(x=>rOf(x.rid)); if(!rc.length) return '';
+      return `<span class="lbl">다음 개인운동 추천</span>`
+        + rc.map(x=>{ const r0=rOf(x.rid);
+          return `<button class="card gold rowc" data-act="rt:${r0.id}">
+            <div><div class="nm g">${esc(x.slot)} · 루틴 ${r0.no} ${esc(r0.n)}</div>
+            <div class="sm">${r0.purpose?esc(r0.purpose)+' · ':''}${r0.items.length}종목 · 예상 ${estMin(r0)}분</div></div>
+            <span class="rt">›</span></button>`; }).join('')
+        + `<div class="note">트레이너가 <b>다음 개인운동</b>에 하시라고 담아 둔 루틴이에요. 개인운동을 한 번 기록하면 사라집니다.</div>`;
+    })()}
 
     <button class="hero2 ${사진있나('routines')}" data-act="go:routines"
         style="${사진꾸밈('routines','#33304a','#131217')}">
