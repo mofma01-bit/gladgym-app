@@ -1050,6 +1050,9 @@ body .set.now{border-color:var(--gold);background:radial-gradient(120% 140% at 0
 .lrf i{width:28px;height:28px;border-radius:50%;margin-left:-7px;border:1.5px solid #171615;background:var(--dark-3);display:flex;align-items:center;justify-content:center;overflow:hidden;font-style:normal}
 .lrf i:first-child{margin-left:0}.lrf i img{width:100%;height:100%;object-fit:cover}.lrf i b{font-size:11.5px;color:var(--sub)}
 .lrf i.me{border-color:var(--gold)}.lrf i.me b{color:var(--gold)}.lrf em{font-style:normal;font-size:11px;color:var(--sub);margin-left:5px}
+.rksample{width:100%;flex:none;display:flex;flex-direction:column;gap:3px;padding:11px 13px;margin-bottom:8px;border-radius:14px;border:1px dashed #b98a4a;background:rgba(240,211,160,.07)}
+.rksample b{font-size:12.5px;font-weight:800;color:var(--gold)}.rksample span{font-size:12px;line-height:1.5;color:var(--sub)}.rksample u{color:var(--cream);text-decoration:none;font-weight:700}
+.lvh.sm{color:var(--sub);border:1px dashed #5a4c33;border-radius:20px;padding:2px 9px}
 .lvnews{width:100%;flex:none;display:flex;flex-direction:column;gap:7px;padding:12px 14px;border-radius:16px;border:1px solid #34332d;background:linear-gradient(180deg,#1f1e1b,#171615)}
 .lvnews div{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--sub)}.lvnews svg{color:var(--gold);flex:none}.lvnews b{color:var(--cream)}
 .megoal{width:100%;flex:none;display:flex;flex-direction:column;gap:8px;text-align:left;padding:14px 14px 13px;border-radius:18px;border:1px solid #34332d;background:linear-gradient(180deg,#201f1c,#171615);box-shadow:inset 0 1px 0 rgba(240,211,160,.14)}
@@ -2345,7 +2348,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '281';
+const BUILD = '282';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -6599,7 +6602,7 @@ async function 커뮤니티받기(){
   }catch(e){ console.warn('커뮤니티 받기', e); }
 }
 const 글쓴이 = () => (S.who==='tr') ? { mid:'', who:(TRAINER||'트레이너') + ' 트레이너' } : { mid:S.mid, who:(MEMBERS.find(m=>m.id===S.mid)||{}).n||'회원' };
-const 이름of = mid => (MEMBERS.find(m=>m.id===mid)||{}).n || '회원';
+const 이름of = mid => (MEMBERS.find(m=>m.id===mid)||{}).n || 샘플이름[mid] || '회원';
 /* 내 글은 내려 둔 것도 본다(다시 올리거나 지우려면 보여야 한다) · 남의 글은 센터 범위이고 안 내린 것만 · 트레이너는 안 내린 것 전부 */
 const 글볼수있나 = p => (p.mid===S.mid && S.who!=='tr') ? true : (!p.hid && (p.vis==='센터' || S.who==='tr'));
 const 좋아요수 = pid => (D.plk||[]).filter(l=>l.pid===pid).length;
@@ -6648,13 +6651,37 @@ const 얼굴 = mid => { const a = profOf(mid).avatar;
   return a ? `<img src="${esc(phURL(a))}" alt="" onerror="picFail(this)">` : `<b>${esc((이름of(mid)||'회').slice(0,1))}</b>`; };
 /* 랭킹 — 한 화면에 판 하나만 (2026-10-06 대표 「한번에 모든 데이터가 쭉 펼쳐지니까 정신 사나워」)
    위에서부터: 기간 → 판 고르기 → 내 순위 → 시상대(1~3위) → 4~10위. 6달 추이는 「내 전적」 창으로 뺐다 */
+/* ══ 랭킹 샘플 모드 ══ 2026-10-06 대표 「우선은 샘플로 가짜로 만들어놔 · 아직 데이터를 옮기지 않을 거야 · 섞이면 혼란만 가중된다」
+   켜져 있으면 랭킹 화면은 **가짜 사람·가짜 숫자만** 보여 준다. 실제 회원 기록은 한 줄도 안 섞는다(나만 가운데쯤에 끼워 화면이 어떻게 보이는지 보여 준다).
+   공식 집계는 아직 카톡 인증방 기준이다. 앱 집계로 넘어갈 때 **이 값을 false 로** 바꾸면 실제 기록으로 돈다. */
+const 랭킹샘플 = true;
+const 샘플이름 = { s01:'덤벨요정', s02:'새벽러너', s03:'스쿼트왕', s04:'단백질곰', s05:'플랭크킹', s06:'런지여신', s07:'벤치장군', s08:'요가토끼', s09:'데드리프터', s10:'버피천사', s11:'철봉고수', s12:'물통지기' };   /* 사람 이름처럼 안 짓는다 — 실제 회원 이름과 겹치면 안 된다 */
+const 샘플성 = { s01:'남', s02:'여', s03:'남', s04:'여', s05:'여', s06:'여', s07:'남', s08:'여', s09:'남', s10:'여', s11:'남', s12:'여' };
+function 샘플순위(판, 성, 지난중){
+  const 값 = { 오운완:[19,16,15,13,11,9,8,6,5,4,2,1], 운동:[21,18,15,14,12,9,7,6,4,3,2,1], 무게:[46,38,27,22,17,12,9,6,4,3,2,1] }[판];
+  let 줄;
+  if(판 === '삼대'){ const 남 = [[520,[190,130,200]],[455,[165,115,175]],[410,[150,100,160]],[340,[120,90,130]],[280,[100,70,110]],[215,[80,50,85]]],
+                          여 = [[305,[110,60,135]],[260,[95,50,115]],[225,[80,45,100]],[190,[70,40,80]],[150,[55,30,65]],[110,[40,25,45]]];
+    const ids = Object.keys(샘플이름).filter(k => 샘플성[k] === 성);
+    줄 = (성==='남' ? 남 : 여).map((x,i)=>({ mid: ids[i], v: x[0], t:'', 상세: x[1] }));
+  } else 줄 = 값.map((v,i)=>({ mid: 's' + String(i+1).padStart(2,'0'), v: 지난중 ? Math.round(v*1.25) : v, t:'' }));
+  /* 나를 가운데쯤에 끼운다 — 내 카드·라이벌·사다리의 내 칸이 어떻게 보이는지 */
+  if(S.who !== 'tr' && S.mid && !(판==='삼대' && (회원성별(S.mid)||'남') !== 성)){
+    const 자리 = Math.min(줄.length - 1, 판==='삼대' ? 2 : 5), 본 = 줄[자리];
+    줄.splice(자리, 1, Object.assign({}, 본, { mid: S.mid }));
+  }
+  return 줄;
+}
+const 샘플소식 = { 오운완:['<b>덤벨요정</b>님 Lv.5 역촌동 헬스 요정 달성','<b>플랭크킹</b>님 지난달 이맘때 5회 → <b>11회</b>','<b>벤치장군</b>님 지난달 이맘때 3회 → <b>8회</b>'],
+                   운동:['<b>덤벨요정</b>님 Lv.5 이달의 출석왕 달성','<b>단백질곰</b>님 지난달 이맘때 8회 → <b>14회</b>'] };
 /* 지금 고른 기간·판의 순위를 뽑는다 — 화면과 레벨 창이 같이 쓴다 */
 function 랭킹지금(){
   const 지난 = 지난달들(4).slice(1); let 기간 = S.rkp || '달'; if(기간==='주') 기간 = '달';      /* 레벨은 달마다 — 「이번 주」는 없앴다 */
   const 지난중 = 지난.includes(기간), ym = 지난중 ? 기간 : TODAY.slice(0,7);
   const 시작 = 월시작(ym), 끝 = 지난중 ? 월끝(ym) : TODAY;
   const 판 = S.rkb || '오운완', 성 = S.rks || (회원성별(S.mid)==='여' ? '여' : '남');
-  const k = 판==='삼대' ? (성==='남' ? '삼대남' : '삼대여') : 판, R = 랭킹계산(시작, 끝);
+  const k = 판==='삼대' ? (성==='남' ? '삼대남' : '삼대여') : 판, R = 랭킹샘플 ? { 미입력:0 } : 랭킹계산(시작, 끝);
+  if(랭킹샘플) R[k] = 샘플순위(판, 성, 지난중);
   return { 기간, 지난, 지난중, ym, 시작, 끝, 판, 성, k, R, 줄: R[k], 단위: 판단위[k], 제목: 지난중 ? 월이름(ym)+' 최종' : '이번 달' };
 }
 const 레벨고리 = (n, on) => `<span class="lvring l${n} ${on?'on':''}"><small>Lv</small><b>${n}</b></span>`;
@@ -6676,6 +6703,7 @@ function 랭킹판(){
       <span class="pdb"><b>${n}</b></span></div>` : `<div class="pd p${n} none"><span class="pda"><b>–</b></span><span class="pdn">비어 있어요</span><span class="pdv">&nbsp;</span><span class="pdb"><b>${n}</b></span></div>`;
   /* 이번 달 소식 — 지난달 같은 날짜까지와 견준다 (이번 달을 볼 때 · 오운완/운동 판만) */
   const 소식 = (()=>{ if(지난중 || (판!=='오운완' && 판!=='운동')) return [];
+    if(랭킹샘플) return 샘플소식[판] || [];
     const pm = 지난[0], 날 = TODAY.slice(8), 앞끝 = pm + '-' + 날 > 월끝(pm) ? 월끝(pm) : pm + '-' + 날;
     const 앞 = {}; 랭킹계산(월시작(pm), 앞끝)[k].forEach(r => { 앞[r.mid] = r.v; });
     const out = [];
@@ -6684,6 +6712,7 @@ function 랭킹판(){
       .forEach(x => out.push(`<b>${esc(이름of(x.r.mid))}</b>님 지난달 이맘때 ${수(앞[x.r.mid]||0)}${단위} → <b>${수(x.r.v)}${단위}</b>`));
     return out.slice(0,3); })();
   return `
+    ${랭킹샘플 ? `<div class="rksample"><b>샘플 화면</b><span>아래 이름과 숫자는 <u>가짜</u>예요. 화면이 어떻게 보일지 미리 보는 용도이고, 실제 기록은 아직 들어가지 않았습니다. 지금 공식 집계는 인증방 기준 그대로입니다.</span></div>` : ''}
     <div class="seg gold" style="margin-bottom:6px">${[['달','이번 달'],['지난','지난 달']].map(x=>{ const on = x[0]==='지난' ? 지난중 : !지난중;
       return `<button class="${on?'on':''}" data-act="rkp:${x[0]==='지난' ? 지난[0] : x[0]}">${x[1]}</button>`; }).join('')}</div>
     ${지난중 ? `<div class="chips" style="margin-bottom:6px">${지난.map(m=>`<button class="chip ${기간===m?'on':''}" data-act="rkp:${m}">${월이름(m)}</button>`).join('')}</div>` : ''}
@@ -6695,7 +6724,7 @@ function 랭킹판(){
           <span class="lvt"><small>${제목} · ${판이름[k]}</small>
             <b>${내lv ? esc(L[내lv-1][1]) : '아직 레벨이 없어요'}</b>
             <i>${나 ? `${수(나.v)}${단위} · ${줄.length}명 중 ${내i+1}위` : (판==='오운완' ? '오운완 한 번이면 Lv.1 이에요' : 판==='삼대' ? (회원성별(S.mid) ? '1RM 을 재면 순위에 올라요' : '성별이 상담일지에 있어야 해요') : '운동 한 번이면 Lv.1 이에요')}</i></span>
-          <button class="lvh" data-act="rkmine">내 전적 ›</button></div>
+          ${랭킹샘플 ? '<span class="lvh sm">샘플</span>' : '<button class="lvh" data-act="rkmine">내 전적 ›</button>'}</div>
         ${나 ? (다음 ? `<div class="lvbar"><u style="width:${Math.max(4, Math.min(100, Math.round((나.v - L[내lv-1][0]) / (다음[0] - L[내lv-1][0]) * 100)))}%"></u></div>
             <div class="lvnx">Lv.${내lv+1} ${esc(다음[1])}까지 <b>${수(다음[0]-나.v)}${단위}</b></div>`
           : `<div class="lvnx top">가장 높은 레벨이에요 👑</div>`) : ''}
@@ -6760,7 +6789,7 @@ function 커뮤니티입구(){
       <span class="cgt"><b>${이름}</b><small>${설명}</small>${알림 ? `<em>${알림}</em>` : ''}</span><i>›</i></button>`;
   return { top: bar('커뮤니티'), tabs:1, body:`
     ${칸('피드','gold','h_cam','오운완 · 식단 피드','회원들의 오운완 · 식단 · 인증샷', 피드.length ? `글 ${피드.length}개 · 최근 ${esc(이름of(피드[0].mid))} · ${언제(피드[0].ts)}` : '아직 글이 없어요')}
-    ${칸('랭킹','dark','h_crown','글래드 랭킹','레벨 달성 · 오운완 · 운동 · 총 무게 · 3대', 내것 ? (i>=0 ? `이번 달 오운완 Lv.${레벨of('오운완', R.오운완[i].v)} · ${i+1}위` : '이번 달 순위에 올라 보세요') : (R.오운완[0] ? `이번 달 오운완 1위 ${esc(이름of(R.오운완[0].mid))}` : ''))}
+    ${칸('랭킹','dark','h_crown','글래드 랭킹','레벨 달성 · 오운완 · 운동 · 총 무게 · 3대', 내것 ? (랭킹샘플 ? '샘플 화면 — 미리 보기' : i>=0 ? `이번 달 오운완 Lv.${레벨of('오운완', R.오운완[i].v)} · ${i+1}위` : '이번 달 순위에 올라 보세요') : (랭킹샘플 ? '샘플 화면 — 미리 보기' : R.오운완[0] ? `이번 달 오운완 1위 ${esc(이름of(R.오운완[0].mid))}` : ''))}
     ${칸('파트너','teal','h_hands','운동 파트너 찾기','같이 운동할 사람 모집', 모집.length ? `모집 중 ${모집.length}건` : '모집 중인 글이 없어요')}
     <div class="note">${내것 ? '같은 센터 회원끼리만 보는 공간이에요.' : '회원들이 올린 글과 순위를 봅니다. 문제 글은 ⋯ 에서 지울 수 있습니다.'}</div>` };
 }
@@ -7080,7 +7109,8 @@ function 배지통계(mid){
     실측:(D.rm||[]).filter(r=>r.mid===mid && r.kind==='실측').length,
     글:(D.posts||[]).filter(p=>p.mid===mid && p.kind!=='파트너').length, 모집:(D.posts||[]).filter(p=>p.mid===mid && p.kind==='파트너').length,
     댓글:(D.pcm||[]).filter(c=>c.mid===mid).length,
-    월1위:등수들.filter(n=>n===1).length, 월3위:등수들.filter(n=>n<=3).length };
+    /* 랭킹이 샘플인 동안엔 「월간 1위·3위 안」 배지를 주지 않는다 — 공식 집계가 아직 앱이 아니다 */
+    월1위: 랭킹샘플 ? 0 : 등수들.filter(n=>n===1).length, 월3위: 랭킹샘플 ? 0 : 등수들.filter(n=>n<=3).length };
 }
 const 받은배지 = mid => (D.badges||[]).filter(b=>b.mid===mid);
 let 배지확인중 = false;
