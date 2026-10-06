@@ -1280,6 +1280,21 @@ body.resizing{cursor:col-resize;user-select:none}
    미디어쿼리는 특이도를 더해 주지 않는다 — 앞에 두면 뒤에 오는 기본 규칙(.side · .menubtn)이 이긴다.
    2026-09-30 에 앞에 뒀다가 ☰ 가 안 보이고 메뉴가 안 나왔다. */
 
+
+/* ── 톤 맞춤 (2026-10-06) — 회원앱에 넣은 디자인 기준을 데스크에도. 짜임·기능은 그대로, 색·결·강조만 ──
+   금색을 앱과 같은 값으로 · 카드에 위→아래 결과 윗변 금빛 테 · 고른 것(메뉴·칩·갈래)은 금색으로 또렷하게 */
+:root{--dark:#121211; --dark-2:#1a1917; --dark-3:#242321; --line:#34332d; --gold:#f0d3a0; --gold-2:#d6b87e; --teal:#a9d8e6}
+.card{background:linear-gradient(180deg,#201f1c,#181816);border-color:#34332d;border-radius:15px;box-shadow:inset 0 1px 0 rgba(240,211,160,.13)}
+.side{background:linear-gradient(180deg,#191816,#141413)}
+.nav{position:relative}
+.nav.on{background:linear-gradient(90deg,rgba(240,211,160,.2),rgba(240,211,160,.04));color:var(--gold);box-shadow:inset 0 0 0 1px rgba(240,211,160,.28)}
+.nav.on::before{content:'';position:absolute;left:-1px;top:8px;bottom:8px;width:3px;border-radius:3px;background:var(--gold)}
+.chip.on{background:linear-gradient(180deg,#f3d9a8,#e2c184);color:#2a1c14;border-color:transparent;font-weight:800}
+.seg button.on{background:linear-gradient(180deg,#f3d9a8,#e2c184);color:#2a1c14;border-color:transparent;font-weight:800}
+.btn.gold{background:linear-gradient(180deg,#f3d9a8,#e2c184);box-shadow:0 2px 10px rgba(240,211,160,.18)}
+.hblk > .homenums .num .v{letter-spacing:-.03em}
+.top{background:linear-gradient(180deg,#151513,#121211)}
+.lbl{color:#a9a29a}
 </style></head><body>
 
 <div class="tx-login" id="txlogin">
@@ -1377,7 +1392,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '173';
+const BUILD = '174';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
