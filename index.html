@@ -895,6 +895,32 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .cgate .cgt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.cgate .cgt b{font-size:20px;font-weight:800;letter-spacing:-.02em}
 .cgate .cgt small{font-size:12.5px;color:var(--sub)}.cgate .cgt em{font-style:normal;font-size:12px;font-weight:700;color:var(--gold);margin-top:4px}
 .cgate.teal .cgt em{color:var(--teal)}.cgate>i{font-style:normal;font-size:22px;color:var(--sub);flex:none}
+/* 식단 — 어두운 판 (2026-10-06 · 밝은 판 lite 는 이제 안 씀) */
+.big2{border:1px solid #6b5a33;background:radial-gradient(110% 120% at 0% 0%,rgba(240,211,160,.2),transparent 62%),linear-gradient(180deg,#241f17,#171614);gap:4px;min-height:132px}
+.big2.b{border-color:#3f7281;background:radial-gradient(110% 120% at 0% 0%,rgba(169,216,230,.18),transparent 62%),linear-gradient(160deg,#1b333b,#11211f 120%)}
+.big2 .ic.ring{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);border:1.5px solid rgba(240,211,160,.55);background:rgba(240,211,160,.07);margin-bottom:5px}
+.big2.b .ic.ring{color:var(--teal);border-color:rgba(169,216,230,.55);background:rgba(169,216,230,.07)}
+.big2 b{color:var(--cream);font-size:16px}.big2 i{color:var(--sub)}
+.mealcd{background:linear-gradient(180deg,#201f1c,#181816);border-color:#34332d;border-radius:17px}
+.mealcd .hd2 .n{color:var(--cream)}.mealcd .hd2 .t{color:var(--sub)}.mealcd .hd2 .k{color:var(--gold)}
+.frow2{border-top-color:#2c2b27}.frow2 .fn2{color:var(--cream)}.frow2 .fq{color:var(--sub)}.frow2 .fk{color:var(--gold)}
+.addf{border-top:1px dashed #3b3a35;color:var(--gold)}
+.addf2{display:flex;align-items:center;border-top:1px dashed #3b3a35}
+.addf2 button,.addf2 .done{flex:1;padding:11px 14px;font-size:13px;font-weight:700;color:var(--gold);text-align:left;display:flex;align-items:center;gap:5px}
+.addf2 button.g{justify-content:flex-end;color:var(--teal)}.addf2 .done{justify-content:flex-end;color:var(--sub);font-weight:600}
+body .wk{background:linear-gradient(180deg,#201f1c,#181816);border-color:#34332d;border-radius:17px}
+/* ── 전역 톤 맞춤 (2026-10-06 · GPT 디자인 시스템 시트 기준) — 홈·랭킹·프로필·식단에 먼저 넣은 모습을 나머지 화면에도 ──
+   바탕은 더 검게 · 카드는 위에서 아래로 살짝 어두워지는 결 + 얇은 테두리 · 고른 탭은 금색 알약 · 소제목 막대는 금색 */
+:root{--dark:#151513;--dark-2:#1d1c1a;--dark-3:#2a2926;--line:#34332d}
+.card{background:linear-gradient(180deg,#201f1c,#181816);border-color:#34332d;border-radius:16px}
+.card.gold{background:radial-gradient(110% 130% at 0% 0%,rgba(240,211,160,.16),transparent 62%),linear-gradient(180deg,#241f17,#171614);border-color:#6b5a33}
+.card.teal{background:radial-gradient(110% 130% at 0% 0%,rgba(169,216,230,.15),transparent 62%),linear-gradient(160deg,#1b333b,#11211f 120%);border-color:#3f7281}
+/* ⚠ 이 묶음은 스타일 가운데쯤에 있다 — 뒤에 나오는 옛 규칙에 지지 않게 body 를 앞에 붙인다 */
+body .seg{background:#1a1917;border:1px solid #34332d}
+body .seg button.on{background:linear-gradient(180deg,#f3d9a8,#e2c184);color:#2a1c14;box-shadow:0 2px 10px rgba(240,211,160,.22)}
+.lbl::before{background:var(--gold-2)}
+.note{background:#1a1917;border-color:#2e2d28}
+.kcard{background:linear-gradient(180deg,#201f1c,#181816);border-color:#34332d;border-radius:16px}
 .hrow{display:grid;grid-template-columns:1fr 1fr;gap:9px;width:100%;flex:none;align-items:stretch}
 .hrow.wide{grid-template-columns:1.5fr 1fr}.hrow.solo{grid-template-columns:1fr}
 .hcard{display:flex;flex-direction:column;gap:7px;min-width:0;text-align:left;padding:13px 13px 12px;border-radius:17px;
@@ -2061,6 +2087,8 @@ Object.assign(아이콘, {
   h_target:'<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/>',
   h_user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/>',
   h_clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  h_lens:'<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/>',
+  h_share:'<path d="M12 15V4M8 7.5 12 4l4 3.5M5 12v6a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-6"/>',
   h_fire:'<path d="M12 3c1 3.2 4.5 5 4.5 9.5a4.5 4.5 0 0 1-9 0c0-1.8.8-3 1.8-4 .3 1.6 1.2 2.4 2 2.5C10.6 8.6 11 5.6 12 3z"/>',
   h_chat:'<path d="M5 5h14a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-7l-4 4v-4H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/><path d="M8.5 10.5h.01M12 10.5h.01M15.5 10.5h.01"/>',
   h_medal:'<circle cx="12" cy="14.5" r="5"/><path d="M9 10 6.5 3h4L12 6.5 13.5 3h4L15 10"/><path d="m12 12.5.8 1.5 1.6.2-1.2 1.1.3 1.6-1.5-.8-1.5.8.3-1.6-1.2-1.1 1.6-.2z"/>',
@@ -2172,7 +2200,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '265';
+const BUILD = '267';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -6017,16 +6045,16 @@ function vDiet(){
   const day = S.dietDay || TODAY;
   const seqs = mealsSeq(mid, day);
   return { top: bar('식단', `<span class="sub">${esc((MEMBERS.find(m=>m.id===mid)||{}).n||'')}</span>`, tr?'tm:'+mid:null),
-    tabs: !tr, lite:true, body:`
+    tabs: !tr, body:`
     ${dietStrip(mid)}
     ${kcalCard(mid, day)}
     ${tr?'':`<div class="two">
       <button class="big2" data-act="shot">
-        <span class="ic">${SALAD_MINI}</span>
+        <span class="ic ring">${svg('h_cam',24)}</span>
         <b>사진으로 기록</b>
         <i>글래드짐 표시와<br>날짜·시간이 찍힙니다</i></button>
       <button class="big2 b" data-act="fadd:new">
-        <span class="ic">${LENS}</span>
+        <span class="ic ring">${svg('h_lens',24)}</span>
         <b>검색해서 기록</b>
         <i>18,000가지 음식에서<br>골라 담습니다</i></button>
     </div>`}
@@ -6038,14 +6066,17 @@ function vDiet(){
         ${m.path?태그판(m,0):''}
         ${(m.path?자리없는것(m):(m.items||[])).map(x=>`<button class="frow2" data-act="fdel:${m.id}:${x.id}">
           <span class="fe">${음식그림(x.name)}</span>
-          <span class="fn2">${esc(x.name)}${x.brand?` <span style="color:#a0917f;font-weight:600">${esc(x.brand)}</span>`:''}</span>
+          <span class="fn2">${esc(x.name)}${x.brand?` <span style="color:var(--sub);font-weight:600">${esc(x.brand)}</span>`:''}</span>
           <span class="fq">${kgfmt(x.qty)}${x.unit?' × '+esc(x.unit):'인분'}</span>
           <span class="fk">${Math.round(x.kcal)}</span></button>`).join('')}
         ${(!m.items||!m.items.length) && m.memo?`<div class="frow2"><span class="fe">${음식그림(m.memo)}</span><span class="fn2">${esc(m.memo)}</span>
           <span class="fk">${Math.round(t.kcal)||''}</span></div>`:''}
-        ${m.note?`<div class="frow2"><span class="fn2" style="color:#8a5a2b">트레이너 · ${esc(m.note)}</span></div>`:''}
+        ${m.note?`<div class="frow2"><span class="fn2" style="color:var(--teal)">트레이너 · ${esc(m.note)}</span></div>`:''}
         ${tr?'':(m.path
-          ? `<button class="addf" data-act="tagedit:${m.id}">＋ 음식 태그하기</button>`
+          ? `<div class="addf2"><button data-act="tagedit:${m.id}">＋ 음식 태그하기</button>
+              ${(D.posts||[]).some(p=>p.photo_id===String(m.id))
+                ? `<span class="done">${svg('h_share',15)}피드에 올렸어요</span>`
+                : `<button class="g" data-act="mealpost:${m.id}">${svg('h_share',15)}피드에 올리기</button>`}</div>`
           : `<button class="addf" data-act="fadd:${m.id}">＋ 이 식사에 음식 담기</button>`)}
       </div>`; }).join('')
      : 빔('bowl','이 날은 올린 식단이 없어요','사진을 찍거나 검색해서 담아 보세요')}
@@ -6106,7 +6137,7 @@ function dietStrip(mid){
   const ring2 = (p, has) => {
     const C = 2*Math.PI*13;
     return `<svg viewBox="0 0 36 36" width="32" height="32" aria-hidden="true">
-      <circle cx="18" cy="18" r="13" fill="none" stroke="${has?'#e2d6c1':'#ece3d4'}" stroke-width="3.6"/>
+      <circle cx="18" cy="18" r="13" fill="none" stroke="${has?'#4a463d':'#2e2d28'}" stroke-width="3.6"/>
       ${p>0?`<circle cx="18" cy="18" r="13" fill="none" stroke="var(--gold-2)" stroke-width="3.6"
         stroke-linecap="round" stroke-dasharray="${(C*p).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 18 18)"/>`:''}
       ${(has && p===0)?`<circle cx="18" cy="18" r="3.4" fill="var(--gold-2)"/>`:''}</svg>`;
@@ -6144,7 +6175,7 @@ function sheetMeal(id){
         ${것.length
           ? 것.map(x=>`<div class="frow2">
               <span class="fe">${음식그림(x.name)}</span>
-              <span class="fn2">${esc(x.name)}${x.brand?` <span style="color:#a0917f;font-weight:600">${esc(x.brand)}</span>`:''}</span>
+              <span class="fn2">${esc(x.name)}${x.brand?` <span style="color:var(--sub);font-weight:600">${esc(x.brand)}</span>`:''}</span>
               <span class="fq">${kgfmt(x.qty)}${x.unit?' × '+esc(x.unit):'인분'}</span>
               <span class="fk">${Math.round(x.kcal)}</span></div>`).join('')
             + `<div class="msum"><b>${Math.round(t.kcal)} kcal</b>
@@ -6494,7 +6525,7 @@ function 커뮤니티입구(){
       <span class="cgi">${svg(ic,26)}</span>
       <span class="cgt"><b>${이름}</b><small>${설명}</small>${알림 ? `<em>${알림}</em>` : ''}</span><i>›</i></button>`;
   return { top: bar('커뮤니티'), tabs:1, body:`
-    ${칸('피드','gold','h_cam','오운완 피드','회원들의 오운완 · 인증샷', 피드.length ? `글 ${피드.length}개 · 최근 ${esc(이름of(피드[0].mid))} · ${언제(피드[0].ts)}` : '아직 글이 없어요')}
+    ${칸('피드','gold','h_cam','오운완 · 식단 피드','회원들의 오운완 · 식단 · 인증샷', 피드.length ? `글 ${피드.length}개 · 최근 ${esc(이름of(피드[0].mid))} · ${언제(피드[0].ts)}` : '아직 글이 없어요')}
     ${칸('랭킹','dark','h_crown','글래드 랭킹','오운완 · 운동 횟수 · 총 무게 · 3대 중량', 내것 ? (i>=0 ? `이번 달 오운완 ${i+1}위` : '이번 달 순위에 올라 보세요') : (R.오운완[0] ? `이번 달 오운완 1위 ${esc(이름of(R.오운완[0].mid))}` : ''))}
     ${칸('파트너','teal','h_hands','운동 파트너 찾기','같이 운동할 사람 모집', 모집.length ? `모집 중 ${모집.length}건` : '모집 중인 글이 없어요')}
     <div class="note">${내것 ? '같은 센터 회원끼리만 보는 공간이에요.' : '회원들이 올린 글과 순위를 봅니다. 문제 글은 ⋯ 에서 지울 수 있습니다.'}</div>` };
@@ -6505,8 +6536,10 @@ function vCommunity(){
   const 내것 = S.who !== 'tr';
   let ps = (D.posts||[]).filter(글볼수있나).filter(p => 모드==='파트너' ? p.kind==='파트너' : p.kind!=='파트너');
   if(f==='내 글') ps = ps.filter(p=>p.mid===S.mid);
-  return { top: bar(모드==='파트너' ? '운동 파트너 찾기' : (모드==='피드' ? '오운완 피드' : '글래드 랭킹'), 내것 && 모드!=='랭킹' ? (모드==='파트너' ? `<button class="tbtn" data-act="partnew">＋ 모집 글</button>` : `<button class="tbtn" data-act="postnew">＋ 올리기</button>`) : '', 'cmode:'), tabs:1, body:`
-    ${모드==='랭킹' ? 랭킹판() : `<div class="chips" style="margin-bottom:4px">${(내것?['전체','내 글']:['전체']).map(k=>`<button class="chip ${f===k?'on':''}" data-act="cfilt:${k}">${k}</button>`).join('')}</div>`}
+  if(f==='오운완') ps = ps.filter(p=>p.kind==='오운완' || p.kind==='인증샷' || p.kind==='사진');
+  if(f==='식단') ps = ps.filter(p=>p.kind==='식단');
+  return { top: bar(모드==='파트너' ? '운동 파트너 찾기' : (모드==='피드' ? '오운완 · 식단 피드' : '글래드 랭킹'), 내것 && 모드!=='랭킹' ? (모드==='파트너' ? `<button class="tbtn" data-act="partnew">＋ 모집 글</button>` : `<button class="tbtn" data-act="postnew">＋ 올리기</button>`) : '', 'cmode:'), tabs:1, body:`
+    ${모드==='랭킹' ? 랭킹판() : `<div class="chips" style="margin-bottom:4px">${(모드==='피드' ? (내것?['전체','오운완','식단','내 글']:['전체','오운완','식단']) : (내것?['전체','내 글']:['전체'])).map(k=>`<button class="chip ${f===k?'on':''}" data-act="cfilt:${k}">${k}</button>`).join('')}</div>`}
     ${모드==='랭킹' ? '' : ps.length ? ps.map(p => p.kind==='파트너' ? 파트너카드(p) : 글카드(p)).join('')
       : (모드==='파트너'
           ? 빔('user', f==='내 글' ? '아직 올린 모집 글이 없어요' : '아직 모집 글이 없어요', 내것 ? '같이 운동할 파트너를 찾아 보세요' : '')
@@ -6592,6 +6625,11 @@ function sheetPostNew(){
     ${사진.length ? `<div class="pgrid">${사진.map(x=>`<button class="pg" data-act="postfrom:${x.id}">
         <img src="${esc(phURL(x.path))}" alt="" loading="lazy" onerror="picFail(this)">${x.kind==='pair'?'<span class="pgk">🤝</span>':''}
         <span class="pgd">${(x.date||'').slice(5).replace('-','.')}</span></button>`).join('')}</div>` : '<div class="empty">올릴 수 있는 오운완·인증샷이 아직 없어요</div>'}
+    ${(()=>{ const 끼 = (D.meals||[]).filter(m => m.mid===S.mid && m.path && !(D.posts||[]).some(p=>p.photo_id===String(m.id)))
+        .sort((a,b)=> a.date<b.date ? 1 : -1).slice(0, 6);
+      return 끼.length ? `<span class="lbl">내 식단 사진</span><div class="pgrid">${끼.map(m=>`<button class="pg" data-act="mealpost:${m.id}">
+        <img src="${esc(phURL(m.path))}" alt="" loading="lazy" onerror="picFail(this)"><span class="pgk">🍽</span>
+        <span class="pgd">${(m.date||'').slice(5).replace('-','.')}</span></button>`).join('')}</div>` : ''; })()}
     <button class="btn sub" data-act="postpick">📷 새 사진 고르기</button>
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
@@ -10815,6 +10853,10 @@ document.addEventListener('click', async ev=>{
       p.state = p.state==='마감' ? '모집중' : '마감'; sv(spatch('posts','id=eq.'+p.id,{ state:p.state }), '모집 상태'); render(); return; }
     case 'postnew': sheetPostNew(); return;
     case 'postpick': closeSheet(); postPick(); return;
+    case 'mealpost': { const m=(D.meals||[]).find(y=>String(y.id)===rest[0]); if(!m || !m.path) return;
+      const 이름들 = (m.items||[]).map(x=>x.name).slice(0,3).join(' · ');
+      S.pnew = { kind:'식단', photo_id:String(m.id), path:m.path, url:phURL(m.path), vis:'센터', cap: m.memo || 이름들 || '' };
+      sheetPostWrite(); return; }
     case 'postfrom': { const x=(D.bph||[]).find(y=>y.id===rest[0]); if(!x) return;
       S.pnew = { kind: x.kind==='pair'?'인증샷':'오운완', photo_id:x.id, path:x.path, url:phURL(x.path), vis:'센터', cap:'', by:x.by||'' };
       sheetPostWrite(); return; }
