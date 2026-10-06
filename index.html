@@ -981,6 +981,16 @@ body .figbox2{background:radial-gradient(80% 50% at 50% 30%,rgba(240,211,160,.09
 .mring i{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-style:normal;line-height:1.1}
 .mring b{font-size:19px;font-weight:800;color:var(--gold);letter-spacing:-.02em}.mring small{font-size:9.5px;color:var(--sub)}
 .mhf{grid-column:1/-1;font-size:11.5px;color:var(--sub);padding-top:10px;border-top:1px solid #34332d}.mhf b{color:var(--cream)}
+.tmhead{width:100%;flex:none;display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;padding:16px 15px 12px;border-radius:20px;border:1px solid #5a4c33;
+  background:radial-gradient(110% 90% at 0% 0%,rgba(240,211,160,.17),transparent 62%),linear-gradient(180deg,#221e17,#161513);box-shadow:inset 0 1px 0 rgba(240,211,160,.2)}
+.tmt{display:flex;flex-direction:column;gap:2px;min-width:0}.tmt small{font-size:11.5px;color:var(--sub)}.tmt b{font-size:21px;font-weight:800;letter-spacing:-.02em}.tmt i{font-style:normal;font-size:12.5px;color:var(--sub)}
+.mring b u{text-decoration:none;font-size:12px;color:var(--sub);font-weight:700}
+.tmb{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.tmb button{padding:12px 6px;border-radius:13px;font-size:14.5px;font-weight:800}
+.tmb .g{background:linear-gradient(180deg,#f3d9a8,#e2c184);color:#2a1c14;box-shadow:0 3px 12px rgba(240,211,160,.2)}
+.tmb .t{background:linear-gradient(160deg,#24434c,#162a30);color:var(--teal);border:1px solid #3f7281}
+.tmf{grid-column:1/-1;font-size:11.5px;color:var(--sub);padding-top:10px;border-top:1px solid #34332d}
+.mrow2 .nb.w{background:var(--warn,#e58b7b);color:#2a1410}
 .megoal{width:100%;flex:none;display:flex;flex-direction:column;gap:8px;text-align:left;padding:14px 14px 13px;border-radius:18px;border:1px solid #34332d;background:linear-gradient(180deg,#201f1c,#171615);box-shadow:inset 0 1px 0 rgba(240,211,160,.14)}
 .mgh{display:grid;grid-template-columns:1fr auto;align-items:center;width:100%}.mgh small{grid-column:1/-1;font-size:11.5px;color:var(--sub)}
 .mgh b{font-size:17px;font-weight:800}.mgh i{font-style:normal;color:var(--sub);font-size:17px}
@@ -2274,7 +2284,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '275';
+const BUILD = '276';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -7613,6 +7623,25 @@ function profPick(){
 }
 
 /* ── 내 정보 ── */
+/* 체중 곡선 — 인바디 체중 기록(둘 이상)과 목표 체중. 마지막 점에 말풍선, 목표는 청록 점선 */
+function 체중곡선(logs, gw){
+  const W = 300, H = 92, PL = 8, PR = 8, PT = 24, PB = 10, 목표 = +gw || 0, n = logs.length, id = 'wcg' + (++그래프번호);
+  const lo = Math.min(...logs, ...(목표 ? [목표] : [])) - 0.6, hi = Math.max(...logs, ...(목표 ? [목표] : [])) + 0.6;
+  const x = i => PL + i*(W-PL-PR)/(n-1), y = v => PT + (1 - (v-lo)/(hi-lo))*(H-PT-PB);
+  const xs = logs.map((_,i)=>x(i)), ys = logs.map(y), d = 곡선길(xs, ys), lx = xs[n-1], ly = ys[n-1];
+  const 글 = kgfmt(logs[n-1]) + ' kg', bw = 글.length*5.6 + 14, bx = Math.min(W-bw-2, lx-bw+10), by = Math.max(2, ly-25);
+  return `<svg class="mgc" viewBox="0 0 ${W} ${H}" aria-hidden="true">
+    <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0d3a0" stop-opacity=".3"/><stop offset="1" stop-color="#f0d3a0" stop-opacity="0"/></linearGradient></defs>
+    ${목표 ? `<line x1="${PL}" x2="${W-PR}" y1="${y(목표).toFixed(1)}" y2="${y(목표).toFixed(1)}" stroke="var(--teal)" stroke-width="1.1" stroke-dasharray="3 3.5" opacity=".7"/>
+      <text x="${PL}" y="${(y(목표)-4).toFixed(1)}" font-size="8" font-weight="700" fill="var(--teal)">목표 ${kgfmt(목표)}kg</text>` : ''}
+    <path d="${d} L ${lx.toFixed(1)} ${H-PB} L ${xs[0].toFixed(1)} ${H-PB} Z" fill="url(#${id})"/>
+    <path d="${d}" fill="none" stroke="var(--gold)" stroke-width="2.2" stroke-linecap="round"/>
+    ${logs.slice(0,-1).map((_,i)=>`<circle cx="${xs[i].toFixed(1)}" cy="${ys[i].toFixed(1)}" r="2" fill="#1b1a18" stroke="var(--gold-2)" stroke-width="1.2"/>`).join('')}
+    <circle cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" r="7" fill="#f0d3a0" opacity=".16"/>
+    <circle cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" r="4" fill="#1b1a18" stroke="var(--gold)" stroke-width="2.2"/>
+    <rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${bw.toFixed(1)}" height="17" rx="8.5" fill="#241f17" stroke="var(--gold-2)" stroke-width=".9"/>
+    <text x="${(bx+bw/2).toFixed(1)}" y="${(by+12).toFixed(1)}" text-anchor="middle" font-size="9.5" font-weight="800" fill="var(--gold)">${글}</text></svg>`;
+}
 function vMe(){
   const g=GOALS[S.mid]||{};
   const r = calcOf(g);
@@ -7648,22 +7677,7 @@ function vMe(){
         if(logs.length < 2) return `<span class="gbar"><span style="width:${(진*100).toFixed(1)}%"></span></span>${줄}`;
         /* 곡선이 인바디 기록이니 아래 숫자도 같은 기록에서 — 계획에 적힌 값(r.w)과 섞으면 말풍선과 「지금」이 서로 달라진다 */
         const 줄2 = `<span class="mgl"><span><small>처음 기록</small><b>${kgfmt(logs[0])}kg</b></span><span class="now"><small>지금</small><b>${kgfmt(logs[logs.length-1])}kg</b></span><span class="to"><small>목표</small><b>${kgfmt(r.gw)}kg</b></span></span>`;
-        const W = 300, H = 92, PL = 8, PR = 8, PT = 24, PB = 10;
-        const lo = Math.min(r.gw, ...logs) - 0.6, hi = Math.max(r.gw, ...logs) + 0.6, n = logs.length;
-        const x = i => PL + i*(W-PL-PR)/(n-1), y = v => PT + (1 - (v-lo)/(hi-lo))*(H-PT-PB);
-        const xs = logs.map((_,i)=>x(i)), ys = logs.map(y), d = 곡선길(xs, ys), lx = xs[n-1], ly = ys[n-1];
-        const 글 = kgfmt(logs[n-1]) + ' kg', bw = 글.length*5.6 + 14, bx = Math.min(W-bw-2, lx-bw+10), by = Math.max(2, ly-25);
-        return `<svg class="mgc" viewBox="0 0 ${W} ${H}" aria-hidden="true">
-          <defs><linearGradient id="mgcf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0d3a0" stop-opacity=".3"/><stop offset="1" stop-color="#f0d3a0" stop-opacity="0"/></linearGradient></defs>
-          <line x1="${PL}" x2="${W-PR}" y1="${y(r.gw).toFixed(1)}" y2="${y(r.gw).toFixed(1)}" stroke="var(--teal)" stroke-width="1.1" stroke-dasharray="3 3.5" opacity=".7"/>
-          <text x="${PL}" y="${(y(r.gw)-4).toFixed(1)}" font-size="8" font-weight="700" fill="var(--teal)">목표 ${kgfmt(r.gw)}kg</text>
-          <path d="${d} L ${lx.toFixed(1)} ${H-PB} L ${xs[0].toFixed(1)} ${H-PB} Z" fill="url(#mgcf)"/>
-          <path d="${d}" fill="none" stroke="var(--gold)" stroke-width="2.2" stroke-linecap="round"/>
-          ${logs.slice(0,-1).map((_,i)=>`<circle cx="${xs[i].toFixed(1)}" cy="${ys[i].toFixed(1)}" r="2" fill="#1b1a18" stroke="var(--gold-2)" stroke-width="1.2"/>`).join('')}
-          <circle cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" r="7" fill="#f0d3a0" opacity=".16"/>
-          <circle cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" r="4" fill="#1b1a18" stroke="var(--gold)" stroke-width="2.2"/>
-          <rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${bw.toFixed(1)}" height="17" rx="8.5" fill="#241f17" stroke="var(--gold-2)" stroke-width=".9"/>
-          <text x="${(bx+bw/2).toFixed(1)}" y="${(by+12).toFixed(1)}" text-anchor="middle" font-size="9.5" font-weight="800" fill="var(--gold)">${글}</text></svg>${줄2}`; })()}
+        return 체중곡선(logs, r.gw) + 줄2; })()}
     </button>
 
     <div class="megrp">
@@ -9345,35 +9359,39 @@ function tMember(){
   const bench=ws.slice().reverse().map(w=>w.items.find(i=>i.ex==='bp')).filter(Boolean).map(it=>Math.max(...it.sets.map(s=>s.kg)));
   const mx=Math.max(...bench,1);
   return { top: bar(m.n, `<span class="sub">최근 ${ws.length}회</span>`, 'go:t_members'), body:`
-    <div class="card"><div class="sm">우리의 목표</div><div class="nm">${esc(g.goal)}</div>
-      <div class="sm">${esc(g.work)}</div></div>
-    ${liveOf(m.id)?`<button class="card teal" data-act="tgo:${m.id}">
-        <div class="nm t">지금 운동 중이에요</div>
-        <div class="sm">${esc(liveOf(m.id).title||'')} · 이어서 기록하기 ›</div></button>
-      <button class="card rowc" data-act="tlive:${m.id}">
-        <div><div class="nm">종목별 코멘트 남기기</div><div class="sm">설명 수정도 여기서</div></div>
-        <span class="rt">›</span></button>`
-     :`<button class="card gold" data-act="tstartask:${m.id}">
-        <div class="nm g">수업 시작</div>
-        <div class="sm">루틴을 골라 지금 기록을 시작합니다</div></button>`}
-    <button class="card ${r?'gold':''}" data-act="go:t_routines">
-      <div class="nm ${r?'g':''}">오늘 지정</div>
-      <div class="sm">${r?`${esc(t.kind)} · 루틴 ${r.no} ${esc(r.n)}`:'아직 없어요 — 루틴에서 지정하세요'}</div></button>
-    <button class="card rowc plan" data-act="tana:${m.id}">
-      <div><div class="nm">기록 분석</div>
-      <div class="sm">증량 그래프 · 운동 균형 · 종목별 변화 · 날짜별 기록</div></div><span class="rt">›</span></button>
-    <div class="hr"></div><span class="lbl">회원 자료</span>
-    <button class="card rowc plan" data-act="tsub:intake:${m.id}"><div><div class="nm">상담일지</div>
-      <div class="sm">${D.intake[m.id]?'작성됨 — 눌러서 보기':'아직 없음'}</div></div><span class="rt">›</span></button>
-    <button class="card rowc plan" data-act="tsub:plan:${m.id}"><div><div class="nm">운동계획</div>
-      <div class="sm">${(g.now&&g.now.w)?`${g.now.w}kg → ${(g.to&&g.to.w)||'?'}kg`:'아직 없음'}</div></div><span class="rt">›</span></button>
-    <button class="card rowc plan" data-act="tsub:diet:${m.id}"><div><div class="nm">식단</div>
-      <div class="sm">${mealsOf(m.id).length?`${mealsOf(m.id).length}장 · 최근 ${dateTxt(mealsOf(m.id)[0].date)}`:'아직 없음'}</div></div><span class="rt">›</span></button>
-    ${(()=>{ const 모 = 사진모음(m.id, false), 요 = 모.filter(x=>x.dreq).length;
-      return `<button class="card rowc ${요?'teal':'plan'}" data-act="tprof:${m.id}"><div><div class="nm">오운완 · 인증샷</div>
-        <div class="sm">${모.length ? `${모.length}장${요 ? ` · <b>삭제 요청 ${요}</b>` : ''}` : '아직 없음 — 수업 마친 화면에서 「같이 찍기」'}</div></div><span class="rt">›</span></button>`; })()}
-    <button class="card rowc plan" data-act="tsub:body:${m.id}"><div><div class="nm">인/아웃바디</div>
-      <div class="sm">${Object.keys(checksOf(m.id)).length}개 표시 · ${roundsOf(m.id).length}회차 · 사진 ${((D.bph||[]).filter(x=>x.mid===m.id)).length}장</div></div><span class="rt">›</span></button>
+    ${(()=>{ /* 맨 위 — 목표 · 이번 주 횟수 고리 · 단추 둘 */
+      const 주 = weekOf(TODAY), 이번주 = ws.filter(w => w.date >= 주[0] && w.date <= 주[6] && 세트있나(w)).length;
+      const 목 = Number(g.freq) || Number(((g.work||'').match(/\d+/)||[])[0]) || 0;
+      const R = 31, C = 2*Math.PI*R, p = 목 ? Math.min(1, 이번주/목) : 0, lv = liveOf(m.id);
+      return `<div class="tmhead">
+        <span class="tmt"><small>우리의 목표</small><b>${esc(g.goal||'아직 없어요')}</b><i>${esc(g.work||'')}</i></span>
+        <span class="mring"><svg viewBox="0 0 76 76" aria-hidden="true">
+          <circle cx="38" cy="38" r="${R}" fill="none" stroke="#34332d" stroke-width="5"/>
+          ${p > 0 ? `<circle cx="38" cy="38" r="${R}" fill="none" stroke="var(--gold)" stroke-width="5" stroke-linecap="round"
+            stroke-dasharray="${(C*p).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 38 38)"/>` : ''}</svg>
+          <i><b>${이번주}${목 ? `<u>/${목}</u>` : ''}</b><small>이번 주</small></i></span>
+        <div class="tmb">${lv
+          ? `<button class="g" data-act="tgo:${m.id}">이어서 기록하기</button><button class="t" data-act="tlive:${m.id}">종목별 코멘트</button>`
+          : `<button class="g" data-act="tstartask:${m.id}">수업 시작</button><button class="t" data-act="go:t_routines">${r ? '오늘 지정 ✓' : '오늘 지정'}</button>`}</div>
+        <div class="tmf">${lv ? `지금 운동 중 · ${esc(lv.title||'')}` : (r ? `오늘 지정 · ${esc(t.kind)} · 루틴 ${r.no} ${esc(r.n)}` : '오늘 지정한 루틴이 아직 없어요')}</div>
+      </div>`; })()}
+
+    ${(()=>{ /* 체중 추이 — 인바디 기록이 둘 이상일 때만 곡선 */
+      const logs = ((D.blog||{})[m.id]||[]).filter(x => +x.w).map(x => +x.w), gw = (g.to||{}).w;
+      return `<button class="megoal" data-act="tana:${m.id}">
+        <span class="mgh"><small>기록 분석</small><b>${logs.length >= 2 ? '체중 추이' : '증량 그래프 · 운동 균형 · 종목별 변화'}</b><i>›</i></span>
+        ${logs.length >= 2 ? 체중곡선(logs, gw) + `<span class="mgl"><span><small>처음 기록</small><b>${kgfmt(logs[0])}kg</b></span><span class="now"><small>지금</small><b>${kgfmt(logs[logs.length-1])}kg</b></span><span class="to"><small>목표</small><b>${gw ? kgfmt(gw)+'kg' : '—'}</b></span></span>` : ''}
+      </button>`; })()}
+
+    <span class="lbl">회원 자료</span>
+    <div class="megrp">${(()=>{ const 모 = 사진모음(m.id, false), 요 = 모.filter(x=>x.dreq).length;
+      return [['note','상담일지', D.intake[m.id]?'작성됨 — 눌러서 보기':'아직 없음', 'tsub:intake:'+m.id, ''],
+        ['plan','운동계획', (g.now&&g.now.w)?`${g.now.w}kg → ${(g.to&&g.to.w)||'?'}kg`:'아직 없음', 'tsub:plan:'+m.id, ''],
+        ['bowl','식단', mealsOf(m.id).length?`${mealsOf(m.id).length}장 · 최근 ${dateTxt(mealsOf(m.id)[0].date)}`:'아직 없음', 'tsub:diet:'+m.id, ''],
+        ['h_cam','오운완 · 인증샷', 모.length ? `${모.length}장` : '아직 없음 — 수업 마친 화면에서 「같이 찍기」', 'tprof:'+m.id, 요 ? `삭제 요청 ${요}` : ''],
+        ['chart','인/아웃바디', `${Object.keys(checksOf(m.id)).length}개 표시 · ${roundsOf(m.id).length}회차 · 사진 ${((D.bph||[]).filter(x=>x.mid===m.id)).length}장`, 'tsub:body:'+m.id, '']]
+        .map(x=>`<button class="mrow2" data-act="${x[3]}"><span class="mi">${svg(x[0],19)}</span>
+          <span class="mt"><b>${x[1]}</b><small>${x[2]}</small></span>${x[4]?`<em class="nb w">${x[4]}</em>`:''}<i>›</i></button>`).join(''); })()}</div>
     ${(()=>{ if(!여성인가(m.id)) return '';
       const c=cycOf(m.id); if(!c||!c.on) return `<div class="card rowc dim"><div><div class="nm">생리주기</div>
         <div class="sm">회원님이 켜지 않았어요</div></div></div>`;
