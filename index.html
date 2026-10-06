@@ -998,6 +998,24 @@ body .figbox2{background:radial-gradient(80% 50% at 50% 30%,rgba(240,211,160,.09
 .sspick em{font-style:normal;flex:none;font-size:13.5px;font-weight:800;color:#2a1c14;background:linear-gradient(180deg,#f3d9a8,#e2c184);border-radius:999px;padding:8px 14px}
 .mrow2 .mi.pt{font-size:11.5px;font-weight:800;letter-spacing:-.03em}
 .mrow2 em.go{font-style:normal;font-size:12.5px;font-weight:700;color:var(--gold);flex:none}
+.anatab.fbtab{display:grid;grid-template-columns:repeat(3,1fr);width:100%;flex:none}
+.fbsum{display:flex;align-items:center;gap:12px;width:100%;flex:none;padding:13px 14px;border-radius:18px;border:1px solid #3f7281;
+  background:radial-gradient(110% 130% at 0% 0%,rgba(169,216,230,.16),transparent 62%),linear-gradient(160deg,#1b333b,#11211f 120%)}
+.fbsum .mi{width:40px;height:40px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;color:var(--teal);border:1.3px solid rgba(169,216,230,.5);background:rgba(169,216,230,.06)}
+.fbsum .ft{flex:1;min-width:0;display:flex;flex-direction:column}.fbsum .ft b{font-size:16px;font-weight:800;color:var(--cream)}.fbsum .ft small{font-size:11.5px;color:#b9d3db}
+.fbsum em{font-style:normal;font-size:10.5px;font-weight:900;letter-spacing:.05em;color:#0d2027;background:var(--teal);border-radius:20px;padding:2px 9px;flex:none}
+body .cm.cm2{border-radius:17px;border-color:#34332d;background:linear-gradient(180deg,#201f1c,#181816);border-left:1px solid #34332d;box-shadow:inset 0 1px 0 rgba(240,211,160,.12);padding:14px}
+body .cm.cm2.new{border-color:#3f7281;background:linear-gradient(160deg,#1b2d33,#161918 80%)}
+body .cm2 .av{width:38px;height:38px;border:1.5px solid rgba(240,211,160,.55);background:rgba(240,211,160,.07);color:var(--gold)}
+body .cm2 .cex{align-self:flex-start;padding:3px 10px;border-radius:999px;background:rgba(240,211,160,.08);border:1px solid rgba(240,211,160,.3);font-size:12.5px}
+body .cm2 .tx{font-size:14px;line-height:1.6;color:var(--cream)}
+/* 트레이너 회원 목록 */
+.tmsum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;flex:none}
+.tmsum>div{display:flex;flex-direction:column;gap:1px;padding:12px 12px 10px;border-radius:16px;border:1px solid #34332d;background:linear-gradient(180deg,#221f1a,#181816);box-shadow:inset 0 1px 0 rgba(240,211,160,.2)}
+.tmsum small{font-size:11.5px;color:var(--sub)}.tmsum b{font-size:24px;font-weight:800;color:var(--gold);line-height:1.15}.tmsum b i{font-style:normal;font-size:11.5px;color:var(--cream);margin-left:2px}
+.tmsum>div.t{border-color:#3f7281;background:linear-gradient(170deg,#1b2d33,#171a19 70%)}.tmsum>div.t b{color:var(--teal)}
+.mrow2 .mi.nm1{font-size:15px;font-weight:800}.mrow2 .mi.lv{color:var(--teal);border-color:rgba(169,216,230,.6);background:rgba(169,216,230,.08)}
+.mrow2 .pill{flex:none}
 .megoal{width:100%;flex:none;display:flex;flex-direction:column;gap:8px;text-align:left;padding:14px 14px 13px;border-radius:18px;border:1px solid #34332d;background:linear-gradient(180deg,#201f1c,#171615);box-shadow:inset 0 1px 0 rgba(240,211,160,.14)}
 .mgh{display:grid;grid-template-columns:1fr auto;align-items:center;width:100%}.mgh small{grid-column:1/-1;font-size:11.5px;color:var(--sub)}
 .mgh b{font-size:17px;font-weight:800}.mgh i{font-style:normal;color:var(--sub);font-size:17px}
@@ -2291,7 +2309,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '277';
+const BUILD = '278';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -5825,10 +5843,16 @@ function vFeedback(){
   const nw=cms.filter(c=>!c.read).length;
   cms.forEach(c=>c.read=true); save();
   const mode = S.fbMode || 'recent';
-  const head = `<div class="chips">
-    <button class="chip ${mode==='recent'?'on':''}" data-act="fbm:recent">최근</button>
-    <button class="chip ${mode==='day'?'on':''}" data-act="fbm:day">최근 수업</button>
-    <button class="chip ${mode==='part'?'on':''}" data-act="fbm:part">종목별</button></div>`;
+  /* 갈래 탭 = 분석과 같은 금테 한 줄 · 그 아래 요약 한 줄 (2026-10-06 융합). 숫자는 실제 코멘트 수 */
+  const 트 = [...new Set(cms.map(c=>(c.tr||'').trim()).filter(Boolean))];
+  const head = `<div class="anatab fbtab">
+    <button class="${mode==='recent'?'on':''}" data-act="fbm:recent">최근</button>
+    <button class="${mode==='day'?'on':''}" data-act="fbm:day">최근 수업</button>
+    <button class="${mode==='part'?'on':''}" data-act="fbm:part">종목별</button></div>
+    <div class="fbsum"><span class="mi">${svg('h_chat',20)}</span>
+      <span class="ft"><b>${nw ? `새 코멘트 ${nw}개` : (cms.length ? '새 코멘트는 없어요' : '아직 받은 코멘트가 없어요')}</b>
+        <small>지금까지 ${cms.length}개${트.length ? ' · ' + esc(트.join(', ')) + ' 트레이너' : ''}</small></span>
+      ${nw ? `<em>NEW</em>` : ''}</div>`;
 
   if(mode==='ask'){
     const sel = S.fbDay || TODAY;
@@ -9348,18 +9372,22 @@ function tTools(){
 
 function tMembers(){
   return { top: bar('회원 목록', `<span class="sub">담당 ${MEMBERS.length}명</span>`), body:
-    `<input class="search" type="text" data-filter="1" placeholder="회원 이름으로 찾기">` +
-    MEMBERS.map(m=>{
-      const ws=D.workouts.filter(w=>w.mid===m.id&&w.done).slice().sort(byDateDesc), last=ws[0];
-      const lv=liveOf(m.id);
-      const nofb=last && !D.cm.some(c=>c.mid===m.id && c.at==='방금');
-      return `<button class="card rowc" data-nm="${esc(m.n)}" data-act="tm:${m.id}">
-        <div><div class="nm">${esc(m.n)}</div>
-        <div class="sm">${lv?`지금 운동 중 · ${esc((it0=>it0?exName(it0.ex,it0.va):'')(lv.items[lv.cur]||lv.items[0]))}`
-          :(last?`${dateTxt(last.date)} · ${esc(last.kind||'')}`:'기록 없음')}</div></div>
-        ${lv?'<span class="pill t">진행 중</span>'
-          :(!last?'<span class="pill q">기록 없음</span>':(nofb?'<span class="pill">안 본 기록</span>':'<span class="pill q">봤음</span>'))}</button>`;
-    }).join('')
+    (()=>{ const 줄 = MEMBERS.map(m=>{
+        const ws=D.workouts.filter(w=>w.mid===m.id&&w.done).slice().sort(byDateDesc), last=ws[0];
+        const lv=liveOf(m.id), nofb=last && !D.cm.some(c=>c.mid===m.id && c.at==='방금');
+        return { m, last, lv, nofb }; });
+      /* 맨 위 숫자 셋 — 실제 수. 그래프는 안 넣는다(넣을 실제 자료가 없다) */
+      return `<div class="tmsum">
+          <div><small>담당 회원</small><b>${줄.length}<i>명</i></b></div>
+          <div class="t"><small>지금 운동 중</small><b>${줄.filter(x=>x.lv).length}<i>명</i></b></div>
+          <div><small>안 본 기록</small><b>${줄.filter(x=>!x.lv && x.nofb).length}<i>명</i></b></div></div>
+        <input class="search" type="text" data-filter="1" placeholder="회원 이름으로 찾기">
+        <div class="megrp">${줄.map(({m,last,lv,nofb})=>`<button class="mrow2" data-nm="${esc(m.n)}" data-act="tm:${m.id}">
+          <span class="mi nm1 ${lv?'lv':''}">${esc((m.n||'회').slice(0,1))}</span>
+          <span class="mt"><b>${esc(m.n)}</b><small>${lv?`지금 운동 중 · ${esc((it0=>it0?exName(it0.ex,it0.va):'')(lv.items[lv.cur]||lv.items[0]))}`
+            :(last?`${dateTxt(last.date)} · ${esc(last.kind||'')}`:'기록 없음')}</small></span>
+          ${lv?'<span class="pill t">진행 중</span>'
+            :(!last?'<span class="pill q">기록 없음</span>':(nofb?'<span class="pill">안 본 기록</span>':'<span class="pill q">봤음</span>'))}<i>›</i></button>`).join('')}</div>`; })()
     + `<button class="btn sub" data-act="newmem" style="margin-top:4px">＋ 회원 새로 만들기</button>` };
 }
 function tMember(){
