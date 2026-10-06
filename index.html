@@ -927,6 +927,12 @@ body .seg button.on{background:linear-gradient(180deg,#f3d9a8,#e2c184);color:#2a
 .sstat3 .k{font-size:11.5px;font-weight:600;color:var(--sub)}
 .sstat3 .v{font-size:25px;font-weight:800;letter-spacing:-.03em;color:var(--gold);line-height:1.15}.sstat3 .v small{font-size:11.5px;font-weight:600;color:var(--cream);margin-left:2px}
 .sstat3 em{font-style:normal;font-size:11px;font-weight:700;color:var(--sub);margin-top:2px}.sstat3 em.up{color:#7fd6a4}.sstat3 em.dn{color:#e58b7b}
+.sstat3>div{position:relative;overflow:hidden;box-shadow:inset 0 1px 0 rgba(240,211,160,.22)}
+.sstat3>div.t{border-color:#3f7281;background:linear-gradient(170deg,#1b2d33,#171a19 70%);box-shadow:inset 0 1px 0 rgba(169,216,230,.25)}
+.sstat3 .spk{position:absolute;right:9px;bottom:10px;width:46px;height:18px;opacity:.85}
+.lcleg{display:flex;align-items:center;gap:6px;justify-content:flex-end;font-size:10.5px;color:var(--sub);margin-top:2px}
+.lcleg i{display:inline-block;width:16px;height:0;border-top:2px solid var(--gold);margin-left:8px}.lcleg i.b{border-top:1.5px dashed var(--teal);opacity:.7}
+body .gbox{box-shadow:inset 0 1px 0 rgba(240,211,160,.16)}
 .sstatn{font-size:10.5px;color:#6f6c66;text-align:right;width:100%;flex:none;margin-top:-4px}
 body .gbox{background:linear-gradient(180deg,#201f1c,#171615);border-color:#34332d;border-radius:18px;padding:14px 12px 12px}
 .hrow{display:grid;grid-template-columns:1fr 1fr;gap:9px;width:100%;flex:none;align-items:stretch}
@@ -2208,7 +2214,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '268';
+const BUILD = '269';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2959,8 +2965,8 @@ function wStat(w, bw){
 function bwOf(mid){ const g = GOALS[mid]||{}; return nnum(g.now && g.now.w) || 65; }
 
 /* 기간을 7칸으로 나눈 꺾은선 */
-function anaSeries(mid, metric){
-  const days = ANA_P[S.anaP||'1주'], bw = bwOf(mid);
+function anaSeries(mid, metric, 앞으로){
+  const days = ANA_P[S.anaP||'1주'], bw = bwOf(mid), 밀기 = 앞으로 || 0;      /* 밀기 = 며칠 앞 기간을 볼지 (바로 앞 기간 비교용) */
   let from = anaFrom();
   if(days > 365){ const all = D.workouts.filter(w=>w.mid===mid && w.done);
     from = all.length ? all.map(w=>w.date).sort()[0] : TODAY; }
@@ -2968,19 +2974,30 @@ function anaSeries(mid, metric){
   const n = Math.min(7, total), span = Math.ceil(total / n);
   const out = [];
   for(let i = n-1; i >= 0; i--){
-    const end = addDays(TODAY, -i*span), st = addDays(end, -(span-1));
+    const end = addDays(TODAY, -i*span - 밀기), st = addDays(end, -(span-1));
     const ws = D.workouts.filter(w => w.mid===mid && w.done && w.date >= st && w.date <= end);
     let v = 0;
     ws.forEach(w => { const t = wStat(w, bw);
-      v += metric==='vol' ? t.vol : metric==='kcal' ? t.kcal : t.min; });
+      v += metric==='n' ? 1 : metric==='vol' ? t.vol : metric==='kcal' ? t.kcal : t.min; });
     out.push({ label: span===1 ? DOW[dNew(end).getDay()] : (+end.slice(5,7))+'/'+(+end.slice(8)), v });
   }
   return out;
 }
 let 그래프번호 = 0;
-function lineChart(pts, unit){
+/* 값 몇 개 → 부드러운 곡선 길 */
+const 곡선길 = (xs, ys) => xs.map((X,i)=>{ if(!i) return 'M' + X.toFixed(1) + ' ' + ys[0].toFixed(1);
+  const h = (X - xs[i-1]) / 2; return `C${(xs[i-1]+h).toFixed(1)} ${ys[i-1].toFixed(1)} ${(X-h).toFixed(1)} ${ys[i].toFixed(1)} ${X.toFixed(1)} ${ys[i].toFixed(1)}`; }).join(' ');
+/* 숫자 카드 안 작은 추이선 — 실제 값으로만 그린다. 값이 둘 미만이거나 다 0 이면 안 그린다 */
+function 작은선(vals, 색){
+  if(!vals || vals.length < 2 || !vals.some(v=>v)) return '';
+  const W = 64, H = 24, mx = Math.max(1, ...vals), xs = vals.map((_,i)=> 2 + i*(W-4)/(vals.length-1)), ys = vals.map(v => H-3 - (v/mx)*(H-7));
+  return `<svg class="spk" viewBox="0 0 ${W} ${H}" aria-hidden="true"><path d="${곡선길(xs,ys)}" fill="none" stroke="${색}" stroke-width="1.6" stroke-linecap="round" opacity=".9"/>
+    <circle cx="${xs[xs.length-1].toFixed(1)}" cy="${ys[ys.length-1].toFixed(1)}" r="2.2" fill="${색}"/></svg>`;
+}
+function lineChart(pts, unit, 앞){
   const W = 320, H = 150, PL = 10, PR = 10, PT = 34, PB = 22, id = 'lcg' + (++그래프번호);
-  const mx = Math.max(1, ...pts.map(p=>p.v)), n = pts.length;
+  const 앞있나 = 앞 && 앞.length === pts.length && 앞.some(p=>p.v);
+  const mx = Math.max(1, ...pts.map(p=>p.v), ...(앞있나 ? 앞.map(p=>p.v) : [])), n = pts.length;
   const x = i => PL + i * (W-PL-PR) / Math.max(1, n-1);
   const y = v => PT + (1 - v/mx) * (H-PT-PB);
   /* 꺾은선 대신 부드러운 곡선 — 점과 점 사이를 가로로 반씩 당긴다(값이 위아래로 넘치지 않는다) */
@@ -2997,7 +3014,10 @@ function lineChart(pts, unit){
       <stop offset="0" stop-color="#f0d3a0" stop-opacity=".34"/><stop offset="1" stop-color="#f0d3a0" stop-opacity="0"/></linearGradient></defs>
     ${[0.25,0.5,0.75].map(t=>`<line x1="${PL}" x2="${W-PR}" y1="${(PT+(H-PT-PB)*t).toFixed(1)}" y2="${(PT+(H-PT-PB)*t).toFixed(1)}" stroke="#3a3832" stroke-width=".6" stroke-dasharray="1.5 4"/>`).join('')}
     <line x1="${PL}" x2="${W-PR}" y1="${H-PB}" y2="${H-PB}" stroke="#3a3832" stroke-width=".8"/>
+    <defs><filter id="${id}b" x="-10%" y="-30%" width="120%" height="160%"><feGaussianBlur stdDeviation="3.2"/></filter></defs>
+    ${앞있나 ? `<path d="${곡선길(앞.map((_,i)=>x(i)), 앞.map(p=>y(p.v)))}" fill="none" stroke="var(--teal)" stroke-width="1.3" stroke-dasharray="3 3.5" stroke-linecap="round" opacity=".55"/>` : ''}
     <path d="${area}" fill="url(#${id})"/>
+    <path d="${d}" fill="none" stroke="#f0d3a0" stroke-width="4" stroke-linecap="round" opacity=".38" filter="url(#${id}b)"/>
     <path d="${d}" fill="none" stroke="var(--gold)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
     ${pts.map((p,i)=>{ const ta = n < 2 ? 'middle' : i===0 ? 'start' : i===n-1 ? 'end' : 'middle';
       const 날짜 = !많다 || i===0 || i===n-1 || i % 간격 === 0;
@@ -3011,7 +3031,7 @@ function lineChart(pts, unit){
       <circle cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" r="4" fill="#1b1a18" stroke="var(--gold)" stroke-width="2.2"/>
       <rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${bw.toFixed(1)}" height="17" rx="8.5" fill="#241f17" stroke="var(--gold-2)" stroke-width=".9"/>
       <text x="${(bx+bw/2).toFixed(1)}" y="${(by+12).toFixed(1)}" text-anchor="middle" font-size="9.5" font-weight="800" fill="var(--gold)">${글}</text>` : ''}
-  </svg>`;
+  </svg>${앞있나 ? `<div class="lcleg"><i class="a"></i>이번 ${esc(S.anaP||'1주')}<i class="b"></i>바로 앞 ${esc(S.anaP||'1주')}</div>` : ''}`;
 }
 
 /* 부위별 세트 수 → 팔각형 */
@@ -5378,10 +5398,11 @@ function vRecords(){
           .reduce((a,w) => { const t = wStat(w, bw); return { n:a.n+1, vol:a.vol+t.vol, min:a.min+t.min }; }, {n:0, vol:0, min:0}); })();
       const 칩 = (지금, 전) => { if(!앞) return ''; if(!전) return 지금 ? '<em class="up">새로 시작</em>' : '';
         const p = Math.round((지금 - 전) / 전 * 100); return p > 0 ? `<em class="up">▲ ${p}%</em>` : p < 0 ? `<em class="dn">▼ ${-p}%</em>` : '<em>그대로</em>'; };
+      const 선 = m => 작은선(anaSeries(mid, m).map(p=>p.v), m==='vol' ? '#a9d8e6' : '#e2c184');
       return `<div class="sstat3">
-        <div><span class="k">운동 횟수</span><span class="v">${ws.length}<small>회</small></span>${칩(ws.length, 앞 && 앞.n)}</div>
-        <div><span class="k">총 무게</span><span class="v">${(tot.vol/1000).toFixed(1)}<small>톤</small></span>${칩(tot.vol, 앞 && 앞.vol)}</div>
-        <div><span class="k">총 시간</span><span class="v">${tot.min}<small>분</small></span>${칩(tot.min, 앞 && 앞.min)}</div>
+        <div>${선('n')}<span class="k">운동 횟수</span><span class="v">${ws.length}<small>회</small></span>${칩(ws.length, 앞 && 앞.n)}</div>
+        <div class="t">${선('vol')}<span class="k">총 무게</span><span class="v">${(tot.vol/1000).toFixed(1)}<small>톤</small></span>${칩(tot.vol, 앞 && 앞.vol)}</div>
+        <div>${선('min')}<span class="k">총 시간</span><span class="v">${tot.min}<small>분</small></span>${칩(tot.min, 앞 && 앞.min)}</div>
       </div>${앞 ? `<div class="sstatn">▲▼ 는 바로 앞 ${esc(per)}과 견준 값이에요</div>` : ''}`; })()}
 
     <span class="lbl">${esc(per)} 변화</span>
@@ -5391,7 +5412,7 @@ function vRecords(){
         <button class="${gm==='kcal'?'on':''}" data-act="anag:kcal">칼로리</button>
         <button class="${gm==='min'?'on':''}" data-act="anag:min">시간</button>
       </div>
-      ${ws.length ? lineChart(anaSeries(mid, gm), unit)
+      ${ws.length ? lineChart(anaSeries(mid, gm), unit, ANA_P[per] > 365 ? null : anaSeries(mid, gm, ANA_P[per]))
         : 빔('chart','이 기간에 기록이 없어요','위에서 기간을 넓혀 보세요')}
     </div>
     ${gm==='kcal'?'<div class="note">칼로리는 운동 시간과 몸무게로 <b>어림한 값</b>입니다. 실제 소모량과는 차이가 있습니다.</div>':''}
