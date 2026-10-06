@@ -847,6 +847,9 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .hero.photo::before{content:'';position:absolute;inset:0;z-index:-1;
   background:linear-gradient(90deg,rgba(22,16,10,.98) 0%,rgba(26,18,11,.95) 52%,rgba(34,22,12,.62) 80%,rgba(40,26,14,.4) 100%)}
 .hero.photo .ht{font-size:24px}
+.hero .tag.new{display:inline-flex;align-items:center;gap:6px;background:rgba(240,211,160,.16);border-color:var(--gold);color:var(--gold)}
+.hero .tag.new b{font-size:10px;font-weight:900;letter-spacing:.04em;color:#2a1c14;background:var(--gold);border-radius:20px;padding:1px 7px}
+.hero2.half.wide{min-height:104px;background-position:center 38%}
 .hrow{display:grid;grid-template-columns:1fr 1fr;gap:9px;width:100%;flex:none;align-items:stretch}
 .hrow.wide{grid-template-columns:1.5fr 1fr}.hrow.solo{grid-template-columns:1fr}
 .hcard{display:flex;flex-direction:column;gap:7px;min-width:0;text-align:left;padding:13px 13px 12px;border-radius:17px;
@@ -871,7 +874,7 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .hcard .r3 b{font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hcard .r3 small{font-size:10px;color:var(--sub)}
 .hcard .r3 em{font-style:normal;font-size:12px;font-weight:700;color:var(--teal);margin-top:2px}
 .hcard .hq{font-size:12.5px;line-height:1.5;color:var(--cream)}
-.hcard.hcm.new{border-color:var(--teal)}.hcard.hcm .hh b{flex:none;overflow:visible}.hcard.hcm .hh .nw,.hcard.hcm .hh i{margin-left:auto}.hcard button.hh{text-align:left}
+.hcard.hcm.new{border-color:var(--teal)}.hcard .hh svg{flex:none}.hcard.hcm.new .hh b{flex:none;overflow:visible}.hcard.hcm .hh .nw,.hcard.hcm .hh i{margin-left:auto}.hcard button.hh{text-align:left}
 .hline{display:flex;align-items:center;gap:8px;width:100%;flex:none;text-align:left;padding:10px 12px;border-radius:13px;background:linear-gradient(160deg,#1d3a43,#12242a);border:1px solid #3f7281;color:var(--teal)}
 .hline.gold{background:linear-gradient(135deg,#3a2f1c,#1c170f);border-color:#6b5a33;color:var(--gold)}.hline.gold small{color:var(--sub)}
 .hline b{font-size:13.5px;font-weight:800}.hline small{font-size:11.5px;color:#b9d3db;flex:1}.hline i{font-style:normal;font-size:16px}
@@ -2117,7 +2120,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '261';
+const BUILD = '262';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -3778,19 +3781,19 @@ function vHome(){
   const hero = lw
     ? { act:'go:workout', tag:'기록 중', ht:'운동기록 계속하기',
         hs:`${esc(lw.title)} · ${lw.items.filter(i=>i.locked).length}/${lw.items.length}종목 끝냄`, go:'이어서 하기' }
-    : r
-      ? { act:'go:start', tag:'트레이너 지정', ht:'트레이너 지정루틴 하기',
-          hs:`${esc(t.kind)} · 루틴 ${r.no} ${esc(r.n)}<br>${r.items.length}종목 · 예상 ${estMin(r)}분 · ${esc(t.by)}가 지정했어요`,
-          go:'시작하기' }
-      : { act:'go:start', tag:'오늘', ht:'오늘 운동 기록하기',
-          hs:(n => n ? `트레이너 추천 루틴 ${n}개가 있어요<br>골라서 바로 시작합니다` : '지정된 루틴이 없어요<br>내 루틴에서 골라 시작합니다')(recosOf(S.mid).filter(x=>rOf(x.rid)).length), go:'루틴 고르기' };
+    /* 홈의 큰 카드는 늘 「운동하기」 하나 — 무엇으로 할지는 누른 뒤 안에서 고른다.
+       트레이너가 지정한 루틴이 있으면 카드에 NEW 알림만 띄운다 (2026-10-06 대표) */
+    : { act:'go:start', tag:'오늘', ht:'운동하기', go:'시작하기',
+        새: r ? `트레이너 지정 루틴이 있어요` : '',
+        hs: r ? `${esc(t.kind)} · 루틴 ${r.no} ${esc(r.n)} · ${r.items.length}종목 · 예상 ${estMin(r)}분`
+              : (n => n ? `트레이너 추천 루틴 ${n}개가 있어요` : '내 루틴 · 지난 운동 · 자유 운동 중에서 골라 시작합니다')(recosOf(S.mid).filter(x=>rOf(x.rid)).length) };
 
   const 알림수 = notiCount(S.mid);
   return { top: bar('글래드짐',
       `<button class="notibell" data-act="go:noti" aria-label="알림${알림수?' '+알림수+'개':''}">
         ${svg('종',20)}${알림수?`<b>${알림수>9?'9+':알림수}</b>`:''}</button>`), tabs:1, body:`
     <button class="hero photo" data-act="${hero.act}">
-      <span class="tag">${hero.tag}</span>
+      ${hero.새 ? `<span class="tag new"><b>NEW</b>${hero.새}</span>` : `<span class="tag">${hero.tag}</span>`}
       <div class="ht">${hero.ht}</div>
       <div class="hs">${hero.hs}</div>
       <span class="hgo">${hero.go} ›</span></button>
@@ -3799,17 +3802,11 @@ function vHome(){
       <div><div class="nm">오늘 지정 · 루틴 ${r.no} ${esc(r.n)}</div>
       <div class="sm">${esc(t.by)}가 지정했어요</div></div><span class="rt">›</span></button>` : ''}
     ${(뱃지주기(S.mid), '')}
-    <!-- 운동 시작 바로 아래 = 준비운동 · 내 루틴 (2026-10-06 대표 「준비운동과 운동시작 혹은 내 루틴 고르기가 보여야 해 · 1RM 은 후순위」) -->
-    <div class="home2">
-      <button class="hero2 half shot" data-act="go:prep"
-          style="--h1:#22424b;--h2:#101719;--img:url(img/card-both.jpg)">
-        <span class="tt">준비운동</span>
-        <span class="dd">스트레칭 · 셀프 마사지</span></button>
-      <button class="hero2 half ${사진있나('routines')}" data-act="go:routines"
-          style="${사진꾸밈('routines','#33304a','#131217')}">
-        <span class="tt">내 루틴 고르기</span>
-        <span class="dd">${myRoutines(S.mid).length}개 · 골라서 바로 시작</span></button>
-    </div>
+    <!-- 큰 카드 아래 = 준비운동 하나. 내 루틴·자유 운동은 「운동하기」 안에 있다 — 홈에 또 꺼내지 않는다 -->
+    <button class="hero2 half wide shot" data-act="go:prep"
+        style="--h1:#22424b;--h2:#101719;--img:url(img/card-both.jpg)">
+      <span class="tt">준비운동</span>
+      <span class="dd">스트레칭 · 셀프 마사지 — 굳은 곳을 먼저 풀고 시작합니다</span></button>
     ${주기줄(S.mid, 'sub:cycle', true)}
     ${(w => w ? `<button class="hline" data-act="ootd:${w.id}">${svg('h_cam',18)}<b>오늘 오운완 찍기</b><small>오늘만 찍을 수 있어요</small><i>›</i></button>` : '')(오운완남음(S.mid))}
     <div class="hrow wide">${홈현황(S.mid)}${홈목표(S.mid)}</div>
