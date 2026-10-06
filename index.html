@@ -873,6 +873,7 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .hcard .hq{font-size:12.5px;line-height:1.5;color:var(--cream)}
 .hcard.hcm.new{border-color:var(--teal)}.hcard.hcm .hh b{flex:none;overflow:visible}.hcard.hcm .hh .nw,.hcard.hcm .hh i{margin-left:auto}.hcard button.hh{text-align:left}
 .hline{display:flex;align-items:center;gap:8px;width:100%;flex:none;text-align:left;padding:10px 12px;border-radius:13px;background:linear-gradient(160deg,#1d3a43,#12242a);border:1px solid #3f7281;color:var(--teal)}
+.hline.gold{background:linear-gradient(135deg,#3a2f1c,#1c170f);border-color:#6b5a33;color:var(--gold)}.hline.gold small{color:var(--sub)}
 .hline b{font-size:13.5px;font-weight:800}.hline small{font-size:11.5px;color:#b9d3db;flex:1}.hline i{font-style:normal;font-size:16px}
 .hslim{width:100%;flex:none;padding:9px;border-radius:13px;border:1px dashed #5a4c33;color:var(--gold);font-size:13px;font-weight:700;background:none}.hcard .nw{font-style:normal;font-size:10.5px;font-weight:800;color:#0d2027;background:var(--teal);border-radius:20px;padding:2px 8px;flex:none}
 .hgoal{width:100%;flex:none;display:flex;flex-direction:column;gap:6px}
@@ -2116,7 +2117,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '260';
+const BUILD = '261';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -3798,22 +3799,24 @@ function vHome(){
       <div><div class="nm">오늘 지정 · 루틴 ${r.no} ${esc(r.n)}</div>
       <div class="sm">${esc(t.by)}가 지정했어요</div></div><span class="rt">›</span></button>` : ''}
     ${(뱃지주기(S.mid), '')}
+    <!-- 운동 시작 바로 아래 = 준비운동 · 내 루틴 (2026-10-06 대표 「준비운동과 운동시작 혹은 내 루틴 고르기가 보여야 해 · 1RM 은 후순위」) -->
+    <div class="home2">
+      <button class="hero2 half shot" data-act="go:prep"
+          style="--h1:#22424b;--h2:#101719;--img:url(img/card-both.jpg)">
+        <span class="tt">준비운동</span>
+        <span class="dd">스트레칭 · 셀프 마사지</span></button>
+      <button class="hero2 half ${사진있나('routines')}" data-act="go:routines"
+          style="${사진꾸밈('routines','#33304a','#131217')}">
+        <span class="tt">내 루틴 고르기</span>
+        <span class="dd">${myRoutines(S.mid).length}개 · 골라서 바로 시작</span></button>
+    </div>
     ${주기줄(S.mid, 'sub:cycle', true)}
     ${(w => w ? `<button class="hline" data-act="ootd:${w.id}">${svg('h_cam',18)}<b>오늘 오운완 찍기</b><small>오늘만 찍을 수 있어요</small><i>›</i></button>` : '')(오운완남음(S.mid))}
     <div class="hrow wide">${홈현황(S.mid)}${홈목표(S.mid)}</div>
     ${내목표(S.mid).length ? `<div class="hgoal">${목표칸(S.mid)}</div>` : ''}
     ${인증샷홈(S.mid)}
     <div class="hrow wide">${홈최근(S.mid)}${홈코멘트(S.mid)}</div>
-    <div class="home2">
-      <button class="hero2 half rm" data-act="rmstart:${S.mid}">
-        <span class="hic">${svg('h_crown',19)}</span>
-        <span class="tt">1RM 측정</span>
-        <span class="dd">목표만 넣으면 무게 · 횟수 · 쉬는 시간 자동</span></button>
-      <button class="hero2 half shot" data-act="go:prep"
-          style="--h1:#22424b;--h2:#101719;--img:url(img/card-both.jpg)">
-        <span class="tt">준비운동</span>
-        <span class="dd">스트레칭 · 셀프 마사지</span></button>
-    </div>`,
+    <button class="hline gold" data-act="rmstart:${S.mid}">${svg('h_crown',18)}<b>1RM 측정</b><small>목표만 넣으면 무게 · 횟수 · 쉬는 시간 자동</small><i>›</i></button>`,
     /* 맨 아래 고정 단추 — 기록 중일 때만. 평소엔 맨 위 큰 카드가 같은 일을 한다 (2026-10-06 홈 줄이기) */
     foot: lw ? `<button class="btn main go live" data-act="go:workout"><span class="gdot"></span>운동기록 계속하기</button>` : undefined };
 }
