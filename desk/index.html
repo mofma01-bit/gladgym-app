@@ -1295,6 +1295,21 @@ body.resizing{cursor:col-resize;user-select:none}
 .hblk > .homenums .num .v{letter-spacing:-.03em}
 .top{background:linear-gradient(180deg,#151513,#121211)}
 .lbl{color:#a9a29a}
+
+/* 숫자 칸 · 표 · 현황 탭 — 회원앱 융합 기준 (2026-10-06 2차) */
+.sumit{background:linear-gradient(180deg,#221f1a,#181816);border-color:#34332d;border-radius:14px;padding:12px 14px;box-shadow:inset 0 1px 0 rgba(240,211,160,.16)}
+.sumit .v2{font-size:26px;line-height:1.15;color:var(--gold)}
+.sumit.teal .v2{color:var(--teal)}.sumit.warn .v2{color:var(--warn)}
+.sumit.on{background:radial-gradient(120% 140% at 0% 0%,rgba(240,211,160,.2),transparent 62%),linear-gradient(180deg,#241f17,#191714);border-color:var(--gold)}
+.st-nums>div{background:linear-gradient(180deg,#221f1a,#181816);border:1px solid #34332d;border-radius:13px;box-shadow:inset 0 1px 0 rgba(240,211,160,.16)}
+.st-ring{display:flex;align-items:center;gap:14px;padding:12px 14px}
+.st-ring .rg{position:relative;width:64px;height:64px;flex:none}.st-ring .rg svg{width:100%;height:100%;filter:drop-shadow(0 0 7px rgba(240,211,160,.22))}
+.st-ring .rg b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:var(--gold)}.st-ring .rg small{font-size:10px;margin-left:1px}
+.st-ring .rt2{display:flex;flex-direction:column;gap:2px;min-width:0}.st-ring .rt2 b{font-size:14px}.st-ring .rt2 i{font-style:normal;font-size:12px;color:var(--sub)}
+.wcg{display:block;width:100%;height:auto}
+.wcl{display:flex;justify-content:space-between;font-size:12px;color:var(--sub);margin-top:4px}.wcl b{color:var(--cream);font-size:13.5px;margin-left:3px}.wcl .n b{color:var(--gold)}.wcl .t b{color:var(--teal)}
+.mtb tbody tr:hover,.tb tbody tr:hover{background:rgba(240,211,160,.05)}
+.mtb th,.tb th{color:#a9a29a}
 </style></head><body>
 
 <div class="tx-login" id="txlogin">
@@ -1392,7 +1407,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '174';
+const BUILD = '175';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -2973,6 +2988,26 @@ function 현황셈(mid){
       p: a===b ? 100 : Math.max(0, Math.min(100, Math.round((a-c)/(a-b)*100))) }; }
   return { m:+달.slice(5), 개인, 수업, 률, 기준, 주들, 목표들, 뱃지:(g.badges||[]).slice().reverse(), 몸, 계획있나:!!M.plan };
 }
+/* 체중 곡선 — 회원앱 `체중곡선()` 과 같은 모양 (2026-10-06 융합 기준: 곡선 · 금색 채움 · 마지막 점 말풍선 · 목표 청록 점선) */
+function 체중곡선(logs, gw){
+  const W = 320, H = 100, PL = 8, PR = 8, PT = 26, PB = 10, 목표 = +gw || 0, n = logs.length;
+  const lo = Math.min.apply(null, logs.concat(목표 ? [목표] : [])) - 0.6, hi = Math.max.apply(null, logs.concat(목표 ? [목표] : [])) + 0.6;
+  const x = i => PL + i*(W-PL-PR)/(n-1), y = v => PT + (1 - (v-lo)/(hi-lo))*(H-PT-PB);
+  const xs = logs.map((_,i)=>x(i)), ys = logs.map(y);
+  const d = xs.map((X,i)=>{ if(!i) return 'M'+X.toFixed(1)+' '+ys[0].toFixed(1); const h=(X-xs[i-1])/2;
+    return 'C'+(xs[i-1]+h).toFixed(1)+' '+ys[i-1].toFixed(1)+' '+(X-h).toFixed(1)+' '+ys[i].toFixed(1)+' '+X.toFixed(1)+' '+ys[i].toFixed(1); }).join(' ');
+  const lx = xs[n-1], ly = ys[n-1], 글 = kgfmt(logs[n-1]) + ' kg', bw = 글.length*5.8 + 14, bx = Math.min(W-bw-2, lx-bw+10), by = Math.max(2, ly-25);
+  return '<svg class="wcg" viewBox="0 0 '+W+' '+H+'" aria-hidden="true">'
+    + '<defs><linearGradient id="wcgf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0d3a0" stop-opacity=".3"/><stop offset="1" stop-color="#f0d3a0" stop-opacity="0"/></linearGradient></defs>'
+    + (목표 ? '<line x1="'+PL+'" x2="'+(W-PR)+'" y1="'+y(목표).toFixed(1)+'" y2="'+y(목표).toFixed(1)+'" stroke="#a9d8e6" stroke-width="1.1" stroke-dasharray="3 3.5" opacity=".7"/>'
+        + '<text x="'+PL+'" y="'+(y(목표)-4).toFixed(1)+'" font-size="9" font-weight="700" fill="#a9d8e6">목표 '+kgfmt(목표)+'kg</text>' : '')
+    + '<path d="'+d+' L '+lx.toFixed(1)+' '+(H-PB)+' L '+xs[0].toFixed(1)+' '+(H-PB)+' Z" fill="url(#wcgf)"/>'
+    + '<path d="'+d+'" fill="none" stroke="#f0d3a0" stroke-width="2.2" stroke-linecap="round"/>'
+    + logs.slice(0,-1).map((_,i)=>'<circle cx="'+xs[i].toFixed(1)+'" cy="'+ys[i].toFixed(1)+'" r="2.2" fill="#1b1a18" stroke="#d6b87e" stroke-width="1.2"/>').join('')
+    + '<circle cx="'+lx.toFixed(1)+'" cy="'+ly.toFixed(1)+'" r="7" fill="#f0d3a0" opacity=".16"/><circle cx="'+lx.toFixed(1)+'" cy="'+ly.toFixed(1)+'" r="4" fill="#1b1a18" stroke="#f0d3a0" stroke-width="2.2"/>'
+    + '<rect x="'+bx.toFixed(1)+'" y="'+by.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="18" rx="9" fill="#241f17" stroke="#d6b87e" stroke-width=".9"/>'
+    + '<text x="'+(bx+bw/2).toFixed(1)+'" y="'+(by+12.5).toFixed(1)+'" text-anchor="middle" font-size="10" font-weight="800" fill="#f0d3a0">'+글+'</text></svg>';
+}
 function tabStat(){
   if(!M.plan && !M.wi.length && !M.meals.length) return '<div class="empty">불러오는 중…</div>';
   const a = 현황셈(S.mid);
@@ -2985,8 +3020,17 @@ function tabStat(){
       + '<div><span class="k">합계</span><span class="v">' + (a.개인+a.수업) + '<small>회</small></span></div>'
       + '<div><span class="k">목표 출석률</span><span class="v g">' + a.률 + '<small>%</small></span></div>'
     + '</div>'
-    + '<div class="card" style="padding:10px 14px">' + 막대(Math.min(100,a.률))
-      + '<div class="t2" style="margin-top:6px">개인운동 기준 · ' + esc(a.기준) + '</div></div>'
+    + (()=>{ const R = 26, C = 2*Math.PI*R, p = Math.max(0, Math.min(1, a.률/100));
+        return '<div class="card st-ring"><span class="rg"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="'+R+'" fill="none" stroke="#34332d" stroke-width="5"/>'
+          + (p > 0 ? '<circle cx="32" cy="32" r="'+R+'" fill="none" stroke="#f0d3a0" stroke-width="5" stroke-linecap="round" stroke-dasharray="'+(C*p).toFixed(1)+' '+C.toFixed(1)+'" transform="rotate(-90 32 32)"/>' : '')
+          + '</svg><b>' + a.률 + '<small>%</small></b></span>'
+          + '<span class="rt2"><b>목표 출석률</b><i>개인운동 기준 · ' + esc(a.기준) + '</i></span></div>'; })()
+    + (()=>{ const logs = (M.bl||[]).filter(x => +x.w).slice().sort((p,q)=> String(p.on_date) < String(q.on_date) ? -1 : 1).map(x => +x.w);
+        if(logs.length < 2) return '';
+        const gw = (a.몸 && a.몸.이름==='체중') ? a.몸.b : 0;
+        return '<div class="lbl" style="margin-top:12px">체중 추이 · 인바디 ' + logs.length + '회</div><div class="card" style="padding:10px 12px 8px">' + 체중곡선(logs, gw)
+          + '<div class="wcl"><span>처음 기록 <b>' + kgfmt(logs[0]) + 'kg</b></span><span class="n">지금 <b>' + kgfmt(logs[logs.length-1]) + 'kg</b></span>'
+          + (gw ? '<span class="t">목표 <b>' + kgfmt(gw) + 'kg</b></span>' : '') + '</div></div>'; })()
     + '<div class="lbl" style="margin-top:12px">주마다</div>'
     + '<div class="card" style="padding:4px 14px">' + a.주들.map(x => '<div class="st-row"><span>'
       + (+x.첫.slice(5,7)) + '/' + (+x.첫.slice(8)) + ' ~ ' + (+x.끝.slice(8)) + '</span><span>개인 <b>' + x.개인.size
