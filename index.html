@@ -886,6 +886,15 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 @keyframes newShine{0%{background-position:130% 0}60%,100%{background-position:-30% 0}}
 @media (prefers-reduced-motion:reduce){.hero .tag.new em{animation:none;color:var(--gold);background:none}}
 .hero2.half.wide{min-height:104px;background-position:center 38%}
+.cgate{display:flex;align-items:center;gap:14px;width:100%;flex:none;text-align:left;min-height:112px;padding:18px 16px;border-radius:20px;border:1px solid #5a4c33;
+  background:radial-gradient(110% 120% at 0% 0%,rgba(240,211,160,.2),transparent 60%),linear-gradient(180deg,#241f17,#161513)}
+.cgate.teal{border-color:#3f7281;background:radial-gradient(110% 120% at 0% 0%,rgba(169,216,230,.18),transparent 60%),linear-gradient(160deg,#1b333b,#11211f 120%)}
+.cgate.dark{border-color:#34332d;background:radial-gradient(110% 120% at 0% 0%,rgba(240,211,160,.1),transparent 60%),linear-gradient(180deg,#201f1c,#161614)}
+.cgate .cgi{width:54px;height:54px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;color:var(--gold);border:1.5px solid rgba(240,211,160,.55);background:rgba(240,211,160,.07)}
+.cgate.teal .cgi{color:var(--teal);border-color:rgba(169,216,230,.55);background:rgba(169,216,230,.07)}
+.cgate .cgt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.cgate .cgt b{font-size:20px;font-weight:800;letter-spacing:-.02em}
+.cgate .cgt small{font-size:12.5px;color:var(--sub)}.cgate .cgt em{font-style:normal;font-size:12px;font-weight:700;color:var(--gold);margin-top:4px}
+.cgate.teal .cgt em{color:var(--teal)}.cgate>i{font-style:normal;font-size:22px;color:var(--sub);flex:none}
 .hrow{display:grid;grid-template-columns:1fr 1fr;gap:9px;width:100%;flex:none;align-items:stretch}
 .hrow.wide{grid-template-columns:1.5fr 1fr}.hrow.solo{grid-template-columns:1fr}
 .hcard{display:flex;flex-direction:column;gap:7px;min-width:0;text-align:left;padding:13px 13px 12px;border-radius:17px;
@@ -2163,7 +2172,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '264';
+const BUILD = '265';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -6476,13 +6485,27 @@ function 내추이(){
       ${키들.map(k=>`<b>${판이름[k].replace(' (남)','').replace(' (여)','')}</b>${표.map(t=>{ const c=t.줄[k]; return c ? `<span class="${색(c.등)}" title="${c.v}${판단위[k]}">${c.등}<small>/${c.중}</small></span>` : '<span class="no">–</span>'; }).join('')}`).join('')}
     </div></div>`;
 }
+/* 커뮤니티 첫 화면 — 입구 셋만. 고르면 그 안으로 들어간다 (2026-10-06 대표 「한 화면에 너무 많은 정보」) */
+function 커뮤니티입구(){
+  const 내것 = S.who !== 'tr';
+  const 글 = (D.posts||[]).filter(글볼수있나), 피드 = 글.filter(p=>p.kind!=='파트너'), 모집 = 글.filter(p=>p.kind==='파트너' && p.state!=='마감');
+  const R = 랭킹계산(월시작(TODAY.slice(0,7)), TODAY), i = 내것 ? R.오운완.findIndex(r=>r.mid===S.mid) : -1;
+  const 칸 = (모드, cls, ic, 이름, 설명, 알림) => `<button class="cgate ${cls}" data-act="cmode:${모드}">
+      <span class="cgi">${svg(ic,26)}</span>
+      <span class="cgt"><b>${이름}</b><small>${설명}</small>${알림 ? `<em>${알림}</em>` : ''}</span><i>›</i></button>`;
+  return { top: bar('커뮤니티'), tabs:1, body:`
+    ${칸('피드','gold','h_cam','오운완 피드','회원들의 오운완 · 인증샷', 피드.length ? `글 ${피드.length}개 · 최근 ${esc(이름of(피드[0].mid))} · ${언제(피드[0].ts)}` : '아직 글이 없어요')}
+    ${칸('랭킹','dark','h_crown','글래드 랭킹','오운완 · 운동 횟수 · 총 무게 · 3대 중량', 내것 ? (i>=0 ? `이번 달 오운완 ${i+1}위` : '이번 달 순위에 올라 보세요') : (R.오운완[0] ? `이번 달 오운완 1위 ${esc(이름of(R.오운완[0].mid))}` : ''))}
+    ${칸('파트너','teal','h_hands','운동 파트너 찾기','같이 운동할 사람 모집', 모집.length ? `모집 중 ${모집.length}건` : '모집 중인 글이 없어요')}
+    <div class="note">${내것 ? '같은 센터 회원끼리만 보는 공간이에요.' : '회원들이 올린 글과 순위를 봅니다. 문제 글은 ⋯ 에서 지울 수 있습니다.'}</div>` };
+}
 function vCommunity(){
-  const f = S.cfilt || '전체', 모드 = S.cmode || '피드';
+  if(!S.cmode) return 커뮤니티입구();
+  const f = S.cfilt || '전체', 모드 = S.cmode;
   const 내것 = S.who !== 'tr';
   let ps = (D.posts||[]).filter(글볼수있나).filter(p => 모드==='파트너' ? p.kind==='파트너' : p.kind!=='파트너');
   if(f==='내 글') ps = ps.filter(p=>p.mid===S.mid);
-  return { top: bar('커뮤니티', 내것 && 모드!=='랭킹' ? (모드==='파트너' ? `<button class="tbtn" data-act="partnew">＋ 모집 글</button>` : `<button class="tbtn" data-act="postnew">＋ 올리기</button>`) : ''), tabs:1, body:`
-    <div class="seg gold" style="margin-bottom:6px">${[['피드','피드'],['파트너','파트너 모집'],['랭킹','랭킹']].map(k=>`<button class="${모드===k[0]?'on':''}" data-act="cmode:${k[0]}">${k[1]}</button>`).join('')}</div>
+  return { top: bar(모드==='파트너' ? '운동 파트너 찾기' : (모드==='피드' ? '오운완 피드' : '글래드 랭킹'), 내것 && 모드!=='랭킹' ? (모드==='파트너' ? `<button class="tbtn" data-act="partnew">＋ 모집 글</button>` : `<button class="tbtn" data-act="postnew">＋ 올리기</button>`) : '', 'cmode:'), tabs:1, body:`
     ${모드==='랭킹' ? 랭킹판() : `<div class="chips" style="margin-bottom:4px">${(내것?['전체','내 글']:['전체']).map(k=>`<button class="chip ${f===k?'on':''}" data-act="cfilt:${k}">${k}</button>`).join('')}</div>`}
     ${모드==='랭킹' ? '' : ps.length ? ps.map(p => p.kind==='파트너' ? 파트너카드(p) : 글카드(p)).join('')
       : (모드==='파트너'
@@ -6615,7 +6638,7 @@ async function postSend(){
   await sv(spost('posts',[row]), '글 올리기');
   D.posts = D.posts || []; D.posts.unshift({ id, mid:S.mid, kind:row.kind, photo_id:row.photo_id||'', path, cap:row.caption, vis:row.visibility, by:row.taken_by||'', hid:'', ts:new Date().toISOString() });
   try{ if(n.url && n.url.startsWith('blob:')) URL.revokeObjectURL(n.url); }catch(e){}
-  S.pnew = null; S.tab='community'; S.cfilt='전체'; toast('올렸어요'); goRoot('community');
+  S.pnew = null; S.tab='community'; S.cmode='피드'; S.cfilt='전체'; toast('올렸어요'); goRoot('community');
 }
 function sheetPost(id){
   const p = (D.posts||[]).find(x=>x.id===id); if(!p) return;
@@ -9711,7 +9734,7 @@ document.addEventListener('click', async ev=>{
     case 'retry': S.screen='boot'; render(); start(); return;
     case 'switch': S.stack=[]; S.who=null; go('login'); return;
     case 'back': goBack(); return;
-    case 'ttab': S.ttab=rest[0]; goRoot(rest[0]);
+    case 'ttab': S.ttab=rest[0]; if(rest[0]==='t_community') S.cmode=''; goRoot(rest[0]);
       if(rest[0]==='t_community') 커뮤니티받기().then(()=>{ if(S.screen==='t_community') render(); });
       return;
     case 'tfm': S.tfeed=rest[0]; render(); return;
@@ -10062,7 +10085,7 @@ document.addEventListener('click', async ev=>{
       S.day = n; render(); return; }
     case 'tab': {
       if(live() && S.screen==='workout'){ sheetLeave(rest[0]); return; }
-      S.tab=rest[0]; goRoot(rest[0]);
+      S.tab=rest[0]; if(rest[0]==='community') S.cmode=''; goRoot(rest[0]);
       if(rest[0]==='community') 커뮤니티받기().then(()=>{ if(S.screen==='community') render(); });
       return; }
     case 'close': S.editDesc=null; closeSheet(); return;
