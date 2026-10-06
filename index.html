@@ -1017,6 +1017,15 @@ body .cm2 .tx{font-size:14px;line-height:1.6;color:var(--cream)}
 .mrow2 .mi.nm1{font-size:15px;font-weight:800}.mrow2 .mi.lv{color:var(--teal);border-color:rgba(169,216,230,.6);background:rgba(169,216,230,.08)}
 .mrow2 .pill{flex:none}
 .hcard.gold2{background:radial-gradient(110% 130% at 0% 0%,rgba(240,211,160,.18),transparent 62%),linear-gradient(180deg,#241f17,#171614);border-color:#6b5a33}
+/* 운동 중 — 융합 (2026-10-06): 짜임·단추는 그대로, 겉모습만 */
+.wkic{width:34px;height:34px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;color:var(--teal);border:1.3px solid rgba(169,216,230,.55);background:rgba(169,216,230,.07)}
+body .card.now2{background:radial-gradient(110% 140% at 0% 0%,rgba(169,216,230,.18),transparent 62%),linear-gradient(160deg,#1b333b,#13262b);border-color:#3f7281;border-radius:17px 17px 0 0}
+body .card.now2 .nm{font-size:16.5px !important;font-weight:800}
+body .opencard{background:linear-gradient(180deg,#191c1c,#151514);border-color:#3f7281;border-radius:0 0 17px 17px}
+body .trio button{border-radius:13px;background:linear-gradient(180deg,#22211e,#1a1917);border:1px solid #34332d;box-shadow:inset 0 1px 0 rgba(240,211,160,.1)}
+body .trio .t1{border-color:#6b5a33;background:radial-gradient(120% 130% at 0% 0%,rgba(240,211,160,.16),transparent 62%),linear-gradient(180deg,#241f17,#191714)}
+body .set{border-radius:13px;background:linear-gradient(180deg,#201f1c,#191817);border-color:#34332d}
+body .set.now{border-color:var(--gold);background:radial-gradient(120% 140% at 0% 0%,rgba(240,211,160,.16),transparent 62%),#1f1b14}
 .megoal{width:100%;flex:none;display:flex;flex-direction:column;gap:8px;text-align:left;padding:14px 14px 13px;border-radius:18px;border:1px solid #34332d;background:linear-gradient(180deg,#201f1c,#171615);box-shadow:inset 0 1px 0 rgba(240,211,160,.14)}
 .mgh{display:grid;grid-template-columns:1fr auto;align-items:center;width:100%}.mgh small{grid-column:1/-1;font-size:11.5px;color:var(--sub)}
 .mgh b{font-size:17px;font-weight:800}.mgh i{font-style:normal;color:var(--sub);font-size:17px}
@@ -2310,7 +2319,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '279';
+const BUILD = '280';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -4752,15 +4761,16 @@ function vWorkout(){
   return {
     top: bar('운동 중', 윗시계(w), 'askleave'),
     keepScroll:true, body:`
-    ${tr ? 주기줄(wmid, 'tsub:cycle:'+wmid) : ''}
-    ${tr?`<button class="card teal" data-act="tlive:${wmid}">
-      <div class="nm t">${esc((MEMBERS.find(m=>m.id===wmid)||{}).n||'')} 회원 수업 기록 중</div>
-      <div class="sm">종목별로 코멘트를 남기려면 여기 ›</div></button>`:''}
+    ${/* 2026-10-06 융합 — 위쪽 안내는 한 줄씩. 주기 권장 글은 수업 시작 창·회원 화면에서 이미 봤다(눌러도 나온다) */''}
+    ${tr ? 주기줄(wmid, 'tsub:cycle:'+wmid, true) : ''}
+    ${tr?`<button class="hline" data-act="tlive:${wmid}">${svg('h_chat',18)}<b>${esc((MEMBERS.find(m=>m.id===wmid)||{}).n||'')} 회원 수업 기록 중</b>
+      <small>종목별 코멘트 남기기</small><i>›</i></button>`:''}
     <span class="lbl">오늘 한 운동${S.moveIdx!=null?' — <b style="color:var(--teal)">순서 바꾸는 중</b>':''}</span>
     ${w.items.map((it,i)=>{
       const on = (i===w.cur), mv = (S.moveIdx===i);
       return `<div class="card rowc ${it.locked&&!on?'dim':''} ${on?'now2':''} ${S.just===VID(it.ex,it.va)?'just':''}"
         style="padding:9px 9px 9px 13px" data-hold="ord:${i}">
+      ${on ? `<span class="wkic">${svg('h_dumb',18)}</span>` : ''}
       <button data-act="jump:${i}" style="flex:1;min-width:0;text-align:left">
         <div class="nm" style="font-size:14px">${esc(exName(it.ex,it.va))}${isMemo(it.ex)?' <span class="pill q">메모</span>':''}</div>
         <div class="sm">${it.locked?`${mmss(it.sec)} · ${isMemo(it.ex)?'메모':it.sets.length+'세트'}`
