@@ -839,6 +839,15 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
   position:absolute;top:13px;left:16px;z-index:3;font-size:10.5px;font-weight:800;
   letter-spacing:.1em;color:rgba(255,255,255,.6)}
 .hero2.tall{min-height:214px}
+/* 홈 정리 (2026-10-06) — 반쪽 카드 둘 · 바로 가기 3칸 · 주기 한 줄 */
+.home2{display:grid;grid-template-columns:1fr 1fr;gap:9px;width:100%;flex:none}
+.hero2.half{min-height:118px;padding:13px 14px;border-radius:16px}
+.hero2.half .tt{font-size:16.5px}.hero2.half .dd{font-size:11.5px;line-height:1.45;margin-top:3px}
+.go3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;flex:none}
+.go3 button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:12px 4px 10px;border-radius:14px;background:var(--dark-2);border:1px solid var(--line);min-width:0}
+.go3 .gi{color:var(--gold);display:flex}.go3 b{font-size:13px}.go3 small{font-size:10.5px;color:var(--sub);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cycline.one{flex-direction:row;align-items:center;justify-content:space-between;gap:8px;padding:9px 12px}
+.cycline.one .ch{font-size:13.5px}.cycline.one .c1{font-size:11.5px;color:var(--sub);flex:none}
 .hero2.dimc{opacity:.55}
 .hero2.shot .art{display:none}
 .hero2.shot::after{
@@ -2059,7 +2068,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '257';
+const BUILD = '258';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -3679,8 +3688,17 @@ function vHome(){
   return { top: bar('글래드짐',
       `<button class="notibell" data-act="go:noti" aria-label="알림${알림수?' '+알림수+'개':''}">
         ${svg('종',20)}${알림수?`<b>${알림수>9?'9+':알림수}</b>`:''}</button>`), tabs:1, body:`
+    <button class="hero" data-act="${hero.act}">
+      <span class="tag">${hero.tag}</span>
+      <div class="ht">${hero.ht}</div>
+      <div class="hs">${hero.hs}</div>
+      <span class="hgo">${hero.go} ›</span></button>
+
+    ${lw && r ? `<button class="card rowc" data-act="rt:${r.id}">
+      <div><div class="nm">오늘 지정 · 루틴 ${r.no} ${esc(r.n)}</div>
+      <div class="sm">${esc(t.by)}가 지정했어요</div></div><span class="rt">›</span></button>` : ''}
     ${(뱃지주기(S.mid), 현황판(S.mid))}
-    ${주기줄(S.mid, 'sub:cycle')}
+    ${주기줄(S.mid, 'sub:cycle', true)}
     ${오운완홈(S.mid)}
     ${인증샷홈(S.mid)}
     <div class="homerec">
@@ -3691,24 +3709,15 @@ function vHome(){
       ${코멘트칸(S.mid)}
     </div>
 
-    <button class="hero" data-act="${hero.act}">
-      <span class="tag">${hero.tag}</span>
-      <div class="ht">${hero.ht}</div>
-      <div class="hs">${hero.hs}</div>
-      <span class="hgo">${hero.go} ›</span></button>
-
-    ${lw && r ? `<button class="card rowc" data-act="rt:${r.id}">
-      <div><div class="nm">오늘 지정 · 루틴 ${r.no} ${esc(r.n)}</div>
-      <div class="sm">${esc(t.by)}가 지정했어요</div></div><span class="rt">›</span></button>` : ''}
-
-    <button class="hero2 rm" data-act="rmstart:${S.mid}">
-      <span class="tt">🏋️ 1RM 측정</span>
-      <span class="dd">목표 무게만 넣으면 워밍업부터 본 시도까지 무게 · 횟수 · 쉬는 시간이 자동으로</span></button>
-
-    <button class="hero2 shot" data-act="go:prep"
-        style="--h1:#22424b;--h2:#101719;--img:url(img/card-both.jpg)">
-      <span class="tt">준비운동</span>
-      <span class="dd">스트레칭 · 셀프 마사지 — 굳은 곳을 먼저 풀고 시작합니다</span></button>
+    <div class="home2">
+      <button class="hero2 half rm" data-act="rmstart:${S.mid}">
+        <span class="tt">1RM 측정</span>
+        <span class="dd">목표만 넣으면 무게 · 횟수 · 쉬는 시간 자동</span></button>
+      <button class="hero2 half shot" data-act="go:prep"
+          style="--h1:#22424b;--h2:#101719;--img:url(img/card-both.jpg)">
+        <span class="tt">준비운동</span>
+        <span class="dd">스트레칭 · 셀프 마사지</span></button>
+    </div>
 
     ${(()=>{ const rc=recosOf(S.mid).filter(x=>rOf(x.rid)); if(!rc.length) return '';
       return `<span class="lbl">다음 개인운동 추천</span>`
@@ -3721,14 +3730,10 @@ function vHome(){
     })()}
 
 
-    <span class="lbl">바로 가기</span>
-    ${[['routine','내 루틴', myRoutines(S.mid).length+'개 · 골라서 바로 시작','go:routines'],
-       ['plan','운동계획', esc(g.goal||'목표 · 칼로리 · 다짐'),'sub:plan'],
-       ['chart','기록 분석','증량 그래프 · 운동 균형 · 지난 기록','tab:records']]
-      .map(x=>`<button class="gocard" data-act="${x[3]}">
-        <span class="gi">${svg(x[0])}</span>
-        <span class="gt"><span class="nm">${x[1]}</span><span class="sm">${x[2]}</span></span>
-        <span class="ga">›</span></button>`).join('')}`,
+    <div class="go3">${[['routine','내 루틴', myRoutines(S.mid).length+'개','go:routines'],
+       ['plan','운동계획', esc(g.goal||'목표 · 다짐'),'sub:plan'],
+       ['chart','기록 분석','그래프 · 균형','tab:records']]
+      .map(x=>`<button data-act="${x[3]}"><span class="gi">${svg(x[0])}</span><b>${x[1]}</b><small>${x[2]}</small></button>`).join('')}</div>`,
     foot:(()=>{
       const doneToday = D.workouts.some(w=>w.mid===S.mid && w.done && w.date===TODAY && w.items.some(i=>i.sets.length));
       const cls = 'btn main go' + (lw?' live':'') + (!lw && doneToday?' calm':'');
@@ -7421,8 +7426,10 @@ const 주기권장 = {
   '배란기': '힘은 가장 좋지만 인대가 느슨해지는 때 — 점프·방향 전환·무릎 비틀림은 조심, 무거운 하체는 자세를 먼저 봐 주세요',
   '황체기': '붓고 무겁게 느끼는 때 — 무게보다 횟수·템포로, 쉬는 시간을 조금 늘리고 수분을 챙기세요',
 };
-function 주기줄(mid, act){
+function 주기줄(mid, act, 짧게){
   const c = cycOf(mid), t = cycToday(c); if(!t || !여성인가(mid)) return '';
+  if(짧게) return `<button class="cycline one" data-act="${act}" style="--cc:${주기색[t.ph]||'var(--gold)'}">
+    <span class="ch">현재 <b>${esc(t.ph)}</b> · ${t.day}일차</span><span class="c1">다음 생리 ${t.left}일 뒤 ›</span></button>`;
   return `<button class="cycline" data-act="${act}" style="--cc:${주기색[t.ph]||'var(--gold)'}">
     <span class="ch">현재 <b>${esc(t.ph)}</b>입니다 <small>${t.day}일차 · 다음 생리 ${t.left}일 뒤 ›</small></span>
     <span class="cw">${esc(주기권장[t.ph]||t.why)}</span></button>`;
