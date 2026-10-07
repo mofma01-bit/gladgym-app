@@ -510,7 +510,7 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .ibhd .seg button{padding:4px 10px;font-size:11.5px}
 .ibch{display:flex;align-items:stretch}
 .ibch .lb{flex:0 0 50px;display:flex;flex-direction:column}
-.ibch .lb span{height:62px;display:flex;flex-direction:column;justify-content:center;font-size:11.5px;font-weight:800;color:#b9b2a8}
+.ibch .lb span{height:74px;display:flex;flex-direction:column;justify-content:center;font-size:11.5px;font-weight:800;color:#b9b2a8}
 .ibch .lb span i{font-style:normal;font-size:10px;font-weight:600;color:#75706a}
 .ibch .sc{flex:1;min-width:0;overflow-x:auto;direction:rtl;scrollbar-width:thin}
 .ibch .sc svg{direction:ltr;display:block}
@@ -1146,6 +1146,12 @@ body .hero.photo{background-origin:border-box;background-clip:border-box}
 .sstat3 .v.cyv{font-size:17px;color:var(--teal);padding-top:6px}
 .cyfoot{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;flex:none;font-size:11.5px;color:var(--sub)}
 .cyfoot button{flex:none;font-size:12px;color:var(--sub);text-decoration:underline;padding:6px 2px}
+.sstat3.ib4{grid-template-columns:1fr 1fr}.sstat3.ib4 .v{font-size:23px}
+.sstat3.ib4>div{display:grid;grid-template-columns:1fr auto;align-items:baseline;column-gap:6px;row-gap:1px}
+.sstat3.ib4 .k{grid-column:1/-1}.sstat3.ib4 em{margin:0;text-align:right;font-size:12px;font-weight:800}
+.sstat3.ib4 i{grid-column:1/-1;font-style:normal;font-size:10.5px;color:#75706a}
+.sstat3.ib4>div.t .v{color:var(--teal)}
+.ibcmp{background:none;border:0;padding:0}
 .megoal{width:100%;flex:none;display:flex;flex-direction:column;gap:8px;text-align:left;padding:14px 14px 13px;border-radius:18px;border:1px solid #34332d;background:linear-gradient(180deg,#201f1c,#171615);box-shadow:inset 0 1px 0 rgba(240,211,160,.14)}
 .mgh{display:grid;grid-template-columns:1fr auto;align-items:center;width:100%}.mgh small{grid-column:1/-1;font-size:11.5px;color:var(--sub)}
 .mgh b{font-size:17px;font-weight:800}.mgh i{font-style:normal;color:var(--sub);font-size:17px}
@@ -2497,7 +2503,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '300';
+const BUILD = '301';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -9005,30 +9011,37 @@ function ib두날(ls){
 /* 변화 그래프 — 루킨바디 「변화」처럼 몸무게·근육량·체지방량을 한 줄씩 쌓는다.
    점 사이를 넓게 고정해 숫자가 겹치지 않고, 많으면 옆으로 밀어 본다(처음엔 최근 쪽이 보임) */
 function ib변화(ls){
-  const K = ['w','m','f'], BH = 62, PB = 30, GAP = 48, PX = 22;
-  const n = ls.length, W = Math.max(PX*2 + (n-1)*GAP, 260), H = BH*K.length + PB;
-  const x = i => n === 1 ? W/2 : PX + i*GAP;
+  const K = ['w','m','f'], BH = 74, PB = 30, GAP = 50, PX = 26;
+  const n = ls.length, W = Math.max(PX*2 + (n-1)*GAP, 272), H = BH*K.length + PB;
+  const x = i => n === 1 ? W/2 : PX + i*Math.max(GAP, (W - PX*2)/(n-1));      /* 기록이 적으면 칸 너비에 맞춰 벌린다 (왼쪽이 비어 보였다) */
   let g = '';
   K.forEach((k, r) => {
     const pts = ls.map((o,i) => o[k] ? { i, v:+o[k] } : null).filter(Boolean);
     const top = r*BH;
-    g += `<line x1="0" x2="${W}" y1="${top+BH}" y2="${top+BH}" stroke="var(--line)" stroke-width="1"/>`;
+    g += `<line x1="0" x2="${W}" y1="${top+BH}" y2="${top+BH}" stroke="#34332d" stroke-width=".8" stroke-dasharray="1.5 4"/>`;
     if(!pts.length) return;
     let mn = Math.min(...pts.map(p=>p.v)), mx = Math.max(...pts.map(p=>p.v));
     if(mx - mn < 0.5){ mn -= 0.5; mx += 0.5; }
-    const y = v => top + 22 + (1 - (v-mn)/(mx-mn)) * (BH - 34);
-    g += `<path d="${pts.map((p,j)=>(j?'L':'M')+x(p.i).toFixed(1)+' '+y(p.v).toFixed(1)).join(' ')}"
-      fill="none" stroke="var(--gold-2)" stroke-width="1.6" stroke-linejoin="round"/>`;
-    pts.forEach((p,j) => { const last = j === pts.length-1;
-      g += `<circle cx="${x(p.i).toFixed(1)}" cy="${y(p.v).toFixed(1)}" r="${last?3.6:2.8}" fill="${last?'var(--gold)':'var(--gold-2)'}"/>
-        <text x="${x(p.i).toFixed(1)}" y="${(y(p.v)-7).toFixed(1)}" text-anchor="middle" font-size="10.5" font-weight="800"
-          fill="${last?'var(--gold)':'#c9c2b9'}">${ib수(p.v)}</text>`; });
+    const y = v => top + 26 + (1 - (v-mn)/(mx-mn)) * (BH - 38);
+    const 색 = k === 'm' ? '#a9d8e6' : '#f0d3a0', xs = pts.map(p=>x(p.i)), ys = pts.map(p=>y(p.v)), d = pts.length > 1 ? 곡선길(xs, ys) : '';
+    if(d) g += `<path d="${d} L ${xs[xs.length-1].toFixed(1)} ${top+BH-3} L ${xs[0].toFixed(1)} ${top+BH-3} Z" fill="url(#ibg_${k})"/>
+      <path d="${d}" fill="none" stroke="${색}" stroke-width="2" stroke-linecap="round"/>`;
+    pts.forEach((p,j) => { const last = j === pts.length-1, cx = xs[j], cy = ys[j];
+      if(!last){ g += `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="2.4" fill="#1b1a18" stroke="${색}" stroke-width="1.3" opacity=".85"/>
+        <text x="${cx.toFixed(1)}" y="${(cy-7).toFixed(1)}" text-anchor="middle" font-size="9.5" font-weight="600" fill="#8f8a83">${ib수(p.v)}</text>`; return; }
+      const 글 = ib수(p.v), bw = 글.length*5.8 + 12, bx = Math.min(W - bw - 1, Math.max(1, cx - bw/2)), by = Math.max(top + 2, cy - 24);
+      g += `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="6.5" fill="${색}" opacity=".16"/>
+        <circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="3.8" fill="#1b1a18" stroke="${색}" stroke-width="2.1"/>
+        <rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${bw.toFixed(1)}" height="16" rx="8" fill="#241f17" stroke="${색}" stroke-width=".9"/>
+        <text x="${(bx+bw/2).toFixed(1)}" y="${(by+11.5).toFixed(1)}" text-anchor="middle" font-size="9.5" font-weight="800" fill="${색}">${글}</text>`; });
   });
-  ls.forEach((o,i) => { g += `<text x="${x(i).toFixed(1)}" y="${H-15}" text-anchor="middle" font-size="9.5" font-weight="700" fill="#8f8a83">${ib날(o.date)}</text>`
+  ls.forEach((o,i) => { g += `<text x="${x(i).toFixed(1)}" y="${H-15}" text-anchor="middle" font-size="9.5" font-weight="${i===n-1?800:600}" fill="${i===n-1?'var(--gold)':'#75706a'}">${ib날(o.date)}</text>`
     + (o.note==='인바디' ? `<circle cx="${x(i).toFixed(1)}" cy="${H-5}" r="2.2" fill="var(--teal)"/>` : ''); });
   return `<div class="ibch">
     <div class="lb">${K.map(k=>`<span>${BL_M[k].n}<i>${BL_M[k].u}</i></span>`).join('')}</div>
-    <div class="sc"><svg viewBox="0 0 ${W} ${H}" style="width:${W}px;height:${H}px;max-width:none">${g}</svg></div></div>`;
+    <div class="sc"><svg viewBox="0 0 ${W} ${H}" style="width:${W}px;height:${H}px;max-width:none">
+      <defs>${K.map(k=>`<linearGradient id="ibg_${k}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${k==='m'?'#a9d8e6':'#f0d3a0'}" stop-opacity=".24"/><stop offset="1" stop-color="${k==='m'?'#a9d8e6':'#f0d3a0'}" stop-opacity="0"/></linearGradient>`).join('')}</defs>
+      ${g}</svg></div></div>`;
 }
 
 function blPane(mid){
@@ -9040,10 +9053,9 @@ function blPane(mid){
   const 줄 = k => { const m = BL_M[k], va = a && a[k], vb = b && b[k];
     let d = '', c = '';
     if(va && vb){ const x = Math.round((vb-va)*10)/10;
-      if(!x) d = '0'; else { c = ((m.good > 0) === (x > 0)) ? 'up' : 'dn'; d = (x>0?'+':'−') + Math.abs(x); } }
-    return `<div class="ibrow"><span class="n">${m.n}</span>
-      <span class="v">${va?ib수(va):'—'}</span><span class="v b">${vb?ib수(vb):'—'}</span>
-      <span class="d ${c}">${d||'—'}</span></div>`; };
+      if(!x) d = '변화 없음'; else { c = ((m.good > 0) === (x > 0)) ? 'up' : 'dn'; d = (x>0?'▲ ':'▼ ') + Math.abs(x).toFixed(1); } }
+    return `<div class="${k==='m'?'t':''}"><span class="k">${m.n}</span><span class="v">${vb?ib수(vb):'—'}<small>${m.u}</small></span>
+      <em class="${c}">${d || '—'}</em><i>이전 ${va?ib수(va):'—'}</i></div>`; };
   return `
     <span class="lbl">인바디 · 체성분</span>
     ${ls.length ? `
@@ -9052,8 +9064,7 @@ function blPane(mid){
         <button data-act="ibsel:A"><small>이전</small><b>${A?ib날(A):'없음'} ▾</b></button>
         <button class="b" data-act="ibsel:B"><small>최근</small><b>${ib날(B)} ▾</b></button>
       </div>
-      <div class="ibrow hd"><span></span><span style="text-align:right">이전</span><span style="text-align:right">최근</span><span style="text-align:right">변화</span></div>
-      ${['w','m','f','fp'].map(줄).join('')}
+      <div class="sstat3 ib4">${['w','m','f','fp'].map(줄).join('')}</div>
     </div>
     <div class="gbox">
       <div class="ibhd"><b>변화 그래프</b>
