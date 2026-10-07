@@ -2300,11 +2300,11 @@ function sheetExNew(){
     <div class="chips">${PARTS.map(x=>`<button class="chip ${x===d.p?'on':''}" data-act="exnp:${x}">${x}</button>`).join('')}</div>
     <div class="fld"><span class="fn">기구 <small>없으면 비워 두세요</small></span><input class="search" type="text" data-k="exe" maxlength="12" value="${esc(d.e)}" placeholder="예) 케이블 · 덤벨 · 맨몸"></div>
     <div class="fld"><span class="fn">설명</span><textarea class="search" data-k="exd" rows="3" maxlength="300" placeholder="예) 골반은 정면에 두고 몸통만 돌립니다">${esc(d.d)}</textarea></div>
-    ${(d.media.length || d.files.length) ? `<div class="pgrid">${d.media.map((f,i)=>`<button class="pg" data-act="exmrm:${i}">${f.kind==='video' ? `<video src="${esc(phURL(f.path))}" muted playsinline preload="metadata"></video>` : `<img src="${esc(phURL(f.path))}" alt="">`}<span class="pgd">빼기</span></button>`).join('')
-      }${d.files.map((f,i)=>`<button class="pg" data-act="exfrm:${i}">${f.kind==='video' ? `<video src="${f.url}" muted playsinline></video>` : `<img src="${f.url}" alt="">`}<span class="pgd">빼기</span></button>`).join('')}</div>` : ''}
+    ${(d.media.length || d.files.length) ? `<div class="pgrid">${d.media.map((f,i)=>`<button class="pg" data-act="exmrm:${i}">${f.kind==='video' ? `<video src="${esc(phURL(f.path))}" muted playsinline preload="metadata"></video>` : `<img src="${esc(phURL(f.path))}" alt="">`}<span class="pgd">제외</span></button>`).join('')
+      }${d.files.map((f,i)=>`<button class="pg" data-act="exfrm:${i}">${f.kind==='video' ? `<video src="${f.url}" muted playsinline></video>` : `<img src="${f.url}" alt="">`}<span class="pgd">제외</span></button>`).join('')}</div>` : ''}
     <div class="hrow"><button class="btn sub" data-act="exfile:pic">${svg('h_cam',18)} 사진</button><button class="btn sub" data-act="exfile:vid">${svg('play',18)} 영상</button></div>
     <button class="btn main" data-act="exsave">저장</button>
-    ${d.새 ? '' : `<button class="dngr" data-act="exdel">이 종목 지우기</button>`}
+    ${d.새 ? '' : `<button class="dngr" data-act="exdel">이 종목 삭제</button>`}
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 function 운동파일고르기(종){
@@ -2564,7 +2564,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '319';
+const BUILD = '322';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -3014,12 +3014,12 @@ function sheetAgreeOff(){
   openSheet(()=>`
     <div class="h2">건강정보 동의를 취소하시겠어요?</div>
     <div class="agbody" style="margin:2px 0 10px">
-      취소하시면 지금까지 모은 아래 기록이 <b>모두 지워집니다.</b> 되돌릴 수 없어요.<br><br>
+      취소하시면 지금까지 모은 아래 기록이 <b>모두 삭제됩니다.</b> 되돌릴 수 없어요.<br><br>
       · 인바디 기록 <b>${ib}건</b><br>
       · 체형 사진 <b>${ph}장</b><br><br>
       운동기록·식단·루틴은 그대로 유지됩니다.
     </div>
-    <button class="btn warn" data-act="agoff">동의 취소하고 지우기</button>
+    <button class="btn warn" data-act="agoff">동의 취소하고 삭제</button>
     <button class="btn ghost sm" data-act="close">취소</button>`);
 }
 async function 건강동의끄기(){
@@ -3029,8 +3029,8 @@ async function 건강동의끄기(){
     await saveAgree(mid, { aS:'' });
     if(D.body) D.body[mid] = [];
     D.bph = (D.bph || []).filter(x=>x.mid!==mid);
-    closeSheet(); toast('취소했어요 · 건강정보를 지웠어요'); render();
-  }catch(e){ console.error(e); toast('지우는 중 문제가 생겼어요 — 다시 시도해 주세요'); }
+    closeSheet(); toast('취소했어요 · 건강정보를 삭제했어요'); render();
+  }catch(e){ console.error(e); toast('삭제하는 중 문제가 생겼어요 — 다시 시도해 주세요'); }
 }
 
 /* ══ 알림함 ══ 표를 새로 만들지 않는다 — 이미 있는 자료를 모아 보여준다 */
@@ -3255,7 +3255,7 @@ function dayDetail(mid, date, 제목){
   const ws  = all.filter(w => w.items.some(i => i.sets.length));
   if(!ws.length) return all.length
     ? `<div class="card" style="flex:none"><div class="dtitle">${T}</div>
-       <div class="sm">${dateTxt(date)} · 시작만 하고 세트를 적지 않은 기록 ${all.length}건</div></div>`
+       <div class="sm">${dateTxt(date)} · 시작만 하고 세트를 입력하지 않은 기록 ${all.length}건</div></div>`
     : '';
   const dayVol = ws.reduce((a,w)=> a + totalKg(w), 0);
   const dayCar = ws.reduce((a,w)=> a + w.items.reduce((b,it)=>
@@ -3673,7 +3673,7 @@ function 붙인것(K){
       ${x.kind==='video' ? `<video src="${x.url}#t=0.1" controls playsinline preload="metadata" muted></video>`
                          : `<img src="${x.url}" alt="">`}
       <b class="no">${i+1}</b>
-      <button data-act="attx:f:${K}:${i}" aria-label="빼기">✕</button></span>`).join('')}</div>`;
+      <button data-act="attx:f:${K}:${i}" aria-label="제외">✕</button></span>`).join('')}</div>`;
 }
 function 넘겨보기(전부, cid){
   const np = 전부.filter(m=>m.kind!=='video').length, nv = 전부.length - np;
@@ -3948,7 +3948,7 @@ function sheetSensitive(왜){
       · 사진은 비공개 저장소에 두고 1시간만 열리는 임시 주소로만 보여드립니다<br>
       · 회원님 동의 없이 홍보·광고에 쓰지 않습니다<br>
       · 언제든 「내 정보 → 약관 및 동의」에서 취소하실 수 있습니다<br>
-      · 취소하시면 저장된 기록과 사진은 지워집니다<br><br>
+      · 취소하시면 저장된 기록과 사진은 삭제됩니다<br><br>
       동의하지 않으셔도 <b>운동기록·식단·루틴·출석은 그대로</b> 쓰실 수 있습니다.
     </div>
     <button class="btn main" data-act="agsens:1">동의하고 시작</button>
@@ -3999,14 +3999,14 @@ function vLogin(){
     <div class="h1">운동을 기록하고<br>트레이너에게 받습니다</div>
     <p class="lbl">PT 회원님만 쓰는 앱입니다.</p>
     <button class="btn kakao" data-act="kakao">카카오로 시작하기</button>
-    <div class="note"><b>시험 단계</b> — 실제 카카오 로그인은 다음입니다. 지금은 아래에서 골라 들어갑니다.</div>
+    <div class="note"><b>시험 단계</b> — 실제 카카오 로그인은 다음입니다. 지금은 아래에서 선택해 들어갑니다.</div>
     <div class="hr"></div>
     <button class="card rowc teal" data-act="as:tr">
       <div><div class="nm t">${esc(TRAINER)} 트레이너로 들어가기</div>
       <div class="sm">회원 만들기 · 루틴 · 코멘트</div></div><span class="rt">›</span></button>
     <div class="hr"></div>
     <span class="lbl">회원으로 들어가기 · ${MEMBERS.length}명</span>
-    <input class="search" type="text" data-filter="1" placeholder="이름으로 찾기">
+    <input class="search" type="text" data-filter="1" placeholder="이름으로 검색">
     <div id="memlist">
     ${MEMBERS.map(m=>`<button class="card rowc" data-nm="${esc(m.n)}" data-act="as:${m.id}">
       <div><div class="nm">${esc(m.n)}</div><div class="sm">담당 ${esc(m.tr||TRAINER)} 트레이너</div></div>
@@ -4037,8 +4037,8 @@ function vNewMem(){
 
 /* ── 홈 ── */
 const 목표종류 = {
-  월운동:   { 이름:'이번 달 개인운동',    단위:'회', 기간:'달', 기본:8, 말:'혼자 운동을 기록한 날로 셉니다 (PT 수업은 빼고)' },
-  주운동:   { 이름:'이번 주 개인운동',    단위:'회', 기간:'주', 기본:2, 말:'혼자 운동을 기록한 날로 셉니다 (PT 수업은 빼고)' },
+  월운동:   { 이름:'이번 달 개인운동',    단위:'회', 기간:'달', 기본:8, 말:'혼자 운동을 기록한 날로 셉니다 (PT 수업은 제외하고)' },
+  주운동:   { 이름:'이번 주 개인운동',    단위:'회', 기간:'주', 기본:2, 말:'혼자 운동을 기록한 날로 셉니다 (PT 수업은 제외하고)' },
   식단기록: { 이름:'이번 달 식단 기록',   단위:'일', 기간:'달', 기본:20 },
   칼로리이하:{ 이름:'칼로리 이하로 먹은 날', 단위:'일', 기간:'달', 기본:15, kcal:1800, 말:'식단을 기록한 날만 셉니다' },
   칼로리이상:{ 이름:'칼로리 이상 먹은 날',  단위:'일', 기간:'달', 기본:15, kcal:2500, 말:'식단을 기록한 날만 셉니다' },
@@ -4126,16 +4126,16 @@ function sheetGoal(id){
         <input class="search" type="number" inputmode="decimal" data-k="gl:n" value="${n}"></div>
       ${T.말 ? `<div class="note">${T.말}</div>` : ''}
       <div style="display:flex;gap:9px">
-        ${옛 ? `<button class="btn ghost" data-act="goaldel:${옛.id}" style="color:var(--warn);border-color:#5a3a33">지우기</button>` : ''}
+        ${옛 ? `<button class="btn ghost" data-act="goaldel:${옛.id}" style="color:var(--warn);border-color:#5a3a33">삭제</button>` : ''}
         <button class="btn main" data-act="goalsave">저장</button></div>
       <button class="btn ghost sm" data-act="close">닫기</button>`; });
 }
 function 목표저장(){
   const mid = S.mid, g = GOALS[mid] = GOALS[mid] || {}, t = S.gd.t, T = 목표종류[t];
   const v = k => { const el = document.querySelector('#sheetbox [data-k="gl:'+k+'"]'); return el ? el.value : ''; };
-  const n = +v('n'); if(!(n > 0)){ toast('목표 숫자를 넣어 주세요'); return; }
+  const n = +v('n'); if(!(n > 0)){ toast('목표 숫자를 입력해 주세요'); return; }
   const x = { id: S.gd.id !== 'new' ? S.gd.id : 'g' + Date.now(), t, n, since: TODAY };
-  if(T.kcal){ const kc = +v('kcal'); if(!(kc > 0)){ toast('하루 칼로리를 넣어 주세요'); return; } x.kcal = kc; }
+  if(T.kcal){ const kc = +v('kcal'); if(!(kc > 0)){ toast('하루 칼로리를 입력해 주세요'); return; } x.kcal = kc; }
   if(t==='종목무게'){ const e = v('ex'); if(!e){ toast('무게를 든 종목이 아직 없어요'); return; } [x.ex, x.va] = e.split(':'); }
   const 옛 = (g.my||[]).find(y => y.id === x.id);
   if(옛 && 옛.t === t && 옛.ex === x.ex && 옛.va === x.va) x.since = 옛.since || TODAY;   /* 숫자만 바꾸면 시작일은 그대로 */
@@ -4276,11 +4276,11 @@ function 닉네임먼저(){
   const f = ()=>`<div class="h2">닉네임을 정해 주세요</div>
     <div class="fld"><input class="search" type="text" data-k="nick0" maxlength="12" placeholder="예) 덤벨요정" autocomplete="off"></div>
     <button class="btn main" data-act="nick0ok">시작하기</button>
-    <div class="sm" style="text-align:center;color:var(--sub)">커뮤니티 · 랭킹에 이 이름으로 나와요. 프로필에서 바꿀 수 있어요</div>`;
+    <div class="sm" style="text-align:center;color:var(--sub)">커뮤니티 · 랭킹에 이 이름으로 나와요. 프로필에서 변경할 수 있어요</div>`;
   f.닉 = true; setTimeout(()=>{ if(!닉of(S.mid) && S.screen==='home'){ openSheet(f); const el=document.querySelector('[data-k="nick0"]'); if(el) el.focus(); } }, 60);
   return true;
 }
-const 닉검사 = 닉 => !닉 ? '닉네임을 적어 주세요' : (닉.length < 2 ? '두 글자 이상으로 적어 주세요'
+const 닉검사 = 닉 => !닉 ? '닉네임을 입력해 주세요' : (닉.length < 2 ? '두 글자 이상으로 입력해 주세요'
   : (MEMBERS.some(m => m.id !== S.mid && (m.n === 닉 || 닉of(m.id) === 닉)) ? '이미 쓰고 있는 이름이에요' : ''));
 function vHome(){
   닉네임먼저();
@@ -4298,7 +4298,7 @@ function vHome(){
     : { act:'go:start', tag:'오늘', ht:'운동하기', go:'시작하기',
         새: r ? `트레이너 지정 루틴이 있어요` : '',
         hs: r ? `${esc(t.kind)} · 루틴 ${r.no} ${esc(r.n)} · ${r.items.length}종목 · 예상 ${estMin(r)}분`
-              : (n => n ? `트레이너 추천 루틴 ${n}개가 있어요` : '내 루틴 · 지난 운동 · 자유 운동 중에서 골라 시작합니다')(recosOf(S.mid).filter(x=>rOf(x.rid)).length) };
+              : (n => n ? `트레이너 추천 루틴 ${n}개가 있어요` : '내 루틴 · 지난 운동 · 자유 운동 중에서 선택해 시작합니다')(recosOf(S.mid).filter(x=>rOf(x.rid)).length) };
 
   const 알림수 = notiCount(S.mid);
   return { top: bar('글래드짐',
@@ -4325,7 +4325,7 @@ function vHome(){
     ${내목표(S.mid).length ? `<div class="hgoal">${목표칸(S.mid)}</div>` : ''}
     ${인증샷홈(S.mid)}
     <div class="hrow wide">${홈최근(S.mid)}${홈코멘트(S.mid)}</div>
-    <button class="hline gold" data-act="rmstart:${S.mid}">${svg('h_crown',18)}<b>1RM 측정</b><small>목표만 넣으면 무게 · 횟수 · 쉬는 시간 자동</small><i>›</i></button>`,
+    <button class="hline gold" data-act="rmstart:${S.mid}">${svg('h_crown',18)}<b>1RM 측정</b><small>목표만 입력하면 무게 · 횟수 · 쉬는 시간 자동</small><i>›</i></button>`,
     /* 맨 아래 고정 단추 — 기록 중일 때만. 평소엔 맨 위 큰 카드가 같은 일을 한다 (2026-10-06 홈 줄이기) */
     foot: lw ? `<button class="btn main go live" data-act="go:workout"><span class="gdot"></span>운동기록 계속하기</button>` : undefined };
 }
@@ -4346,8 +4346,8 @@ function vRoutines(){
       <div><div class="nm ${(t&&t.rid===r.id)||rc?'g':''}">루틴 ${r.no} · ${esc(r.n)}${rc?` <span class="pill">${esc(rc.slot)}</span>`:''}</div>
       <div class="sm">${esc(r.purpose)}<br>${r.items.length}종목 · 예상 ${estMin(r)}분</div></div>
       ${t&&t.rid===r.id?`<span class="pill">오늘 ${esc(t.kind)}</span>`:'<span class="rt">›</span>'}</button>`; }).join('')
-    : 빔('routine','아직 받은 루틴이 없어요','트레이너가 담아 두면 여기에 보여요'))
-    + `<div class="note">루틴은 수업 전에 운동 방향에 맞춰 미리 짜 둡니다. <b>수업용과 혼자 할 때 쓰는 루틴</b>을 트레이너가 지정하거나, 직접 골라 시작할 수 있어요.</div>` };
+    : 빔('routine','아직 받은 루틴이 없어요','트레이너가 추가해 두면 여기에 보여요'))
+    + `<div class="note">루틴은 수업 전에 운동 방향에 맞춰 미리 짜 둡니다. <b>수업용과 혼자 할 때 쓰는 루틴</b>을 트레이너가 지정하거나, 직접 선택해 시작할 수 있어요.</div>` };
 }
 function vRoutine(){
   const r=rOf(S.rid); if(!r) return vRoutines();
@@ -4379,7 +4379,7 @@ function vStart(){
             <div><div class="nm g">${esc(x.slot)} · 루틴 ${r0.no} ${esc(r0.n)}</div>
             <div class="sm">${r0.purpose?esc(r0.purpose)+' · ':''}${r0.items.length}종목 · 예상 ${estMin(r0)}분</div></div>
             <span class="rt">›</span></button>`; }).join('')
-        + `<div class="note">트레이너가 <b>다음 개인운동</b>에 하시라고 담아 둔 루틴이에요. 개인운동을 한 번 기록하면 사라집니다.</div>`;
+        + `<div class="note">트레이너가 <b>다음 개인운동</b>에 하시라고 추가해 둔 루틴이에요. 개인운동을 한 번 기록하면 사라집니다.</div>`;
     })()}
 
     ${/* 큰 사진 카드는 맨 위 하나만. 지정 루틴이 없는 날은 「내 루틴」이 그 자리에 온다 (2026-10-06 융합) */''}
@@ -4387,14 +4387,14 @@ function vStart(){
         style="order:-1;${사진꾸밈('routines','#33304a','#131217')}">
       <span class="art g5"></span>
       <span class="tag2">${myRoutines(S.mid).length}개</span>
-      <span class="tt">내 루틴에서 고르기</span>
-      <span class="dd">미리 짜 둔 루틴 중에서 직접 고릅니다</span></button>`}
+      <span class="tt">내 루틴에서 선택</span>
+      <span class="dd">미리 짜 둔 루틴 중에서 직접 선택합니다</span></button>`}
     <span class="lbl">${r ? '다른 방법으로 시작' : '또는'}</span>
     <div class="home2 st3">
       ${r ? `<button class="hero2 half ${사진있나('routines')}" data-act="go:routines"
           style="${사진꾸밈('routines','#33304a','#131217')}">
         <span class="tt">내 루틴</span>
-        <span class="dd">${myRoutines(S.mid).length}개 중에서 고르기</span></button>` : ''}
+        <span class="dd">${myRoutines(S.mid).length}개 중에서 선택</span></button>` : ''}
       ${ws[0]
         ? `<button class="hero2 half ${사진있나('again')}" data-act="again:${ws[0].id}"
             style="${사진꾸밈('again','#3a2a20','#15110d')}">
@@ -4407,7 +4407,7 @@ function vStart(){
       <button class="hero2 half ${r ? 'wide2' : ''} ${사진있나('pickex')}" data-act="empty"
           style="${사진꾸밈('pickex','#4a3b1c','#17130b')}">
         <span class="tt">자유 운동</span>
-        <span class="dd">원하는 종목을 골라 시작</span></button>
+        <span class="dd">원하는 종목을 선택해 시작</span></button>
     </div>` };
 }
 
@@ -4425,8 +4425,8 @@ function vPick(){
   const 추가중 = !!(w && w.begun);
   const 처음 = 추가중 ? Math.min(S.addFrom||0, w.items.length) : 0;
   const 담은 = w ? w.items.length - 처음 : 0;
-  return { top: bar('종목 고르기','', (w&&w.begun)?'go:workout':'go:start'), body:`
-    <input class="search" type="text" data-k="exq" placeholder="찾기 — 스쿼트 · 레그컬 · bp · 코어 · 맨몸">
+  return { top: bar('종목 선택','', (w&&w.begun)?'go:workout':'go:start'), body:`
+    <input class="search" type="text" data-k="exq" placeholder="검색 — 스쿼트 · 레그컬 · bp · 코어 · 맨몸">
     <div class="pkparts">${PARTS.map(x=>`<button class="chip ${x===S.pickPart?'on':''}" data-act="part:${x}">${x}</button>`).join('')}</div>
     <div class="pkmini" id="pickhint">
       <button class="${(S.pickOpen || S.pickEq!=='전체')?'on':''}" data-act="partopen">기구 · ${esc(S.pickEq)} ${S.pickOpen?'▴':'▾'}</button>
@@ -4436,7 +4436,7 @@ function vPick(){
     ${S.pickOpen?`<div class="chips pkeq">${EQS().map(x=>`<button class="chip ${x===S.pickEq?'on t':''}" data-act="peq:${x}">${x}</button>`).join('')}</div>`:''}
     <div class="megrp pkg">
     <button class="mrow2" data-exrow="1rm 원알엠 일알엠 원rm 1알엠 1rm측정 측정 최대중량 맥스 max onerepmax" data-part="__1rm" data-eq="" style="display:none" data-act="rmaddpick">
-      <span class="mt"><b style="color:var(--gold)">1RM 측정 종목 담기</b><small>스쿼트 · 벤치 · 데드 등 — 담으면 바로 측정 계획을 엽니다</small></span><em class="pkadd">＋</em></button>
+      <span class="mt"><b style="color:var(--gold)">1RM 측정 종목 추가</b><small>스쿼트 · 벤치 · 데드 등 — 추가하면 바로 측정 계획을 엽니다</small></span><em class="pkadd">＋</em></button>
     ${EX.filter(고를수있나).map(e=>{ const vs=vars(e.id), n=cmOf(S.mid,e.id).length, last=lastSet(e.id), 담 = w ? w.items.slice(처음).filter(it=>it.ex===e.id).length : 0;
       return `<button class="mrow2 ${담?'pson':''}" data-exrow="${esc(exKey(e))}" data-part="${esc(e.p)}"
         data-eq="${esc(e.e||'')}"
@@ -4448,7 +4448,7 @@ function vPick(){
     </div>`,
     foot: 담은
       ? `<button class="picked ${S.just?'bump':''}" data-act="askstart">
-           <span class="c">${추가중?'추가한':'담은'} 종목 ${담은}개 ›</span>
+           <span class="c">${추가중?'추가한':'추가한'} 종목 ${담은}개 ›</span>
            <span class="l">${esc(w.items.slice(처음).map(it=>exName(it.ex,it.va)).join(' · '))}</span></button>
          <button class="btn main" style="flex:1" data-act="askstart">${추가중?'추가하기':'운동 시작'}</button>`
       : `<button class="btn ghost" data-act="${(w&&w.begun)?'go:workout':'go:start'}">취소</button>` };
@@ -4456,15 +4456,15 @@ function vPick(){
 
 /* 담은 순서 확인 → 시작 */
 function sheetStart(){
-  openSheet(()=>{ const w=live(); if(!w) return '<div class="h2">담은 종목이 없어요</div>';
+  openSheet(()=>{ const w=live(); if(!w) return '<div class="h2">추가한 종목이 없어요</div>';
     /* 이미 하는 중이면 「추가」다 — 새로 담은 것만 보여 주고, 순서 바꾸기·전부 비우기는 감춘다 */
     const 추가중 = !!w.begun;
     const 처음 = 추가중 ? Math.min(S.addFrom||0, w.items.length) : 0;
     const 보일것 = w.items.slice(처음);
-    if(추가중 && !보일것.length) return `<div class="h2">담은 종목이 없어요</div>
+    if(추가중 && !보일것.length) return `<div class="h2">추가한 종목이 없어요</div>
       <button class="btn ghost sm" data-act="close">닫기</button>`;
     return `<div class="h2">${추가중 ? '이 종목을 추가할까요?' : '지금 순서대로 시작할까요?'}</div>
-    ${추가중 ? '' : `<p class="lbl plain" style="font-weight:500;color:var(--sub)">종목을 <b style="color:var(--teal)">길게 누르면</b> 순서를 바꿀 수 있어요</p>`}
+    ${추가중 ? '' : `<p class="lbl plain" style="font-weight:500;color:var(--sub)">종목을 <b style="color:var(--teal)">길게 누르면</b> 순서를 변경할 수 있어요</p>`}
     ${보일것.map((it,k)=>{ const i = 처음 + k; const mv=(S.sordIdx===i);
       return `<div class="card rowc ${mv?'teal':''}" style="padding:9px 9px 9px 13px"
         ${추가중?'':`data-hold="sord:${i}"`}>
@@ -4473,21 +4473,21 @@ function sheetStart(){
         ${mv?`<button class="ordbtn" data-act="sordmv:${i}:-1" ${i===0?'disabled':''}>▲</button>
               <button class="ordbtn" data-act="sordmv:${i}:1" ${i===w.items.length-1?'disabled':''}>▼</button>
               <button class="chip t" data-act="sordend" style="flex:none;padding:6px 10px">여기에 놓기</button>`
-            :`<button class="chip" data-act="spdel:${i}" style="flex:none;padding:6px 10px">빼기</button>`}
+            :`<button class="chip" data-act="spdel:${i}" style="flex:none;padding:6px 10px">제외</button>`}
       </div>`; }).join('')}
     <button class="btn main" data-act="startgo">${추가중 ? '추가하기' : '시작하기'}</button>
     <div style="display:flex;gap:9px">
-      <button class="btn ghost" data-act="close">더 담기</button>
+      <button class="btn ghost" data-act="close">더 추가</button>
       ${추가중 ? '' : `<button class="btn ghost" data-act="clearpick">전부 비우기</button>`}</div>`; });
 }
 function sheetMemoAdd(){
   openSheet(()=>`
-    <div class="h2">기타운동 추가 <small>이름을 적어 주세요</small></div>
+    <div class="h2">기타운동 추가 <small>이름을 입력해 주세요</small></div>
     <input class="search" type="text" data-k="memo:n" placeholder="예) 팔로프 프레스 · 케틀벨 스윙 · 밴드 워크">
     <div class="chips">${['팔로프 프레스','케틀벨 스윙','밴드 워크','TRX','메디신볼','박스 점프','스텝업','데드버그']
       .map(x=>`<button class="chip" data-act="memofill:${x}">${x}</button>`).join('')}</div>
     <div class="note">볼륨·그래프에는 안 들어갑니다</div>
-    <button class="btn main sm" data-act="memogo">담기</button>
+    <button class="btn main sm" data-act="memogo">추가</button>
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 
@@ -4824,12 +4824,12 @@ function sheetPsetEdit(){
     ${p.items.length ? `<div class="megrp">${p.items.map((it,i)=>{ const v = 세트동작(it) || { n:'(없는 동작)', t:'', media:[] };
         const 붙 = (v.media||[]).length ? ((v.media.some(z=>z.kind==='video') ? '영상' : '사진') + ' ' + v.media.length) : '';
         return `<div class="mrow2"><span class="mi pt">${i+1}</span><span class="mt"><b>${esc(v.n)}</b><small>${it.k==='lib' ? '목록 동작' : '내 종목'}${v.t ? ' · '+esc(v.t) : ''}${붙 ? ' · '+붙 : ''}</small></span>
-          <button class="psed" data-act="psup:${i}" ${i===0?'disabled':''}>▲</button><button class="psed w" data-act="psrm:${i}">빼기</button></div>`; }).join('')}</div>` : '<div class="empty">아직 담은 동작이 없어요</div>'}
-    <button class="hline gold" data-act="pslib">${svg('h_roll',18)}<b>동작 고르기</b><small>스트레칭 · 마사지 · 내 종목 ${내종목().length}</small></button>
+          <button class="psed" data-act="psup:${i}" ${i===0?'disabled':''}>▲</button><button class="psed w" data-act="psrm:${i}">제외</button></div>`; }).join('')}</div>` : '<div class="empty">아직 추가한 동작이 없어요</div>'}
+    <button class="hline gold" data-act="pslib">${svg('h_roll',18)}<b>동작 선택</b><small>스트레칭 · 마사지 · 내 종목 ${내종목().length}</small></button>
     <button class="card rowc" data-act="psmem"><div><div class="nm">받을 회원 ${p.mids.length}명</div>
-      <div class="sm">${p.mids.length ? esc(p.mids.map(id=>(MEMBERS.find(m=>m.id===id)||{}).n||'').filter(Boolean).slice(0,4).join(' · ')) + (p.mids.length>4?' 외':'') : '눌러서 고르기 — 나중에 해도 돼요'}</div></div><span class="rt">›</span></button>
+      <div class="sm">${p.mids.length ? esc(p.mids.map(id=>(MEMBERS.find(m=>m.id===id)||{}).n||'').filter(Boolean).slice(0,4).join(' · ')) + (p.mids.length>4?' 외':'') : '눌러서 선택 — 나중에 해도 돼요'}</div></div><span class="rt">›</span></button>
     <button class="btn main" data-act="pssave">저장</button>
-    ${p.새 ? '' : `<button class="dngr" data-act="psdel">이 세트 지우기</button>`}
+    ${p.새 ? '' : `<button class="dngr" data-act="psdel">이 세트 삭제</button>`}
     <button class="btn ghost sm" data-act="psback">‹ 세트 목록</button>`);
 }
 /* 목록에서 고르기 — 스트레칭 / 마사지 */
@@ -4838,13 +4838,13 @@ function sheetPsetLib(){
   /* ⛔ 체크 표시를 만드는 값은 **그릴 때마다** 다시 센다 — 밖에서 한 번만 세면 눌러도 표시가 안 바뀐다 (2026-10-07 대표 「체크박스가 눌러지지 않아」) */
   openSheet(()=>{ const 갈 = S.pslk || 's', 내 = 내종목(), 줄 = 갈==='s' ? ST : 갈==='m' ? MS : 내,
       담긴 = new Set(p.items.filter(x=>x.k==='lib' || x.k==='my').map(x=>x.k+':'+x.i)), 키 = x => (갈==='y' ? 'my:'+x.id : 'lib:'+x.i);
-    return `<div class="h2">동작 고르기 <small>${p.items.length}개 담음</small></div>
+    return `<div class="h2">동작 선택 <small>${p.items.length}개 담음</small></div>
     <div class="seg">${[['s','스트레칭 '+ST.length],['m','마사지 '+MS.length],['y','내 종목 '+내.length]].map(k=>`<button class="${갈===k[0]?'on':''}" data-act="pslk:${k[0]}">${k[1]}</button>`).join('')}</div>
     <div class="pickbox">${줄.length ? `<div class="megrp">${줄.map(x=>`<button class="mrow2 ${담긴.has(키(x))?'pson':''}" data-act="pstog:${키(x)}">
       <span class="ck">${담긴.has(키(x))?'✓':''}</span><span class="mt"><b>${esc(x.n)}</b><small>${esc([x.t, x.d].filter(Boolean).join(' · '))}</small></span></button>`).join('')}</div>`
-      : 빔('prep','아직 만든 종목이 없어요','목록에 없는 동작은 직접 만들어 담을 수 있어요')}
+      : 빔('prep','아직 만든 종목이 없어요','목록에 없는 동작은 직접 만들어 추가할 수 있어요')}
       ${갈==='y' ? `<button class="hline" data-act="pinew">${svg('h_cam',18)}<b>＋ 새 종목 만들기</b><small>이름 · 사진 · 영상</small></button>` : ''}</div>
-    <button class="btn main" data-act="psedit2">다 골랐어요</button>`; });
+    <button class="btn main" data-act="psedit2">선택 완료</button>`; });
 }
 /* 종목 만들기 · 고치기 — 이름 · 시간/횟수 · 설명 · 사진 여러 장 또는 영상 */
 function sheetPsetOwn(){
@@ -4853,11 +4853,11 @@ function sheetPsetOwn(){
     <div class="fld"><span class="fn">종목 이름</span><input class="search" type="text" data-k="pon" maxlength="24" value="${esc(d.n)}" placeholder="예) 장요근 늘이기"></div>
     <div class="fld"><span class="fn">시간 · 횟수</span><input class="search" type="text" data-k="pot" maxlength="16" value="${esc(d.t)}" placeholder="예) 좌우 30초"></div>
     <div class="fld"><span class="fn">설명</span><textarea class="search" data-k="pod" rows="2" maxlength="140" placeholder="예) 뒷다리 골반을 앞으로 밀며 허리는 꺾지 않아요">${esc(d.d)}</textarea></div>
-    ${(d.media.length || d.files.length) ? `<div class="pgrid">${d.media.map((f,i)=>`<button class="pg" data-act="pomrm:${i}">${f.kind==='video' ? `<video src="${esc(phURL(f.path))}" muted playsinline preload="metadata"></video>` : `<img src="${esc(phURL(f.path))}" alt="">`}<span class="pgd">빼기</span></button>`).join('')
-      }${d.files.map((f,i)=>`<button class="pg" data-act="pofrm:${i}">${f.kind==='video' ? `<video src="${f.url}" muted playsinline></video>` : `<img src="${f.url}" alt="">`}<span class="pgd">빼기</span></button>`).join('')}</div>` : ''}
+    ${(d.media.length || d.files.length) ? `<div class="pgrid">${d.media.map((f,i)=>`<button class="pg" data-act="pomrm:${i}">${f.kind==='video' ? `<video src="${esc(phURL(f.path))}" muted playsinline preload="metadata"></video>` : `<img src="${esc(phURL(f.path))}" alt="">`}<span class="pgd">제외</span></button>`).join('')
+      }${d.files.map((f,i)=>`<button class="pg" data-act="pofrm:${i}">${f.kind==='video' ? `<video src="${f.url}" muted playsinline></video>` : `<img src="${f.url}" alt="">`}<span class="pgd">제외</span></button>`).join('')}</div>` : ''}
     <div class="hrow"><button class="btn sub" data-act="pofile:pic">${svg('h_cam',18)} 사진</button><button class="btn sub" data-act="pofile:vid">${svg('play',18)} 영상</button></div>
     <button class="btn main" data-act="pisave">저장</button>
-    ${d.새 ? '' : `<button class="dngr" data-act="pidel">이 종목 지우기</button>`}
+    ${d.새 ? '' : `<button class="dngr" data-act="pidel">이 종목 삭제</button>`}
     <button class="btn ghost sm" data-act="piback">‹ 돌아가기</button>`);
 }
 function 세트파일고르기(종){
@@ -4879,7 +4879,7 @@ function sheetPsetMem(){
   openSheet(()=>`<div class="h2">받을 회원 <small>${p.mids.length}명</small></div>
     <div class="pickbox"><div class="megrp">${ms.map(m=>`<button class="mrow2 ${p.mids.includes(m.id)?'pson':''}" data-act="psmt:${m.id}">
       <span class="ck">${p.mids.includes(m.id)?'✓':''}</span><span class="mt"><b>${esc(m.n)}</b></span></button>`).join('')}</div></div>
-    <button class="btn main" data-act="psedit2">다 골랐어요</button>`);
+    <button class="btn main" data-act="psedit2">선택 완료</button>`);
 }
 
 /* ── 준비운동 · 갈래 고르기 ── */
@@ -4910,7 +4910,7 @@ function prepFromRoutine(r){
     const e = exOf(it.ex), v = varOf(it.ex, it.va);
     return { i:'x', n: exName(it.ex, it.va),
       t: e.cardio ? (it.reps+'분') : (it.sets>1 ? it.reps+'회 · '+it.sets+'세트' : it.reps+'회'),
-      d: (v && v.desc) ? v.desc.replace(/\s+/g,' ').trim().slice(0,70) : '트레이너가 담아 둔 동작입니다' };
+      d: (v && v.desc) ? v.desc.replace(/\s+/g,' ').trim().slice(0,70) : '트레이너가 추가해 둔 동작입니다' };
   }).filter(Boolean);
 }
 
@@ -4984,7 +4984,7 @@ function vPrep3(){
         ${(x.media||[]).length ? `<span class="psmedia">${x.media.map(z => z.kind==='video'
             ? `<video src="${esc(phURL(z.path))}" controls playsinline preload="metadata"></video>`
             : `<img src="${esc(phURL(z.path))}" alt="" loading="lazy" onerror="picFail(this)">`).join('')}</span>` : ''}
-      </span><span class="kd">${x.media ? '트레이너' : 갈래말[갈래(x)]}</span></div>`).join('') + `</div>` : 빔('prep','담긴 동작이 없어요')}
+      </span><span class="kd">${x.media ? '트레이너' : 갈래말[갈래(x)]}</span></div>`).join('') + `</div>` : 빔('prep','추가된 동작이 없어요')}
     <div class="cyfoot"><span>아프지 않게, 살짝 당기는 정도까지만 · 반동 없이 천천히 · 뼈·관절 위는 피하세요</span></div>`,
     foot: w
       ? `<button class="btn sub" data-act="go:home">홈으로</button>
@@ -5097,8 +5097,8 @@ function vWorkout(){
   const w=live(); if(!w) return (S.who==='tr' ? tToday() : vHome());
   if(!w.items.length) return {
     top: bar('운동 중', 윗시계(w), 'go:home'),
-    body:`<div class="empty">종목을 담아 주세요</div>
-      <button class="dngr" data-act="askcancel">기록 지우고 나가기</button>`,
+    body:`<div class="empty">종목을 추가해 주세요</div>
+      <button class="dngr" data-act="askcancel">기록 삭제하고 나가기</button>`,
     foot: 발판(w) };
   const cur=w.items[w.cur]||w.items[0], e=exOf(cur.ex), v=varOf(cur.ex,cur.va);
   const wmid = w.mid || S.mid, tr = (S.who==='tr');
@@ -5152,7 +5152,7 @@ function vWorkout(){
     ${tr ? 주기줄(wmid, 'tsub:cycle:'+wmid, true) : ''}
     ${tr?`<button class="hline" data-act="tlive:${wmid}">${svg('h_chat',18)}<b>${esc((MEMBERS.find(m=>m.id===wmid)||{}).n||'')} 회원 수업 기록 중</b>
       <small>종목별 코멘트 남기기</small><i>›</i></button>`:''}
-    <span class="lbl">오늘 한 운동${S.moveIdx!=null?' — <b style="color:var(--teal)">순서 바꾸는 중</b>':''}</span>
+    <span class="lbl">오늘 한 운동${S.moveIdx!=null?' — <b style="color:var(--teal)">순서 변경 중</b>':''}</span>
     ${w.items.map((it,i)=>{
       const on = (i===w.cur), mv = (S.moveIdx===i);
       return `<div class="card rowc ${it.locked&&!on?'dim':''} ${on?'now2':''} ${S.just===VID(it.ex,it.va)?'just':''}"
@@ -5168,11 +5168,11 @@ function vWorkout(){
            <button class="ordbtn" data-act="ordmv:${i}:1" ${i===w.items.length-1?'disabled':''}>▼</button>
            <button class="chip t" data-act="ordend" style="flex:none;padding:6px 10px">여기에 놓기</button>`
         : `${on&&!it.locked?'<span class="pill t">지금</span>':(it.locked?'<span class="pill q">완료</span>':'')}
-           <button class="chip" data-act="wdel:${i}" style="flex:none;padding:6px 10px">빼기</button>`}
+           <button class="chip" data-act="wdel:${i}" style="flex:none;padding:6px 10px">제외</button>`}
       </div>${(on && !S.fold) ? 펼침() : ''}`;
     }).join('')}
     ${/* 담고 끝내는 건 아래 고정바로 갔다. 여기엔 되돌릴 수 없는 것만 작게 남긴다 */''}
-    <button class="dngr" data-act="askcancel">기록 지우고 나가기</button>`,
+    <button class="dngr" data-act="askcancel">기록 삭제하고 나가기</button>`,
     foot: 발판(w) };
 }
 
@@ -5246,7 +5246,7 @@ function 코멘트회차(cms, K, tr){
     <div class="cm">
       <span class="who">${esc(c.tr||'')} 트레이너 · ${esc(c.at||'')}
         ${tr?`<button class="chip" style="margin-left:auto;padding:3px 9px;font-size:11.5px"
-          data-act="delcm:${esc(c.id)}">지우기</button>`:''}</span>
+          data-act="delcm:${esc(c.id)}">삭제</button>`:''}</span>
       <span class="tx">${esc(c.tx||'')}</span>
       ${(c.media && c.media.length) ? 넘겨보기(c.media, c.id) : ''}</div>`;
 }
@@ -5269,12 +5269,12 @@ function sheetExDesc(exid, vk, mid){
     if(tr) return head + `
       ${askOf(mid, exid, vk).length?`<div class="note" style="border-color:var(--gold-2)">
         <b style="color:var(--gold)">회원이 이 종목을 봐 달라고 했어요</b>
-        <div>${esc(askOf(mid, exid, vk)[0].note||'따로 적은 말은 없습니다.')}</div></div>`:''}
+        <div>${esc(askOf(mid, exid, vk)[0].note||'따로 입력한 말은 없습니다.')}</div></div>`:''}
       <div class="attbig">
         <button data-act="att:pic:${K}"><span class="ic">📷</span>사진 첨부</button>
         <button data-act="att:vid:${K}"><span class="ic">🎬</span>영상 첨부</button></div>
       ${붙인것(K)}
-      <textarea data-k="cm:${K}" placeholder="코멘트를 적으세요 — 길이 제한 없어요"></textarea>
+      <textarea data-k="cm:${K}" placeholder="코멘트를 입력하세요 — 길이 제한 없어요"></textarea>
       <button class="btn main sm" data-act="sendcm:${exid}:${vk}:${mid}">${S.보내는중?'보내는 중…':'보내기'}</button>
       <div class="hr"></div>
       <span class="lbl">지난 코멘트 ${cms.length?`${cms.length}개`:''}</span>
@@ -5282,13 +5282,13 @@ function sheetExDesc(exid, vk, mid){
       <div class="desc" style="margin-top:6px"><div class="hd"><b>기본 설명</b>
         ${isEdited(mid,exid,vk)?'<span class="pill q">이 회원용</span>':'<span class="pill q">공통</span>'}
         <button class="chip t" style="margin-left:auto" data-act="editdesc:${exid}:${vk}">수정</button></div>
-        <div class="tx">${dsc? esc(dsc) : '아직 설명이 없어요 — 수정을 눌러 적어 주세요'}</div></div>
+        <div class="tx">${dsc? esc(dsc) : '아직 설명이 없어요 — 수정을 눌러 입력해 주세요'}</div></div>
       <button class="btn ghost sm" data-act="close">닫기</button>`;
     return head + `
       <div class="desc"><div class="hd"><b>기본 설명</b>
         ${isEdited(mid,exid,vk)?'<span class="pill q">이 회원용</span>':'<span class="pill q">공통</span>'}
         ${tr?`<button class="chip t" style="margin-left:auto" data-act="editdesc:${exid}:${vk}">수정</button>`:''}</div>
-        <div class="tx">${dsc? esc(dsc) : '아직 설명이 없어요'+(tr?' — 수정을 눌러 적어 주세요':'')}</div></div>
+        <div class="tx">${dsc? esc(dsc) : '아직 설명이 없어요'+(tr?' — 수정을 눌러 입력해 주세요':'')}</div></div>
       ${S.screen==='workout' ? '' : demoBox(exOf(exid), v)}
       <span class="lbl">코멘트 ${cms.length?`${cms.length}개`:''}</span>
       ${cms.length ? 코멘트회차(cms, K, tr)
@@ -5301,15 +5301,15 @@ function sheetExDesc(exid, vk, mid){
               <button class="btn ghost sm" style="margin-top:8px" data-act="unask:${mine[0].id}">요청 취소</button></div>`
           : `<div class="hr"></div>
              <span class="lbl">이 종목 봐 달라고 요청하기</span>
-             <textarea data-k="ask:${K}" placeholder="어디가 궁금한지 한 줄 적어 주세요 (안 적어도 돼요)"></textarea>
+             <textarea data-k="ask:${K}" placeholder="어디가 궁금한지 한 줄 입력해 주세요 (입력하지 않아도 돼요)"></textarea>
              <button class="btn sub sm" data-act="ask:${exid}:${vk}">코멘트 요청하기</button>`;
       })():''}
       ${tr?`<div class="hr"></div>
         ${askOf(mid, exid, vk).length?`<div class="note" style="border-color:var(--gold-2)">
           <b style="color:var(--gold)">회원이 이 종목을 봐 달라고 했어요</b>
-          <div>${esc(askOf(mid, exid, vk)[0].note||'따로 적은 말은 없습니다.')}</div></div>`:''}
+          <div>${esc(askOf(mid, exid, vk)[0].note||'따로 입력한 말은 없습니다.')}</div></div>`:''}
         <span class="lbl">코멘트 남기기 — 길이 제한 없어요</span>
-        <textarea data-k="cm:${K}" placeholder="지금 본 것을 적으세요"></textarea>
+        <textarea data-k="cm:${K}" placeholder="지금 본 것을 입력하세요"></textarea>
         ${붙인것(K)}
         <div class="chips">
           <button class="chip" data-act="att:pic:${K}">＋ 사진</button>
@@ -5424,7 +5424,7 @@ function sheetLeave(nextTab){
       기록하는 동안에는 다른 화면으로 갈 수 없어요.<br>마치면 오늘 기록이 저장됩니다.</p>
     <button class="btn gold" data-act="askfin">오늘 운동 마치기</button>
     <button class="btn ghost" data-act="close">계속 운동하기</button>
-    <button class="dngr" data-act="askcancel">기록 지우고 나가기</button>`);
+    <button class="dngr" data-act="askcancel">기록 삭제하고 나가기</button>`);
 }
 function sheetRest(){
   const w=live(), cur=w.items[w.cur], preset=[30,60,90,120];
@@ -5452,7 +5452,7 @@ function sheetFinish(){
       ${left.length
         ? `아직 안 한 운동이 <b style="color:var(--gold)">${left.length}개</b> 남아 있어요 — ${esc(left.map(it=>exOf(it.ex).n).join(', '))}<br>
            <span style="color:#7d786f">마쳐도 남은 것은 안 한 것으로 넘어갑니다</span>`
-        : '담은 것을 모두 마쳤어요.'}</p>
+        : '추가한 것을 모두 마쳤어요.'}</p>
     <div style="display:flex;gap:9px">
       <button class="btn sub" data-act="close">더 할래요</button>
       <button class="btn gold" data-act="dofin">마치고 기록하기</button></div>
@@ -5461,12 +5461,12 @@ function sheetFinish(){
 
 function sheetCancel(){
   const w=live(), n=(w?w.items:[]).reduce((a,it)=>a+it.sets.filter(s=>s.done).length,0);
-  openSheet(()=>`<div class="h2">기록을 지우고 나갈까요</div>
-    <p class="lbl" style="line-height:1.8">${n?`지금까지 적은 <b style="color:var(--warn)">${n}세트</b>가 사라져요.`:'적은 기록이 없어서 그냥 닫혀요.'}<br>
+  openSheet(()=>`<div class="h2">기록을 삭제하고 나갈까요</div>
+    <p class="lbl" style="line-height:1.8">${n?`지금까지 입력한 <b style="color:var(--warn)">${n}세트</b>가 사라져요.`:'입력한 기록이 없어서 그냥 닫혀요.'}<br>
     잠깐 다른 화면만 보실 거면 왼쪽 위 <b style="color:var(--gold)">‹</b> 를 누르세요. 운동은 그대로 남아 있어요.</p>
     <div style="display:flex;gap:9px">
       <button class="btn main" data-act="close">계속 운동하기</button>
-      <button class="btn ghost" data-act="cancel" style="color:var(--warn)">지우고 나가기</button></div>`);
+      <button class="btn ghost" data-act="cancel" style="color:var(--warn)">삭제하고 나가기</button></div>`);
 }
 function sheetNewVar(exid){
   const e=exOf(exid);
@@ -5474,7 +5474,7 @@ function sheetNewVar(exid){
     <span class="lbl">이름 — 「등 상부 타겟」, 「한손」처럼</span>
     <input type="text" data-k="vn:${exid}" placeholder="하는 법 이름">
     <span class="lbl">기본 설명</span>
-    <textarea data-k="vd:${exid}" placeholder="이렇게 하는 법을 적어 주세요"></textarea>
+    <textarea data-k="vd:${exid}" placeholder="이렇게 하는 법을 입력해 주세요"></textarea>
     <button class="btn main sm" data-act="savevar:${exid}">추가</button>
     <button class="btn ghost sm" data-act="close">닫기</button>
     <div class="note">잡는 법이나 자극 부위가 달라 <b>따로 기록해야 하는 경우</b>에만 나눕니다. 시범 영상도 따로 붙습니다.</div>`);
@@ -5679,7 +5679,7 @@ async function 초상동의화면(key){
     + '수업 중 찍은 사진과 영상을 <b>글래드짐 블로그·릴스</b>에 쓸 수 있을까요?</p>'
     + '<div class="ptpick">' + 고르기.map(([v, t, sub]) =>
         '<button class="ptbtn" data-v="' + v + '"><b>' + t + '</b><small>' + sub + '</small></button>').join('')
-    + '</div><div class="sub">언제든 담당 트레이너에게 말씀하시면 바꿀 수 있어요</div></div>');
+    + '</div><div class="sub">언제든 담당 트레이너에게 말씀하시면 변경할 수 있어요</div></div>');
 
   판.querySelectorAll('.ptbtn').forEach(b => b.onclick = async function(){
     판.querySelectorAll('.ptbtn').forEach(x => x.disabled = true);
@@ -5693,7 +5693,7 @@ async function 초상동의화면(key){
         + '<p><b>' + esc(v) + '</b> 로 남겼습니다.<br>'
         + (v === '미협의' ? '사진·영상을 쓰지 않습니다.'
            : v === '모자이크' ? '얼굴을 가려서 씁니다.' : '사진·영상을 그대로 씁니다.')
-        + '<br>바꾸고 싶으시면 담당 트레이너에게 말씀해 주세요.</p></div>');
+        + '<br>변경하고 싶으시면 담당 트레이너에게 말씀해 주세요.</p></div>');
     }catch(e){
       판.querySelectorAll('.ptbtn').forEach(x => x.disabled = false);
       그리기(판.innerHTML + '<div class="cmoffbox warn">잠시 뒤 다시 눌러 주세요 — ' + esc(e.message) + '</div>');
@@ -6029,7 +6029,7 @@ function sheetSetEdit(i, j){
           <input class="search" type="text" inputmode="numeric" data-k="se:reps" value="${esc(st.reps)}"></div>`}
     </div>
     <button class="btn blue sm" data-act="rsetsave:${i}:${j}">이 세트 수정</button>
-    <button class="btn ghost sm" data-act="rsetdel:${i}:${j}" style="color:var(--warn)">이 세트 빼기</button>
+    <button class="btn ghost sm" data-act="rsetdel:${i}:${j}" style="color:var(--warn)">이 세트 제외</button>
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 
@@ -6045,7 +6045,7 @@ async function recSave(){
     src.sets = it.sets.map(x=>({ kg:Number(x.kg)||0, reps:Number(x.reps)||0,
       spd: x.spd==null||x.spd==='' ? undefined : Number(x.spd) }));
     if(it._id){
-      await sv(sdel('workout_sets','item_id=eq.'+it._id), '세트 지우기');
+      await sv(sdel('workout_sets','item_id=eq.'+it._id), '세트 삭제');
       if(src.sets.length) await sv(spost('workout_sets', src.sets.map((x,k)=>({
         item_id: it._id, sort:k, kg:x.kg, reps:x.reps, spd: x.spd==null?null:x.spd, done:true }))), '세트 저장');
     }
@@ -6083,7 +6083,7 @@ function sheetTfCal(){
       cells += `<button class="cday ${ds===sel?'sel':''} ${n?'has':''} ${ds>TODAY?'fut':''}"
         data-act="tfd:${ds}">${d}${n?`<i>${n}</i>`:''}</button>`;
     }
-    return `<div class="h2">날짜 고르기 <small>수업 기록 있는 날에 표시</small></div>
+    return `<div class="h2">날짜 선택 <small>수업 기록 있는 날에 표시</small></div>
       <div class="wkhd"><button data-act="tfmon:-1">‹</button>
         <span class="d">${y}년 ${m}월</span>
         <button data-act="tfmon:1">›</button></div>
@@ -6106,7 +6106,7 @@ function sheetFbCal(){
       cells += `<button class="cday ${ds===sel?'sel':''} ${n?'has':''} ${ds>TODAY?'fut':''} ${ds===TODAY?'tdy':''}"
         data-act="fbd:${ds}"><u>${d}</u>${n?`<i>${n}</i>`:''}</button>`;
     }
-    return `<div class="h2">날짜 고르기 <small>코멘트 온 날에 표시</small></div>
+    return `<div class="h2">날짜 선택 <small>코멘트 온 날에 표시</small></div>
       <div class="wkhd"><button data-act="fbmon:-1">‹</button>
         <span class="d">${y}년 ${m}월</span>
         <button data-act="fbmon:1">›</button></div>
@@ -6135,7 +6135,7 @@ function sheetDayCal(){
     const sel = S.day || TODAY;
     const { y, m, cells } = 달칸(S.dayMon || sel.slice(0,7), sel,
       ds => dayStat(S.mid, ds).ex > 0, 'dcalp');
-    return `<div class="h2">날짜 고르기 <small>운동한 날에 점</small></div>
+    return `<div class="h2">날짜 선택 <small>운동한 날에 점</small></div>
       <div class="wkhd"><button data-act="dmon:-1">‹</button>
         <span class="d">${y}년 ${m}월</span>
         <button data-act="dmon:1">›</button></div>
@@ -6151,12 +6151,12 @@ function sheetCycCal(mid){
     const sel=c.last||TODAY;
     const { y, m, cells } = 달칸(S.cycMon || sel.slice(0,7), sel,
       ds => ds===c.last || (t && ds===t.다음), 'cycpick:'+mid);
-    return `<div class="h2">생리 시작일 고르기 <small>시작한 날을 눌러 주세요</small></div>
+    return `<div class="h2">생리 시작일 선택 <small>시작한 날을 눌러 주세요</small></div>
       <div class="wkhd"><button data-act="cycmon:-1">‹</button>
         <span class="d">${y}년 ${m}월</span>
         <button data-act="cycmon:1">›</button></div>
       <div class="cal2">${cells}</div>
-      <div class="cyfoot"><span>고른 날부터 다시 셉니다 · 지난 시작일과 21~45일 사이면 주기도 조금 따라가요</span></div>`;
+      <div class="cyfoot"><span>선택한 날부터 다시 셉니다 · 지난 시작일과 21~45일 사이면 주기도 조금 따라가요</span></div>`;
   });
 }
 function sheetDietCal(){
@@ -6164,7 +6164,7 @@ function sheetDietCal(){
     const sel = S.dietDay || TODAY;
     const { y, m, cells } = 달칸(S.dietMon || sel.slice(0,7), sel,
       ds => mealDayStat(S.mid, ds).n > 0, 'dcalp2');
-    return `<div class="h2">날짜 고르기 <small>먹은 걸 올린 날에 점</small></div>
+    return `<div class="h2">날짜 선택 <small>먹은 걸 올린 날에 점</small></div>
       <div class="wkhd"><button data-act="dmon2:-1">‹</button>
         <span class="d">${y}년 ${m}월</span>
         <button data-act="dmon2:1">›</button></div>
@@ -6202,7 +6202,7 @@ function sheetAskCal(){
 function sheetAskFor(ex, va){
   openSheet(()=>`
     <div class="h2">${esc(exName(ex,va))} <small>코멘트 요청</small></div>
-    <textarea data-k="ask:${ex}|${va}" placeholder="어디가 궁금한지 한 줄 적어 주세요 (안 적어도 돼요)"></textarea>
+    <textarea data-k="ask:${ex}|${va}" placeholder="어디가 궁금한지 한 줄 입력해 주세요 (입력하지 않아도 돼요)"></textarea>
     <button class="btn blue" data-act="ask:${ex}:${va}:x">요청 보내기</button>
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
@@ -6260,7 +6260,7 @@ function vFeedback(){
             <div class="sm">${it.sets.map(x=>setShort(it.ex,x)).join(' · ')}${n?` · 코멘트 ${n}개`:''}</div></div>
             <span class="pill${on?'':' q'}">${on?'요청함 · 거두기':'코멘트 요청'}</span></button>`; }).join('')
         : '<div class="empty">이 날은 기록된 종목이 없어요</div>'),
-      foot:`<button class="btn blue go" data-act="askpick">다른 날 고르기</button>` };
+      foot:`<button class="btn blue go" data-act="askpick">다른 날 선택</button>` };
   }
 
   if(mode==='day'){
@@ -6279,7 +6279,7 @@ function vFeedback(){
       <span class="lbl">그날 받은 코멘트 ${list.length?`· ${list.length}개`:''}</span>
       ${list.length ? list.map(c=>cmCard(c, 0)).join('')
       : 빔('chat','이 날 받은 코멘트가 없어요')}
-      <div class="note">날짜를 눌러 넘기거나, 가운데 날짜를 눌러 <b>달력에서</b> 고르세요. 코멘트가 온 날에는 <b style="color:var(--gold)">●</b> 가 붙습니다.</div>` };
+      <div class="note">날짜를 눌러 넘기거나, 가운데 날짜를 눌러 <b>달력에서</b> 선택하세요. 코멘트가 온 날에는 <b style="color:var(--gold)">●</b> 가 붙습니다.</div>` };
   }
 
   if(mode==='recent'){
@@ -6386,11 +6386,11 @@ function sheetItemEdit(mealId, itemId){
       ${칸('칼로리','kcal',it.kcal)}${칸('탄수 g','carb',it.carb)}
       ${칸('단백 g','protein',it.protein)}${칸('지방 g','fat',it.fat)}
     </div>
-    <div class="note">고른 음식 그대로 채워져 있습니다.
+    <div class="note">선택한 음식 그대로 채워져 있습니다.
       <b>똑같은 제품이 없으면</b> 포장에 적힌 값으로 수정해 주세요.</div>
     <button class="btn main" data-act="fsave:${mealId}:${itemId}">저장</button>
     <div style="display:flex;gap:9px">
-      <button class="btn ghost sm" data-act="fdelgo:${mealId}:${itemId}" style="color:var(--warn)">빼기</button>
+      <button class="btn ghost sm" data-act="fdelgo:${mealId}:${itemId}" style="color:var(--warn)">제외</button>
       <button class="btn ghost sm" data-act="${mealId==='draft'?'tagback':'close'}">닫기</button></div>`);
 }
 
@@ -6405,9 +6405,9 @@ function sheetTagPhoto(mealId){
     const t = mealSum(m), 밖 = 자리없는것(m);
     return `<div class="h2">음식 태그${미리?'':` <small>${esc(m.slot)}</small>`}</div>
       ${태그판(m, 1)}
-      <div class="note">사진에서 <b>음식이 있는 자리를 눌러</b> 무엇인지 고르세요.
-        고르면 <b>칼로리와 탄단지가 저절로 들어갑니다</b> — 숫자를 적을 필요가 없어요.
-        <br>태그를 누르면 <b>숫자를 수정하거나 뺄 수 있어요.</b></div>
+      <div class="note">사진에서 <b>음식이 있는 자리를 눌러</b> 무엇인지 선택하세요.
+        선택하면 <b>칼로리와 탄단지가 저절로 들어갑니다</b> — 숫자를 입력할 필요가 없어요.
+        <br>태그를 누르면 <b>숫자를 수정하거나 제외할 수 있어요.</b></div>
       ${밖.length?`<span class="lbl">태그 안 한 음식</span>
         ${밖.map(x=>`<button class="frow2" data-act="fdel:${m.id}:${x.id}">
           <span class="fe">${음식그림(x.name)}</span>
@@ -6415,7 +6415,7 @@ function sheetTagPhoto(mealId){
           <span class="fk">${Math.round(x.kcal)}</span></button>`).join('')}`:''}
       ${t.kcal?`<div class="msum"><b>${Math.round(t.kcal)} kcal</b>
         <span>탄 ${Math.round(t.carb)}g · 단 ${Math.round(t.protein)}g · 지 ${Math.round(t.fat)}g</span></div>`:''}
-      <button class="btn sub sm" data-act="fadd:${m.id}">사진에 없는 음식 담기</button>
+      <button class="btn sub sm" data-act="fadd:${m.id}">사진에 없는 음식 추가</button>
       ${미리
         ? `<button class="btn main" data-act="tagnext">다음 — 언제 먹었나요 ›</button>
            <button class="btn ghost sm" data-act="shotcancel">취소</button>`
@@ -6545,8 +6545,8 @@ function monthStart(){ const d=new Date(); return d.getFullYear()+'-'+String(d.g
 
 function kcalCard(mid, day){
   const st = dietStat(mid, day, day);
-  if(!st.ready) return `<div class="note">운동계획에서 <b>인바디 값(기초대사량)과 활동량</b>을 먼저 넣어 주세요.
-    넣으면 여기에 <b>오늘 남은 칼로리</b>와 탄단지가 나옵니다.
+  if(!st.ready) return `<div class="note">운동계획에서 <b>인바디 값(기초대사량)과 활동량</b>을 먼저 입력해 주세요.
+    입력하면 여기에 <b>오늘 남은 칼로리</b>와 탄단지가 나옵니다.
     ${S.who==='tr'?'<br>트레이너 → 회원 → 운동계획 → 계획 수정':''}</div>`;
   const left = st.target - st.eaten, over = left < 0;
   const pct = Math.min(100, Math.round(st.eaten / st.target * 100));
@@ -6576,7 +6576,7 @@ function kcalSummary(mid){
   if(!w.ready) return '';
   return `<div class="kcard">
     ${box('이번 주', w)}<div class="hr"></div>${box('이번 달', m)}
-    ${m.noK?`<div class="krow"><span class="k">칼로리 안 적은 사진</span><span class="v" style="color:var(--sub)">${m.noK}장</span></div>`:''}
+    ${m.noK?`<div class="krow"><span class="k">칼로리 입력 안 한 사진</span><span class="v" style="color:var(--sub)">${m.noK}장</span></div>`:''}
     <div class="note">목표보다 <b>더 먹으면 +</b>, 덜 먹으면 −로 쌓입니다. 지방 1kg = 7,700kcal 로 환산했습니다.</div></div>`;
 }
 
@@ -6616,9 +6616,9 @@ function vDiet(){
               ${(D.posts||[]).some(p=>p.photo_id===String(m.id))
                 ? `<span class="done">${svg('h_share',15)}피드에 올렸어요</span>`
                 : `<button class="g" data-act="mealpost:${m.id}">${svg('h_share',15)}피드에 올리기</button>`}</div>`
-          : `<button class="addf" data-act="fadd:${m.id}">＋ 이 식사에 음식 담기</button>`)}
+          : `<button class="addf" data-act="fadd:${m.id}">＋ 이 식사에 음식 추가</button>`)}
       </div>`; }).join('')
-     : 빔('bowl','이 날은 올린 식단이 없어요','사진을 찍거나 검색해서 담아 보세요')}
+     : 빔('bowl','이 날은 올린 식단이 없어요','사진을 찍거나 검색해서 추가해 보세요')}
     ${tr||!seqs.length?'':`<button class="btn ghost sm" data-act="fadd:new">＋ 식사 추가하기</button>`}
     <div class="hr"></div>
     <span class="lbl">지금까지 모은 것</span>
@@ -6722,13 +6722,13 @@ function sheetMeal(id){
             + `<div class="msum"><b>${Math.round(t.kcal)} kcal</b>
                 <span>탄 ${Math.round(t.carb)}g · 단 ${Math.round(t.protein)}g · 지 ${Math.round(t.fat)}g</span></div>`
           : (t.kcal
-             ? `<div class="msum"><b>${Math.round(t.kcal)} kcal</b><span>음식은 아직 안 골랐어요</span></div>`
-             : `<div class="note">아직 안 골랐어요. 아래에서 담으면 <b>칼로리가 저절로 채워집니다.</b></div>`)}
+             ? `<div class="msum"><b>${Math.round(t.kcal)} kcal</b><span>음식은 아직 안 선택했어요</span></div>`
+             : `<div class="note">아직 안 선택했어요. 아래에서 추가하면 <b>칼로리가 저절로 채워집니다.</b></div>`)}
         ${tr?'':(m.path
           ? `<button class="addf" data-act="tagedit:${m.id}">＋ 음식 태그하기</button>`
-          : `<button class="addf" data-act="fadd:${m.id}">＋ 음식 담기</button>`)}`; })()}
+          : `<button class="addf" data-act="fadd:${m.id}">＋ 음식 추가</button>`)}`; })()}
     ${(m.items&&m.items.length)
-      ? `<div class="note">칼로리와 탄단지는 <b>담은 음식에서 저절로 더해집니다.</b>
+      ? `<div class="note">칼로리와 탄단지는 <b>추가한 음식에서 저절로 더해집니다.</b>
           숫자를 수정하려면 <b>음식을 눌러</b> 주세요.</div>`
       : `<span class="lbl">칼로리와 탄단지</span>
       <div class="grid2">
@@ -6742,7 +6742,7 @@ function sheetMeal(id){
     ${tr?`<span class="lbl">코멘트 남기기</span>
       <textarea data-k="mn:${m.id}" placeholder="식단에 한마디">${esc(m.note||'')}</textarea>
       <button class="btn main sm" data-act="mealnote:${m.id}">보내기</button>`:''}
-    ${!tr?`<button class="btn ghost sm" data-act="mealdel:${m.id}" style="color:var(--warn)">이 사진 지우기</button>`:''}
+    ${!tr?`<button class="btn ghost sm" data-act="mealdel:${m.id}" style="color:var(--warn)">이 사진 삭제</button>`:''}
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 
@@ -7204,7 +7204,7 @@ function 커뮤니티입구(){
     ${칸('피드','gold','h_cam','오운완 · 식단 피드','회원들의 오운완 · 식단 · 인증샷', 피드.length ? `글 ${피드.length}개 · 최근 ${esc(이름of(피드[0].mid))} · ${언제(피드[0].ts)}` : '아직 글이 없어요')}
     ${칸('랭킹','dark','h_crown','글래드 랭킹','오운완 인증 · 운동 기록 · 총 무게 · 3대', 내것 ? (랭킹샘플 ? '샘플 화면 — 미리 보기' : i>=0 ? `이번 달 오운완 Lv.${레벨of('오운완', R.오운완[i].v)} · ${i+1}위` : '이번 달 순위에 올라 보세요') : (랭킹샘플 ? '샘플 화면 — 미리 보기' : R.오운완[0] ? `이번 달 오운완 1위 ${esc(이름of(R.오운완[0].mid))}` : ''))}
     ${칸('파트너','teal','h_hands','운동 파트너 찾기','같이 운동할 사람 모집', 모집.length ? `모집 중 ${모집.length}건` : '모집 중인 글이 없어요')}
-    <div class="note">${내것 ? '같은 센터 회원끼리만 보는 공간이에요.' : '회원들이 올린 글과 순위를 봅니다. 문제 글은 ⋯ 에서 지울 수 있습니다.'}</div>` };
+    <div class="note">${내것 ? '같은 센터 회원끼리만 보는 공간이에요.' : '회원들이 올린 글과 순위를 봅니다. 문제 글은 ⋯ 에서 삭제할 수 있습니다.'}</div>` };
 }
 function vCommunity(){
   if(!S.cmode) return 커뮤니티입구();
@@ -7220,8 +7220,8 @@ function vCommunity(){
       : (모드==='파트너'
           ? 빔('user', f==='내 글' ? '아직 올린 모집 글이 없어요' : '아직 모집 글이 없어요', 내것 ? '같이 운동할 파트너를 찾아 보세요' : '')
           : 빔('pic', f==='내 글' ? '아직 올린 글이 없어요' : '아직 글이 없어요', 내것 ? '오운완이나 인증샷을 올려 보세요' : ''))}
-    <div class="note">${내것 ? '같은 센터 회원끼리만 보는 공간이에요. 올린 글은 언제든 내리거나 지울 수 있습니다.'
-      : '회원들이 올린 오운완·인증샷이에요. 댓글은 「○○ 트레이너」로 남고, 문제 글은 ⋯ 에서 지울 수 있습니다.'}</div>` };
+    <div class="note">${내것 ? '같은 센터 회원끼리만 보는 공간이에요. 올린 글은 언제든 내리거나 삭제할 수 있습니다.'
+      : '회원들이 올린 오운완·인증샷이에요. 댓글은 「○○ 트레이너」로 남고, 문제 글은 ⋯ 에서 삭제할 수 있습니다.'}</div>` };
 }
 function 글카드(p){
   const n댓 = 댓글들(p.id).length, n좋 = 좋아요수(p.id), 내글 = p.mid===S.mid && S.who!=='tr';
@@ -7284,7 +7284,7 @@ async function partnerSend(){
   const 빠짐 = [];
   if(!n.sex) 빠짐.push('성별'); if(!n.career) 빠짐.push('운동경력'); if(!n.ptime) 빠짐.push('파트너 운동시간');
   if(!(Number(n.sq)>0 || Number(n.bp)>0 || Number(n.dl)>0)) 빠짐.push('3대 중량'); if(!n.parts.length) 빠짐.push('운동부위');
-  if(빠짐.length){ toast(빠짐.join(' · ') + ' 을(를) 적어 주세요'); return; }
+  if(빠짐.length){ toast(빠짐.join(' · ') + ' 을(를) 입력해 주세요'); return; }
   const id = 'pp' + Date.now();
   const big3 = `스쿼트 ${Number(n.sq)||0} · 벤치 ${Number(n.bp)||0} · 데드 ${Number(n.dl)||0}`;
   const row = { id, member_id:S.mid, kind:'파트너', photo_id:null, path:'', caption:n.body||'', visibility:'센터',
@@ -7299,7 +7299,7 @@ async function partnerSend(){
 function sheetPostNew(){
   const 사진 = 사진모음(S.mid, true).filter(x => !(D.posts||[]).some(p=>p.photo_id===x.id)).slice(0, 12);
   openSheet(()=>`
-    <div class="h2">올리기 <small>내 사진 중에서 고르거나 새로 찍어요</small></div>
+    <div class="h2">올리기 <small>내 사진 중에서 선택하거나 새로 찍어요</small></div>
     ${사진.length ? `<div class="pgrid">${사진.map(x=>`<button class="pg" data-act="postfrom:${x.id}">
         <img src="${esc(phURL(x.path))}" alt="" loading="lazy" onerror="picFail(this)">${x.kind==='pair'?`<span class="pgk">${svg('h_hands',13)}</span>`:''}
         <span class="pgd">${(x.date||'').slice(5).replace('-','.')}</span></button>`).join('')}</div>` : '<div class="empty">올릴 수 있는 오운완·인증샷이 아직 없어요</div>'}
@@ -7308,13 +7308,13 @@ function sheetPostNew(){
       return 끼.length ? `<span class="lbl">내 식단 사진</span><div class="pgrid">${끼.map(m=>`<button class="pg" data-act="mealpost:${m.id}">
         <img src="${esc(phURL(m.path))}" alt="" loading="lazy" onerror="picFail(this)"><span class="pgk">${svg('bowl',13)}</span>
         <span class="pgd">${(m.date||'').slice(5).replace('-','.')}</span></button>`).join('')}</div>` : ''; })()}
-    <button class="btn sub" data-act="postpick">${svg('h_cam',18)} 새 사진 고르기</button>
+    <button class="btn sub" data-act="postpick">${svg('h_cam',18)} 새 사진 선택</button>
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 function sheetPostWrite(){
   const n = S.pnew; if(!n) return;
   openSheet(()=>`
-    <div class="h2">한마디 <small>안 적어도 돼요</small></div>
+    <div class="h2">한마디 <small>입력하지 않아도 돼요</small></div>
     <img class="shot ootdimg" src="${esc(n.url)}" alt="">
     <textarea class="search" data-k="pcap" rows="2" maxlength="140" placeholder="예) 오늘 스쿼트 50kg 성공!">${esc(n.cap||'')}</textarea>
     <div class="seg">${['센터','나만'].map(v=>`<button class="${(n.vis||'센터')===v?'on':''}" data-act="postvis:${v}">${v==='센터'?'센터 회원끼리':'나만 보기'}</button>`).join('')}</div>
@@ -7369,7 +7369,7 @@ function sheetPost(id){
       <button class="${내좋아요(id)?'on':''}" data-act="plike:${id}">${svg('h_heart',19)}${좋아요수(id)||''}</button><span class="psp"></span>
       <button class="ic" data-act="pshare:${id}" aria-label="공유">${svg('h_share',19)}</button><button class="ic" data-act="psave:${id}" aria-label="저장">${svg('h_save',19)}</button></div>`}
     <span class="lbl">댓글 ${cs.length ? '· '+cs.length : ''}</span>
-    ${cs.length ? `<div class="pcms">${cs.map(c=>`<div class="pcm"><b>${esc(c.who)}</b> ${esc(c.body)}<small>${언제(c.ts)}${(c.mid && c.mid===S.mid && !트) || 트 ? ` · <button data-act="pcdel:${c.id}">지우기</button>` : ''}</small></div>`).join('')}</div>` : '<div class="note">첫 댓글을 남겨 보세요</div>'}
+    ${cs.length ? `<div class="pcms">${cs.map(c=>`<div class="pcm"><b>${esc(c.who)}</b> ${esc(c.body)}<small>${언제(c.ts)}${(c.mid && c.mid===S.mid && !트) || 트 ? ` · <button data-act="pcdel:${c.id}">삭제</button>` : ''}</small></div>`).join('')}</div>` : '<div class="note">첫 댓글을 남겨 보세요</div>'}
     <div class="pcmin"><input class="search" type="text" data-k="pcm" maxlength="120" placeholder="응원 한마디"><button class="btn main sm" data-act="pcsend:${id}">남기기</button></div>
     <button class="btn ghost sm" data-act="close">닫기</button>`; });
 }
@@ -7441,14 +7441,14 @@ function sheetRMStart(mid, 추가){
   S.rmPick = S.rmPick || ['sq','bp','dl'];
   const 있는 = RM순서.filter(e => exOf(e));
   openSheet(()=>`
-    <div class="h2">1RM 측정 <small>${esc(m.n)} 회원 · 잴 종목을 고르세요</small></div>
+    <div class="h2">1RM 측정 <small>${esc(m.n)} 회원 · 잴 종목을 선택하세요</small></div>
     <div class="pickbox">${있는.map(e=>{ const b = rm최고(mid, e), on = S.rmPick.includes(e);
       return `<button class="card rowc ${on?'teal':''}" data-act="rmpk:${mid}:${e}"><div><div class="nm ${on?'t':''}">${on?'☑':'☐'} ${esc(exOf(e).n)}</div>
         <div class="sm">${RM종목[e]} · ${b ? '최고 '+kg표(b.kg)+'kg ('+b.kind+')' : '기록 없음'}</div></div></button>`; }).join('')}</div>
     <button class="btn main" data-act="rmgo:${mid}">1RM 측정 루틴으로 시작 <small style="opacity:.75;font-weight:500">· 워밍업부터 자동</small></button>
     <button class="btn sub" data-act="rmdirect:${mid}">1RM 기록 직접 입력하기 <small style="opacity:.75;font-weight:500">· 이미 잰 무게</small></button>
     <button class="btn ghost sm" data-act="close">닫기</button>
-    <div class="note">종목마다 「1RM 재기」에서 목표를 넣으면 워밍업 → 준비 3단계 → 본 시도까지 세트가 자동으로 깔립니다 (NSCA 절차).</div>`);
+    <div class="note">종목마다 「1RM 재기」에서 목표를 입력하면 워밍업 → 준비 3단계 → 본 시도까지 세트가 자동으로 깔립니다 (NSCA 절차).</div>`);
 }
 
 function sheetRM(){
@@ -7467,7 +7467,7 @@ function sheetRM(){
           <button class="btn sub sm" data-act="rmgoal">계획 보기</button></div></div>
       ${계획 ? `<div class="rmplan">${계획.map((p,i)=>`<div class="rmrow ${p.선택?'opt':''}"><b>${i+1}</b><span>${p.단계}<small>${Math.round(p.pct*100)}%</small></span><em>${kg표(p.kg)}kg × ${p.reps}회</em><i>쉬기 ${p.쉼}</i></div>`).join('')}</div>
         <button class="btn main" data-act="rmplan">이 계획으로 세트 깔기</button>
-        <div class="note">세트는 「이번 세트 완료」로 넘깁니다. 본 시도가 끝나면 그 자리에서 <b>성공 · 한 번 더</b>를 고릅니다 (근거: NSCA 1RM 측정 절차).</div>` : ''}`
+        <div class="note">세트는 「이번 세트 완료」로 넘깁니다. 본 시도가 끝나면 그 자리에서 <b>성공 · 한 번 더</b>를 선택합니다 (근거: NSCA 1RM 측정 절차).</div>` : ''}`
     : `
       <div class="fld"><span class="fn">한 번 든 최고 무게 (kg)</span>
         <input class="search" type="number" inputmode="decimal" data-k="rmkg" placeholder="0"></div>
@@ -7485,7 +7485,7 @@ function sheetRMDirect(mid){
       return `<div class="fld"><span class="fn">${esc(exOf(e).n)} <small>${b ? '지금 최고 '+kg표(b.kg)+'kg ('+b.kind+')' : '기록 없음'}</small></span>
         <input class="search" type="number" inputmode="decimal" data-k="rmd:${e}" placeholder="kg"></div>`; }).join('')}
     <button class="btn main" data-act="rmdsave:${mid}">기록 남기기</button>
-    <button class="btn ghost sm" data-act="rmstart:${mid}">‹ 종목 다시 고르기</button>
+    <button class="btn ghost sm" data-act="rmstart:${mid}">‹ 종목 다시 선택</button>
     <div class="note">빈 칸은 건너뜁니다. 프로필·랭킹에 <b>실측</b>으로 남습니다.</div>`);
 }
 
@@ -7600,7 +7600,7 @@ function sheetOotd(){
       <button class="btn sub" data-act="ootddl">갤러리에 저장</button>
       <button class="btn sub" data-act="ootdshare">공유하기</button>
     </div>
-    <div class="note">저장이 안 되면 <b>사진을 꾹 눌러</b> 「이미지 저장」을 고르셔도 됩니다.</div>
+    <div class="note">저장이 안 되면 <b>사진을 꾹 눌러</b> 「이미지 저장」을 선택하셔도 됩니다.</div>
     <button class="btn ghost sm" data-act="ootdre:${S.ootd.wid}">다시 찍기</button>
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
@@ -7632,7 +7632,7 @@ async function ootdDL(url, 날짜){
     const blob = await (await fetch(url)).blob();
     const file = ootd파일(blob, 날짜);
     if(아이폰() && navigator.canShare && navigator.canShare({ files:[file] })){
-      toast('「이미지 저장」을 골라 주세요');
+      toast('「이미지 저장」을 선택해 주세요');
       try{ await navigator.share({ files:[file] }); return; }
       catch(e){ if(e.name==='AbortError') return; }
     }
@@ -7837,20 +7837,20 @@ function sheetFoodPick(mealId){
       <span class="n2">${esc(f.name)}<small>${f.brand?esc(f.brand)+' · ':''}${esc(f.unit||'')} ${f.amount?`(${kgfmt(f.amount)}g)`:''}</small></span>
       <span class="k2">${Math.round(f.kcal)}<span style="font-size:11px;font-weight:600;color:#8f8a83"> kcal</span></span></button>`;
     return `
-      <div class="h2">음식 담기 <small>${mealId==='new'?'새 식사':'이 식사에'}</small></div>
-      <input class="search" type="text" data-k="fq" value="${esc(S.fpQ)}" placeholder="음식 이름으로 찾기 — 예) 닭가슴살">
+      <div class="h2">음식 추가 <small>${mealId==='new'?'새 식사':'이 식사에'}</small></div>
+      <input class="search" type="text" data-k="fq" value="${esc(S.fpQ)}" placeholder="음식 이름으로 검색 — 예) 닭가슴살">
       <div style="display:flex;gap:9px">
-        <button class="btn main sm" data-act="fsearch">찾기</button>
-        <button class="btn sub sm" data-act="fnew">직접 넣기</button>
+        <button class="btn main sm" data-act="fsearch">검색</button>
+        <button class="btn sub sm" data-act="fnew">직접 입력</button>
       </div>
       ${res===null && rec.length?`<span class="lbl">최근 먹은 것</span>
         ${rec.map(x=>`<button class="fitem" data-act="frec:${esc(x.name)}">
           <span class="n2">${esc(x.name)}<small>${x.brand?esc(x.brand)+' · ':''}${kgfmt(x.qty)}${x.unit?' × '+esc(x.unit):'인분'}</small></span>
           <span class="k2">${Math.round(x.kcal)}<span style="font-size:11px;font-weight:600;color:#8f8a83"> kcal</span></span></button>`).join('')}`:''}
-      ${res===null && !rec.length?'<div class="note">이름을 적고 <b>찾기</b>를 누르세요. 없으면 <b>직접 넣기</b>로 새로 만듭니다.</div>':''}
+      ${res===null && !rec.length?'<div class="note">이름을 적고 <b>검색</b>를 누르세요. 없으면 <b>직접 입력</b>로 새로 만듭니다.</div>':''}
       ${res==='loading'?'<div class="empty">찾는 중이에요…</div>':''}
       ${Array.isArray(res)? (res.length? `<span class="lbl">${res.length}가지 찾았어요</span>${res.map(row).join('')}`
-        : '<div class="empty">못 찾았어요<br>「직접 넣기」로 새로 만들 수 있어요</div>') : ''}
+        : '<div class="empty">못 찾았어요<br>「직접 입력」으로 새로 만들 수 있어요</div>') : ''}
       <button class="btn ghost sm" data-act="close">닫기</button>
       <div class="note">음식 정보 출처 · <b>식품영양성분 데이터베이스</b> (식품의약품안전처)</div>`;
   });
@@ -7881,7 +7881,7 @@ function sheetFoodQty(f){
       <div class="chips" style="justify-content:center">
         ${[10,20,30,50,80,100,150,200,250,300].map(x=>`<button class="chip ${gram===x?'on':''}" data-act="fgs:${x}">${x}g</button>`).join('')}
       </div>
-      <div class="note">＋－ 는 <b>5g</b>씩 움직입니다. 칸에 바로 적어도 됩니다.</div>`
+      <div class="note">＋－ 는 <b>5g</b>씩 움직입니다. 칸에 바로 입력해도 됩니다.</div>`
       : `
       <div class="qbig">
         <button data-act="fq:-">－</button>
@@ -7896,7 +7896,7 @@ function sheetFoodQty(f){
         <div class="krow"><span class="k">칼로리</span><span class="v" style="color:var(--gold)">${Math.round(k)} kcal</span></div>
         <div class="krow"><span class="k">탄수 · 단백 · 지방</span><span class="v">${Math.round(f.carb*q)} · ${Math.round(f.protein*q)} · ${Math.round(f.fat*q)} g</span></div>
       </div>
-      <button class="btn main" data-act="fput">이 식사에 담기</button>
+      <button class="btn main" data-act="fput">이 식사에 추가</button>
       <button class="btn ghost sm" data-act="fadd:${S.fpMeal}">뒤로</button>`;
   });
 }
@@ -7913,7 +7913,7 @@ function readGram(){
 /* 음식장에 없을 때 */
 function sheetFoodNew(){
   openSheet(()=>`
-    <div class="h2">직접 넣기 <small>음식장에 없을 때</small></div>
+    <div class="h2">직접 입력 <small>음식장에 없을 때</small></div>
     <div class="fld"><span class="fn">음식 이름</span>
       <input class="search" type="text" data-k="nf:name" placeholder="예) 랩노쉬 초코"></div>
     <div class="grid2">
@@ -7933,8 +7933,8 @@ function sheetFoodNew(){
       <div class="fld"><span class="fn">단백 g</span><input class="search" type="text" inputmode="numeric" data-k="nf:protein"></div>
       <div class="fld"><span class="fn">지방 g</span><input class="search" type="text" inputmode="numeric" data-k="nf:fat"></div>
     </div>
-    <div class="note">한 번 넣으면 <b>음식장에 쌓여</b> 다음부터는 검색으로 바로 나옵니다.</div>
-    <button class="btn main sm" data-act="fnewsave">만들고 담기</button>
+    <div class="note">한 번 입력하면 <b>음식장에 쌓여</b> 다음부터는 검색으로 바로 나옵니다.</div>
+    <button class="btn main sm" data-act="fnewsave">만들고 추가</button>
     <button class="btn ghost sm" data-act="fadd:${S.fpMeal}">뒤로</button>`);
 }
 
@@ -7949,8 +7949,8 @@ function sheetShot(){
     <div class="chips">${SLOTS.map(x=>`<button class="chip ${S.shotSlot===x?'on':''}" data-act="slot:${x}">${x}</button>`).join('')}</div>
     ${t.kcal?`<div class="msum"><b>${Math.round(t.kcal)} kcal</b>
       <span>탄 ${Math.round(t.carb)}g · 단 ${Math.round(t.protein)}g · 지 ${Math.round(t.fat)}g</span></div>`
-      :`<div class="note">담은 음식이 없어요. <b>뒤로</b> 가서 사진을 눌러 고를 수 있습니다.</div>`}
-    <textarea data-k="mmemo" placeholder="한마디 (안 적어도 됩니다)"></textarea>
+      :`<div class="note">추가한 음식이 없어요. <b>뒤로</b> 가서 사진을 눌러 선택할 수 있습니다.</div>`}
+    <textarea data-k="mmemo" placeholder="한마디 (입력하지 않아도 됩니다)"></textarea>
     <div style="display:flex;gap:9px">
       <button class="btn main" data-act="shotup">올리기</button>
       <button class="btn ghost" data-act="tagback">뒤로</button></div>
@@ -7979,8 +7979,8 @@ async function putFood(){
       kcal:Math.round(f.kcal*q*10)/10, carb:Math.round(f.carb*q*10)/10,
       protein:Math.round(f.protein*q*10)/10, fat:Math.round(f.fat*q*10)/10,
       pos: (자리 != null) ? 자리 : S.dm.items.length });
-    if(f.id) sv(spatch('foods','id=eq.'+f.id, { uses:(Number(f.uses)||0)+1 }), '많이 고른 것');
-    closeSheet(); toast('담았어요'); sheetTagPhoto('draft'); return;
+    if(f.id) sv(spatch('foods','id=eq.'+f.id, { uses:(Number(f.uses)||0)+1 }), '많이 선택한 것');
+    closeSheet(); toast('추가했어요'); sheetTagPhoto('draft'); return;
   }
 
   let mealId = S.fpMeal, m = (D.meals||[]).find(x=>x.id===mealId);
@@ -8004,10 +8004,10 @@ async function putFood(){
   m.items = m.items || [];
   m.items.push({ id:(r&&r[0]&&r[0].id)||('tmp'+Date.now()), fid:f.id, name:row.name, brand:row.brand,
     qty:q, unit:row.unit, kcal:row.kcal, carb:row.carb, protein:row.protein, fat:row.fat, pos:이자리 });
-  if(f.id) sv(spatch('foods','id=eq.'+f.id, { uses: (Number(f.uses)||0) + 1 }), '많이 고른 것');
+  if(f.id) sv(spatch('foods','id=eq.'+f.id, { uses: (Number(f.uses)||0) + 1 }), '많이 선택한 것');
   syncMealTotal(m);
   S.dietDay = m.date;
-  toast('담았어요'); render();
+  toast('추가했어요'); render();
   /* 사진에 표시하던 중이면 그 화면으로 돌아간다 — 이어서 다음 것을 찍게 */
   if(S.tagBack === mealId) sheetTagPhoto(mealId);
 }
@@ -8101,7 +8101,7 @@ function vProfile(){
           ? `<img src="${esc(phURL(pf.avatar))}" alt="" onerror="picFail(this)">`
           : `<b>${esc(첫자)}</b>`}</span>
         <span class="pf2n"><b>${esc(나.n||'')}</b>
-          <small>${pf.bio ? esc(pf.bio) : (내것 ? '한 줄 소개를 적어 보세요' : '')}</small>
+          <small>${pf.bio ? esc(pf.bio) : (내것 ? '한 줄 소개를 입력해 보세요' : '')}</small>
           ${st.연속>1?`<em>${svg('h_fire',14)}${st.연속}일 이어서 운동 중</em>`:''}</span>
       </div>
       <div class="pf2s">${[['h_cal',수(st.일수),'운동한 날'],['h_dumb',수(Math.round(st.vol/1000)*1||0),'총 무게(톤)'],['h_cam',수(st.오운완),'오운완']]
@@ -8128,13 +8128,13 @@ function sheetOotdView(id){
   openSheet(()=>`
     <div class="h2">${esc(dateTxt(x.date))} <small>${인증 ? '인증샷' + (x.by ? ' · ' + esc(x.by) + ' 찍음' : '') : '오운완'}</small></div>
     <img class="shot ootdimg" src="${esc(phURL(x.path))}" alt="" onerror="picFail(this)">
-    ${트 && x.dreq ? `<div class="note" style="color:var(--warn)">회원이 <b>완전 삭제</b>를 요청했어요 (${esc(dateTxt(String(x.dreq).slice(0,10)))}). 아래 「지우기」로 들어 주세요.</div>`
+    ${트 && x.dreq ? `<div class="note" style="color:var(--warn)">회원이 <b>완전 삭제</b>를 요청했어요 (${esc(dateTxt(String(x.dreq).slice(0,10)))}). 아래 「삭제」로 들어 주세요.</div>`
       : (트 && x.hid ? `<div class="note">회원이 자기 화면에서 숨겼어요 — 트레이너 화면에만 보입니다.</div>` : '')}
     <button class="btn main sm" data-act="ootddl2:${x.id}">갤러리에 저장</button>
     ${!트 && !(D.posts||[]).some(p=>p.photo_id===x.id) ? `<button class="btn sub sm" data-act="postfrom:${x.id}">커뮤니티에 올리기</button>` : ''}
     ${w?`<button class="btn sub sm" data-act="orec:${w.id}">그날 기록 보기</button>`:''}
     ${트
-      ? `<button class="btn ghost sm" data-act="ootddel:${x.id}" style="color:var(--warn)">이 사진 지우기</button>`
+      ? `<button class="btn ghost sm" data-act="ootddel:${x.id}" style="color:var(--warn)">이 사진 삭제</button>`
       : (인증
         ? `${x.hid
             ? `<button class="btn ghost sm" data-act="phshow:${x.id}">다시 보이기</button>`
@@ -8142,8 +8142,8 @@ function sheetOotdView(id){
            ${x.dreq
             ? `<div class="note">완전 삭제를 요청했어요 — 트레이너가 확인하고 지웁니다.</div>`
             : `<button class="btn ghost sm" data-act="phdreq:${x.id}" style="color:var(--warn)">완전히 삭제 요청</button>
-               <div class="note">숨기기는 내 화면에서만 사라지고 트레이너의 지도 기록에는 남습니다. 완전히 지우려면 삭제를 요청해 주세요.</div>`}`
-        : `<button class="btn ghost sm" data-act="ootddel:${x.id}" style="color:var(--warn)">이 사진 지우기</button>`)}
+               <div class="note">숨기기는 내 화면에서만 사라지고 트레이너의 지도 기록에는 남습니다. 완전히 삭제하려면 삭제를 요청해 주세요.</div>`}`
+        : `<button class="btn ghost sm" data-act="ootddel:${x.id}" style="color:var(--warn)">이 사진 삭제</button>`)}
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 function sheetProfEdit(){
@@ -8156,7 +8156,7 @@ function sheetProfEdit(){
     <div class="fld"><span class="fn">한 줄 소개</span>
       <input class="search" type="text" data-k="pf:bio" maxlength="40"
         value="${esc(pf.bio||'')}" placeholder="예) 주 3회 · 하체 집중"></div>
-    <button class="btn sub sm" data-act="profpic">프로필 사진 바꾸기</button>
+    <button class="btn sub sm" data-act="profpic">프로필 사진 변경</button>
     <button class="btn main" data-act="profok">저장</button>
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
@@ -8183,7 +8183,7 @@ function profPick(){
           'Content-Type':'image/jpeg' }, body: blob });
       if(!r2.ok){ toast('사진을 못 올렸어요'); console.error(await r2.text()); return; }
       await profSave(S.mid, { avatar: path });
-      toast('바꿨어요'); closeSheet(); render();
+      toast('변경했어요'); closeSheet(); render();
     }catch(e){ console.error(e); toast('사진을 읽지 못했어요'); }
   });
   inp.click();
@@ -8257,7 +8257,7 @@ function vMe(){
     </div>
 
     <span class="lbl">내 기록장</span>
-    <div class="megrp">${[['note','상담일지','첫 상담 때 트레이너가 적은 내용','sub:intake'],
+    <div class="megrp">${[['note','상담일지','첫 상담 때 트레이너가 입력한 내용','sub:intake'],
        ['plan','운동계획','목표 · 맞춤 칼로리 · 다짐','sub:plan'],
        ['chart','인/아웃바디','인바디 · 비포애프터 · 체형분석','sub:body'],
        ...(여성인가(S.mid) ? [['moon','생리주기', (cycOf(S.mid)&&cycOf(S.mid).on)
@@ -8270,7 +8270,7 @@ function vMe(){
     <button class="card rowc" data-act="as:tr"><div><div class="nm">트레이너 화면 보기</div>
       <div class="sm">루틴 지정 · 코멘트 · 설명 수정</div></div><span class="rt">›</span></button>
     <button class="card rowc" data-act="reset"><div><div class="nm">처음 상태로 되돌리기</div>
-      <div class="sm">넣은 기록이 모두 지워집니다</div></div><span class="rt">›</span></button>` };
+      <div class="sm">입력한 기록이 모두 삭제됩니다</div></div><span class="rt">›</span></button>` };
 }
 
 /* ── 생리주기 ── */
@@ -8445,8 +8445,8 @@ function vIntake(){
     ${d.needs ? `<span class="lbl">회원님이 원하는 것</span><div class="megrp ikg"><div class="mrow2"><span class="ikv">${esc(d.needs)}</span></div></div>` : (빈++, '')}
     ${tr && d.notes ? `<span class="lbl">특이사항 · 트레이너만 봅니다</span><div class="megrp ikg t"><div class="mrow2"><span class="ikv">${esc(d.notes)}</span></div></div>` : ''}`;
   return { top: bar('상담일지', `<span class="sub">${esc(subjName())}</span>`, tr?'tm:'+mid:'tab:me'), body: 몸 + (빈
-    ? (tr ? `<button class="hline" data-act="editintake:${mid}">${svg('h_note',18)}<b>안 적은 항목 ${빈}개</b><small>눌러서 채우기</small></button>`
-          : `<div class="cyfoot"><span>아직 안 적은 항목 ${빈}개 · 바뀐 것이 있으면 트레이너에게 말씀해 주세요</span></div>`)
+    ? (tr ? `<button class="hline" data-act="editintake:${mid}">${svg('h_note',18)}<b>입력 안 한 항목 ${빈}개</b><small>눌러서 채우기</small></button>`
+          : `<div class="cyfoot"><span>아직 입력 안 한 항목 ${빈}개 · 바뀐 것이 있으면 트레이너에게 말씀해 주세요</span></div>`)
     : '') };
 }
 
@@ -8524,7 +8524,7 @@ function dLeft(date){
 }
 function goalLine(g){
   const d = (g.to && g.to.date) || '';
-  if(!d) return '<div class="note" style="padding:8px 10px">달력에서 목표 날짜를 골라 주세요. 그날까지 맞춰 섭취 칼로리를 잡아 드립니다.</div>';
+  if(!d) return '<div class="note" style="padding:8px 10px">달력에서 목표 날짜를 선택해 주세요. 그날까지 맞춰 섭취 칼로리를 잡아 드립니다.</div>';
   const n = dLeft(d);
   return `<div class="note" style="padding:8px 10px">오늘부터 <b style="color:var(--gold)">${n>0?n+'일':(n===0?'오늘':'지난 날짜')}</b>
     ${n>0?` · 약 ${Math.round(n/7)}주`:''}</div>`;
@@ -8668,7 +8668,7 @@ function calcBrief(g, ed){
 /* 보기 화면용 — 숫자는 `calcOf()` 그대로, 보여 주는 꼴만 다르다 (2026-10-07 융합). 수정 화면은 calcBrief + calcHTML 을 쓴다 */
 function calcView(g){
   const r = calcOf(g), kg = v => (Math.round(v*10)/10).toFixed(1);
-  if(!r.bmr) return `<div class="cyfoot"><span>${!r.w ? '몸무게를 넣으면 계산해 드려요' : '체지방률, 또는 생년월일과 키를 넣으면 계산해 드려요'}</span></div>`;
+  if(!r.bmr) return `<div class="cyfoot"><span>${!r.w ? '몸무게를 입력하면 계산해 드려요' : '체지방률, 또는 생년월일과 키를 입력하면 계산해 드려요'}</span></div>`;
   const 도착 = !r.gw ? '' : !r.hitDate ? '안 빠짐' : (r.goal && r.hitDate > r.goal ? dateTxt(r.hitDate) : (r.goal ? '날짜 안에' : dateTxt(r.hitDate)));
   const 합 = (r.kk.c + r.kk.p + r.kk.f) || 1;
   return `
@@ -8703,8 +8703,8 @@ function calcHTML(g, ed){
   const c = g.calc || {};
   const kg = v => (Math.round(v*100)/100).toFixed(2);
   const per = r.days ? (r.days>=60 ? `약 ${Math.round(r.days/30)}개월` : `약 ${Math.ceil(r.days/7)}주`) : '—';
-  const need = r.bmr ? '' : (!r.w ? '몸무게를 넣어 주세요.'
-    : '체지방률, 또는 생년월일과 키를 넣으면 기초대사량을 잡아 드립니다.');
+  const need = r.bmr ? '' : (!r.w ? '몸무게를 입력해 주세요.'
+    : '체지방률, 또는 생년월일과 키를 입력하면 기초대사량을 잡아 드립니다.');
   return `<div class="calc">
     ${need?`<div class="note" style="border-color:var(--warn);color:var(--warn);font-weight:700">${need}</div>`:''}
     <div class="kres">
@@ -8713,17 +8713,17 @@ function calcHTML(g, ed){
         <span class="kb">${r.kcal?수(r.kcal,1):'—'}<small>kcal</small></span>
         <span class="ks">${r.total && r.day>0
           ? `유지 ${r.total.toLocaleString()} 에서 <b>${r.day}kcal</b> 줄인 값 — ${esc(foodTxt(r.day))}`
-          : (r.total ? `유지 칼로리 ${r.total.toLocaleString()}kcal 과 같습니다` : '몸무게와 활동량을 넣어 주세요')}</span>
+          : (r.total ? `유지 칼로리 ${r.total.toLocaleString()}kcal 과 같습니다` : '몸무게와 활동량을 입력해 주세요')}</span>
       </div>
       <div class="ksub">
         <div><span class="n">목표 날짜까지</span>
           <span class="v">${r.daysTo?`${r.daysTo}일`:'—'}</span>
-          <span class="u">${r.dayNeed?`하루 ${r.dayNeed.toLocaleString()}kcal 줄이기`:'목표 날짜를 넣어 주세요'}</span></div>
+          <span class="u">${r.dayNeed?`하루 ${r.dayNeed.toLocaleString()}kcal 줄이기`:'목표 날짜를 입력해 주세요'}</span></div>
         <div><span class="n">이 속도로 가면</span>
           <span class="v">${r.w&&r.gw?per:'—'}</span>
           <span class="u">${r.w&&r.gw
             ? `${r.w}kg → ${r.gw}kg${r.hitDate?` · ${r.hitDate}`:''}`
-            : '목표 몸무게를 넣어 주세요'}</span></div>
+            : '목표 몸무게를 입력해 주세요'}</span></div>
       </div>
     </div>
 
@@ -8802,7 +8802,7 @@ function intakeNote(mid){
   if(!need.length) return `<div class="note" style="padding:8px 10px">상담일지에서 <b>생년월일 · 신장 · 성별</b>을 가져왔습니다.</div>`;
   return `<div class="note" style="border-color:var(--warn);padding:9px 11px">
     <div style="color:var(--warn);font-weight:700">상담일지에 ${need.join(' · ')}이(가) 비어 있습니다</div>
-    <div>여기 적으시면 <b>상담일지에도 같이 들어갑니다.</b></div>
+    <div>여기 입력하시면 <b>상담일지에도 같이 들어갑니다.</b></div>
     <button class="btn ghost sm" data-act="editintake:${mid}" style="margin-top:8px">상담일지 열기 ›</button></div>`;
 }
 
@@ -8838,7 +8838,7 @@ function vPlanEdit(){
       <div class="fld"><span class="fn">키 cm</span>
         <input class="search" type="text" inputmode="decimal" data-k="pc:height" value="${esc(c.height||'')}"></div>
     </div>
-    <span class="fsub">인바디 — 하셨으면 적어 주세요</span>
+    <span class="fsub">인바디 — 하셨으면 입력해 주세요</span>
     <div class="grid2">${num('now','w','몸무게 kg')}${num('now','m','근육량 kg')}</div>
     <div class="grid2">${num('now','f','체지방량 kg')}
       <div class="fld"><span class="fn">체지방률 %</span>
@@ -8897,8 +8897,8 @@ function vPlan(){
     <span class="lbl">목표${(g.now.date||g.to.date) ? ` <small style="font-weight:600;color:var(--sub)">${esc(g.now.date||'—')} → ${esc(g.to.date||'—')}${남!=null&&남>=0 ? ' · '+남+'일 남음' : ''}</small>` : ''}</span>
     ${칸들 ? `<div class="sstat3 ib4 plg">${칸들}</div>` : '<div class="cyfoot"><span>아직 정한 목표가 없어요</span></div>'}
     <span class="lbl">맞춤 칼로리 · 얼마나 빠질까</span>
-    ${(g.calc && (g.now.w||g.calc.bmr)) ? calcView(g) : '<div class="cyfoot"><span>몸무게와 활동량을 넣으면 계산해 드려요</span></div>'}
-    ${(g.kcal||g.ratio||g.wk||g.mo) ? `<span class="lbl">직접 적어 둔 값</span>
+    ${(g.calc && (g.now.w||g.calc.bmr)) ? calcView(g) : '<div class="cyfoot"><span>몸무게와 활동량을 입력하면 계산해 드려요</span></div>'}
+    ${(g.kcal||g.ratio||g.wk||g.mo) ? `<span class="lbl">직접 입력해 둔 값</span>
     <div class="megrp ikg">${[['하루 칼로리', g.kcal ? g.kcal+' kcal' : ''], ['탄 / 단 / 지', g.ratio], ['1주 감량 예상', g.wk], ['한 달 감량 예상', g.mo]].filter(p=>p[1])
       .map(p=>`<div class="mrow2"><span class="ikk">${p[0]}</span><span class="ikv">${esc(p[1])}</span></div>`).join('')}</div>` : ''}
     ${(g.vows||[]).length ? `<span class="lbl">내가 지킬 약속</span>
@@ -9201,7 +9201,7 @@ function blPane(mid){
           <button class="${모두?'on':''}" data-act="iball:1">전체 ${ls.length}회</button></div>` : ''}</div>
       ${ib변화(보일것)}
     </div>
-    <button class="btn sub sm" data-act="ibfind">기록 찾기 · ${ls.length}건 ›</button>
+    <button class="btn sub sm" data-act="ibfind">기록 검색 · ${ls.length}건 ›</button>
     ` : '<div class="empty">아직 잰 기록이 없어요</div>'}
     <button class="btn blue sm" data-act="ibpull:${mid}">루킨바디에서 지난 기록 가져오기</button>
     <button class="btn sub sm" data-act="bladd:${mid}">＋ 오늘 인바디 기록</button>`;
@@ -9214,7 +9214,7 @@ function sheetIbPick(mid, side){
   const 지금 = side === 'A' ? A : side === 'B' ? B : null;
   const 해들 = [...new Set(ls.map(x=>x.date.slice(0,4)))].reverse();
   const 해 = (S.ibY && 해들.includes(S.ibY)) ? S.ibY : 해들[0];
-  openSheet(()=>`<div class="h2">${side==='A'?'이전 날짜':side==='B'?'최근 날짜':'기록 찾기'} <small>${ls.length}건</small></div>
+  openSheet(()=>`<div class="h2">${side==='A'?'이전 날짜':side==='B'?'최근 날짜':'기록 검색'} <small>${ls.length}건</small></div>
     ${해들.length > 1 ? `<div class="seg" style="margin-bottom:8px">${해들.map(y=>
       `<button class="${y===해?'on':''}" data-act="ibyr:${side}:${y}">${y}년</button>`).join('')}</div>` : ''}
     <div class="card ibfd" style="padding:8px 12px 10px">
@@ -9294,10 +9294,10 @@ function sheetBlAdd(mid){
       <div class="fld"><span class="fn">체지방률 %</span>
         <input class="search" type="text" inputmode="decimal" data-k="bl:fp" value="${v('fp')}"></div>
     </div>
-    <div class="note">몸무게만 적어도 됩니다. <b>같은 날에 또 적으면 덮어씁니다.</b>
+    <div class="note">몸무게만 입력해도 됩니다. <b>같은 날에 또 입력하면 덮어씁니다.</b>
       가장 최근 기록은 <b>칼로리 계산</b>의 현재 몸무게로도 들어갑니다.</div>
     <button class="btn blue sm" data-act="blgo:${mid}">저장</button>
-    ${cur?`<button class="btn ghost sm" data-act="bldel:${cur.id}" style="color:var(--warn)">이 날 기록 지우기</button>`:''}
+    ${cur?`<button class="btn ghost sm" data-act="bldel:${cur.id}" style="color:var(--warn)">이 날 기록 삭제</button>`:''}
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 
@@ -9305,7 +9305,7 @@ async function blSave(mid){
   const gv = k => { const el = document.querySelector('[data-k="bl:'+k+'"]'); return el ? el.value.trim() : ''; };
   const date = gv('date') || TODAY;
   const w = nnum(gv('w')), m2 = nnum(gv('m')), f2 = nnum(gv('f')), fp = nnum(gv('fp'));
-  if(!w && !m2 && !f2 && !fp){ toast('하나는 적어 주세요'); return; }
+  if(!w && !m2 && !f2 && !fp){ toast('하나는 입력해 주세요'); return; }
   closeSheet();
   D.blog = D.blog || {}; const ls = D.blog[mid] = D.blog[mid] || [];
   let row = ls.find(x => x.date === date);
@@ -9415,8 +9415,8 @@ function sheetBpMark(id){
           : '다 찍었습니다. 저장하시면 비교 화면에도 같이 그려집니다.'}</div>
       ${markTxt(M.pts)}
       <div style="display:flex;gap:8px">
-        <button class="btn ghost sm" data-act="mkundo" ${n?'':'disabled'}>마지막 점 지우기</button>
-        <button class="btn ghost sm" data-act="mkclear" ${n?'':'disabled'}>모두 지우기</button></div>
+        <button class="btn ghost sm" data-act="mkundo" ${n?'':'disabled'}>마지막 점 삭제</button>
+        <button class="btn ghost sm" data-act="mkclear" ${n?'':'disabled'}>모두 삭제</button></div>
       <button class="btn blue sm" data-act="mksave">저장</button>
       <button class="btn ghost sm" data-act="close">닫기</button>`;
   });
@@ -9467,9 +9467,9 @@ function bodyPane(mid){
       ? `<div class="bcmp" style="margin-top:9px">${cel(L,'비포','L')}${cel(R,'애프터','R')}</div>
          <div class="note">${ds.length>1
             ? `날짜를 눌러 다른 날과 비교합니다. <b>${esc(pose)}</b> 사진이 <b>${ds.length}일치</b> 있어요.`
-            : '사진이 하루치뿐입니다. 다음에 한 장 더 넣으면 나란히 비교합니다.'}</div>`
+            : '사진이 하루치뿐입니다. 다음에 한 장 더 추가하면 나란히 비교합니다.'}</div>`
       : `<div class="empty">${esc(pose)} 사진이 아직 없어요</div>`}
-    <button class="btn blue sm" data-act="bpadd:body">＋ ${esc(pose)} 사진 넣기</button>
+    <button class="btn blue sm" data-act="bpadd:body">＋ ${esc(pose)} 사진 추가</button>
     ${tr?'':'<div class="note">집에서 찍으실 때는 <b>같은 자리 · 같은 옷 · 같은 밝기</b>로 찍어야 비교하기 좋습니다.</div>'}
 
     <div class="hr"></div>
@@ -9478,7 +9478,7 @@ function bodyPane(mid){
       ? `<div class="phstrip">${ai.slice().reverse().map(x=>`<button class="pt" data-act="bpview:${x.id}">
           <img src="${esc(phURL(x.path))}" alt="" onerror="picFail(this)"><span>${mdTxt(x.date)}</span></button>`).join('')}</div>`
       : '<div class="empty">아직 없어요</div>'}
-    ${tr?`<button class="btn sub sm" data-act="bpadd:ai">＋ AI 사진 넣기</button>`:''}
+    ${tr?`<button class="btn sub sm" data-act="bpadd:ai">＋ AI 사진 추가</button>`:''}
 
     <div class="hr"></div>
     <span class="lbl">영상 · ${vids.length}개</span>
@@ -9487,7 +9487,7 @@ function bodyPane(mid){
           <video src="${esc(phURL(x.path))}#t=0.1" preload="metadata" muted playsinline></video>
           <span>${mdTxt(x.date)}</span></button>`).join('')}</div>`
       : '<div class="empty">아직 없어요</div>'}
-    <button class="btn sub sm" data-act="bpvid">＋ 영상 넣기</button>
+    <button class="btn sub sm" data-act="bpvid">＋ 영상 추가</button>
 
     ${all.length ? `<div class="hr"></div>
       <span class="lbl">사진 모두 · ${all.length}장</span>
@@ -9670,12 +9670,12 @@ function bpVid(){
 function sheetBpVid(){
   const V = S.bpVid; if(!V) return;
   openSheet(()=>`
-    <div class="h2">영상 <small>넣기 · ${V.mb}MB</small></div>
+    <div class="h2">영상 <small>추가 · ${V.mb}MB</small></div>
     <video src="${V.url}" controls playsinline
       style="width:100%;max-height:44vh;border-radius:12px;background:#000"></video>
     <div class="fld" style="margin-top:10px"><span class="fn">찍은 날</span>
       <input class="search" type="date" data-k="bp:d" value="${S.bpNewDate||TODAY}"></div>
-    <button class="btn blue sm" data-act="bpvgo">넣기</button>
+    <button class="btn blue sm" data-act="bpvgo">추가</button>
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 async function bpVidUpload(){
@@ -9716,13 +9716,13 @@ function shrinkPhoto(file){
 
 function sheetBpAdd(){
   openSheet(()=>`
-    <div class="h2">${S.bpKind==='ai'?'AI 체형분석 사진':'몸 사진'} <small>넣기</small></div>
+    <div class="h2">${S.bpKind==='ai'?'AI 체형분석 사진':'몸 사진'} <small>추가</small></div>
     <img class="shot" src="${S.bpShot}" alt="" style="max-height:36vh;object-fit:contain">
     ${S.bpKind==='ai'?'':`<div class="seg" style="margin-top:10px">${POSES.map(x=>
       `<button class="${S.bpNewPose===x?'on':''}" data-act="bpnp:${x}">${x}</button>`).join('')}</div>`}
     <div class="fld" style="margin-top:10px"><span class="fn">찍은 날</span>
       <input class="search" type="date" data-k="bp:d" value="${S.bpNewDate||TODAY}"></div>
-    <button class="btn blue sm" data-act="bpgo">넣기</button>
+    <button class="btn blue sm" data-act="bpgo">추가</button>
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 
@@ -9759,7 +9759,7 @@ function sheetBpView(id){
         + markTxt(x.marks.pts)
       : `<img class="shot" src="${esc(phURL(x.path))}" alt="" onerror="picFail(this)">`}
     ${(x.kind!=='ai' && x.kind!=='vid')?`<button class="btn sub sm" data-act="bpmark:${x.id}">기준선 그리기</button>`:''}
-    ${own?`<button class="btn ghost sm" data-act="bpdel:${x.id}" style="color:var(--warn)">이 ${x.kind==='vid'?'영상':'사진'} 지우기</button>`:''}
+    ${own?`<button class="btn ghost sm" data-act="bpdel:${x.id}" style="color:var(--warn)">이 ${x.kind==='vid'?'영상':'사진'} 삭제</button>`:''}
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 
@@ -9837,8 +9837,8 @@ function tToday(){
     <button class="hero photo" data-act="pickmem">
       <span class="tag">수업</span>
       <div class="ht">오늘 수업 기록하기</div>
-      <div class="hs">회원을 찾아 루틴을 골라 바로 시작합니다</div>
-      <span class="hgo">회원 찾기 ›</span></button>
+      <div class="hs">회원을 찾아 루틴을 선택해 바로 시작합니다</div>
+      <span class="hgo">회원 검색 ›</span></button>
     ${live.map(x=>`<button class="hline" data-act="tgo:${x.m.id}">${svg('h_clock',18)}<b>${esc(x.m.n)} · 기록 중</b>
         <small>${esc((it=>it?exName(it.ex,it.va):'')(x.w.items[x.w.cur]||x.w.items[0]))}</small><i>›</i></button>`).join('')}
     ${(()=>{ const 식 = (D.meals||[]).filter(m=>m.date===TODAY), 안단 = 식.filter(m=>!m.note).length;
@@ -9921,7 +9921,7 @@ function tFeed(){
     ${asks.length?`<span class="lbl">회원이 봐 달라고 한 것 · ${asks.length}건</span>
       <div class="megrp fbg g">${asks.map(a=>`<button class="mrow2" data-act="exd:${a.ex}:${a.va}:${a.mid}">
         <span class="mi nm1">${esc(nm(a.mid).slice(0,1))}</span>
-        <span class="mt"><b>${esc(nm(a.mid))} · ${esc(exName(a.ex,a.va))}</b><small>${esc(a.note||'따로 적은 말은 없어요')} · ${esc(agoTxt(a.ts))}</small></span><em class="go">쓰기 ›</em></button>`).join('')}</div>`:''}
+        <span class="mt"><b>${esc(nm(a.mid))} · ${esc(exName(a.ex,a.va))}</b><small>${esc(a.note||'따로 입력한 말은 없어요')} · ${esc(agoTxt(a.ts))}</small></span><em class="go">쓰기 ›</em></button>`).join('')}</div>`:''}
     <div class="wk">
       <div class="wkhd">
         <button data-act="tfmove:-1">‹</button>
@@ -9969,7 +9969,7 @@ function tTools(){
     <button class="card rowc" data-act="go:t_routines"><div><div class="nm">루틴 만들기 · 지정</div>
       <div class="sm">회원별 루틴 세트</div></div><span class="rt">›</span></button>
     <button class="card rowc gold" data-act="psets"><div><div class="nm g">스트레칭 세트 만들기 · 지정</div>
-      <div class="sm">내가 만든 세트 ${내세트().length}개 · 있는 종목을 골라 담아 회원에게</div></div><span class="rt">›</span></button>
+      <div class="sm">내가 만든 세트 ${내세트().length}개 · 있는 종목을 선택해 회원에게</div></div><span class="rt">›</span></button>
     <button class="card rowc gold" data-act="pitems"><div><div class="nm g">스트레칭 종목 만들기</div>
       <div class="sm">내가 만든 종목 ${내종목().length}개 · 목록에 없는 동작을 사진·영상으로</div></div><span class="rt">›</span></button>
     <button class="card rowc" data-act="go:t_ex"><div><div class="nm">종목 사전</div>
@@ -9981,8 +9981,8 @@ function tTools(){
     <div class="hr"></div>
     <button class="card rowc" data-act="newmem"><div><div class="nm">＋ 회원 새로 만들기</div>
       <div class="sm">상담일지부터 처음부터</div></div><span class="rt">›</span></button>
-    <button class="card rowc" data-act="switch"><div><div class="nm">회원 화면으로 바꾸기</div>
-      <div class="sm">계정 고르는 화면으로</div></div><span class="rt">›</span></button>` };
+    <button class="card rowc" data-act="switch"><div><div class="nm">회원 화면으로 전환</div>
+      <div class="sm">계정 선택 화면으로</div></div><span class="rt">›</span></button>` };
 }
 
 function tMembers(){
@@ -9999,7 +9999,7 @@ function tMembers(){
           <div class="t"><small>지금 운동 중</small><b>${줄.filter(x=>x.lv).length}<i>명</i></b></div>
           <div><small>안 본 기록</small><b>${줄.filter(x=>!x.lv && x.nofb).length}<i>명</i></b></div></div>
         <div class="chips">${[['','전체',MEMBERS.length],['신규','신규',수.신규],['재등록','재등록',수.재등록]].map(k=>`<button class="chip ${거름===k[0]?'on':''}" data-act="tmreg:${k[0]}">${k[1]} ${k[2]}</button>`).join('')}</div>
-        <input class="search" type="text" data-filter="1" placeholder="회원 이름으로 찾기">
+        <input class="search" type="text" data-filter="1" placeholder="회원 이름으로 검색">
         <div class="megrp">${줄.length ? '' : '<div class="empty">해당하는 회원이 없어요</div>'}${줄.map(({m,last,lv,nofb})=>`<button class="mrow2" data-nm="${esc(m.n)}" data-act="tm:${m.id}">
           <span class="regtag ${m.reg==='신규'?'n':(m.reg==='재등록'?'r':'x')}">${m.reg==='신규'?'신규':(m.reg==='재등록'?'재등':'–')}</span>
           <span class="mt"><b>${esc(m.n)}</b><small>${lv?`지금 운동 중 · ${esc((it0=>it0?exName(it0.ex,it0.va):'')(lv.items[lv.cur]||lv.items[0]))}`
@@ -10055,7 +10055,7 @@ function tMember(){
     <div class="hr"></div><span class="lbl">운동 기록 <small>최근 ${Math.min(ws.length,5)}회${ws.length>5?` · 전체 ${ws.length}회`:''}</small></span>
     ${ws.slice(0,5).map(기록줄).join('') || '<div class="empty">아직 기록이 없어요</div>'}
     ${ws.length>5 ? `<button class="card rowc teal" data-act="twall:${m.id}"><div><div class="nm t">지난 운동 기록 모두 보기</div>
-      <div class="sm">전체 ${ws.length}회 · 수업 / 개인운동으로 골라 보기</div></div><span class="rt">›</span></button>` : ''}` };
+      <div class="sm">전체 ${ws.length}회 · 수업 / 개인운동으로 선택해 보기</div></div><span class="rt">›</span></button>` : ''}` };
 }
 /* 트레이너 회원 화면의 기록 한 줄 — 화면·전체 보기 창이 같이 쓴다 */
 const 기록줄 = w => `<button class="card rowc" data-act="tw:${w.id}">
@@ -10100,7 +10100,7 @@ function tWrite(){
           <div><div class="nm ${n?'':'g'}">${esc(exName(it.ex,it.va))}${ak?' <span class="pill">요청</span>':''}</div>
           <div class="sm">${it.sets.map(x=>setShort(it.ex,x)).join(' · ')}</div></div>
           <span class="pill${n?' q':''}">${n?`코멘트 ${n}`:'코멘트 쓰기'} ›</span></button>`; }).join('')
-      : '<div class="empty">세트를 적은 종목이 없어요</div>')
+      : '<div class="empty">세트를 입력한 종목이 없어요</div>')
     ,
     foot:`<button class="btn blue go" data-act="recedit:${w.id}">기록 수정하기</button>` };
 }
@@ -10136,8 +10136,8 @@ function tRoutines(){
 /* 회원 고르기 */
 function sheetRmPick(){
   openSheet(()=>`
-    <div class="h2">회원 고르기 <small>루틴을 볼 회원</small></div>
-    <input class="search" type="text" data-filter="1" placeholder="회원 이름으로 찾기">
+    <div class="h2">회원 선택 <small>루틴을 볼 회원</small></div>
+    <input class="search" type="text" data-filter="1" placeholder="회원 이름으로 검색">
     ${MEMBERS.map(m=>`<button class="card rowc ${m.id===(S.tmid||'m1')?'gold':''}" data-nm="${esc(m.n)}" data-act="rm:${m.id}">
       <div><div class="nm ${m.id===(S.tmid||'m1')?'g':''}">${esc(m.n)}</div>
       <div class="sm">루틴 ${myRoutines(m.id).length}개</div></div>
@@ -10158,16 +10158,16 @@ function sheetRAdd(){
     const row = (r, who) => {
       const n = cart.filter(x=>x===r.id).length;
       return `<div class="card rowc ${n?'gold':''}" data-nm="${esc(r.n+' '+(r.purpose||'')+' '+who)}">
-        <div><div class="nm ${n?'g':''}">${esc(r.n)}${n?` <span class="pill">${n}개 담김</span>`:''}</div>
+        <div><div class="nm ${n?'g':''}">${esc(r.n)}${n?` <span class="pill">${n}개 추가됨</span>`:''}</div>
         <div class="sm">${who?esc(who)+' · ':''}${r.grp?esc(r.grp)+' · ':''}${r.items.length}종목 · 예상 ${estMin(r)}분</div></div>
         ${n?`<button class="chip" data-act="rcart:-:${r.id}">－</button>`:''}
         <button class="chip t" data-act="rcart:+:${r.id}">＋</button></div>`;
     };
     return `
       <div class="h2">루틴 추가하기 <small>${esc(me2.n)} 회원에게</small></div>
-      <input class="search" type="text" data-filter="1" placeholder="루틴 이름으로 찾기">
+      <input class="search" type="text" data-filter="1" placeholder="루틴 이름으로 검색">
       ${cart.length?`<div class="note" style="border-color:var(--gold-2)">
-        <b style="color:var(--gold)">${cart.length}개 담김</b>
+        <b style="color:var(--gold)">${cart.length}개 추가됨</b>
         <div>${[...new Set(cart)].map(id=>{ const r=rOf(id);
           return r?`${esc(r.n)}${cart.filter(x=>x===id).length>1?` ×${cart.filter(x=>x===id).length}`:''}`:''; }).join(' · ')}</div>
         <div style="display:flex;gap:8px;margin-top:9px">
@@ -10178,8 +10178,8 @@ function sheetRAdd(){
       ${others.map(o=>`<span class="lbl">${esc(o.m.n)} 회원 루틴 — 가져오기</span>
         ${o.rs.map(r=>row(r, o.m.n)).join('')}`).join('')}
       <button class="btn ghost sm" data-act="close">닫기</button>
-      <div class="note">＋ 를 눌러 담고, <b>담은 뒤 추가하기</b>를 누르면 한 번 더 여쭤봅니다.
-        같은 루틴을 여러 번 담아도 됩니다.</div>`;
+      <div class="note">＋ 를 눌러 선택하고, <b>추가하기</b>를 누르면 한 번 더 여쭤봅니다.
+        같은 루틴을 여러 번 추가해도 됩니다.</div>`;
   });
 }
 
@@ -10189,12 +10189,12 @@ function sheetRDel(rid){
   const m = MEMBERS.find(x=>x.id===r.mid) || {n:''};
   const t = D.today[r.mid];
   openSheet(()=>`
-    <div class="h2">이 루틴을 지울까요? <small>${esc(m.n)} 회원</small></div>
+    <div class="h2">이 루틴을 삭제할까요? <small>${esc(m.n)} 회원</small></div>
     <div class="card"><div class="nm">루틴 ${r.no} · ${esc(r.n)}</div>
       <div class="sm">${r.grp?esc(r.grp)+' · ':''}${r.items.length}종목 · 예상 ${estMin(r)}분</div></div>
     <div class="note">${t&&t.rid===r.id?'<b style="color:var(--warn)">오늘 지정된 루틴입니다 — 지정도 함께 풀립니다.</b><br>':''}
       <b>되돌릴 수 없습니다.</b> 이 루틴으로 이미 한 운동 기록은 그대로 남습니다.</div>
-    <button class="btn main" data-act="rdelgo:${rid}" style="background:var(--warn);color:#241310">지우기</button>
+    <button class="btn main" data-act="rdelgo:${rid}" style="background:var(--warn);color:#241310">삭제</button>
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 
@@ -10203,10 +10203,10 @@ function sheetGrpMan(){
   openSheet(()=>{
     const gs = grpsOf(mid);
     if(S.grpRen) return `
-      <div class="h2">그룹 이름 바꾸기 <small>${esc(S.grpRen)}</small></div>
+      <div class="h2">그룹 이름 변경 <small>${esc(S.grpRen)}</small></div>
       <input class="search" type="text" data-k="grprenv" value="${esc(S.grpRen)}">
       <div class="note">이 그룹에 든 루틴 ${myRoutines(mid).filter(r=>(r.grp||'').trim()===S.grpRen).length}개가 함께 바뀝니다.</div>
-      <button class="btn main sm" data-act="grprendo">바꾸기</button>
+      <button class="btn main sm" data-act="grprendo">변경</button>
       <button class="btn ghost sm" data-act="grprencancel">취소</button>`;
     return `
     <div class="h2">루틴 그룹 만들기 <small>${esc((MEMBERS.find(x=>x.id===mid)||{}).n||'')} 회원</small></div>
@@ -10214,8 +10214,8 @@ function sheetGrpMan(){
       ${gs.map(g=>`<div class="card rowc">
         <div><div class="nm">${esc(g)}</div>
         <div class="sm">루틴 ${myRoutines(mid).filter(r=>(r.grp||'').trim()===g).length}개</div></div>
-        <button class="chip t" data-act="grpren:${g}">이름 바꾸기</button>
-        <button class="chip" data-act="grpdel:${g}">지우기</button></div>`).join('')}
+        <button class="chip t" data-act="grpren:${g}">이름 변경</button>
+        <button class="chip" data-act="grpdel:${g}">삭제</button></div>`).join('')}
       <div class="hr"></div>`:''}
     <span class="lbl">그룹 이름 만들기</span>
     <input class="search" type="text" data-k="grpnew" placeholder="예 · 근지구력, 황체기">
@@ -10249,16 +10249,16 @@ function tRedit(){
       return `<button class="card rowc ${S.just===VID(it.ex,it.va)?'just':''}" data-act="ritem:${r.id}:${i}"><div><div class="nm">${i+1}. ${esc(exName(it.ex,it.va))}</div>
         <div class="sm">${e.cardio?`${it.reps}분`:`${kgfmt(it.kg)}kg × ${it.reps}회 · ${it.sets}세트`}${it.rest?` · 휴식 ${it.rest}초`:''}</div></div>
         <span class="rt">수정 ›</span></button>`; }).join('')
-      : '<div class="empty">아직 종목이 없어요<br>아래에서 담아 주세요</div>'}
-    <button class="btn main" data-act="raddex:${r.id}">＋ 종목 담기</button>
+      : '<div class="empty">아직 종목이 없어요<br>아래에서 추가해 주세요</div>'}
+    <button class="btn main" data-act="raddex:${r.id}">＋ 종목 추가</button>
     <div class="hr"></div><span class="lbl">오늘 이 루틴으로 지정</span>
     <div style="display:flex;gap:9px">
       <button class="btn ${t&&t.rid===r.id&&t.kind==='수업'?'gold':'sub'} sm" data-act="assign:${r.id}:수업">수업</button>
       <button class="btn ${t&&t.rid===r.id&&t.kind==='개인운동'?'gold':'sub'} sm" data-act="assign:${r.id}:개인운동">개인운동</button></div>
     <div class="note">누르면 <b>확인을 한 번 더</b> 받고 지정합니다. 지정된 것을 다시 누르면 <b>풀지</b> 물어봅니다.
-      지정하지 않아도 회원이 직접 골라 시작할 수 있어요.</div>
+      지정하지 않아도 회원이 직접 선택해 시작할 수 있어요.</div>
     <div class="hr"></div>
-    <button class="btn ghost sm" data-act="rdel:${r.id}" style="color:var(--warn)">이 루틴 지우기</button>`,
+    <button class="btn ghost sm" data-act="rdel:${r.id}" style="color:var(--warn)">이 루틴 삭제</button>`,
     foot: r.items.length ? `<button class="btn sub" data-act="tstart:${r.mid}:${r.id}:수업">지금 이 루틴으로 수업</button>
       <button class="btn main" data-act="rdone:${r.id}">저장</button>` : '' };
 }
@@ -10289,7 +10289,7 @@ function sheetAssign(rid, kind){
 function sheetPickMember(){
   openSheet(()=>`
     <div class="h2">오늘 수업 <small>누구와 하시나요</small></div>
-    <input class="search" type="text" data-filter="1" placeholder="회원 이름으로 찾기">
+    <input class="search" type="text" data-filter="1" placeholder="회원 이름으로 검색">
     ${MEMBERS.map(m=>{ const lv=liveOf(m.id);
       return `<button class="card rowc ${lv?'teal':''}" data-nm="${esc(m.n)}" data-act="${lv?'tgo:'+m.id:'tstartask:'+m.id}">
         <div><div class="nm ${lv?'t':''}">${esc(m.n)}</div>
@@ -10302,12 +10302,12 @@ function sheetPickMember(){
 function sheetPickAssign(){
   openSheet(()=>`
     <div class="h2">루틴 지정 <small>누구에게 정해 둘까요</small></div>
-    <input class="search" type="text" data-filter="1" placeholder="회원 이름으로 찾기">
+    <input class="search" type="text" data-filter="1" placeholder="회원 이름으로 검색">
     ${MEMBERS.map(m=>{ const t=D.today[m.id], r=t?rOf(t.rid):null;
       return `<button class="card rowc ${t?'gold':''}" data-nm="${esc(m.n)}" data-act="tassign:${m.id}">
         <div><div class="nm ${t?'g':''}">${esc(m.n)}</div>
         <div class="sm">${r?`오늘 ${esc(t.kind)} · 루틴 ${r.no} ${esc(r.n)}`:'아직 지정 안 함'}</div></div>
-        <span class="rt">${t?'바꾸기 ›':'지정 ›'}</span></button>`; }).join('')
+        <span class="rt">${t?'변경 ›':'지정 ›'}</span></button>`; }).join('')
       || '<div class="empty">회원이 없어요</div>'}
     <button class="btn ghost sm" data-act="close">닫기</button>
     <div class="note">지정해 두면 회원 폰 홈에 <b>오늘 할 루틴</b>으로 뜹니다.</div>`);
@@ -10322,7 +10322,7 @@ function sheetStartSession(mid){
     ${t && rOf(t.rid) ? `<button class="sspick" data-act="tstart:${mid}:${t.rid}:${t.kind}">
       <span class="sst"><small>오늘 지정 · ${esc(t.kind)}</small><b>루틴 ${rOf(t.rid).no} · ${esc(rOf(t.rid).n)}</b>
         <i>${rOf(t.rid).items.length}종목 · 예상 ${estMin(rOf(t.rid))}분</i></span><em>시작 ›</em></button>` : ''}
-    <span class="lbl">루틴에서 고르기</span>
+    <span class="lbl">루틴에서 선택</span>
     ${rs.length ? `<div class="megrp">${rs.map(r=>{ /* 고리 속 글자 = 그 루틴에 가장 많은 부위 (실제 종목에서 센다) */
         const 셈 = {}; r.items.forEach(it => { const p = (exOf(it.ex)||{}).p; if(p) 셈[p] = (셈[p]||0) + 1; });
         const 부위 = Object.keys(셈).sort((a,b)=>셈[b]-셈[a])[0] || '';
@@ -10334,7 +10334,7 @@ function sheetStartSession(mid){
         return `<button class="hcard teal" data-act="tstartrecs:${mid}">${홈머리('h_clock','지난 기록에서')}
           <span class="hs">최근 ${esc(dateTxt(ws[0].date))} 등 ${Math.min(ws.length,12)}회<br>그날 종목과 무게 그대로</span></button>`; })()}
       <button class="hcard" data-act="tstart:${mid}:0:수업">${홈머리('h_note','빈 운동으로')}
-        <span class="hs">종목을 그때그때<br>담습니다</span></button>
+        <span class="hs">종목을 그때그때<br>추가합니다</span></button>
     </div>
     <button class="hline gold" data-act="psets:${mid}">${svg('h_roll',18)}<b>준비운동 먼저</b><small>${(n => n ? `스트레칭 세트 ${n}개 지정함` : '스트레칭 세트 지정하기')(내세트().filter(x=>x.mids.includes(mid)).length)}</small><i>›</i></button>
     <button class="btn ghost sm" data-act="close">닫기</button>
@@ -10348,7 +10348,7 @@ function sheetRecentPick(mid){
   const all = workoutsOf(mid).filter(w=>세트있나(w));
   const ws = all.filter(w => f==='전체' || w.kind===f).slice(0, 12);
   openSheet(()=>`
-    <div class="h2">지난 기록에서 고르기 <small>${esc(m.n)} 회원 · 그날 종목과 무게 그대로</small></div>
+    <div class="h2">지난 기록에서 선택 <small>${esc(m.n)} 회원 · 그날 종목과 무게 그대로</small></div>
     <div class="seg">${['전체','수업','개인운동'].map(k=>`<button class="${f===k?'on':''}" data-act="trf:${mid}:${k}">${k==='수업'?'PT 수업':k}</button>`).join('')}</div>
     <div class="pickbox">${ws.length ? ws.map(w=>{ const its = w.items.filter(it=>it.sets.length);
       return `<button class="card rowc" data-act="tstartrec:${mid}:${w.id}:수업">
@@ -10363,8 +10363,8 @@ function tPickEx(){
   const r=rOf(S.redit); if(!r) return tRoutines();
   const list = EX.filter(e=>e.p===S.pickPart && 고를수있나(e)).sort((a,b)=>(b.owner?1:0)-(a.owner?1:0));     /* 내가 만든 종목이 위로 */
   const cnt = k => r.items.filter(it=>VID(it.ex,it.va)===k).length;
-  return { top: bar('종목 담기', `<span class="sub">담은 ${r.items.length}개</span>`, 're:'+r.id), keepScroll:true, body:`
-    <input class="search" type="text" data-filter="1" placeholder="종목 이름으로 찾기">
+  return { top: bar('종목 추가', `<span class="sub">추가한 ${r.items.length}개</span>`, 're:'+r.id), keepScroll:true, body:`
+    <input class="search" type="text" data-filter="1" placeholder="종목 이름으로 검색">
     <div class="pkparts">${PARTS.map(x=>`<button class="chip ${x===S.pickPart?'on':''}" data-act="rpart:${x}">${x}</button>`).join('')}</div>
     <div class="pkmini"><button class="g" data-act="exnew">${svg('h_dumb',15)} ＋ 종목 만들기${내운동().length ? ` · 내 종목 ${내운동().length}` : ''}</button></div>
     <div class="megrp pkg">${list.map(e=>vars(e.id).map(v=>{ const k=VID(e.id,v.k), n=cnt(k), just=(S.just===k);
@@ -10373,7 +10373,7 @@ function tPickEx(){
           <small>${e.owner ? '<u>내 종목</u> · ' : ''}${esc(e.e)}${v.desc?' · 설명 있음':''}${just?' · 방금 담음':''}</small></span>
         <em class="pkadd">${n ? '✓' + (n>1 ? n : '') : '＋'}</em></button>`;
       }).join('')).join('')}</div>`,
-    foot:`<button class="btn main" data-act="re:${r.id}">다 담았어요 · ${r.items.length}개 ›</button>` };
+    foot:`<button class="btn main" data-act="re:${r.id}">추가 완료 · ${r.items.length}개 ›</button>` };
 }
 
 /* ── 루틴 종목 값 고치기 ── */
@@ -10399,7 +10399,7 @@ function sheetRitem(rid, i){
       <button class="btn sub" data-act="rmove:${rid}:${i}:1">▼ 아래로</button></div>
     <div style="display:flex;gap:9px">
       <button class="btn main" data-act="close">다 됐어요</button>
-      <button class="btn ghost" data-act="rdelitem:${rid}:${i}" style="color:var(--warn)">빼기</button></div>`);
+      <button class="btn ghost" data-act="rdelitem:${rid}:${i}" style="color:var(--warn)">제외</button></div>`);
 }
 
 /* 루틴 종목을 서버에 통째로 다시 쓴다 */
@@ -10618,7 +10618,7 @@ document.addEventListener('click', async ev=>{
     case 'fpick': {
       const id = Number(rest[0]);
       const f = (Array.isArray(S.fpRes)? S.fpRes : []).find(x=>Number(x.id)===id);
-      if(!f){ toast('다시 골라 주세요'); return; }
+      if(!f){ toast('다시 선택해 주세요'); return; }
       sheetFoodQty({ id:f.id, name:f.name, brand:f.brand||'', unit:f.unit||'', amount:Number(f.amount||0),
         kcal:Number(f.kcal||0), carb:Number(f.carb||0), protein:Number(f.protein||0), fat:Number(f.fat||0) });
       return; }
@@ -10648,8 +10648,8 @@ document.addEventListener('click', async ev=>{
     case 'fnewsave': {
       const g = k => { const el=document.querySelector('[data-k="nf:'+k+'"]'); return el? el.value.trim() : ''; };
       const name = g('name'); const kcal = nnum(g('kcal'));
-      if(!name){ toast('음식 이름을 적어 주세요'); return; }
-      if(!kcal){ toast('칼로리를 적어 주세요'); return; }
+      if(!name){ toast('음식 이름을 입력해 주세요'); return; }
+      if(!kcal){ toast('칼로리를 입력해 주세요'); return; }
       const f = { name, brand:g('brand'), unit:g('unit')||'1인분', amount:nnum(g('amount'))||0,
         kcal, carb:nnum(g('carb')), protein:nnum(g('protein')), fat:nnum(g('fat')),
         src:'회원', by_mid:S.mid };
@@ -10679,12 +10679,12 @@ document.addEventListener('click', async ev=>{
       const [mealId, itemId] = rest; closeSheet();
       if(mealId === 'draft'){                       /* 아직 안 올린 것 — 들고 있던 데서만 뺀다 */
         if(S.dm) S.dm.items = (S.dm.items||[]).filter(x=>String(x.id)!==String(itemId));
-        toast('뺐어요'); sheetTagPhoto('draft'); return; }
+        toast('제외했어요'); sheetTagPhoto('draft'); return; }
       const m = (D.meals||[]).find(x=>x.id===mealId); if(!m) return;
       m.items = (m.items||[]).filter(x=>String(x.id)!==String(itemId));
-      sv(sdel('meal_items','id=eq.'+itemId), '음식 빼기');
+      sv(sdel('meal_items','id=eq.'+itemId), '음식 제외');
       syncMealTotal(m);
-      toast('뺐어요'); render();
+      toast('제외했어요'); render();
       if(S.tagBack === mealId) sheetTagPhoto(mealId);
       return; }
     case 'slot': S.shotSlot=rest[0]; drawSheet(); return;
@@ -10709,9 +10709,9 @@ document.addEventListener('click', async ev=>{
       toast('보냈어요'); drawSheet(); render(); return; }
     case 'mealdel': { const id=rest[0], m=(D.meals||[]).find(x=>x.id===id); if(!m) return;
       D.meals=D.meals.filter(x=>x.id!==id);
-      sv(sdel('meals','id=eq.'+id), '식단 지우기');
+      sv(sdel('meals','id=eq.'+id), '식단 삭제');
       if(m.path) fetch(SB_URL+'/storage/v1/object/media/'+m.path,{method:'DELETE',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}}).catch(()=>{});
-      closeSheet(); toast('지웠어요'); render(); return; }
+      closeSheet(); toast('삭제했어요'); render(); return; }
     case 'tstartask': S.tmid=rest[0]; sheetStartSession(rest[0]);
       try{ sessionStorage.setItem('cycpop_'+rest[0]+'_'+TODAY, '1'); }catch(e){}
       return;
@@ -10834,7 +10834,7 @@ document.addEventListener('click', async ev=>{
     case 'exfrm': { const d = S.exn; if(d){ 운동글담기(); d.files.splice(+rest[0],1); drawSheet(); } return; }
     case 'exmrm': { const d = S.exn; if(d){ 운동글담기(); d.media.splice(+rest[0],1); drawSheet(); } return; }
     case 'exsave': { const d = S.exn; if(!d) return; 운동글담기();
-      if(!d.n){ toast('종목 이름을 적어 주세요'); return; }
+      if(!d.n){ toast('종목 이름을 입력해 주세요'); return; }
       if(EX.some(e => e.id !== d.id && 고를수있나(e) && e.n.replace(/\s/g,'') === d.n.replace(/\s/g,''))){ toast('같은 이름의 종목이 이미 있어요'); return; }
       if(d.files.length) toast('올리는 중이에요');
       const media = d.media.slice();
@@ -10852,13 +10852,13 @@ document.addEventListener('click', async ev=>{
       S.exn = null; S.pickPart = d.p; closeSheet(); toast(d.새 ? '만들었어요 — 목록 맨 위에 있어요' : '수정했어요'); render(); return; }
     case 'exdel': { const d = S.exn; if(!d) return;
       const 쓰는 = D.routines.some(r => (r.items||[]).some(it => it.ex === d.id)) || D.workouts.some(w => (w.items||[]).some(it => it.ex === d.id));
-      if(쓰는){ toast('루틴이나 기록에 담긴 종목은 지울 수 없어요 — 루틴에서 먼저 빼 주세요'); return; }
-      if(!confirm('이 종목을 지울까요?')) return;
+      if(쓰는){ toast('루틴이나 기록에 추가된 종목은 삭제할 수 없어요 — 루틴에서 먼저 제외해 주세요'); return; }
+      if(!confirm('이 종목을 삭제할까요?')) return;
       const 옛파일 = ((EX.find(e => e.id === d.id)||{}).media||[]).map(m=>m.path);
       EX = EX.filter(e => e.id !== d.id);
-      await sv(sdel('variants','ex_id=eq.'+d.id), '종목 설명 지우기'); await sv(sdel('exercises','id=eq.'+d.id), '종목 지우기');
+      await sv(sdel('variants','ex_id=eq.'+d.id), '종목 설명 삭제'); await sv(sdel('exercises','id=eq.'+d.id), '종목 삭제');
       await 파일지우기(옛파일, 'exmedia/'+d.id+'/');
-      S.exn = null; closeSheet(); toast('지웠어요'); render(); return; }
+      S.exn = null; closeSheet(); toast('삭제했어요'); render(); return; }
     case 'rpart': S.pickPart=rest[0]; render(); return;
     case 'raddv': { const [rid,ex,va]=rest, r=rOf(rid); if(!r) return;
       r.items.push({ ex, va, kg: exOf(ex).cardio?0:20, reps: exOf(ex).cardio?20:10, sets:3, rest:60 });
@@ -10866,7 +10866,7 @@ document.addEventListener('click', async ev=>{
       S.just = VID(ex,va);
       clearTimeout(S.justT);
       S.justT = setTimeout(()=>{ S.just=null; if(S.screen==='t_pickex') render(); }, 2600);
-      toast(exName(ex,va)+' 담았어요 · ' + r.items.length + '개');
+      toast(exName(ex,va)+' 추가했어요 · ' + r.items.length + '개');
       render(); return; }
     case 'ritem': sheetRitem(rest[0], +rest[1]); return;
     case 'rd2': { const [rid,i,f,dv]=rest, r=rOf(rid); if(!r) return;
@@ -10880,20 +10880,20 @@ document.addEventListener('click', async ev=>{
       const tmp=r.items[a]; r.items[a]=r.items[b]; r.items[b]=tmp;
       svRoutineItems(rid); closeSheet(); render(); return; }
     case 'rdelitem': { const [rid,i]=rest, r=rOf(rid); if(!r) return;
-      r.items.splice(+i,1); svRoutineItems(rid); closeSheet(); toast('뺐어요'); render(); return; }
+      r.items.splice(+i,1); svRoutineItems(rid); closeSheet(); toast('제외했어요'); render(); return; }
     case 'rdone': { S.just=null; toast('루틴을 저장했어요'); go('t_routines'); return; }
     case 'rdel': sheetRDel(rest[0]); return;
     case 'rdelgo': { const rid=rest[0]; closeSheet();
       D.routines = D.routines.filter(x=>x.id!==rid);
       Object.keys(D.today).forEach(m=>{ if(D.today[m].rid===rid) delete D.today[m]; });
-      sv(sdel('routines','id=eq.'+rid), '루틴 지우기');
-      toast('루틴을 지웠어요'); go('t_routines'); return; }
+      sv(sdel('routines','id=eq.'+rid), '루틴 삭제');
+      toast('루틴을 삭제했어요'); go('t_routines'); return; }
     case 'newmem': S.nm_sex='여'; go('newmem'); return;
     case 'nmsex': S.nm_sex=rest[0]; render(); return;
     case 'nmsave': {
       const g=k=>{ const el=document.querySelector('input[data-k="nm:'+k+'"]'); return (el&&el.value||'').trim(); };
       const name=g('name');
-      if(!name){ toast('이름을 적어 주세요'); return; }
+      if(!name){ toast('이름을 입력해 주세요'); return; }
       const id='m'+Date.now(), tr=g('tr')||TRAINER;
       const intake={ age:g('age'), height:g('height'), sex:S.nm_sex||'', meals:{}, route:[], relief:[], cond:[], hist:[], time:[] };
       const plan={ goal:'', work:'', diet:'', purpose:[], now:{}, to:{}, vows:[], promises:[] };
@@ -10994,13 +10994,13 @@ document.addEventListener('click', async ev=>{
     case 'gt': S.gd.t = rest[0]; drawSheet(); return;
     case 'goalsave': 목표저장(); return;
     case 'goaldel': { const g = GOALS[S.mid]; if(!g) return;
-      openSheet(()=>`<div class="h2">이 목표를 지울까요?</div>
+      openSheet(()=>`<div class="h2">이 목표를 삭제할까요?</div>
         <div class="note">이미 받은 배지는 그대로 남아요.</div>
-        <button class="btn main" data-act="goaldelgo:${rest[0]}" style="background:var(--warn);color:#241310">지우기</button>
+        <button class="btn main" data-act="goaldelgo:${rest[0]}" style="background:var(--warn);color:#241310">삭제</button>
         <button class="btn ghost sm" data-act="close">닫기</button>`); return; }
     case 'goaldelgo': { const g = GOALS[S.mid]; if(!g) return;
       g.my = (g.my||[]).filter(x => x.id !== rest[0]); closeSheet();
-      toast('지웠어요'); render();
+      toast('삭제했어요'); render();
       목표뱃지저장(S.mid).then(render); return; }
     case 'rpt': S.rw=rest[0]; go('report'); return;
     case 'noop': return;
@@ -11052,7 +11052,7 @@ document.addEventListener('click', async ev=>{
           수업일 <b>${esc(dateTxt(w.date))}</b><br>
           운동 <b>${esc(요약)}</b><br>
           <span style="color:var(--gold)">${esc(언제)}</span></p>
-        <p class="note">알림톡에는 <b>링크만</b> 담깁니다. 회원님이 열 때 그 시점의 기록이 보이니,
+        <p class="note">알림톡에는 <b>링크만</b> 들어갑니다. 회원님이 열 때 그 시점의 기록이 보이니,
           코멘트나 사진을 나중에 올리셔도 됩니다.</p>
         <div style="display:flex;gap:9px">
           <button class="btn main" data-act="rsend2:${w.id}">보내기</button>
@@ -11147,7 +11147,7 @@ document.addEventListener('click', async ev=>{
            <div class="agbody"><b>무엇을 모으나</b><br>
              이름·전화 뒤4자리·이메일, 키·생년월일, 운동기록, 식단, 문진·목표·문의<br>
              건강정보(인바디·체형사진)는 <b>따로 동의하신 경우에만</b> 모읍니다<br><br>
-             <b>얼마나 갖고 있나</b> — 회원 탈퇴 시까지. 지운 자료는 휴지통에서 60일 뒤 완전 삭제<br><br>
+             <b>얼마나 갖고 있나</b> — 회원 탈퇴 시까지. 삭제한 자료는 휴지통에서 60일 뒤 완전 삭제<br><br>
              <b>어떻게 지키나</b><br>
              · 회원님은 <b>자신의 기록만</b> 보십니다<br>
              · 체형 사진은 비공개 저장소에 두고 1시간만 열리는 임시 주소로만 보여드립니다<br>
@@ -11218,8 +11218,8 @@ document.addEventListener('click', async ev=>{
     case 'delcm': { const cid=rest[0];
       const i=D.cm.findIndex(c=>c.id===cid); if(i<0) return;
       D.cm.splice(i,1);
-      sv(sdel('comments','id=eq.'+cid), '코멘트 지우기');
-      save(); toast('지웠어요'); drawSheet(); render(); return; }
+      sv(sdel('comments','id=eq.'+cid), '코멘트 삭제');
+      save(); toast('삭제했어요'); drawSheet(); render(); return; }
     case 'ask': {
       const [ex,va]=rest, K=ex+'|'+va;
       const ta=document.querySelector('textarea[data-k="ask:'+K+'"]');
@@ -11264,15 +11264,15 @@ document.addEventListener('click', async ev=>{
     case 'blgo': blSave(rest[0]); return;
     case 'bldel': { const id = rest[0]; closeSheet();
       Object.keys(D.blog||{}).forEach(k => D.blog[k] = D.blog[k].filter(x=>x.id!==id));
-      sv(sdel('body_logs','id=eq.'+id), '인바디 기록 지우기');
-      toast('지웠어요'); render(); return; }
+      sv(sdel('body_logs','id=eq.'+id), '인바디 기록 삭제');
+      toast('삭제했어요'); render(); return; }
     case 'bppose': S.bpPose = rest[0]; S.bpL=null; S.bpR=null; render(); return;
     case 'bpsel': { const side = rest[0], mid = (S.screen==='body') ? subj() : anaMid();
       const pose = S.bpPose || '전면';
       const lst = bphOf(mid,'body',pose);
       const ds = [...new Set(lst.map(x=>x.date))];
       if(!ds.length){ toast('사진이 없어요'); return; }
-      openSheet(()=>`<div class="h2">${side==='L'?'비포':'애프터'} <small>날짜 고르기</small></div>
+      openSheet(()=>`<div class="h2">${side==='L'?'비포':'애프터'} <small>날짜 선택</small></div>
         ${ds.slice().reverse().map(d=>{ const x = lst.filter(y=>y.date===d)[0];
           return `<button class="card rowc" data-act="bpset:${side}:${d}">
             <div><div class="nm">${esc(dateTxt(d))}</div><div class="sm">${esc(pose)}</div></div>
@@ -11300,17 +11300,17 @@ document.addEventListener('click', async ev=>{
     case 'bpgo': bpUpload(); return;
     case 'bpview': sheetBpView(rest[0]); return;
     case 'bpdel': { const x=(D.bph||[]).find(y=>y.id===rest[0]); if(!x) return;
-      openSheet(()=>`<div class="h2">이 ${x.kind==='vid'?'영상':'사진'}을 지울까요?</div>
+      openSheet(()=>`<div class="h2">이 ${x.kind==='vid'?'영상':'사진'}을 삭제할까요?</div>
         <div class="note">${esc(dateTxt(x.date))} · ${x.kind==='ai'?'AI 체형분석':esc(x.pose)} — 되돌릴 수 없습니다.</div>
-        <button class="btn main" data-act="bpdelgo:${x.id}" style="background:var(--warn);color:#241310">지우기</button>
+        <button class="btn main" data-act="bpdelgo:${x.id}" style="background:var(--warn);color:#241310">삭제</button>
         <button class="btn ghost sm" data-act="close">닫기</button>`);
       return; }
     case 'bpdelgo': { const id=rest[0], x=(D.bph||[]).find(y=>y.id===id); closeSheet(); if(!x) return;
       D.bph = D.bph.filter(y=>y.id!==id);
-      sv(sdel('body_photos','id=eq.'+id), '사진 지우기');
+      sv(sdel('body_photos','id=eq.'+id), '사진 삭제');
       fetch(SB_URL+'/storage/v1/object/media/'+x.path,
         {method:'DELETE',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}}).catch(()=>{});
-      toast('지웠어요'); render(); return; }
+      toast('삭제했어요'); render(); return; }
     case 'bmemo': { const mid=rest[0], b=(D.body&&D.body[mid])||{};
       openSheet(()=>`<div class="h2">체형 메모</div>
         <textarea data-k="bmemo" style="min-height:130px" placeholder="예) 거북목 · 라운드숄더 · 골반 전방경사. 흉추 폄과 둔근 활성화 먼저.">${esc(b.memo||'')}</textarea>
@@ -11368,21 +11368,21 @@ document.addEventListener('click', async ev=>{
       const x=(D.bph||[]).find(y=>y.id===M.id); closeSheet(); S.bpMark=null; if(!x) return;
       x.marks = M.pts.length ? { pts:M.pts } : null;
       sv(spatch('body_photos','id=eq.'+x.id, { marks:x.marks }), '기준선 저장');
-      toast(M.pts.length?'기준선을 그었어요':'기준선을 지웠어요'); render(); return; }
+      toast(M.pts.length?'기준선을 그었어요':'기준선을 삭제했어요'); render(); return; }
     case 'cycon': { const mid=rest[0]; D.cycle=D.cycle||{};
       /* ⛔ 다시 켤 때 **적어 둔 시작일 · 주기를 지우지 않는다** — 전엔 켤 때마다 오늘 · 28일로 초기화돼서, 잘못 껐다 켜면 기록이 날아갔다 (2026-10-07 대표) */
       const 옛 = D.cycle[mid];
       if(!(옛 && 옛.last)){ S.cyset = { mid, last:TODAY, len:28, period:5, 새:true }; sheetCycSet(); return; }      /* 처음이면 세 가지를 묻는다 */
       D.cycle[mid] = Object.assign({}, 옛, { on:true });
-      svCycle(mid); toast('주기를 다시 켰어요 — 적어 둔 날짜 그대로예요'); render(); return; }
+      svCycle(mid); toast('주기를 다시 켰어요 — 입력해 둔 날짜 그대로예요'); render(); return; }
     case 'cycset': { const c = cycOf(rest[0]); if(!c) return; S.cyset = { mid:rest[0], last:c.last, len:c.len, period:c.period }; sheetCycSet(); return; }
     case 'cycd': { const d = S.cyset; if(!d) return; const el = document.querySelector('[data-k="cyclast"]'); if(el && el.value) d.last = el.value;
       const k = rest[0], [lo, hi] = 주기범위[k]; d[k] = Math.min(hi, Math.max(lo, d[k] + Number(rest[1]))); drawSheet(); return; }
     case 'cycsetok': { const d = S.cyset; if(!d) return; const el = document.querySelector('[data-k="cyclast"]'); if(el && el.value) d.last = el.value;
-      if(!d.last || d.last > TODAY){ toast('시작일은 오늘이나 지난 날로 골라 주세요'); return; }
+      if(!d.last || d.last > TODAY){ toast('시작일은 오늘이나 지난 날로 선택해 주세요'); return; }
       D.cycle = D.cycle || {}; D.cycle[d.mid] = { on:true, last:d.last, len:d.len, period:d.period };
       S.cyset = null; closeSheet(); svCycle(d.mid); toast(d.새 ? '주기를 켰어요' : '수정했어요'); render(); return; }
-    case 'cycoff': sheet끄기확인('생리주기를 끌까요?', '끄면 내 화면과 트레이너 화면에서 주기가 안 보입니다.<br>적어 둔 시작일 · 주기는 남아 있어서, 다시 켜면 그대로 이어집니다.', '끄기', 'cycoffok:' + rest[0]); return;
+    case 'cycoff': sheet끄기확인('생리주기를 끌까요?', '끄면 내 화면과 트레이너 화면에서 주기가 안 보입니다.<br>입력해 둔 시작일 · 주기는 남아 있어서, 다시 켜면 그대로 이어집니다.', '끄기', 'cycoffok:' + rest[0]); return;
     case 'cycoffok': { const mid=rest[0];
       if(D.cycle&&D.cycle[mid]) D.cycle[mid].on=false;
       closeSheet(); svCycle(mid); toast('껐어요 — 트레이너에게도 안 보여요'); render(); return; }
@@ -11394,7 +11394,7 @@ document.addEventListener('click', async ev=>{
       const d=new Date(+b.slice(0,4), +b.slice(5,7)-1 + Number(rest[0]), 1);
       S.cycMon=ymd(d).slice(0,7); drawSheet(); return; }
     case 'cycpick':  { const mid=rest[0], 날=rest[1];
-      if(날 > TODAY){ toast('앞날은 고를 수 없어요'); return; }
+      if(날 > TODAY){ toast('앞날은 선택할 수 없어요'); return; }
       closeSheet(); 주기시작(mid, 날); return; }
     case 'qa': S.qaOpen = 0; go('qa'); return;
     case 'qaopen': S.qaOpen = (S.qaOpen == null ? 0 : S.qaOpen) === +rest[0] ? -1 : +rest[0]; render(); return;
@@ -11405,7 +11405,7 @@ document.addEventListener('click', async ev=>{
       const ni=document.querySelector('input[data-k="vn:'+ex+'"]');
       const di=document.querySelector('textarea[data-k="vd:'+ex+'"]');
       const n=(ni&&ni.value||'').trim();
-      if(!n){ toast('이름을 적어 주세요'); return; }
+      if(!n){ toast('이름을 입력해 주세요'); return; }
       const vk='x'+Date.now(), desc=(di&&di.value||'').trim();
       const e0=EX.find(x=>x.id===ex);
       if(e0) e0.vars.push({k:vk, n, desc, demo:0});
@@ -11446,7 +11446,7 @@ document.addEventListener('click', async ev=>{
       save();
       S.just = VID(ex,va); clearTimeout(S.justT);
       S.justT = setTimeout(()=>{ S.just=null; render(); }, 2600);
-      toast(exName(ex,va)+' 담았어요');
+      toast(exName(ex,va)+' 추가했어요');
       if(S.screen==='pick') render(); else go('workout');
       svNewItem(live().items.length-1).then(()=>{
         const sw=D.workouts.find(x=>x.id===live().id);
@@ -11459,7 +11459,7 @@ document.addEventListener('click', async ev=>{
     case 'memogo': {
       const el=document.querySelector('[data-k="memo:n"]');
       const nm=(el&&el.value||'').trim().replace(/:/g,'·').slice(0,40);
-      if(!nm){ toast('이름을 적어 주세요'); return; }
+      if(!nm){ toast('이름을 입력해 주세요'); return; }
       closeSheet();
       if(!live()) newLive('빈 운동', [], '개인운동');
       live().items.push({ ex:'memo', va:nm, rest:60, locked:false, sec:0,
@@ -11467,7 +11467,7 @@ document.addEventListener('click', async ev=>{
         sets:[{ kg:0, reps:0, done:true }] });
       live().cur = live().items.length-1; save();
       if(S.draft) delete S.draft['memo:n'];
-      toast(nm+' 담았어요');
+      toast(nm+' 추가했어요');
       if(S.screen==='pick') render(); else go('workout');
       svNewItem(live().items.length-1).then(()=>{
         const sw=D.workouts.find(x=>x.id===live().id);
@@ -11476,19 +11476,19 @@ document.addEventListener('click', async ev=>{
       return; }
 
     case 'wdel': { const i=+rest[0], it=w&&w.items[i]; if(!it) return;
-      openSheet(()=>`<div class="h2">이 종목을 뺄까요? <small>${esc(exName(it.ex,it.va))}</small></div>
-        <div class="note">${it.sets.filter(x=>x.done).length?`적어 둔 <b>${it.sets.filter(x=>x.done).length}세트</b>도 함께 사라집니다.`:'아직 적은 것이 없습니다.'}</div>
-        <button class="btn main" data-act="wdelgo:${i}" style="background:var(--warn);color:#241310">빼기</button>
+      openSheet(()=>`<div class="h2">이 종목을 제외할까요? <small>${esc(exName(it.ex,it.va))}</small></div>
+        <div class="note">${it.sets.filter(x=>x.done).length?`입력해 둔 <b>${it.sets.filter(x=>x.done).length}세트</b>도 함께 사라집니다.`:'아직 입력한 것이 없습니다.'}</div>
+        <button class="btn main" data-act="wdelgo:${i}" style="background:var(--warn);color:#241310">제외</button>
         <button class="btn ghost sm" data-act="close">닫기</button>`);
       return; }
     case 'wdelgo': { const i=+rest[0]; closeSheet();
       const it = w && w.items[i]; if(!it) return;
-      if(it._id) sv(sdel('workout_items','id=eq.'+it._id), '종목 빼기');
+      if(it._id) sv(sdel('workout_items','id=eq.'+it._id), '종목 제외');
       w.items.splice(i,1);
       const sw=D.workouts.find(x=>x.id===w.id);
       if(sw) sw.items = sw.items.filter(x=>!it._id || x._id!==it._id);
       if(w.cur >= w.items.length) w.cur = Math.max(0, w.items.length-1);
-      save(); toast('뺐어요'); render(); return; }
+      save(); toast('제외했어요'); render(); return; }
 
     case 'jump': S.demoOpen = false;
       S.prevOpen=false; { const i=+rest[0];
@@ -11497,7 +11497,7 @@ document.addEventListener('click', async ev=>{
       w.cur=i; save(); render(); return; }
     /* 끝난 종목은 「재기록」을 눌러야 다시 적을 수 있다 */
     case 'redo': { const it=w.items[w.cur]; it.locked=false; it.startAt=Date.now();
-      save(); svItem(w.cur); toast('다시 적을 수 있어요'); render(); return; }
+      save(); svItem(w.cur); toast('다시 입력할 수 있어요'); render(); return; }
     /* 종목 순서 — 길게 누르면 옮기기 모드, ▲▼ 로 이동 */
     case 'ord': S.moveIdx=+rest[0]; render(); return;
     case 'ordend': S.moveIdx=null; render(); return;
@@ -11552,9 +11552,9 @@ document.addEventListener('click', async ev=>{
       const vk = rest[0]; if(cur.va === vk) return;
       cur.va = vk; S.prevOpen = false; save();
       if(cur._id) sv(spatch('workout_items','id=eq.'+cur._id,
-        { variant_id: VID(cur.ex, vk) }), '하는 법 바꾸기');
+        { variant_id: VID(cur.ex, vk) }), '하는 법 변경');
       const nm = vaName(cur.ex, vk);
-      toast(nm ? nm + '으로 바꿨어요' : '기본으로 바꿨어요');
+      toast(nm ? nm + '으로 변경했어요' : '기본으로 변경했어요');
       render(); return; }
     case 'pk': S.prepKind = rest[0]; S.prepRid = null; S.prepPset = null; go('prep2'); return;
     case 'pset': S.prepPset = rest[0]; S.prepRid = null; go('prep3'); return;
@@ -11577,17 +11577,17 @@ document.addEventListener('click', async ev=>{
     case 'piback': S.pso = null; if(S.pse){ S.pslk = 'y'; sheetPsetLib(); } else sheetPitems(); return;
     case 'pomrm': { const d = S.pso; if(d){ d.media.splice(+rest[0],1); drawSheet(); } return; }
     case 'pidel': { const d = S.pso; if(!d) return; const 쓰는 = 내세트().filter(x=>x.items.some(z=>z.k==='my' && z.i===d.id)).length;
-      if(!confirm(쓰는 ? `이 종목을 지울까요? 세트 ${쓰는}개에서도 빠집니다.` : '이 종목을 지울까요?')) return;
+      if(!confirm(쓰는 ? `이 종목을 삭제할까요? 세트 ${쓰는}개에서도 제외됩니다.` : '이 종목을 삭제할까요?')) return;
       const 옛파일 = (((D.pitems||[]).find(z=>z.id===d.id)||{}).media||[]).map(m=>m.path);
-      D.pitems = (D.pitems||[]).filter(z=>z.id!==d.id); await sv(sdel('prep_items','id=eq.'+d.id), '종목 지우기');
+      D.pitems = (D.pitems||[]).filter(z=>z.id!==d.id); await sv(sdel('prep_items','id=eq.'+d.id), '종목 삭제');
       await 파일지우기(옛파일, 'prep/items/'+d.id+'/');
       for(const x of 내세트()){ const n = x.items.length; x.items = x.items.filter(z=>!(z.k==='my' && z.i===d.id)); if(x.items.length !== n) await 세트저장(x); }
-      S.pso = null; toast('지웠어요'); sheetPitems(); render(); return; }
+      S.pso = null; toast('삭제했어요'); sheetPitems(); render(); return; }
     case 'pofile': 세트파일고르기(rest[0]); return;
     case 'pofrm': { const d = S.pso; if(d){ d.files.splice(+rest[0],1); drawSheet(); } return; }
     case 'pisave': { const d = S.pso; if(!d) return;
       ['pon','pot','pod'].forEach(k=>{ const el = document.querySelector('[data-k="'+k+'"]'); if(el) d[{pon:'n',pot:'t',pod:'d'}[k]] = el.value.trim(); });
-      if(!d.n){ toast('종목 이름을 적어 주세요'); return; }
+      if(!d.n){ toast('종목 이름을 입력해 주세요'); return; }
       if(d.files.length) toast('올리는 중이에요');
       const media = d.media.slice();
       try{ for(let i=0;i<d.files.length;i++){ const f = d.files[i], path = `prep/items/${d.id}/${Date.now()}_${i}.${f.ext}`;
@@ -11607,14 +11607,14 @@ document.addEventListener('click', async ev=>{
     case 'psmem': 세트글담기(); sheetPsetMem(); return;
     case 'psmt': { const p = S.pse; if(!p) return; const i = p.mids.indexOf(rest[0]); if(i >= 0) p.mids.splice(i,1); else p.mids.push(rest[0]); drawSheet(); return; }
     case 'pssave': { const p = S.pse; if(!p) return; 세트글담기(); p.n = (p.n||'').trim(); p.memo = (p.memo||'').trim();
-      if(!p.n){ toast('세트 이름을 적어 주세요'); return; }
-      if(!p.items.length){ toast('동작을 하나 이상 담아 주세요'); return; }
+      if(!p.n){ toast('세트 이름을 입력해 주세요'); return; }
+      if(!p.items.length){ toast('동작을 하나 이상 추가해 주세요'); return; }
       const x = { id:p.id, tr:TRAINER, n:p.n, memo:p.memo, items:p.items, mids:p.mids };
       D.psets = (D.psets||[]).filter(z=>z.id!==x.id).concat([x]); await 세트저장(x);
       S.pse = null; toast('세트를 저장했어요'); sheetPsets(S.psMid); render(); return; }
-    case 'psdel': { const p = S.pse; if(!p) return; if(!confirm('이 세트를 지울까요? 받은 회원 화면에서도 사라집니다.')) return;
-      D.psets = (D.psets||[]).filter(z=>z.id!==p.id); await sv(sdel('prep_sets','id=eq.'+p.id), '세트 지우기');
-      S.pse = null; toast('지웠어요'); sheetPsets(S.psMid); render(); return; }
+    case 'psdel': { const p = S.pse; if(!p) return; if(!confirm('이 세트를 삭제할까요? 받은 회원 화면에서도 사라집니다.')) return;
+      D.psets = (D.psets||[]).filter(z=>z.id!==p.id); await sv(sdel('prep_sets','id=eq.'+p.id), '세트 삭제');
+      S.pse = null; toast('삭제했어요'); sheetPsets(S.psMid); render(); return; }
     case 'psasg': { const x = 내세트().find(z=>z.id===rest[0]); if(!x) return; const mid = rest[1], i = x.mids.indexOf(mid);
       if(i >= 0) x.mids.splice(i,1); else x.mids.push(mid);
       drawSheet(); await 세트저장(x); toast(i >= 0 ? '지정을 풀었어요' : '지정했어요 — 회원 「준비운동」 맨 위에 떠요'); return; }
@@ -11655,7 +11655,7 @@ document.addEventListener('click', async ev=>{
       w.items.forEach((it,k)=>{ if(it._id) sv(spatch('workout_items','id=eq.'+it._id,{sort:k}), '순서 저장'); });
       save(); drawSheet(); return; }
     case 'spdel': { const i=+rest[0]; if(!w) return;
-      const it=w.items[i]; if(it && it._id) sv(sdel('workout_items','id=eq.'+it._id), '종목 빼기');
+      const it=w.items[i]; if(it && it._id) sv(sdel('workout_items','id=eq.'+it._id), '종목 제외');
       w.items.splice(i,1); S.sordIdx=null; w.cur=0; save();
       if(!w.items.length){ closeSheet(); render(); return; }
       drawSheet(); render(); return; }
@@ -11668,7 +11668,7 @@ document.addEventListener('click', async ev=>{
       if(이미) toast('추가했어요');
       go('workout'); return; }
     case 'clearpick': { if(!w) return;
-      w.items.forEach(it=>{ if(it._id) sv(sdel('workout_items','id=eq.'+it._id), '종목 빼기'); });
+      w.items.forEach(it=>{ if(it._id) sv(sdel('workout_items','id=eq.'+it._id), '종목 제외'); });
       w.items=[]; w.cur=0; save(); closeSheet(); toast('비웠어요'); render(); return; }
     case 'stepu': { const u=[2.5,1,0.5,5]; S.uKg=u[(u.indexOf(S.uKg||2.5)+1)%u.length]; drawSheet(); return; }
     case 'askcancel': sheetCancel(); return;
@@ -11697,12 +11697,12 @@ document.addEventListener('click', async ev=>{
     case 'orec': closeSheet(); S.wid = rest[0]; go('summary'); return;
     case 'ootddel': {
       const x = (D.bph||[]).find(y=>y.id===rest[0]); if(!x) return;
-      if(S.who==='tr' && !confirm('이 사진을 지울까요? 회원 화면에서도 사라지고 되돌릴 수 없습니다.')) return;
+      if(S.who==='tr' && !confirm('이 사진을 삭제할까요? 회원 화면에서도 사라지고 되돌릴 수 없습니다.')) return;
       D.bph = D.bph.filter(y=>y.id!==x.id);
-      sv(sdel('body_photos','id=eq.'+x.id), '오운완 지우기');
+      sv(sdel('body_photos','id=eq.'+x.id), '오운완 삭제');
       fetch(SB_URL+'/storage/v1/object/media/'+x.path,
         {method:'DELETE',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}}).catch(()=>{});
-      closeSheet(); toast('지웠어요'); render(); return; }
+      closeSheet(); toast('삭제했어요'); render(); return; }
     case 'profedit': sheetProfEdit(); return;
     case 'profpic': profPick(); return;
     case 'nick0ok': { const el = document.querySelector('[data-k="nick0"]'), 닉 = el ? el.value.trim().replace(/\s+/g,' ') : '', 말 = 닉검사(닉);
@@ -11719,12 +11719,12 @@ document.addEventListener('click', async ev=>{
     /* ── 커뮤니티 ── */
     case 'rm': S.rmGoal = 0; S.rmMode = '루틴'; sheetRM(); return;
     case 'rmmode': { const el=document.querySelector('[data-k="rmgoal"]'); if(el) S.rmGoal = Number(el.value)||0; S.rmMode = rest[0]; sheetRM(); return; }
-    case 'rmdirect': { if(!(S.rmPick||[]).length){ toast('종목을 하나 이상 골라 주세요'); return; } sheetRMDirect(rest[0]); return; }
+    case 'rmdirect': { if(!(S.rmPick||[]).length){ toast('종목을 하나 이상 선택해 주세요'); return; } sheetRMDirect(rest[0]); return; }
     case 'rmdsave': { const mid=rest[0]; let n=0; const by = S.who==='tr' ? (TRAINER||'트레이너') : '회원';
       for(const el of document.querySelectorAll('[data-k^="rmd:"]')){ const kg=Number(el.value); if(!(kg>0)) continue;
         const e=el.getAttribute('data-k').slice(4), v=(exOf(e).vars||[])[0];
         await rm기록(mid, e, (v&&v.k)||'a', kg, 1, '실측', '', by); n++; }
-      if(!n){ toast('무게를 하나 이상 적어 주세요'); return; }
+      if(!n){ toast('무게를 하나 이상 입력해 주세요'); return; }
       closeSheet(); toast('1RM '+n+'종목 남겼어요'); render(); return; }
     /* 측정 루틴 — 본 시도가 끝난 뒤 그 자리에서 */
     case 'rmok': { const z=지금종목(); if(!z) return;
@@ -11742,7 +11742,7 @@ document.addEventListener('click', async ev=>{
     case 'rmpk': { const e=rest[1], a=S.rmPick||(S.rmPick=[]); const i=a.indexOf(e); if(i>=0) a.splice(i,1); else a.push(e); sheetRMStart(rest[0], S.rmAdd); return; }
     case 'rmaddpick': { const lw=live(); S.rmPick=['sq']; sheetRMStart(lw ? lw.mid : S.mid, !!lw); return; }
     case 'rmgo': { const mid=rest[0], 고른=RM순서.filter(e=>(S.rmPick||[]).includes(e) && exOf(e));
-      if(!고른.length){ toast('잴 종목을 하나 이상 골라 주세요'); return; }
+      if(!고른.length){ toast('잴 종목을 하나 이상 선택해 주세요'); return; }
       const items = 고른.map(e=>{ const v=(exOf(e).vars||[])[0]; const b=rm최고(mid,e);
         return { ex:e, va:(v&&v.k)||'a', rest:180, locked:false, sec:0, startAt:Date.now(), sets:[{ kg: b ? Math.max(20, Math.round(b.kg*0.5/2.5)*2.5) : 20, reps:8, done:false }] }; });
       closeSheet(); S.tmid=mid; S.subj=mid; S.rmGoal=0;
@@ -11761,16 +11761,16 @@ document.addEventListener('click', async ev=>{
       setTimeout(()=>{ if(지금종목()) sheetRM(); }, 400);
       return; }
     case 'rmgoal': { const el=document.querySelector('[data-k="rmgoal"]'); S.rmGoal = el ? Number(el.value)||0 : 0;
-      if(!(S.rmGoal>0)){ toast('목표 1RM 을 적어 주세요'); return; } sheetRM(); return; }
+      if(!(S.rmGoal>0)){ toast('목표 1RM 을 입력해 주세요'); return; } sheetRM(); return; }
     case 'rmplan': { const z=지금종목(); if(!z || !(S.rmGoal>0)) return;
       const 계획 = rm계획(S.rmGoal, z.cur.ex).filter(p=>!p.선택);
-      if(z.cur.sets.some(x=>x.done)){ toast('이미 끝낸 세트가 있어요 — 새 종목으로 넣어 재 주세요'); return; }
+      if(z.cur.sets.some(x=>x.done)){ toast('이미 끝낸 세트가 있어요 — 새 종목으로 추가해 재 주세요'); return; }
       z.cur.sets = [{ kg:계획[0].kg, reps:계획[0].reps, done:false }];     /* 첫 세트만 — 완료할 때마다 다음 단계가 자동으로 온다 */
       z.cur.rest = 계획[0].쉼초;
       z.cur.rmPlan = 계획; z.cur.rmGoal = S.rmGoal; save(); closeSheet();
       toast('워밍업 '+계획[0].kg+'kg × '+계획[0].reps+'회부터 — 완료하면 다음 단계가 자동으로 깔려요'); render(); return; }
     case 'rmsave': { const z=지금종목(); if(!z) return; const el=document.querySelector('[data-k="rmkg"]'); const kg=el?Number(el.value):0;
-      if(!(kg>0)){ toast('무게를 적어 주세요'); return; }
+      if(!(kg>0)){ toast('무게를 입력해 주세요'); return; }
       rm기록(z.mid, z.cur.ex, z.cur.va, kg, 1, '실측', z.w.id, S.who==='tr' ? (TRAINER||'트레이너') : '회원');
       closeSheet(); toast('1RM 실측 '+kg+'kg 남겼어요'); render(); return; }
     case 'rkp': S.rkp=rest[0]; render(); return;
@@ -11817,23 +11817,23 @@ document.addEventListener('click', async ev=>{
     case 'pmore': { const p=(D.posts||[]).find(x=>x.id===rest[0]); if(!p) return;
       openSheet(()=>`<div class="h2">이 글</div>
         ${p.mid===S.mid && S.who!=='tr' ? `<button class="btn sub" data-act="phide:${p.id}">${p.hid?'다시 올리기':'내리기 (나만 보기)'}</button>` : ''}
-        <button class="btn ghost" data-act="pdel:${p.id}" style="color:var(--warn)">지우기</button>
+        <button class="btn ghost" data-act="pdel:${p.id}" style="color:var(--warn)">삭제</button>
         <button class="btn ghost sm" data-act="close">닫기</button>`); return; }
     case 'phide': { const p=(D.posts||[]).find(x=>x.id===rest[0]); if(!p) return;
       p.hid = p.hid ? '' : new Date().toISOString(); p.vis = p.hid ? '나만' : '센터';
       sv(spatch('posts','id=eq.'+p.id, { hidden_at:p.hid||null, visibility:p.vis }), '글 내리기'); closeSheet(); render(); return; }
     case 'pdel': { const p=(D.posts||[]).find(x=>x.id===rest[0]); if(!p) return;
-      if(!confirm('이 글을 지울까요? 댓글도 같이 지워집니다.')) return;
+      if(!confirm('이 글을 삭제할까요? 댓글도 같이 삭제됩니다.')) return;
       D.posts = D.posts.filter(x=>x.id!==p.id); D.pcm = (D.pcm||[]).filter(c=>c.pid!==p.id); D.plk = (D.plk||[]).filter(l=>l.pid!==p.id);
-      sv(sdel('posts','id=eq.'+p.id), '글 지우기');
+      sv(sdel('posts','id=eq.'+p.id), '글 삭제');
       if(p.path && p.path.startsWith('posts/')) fetch(SB_URL+'/storage/v1/object/media/'+p.path, {method:'DELETE',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}}).catch(()=>{});
-      closeSheet(); toast('지웠어요'); render(); return; }
-    case 'pcsend': { const el=document.querySelector('[data-k="pcm"]'); const body=el?el.value.trim():''; if(!body){ toast('한마디를 적어 주세요'); return; }
+      closeSheet(); toast('삭제했어요'); render(); return; }
+    case 'pcsend': { const el=document.querySelector('[data-k="pcm"]'); const body=el?el.value.trim():''; if(!body){ toast('한마디를 입력해 주세요'); return; }
       const g=글쓴이(), id='pc'+Date.now(), ts=new Date().toISOString();
       (D.pcm=D.pcm||[]).push({ id, pid:rest[0], mid:g.mid, who:g.who, body, ts });
       sv(spost('post_comments',[{ id, post_id:rest[0], member_id:g.mid||null, author:g.who, body }]), '댓글');
       drawSheet(); render(); return; }
-    case 'pcdel': { D.pcm=(D.pcm||[]).filter(c=>c.id!==rest[0]); sv(sdel('post_comments','id=eq.'+rest[0]), '댓글 지우기'); drawSheet(); render(); return; }
+    case 'pcdel': { D.pcm=(D.pcm||[]).filter(c=>c.id!==rest[0]); sv(sdel('post_comments','id=eq.'+rest[0]), '댓글 삭제'); drawSheet(); render(); return; }
     case 'pair': pairPick(rest[0]); return;
     case 'pairre': closeSheet(); pairPick(rest[0]); return;
     case 'pairsave': pairSave(); return;
@@ -11865,11 +11865,11 @@ document.addEventListener('click', async ev=>{
       if(exOf(it.ex).cardio){ st.reps = nnum(g('reps')); st.spd = g('spd')===''? undefined : nnum(g('spd'));
         if(경사최대(it.ex)) st.kg = Math.min(경사최대(it.ex), nnum(g('kg'))); }
       else { st.kg = nnum(g('kg')); st.reps = nnum(g('reps')); }
-      closeSheet(); toast('바꿨어요 · 아직 저장 전이에요'); render(); return; }
+      closeSheet(); toast('변경했어요 · 아직 저장 전이에요'); render(); return; }
     case 'rsetdel': {
       const [i,j] = rest.map(Number);
       S.recEdit.items[i].sets.splice(j,1);
-      closeSheet(); toast('뺐어요 · 아직 저장 전이에요'); render(); return; }
+      closeSheet(); toast('제외했어요 · 아직 저장 전이에요'); render(); return; }
     case 'raddset': {
       const i = Number(rest[0]), it = S.recEdit.items[i];
       const last = it.sets[it.sets.length-1] || { kg:0, reps:10 };
@@ -11902,7 +11902,7 @@ document.addEventListener('click', async ev=>{
       save(); toast('이어서 하실 수 있어요'); go('workout'); return; }
     case 'cancel': { const id=live()&&live().id;
       D.live=null; save();
-      if(id){ D.workouts=D.workouts.filter(x=>x.id!==id); sv(sdel('workouts','id=eq.'+id), '운동 지우기'); }
+      if(id){ D.workouts=D.workouts.filter(x=>x.id!==id); sv(sdel('workouts','id=eq.'+id), '운동 삭제'); }
       toast('운동을 취소했어요');
       /* ⛔ 자취에 「운동 중」 화면이 남아 있으면 뒤로가기가 거기로 가고, 기록이 없으니 **회원 홈**이 그려졌다(2026-10-05 대표).
          지운 기록으로 돌아갈 일은 없다 — 자취를 비우고 트레이너 「오늘」 위에 회원 화면을 올린다 */
@@ -11925,14 +11925,14 @@ document.addEventListener('click', async ev=>{
     case 'rcartclr': S.rcart = []; drawSheet(); return;
     case 'raddask': {
       const mid = S.tmid || 'm1', cart = S.rcart || [];
-      if(!cart.length){ toast('담은 루틴이 없어요'); return; }
+      if(!cart.length){ toast('추가한 루틴이 없어요'); return; }
       const m = MEMBERS.find(x=>x.id===mid) || {n:''};
       openSheet(()=>`
         <div class="h2">루틴 ${cart.length}개를 추가할까요? <small>${esc(m.n)} 회원</small></div>
         <div class="card">${[...new Set(cart)].map(id=>{ const r=rOf(id), n=cart.filter(x=>x===id).length;
           return r?`<div class="frow"><span class="fk">${esc(r.n)}</span>
             <span class="fv">${r.items.length}종목${n>1?` · ${n}개`:''}</span></div>`:''; }).join('')}</div>
-        <div class="note">고른 루틴을 <b>그대로 베껴</b> 새 루틴으로 만듭니다. 원래 루틴은 그대로 있습니다.</div>
+        <div class="note">선택한 루틴을 <b>그대로 베껴</b> 새 루틴으로 만듭니다. 원래 루틴은 그대로 있습니다.</div>
         <button class="btn main" data-act="raddgo">추가하기</button>
         <button class="btn ghost sm" data-act="raddpick">뒤로</button>`);
       return; }
@@ -11964,41 +11964,41 @@ document.addEventListener('click', async ev=>{
       });
       save();
       if(cart.length===1 && 마지막){        /* 하나만 가져왔으면 바로 이름 짓는 화면으로 */
-        S.redit=마지막; toast('가져왔어요 · 이름을 바꿔 주세요'); go('t_redit'); return; }
-      toast(`루틴 ${cart.length}개를 가져왔어요 · 이름을 바꿔 주세요`); go('t_routines'); return; }
+        S.redit=마지막; toast('가져왔어요 · 이름을 변경해 주세요'); go('t_redit'); return; }
+      toast(`루틴 ${cart.length}개를 가져왔어요 · 이름을 변경해 주세요`); go('t_routines'); return; }
     case 'rgrp': S.rgrp = rest.join(':'); render(); return;
     case 'rmpick': sheetRmPick(); return;
     case 'grpman': sheetGrpMan(); return;
     case 'grpfill': { const el=document.querySelector('[data-k="grpnew"]'); if(el){ el.value=rest.join(':'); el.focus(); } return; }
     case 'grpadd': {
       const el=document.querySelector('[data-k="grpnew"]'), g=(el&&el.value||'').trim();
-      if(!g){ toast('그룹 이름을 적어 주세요'); return; }
+      if(!g){ toast('그룹 이름을 입력해 주세요'); return; }
       S.rgrpNew = S.rgrpNew || {}; S.rgrpNew[(S.tmid||'m1')] = g;
       S.newGrps = S.newGrps || {}; (S.newGrps[S.tmid||'m1'] = S.newGrps[S.tmid||'m1'] || []).push(g);
       if(el) el.value='';
       S.rgrp = g;                       /* 만든 그룹으로 바로 들어간다 */
       closeSheet();
-      toast(`「${g}」 그룹을 만들었어요 · 여기에 루틴을 넣으세요`);
+      toast(`「${g}」 그룹을 만들었어요 · 여기에 루틴을 추가하세요`);
       render(); return; }
     case 'grpren': S.grpRen = rest.join(':'); drawSheet(); return;
     case 'grprencancel': S.grpRen = null; drawSheet(); return;
     case 'grprendo': {
       const from = S.grpRen, el = document.querySelector('[data-k="grprenv"]');
       const to = (el && el.value || '').trim();
-      if(!from || !to){ toast('새 이름을 적어 주세요'); return; }
+      if(!from || !to){ toast('새 이름을 입력해 주세요'); return; }
       const mid = S.tmid||'m1';
       myRoutines(mid).filter(r=>(r.grp||'').trim()===from).forEach(r=>setGrp(r.id, to));
       S.newGrps = S.newGrps || {};
       S.newGrps[mid] = (S.newGrps[mid]||[]).map(g=> g===from ? to : g);
       if(S.rgrp===from) S.rgrp=to;
-      S.grpRen = null; toast('이름을 바꿨어요'); drawSheet(); render(); return; }
+      S.grpRen = null; toast('이름을 변경했어요'); drawSheet(); render(); return; }
     case 'grpdel': {
       const g = rest.join(':');
       myRoutines(S.tmid||'m1').filter(r=>(r.grp||'').trim()===g).forEach(r=>setGrp(r.id, ''));
       if(S.rgrp===g) S.rgrp='전체';
       toast('그룹을 없앴어요 · 루틴은 그대로 있어요'); drawSheet(); render(); return; }
     case 'rsetgrp': { const rid=rest[0], g=rest.slice(1).join(':');
-      setGrp(rid, g); toast(g?`「${g}」 그룹으로`:'그룹에서 뺐어요'); render(); return; }
+      setGrp(rid, g); toast(g?`「${g}」 그룹으로`:'그룹에서 제외했어요'); render(); return; }
     case 'assign': sheetAssign(rest[0], rest[1]); return;
     case 'assigno': {
       const r=rOf(rest[0]), kind=rest[1], on=(rest[2]==='on');
@@ -12033,7 +12033,7 @@ document.addEventListener('click', async ev=>{
 async function finish(){
   const w=live(), done=w.items.filter(it=>it.sets.some(s=>s.done));
   if(!done.length){
-    await sv(sdel('workouts','id=eq.'+w.id), '운동 지우기');
+    await sv(sdel('workouts','id=eq.'+w.id), '운동 삭제');
     D.workouts=D.workouts.filter(x=>x.id!==w.id);
     D.live=null; save(); toast('기록할 세트가 없어요');
     if(S.who==='tr'){ S.tmid=w.mid; S.subj=w.mid; S.stack=[]; S.screen='t_today'; S.ttab='t_today'; go('t_member'); } else go('home');
