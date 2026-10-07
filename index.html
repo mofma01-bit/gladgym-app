@@ -1211,6 +1211,8 @@ body .prephd .ph1{font-size:21px}
 .fsec .grid2{gap:9px}.fsec .fld{gap:5px}.fsec textarea{min-height:76px}
 .lvring.pct small{font-size:8px}.lvring.pct b{font-size:15px;letter-spacing:-.04em}.lvring.pct b u{text-decoration:none;font-size:9px;font-weight:700;margin-left:.5px}
 .rkcap{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;flex:none;margin:-2px 0 4px;font-size:12px;font-weight:600;color:var(--sub)}.rkcap svg{color:var(--gold);flex:none}
+.sstat3>button{display:flex;flex-direction:column;gap:2px;padding:13px 12px 11px;border-radius:16px;background:linear-gradient(180deg,#221f1a,#181816);border:1px solid #34332d;min-width:0;text-align:left;box-shadow:inset 0 1px 0 rgba(240,211,160,.22)}
+.sstat3 .k u{text-decoration:none;font-size:10px;font-weight:700;color:var(--gold-2);margin-left:3px}
 .megoal{width:100%;flex:none;display:flex;flex-direction:column;gap:8px;text-align:left;padding:14px 14px 13px;border-radius:18px;border:1px solid #34332d;background:linear-gradient(180deg,#201f1c,#171615);box-shadow:inset 0 1px 0 rgba(240,211,160,.14)}
 .mgh{display:grid;grid-template-columns:1fr auto;align-items:center;width:100%}.mgh small{grid-column:1/-1;font-size:11.5px;color:var(--sub)}
 .mgh b{font-size:17px;font-weight:800}.mgh i{font-style:normal;color:var(--sub);font-size:17px}
@@ -2562,7 +2564,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '316';
+const BUILD = '317';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -6154,8 +6156,7 @@ function sheetCycCal(mid){
         <span class="d">${y}년 ${m}월</span>
         <button data-act="cycmon:1">›</button></div>
       <div class="cal2">${cells}</div>
-      <div class="note">고르신 날부터 다시 셉니다. 지난번 시작일과의 사이가
-        <b>21~40일</b>이면 주기 길이도 그에 맞춰 조금씩 따라갑니다.</div>`;
+      <div class="cyfoot"><span>고른 날부터 다시 셉니다 · 지난 시작일과 21~45일 사이면 주기도 조금 따라가요</span></div>`;
   });
 }
 function sheetDietCal(){
@@ -8291,7 +8292,7 @@ function 주기시작(mid, 날){
   let 말 = dateTxt(날) + ' 로 기록했어요';
   if(앞 && 앞 < 날){
     const 사이 = Math.round((new Date(날+'T00:00:00') - new Date(앞+'T00:00:00')) / 86400000);
-    if(사이 >= 21 && 사이 <= 40){
+    if(사이 >= 21 && 사이 <= 45){
       const 새 = Math.round((c.len + 사이) / 2);
       if(새 !== c.len){ 말 += ' · 주기를 ' + c.len + '일 → ' + 새 + '일로 맞췄어요'; c.len = 새; }
     }
@@ -9769,7 +9770,7 @@ function vCycle(){
     <div class="empty">주기를 켜면 그날그날 상태를 볼 수 있어요</div>
     ${!tr?`<div class="card"><div class="nm">직접 입력하시겠어요?</div>
       <div class="sm">언제든 끄실 수 있고, 켜 두시면 트레이너가 수업 날 컨디션을 미리 알 수 있어요</div></div>
-      <button class="btn main" data-act="cycon:${mid}">주기 켜기</button>`
+      <button class="btn main" style="flex:none" data-act="cycon:${mid}">주기 켜기</button>`
     :'<div class="note">회원님이 앱에서 직접 켜야 보입니다. 트레이너가 대신 켜지 않습니다.</div>'}` };
   return { top: bar('생리주기', `<span class="sub">${esc(subjName())}</span>`, tr?'tm:'+mid:'tab:me'), body:`
     ${주기고리(c, t)}
@@ -9778,8 +9779,8 @@ function vCycle(){
     <div class="megrp cytip" style="--cc:${주기색[t.ph]}">${CYC_TIP[t.ph].map(x=>`<div class="mrow2"><span class="cyd"></span><span class="mt"><b>${esc(x)}</b></span></div>`).join('')}</div>
     ${!tr?`<span class="lbl">내 주기</span>
       <div class="sstat3">
-        <div><span class="k">주기</span><span class="v">${c.len}<small>일</small></span></div>
-        <div><span class="k">생리 기간</span><span class="v">${c.period}<small>일</small></span></div>
+        <button data-act="cycset:${mid}"><span class="k">주기 <u>고치기</u></span><span class="v">${c.len}<small>일</small></span></button>
+        <button data-act="cycset:${mid}"><span class="k">생리 기간 <u>고치기</u></span><span class="v">${c.period}<small>일</small></span></button>
         <div class="t"><span class="k">다음 예정</span><span class="v cyv">${esc(dateTxt(t.다음))}</span></div>
       </div>
       <div class="megrp"><button class="mrow2" data-act="cyccal:${mid}"><span class="mi">${svg('h_cal',18)}</span>
@@ -9787,6 +9788,22 @@ function vCycle(){
       <button class="btn main" data-act="cycstart:${mid}">오늘 시작했어요</button>
       <div class="cyfoot"><span>트레이너에게는 시기만 보이고 날짜는 보이지 않아요</span><button data-act="cycoff:${mid}">주기 끄기</button></div>`
     :`<div class="cyfoot"><span>회원님이 켜 둬서 보입니다 · 시기만 보이고 날짜는 보이지 않습니다</span></div>`}` };
+}
+/* 주기 설정 — 처음 켤 때 묻고, 나중에도 「내 주기」 숫자 카드를 눌러 고친다 (2026-10-07 대표 「생리주기가 33일도 있고 · 시작 날짜를 직접 지정」)
+   전엔 무조건 28일 · 5일로 시작하고 고칠 칸이 없어, 33일인 사람은 석 달을 써야 맞았다. 다른 앱(애플 · 삼성 · Clue · Flo)은 다 직접 넣는다.
+   범위: 주기 21~45일 · 생리 기간 2~10일. 자동 맞춤(시작일을 기록하면 조금씩 따라감)은 그대로 — 여기 넣은 값에서 출발한다. */
+const 주기범위 = { len:[21,45], period:[2,10] };
+function sheetCycSet(){
+  const d = S.cyset; if(!d) return;
+  openSheet(()=>{ const seg = cycSeg({ len:d.len, period:d.period });
+    return `<div class="h2">${d.새 ? '생리주기 켜기' : '내 주기 고치기'}</div>
+    <div class="fld"><span class="fn">마지막 생리 시작일</span><input class="search" type="date" data-k="cyclast" max="${TODAY}" value="${esc(d.last)}"></div>
+    <div class="step"><span class="k">평소 주기</span><button data-act="cycd:len:-1">−</button><span class="v">${d.len}<small> 일</small></span><button data-act="cycd:len:1">＋</button></div>
+    <div class="step"><span class="k">생리 기간</span><button data-act="cycd:period:-1">−</button><span class="v">${d.period}<small> 일</small></span><button data-act="cycd:period:1">＋</button></div>
+    <div class="cyleg">${seg.map(([nm,a,b])=>`<span class="on" style="--cc:${주기색[nm]}"><i></i><b>${nm}</b><small>${a}~${b}일</small></span>`).join('')}</div>
+    <div class="cyfoot"><span>잘 모르면 28일 · 5일로 두세요. 시작일을 기록할 때마다 조금씩 맞춰집니다</span></div>
+    <button class="btn main" data-act="cycsetok">${d.새 ? '켜기' : '저장'}</button>
+    <button class="btn ghost sm" data-act="close">그대로 두기</button>`; });
 }
 /* 주기 고리 — 네 시기를 고리의 네 토막으로, 오늘 자리에 점. 지금 시기만 진하게 (2026-10-07 융합) */
 function 주기고리(c, t){
@@ -11355,8 +11372,16 @@ document.addEventListener('click', async ev=>{
     case 'cycon': { const mid=rest[0]; D.cycle=D.cycle||{};
       /* ⛔ 다시 켤 때 **적어 둔 시작일 · 주기를 지우지 않는다** — 전엔 켤 때마다 오늘 · 28일로 초기화돼서, 잘못 껐다 켜면 기록이 날아갔다 (2026-10-07 대표) */
       const 옛 = D.cycle[mid];
-      D.cycle[mid] = (옛 && 옛.last) ? Object.assign({}, 옛, { on:true }) : { on:true, last:TODAY, len:28, period:5 };
-      svCycle(mid); toast(옛 && 옛.last ? '주기를 다시 켰어요 — 적어 둔 날짜 그대로예요' : '주기를 켰어요'); render(); return; }
+      if(!(옛 && 옛.last)){ S.cyset = { mid, last:TODAY, len:28, period:5, 새:true }; sheetCycSet(); return; }      /* 처음이면 세 가지를 묻는다 */
+      D.cycle[mid] = Object.assign({}, 옛, { on:true });
+      svCycle(mid); toast('주기를 다시 켰어요 — 적어 둔 날짜 그대로예요'); render(); return; }
+    case 'cycset': { const c = cycOf(rest[0]); if(!c) return; S.cyset = { mid:rest[0], last:c.last, len:c.len, period:c.period }; sheetCycSet(); return; }
+    case 'cycd': { const d = S.cyset; if(!d) return; const el = document.querySelector('[data-k="cyclast"]'); if(el && el.value) d.last = el.value;
+      const k = rest[0], [lo, hi] = 주기범위[k]; d[k] = Math.min(hi, Math.max(lo, d[k] + Number(rest[1]))); drawSheet(); return; }
+    case 'cycsetok': { const d = S.cyset; if(!d) return; const el = document.querySelector('[data-k="cyclast"]'); if(el && el.value) d.last = el.value;
+      if(!d.last || d.last > TODAY){ toast('시작일은 오늘이나 지난 날로 골라 주세요'); return; }
+      D.cycle = D.cycle || {}; D.cycle[d.mid] = { on:true, last:d.last, len:d.len, period:d.period };
+      S.cyset = null; closeSheet(); svCycle(d.mid); toast(d.새 ? '주기를 켰어요' : '고쳤어요'); render(); return; }
     case 'cycoff': sheet끄기확인('생리주기를 끌까요?', '끄면 내 화면과 트레이너 화면에서 주기가 안 보입니다.<br>적어 둔 시작일 · 주기는 남아 있어서, 다시 켜면 그대로 이어집니다.', '끄기', 'cycoffok:' + rest[0]); return;
     case 'cycoffok': { const mid=rest[0];
       if(D.cycle&&D.cycle[mid]) D.cycle[mid].on=false;
