@@ -874,7 +874,7 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .hero.photo{position:relative;overflow:hidden;isolation:isolate;min-height:176px;border-color:rgba(240,211,160,.45);
   background:#17120d url(img/hero-rack.jpg) right center/cover no-repeat}
 .hero.photo::before{content:'';position:absolute;inset:0;z-index:-1;
-  background:linear-gradient(90deg,rgba(22,16,10,.98) 0%,rgba(26,18,11,.95) 52%,rgba(34,22,12,.62) 80%,rgba(40,26,14,.4) 100%)}
+  background:linear-gradient(90deg,rgba(22,16,10,.97) 0%,rgba(24,17,11,.9) 46%,rgba(30,20,12,.35) 74%,rgba(30,20,12,.08) 100%)}   /* 덮개는 글자 쪽만 — 오른쪽 사진은 또렷하게 (2026-10-07 대표 「마스크가 낀 것 같다」) */
 .hero.photo .ht{font-size:24px}
 /* NEW 알림 — 바깥 알약은 없다(알약 안에 알약이라 과했다 · 2026-10-06 대표). 글자에 빛이 지나간다 */
 .hero .tag.new{display:inline-flex;align-items:center;gap:7px;background:none;border:0;padding:0;color:var(--gold);font-size:13px;font-weight:700}
@@ -1113,6 +1113,10 @@ body .pcm{padding:9px 11px;border-radius:12px;background:#1b1a18;border:1px soli
 body .ootdnudge .ic{color:var(--gold);display:flex}
 .pgk svg{display:block}
 .btn svg.ic2{vertical-align:-4px}
+.regtag{width:40px;height:36px;border-radius:11px;flex:none;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--gold);border:1px solid rgba(240,211,160,.45);background:rgba(240,211,160,.07)}
+.regtag.r{color:var(--teal);border-color:rgba(169,216,230,.5);background:rgba(169,216,230,.07)}.regtag.x{color:#6f6c66;border-color:#34332d;background:none}
+body .tmsum>div,body .sstat3>div,body .dgrid>div,body .hcard,body .lvme,body .mehead,body .tmhead,body .megoal,body .mealcd,body .dwk,body .wk,body .gbox,body .card,body .pcard,body .cm.cm2,body .sspick{box-shadow:none}
+body .hero.photo{background-origin:border-box;background-clip:border-box}
 .megoal{width:100%;flex:none;display:flex;flex-direction:column;gap:8px;text-align:left;padding:14px 14px 13px;border-radius:18px;border:1px solid #34332d;background:linear-gradient(180deg,#201f1c,#171615);box-shadow:inset 0 1px 0 rgba(240,211,160,.14)}
 .mgh{display:grid;grid-template-columns:1fr auto;align-items:center;width:100%}.mgh small{grid-column:1/-1;font-size:11.5px;color:var(--sub)}
 .mgh b{font-size:17px;font-weight:800}.mgh i{font-style:normal;color:var(--sub);font-size:17px}
@@ -2423,7 +2427,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '293';
+const BUILD = '294';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2576,7 +2580,7 @@ async function boot(){
 
   EX = exs.map(e => ({ id:e.id, n:e.name, p:e.part, e:e.equip, cardio: e.cardio ? 1 : 0,
     vars: vrs.filter(v => v.ex_id === e.id).map(v => ({ k:v.vkey, n:v.name||'', desc:v.descr||'', demo: v.demo?1:0, du: v.demo_url||'' })) }));
-  MEMBERS = mems.filter(m => m.role === 'member').map(m => ({ id:m.id, n:m.name, tr:m.trainer,
+  MEMBERS = mems.filter(m => m.role === 'member').map(m => ({ id:m.id, n:m.name, tr:m.trainer, reg:(m.reg_kind||'').trim(),
     /* 동의 칸 — 설계서\8단계_SQL_동의칸.sql (없으면 undefined 로 들어와 「미동의」로 본다) */
     aT:m.agree_terms_at||'', aP:m.agree_privacy_at||'', aS:m.agree_sensitive_at||'',
     aM:m.agree_marketing_at||'', aV:m.agree_version||'',
@@ -2963,7 +2967,11 @@ function drawSheet(){
   const box=$('#sheetbox');
   box.querySelectorAll('textarea[data-k],input[data-k]').forEach(t=>{
     if(!초안칸(t)) return; S.draft=S.draft||{}; S.draft[t.getAttribute('data-k')]=t.value; });
+  /* 체크·칩을 누르면 창을 통째로 다시 그린다 → 스크롤이 맨 위로 튀었다. **같은 창**(제목이 같다)이면 보던 자리를 되돌린다 */
+  const 제목 = b => { const h = b.querySelector('.h2'); return h && h.firstChild ? (h.firstChild.textContent||'').trim() : ''; };
+  const 옛제목 = 제목(box), 옛자리 = [box.scrollTop].concat([...box.querySelectorAll('.pickbox')].map(e=>e.scrollTop));
   box.innerHTML='<div class="grip"></div>'+sheetRender();
+  if(옛제목 && 제목(box) === 옛제목){ box.scrollTop = 옛자리[0]; [...box.querySelectorAll('.pickbox')].forEach((e,i)=>{ if(옛자리[i+1]) e.scrollTop = 옛자리[i+1]; }); }
   box.querySelectorAll('textarea[data-k],input[data-k]').forEach(t=>{
     if(!초안칸(t)) return; const d=S.draft&&S.draft[t.getAttribute('data-k')]; if(d) t.value=d; });
 }
@@ -9598,7 +9606,9 @@ function tTools(){
 
 function tMembers(){
   return { top: bar('회원 목록', `<span class="sub">담당 ${MEMBERS.length}명</span>`), body:
-    (()=>{ const 줄 = MEMBERS.map(m=>{
+    (()=>{ const 거름 = S.tmreg || '';
+      const 수 = { 신규: MEMBERS.filter(m=>m.reg==='신규').length, 재등록: MEMBERS.filter(m=>m.reg==='재등록').length };
+      const 줄 = MEMBERS.filter(m => !거름 || m.reg === 거름).map(m=>{
         const ws=D.workouts.filter(w=>w.mid===m.id&&w.done).slice().sort(byDateDesc), last=ws[0];
         const lv=liveOf(m.id), nofb=last && !D.cm.some(c=>c.mid===m.id && c.at==='방금');
         return { m, last, lv, nofb }; });
@@ -9607,9 +9617,10 @@ function tMembers(){
           <div><small>담당 회원</small><b>${줄.length}<i>명</i></b></div>
           <div class="t"><small>지금 운동 중</small><b>${줄.filter(x=>x.lv).length}<i>명</i></b></div>
           <div><small>안 본 기록</small><b>${줄.filter(x=>!x.lv && x.nofb).length}<i>명</i></b></div></div>
+        <div class="chips">${[['','전체',MEMBERS.length],['신규','신규',수.신규],['재등록','재등록',수.재등록]].map(k=>`<button class="chip ${거름===k[0]?'on':''}" data-act="tmreg:${k[0]}">${k[1]} ${k[2]}</button>`).join('')}</div>
         <input class="search" type="text" data-filter="1" placeholder="회원 이름으로 찾기">
-        <div class="megrp">${줄.map(({m,last,lv,nofb})=>`<button class="mrow2" data-nm="${esc(m.n)}" data-act="tm:${m.id}">
-          <span class="mi nm1 ${lv?'lv':''}">${esc((m.n||'회').slice(0,1))}</span>
+        <div class="megrp">${줄.length ? '' : '<div class="empty">해당하는 회원이 없어요</div>'}${줄.map(({m,last,lv,nofb})=>`<button class="mrow2" data-nm="${esc(m.n)}" data-act="tm:${m.id}">
+          <span class="regtag ${m.reg==='신규'?'n':(m.reg==='재등록'?'r':'x')}">${m.reg==='신규'?'신규':(m.reg==='재등록'?'재등':'–')}</span>
           <span class="mt"><b>${esc(m.n)}</b><small>${lv?`지금 운동 중 · ${esc((it0=>it0?exName(it0.ex,it0.va):'')(lv.items[lv.cur]||lv.items[0]))}`
             :(last?`${dateTxt(last.date)} · ${esc(last.kind||'')}`:'기록 없음')}</small></span>
           ${lv?'<span class="pill t">진행 중</span>'
@@ -9683,7 +9694,7 @@ function sheetTWAll(mid){
 function tLive(){
   const lv=liveOf(S.tmid); if(!lv) return tMembers();
   const m=MEMBERS.find(x=>x.id===lv.mid);
-  return { top: bar(m.n+' · 수업 중', (lv.startAt ? `<span class="tm" id="tm">${mmss((Date.now()-lv.startAt)/1000)}</span>`
+  return { top: bar(m.n+' · 코멘트 남기기', (lv.startAt ? `<span class="tm" id="tm">${mmss((Date.now()-lv.startAt)/1000)}</span>`
       : `<button class="chip t" data-act="timego">시간 재기 ▶</button>`), 'tm:'+m.id),
     keepScroll:true, body:
     lv.items.map((it,i)=>{ const sent=D.cm.filter(c=>c.mid===m.id&&c.ex===it.ex&&c.va===it.va&&c.at==='방금');
@@ -9692,8 +9703,8 @@ function tLive(){
         <div class="sm">${it.sets.filter(s=>s.done).length?it.sets.filter(s=>s.done).map(x=>setShort(it.ex,x)).join(' · '):'아직 안 했어요'}
         ${sent.length?`<br>방금 코멘트 ${sent.length}개 보냄`:''}<br>설명 보기 · 코멘트 남기기 ›</div></button>`;
     }).join('')
-    + `<div class="note">회원이 <b>지금 하는 것</b>이 골드로 잡힙니다. 누르면 그 자리에서 설명을 고치거나 코멘트를 남길 수 있어요. 보낸 것은 회원 화면에 <b>NEW</b>로 뜹니다.</div>`,
-    foot:`<button class="btn main" data-act="tgo:${m.id}">내가 대신 기록하기</button>` };
+    + `<div class="note">종목을 누르면 코멘트를 남길 수 있어요. <b>지금 하는 종목</b>이 금색입니다.</div>`,
+    foot:`<button class="btn main" data-act="tgo:${m.id}">수업 기록으로 돌아가기</button>` };
 }
 function tWrite(){
   const w=D.workouts.find(x=>x.id===S.twid), m=MEMBERS.find(x=>x.id===w.mid);
@@ -11270,6 +11281,7 @@ document.addEventListener('click', async ev=>{
     case 'rkb': S.rkb=rest[0]; render(); return;
     case 'rks': S.rks=rest[0]; render(); return;
     case 'rkmine': sheetRkMine(); return;
+    case 'tmreg': S.tmreg = rest[0] || ''; render(); return;
     case 'rklv': sheetRkLevel(+rest[0]); return;
     case 'rkladder': sheetRkLadder(); return;
     case 'rkall': sheetRkAll(); return;
