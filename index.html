@@ -1179,6 +1179,14 @@ body .prephd .ph1{font-size:21px}
 .pkg .mrow2 .mt small u{text-decoration:none;color:var(--gold-2)}
 .pkadd{font-style:normal;flex:none;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:var(--sub);border:1.2px solid #4a463d}
 .pson .pkadd{color:#2a1c14;border-color:transparent;background:linear-gradient(180deg,#f3d9a8,#e2c184);font-size:13px;font-weight:800}
+.pkg .mrow2.pkjust{background:rgba(240,211,160,.08)}
+.ikg .mrow2{padding:12px 15px;align-items:flex-start;gap:12px}
+.ikk{flex:none;width:86px;font-size:12.5px;font-weight:600;color:var(--sub);padding-top:1px}.ikv{flex:1;min-width:0;font-size:14.5px;font-weight:600;line-height:1.5;white-space:pre-wrap;word-break:keep-all}
+.megrp.ikg.t{border-color:#3f7281}
+.ikdays{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;width:100%;flex:none}
+.ikdays span{aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#6f6a63;border:1.2px solid #34332d}
+.ikdays span.on{color:#2a1c14;border-color:transparent;background:linear-gradient(180deg,#f3d9a8,#e2c184)}
+.sstat3.ib4.plg>div{grid-template-columns:1fr}
 .megoal{width:100%;flex:none;display:flex;flex-direction:column;gap:8px;text-align:left;padding:14px 14px 13px;border-radius:18px;border:1px solid #34332d;background:linear-gradient(180deg,#201f1c,#171615);box-shadow:inset 0 1px 0 rgba(240,211,160,.14)}
 .mgh{display:grid;grid-template-columns:1fr auto;align-items:center;width:100%}.mgh small{grid-column:1/-1;font-size:11.5px;color:var(--sub)}
 .mgh b{font-size:17px;font-weight:800}.mgh i{font-style:normal;color:var(--sub);font-size:17px}
@@ -2530,7 +2538,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '303';
+const BUILD = '305';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -8329,30 +8337,32 @@ function subj(){ return S.subj || S.mid; }
 function subjName(){ const m=MEMBERS.find(x=>x.id===subj()); return m?m.n:''; }
 function vIntake(){
   const mid=subj(), d=D.intake[mid]||{}, tr=(S.who==='tr');
-  const row=(k,v)=>`<div class="frow"><span class="fk">${esc(k)}</span><span class="fv ${v?'':'none'}">${esc(v||'아직 안 적음')}</span></div>`;
-  return { top: bar('상담일지', `<span class="sub">${esc(subjName())}</span>`, tr?'tm:'+mid:'tab:me'), body:`
-    ${tr?`<button class="btn main" data-act="editintake:${mid}">상담일지 수정</button>`:''}
-    <div class="card">
-      ${row('생년월일', d.birth ? `${birthYmd(d.birth)||d.birth}${ageFrom(d.birth)?`  ·  만 ${ageFrom(d.birth)}세`:''}` : '')}${row('신장', d.height)}${row('성별', d.sex)}
-      ${row('직업', d.job)}${row('직업환경', d.jobenv)}${row('교대근무', d.shift)}</div>
-    <span class="lbl">글래드짐을 알게 된 경로</span>
-    <div class="card"><div class="chips">${(d.route||[]).map(x=>`<span class="chip on">${esc(x)}</span>`).join('')||'<span class="lbl">없음</span>'}</div></div>
-    <div class="card">${row('경험한 운동', d.expr)}${row('스트레스 요인', d.stress)}${row('스트레스 강도', d.stressLv)}
-      ${row('해소 방법', (d.relief||[]).join(', '))}</div>
-    <span class="lbl">나의 식습관</span>
-    <div class="card">${Object.entries(d.meals||{}).map(([k,v])=>row(k,v)).join('')}</div>
-    <div class="card">${row('현재 겪는 것', (d.cond||[]).join(', '))}${row('과거 병력·질환', (d.hist||[]).join(', '))}</div>
-    <span class="lbl">운동 가능 시간</span>
-    <div class="card"><div class="chips">${['월','화','수','목','금','토','일'].map(x=>
-      `<span class="chip ${(d.time||[]).includes(x)?'on':''}">${x}</span>`).join('')}</div>
-      <div class="sm">${esc(d.timeTxt||'')}</div></div>
-    <span class="lbl">회원님이 원하는 것</span>
-    <div class="card"><div class="fv">${esc(d.needs||'아직 안 적음')}</div></div>
-    ${tr?`<span class="lbl">특이사항 — 트레이너만 봅니다</span>
-      <div class="card"><div class="fv">${esc(d.notes||'없음')}</div></div>
-      <button class="btn sub" data-act="editintake:${mid}">수정</button>
-      <div class="note">상담일지는 <b>트레이너가 대시보드나 태블릿에서</b> 작성합니다. 회원님은 설치할 때 아무것도 안 적어도 됩니다.</div>`
-    :`<div class="note">첫 상담 때 <b>트레이너가 적어 둔 내용</b>입니다. 바뀐 것이 있으면 말씀해 주세요.</div>`}` };
+  let 빈 = 0;
+  /* 적힌 것만 줄로 — 안 적은 항목은 세기만 한다 (2026-10-07 융합: 「아직 안 적음」이 화면을 채웠다) */
+  const 묶음 = (제목, 쌍) => { const 찬 = 쌍.filter(p => { if(!p[1]) 빈++; return p[1]; }); if(!찬.length) return '';
+    return `<span class="lbl">${제목}</span><div class="megrp ikg">${찬.map(p=>`<div class="mrow2"><span class="ikk">${esc(p[0])}</span><span class="ikv">${esc(p[1])}</span></div>`).join('')}</div>`; };
+  const 나이 = ageFrom(d.birth), 식 = Object.entries(d.meals||{});
+  const 몸 = `
+    <div class="sstat3">
+      <div><span class="k">나이</span><span class="v">${나이 || '—'}<small>${나이 ? '세' : ''}</small></span></div>
+      <div><span class="k">신장</span><span class="v">${esc(String(d.height||'—').replace(/cm/i,''))}<small>${d.height ? 'cm' : ''}</small></span></div>
+      <div class="t"><span class="k">성별</span><span class="v cyv" style="font-size:22px;padding-top:2px">${esc(d.sex||'—')}</span></div>
+    </div>
+    ${tr?`<button class="hline gold" data-act="editintake:${mid}">${svg('h_note',18)}<b>상담일지 수정</b><small>눌러서 고치기</small></button>`:''}
+    ${묶음('기본', [['생년월일', d.birth ? (birthYmd(d.birth)||d.birth) : ''], ['직업', d.job], ['직업환경', d.jobenv], ['교대근무', d.shift]])}
+    ${(d.route||[]).length ? `<span class="lbl">글래드짐을 알게 된 경로</span><div class="chips">${d.route.map(x=>`<span class="chip on">${esc(x)}</span>`).join('')}</div>` : (빈++, '')}
+    ${묶음('운동 · 스트레스', [['경험한 운동', d.expr], ['스트레스 요인', d.stress], ['스트레스 강도', d.stressLv], ['해소 방법', (d.relief||[]).join(', ')]])}
+    ${묶음('나의 식습관', 식)}
+    ${묶음('몸 상태', [['현재 겪는 것', (d.cond||[]).join(', ')], ['과거 병력·질환', (d.hist||[]).join(', ')]])}
+    ${((d.time||[]).length || d.timeTxt) ? `<span class="lbl">운동 가능 시간</span>
+      <div class="ikdays">${['월','화','수','목','금','토','일'].map(x=>`<span class="${(d.time||[]).includes(x)?'on':''}">${x}</span>`).join('')}</div>
+      ${d.timeTxt ? `<div class="cyfoot"><span>${esc(d.timeTxt)}</span></div>` : ''}` : (빈++, '')}
+    ${d.needs ? `<span class="lbl">회원님이 원하는 것</span><div class="megrp ikg"><div class="mrow2"><span class="ikv">${esc(d.needs)}</span></div></div>` : (빈++, '')}
+    ${tr && d.notes ? `<span class="lbl">특이사항 · 트레이너만 봅니다</span><div class="megrp ikg t"><div class="mrow2"><span class="ikv">${esc(d.notes)}</span></div></div>` : ''}`;
+  return { top: bar('상담일지', `<span class="sub">${esc(subjName())}</span>`, tr?'tm:'+mid:'tab:me'), body: 몸 + (빈
+    ? (tr ? `<button class="hline" data-act="editintake:${mid}">${svg('h_note',18)}<b>안 적은 항목 ${빈}개</b><small>눌러서 채우기</small></button>`
+          : `<div class="cyfoot"><span>아직 안 적은 항목 ${빈}개 · 바뀐 것이 있으면 트레이너에게 말씀해 주세요</span></div>`)
+    : '') };
 }
 
 function vIntakeEdit(){
@@ -8749,30 +8759,25 @@ function vPlan(){
   const g=GOALS[mid]||{}; g.now=g.now||{}; g.to=g.to||{};
   const unit = u => u==='fp' ? '%' : 'kg';
   const has=u=>g.to[u]!=null&&g.to[u]!=='';
-  const cmp=(k,u)=>`<div class="frow"><span class="fk">${k}</span>
-    <span class="fv">${g.now[u]!=null&&g.now[u]!==''?g.now[u]+unit(u):'—'}${has(u)?` <span style="color:#5f5c57">→</span> <b style="color:var(--gold)">${g.to[u]+unit(u)}</b>`:''}</span></div>`;
+  const 있 = v => v!=null && v!=='';
+  const 칸 = (k,u) => (!있(g.now[u]) && !has(u)) ? '' : `<div class="${u==='m'?'t':''}"><span class="k">${k}</span>
+    <span class="v">${has(u) ? g.to[u] : g.now[u]}<small>${unit(u)}</small></span><i>${has(u) ? (있(g.now[u]) ? '지금 '+g.now[u]+unit(u) : '목표') : '지금 · 목표 없음'}</i></div>`;
+  const 칸들 = 칸('몸무게','w') + 칸('근육량','m') + 칸('체지방량','f') + 칸('체지방률','fp'), 목적 = (g.purpose||[]), 남 = dLeft(g.to.date);
   return { top: bar('운동계획', `<span class="sub">${esc(subjName())}</span>`, tr?'tm:'+mid:'tab:me'), body:`
-    ${tr?`<button class="btn main" data-act="editplan:${mid}">계획 수정 · 칼로리 계산</button>`:''}
+    ${tr?`<button class="hline gold" data-act="editplan:${mid}">${svg('h_target',18)}<b>계획 수정 · 칼로리 계산</b><small>눌러서 고치기</small></button>`:''}
     <span class="lbl">나의 운동 목적</span>
-    <div class="chips">${['다이어트','근육증가','교정운동','건강','그 밖에'].map(x=>
-      `<button class="chip ${(g.purpose||[]).includes(x)?'on':''}" ${tr?`data-act="editplan:${mid}"`:''}>${x}</button>`).join('')}</div>
-    <span class="lbl">목표 설정</span>
-    <div class="card">
-      <div class="sm">${esc(g.now.date||'—')} → ${esc(g.to.date||'—')}${
-        (()=>{ const n=dLeft(g.to.date); return n!=null&&n>=0?` · ${n}일 남음`:''; })()}</div>
-      ${cmp('몸무게','w')}${cmp('근육량','m')}${cmp('체지방량','f')}${cmp('체지방률','fp')}</div>
+    ${목적.length ? `<div class="chips">${목적.map(x=>`<span class="chip on">${esc(x)}</span>`).join('')}</div>` : '<div class="cyfoot"><span>아직 정하지 않았어요</span></div>'}
+    <span class="lbl">목표${(g.now.date||g.to.date) ? ` <small style="font-weight:600;color:var(--sub)">${esc(g.now.date||'—')} → ${esc(g.to.date||'—')}${남!=null&&남>=0 ? ' · '+남+'일 남음' : ''}</small>` : ''}</span>
+    ${칸들 ? `<div class="sstat3 ib4 plg">${칸들}</div>` : '<div class="cyfoot"><span>아직 정한 목표가 없어요</span></div>'}
     <span class="lbl">맞춤 칼로리 · 얼마나 빠질까</span>
     ${(g.calc && (g.now.w||g.calc.bmr)) ? calcBrief(g)+calcHTML(g) : ''}
-    <span class="lbl" style="opacity:.6">직접 적어 둔 값</span>
-    <div class="grid2">
-      <div class="tile"><span class="k">하루 칼로리</span><span class="v">${g.kcal||'—'}<small> kcal</small></span></div>
-      <div class="tile"><span class="k">탄 / 단 / 지</span><span class="v" style="font-size:19px">${esc(g.ratio||'—')}</span></div>
-      <div class="tile"><span class="k">1주 감량 예상</span><span class="v">${esc(g.wk||'—')}</span></div>
-      <div class="tile"><span class="k">한 달 감량 예상</span><span class="v">${esc(g.mo||'—')}</span></div></div>
-    <span class="lbl">내가 지킬 약속</span>
-    <div class="card">${(g.vows||[]).map(v=>`<div class="frow"><span class="fk" style="min-width:20px;color:var(--gold)">✓</span><span class="fv">${esc(v)}</span></div>`).join('')}</div>
-    <span class="lbl">회원님, 이건 꼭 약속해요</span>
-    <div class="card">${(g.promises||[]).map(v=>`<div class="frow"><span class="fk" style="min-width:20px;color:var(--teal)">✓</span><span class="fv">${esc(v)}</span></div>`).join('')}</div>
+    ${(g.kcal||g.ratio||g.wk||g.mo) ? `<span class="lbl">직접 적어 둔 값</span>
+    <div class="megrp ikg">${[['하루 칼로리', g.kcal ? g.kcal+' kcal' : ''], ['탄 / 단 / 지', g.ratio], ['1주 감량 예상', g.wk], ['한 달 감량 예상', g.mo]].filter(p=>p[1])
+      .map(p=>`<div class="mrow2"><span class="ikk">${p[0]}</span><span class="ikv">${esc(p[1])}</span></div>`).join('')}</div>` : ''}
+    ${(g.vows||[]).length ? `<span class="lbl">내가 지킬 약속</span>
+    <div class="megrp ikg">${g.vows.map(v=>`<div class="mrow2"><span class="cyd" style="--cc:var(--gold)"></span><span class="ikv">${esc(v)}</span></div>`).join('')}</div>` : ''}
+    ${(g.promises||[]).length ? `<span class="lbl">회원님, 이건 꼭 약속해요</span>
+    <div class="megrp ikg">${g.promises.map(v=>`<div class="mrow2"><span class="cyd" style="--cc:var(--teal)"></span><span class="ikv">${esc(v)}</span></div>`).join('')}</div>` : ''}
 ` };
 }
 
@@ -10220,15 +10225,14 @@ function tPickEx(){
   const cnt = k => r.items.filter(it=>VID(it.ex,it.va)===k).length;
   return { top: bar('종목 담기', `<span class="sub">담은 ${r.items.length}개</span>`, 're:'+r.id), keepScroll:true, body:`
     <input class="search" type="text" data-filter="1" placeholder="종목 이름으로 찾기">
-    <div class="chips">${PARTS.map(x=>`<button class="chip ${x===S.pickPart?'on':''}" data-act="rpart:${x}">${x}</button>`).join('')}</div>
-    <button class="hline gold" data-act="exnew">${svg('h_dumb',18)}<b>＋ 종목 만들기</b><small>사전에 없는 운동 · 내 종목 ${내운동().length}개</small></button>
-    ${list.map(e=>vars(e.id).map(v=>{ const k=VID(e.id,v.k), n=cnt(k), just=(S.just===k);
-      return `<button class="card rowc ${just?'just':(n?'done2':'')}" data-nm="${esc(e.n+' '+(v.n||''))}" data-act="raddv:${r.id}:${e.id}:${v.k}">
-        <div><div class="nm">${esc(e.n)}${v.n?` (${esc(v.n)})`:''}</div>
-        <div class="sm">${e.owner ? '<span style="color:var(--gold)">내 종목</span> · ' : ''}${esc(e.e)}${v.desc?' · 설명 있음':''}</div></div>
-        ${just?'<span class="pill">방금 담음</span>':(n?`<span class="pill t">담김 ${n>1?n:'✓'}</span>`:'<span class="rt">＋</span>')}</button>`;
-      }).join('')).join('')}
-    <div class="note">눌러서 <b>여러 개를 이어서</b> 담으세요. 다 담았으면 아래 버튼을 누릅니다.</div>`,
+    <div class="pkparts">${PARTS.map(x=>`<button class="chip ${x===S.pickPart?'on':''}" data-act="rpart:${x}">${x}</button>`).join('')}</div>
+    <div class="pkmini"><button class="g" data-act="exnew">${svg('h_dumb',15)} ＋ 종목 만들기${내운동().length ? ` · 내 종목 ${내운동().length}` : ''}</button></div>
+    <div class="megrp pkg">${list.map(e=>vars(e.id).map(v=>{ const k=VID(e.id,v.k), n=cnt(k), just=(S.just===k);
+      return `<button class="mrow2 ${n?'pson':''} ${just?'pkjust':''}" data-nm="${esc(e.n+' '+(v.n||''))}" data-act="raddv:${r.id}:${e.id}:${v.k}">
+        <span class="mt"><b>${esc(e.n)}${v.n?` (${esc(v.n)})`:''}</b>
+          <small>${e.owner ? '<u>내 종목</u> · ' : ''}${esc(e.e)}${v.desc?' · 설명 있음':''}${just?' · 방금 담음':''}</small></span>
+        <em class="pkadd">${n ? '✓' + (n>1 ? n : '') : '＋'}</em></button>`;
+      }).join('')).join('')}</div>`,
     foot:`<button class="btn main" data-act="re:${r.id}">다 담았어요 · ${r.items.length}개 ›</button>` };
 }
 
