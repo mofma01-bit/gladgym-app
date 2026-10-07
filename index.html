@@ -2564,7 +2564,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '318';
+const BUILD = '319';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -3015,7 +3015,7 @@ function sheetAgreeOff(){
     <div class="h2">건강정보 동의를 취소하시겠어요?</div>
     <div class="agbody" style="margin:2px 0 10px">
       취소하시면 지금까지 모은 아래 기록이 <b>모두 지워집니다.</b> 되돌릴 수 없어요.<br><br>
-      · 인바디·체성분 기록 <b>${ib}건</b><br>
+      · 인바디 기록 <b>${ib}건</b><br>
       · 체형 사진 <b>${ph}장</b><br><br>
       운동기록·식단·루틴은 그대로 유지됩니다.
     </div>
@@ -8828,7 +8828,7 @@ function vPlanEdit(){
       <div class="chips">${['다이어트','근육증가','교정운동','건강','그 밖에'].map(x=>
         `<button class="chip ${(g.purpose||[]).includes(x)?'on':''}" data-act="pickn:pg:purpose:${x}">${x}</button>`).join('')}</div></div>
     </div>
-    <div class="fsec"><span class="fsh">현재 체성분</span>
+    <div class="fsec"><span class="fsh">현재 인바디</span>
     ${intakeNote(mid)}
     <div class="fld"><span class="fn">성별</span>
       <div class="chips">${['여','남'].map(x=>`<button class="chip ${c.sex===x?'on':''}" data-act="pc1:sex:${x}">${x}</button>`).join('')}</div></div>
@@ -9186,7 +9186,7 @@ function blPane(mid){
     return `<div class="${k==='m'?'t':''}"><span class="k">${m.n}</span><span class="v">${vb?ib수(vb):'—'}<small>${m.u}</small></span>
       <em class="${c}">${d || '—'}</em><i>이전 ${va?ib수(va):'—'}</i></div>`; };
   return `
-    <span class="lbl">인바디 · 체성분</span>
+    <span class="lbl">인바디</span>
     ${ls.length ? `
     <div class="ibcmp">
       <div class="ibsel">
@@ -9204,7 +9204,7 @@ function blPane(mid){
     <button class="btn sub sm" data-act="ibfind">기록 찾기 · ${ls.length}건 ›</button>
     ` : '<div class="empty">아직 잰 기록이 없어요</div>'}
     <button class="btn blue sm" data-act="ibpull:${mid}">루킨바디에서 지난 기록 가져오기</button>
-    <button class="btn sub sm" data-act="bladd:${mid}">＋ 오늘 체성분 기록</button>`;
+    <button class="btn sub sm" data-act="bladd:${mid}">＋ 오늘 인바디 기록</button>`;
 }
 
 /* 기록 찾기 · 날짜 고르기 — 같은 창. 고르면 그 날이 비교 칸에 들어간다 */
@@ -9279,7 +9279,7 @@ function sheetBlAdd(mid){
   const v = k => { const x = cur ? cur[k] : (k==='w' ? nnum(g.now && g.now.w) : (k==='fp' ? nnum(g.now && g.now.fp) : last[k]));
     return x ? kgfmt(x) : ''; };
   openSheet(()=>`
-    <div class="h2">체성분 기록 <small>${esc((MEMBERS.find(m=>m.id===mid)||{}).n||'')}</small></div>
+    <div class="h2">인바디 기록 <small>${esc((MEMBERS.find(m=>m.id===mid)||{}).n||'')}</small></div>
     <div class="fld"><span class="fn">잰 날</span>
       <input class="search" type="date" data-k="bl:date" value="${S.blDate||TODAY}"></div>
     <div class="grid2">
@@ -9313,7 +9313,7 @@ async function blSave(mid){
   Object.assign(row, { w, m:m2, f:f2, fp });
   ls.sort((a,b)=> a.date<b.date?-1:1);
   await sv(spost('body_logs', [{ id:row.id, member_id:mid, on_date:date, w:w||null, m:m2||null,
-    f:f2||null, fp:fp||null }], {on:'member_id,on_date'}), '체성분 저장');
+    f:f2||null, fp:fp||null }], {on:'member_id,on_date'}), '인바디 기록 저장');
   /* 가장 최근 것이면 운동계획의 현재 몸 상태에도 넣습니다 */
   if(ls[ls.length-1] === row){
     const g = GOALS[mid] || (GOALS[mid] = {}); g.now = g.now || {};
@@ -11264,7 +11264,7 @@ document.addEventListener('click', async ev=>{
     case 'blgo': blSave(rest[0]); return;
     case 'bldel': { const id = rest[0]; closeSheet();
       Object.keys(D.blog||{}).forEach(k => D.blog[k] = D.blog[k].filter(x=>x.id!==id));
-      sv(sdel('body_logs','id=eq.'+id), '체성분 기록 지우기');
+      sv(sdel('body_logs','id=eq.'+id), '인바디 기록 지우기');
       toast('지웠어요'); render(); return; }
     case 'bppose': S.bpPose = rest[0]; S.bpL=null; S.bpR=null; render(); return;
     case 'bpsel': { const side = rest[0], mid = (S.screen==='body') ? subj() : anaMid();
