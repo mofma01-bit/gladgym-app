@@ -1423,7 +1423,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '186';
+const BUILD = '187';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -2737,11 +2737,11 @@ function 추가판그리기(){
     + '<div style="display:flex;gap:6px;margin-bottom:12px">'
     + '<input class="inp" id="crmq" placeholder="이름 또는 전화번호 뒷자리" value="' + esc(추가판.q) + '" style="flex:1">'
     + '<button class="btn main" data-act="memfind">검색</button></div>'
-    + (추가판.찾는중 ? '<div class="empty">찾는 중이에요…</div>'
+    + (추가판.찾는중 ? '<div class="empty">검색 중이에요…</div>'
        : 추가판.왜 ? '<div class="empty">' + esc(추가판.왜) + '</div>'
        : 줄 ? 줄
        : (추가판.q ? '<div class="empty">그런 분이 없어요 — PT 수강권이 없으면 안 나옵니다</div>'
-                  : '<div class="empty">찾을 말을 입력해 주세요</div>'))
+                  : '<div class="empty">검색어를 입력해 주세요</div>'))
     + '</div>');
   setTimeout(function(){ const el = $('#crmq'); if(el){ el.focus();
     el.onkeydown = function(ev){ if(ev.key==='Enter') 회원찾기(); }; } }, 40);
@@ -3236,7 +3236,7 @@ async function 운동종목손잡이(a, act){
       await ssend('variants?on_conflict=id', 'POST', [vrow], 'resolution=merge-duplicates');
       D.ex = D.ex.filter(z => z.id !== row.id).concat([row]);
       const v0 = D.va.find(z => z.id === vrow.id); if(v0) Object.assign(v0, vrow); else D.va.push(vrow);
-      const 새 = EXN.새; S.part = EXN.part; S.exq = ''; EXN = null; 세트창(); 팝업다시(); toast(새 ? '만들었어요 — 목록 맨 위에 있어요' : '고쳤어요'); }
+      const 새 = EXN.새; S.part = EXN.part; S.exq = ''; EXN = null; 세트창(); 팝업다시(); toast(새 ? '만들었어요 — 목록 맨 위에 있어요' : '수정했어요'); }
     catch(e){ toast('못 저장했어요 — ' + e.message); } return true; }
   if(a==='exdel'){ const 쓰는 = (D.ri||[]).some(x => String(x.variant_id||'').indexOf(EXN.id + ':') === 0) || (D.wi||[]).some(x => String(x.variant_id||'').indexOf(EXN.id + ':') === 0);
     if(쓰는){ toast('루틴이나 기록에 추가된 종목은 삭제할 수 없어요 — 루틴에서 먼저 제외해 주세요'); return true; }
@@ -4346,7 +4346,7 @@ function vKit(){
     + 글칸('problem', '체형 문제', '예) 일자목 진단 · 코어 약함 · 햄스트링 단축', 3)
     + 글칸('fixed', '보완된 점', '예) 버섯목 완화 · 체중 감소 중', 3)
     + 글칸('story', '스토리', '등록 경위 · 목표 · 기간 · 변화 과정. 블로그 글의 뼈대가 됩니다', 10)
-    + 글칸('extra', '보충내용', '운동 처방 근거 — 왜 그 운동을 골랐는지', 8)
+    + 글칸('extra', '보충내용', '운동 처방 근거 — 왜 그 운동을 선택했는지', 8)
     + '</div></div>';
 
   /* 초상권 — 회원이 직접 고르는 것이 원칙 */
@@ -4436,7 +4436,7 @@ function vReports(){
       + '<span class="t2">회원 앱에서 수업 기록을 열고 「알림톡 보내기」를 누르면 여기 쌓입니다</span></div>';
 
   if(!목록.length)
-    return 요약 + 칩 + 찾기 + '<div class="empty">찾는 것이 없어요</div>';
+    return 요약 + 칩 + 찾기 + '<div class="empty">검색 결과가 없어요</div>';
 
   const 때 = t => { if(!t) return ''; const d = new Date(t);
     return (d.getMonth()+1) + '/' + d.getDate() + ' ' + String(d.getHours()).padStart(2,'0')
@@ -6307,7 +6307,7 @@ function 블록칸(b, i, 편집, urls, 번호){
       + '</div><div class="tx-kids">' + 블록들(b.c && b.c.length ? b.c : [새블록('p')], 편집, urls, i) + '</div></div></div>';
   }
   const ph = b.t==='h1' ? '제목' : b.t==='h2' ? '소제목' : b.t==='call' ? '강조할 내용'
-    : i===0 ? "내용을 적거나  /  를 눌러 블록을 추가하세요" : '';
+    : i===0 ? "내용을 입력하거나  /  를 눌러 블록을 추가하세요" : '';
   const 글 = 편집
     ? '<div class="tx-x" contenteditable="true" data-ph="'+ph+'" data-bi="'+i+'" spellcheck="false"></div>'
     : '<div class="tx-x">'+링크살리기(b.x||'')+'</div>';
@@ -6606,7 +6606,7 @@ function 슬래시그리기(){
   const d = $('#txslash'); if(!d || !SL) return;
   const 것 = 블록종류.filter(k => 슬래시맞나(k, SL.q));
   if(SL.골라 >= 것.length) SL.골라 = 0;
-  d.innerHTML = (SL.q ? '<div class="q">/<b>'+esc(SL.q)+'</b> 로 찾는 중</div>' : '')
+  d.innerHTML = (SL.q ? '<div class="q">/<b>'+esc(SL.q)+'</b> 로 검색 중</div>' : '')
     + (것.length ? 것.map((k,i) => '<button class="'+(i===SL.골라?'on':'')+'" data-act="tx:bset" data-i="'+SL.path+'" data-t="'+k.t+'"'
         + (k.크기?' data-sz="'+k.크기+'"':'') + '><i>'+k.i+'</i>'+k.n+'</button>').join('')
       : '<div class="no">그런 블록은 없어요</div>');
@@ -8235,7 +8235,7 @@ function popPick(){
               + '가지 — 기록에서 선택합니다</span>' : '') + '</div></div>'
           + (e.owner ? '<span class="btn ghost sm" data-act="exedit" data-v2="' + esc(e.id) + '" style="margin-left:auto;margin-right:8px">수정</span>' : '')
           + '<span class="rt">＋</span></button>'; }).join('')
-      : '<div class="empty">찾는 종목이 없어요 — 위 「＋ 종목 만들기」로 만들 수 있어요</div>')
+      : '<div class="empty">검색된 종목이 없어요 — 위 「＋ 종목 만들기」로 만들 수 있어요</div>')
     + '</div><button class="btn ghost" data-act="popclose">닫기</button>';
 }
 
@@ -8261,7 +8261,7 @@ function popPrep(){
           + ' <span style="color:var(--gold-2);font-size:12px">' + esc(x.t) + '</span></div>'
           + '<div class="t2">' + esc(x.d) + '</div></div>'
           + '<span class="rt">' + (있음 ? '추가됨 ✓' : '＋') + '</span></button>'; }).join('')
-      : '<div class="empty">찾는 동작이 없어요</div>')
+      : '<div class="empty">검색된 동작이 없어요</div>')
     + '</div><button class="btn ghost" data-act="popclose">닫기</button>';
 }
 
