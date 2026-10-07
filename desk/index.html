@@ -1423,7 +1423,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '180';
+const BUILD = '181';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -8115,6 +8115,8 @@ async function txAct(a, el){
     return; }
   if(a==='staffoff'){
     const p = W.staff.find(x=>x.id===id); if(!p) return;
+    /* ⛔ 끄는 단추는 바로 꺼지면 안 된다 — 한 번 묻는다 (2026-10-07 대표 「항상 뭔가를 끌 때는 확인 창이 한 번 더」). 다시 켜는 쪽은 안 묻는다 */
+    if(p.active !== false && !confirm(p.name + ' 님을 끌까요? 꺼 두면 데스크에 들어오지 못합니다. 다시 켤 수 있어요.')) return;
     try{ const r = await usend('staff?id=eq.'+id, 'PATCH', { active: p.active===false }, 'return=representation');
       if(r && r[0]) Object.assign(p, r[0]); toast(p.name+(p.active===false?' 껐어요':' 켰어요')); txMe('staff'); }
     catch(e){ toast('못 바꿨어요 — '+e.message); }
