@@ -1093,6 +1093,26 @@ body .wk{box-shadow:inset 0 1px 0 rgba(240,211,160,.14);border-radius:18px}
 body .wk .dsum{background:none;gap:6px;margin-top:12px;border-radius:0;overflow:visible}
 body .wk .dsum>div{background:#1b1a18;border:1px solid #2e2d28;border-radius:12px;padding:9px 4px}
 body .wk .dsum .on .v{color:var(--gold)}
+/* 커뮤니티 피드 — 융합 (2026-10-07) */
+body .pcard{border-radius:18px;border-color:#34332d;background:linear-gradient(180deg,#201f1c,#171615);box-shadow:inset 0 1px 0 rgba(240,211,160,.13)}
+body .phead{padding:12px 13px}
+body .pav{width:36px;height:36px;border:1.5px solid rgba(240,211,160,.55);background:rgba(240,211,160,.07);font-size:14px;font-weight:800}
+body .pwho{font-size:14px}
+.pkind{flex:none;font-size:11px;font-weight:800;padding:3px 10px;border-radius:999px;color:var(--gold);border:1px solid rgba(240,211,160,.4);background:rgba(240,211,160,.07)}
+.pkind.k-d{color:var(--teal);border-color:rgba(169,216,230,.45);background:rgba(169,216,230,.07)}
+body .pimgw{background:#0d0d0c}body .pimgw .nopic{width:100%;height:220px}
+body .pcap{padding:11px 14px 0;font-size:14px}
+body .pacts{align-items:center;gap:6px;padding:9px 10px 11px}
+body .pacts button{display:inline-flex;align-items:center;gap:6px;background:none;border:1px solid #34332d;border-radius:999px;padding:7px 12px;color:var(--cream);font-size:13px;font-weight:700}
+body .pacts button svg{color:var(--sub)}
+body .pacts button.on{border-color:rgba(232,146,124,.6);color:#f0a091;background:rgba(232,146,124,.08)}body .pacts button.on svg{color:#f0a091;fill:rgba(240,160,145,.35)}
+body .pacts button.ic{padding:7px 9px}.psp{flex:1}
+body .ptgrid{border-radius:13px}
+body .pcm{padding:9px 11px;border-radius:12px;background:#1b1a18;border:1px solid #2e2d28}
+.ic.gi2{color:var(--gold);display:flex}
+body .ootdnudge .ic{color:var(--gold);display:flex}
+.pgk svg{display:block}
+.btn svg.ic2{vertical-align:-4px}
 .megoal{width:100%;flex:none;display:flex;flex-direction:column;gap:8px;text-align:left;padding:14px 14px 13px;border-radius:18px;border:1px solid #34332d;background:linear-gradient(180deg,#201f1c,#171615);box-shadow:inset 0 1px 0 rgba(240,211,160,.14)}
 .mgh{display:grid;grid-template-columns:1fr auto;align-items:center;width:100%}.mgh small{grid-column:1/-1;font-size:11.5px;color:var(--sub)}
 .mgh b{font-size:17px;font-weight:800}.mgh i{font-style:normal;color:var(--sub);font-size:17px}
@@ -2290,6 +2310,8 @@ Object.assign(아이콘, {
   h_clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
   h_lens:'<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/>',
   h_share:'<path d="M12 15V4M8 7.5 12 4l4 3.5M5 12v6a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-6"/>',
+  h_heart:'<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
+  h_save:'<path d="M12 4v11M8 11.5l4 3.5 4-3.5M5 19h14"/>',
   h_fire:'<path d="M12 3c1 3.2 4.5 5 4.5 9.5a4.5 4.5 0 0 1-9 0c0-1.8.8-3 1.8-4 .3 1.6 1.2 2.4 2 2.5C10.6 8.6 11 5.6 12 3z"/>',
   h_chat:'<path d="M5 5h14a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-7l-4 4v-4H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/><path d="M8.5 10.5h.01M12 10.5h.01M15.5 10.5h.01"/>',
   h_medal:'<circle cx="12" cy="14.5" r="5"/><path d="M9 10 6.5 3h4L12 6.5 13.5 3h4L15 10"/><path d="m12 12.5.8 1.5 1.6.2-1.2 1.1.3 1.6-1.5-.8-1.5.8.3-1.6-1.2-1.1 1.6-.2z"/>',
@@ -2401,7 +2423,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '291';
+const BUILD = '293';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2861,7 +2883,7 @@ function notiList(mid){
   }
   /* ② 아직 안 읽은 트레이너 코멘트 */
   D.cm.filter(c=>c.mid===mid && !c.read).forEach(c=>{
-    out.push({ k:'cm', at:c.at||'', 제목:'트레이너가 코멘트를 남겼습니다',
+    out.push({ k:'cm', at:c.ts||'', 제목:'트레이너가 코멘트를 남겼습니다',
                줄:exName(c.ex, c.va), act:`exd:${c.ex}:${c.va}` });
   });
   /* ③ 인바디가 새로 들어옴 (건강정보에 동의한 회원만) */
@@ -3066,7 +3088,7 @@ function dayDetail(mid, date, 제목){
   const all = D.workouts.filter(w => w.mid===mid && w.date===date && w.done);
   const ws  = all.filter(w => w.items.some(i => i.sets.length));
   if(!ws.length) return all.length
-    ? `<div class="card" style="flex:none"><div class="dtitle">📋 ${T}</div>
+    ? `<div class="card" style="flex:none"><div class="dtitle">${T}</div>
        <div class="sm">${dateTxt(date)} · 시작만 하고 세트를 적지 않은 기록 ${all.length}건</div></div>`
     : '';
   const dayVol = ws.reduce((a,w)=> a + totalKg(w), 0);
@@ -3098,7 +3120,7 @@ function dayDetail(mid, date, 제목){
     return `<div class="card" style="padding:0;overflow:hidden;flex:none">
       <div class="dhrow"><button class="dhd2 dtop" data-act="dopen:${w.id}">
         <span class="tx">
-          <span class="t">📋 ${T}</span>
+          <span class="t">${T}</span>
           <span class="r">${dateTxt(date)} · ${요약(w)}</span>
         </span>
         <span class="ar">${열림?'▴':'▾'}</span></button>${새코멘트(mid, w)}</div>
@@ -3107,7 +3129,7 @@ function dayDetail(mid, date, 제목){
 
   /* 두 개 이상이면 제목 아래로 줄줄이 */
   return `<div class="card" style="padding:0;overflow:hidden;flex:none">
-    <div class="dtitle">📋 ${T}
+    <div class="dtitle">${T}
       <small>${dateTxt(date)} · ${ws.length}개${dayVol?` · 총 ${Math.round(dayVol).toLocaleString()}kg`:''}${dayCar?` · 유산소 ${dayCar}분`:''}</small></div>`
    + ws.map(w => { const 열림 = S.dayOpen === w.id;
        return `
@@ -4164,7 +4186,7 @@ function vRoutines(){
 function vRoutine(){
   const r=rOf(S.rid); if(!r) return vRoutines();
   return { top: bar(`루틴 ${r.no} · ${r.n}`, `<span class="sub">${r.items.length}종목</span>`, 'go:routines'), body:
-    `<div class="note">${esc(r.purpose)}</div>`
+    (r.purpose ? `<div class="note">${esc(r.purpose)}</div>` : '')
     + r.items.map((it,i)=>{ const e=exOf(it.ex);
       return `<button class="card" data-act="exd:${it.ex}:${it.va}"><div class="nm">${i+1}. ${esc(exName(it.ex,it.va))}</div>
         <div class="sm">${e.cardio?`${it.reps}분`:`${kgfmt(it.kg)}kg × ${it.reps}회 · ${it.sets}세트`}${it.rest?` · 휴식 ${it.rest}초`:''}
@@ -4253,12 +4275,12 @@ function vPick(){
           <span class="tx"><b>기타운동 추가</b><span>검색에 없는 것</span></span>
           <span class="ar">›</span></button>
         <button class="pbtn etc" data-act="rmaddpick">
-          <span class="ic">🏋️</span>
+          <span class="ic gi2">${svg('h_crown',19)}</span>
           <span class="tx"><b>1RM 종목 추가</b><span>스쿼트 · 벤치 · 데드 등 측정 종목</span></span>
           <span class="ar">›</span></button></div>
     </div>
     <button class="card rowc gold" data-exrow="1rm 원알엠 일알엠 원rm 1알엠 1rm측정 측정 최대중량 맥스 max onerepmax" data-part="__1rm" data-eq="" style="display:none" data-act="rmaddpick">
-      <div><div class="nm g">🏋️ 1RM 측정 종목 담기</div><div class="sm">스쿼트 · 벤치 · 데드 · 오버헤드 프레스 등 — 담으면 바로 측정 계획을 엽니다</div></div>
+      <div><div class="nm g">1RM 측정 종목 담기</div><div class="sm">스쿼트 · 벤치 · 데드 · 오버헤드 프레스 등 — 담으면 바로 측정 계획을 엽니다</div></div>
       <span class="rt">＋</span></button>
     ${EX.map(e=>{ const vs=vars(e.id), n=cmOf(S.mid,e.id).length, last=lastSet(e.id);
       return `<button class="card rowc" data-exrow="${esc(exKey(e))}" data-part="${esc(e.p)}"
@@ -4831,7 +4853,7 @@ function vWorkout(){
   const 펼침 = ()=>`<div class="opencard">
     ${벌고르기}
     ${cur.rmPlan ? (()=>{ const n = cur.sets.filter(x=>x.done).length;
-      return `<div class="rmnow"><div class="rmt">🏋️ 1RM 측정 · 목표 ${kg표(cur.rmGoal)}kg <small>${Math.min(n+1, cur.rmPlan.length)} / ${cur.rmPlan.length} 단계</small></div>
+      return `<div class="rmnow"><div class="rmt">1RM 측정 · 목표 ${kg표(cur.rmGoal)}kg <small>${Math.min(n+1, cur.rmPlan.length)} / ${cur.rmPlan.length} 단계</small></div>
         ${cur.rmPlan.map((p,i)=>`<div class="rmrow ${i<n?'ok':(i===n?'now':'')}"><b>${i<n?'✓':i+1}</b><span>${p.단계}<small>${Math.round(p.pct*100)}%</small></span><em>${kg표(p.kg)}kg × ${p.reps}회</em><i>쉬기 ${p.쉼}</i></div>`).join('')}
         ${n < cur.rmPlan.length ? `<div class="rmhint">세트를 끝내면 그 단계 쉬는 시간이 자동으로 돌아갑니다</div>`
           : (cur.rmDone ? `<div class="rmhint"><b style="color:var(--gold)">✓ 1RM 실측 ${kg표(cur.rmDone)}kg 남겼어요</b></div>`
@@ -5227,10 +5249,10 @@ function vSummary(){
   return { top: bar('오늘 운동', `<span class="sub">${dateTxt(w.date)}</span>`, S.who==='tr'?'ttab:t_today':'tab:home'), body:`
     ${끝카드(w)}
     ${w.date === TODAY
-      ? `<button class="btn gold" data-act="ootd:${w.id}">📷 ${ootd찍었나(w) ? '오운완 다시 찍기' : '오운완 찍기'}</button>
+      ? `<button class="btn gold" data-act="ootd:${w.id}">${svg('h_cam',19)} ${ootd찍었나(w) ? '오운완 다시 찍기' : '오운완 찍기'}</button>
          <div class="note" style="margin-top:-4px">사진을 찍으면 <b>오늘 한 종목·세트·총 무게</b>가 얹힌 한 장이 만들어집니다.
            ${S.who==='tr' ? '찍은 사진은 <b>회원 프로필 오운완</b>에 남습니다.' : '그대로 인스타에 올리거나 내 프로필에 남겨 두세요.'}</div>
-         ${S.who==='tr' ? `<button class="btn sub" data-act="pair:${w.id}">🤝 회원과 같이 찍기</button>
+         ${S.who==='tr' ? `<button class="btn sub" data-act="pair:${w.id}">${svg('h_hands',19)} 회원과 같이 찍기</button>
          <div class="note" style="margin-top:-4px">찍고 <b>저장</b>만 누르면 됩니다. 회원 프로필과 트레이너 화면 <b>양쪽</b>에 남고, 양쪽 다 내려받을 수 있어요.</div>` : ''}`
       : `<div class="note">오운완은 <b>기록한 날에만</b> 찍을 수 있어요.</div>`}
     ${S.who==='tr' ? `<button class="btn sub" data-act="rpt:${w.id}">오늘 수업 리포트 보기</button>` : ''}
@@ -6796,7 +6818,7 @@ function 랭킹판(){
           ${랭킹샘플 ? '<span class="lvh sm">샘플</span>' : '<button class="lvh" data-act="rkmine">내 전적 ›</button>'}</div>
         ${나 ? (다음 ? `<div class="lvbar"><u style="width:${Math.max(4, Math.min(100, Math.round((나.v - L[내lv-1][0]) / (다음[0] - L[내lv-1][0]) * 100)))}%"></u></div>
             <div class="lvnx">Lv.${내lv+1}까지 <b>${수(다음[0]-나.v)}${단위}</b></div>`
-          : `<div class="lvnx top">가장 높은 레벨이에요 👑</div>`) : ''}
+          : `<div class="lvnx top">가장 높은 레벨이에요</div>`) : ''}
       </div>` : ''}
 
     ${줄.length >= 3 ? `<span class="lbl">TOP 3</span>
@@ -6901,15 +6923,17 @@ function 글카드(p){
   const n댓 = 댓글들(p.id).length, n좋 = 좋아요수(p.id), 내글 = p.mid===S.mid && S.who!=='tr';
   return `<div class="pcard">
     <div class="phead"><span class="pav">${esc(이름of(p.mid).slice(0,1))}</span>
-      <span class="pwho">${esc(이름of(p.mid))}<small>${esc(p.kind)}${p.by && p.kind==='인증샷' ? ' · '+esc(p.by)+' 찍음' : ''} · ${언제(p.ts)}${p.hid ? ' · <b style="color:var(--warn)">내려둠</b>' : (p.vis==='나만' ? ' · 나만 보기' : '')}</small></span>
+      <span class="pwho">${esc(이름of(p.mid))}<small>${p.by && p.kind==='인증샷' ? esc(p.by)+' 찍음 · ' : ''}${언제(p.ts)}${p.hid ? ' · <b style="color:var(--warn)">내려둠</b>' : (p.vis==='나만' ? ' · 나만 보기' : '')}</small></span>
+      <span class="pkind k-${p.kind==='식단'?'d':'o'}">${esc(p.kind)}</span>
       ${내글 || S.who==='tr' ? `<button class="pmore" data-act="pmore:${p.id}">⋯</button>` : ''}</div>
     <button class="pimgw" data-act="popen:${p.id}"><img class="pimg" src="${esc(phURL(p.path))}" alt="" loading="lazy" onerror="picFail(this)"></button>
     ${p.cap ? `<div class="pcap">${esc(p.cap)}</div>` : ''}
     <div class="pacts">
-      <button class="${내좋아요(p.id)?'on':''}" data-act="plike:${p.id}">${내좋아요(p.id)?'❤️':'🤍'} ${n좋||''}</button>
-      <button data-act="popen:${p.id}">💬 ${n댓||''}</button>
-      <button data-act="pshare:${p.id}">공유</button>
-      <button data-act="psave:${p.id}">저장</button>
+      <button class="${내좋아요(p.id)?'on':''}" data-act="plike:${p.id}">${svg('h_heart',19)}${n좋||''}</button>
+      <button data-act="popen:${p.id}">${svg('h_chat',19)}${n댓||''}</button>
+      <span class="psp"></span>
+      <button class="ic" data-act="pshare:${p.id}" aria-label="공유">${svg('h_share',19)}</button>
+      <button class="ic" data-act="psave:${p.id}" aria-label="저장">${svg('h_save',19)}</button>
     </div></div>`;
 }
 /* ── 운동 파트너 모집 ── 카톡 번개 · 당근 모임처럼. 필수 다섯 + 본문 자유 */
@@ -6926,7 +6950,7 @@ function 파트너카드(p){
         <i>운동시간</i><b>${esc(p.ptime)}</b><i>3대 중량</i><b>${esc(p.big3)}</b>
         <i>운동부위</i><b>${esc(p.parts)}</b></div>
       ${p.cap ? `<div class="pcap">${esc(p.cap)}</div>` : ''}</button>
-    <div class="pacts"><button data-act="popen:${p.id}">💬 ${n댓||''} 댓글</button>${내글 ? `<button data-act="partclose:${p.id}">${마감?'다시 모집':'마감하기'}</button>` : ''}</div></div>`;
+    <div class="pacts"><button data-act="popen:${p.id}">${svg('h_chat',19)}${n댓||''} 댓글</button>${내글 ? `<button data-act="partclose:${p.id}">${마감?'다시 모집':'마감하기'}</button>` : ''}</div></div>`;
 }
 function sheetPartnerWrite(){
   const n = S.part || (S.part = { sex:'', career:'', ptime:'', sq:'', bp:'', dl:'', parts:[], body:'' });
@@ -6973,14 +6997,14 @@ function sheetPostNew(){
   openSheet(()=>`
     <div class="h2">올리기 <small>내 사진 중에서 고르거나 새로 찍어요</small></div>
     ${사진.length ? `<div class="pgrid">${사진.map(x=>`<button class="pg" data-act="postfrom:${x.id}">
-        <img src="${esc(phURL(x.path))}" alt="" loading="lazy" onerror="picFail(this)">${x.kind==='pair'?'<span class="pgk">🤝</span>':''}
+        <img src="${esc(phURL(x.path))}" alt="" loading="lazy" onerror="picFail(this)">${x.kind==='pair'?`<span class="pgk">${svg('h_hands',13)}</span>`:''}
         <span class="pgd">${(x.date||'').slice(5).replace('-','.')}</span></button>`).join('')}</div>` : '<div class="empty">올릴 수 있는 오운완·인증샷이 아직 없어요</div>'}
     ${(()=>{ const 끼 = (D.meals||[]).filter(m => m.mid===S.mid && m.path && !(D.posts||[]).some(p=>p.photo_id===String(m.id)))
         .sort((a,b)=> a.date<b.date ? 1 : -1).slice(0, 6);
       return 끼.length ? `<span class="lbl">내 식단 사진</span><div class="pgrid">${끼.map(m=>`<button class="pg" data-act="mealpost:${m.id}">
-        <img src="${esc(phURL(m.path))}" alt="" loading="lazy" onerror="picFail(this)"><span class="pgk">🍽</span>
+        <img src="${esc(phURL(m.path))}" alt="" loading="lazy" onerror="picFail(this)"><span class="pgk">${svg('bowl',13)}</span>
         <span class="pgd">${(m.date||'').slice(5).replace('-','.')}</span></button>`).join('')}</div>` : ''; })()}
-    <button class="btn sub" data-act="postpick">📷 새 사진 고르기</button>
+    <button class="btn sub" data-act="postpick">${svg('h_cam',18)} 새 사진 고르기</button>
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 function sheetPostWrite(){
@@ -7038,8 +7062,8 @@ function sheetPost(id){
         : `<img class="shot ootdimg" src="${esc(phURL(p.path))}" alt="" onerror="picFail(this)">`}
     ${p.cap ? `<div class="pcap">${esc(p.cap)}</div>` : ''}
     ${파 ? '' : `<div class="pacts">
-      <button class="${내좋아요(id)?'on':''}" data-act="plike:${id}">${내좋아요(id)?'❤️':'🤍'} ${좋아요수(id)||''}</button>
-      <button data-act="pshare:${id}">공유</button><button data-act="psave:${id}">저장</button></div>`}
+      <button class="${내좋아요(id)?'on':''}" data-act="plike:${id}">${svg('h_heart',19)}${좋아요수(id)||''}</button><span class="psp"></span>
+      <button class="ic" data-act="pshare:${id}" aria-label="공유">${svg('h_share',19)}</button><button class="ic" data-act="psave:${id}" aria-label="저장">${svg('h_save',19)}</button></div>`}
     <span class="lbl">댓글 ${cs.length ? '· '+cs.length : ''}</span>
     ${cs.length ? `<div class="pcms">${cs.map(c=>`<div class="pcm"><b>${esc(c.who)}</b> ${esc(c.body)}<small>${언제(c.ts)}${(c.mid && c.mid===S.mid && !트) || 트 ? ` · <button data-act="pcdel:${c.id}">지우기</button>` : ''}</small></div>`).join('')}</div>` : '<div class="note">첫 댓글을 남겨 보세요</div>'}
     <div class="pcmin"><input class="search" type="text" data-k="pcm" maxlength="120" placeholder="응원 한마디"><button class="btn main sm" data-act="pcsend:${id}">남기기</button></div>
@@ -7354,7 +7378,7 @@ function 오운완남음(mid){
 function 오운완홈(mid){
   const w = 오운완남음(mid); if(!w) return '';
   return `<button class="ootdnudge" data-act="ootd:${w.id}">
-    <span class="ic">📷</span>
+    <span class="ic">${svg('h_cam',24)}</span>
     <span><div class="t">오늘 오운완 찍기</div>
       <div class="s">${w.kind==='수업' ? 'PT 수업' : '오늘 운동'}을 마쳤어요 · 오늘만 찍을 수 있어요</div></span>
     <span class="go">›</span></button>`;
@@ -7423,7 +7447,7 @@ function 인증샷홈(mid){
   const n = (D.bph||[]).filter(x => x.mid===mid && x.kind==='pair' && !x.hid && (x.date||'') >= 기준).length;
   if(!n) return '';
   return `<button class="ootdnudge" data-act="go:profile">
-    <span class="ic">🤝</span>
+    <span class="ic">${svg('h_hands',24)}</span>
     <span><div class="t">트레이너와 찍은 사진 ${n}장</div>
       <div class="s">프로필에서 보고 갤러리에 저장할 수 있어요</div></span>
     <span class="go">›</span></button>`;
@@ -7788,7 +7812,7 @@ function vProfile(){
     ${사진.length
       ? `<div class="pgrid">${사진.map(x=>`<button class="pg ${x.hid?'hid':''}" data-act="ootdview:${x.id}">
           <img src="${esc(phURL(x.path))}" alt="" loading="lazy" onerror="picFail(this)">
-          ${x.kind==='pair' ? '<span class="pgk">🤝</span>' : ''}
+          ${x.kind==='pair' ? `<span class="pgk">${svg('h_hands',13)}</span>` : ''}
           ${!내것 && x.dreq ? '<span class="pgw">삭제 요청</span>' : (!내것 && x.hid ? '<span class="pgw">숨김</span>' : '')}
           <span class="pgd">${(x.date||'').slice(5).replace('-','.')}</span></button>`).join('')}</div>`
       : 빔('pic','아직 사진이 없어요', 내것?'운동을 마치고 오운완을 남겨 보세요':'')}` };
@@ -8731,26 +8755,28 @@ function lrScale(checks){
 
 /* ⑤ 몸 상태 이력 그래프 — 값이 붙어 있어도 보이게 아래위를 잘라 그립니다 */
 function lineChart2(pts, unit, dec){
-  const W=320, H=126, PL=12, PR=12, PT=28, PB=20;
+  const W=320, H=126, PL=14, PR=14, PT=28, PB=20, id = 'lc2' + (++그래프번호);
   const vs = pts.map(p=>p.v);
   let mn = Math.min(...vs), mx = Math.max(...vs);
   if(mx - mn < 0.0001){ mn -= 1; mx += 1; }
   const pad = (mx-mn)*0.28; mn -= pad; mx += pad;
   const x = i => PL + i*(W-PL-PR)/Math.max(1, pts.length-1);
   const y = v => PT + (1 - (v-mn)/(mx-mn))*(H-PT-PB);
-  const d = pts.map((p,i)=> (i?'L':'M') + x(i).toFixed(1) + ' ' + y(p.v).toFixed(1)).join(' ');
-  const area = d + ` L ${x(pts.length-1).toFixed(1)} ${H-PB} L ${x(0).toFixed(1)} ${H-PB} Z`;
+  const xs = pts.map((_,i)=>x(i)), ys = pts.map(p=>y(p.v)), d = 곡선길(xs, ys), n = pts.length;
   const f = v => (dec ? v.toFixed(dec) : String(Math.round(v)));
-  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="height:146px">
-    <path d="${area}" fill="var(--gold-dim)"/>
-    <path d="${d}" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-    ${pts.map((p,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${y(p.v).toFixed(1)}" r="${i===pts.length-1?3.6:2.6}"
-        fill="${i===pts.length-1?'var(--gold)':'var(--gold-2)'}"/>
-      <text x="${x(i).toFixed(1)}" y="${Math.max(11,y(p.v)-8).toFixed(1)}" text-anchor="middle"
-        font-size="10" font-weight="700" fill="#c9c2b9">${f(p.v)}</text>
-      <text x="${x(i).toFixed(1)}" y="${H-6}" text-anchor="middle" font-size="9.5" font-weight="600"
-        fill="#75706a">${esc(p.label)}</text>`).join('')}
-  </svg><div class="sm" style="text-align:right;color:#75706a">단위 ${unit}</div>`;
+  return `<svg viewBox="0 0 ${W} ${H}">
+    <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0d3a0" stop-opacity=".3"/><stop offset="1" stop-color="#f0d3a0" stop-opacity="0"/></linearGradient></defs>
+    <line x1="${PL}" x2="${W-PR}" y1="${H-PB}" y2="${H-PB}" stroke="#3a3832" stroke-width=".8"/>
+    <path d="${d} L ${xs[n-1].toFixed(1)} ${H-PB} L ${xs[0].toFixed(1)} ${H-PB} Z" fill="url(#${id})"/>
+    <path d="${d}" fill="none" stroke="var(--gold)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+    ${pts.map((p,i)=>`${i===n-1 ? `<circle cx="${xs[i].toFixed(1)}" cy="${ys[i].toFixed(1)}" r="7" fill="#f0d3a0" opacity=".16"/>
+        <circle cx="${xs[i].toFixed(1)}" cy="${ys[i].toFixed(1)}" r="4" fill="#1b1a18" stroke="var(--gold)" stroke-width="2.2"/>`
+        : `<circle cx="${xs[i].toFixed(1)}" cy="${ys[i].toFixed(1)}" r="2.3" fill="#1b1a18" stroke="var(--gold-2)" stroke-width="1.3"/>`}
+      <text x="${xs[i].toFixed(1)}" y="${Math.max(11,ys[i]-9).toFixed(1)}" text-anchor="${i===0?'start':i===n-1?'end':'middle'}"
+        font-size="${i===n-1?10.5:9.5}" font-weight="${i===n-1?800:600}" fill="${i===n-1?'var(--gold)':'#8f8a83'}">${f(p.v)}${i===n-1?' '+unit:''}</text>
+      <text x="${xs[i].toFixed(1)}" y="${H-6}" text-anchor="${i===0?'start':i===n-1?'end':'middle'}" font-size="9.5" font-weight="${i===n-1?800:600}"
+        fill="${i===n-1?'var(--gold)':'#75706a'}">${esc(p.label)}</text>`).join('')}
+  </svg>`;
 }
 
 const BL_M = { w:{n:'몸무게', u:'kg', d:1, good:-1}, m:{n:'근육량', u:'kg', d:1, good:1},
