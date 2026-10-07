@@ -2562,7 +2562,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '315';
+const BUILD = '316';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2997,6 +2997,14 @@ async function saveAgree(mid, 값){
 }
 
 /* 건강정보 동의를 끌 때 — 「보관」도 처리다. 있던 자료를 지운다 (제21조) */
+/* ⛔ **무언가를 끄는 단추는 바로 꺼지면 안 된다** — 확인 창을 한 번 거친다 (2026-10-07 대표 「항상 뭔가를 끌 때는 확인 창이 한 번 더 · 운동기록 마칠 때처럼 · 잘못 누르면 그냥 초기화되는 거야」)
+   새로 「끄기 · 숨기기 · 그만 받기」 단추를 만들면 손잡이에서 바로 바꾸지 말고 이 창을 띄우고, 실제로 끄는 일은 `…ok` 손잡이에 둔다. */
+function sheet끄기확인(제목, 글, 단추말, act){
+  openSheet(()=>`<div class="h2">${esc(제목)}</div>
+    <div class="agbody" style="margin:2px 0 12px">${글}</div>
+    <div style="display:flex;gap:9px"><button class="btn sub" style="flex:1" data-act="close">그대로 두기</button>
+      <button class="btn ghost" style="flex:1;color:var(--warn);border-color:#5a3830" data-act="${act}">${esc(단추말)}</button></div>`);
+}
 function sheetAgreeOff(){
   const mid = S.mid;
   const ib = ((D.body && D.body[mid]) || []).length;
@@ -11099,9 +11107,11 @@ document.addEventListener('click', async ev=>{
       closeSheet(); toast('동의해 주셔서 고맙습니다'); render(); return; }
     case 'agree': { sheetSensitive('inbody'); return; }
     /* 약관 및 동의에서 켜고 끄기 */
+    case 'agoffok': { if(rest[0] === 'aM'){ await saveAgree(S.mid, { aM:'' }); closeSheet(); toast('마케팅 수신을 껐어요'); render(); } return; }
     case 'agtog': {
       const k = rest[0], 켜짐 = !!agreeOf(S.mid)[k];
-      if(k === 'aM'){ await saveAgree(S.mid, { aM: 켜짐 ? '' : new Date().toISOString() }); render(); return; }
+      if(k === 'aM'){ if(켜짐){ sheet끄기확인('마케팅 정보 수신을 끌까요?', '센터 이벤트 · 프로그램 안내를 더 받지 않습니다.<br>회원권 만료 안내처럼 꼭 필요한 안내는 그대로 갑니다.', '끄기', 'agoffok:aM'); return; }
+        await saveAgree(S.mid, { aM: new Date().toISOString() }); render(); return; }
       if(k === 'aS'){
         if(!켜짐){ sheetSensitive('inbody'); return; }
         sheetAgreeOff(); return; }
@@ -11343,11 +11353,14 @@ document.addEventListener('click', async ev=>{
       sv(spatch('body_photos','id=eq.'+x.id, { marks:x.marks }), '기준선 저장');
       toast(M.pts.length?'기준선을 그었어요':'기준선을 지웠어요'); render(); return; }
     case 'cycon': { const mid=rest[0]; D.cycle=D.cycle||{};
-      D.cycle[mid]={on:true, last:TODAY, len:28, period:5};
-      svCycle(mid); toast('주기를 켰어요'); render(); return; }
-    case 'cycoff': { const mid=rest[0];
+      /* ⛔ 다시 켤 때 **적어 둔 시작일 · 주기를 지우지 않는다** — 전엔 켤 때마다 오늘 · 28일로 초기화돼서, 잘못 껐다 켜면 기록이 날아갔다 (2026-10-07 대표) */
+      const 옛 = D.cycle[mid];
+      D.cycle[mid] = (옛 && 옛.last) ? Object.assign({}, 옛, { on:true }) : { on:true, last:TODAY, len:28, period:5 };
+      svCycle(mid); toast(옛 && 옛.last ? '주기를 다시 켰어요 — 적어 둔 날짜 그대로예요' : '주기를 켰어요'); render(); return; }
+    case 'cycoff': sheet끄기확인('생리주기를 끌까요?', '끄면 내 화면과 트레이너 화면에서 주기가 안 보입니다.<br>적어 둔 시작일 · 주기는 남아 있어서, 다시 켜면 그대로 이어집니다.', '끄기', 'cycoffok:' + rest[0]); return;
+    case 'cycoffok': { const mid=rest[0];
       if(D.cycle&&D.cycle[mid]) D.cycle[mid].on=false;
-      svCycle(mid); toast('껐어요 — 트레이너에게도 안 보여요'); render(); return; }
+      closeSheet(); svCycle(mid); toast('껐어요 — 트레이너에게도 안 보여요'); render(); return; }
     case 'cycstart': { 주기시작(rest[0], TODAY); return; }
     case 'cyccal':   { sheetCycCal(rest[0]); return; }
     /* ⛔ `openSheet()` 를 빈 채로 부르면 **시트가 꺼진다** (sheetRender 가 지워진다).
@@ -11800,7 +11813,8 @@ document.addEventListener('click', async ev=>{
     case 'pairre': closeSheet(); pairPick(rest[0]); return;
     case 'pairsave': pairSave(); return;
     case 'tprof': S.tmid=rest[0]; S.subj=rest[0]; go('profile'); return;
-    case 'phhide': await 사진표시(rest[0], 'hid', new Date().toISOString()); toast('내 화면에서 숨겼어요'); closeSheet(); render(); return;
+    case 'phhide': sheet끄기확인('이 사진을 내 화면에서 숨길까요?', '내 프로필 · 사진 모음에서 안 보이게 됩니다. 트레이너 화면에는 남아 있고, 다시 보이게 할 수 있어요.', '숨기기', 'phhideok:' + rest[0]); return;
+    case 'phhideok': await 사진표시(rest[0], 'hid', new Date().toISOString()); toast('내 화면에서 숨겼어요'); closeSheet(); render(); return;
     case 'phshow': await 사진표시(rest[0], 'hid', ''); toast('다시 보여요'); closeSheet(); render(); return;
     case 'phdreq': await 사진표시(rest[0], 'dreq', new Date().toISOString()); toast('트레이너에게 삭제를 요청했어요'); drawSheet(); return;
     case 'ootdshare': ootdShare(); return;
