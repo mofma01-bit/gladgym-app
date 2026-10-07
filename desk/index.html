@@ -1423,7 +1423,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '177';
+const BUILD = '178';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -8139,7 +8139,7 @@ function vToday(){
 /* ── 종목 고르기 팝업 ── */
 function popPick(){
   const q = 검색키(S.exq);
-  let list = D.ex.slice();
+  let list = D.ex.filter(e => !e.owner || e.owner === 나이름());      /* 남이 만든 종목은 고르기에 안 보인다 (2026-10-07 내 운동 종목) */
   if(!q && S.part!=='전체') list = list.filter(e=>e.part===S.part);
   if(S.eq!=='전체') list = list.filter(e=>(e.equip||'')===S.eq);
   if(q) list = list.filter(e => exKey(e).includes(q));
