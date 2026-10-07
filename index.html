@@ -59,6 +59,12 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 #top .logo{font-size:10.5px;letter-spacing:.2em;color:var(--gold-2);font-weight:700;
   border:1px solid var(--line);border-radius:7px;padding:5px 8px;flex:none}
 #top .logo:active{background:var(--dark-3)}
+#top .tright{margin-left:auto;display:flex;align-items:center;gap:6px;flex:none}
+#top .sub + .tright{margin-left:10px}
+#top .topme{width:32px;height:32px;border-radius:50%;flex:none;padding:0;overflow:hidden;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--gold-2);background:#221f1a}
+#top .topme img{width:100%;height:100%;object-fit:cover;display:block}#top .topme b{font-size:13.5px;font-weight:800;color:var(--gold)}
+#top .topme:active{transform:scale(.94)}
+#top .ttl:empty{display:none}
 
 .search{background:var(--dark-3);border:1px solid var(--line);border-radius:11px;
   padding:12px 13px;font-size:14.5px;font-weight:500;color:var(--cream);width:100%}
@@ -2564,7 +2570,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '323';
+const BUILD = '324';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -3843,7 +3849,17 @@ function render(){
 }
 function bar(title, right, back, sub){
   const bare = (S.screen==='login'||S.screen==='boot'||S.screen==='err');
-  const logo = bare ? '' : `<button class="logo" data-act="switch">GLAD GYM</button>`;
+  /* 윗줄 정리 (2026-10-07 대표 「여기 정리가 필요해 · 프로필 바로 가는 버튼 · 알림은 지금처럼 · 카카오톡 인스타 참조」)
+     왼쪽 = 뒤로 · 로고(누르면 **홈** — 전엔 계정 선택으로 나가 버렸다) / 오른쪽 끝 = 알림 종 · 내 프로필 사진(누르면 프로필).
+     「글래드짐」 제목은 로고와 겹쳐서 뺀다. 종 · 프로필은 **탭 첫 화면**(홈 · 분석 · 식단 · 커뮤니티 · 피드백 · 내 정보)에만 — 안쪽 화면은 제목과 뒤로가기가 주인이다.
+     계정 전환은 「내 정보」 맨 아래로 옮겼다. */
+  const logo = bare ? '' : `<button class="logo" data-act="${S.who==='tr' ? 'ttab:t_today' : 'tab:home'}" aria-label="홈으로">GLAD GYM</button>`;
+  if(title === '글래드짐' && !bare) title = '';
+  const 첫화면 = S.who !== 'tr' && !bare && ['home','records','diet','community','feedback','me'].includes(S.screen) && MEMBERS.some(m=>m.id===S.mid);
+  if(첫화면){ const n = notiCount(S.mid);
+    right = (right && right.indexOf('notibell') < 0 ? right : '') + `<span class="tright">
+      <button class="notibell" data-act="go:noti" aria-label="알림${n?' '+n+'개':''}">${svg('종',20)}${n?`<b>${n>9?'9+':n}</b>`:''}</button>
+      <button class="topme" data-act="go:profile" aria-label="내 프로필">${얼굴(S.mid)}</button></span>`; }
   const hasHist = !!(S.stack && S.stack.length);
   const force = (back === 'reccancel');            /* 수정 그만두기는 그대로 */
   const act = force ? back : (hasHist ? 'back' : (back || ''));
@@ -8254,6 +8270,7 @@ function vMe(){
       <button class="mrow2" data-act="go:terms"><span class="mi">${svg('note',19)}</span><span class="mt"><b>약관 및 동의</b>
         <small>${건강동의함(S.mid)?'건강정보 동의함':'건강정보 동의 안 함'} · 마케팅 ${agreeOf(S.mid).aM?'받음':'안 받음'}</small></span><i>›</i></button>
       <div class="mrow2"><span class="mi">${svg('h_clock',19)}</span><span class="mt"><b>화면 꺼짐 방지</b><small>운동 중에만 켭니다</small></span>${스위치(1)}</div>
+      <button class="mrow2" data-act="switch"><span class="mi">${svg('h_user',19)}</span><span class="mt"><b>계정 전환</b><small>다른 사람으로 들어가기</small></span><i>›</i></button>
     </div>
 
     <span class="lbl">내 기록장</span>
