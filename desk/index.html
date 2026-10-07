@@ -1423,7 +1423,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '176';
+const BUILD = '177';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -3111,10 +3111,15 @@ function tabRoutine(){
 const 나이름 = () => (ME && ME.name) || '';
 const 내세트 = () => (D.ps || []).filter(x => x.trainer === 나이름());
 const 세트사전 = {}; ST.concat(MS).forEach(x => { 세트사전[x.i] = x; });
+/* 내 스트레칭 종목 — 이름·사진/영상을 붙여 만든 것. 세트는 이것과 기성 목록에서 고르기만 한다 (2026-10-07 대표 「종목 만들기 · 루틴 만들기 둘로 나눠서」) */
+const 내종목 = () => (D.pi || []).filter(x => x.trainer === 나이름());
+const 세트동작 = it => it.k==='lib' ? (세트사전[it.i] || null)
+  : it.k==='my' ? ((z => z ? { n:z.name, t:z.time, d:z.descr, media:z.media||[] } : null)((D.pi||[]).find(z => z.id === it.i)))
+  : it;
 function 세트칸(){
   const ss = 내세트();
   return '<div class="lbl" style="margin-top:16px">스트레칭 세트 ' + ss.length + '개'
-    + '<span class="r"><button class="btn sub sm" data-act="pznew">＋ 새 세트</button></span></div>'
+    + '<span class="r"><button class="btn ghost sm" data-act="pilist">내 종목 ' + 내종목().length + '개 · 종목 만들기</button> <button class="btn sub sm" data-act="pznew">＋ 새 세트</button></span></div>'
     + (ss.length ? ss.map(function(x){ const on = (x.member_ids||[]).includes(S.mid);
         return '<div class="card rowc pzrow' + (on?' gold':'') + '">'
           + '<button class="pzck' + (on?' on':'') + '" data-act="pzasg" data-ps="' + esc(x.id) + '" title="이 회원에게 지정">' + (on?'✓':'') + '</button>'
@@ -3127,41 +3132,101 @@ function 세트칸(){
 let PZ = null;      /* 고치는 중인 세트 */
 function 세트창(){
   let el = document.getElementById('pzmodal');
-  if(!PZ){ if(el) el.remove(); return; }
+  if(!PZ && !PI){ if(el) el.remove(); return; }
   if(!el){ el = document.createElement('div'); el.id = 'pzmodal'; document.body.appendChild(el); }
-  const 담긴 = new Set(PZ.items.filter(x => x.k==='lib').map(x => x.i));
+  if(PI){ el.innerHTML = 종목창(); return; }
+  const 담긴 = new Set(PZ.items.filter(x => x.k==='lib' || x.k==='my').map(x => x.k + ':' + x.i)), 내 = 내종목();
   const 회원들 = D.m.filter(m => (m.role||'member') === 'member' && (내담당(m.id) || PZ.member_ids.includes(m.id)));
-  const 갈 = PZ.갈 || 's', 줄 = 갈==='s' ? ST : MS;
+  const 갈 = PZ.갈 || 's', 줄 = 갈==='s' ? ST.map(x => ({ k:'lib:'+x.i, n:x.n, s:x.t+' · '+x.d })) : 갈==='m' ? MS.map(x => ({ k:'lib:'+x.i, n:x.n, s:x.t+' · '+x.d }))
+    : 내.map(x => ({ k:'my:'+x.id, n:x.name, s:[x.time, x.descr, (x.media||[]).length ? ((x.media.some(z=>z.kind==='video') ? '영상 ' : '사진 ') + x.media.length) : ''].filter(Boolean).join(' · ') }));
   el.innerHTML = '<div class="pzbox">'
     + '<div class="pzhd"><b>' + (PZ.새 ? '새 스트레칭 세트' : '스트레칭 세트 고치기') + '</b><button class="btn ghost sm" data-act="pzclose">닫기</button></div>'
     + '<div class="pzbody"><div class="pzcol">'
       + '<div class="lbl">세트 이름</div><input class="inp" id="pzname" maxlength="24" value="' + esc(PZ.name) + '" placeholder="예) 하체 수업 전 풀기">'
       + '<div class="lbl" style="margin-top:10px">한 줄 메모 (회원에게 보여요)</div><input class="inp" id="pzmemo" maxlength="60" value="' + esc(PZ.memo) + '" placeholder="예) 골반 앞쪽 위주로 30초씩">'
       + '<div class="lbl" style="margin-top:14px">담은 동작 ' + PZ.items.length + '개</div>'
-      + (PZ.items.length ? PZ.items.map(function(it, i){ const v = it.k==='lib' ? (세트사전[it.i] || {n:'(없는 동작)', t:''}) : it;
-          const 붙 = (it.media||[]).length ? ' · ' + (it.media.some(z=>z.kind==='video') ? '영상' : '사진') + ' ' + it.media.length : '';
+      + (PZ.items.length ? PZ.items.map(function(it, i){ const v = 세트동작(it) || {n:'(없는 동작)', t:''};
+          const 붙 = (v.media||[]).length ? ' · ' + (v.media.some(z=>z.kind==='video') ? '영상' : '사진') + ' ' + v.media.length : '';
           return '<div class="card rowc" style="padding:8px 12px"><span class="tag gold">' + (i+1) + '</span><div style="flex:1;min-width:0"><div class="t1">' + esc(v.n) + '</div>'
-            + '<div class="t2">' + (it.k==='lib' ? '목록 동작' : '직접 올림') + (v.t ? ' · ' + esc(v.t) : '') + 붙 + '</div></div>'
+            + '<div class="t2">' + (it.k==='lib' ? '목록 동작' : '내 종목') + (v.t ? ' · ' + esc(v.t) : '') + 붙 + '</div></div>'
             + (i ? '<button class="btn ghost sm" data-act="pzup" data-i="' + i + '">▲</button>' : '')
-            + '<button class="btn ghost sm" data-act="pzrm" data-i="' + i + '">빼기</button></div>'; }).join('') : '<div class="empty">오른쪽에서 고르거나 아래에서 직접 올리세요</div>')
-      + '<div class="lbl" style="margin-top:14px">직접 올리기</div>'
-      + '<input class="inp" id="pzon" maxlength="24" placeholder="동작 이름  예) 장요근 늘이기">'
-      + '<input class="inp" id="pzot" maxlength="16" placeholder="시간 · 횟수  예) 좌우 30초" style="margin-top:6px">'
-      + '<input class="inp" id="pzod" maxlength="140" placeholder="설명" style="margin-top:6px">'
-      + '<input type="file" id="pzfile" accept="image/*,video/*" multiple style="margin-top:8px;font-size:12.5px;color:var(--sub)">'
-      + '<button class="btn sub sm" data-act="pzown" style="margin-top:8px">이 동작 담기</button>'
+            + '<button class="btn ghost sm" data-act="pzrm" data-i="' + i + '">빼기</button></div>'; }).join('') : '<div class="empty">오른쪽에서 골라 담으세요</div>')
     + '</div><div class="pzcol">'
-      + '<div class="lbl">목록에서 고르기 <span class="r"><button class="chip' + (갈==='s'?' on':'') + '" data-act="pzk" data-v2="s">스트레칭 ' + ST.length + '</button> <button class="chip' + (갈==='m'?' on':'') + '" data-act="pzk" data-v2="m">마사지 ' + MS.length + '</button></span></div>'
-      + '<div class="pzlist">' + 줄.map(x => '<button class="pzit' + (담긴.has(x.i)?' on':'') + '" data-act="pztog" data-v2="' + x.i + '"><i>' + (담긴.has(x.i)?'✓':'') + '</i><span><b>' + esc(x.n) + '</b><small>' + esc(x.t) + ' · ' + esc(x.d) + '</small></span></button>').join('') + '</div>'
+      + '<div class="lbl">동작 고르기 <span class="r">' + [['s','스트레칭 '+ST.length],['m','마사지 '+MS.length],['y','내 종목 '+내.length]].map(k => '<button class="chip' + (갈===k[0]?' on':'') + '" data-act="pzk" data-v2="' + k[0] + '">' + k[1] + '</button>').join(' ') + '</span></div>'
+      + '<div class="pzlist">' + (줄.length ? 줄.map(x => '<button class="pzit' + (담긴.has(x.k)?' on':'') + '" data-act="pztog" data-v2="' + esc(x.k) + '"><i>' + (담긴.has(x.k)?'✓':'') + '</i><span><b>' + esc(x.n) + '</b><small>' + esc(x.s) + '</small></span></button>').join('')
+          : '<div class="empty">아직 만든 종목이 없어요</div>')
+        + (갈==='y' ? '<button class="btn sub sm" data-act="pinew" style="margin:8px">＋ 새 종목 만들기</button>' : '') + '</div>'
       + '<div class="lbl" style="margin-top:14px">받을 회원 ' + PZ.member_ids.length + '명</div>'
       + '<div class="pzmem">' + 회원들.map(m => '<button class="chip' + (PZ.member_ids.includes(m.id)?' on':'') + '" data-act="pzmt" data-v2="' + esc(m.id) + '">' + esc(m.name) + '</button>').join('') + '</div>'
     + '</div></div>'
     + '<div class="pzft">' + (PZ.새 ? '' : '<button class="btn ghost sm" data-act="pzdel" style="color:var(--warn)">이 세트 지우기</button>')
       + '<span style="flex:1"></span><button class="btn gold" data-act="pzsave">저장</button></div></div>';
 }
+/* 종목 만들기 창 — 왼쪽 내 종목 목록 · 오른쪽 이름/시간/설명/사진·영상. 세트를 고치다 열면(PZ) 닫을 때 세트 창으로 돌아간다 */
+let PI = null;
+function 종목창(){
+  const 내 = 내종목();
+  return '<div class="pzbox">'
+    + '<div class="pzhd"><b>스트레칭 종목 만들기</b><button class="btn ghost sm" data-act="piclose">' + (PZ ? '‹ 세트로 돌아가기' : '닫기') + '</button></div>'
+    + '<div class="pzbody"><div class="pzcol">'
+      + '<div class="lbl">내가 만든 종목 ' + 내.length + '개<span class="r"><button class="btn sub sm" data-act="pinew">＋ 새 종목</button></span></div>'
+      + (내.length ? 내.map(x => '<button class="pzit' + (PI.id===x.id?' on':'') + '" data-act="piedit" data-v2="' + esc(x.id) + '" style="width:100%"><span><b>' + esc(x.name) + '</b><small>'
+          + esc([x.time, (x.media||[]).length ? ((x.media.some(z=>z.kind==='video') ? '영상 ' : '사진 ') + x.media.length) : '사진·영상 없음'].filter(Boolean).join(' · ')) + '</small></span></button>').join('')
+        : '<div class="empty">아직 만든 종목이 없어요</div>')
+    + '</div><div class="pzcol">'
+      + '<div class="lbl">' + (PI.새 ? '새 종목' : '종목 고치기') + '</div>'
+      + '<input class="inp" id="pion" maxlength="24" value="' + esc(PI.name) + '" placeholder="종목 이름  예) 장요근 늘이기">'
+      + '<input class="inp" id="piot" maxlength="16" value="' + esc(PI.time) + '" placeholder="시간 · 횟수  예) 좌우 30초" style="margin-top:6px">'
+      + '<input class="inp" id="piod" maxlength="140" value="' + esc(PI.descr) + '" placeholder="설명" style="margin-top:6px">'
+      + (PI.media.length ? '<div class="pzmem" style="margin-top:8px">' + PI.media.map((m, i) => '<button class="chip" data-act="pimrm" data-i="' + i + '">' + (m.kind==='video' ? '영상' : '사진') + ' ' + (i+1) + ' ✕</button>').join('') + '</div>' : '')
+      + '<div class="lbl" style="margin-top:12px">사진 · 영상 더하기</div>'
+      + '<input type="file" id="pifile" accept="image/*,video/*" multiple style="font-size:12.5px;color:var(--sub)">'
+    + '</div></div>'
+    + '<div class="pzft">' + (PI.새 ? '' : '<button class="btn ghost sm" data-act="pidel" style="color:var(--warn)">이 종목 지우기</button>')
+      + '<span style="flex:1"></span><button class="btn gold" data-act="pisave">종목 저장</button></div></div>';
+}
+const 새종목 = () => ({ id:'pi'+Date.now(), name:'', time:'', descr:'', media:[], 새:true });
+async function 종목손잡이(a, act){
+  if(a==='pilist' || a==='pinew'){ if(PZ) 세트글담기(); PI = 새종목(); 세트창(); return true; }
+  if(!PI) return false;
+  if(a==='piclose'){ PI = null; 세트창(); return true; }
+  const 글 = () => { ['name:pion','time:piot','descr:piod'].forEach(k => { const [f, id] = k.split(':'), el = document.getElementById(id); if(el) PI[f] = el.value.trim(); }); };
+  if(a==='piedit'){ const x = 내종목().find(z => z.id === act.dataset.v2); if(!x) return true;
+    PI = { id:x.id, name:x.name||'', time:x.time||'', descr:x.descr||'', media:(x.media||[]).slice() }; 세트창(); return true; }
+  if(a==='pimrm'){ 글(); PI.media.splice(+act.dataset.i, 1); 세트창(); return true; }
+  if(a==='pisave'){ 글(); if(!PI.name){ toast('종목 이름을 적어 주세요'); return true; }
+    const fs = Array.from((document.getElementById('pifile').files)||[]), media = PI.media.slice();
+    try{ for(let i=0;i<fs.length;i++){ const f = fs[i], 영상 = /^video\//.test(f.type);
+        if(!영상 && !/^image\//.test(f.type)) continue;
+        if(영상 && f.size > 60*1024*1024){ toast('영상은 60MB 까지 올릴 수 있어요'); return true; }
+        toast('올리는 중이에요 (' + (i+1) + '/' + fs.length + ')');
+        const blob = 영상 ? f : await 줄이기(f), ext = 영상 ? (/webm/.test(f.type) ? 'webm' : 'mp4') : 'jpg', path = 'prep/items/' + PI.id + '/' + Date.now() + '_' + i + '.' + ext;
+        const r = await fetch(SB_URL+'/storage/v1/object/media/'+path, { method:'POST',
+          headers:{ apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type': 영상 ? (ext==='webm' ? 'video/webm' : 'video/mp4') : 'image/jpeg' }, body: blob });
+        if(!r.ok) throw new Error(await r.text());
+        media.push({ kind: 영상 ? 'video' : 'photo', path }); } }
+    catch(e){ toast('파일을 못 올렸어요 — ' + (e.message||'').slice(0,60)); return true; }
+    const row = { id:PI.id, trainer:나이름(), name:PI.name, time:PI.time, descr:PI.descr, media, updated_at:new Date().toISOString() };
+    try{ await ssend('prep_items?on_conflict=id', 'POST', [row], 'resolution=merge-duplicates');
+      D.pi = (D.pi||[]).filter(z => z.id !== row.id).concat([row]);
+      if(PZ && PI.새){ PZ.items.push({ k:'my', i:row.id }); PZ.갈 = 'y'; PI = null; }      /* 세트를 고치다 만든 종목은 바로 담고 세트 창으로 */
+      else PI = 새종목();
+      세트창(); toast('종목을 저장했어요'); render(); }
+    catch(e){ toast('못 저장했어요 — ' + e.message); } return true; }
+  if(a==='pidel'){ const 쓰는 = 내세트().filter(x => (x.items||[]).some(z => z.k==='my' && z.i===PI.id));
+    if(!confirm(쓰는.length ? '이 종목을 지울까요? 세트 ' + 쓰는.length + '개에서도 빠집니다.' : '이 종목을 지울까요?')) return true;
+    try{ await ssend('prep_items?id=eq.' + encodeURIComponent(PI.id), 'DELETE');
+      for(const x of 쓰는){ x.items = x.items.filter(z => !(z.k==='my' && z.i===PI.id));
+        await ssend('prep_sets?id=eq.' + encodeURIComponent(x.id), 'PATCH', { items:x.items, updated_at:new Date().toISOString() }); }
+      if(PZ) PZ.items = PZ.items.filter(z => !(z.k==='my' && z.i===PI.id));
+      D.pi = (D.pi||[]).filter(z => z.id !== PI.id); PI = 새종목(); 세트창(); toast('지웠어요'); render(); }
+    catch(e){ toast('못 지웠어요 — ' + e.message); } return true; }
+  return false;
+}
 function 세트글담기(){ if(!PZ) return; const a = document.getElementById('pzname'), b = document.getElementById('pzmemo');
   if(a) PZ.name = a.value; if(b) PZ.memo = b.value; }
 async function 세트손잡이(a, act){
+  if(/^pi/.test(a) && await 종목손잡이(a, act)) return true;
   if(a==='pznew'){ PZ = { id:'ps'+Date.now(), trainer:나이름(), name:'', memo:'', items:[], member_ids: S.mid ? [S.mid] : [], 새:true }; 세트창(); return true; }
   if(a==='pzedit'){ const x = 내세트().find(z => z.id === act.dataset.ps); if(!x) return true;
     PZ = { id:x.id, trainer:x.trainer, name:x.name||'', memo:x.memo||'', items:(x.items||[]).map(z=>Object.assign({}, z)), member_ids:(x.member_ids||[]).slice() }; 세트창(); return true; }
@@ -3174,25 +3239,11 @@ async function 세트손잡이(a, act){
   if(a==='pzclose'){ PZ = null; 세트창(); return true; }
   세트글담기();
   if(a==='pzk'){ PZ.갈 = act.dataset.v2; 세트창(); return true; }
-  if(a==='pztog'){ const k = act.dataset.v2, i = PZ.items.findIndex(z => z.k==='lib' && z.i===k); if(i >= 0) PZ.items.splice(i,1); else PZ.items.push({ k:'lib', i:k });
+  if(a==='pztog'){ const [종, k] = [act.dataset.v2.slice(0, act.dataset.v2.indexOf(':')), act.dataset.v2.slice(act.dataset.v2.indexOf(':')+1)], i = PZ.items.findIndex(z => z.k===종 && z.i===k); if(i >= 0) PZ.items.splice(i,1); else PZ.items.push({ k:종, i:k });
     const sc = (document.querySelector('.pzlist')||{}).scrollTop || 0; 세트창(); const l = document.querySelector('.pzlist'); if(l) l.scrollTop = sc; return true; }
   if(a==='pzmt'){ const k = act.dataset.v2, i = PZ.member_ids.indexOf(k); if(i >= 0) PZ.member_ids.splice(i,1); else PZ.member_ids.push(k); 세트창(); return true; }
   if(a==='pzup'){ const i = +act.dataset.i; if(i > 0){ const t = PZ.items[i-1]; PZ.items[i-1] = PZ.items[i]; PZ.items[i] = t; } 세트창(); return true; }
   if(a==='pzrm'){ PZ.items.splice(+act.dataset.i, 1); 세트창(); return true; }
-  if(a==='pzown'){ const n = (document.getElementById('pzon').value||'').trim(); if(!n){ toast('동작 이름을 적어 주세요'); return true; }
-    const t = (document.getElementById('pzot').value||'').trim(), d = (document.getElementById('pzod').value||'').trim();
-    const fs = Array.from((document.getElementById('pzfile').files)||[]), media = [];
-    try{ for(let i=0;i<fs.length;i++){ const f = fs[i], 영상 = /^video\//.test(f.type);
-        if(!영상 && !/^image\//.test(f.type)) continue;
-        if(영상 && f.size > 60*1024*1024){ toast('영상은 60MB 까지 올릴 수 있어요'); return true; }
-        toast('올리는 중이에요 (' + (i+1) + '/' + fs.length + ')');
-        const blob = 영상 ? f : await 줄이기(f), ext = 영상 ? (/webm/.test(f.type) ? 'webm' : 'mp4') : 'jpg', path = 'prep/' + PZ.id + '/' + Date.now() + '_' + i + '.' + ext;
-        const r = await fetch(SB_URL+'/storage/v1/object/media/'+path, { method:'POST',
-          headers:{ apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type': 영상 ? (ext==='webm' ? 'video/webm' : 'video/mp4') : 'image/jpeg' }, body: blob });
-        if(!r.ok) throw new Error(await r.text());
-        media.push({ kind: 영상 ? 'video' : 'photo', path }); } }
-    catch(e){ toast('파일을 못 올렸어요 — ' + (e.message||'').slice(0,60)); return true; }
-    PZ.items.push({ k:'own', n, t, d, media }); toast('담았어요'); 세트창(); return true; }
   if(a==='pzsave'){ PZ.name = (PZ.name||'').trim(); PZ.memo = (PZ.memo||'').trim();
     if(!PZ.name){ toast('세트 이름을 적어 주세요'); return true; }
     if(!PZ.items.length){ toast('동작을 하나 이상 담아 주세요'); return true; }
@@ -8401,7 +8452,8 @@ async function load(){
     D.m=g[0]; D.w=g[1]; D.wi=g[2]; D.r=g[3]; D.ri=g[4]; D.c=g[5];
     D.aAll=g[6]; D.a=g[6].filter(x=>x.on_date===TODAY);
     D.ex=g[7]; D.va=g[8]; D.asks=g[9]||[];
-    try{ D.ps = await sget('prep_sets?select=*&order=created_at'); }catch(e){ D.ps = []; }      /* 스트레칭 세트 (2026-10-07) */
+    try{ D.ps = await sget('prep_sets?select=*&order=created_at'); }catch(e){ D.ps = []; }
+    try{ D.pi = await sget('prep_items?select=*&order=created_at'); }catch(e){ D.pi = []; }      /* 내가 만든 스트레칭 종목 */      /* 스트레칭 세트 (2026-10-07) */
     const trs = [...new Set(D.m.map(x=>x.trainer).filter(Boolean))];
     $('#whosel').innerHTML = ['전체'].concat(trs).map(t =>
       '<option value="' + esc(t) + '">' + esc(t==='전체'?'전체 보기':t+' 트레이너') + '</option>').join('');
@@ -8750,7 +8802,7 @@ document.addEventListener('click', async function(ev){
      두 손잡이가 같은 이름을 쓰면 어느 쪽에 적든 돈다. */
   const a = act.dataset.act, id = +act.dataset.i, v2 = act.dataset.v2;
   if(a.indexOf('tx:')===0){ ev.preventDefault(); await txAct(a.slice(3), act); return; }
-  if(a.indexOf('pz')===0 && await 세트손잡이(a, act)) return;      /* 스트레칭 세트 (2026-10-07) */
+  if((a.indexOf('pz')===0 || /^pi(list|new|close|edit|mrm|save|del)$/.test(a)) && await 세트손잡이(a, act)) return;      /* 스트레칭 세트 (2026-10-07) */
 
   if(a==='mfull'){ const mid = (회원판 && 회원판.mid) || S.mid;
     회원판 = null; $('#pop').classList.remove('on');
