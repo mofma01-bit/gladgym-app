@@ -1113,6 +1113,10 @@ body .pcm{padding:9px 11px;border-radius:12px;background:#1b1a18;border:1px soli
 body .ootdnudge .ic{color:var(--gold);display:flex}
 .pgk svg{display:block}
 .btn svg.ic2{vertical-align:-4px}
+.tmsum.btn3>button{display:flex;flex-direction:column;gap:1px;text-align:left;padding:12px 12px 10px;border-radius:16px;border:1px solid #34332d;background:linear-gradient(180deg,#221f1a,#181816);min-width:0}
+.tmsum.btn3>button.t{border-color:#3f7281;background:linear-gradient(170deg,#1b2d33,#171a19 70%)}.tmsum.btn3>button.t b{color:var(--teal)}
+.tmsum.btn3>button.zero{opacity:.45}.tmsum.btn3 small em{font-style:normal;color:var(--gold)}
+.tmsum.btn3>button:not(.zero):active{transform:scale(.97)}
 .regtag{width:40px;height:36px;border-radius:11px;flex:none;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--gold);border:1px solid rgba(240,211,160,.45);background:rgba(240,211,160,.07)}
 .regtag.r{color:var(--teal);border-color:rgba(169,216,230,.5);background:rgba(169,216,230,.07)}.regtag.x{color:#6f6c66;border-color:#34332d;background:none}
 body .tmsum>div,body .sstat3>div,body .dgrid>div,body .hcard,body .lvme,body .mehead,body .tmhead,body .megoal,body .mealcd,body .dwk,body .wk,body .gbox,body .card,body .pcard,body .cm.cm2,body .sspick{box-shadow:none}
@@ -2436,7 +2440,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '296';
+const BUILD = '297';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -9595,31 +9599,47 @@ function tToday(){
       <span class="hgo">회원 찾기 ›</span></button>
     ${live.map(x=>`<button class="hline" data-act="tgo:${x.m.id}">${svg('h_clock',18)}<b>${esc(x.m.n)} · 기록 중</b>
         <small>${esc((it=>it?exName(it.ex,it.va):'')(x.w.items[x.w.cur]||x.w.items[0]))}</small><i>›</i></button>`).join('')}
-    <div class="tmsum">
-      <div class="t"><small>기록 중인 수업</small><b>${live.length}<i>명</i></b></div>
-      <div><small>코멘트 안 단 기록</small><b>${todo.length}<i>건</i></b></div>
-      <div><small>오늘 올라온 식단</small><b>${(D.meals||[]).filter(m=>m.date===TODAY).length}<i>장</i></b></div>
-    </div>
+    ${(()=>{ const 식 = (D.meals||[]).filter(m=>m.date===TODAY), 안단 = 식.filter(m=>!m.note).length;
+      return `<div class="tmsum btn3">
+      <button class="t ${live.length?'':'zero'}" ${live.length ? `data-act="${live.length===1 ? 'tgo:'+live[0].m.id : 'tdlive'}"` : 'disabled'}><small>기록 중인 수업</small><b>${live.length}<i>명</i></b></button>
+      <button class="${todo.length?'':'zero'}" ${todo.length ? 'data-act="tdtodo"' : 'disabled'}><small>코멘트 안 단 기록</small><b>${todo.length}<i>건</i></b></button>
+      <button class="${식.length?'':'zero'}" ${식.length ? 'data-act="tdmeal"' : 'disabled'}><small>오늘 올라온 식단${안단 ? ` · <em>안 단 것 ${안단}</em>` : ''}</small><b>${식.length}<i>장</i></b></button>
+    </div>`; })()}
     <div class="hrow">
       <button class="hcard teal" data-act="pickasg">${홈머리('h_cal','루틴 지정하기')}
         <span class="hs">회원이 오늘 할 루틴을<br>미리 정해 둡니다</span></button>
       <button class="hcard gold2" data-act="rmpickmem">${홈머리('h_crown','1RM 측정하기')}
         <span class="hs">워밍업부터 무게 · 횟수 ·<br>쉬는 시간 자동</span></button>
     </div>
-    ${(()=>{ const md=(D.meals||[]).filter(m=>m.date===TODAY);
-      if(!md.length) return '';
-      const nm2 = id => (MEMBERS.find(x=>x.id===id)||{}).n || '?';
-      return `<div class="hr"></div><span class="lbl">오늘 올라온 식단 · ${md.length}장</span>
-        ${md.slice(0,6).map(m=>`<button class="mrow" data-act="meal:${m.id}">
-          ${picImg(m.path)}
-          <div><div class="nm">${esc(nm2(m.mid))} · ${esc(m.slot)}</div>
-          <div class="sm">${esc(m.memo||'')}</div></div>
-          ${m.note?'<span class="pill q">봤음</span>':'<span class="pill">코멘트</span>'}</button>`).join('')}`;
-    })()}
-    ${todo.length?`<div class="hr"></div>
-      <span class="lbl">코멘트 안 단 기록 · ${todo.length}건</span>
-      <button class="card rowc" data-act="ttab:t_feed"><div><div class="nm">피드백 탭에서 몰아서 쓰기</div>
-        <div class="sm">가장 오래된 것부터 보여 드립니다</div></div><span class="rt">›</span></button>`:''}` };
+` };
+}
+/* 오늘 화면 숫자 칸을 누르면 뜨는 내역 창 셋 */
+function sheetTdLive(){
+  const live = MEMBERS.map(m=>({m, w:liveOf(m.id)})).filter(x=>x.w);
+  openSheet(()=>`<div class="h2">기록 중인 수업 <small>${live.length}명</small></div>
+    <div class="megrp">${live.map(x=>`<button class="mrow2" data-act="tgo:${x.m.id}"><span class="mi lv">${svg('h_clock',19)}</span>
+      <span class="mt"><b>${esc(x.m.n)}</b><small>${esc((it=>it?exName(it.ex,it.va):'')(x.w.items[x.w.cur]||x.w.items[0]))}</small></span><i>›</i></button>`).join('')}</div>
+    <button class="btn ghost sm" data-act="close">닫기</button>`);
+}
+function sheetTdTodo(){
+  const nm = id => (MEMBERS.find(x=>x.id===id)||{}).n || '?';
+  openSheet(()=>{ const todo = D.workouts.filter(w=>w.done && unseen(w)).sort((a,b)=> a.date < b.date ? -1 : a.date > b.date ? 1 : 0);      /* 오래된 것부터 */
+    return `<div class="h2">코멘트 안 단 기록 <small>${todo.length}건 · 오래된 것부터</small></div>
+    <div class="pickbox"><div class="megrp">${todo.map(w=>{ const n = w.items.filter(it => it.sets.length && cmOf(w.mid, it.ex, it.va).length === 0).length;
+      return `<button class="mrow2" data-act="tw:${w.id}"><span class="mi nm1">${esc(nm(w.mid).slice(0,1))}</span>
+        <span class="mt"><b>${esc(nm(w.mid))} · ${dateTxt(w.date)}</b><small>${esc(w.kind||'')} · 코멘트 없는 종목 ${n}개</small></span><em class="go">쓰기 ›</em></button>`; }).join('') || '<div class="empty">다 달았어요</div>'}</div></div>
+    <button class="btn ghost sm" data-act="close">닫기</button>`; });
+}
+function sheetTdMeal(){
+  const nm = id => (MEMBERS.find(x=>x.id===id)||{}).n || '?';
+  openSheet(()=>{ const md = (D.meals||[]).filter(m=>m.date===TODAY);
+    return `<div class="h2">오늘 올라온 식단 <small>${md.length}장</small></div>
+    <div class="pickbox">${md.map(m=>`<button class="mrow" data-act="meal:${m.id}">
+        ${picImg(m.path)}
+        <div><div class="nm">${esc(nm(m.mid))} · ${esc(m.slot)}</div>
+        <div class="sm">${esc(m.memo||'')}</div></div>
+        ${m.note?'<span class="pill q">봤음</span>':'<span class="pill">코멘트</span>'}</button>`).join('')}</div>
+    <button class="btn ghost sm" data-act="close">닫기</button>`; });
 }
 
 /* 피드백 — 코멘트 쓸 곳 모아보기 */
@@ -11444,6 +11464,9 @@ document.addEventListener('click', async ev=>{
     case 'rks': S.rks=rest[0]; render(); return;
     case 'rkmine': sheetRkMine(); return;
     case 'tmreg': S.tmreg = rest[0] || ''; render(); return;
+    case 'tdlive': sheetTdLive(); return;
+    case 'tdtodo': sheetTdTodo(); return;
+    case 'tdmeal': sheetTdMeal(); return;
     case 'rklv': sheetRkLevel(+rest[0]); return;
     case 'rkladder': sheetRkLadder(); return;
     case 'rkall': sheetRkAll(); return;
