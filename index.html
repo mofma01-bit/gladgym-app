@@ -2436,7 +2436,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '295';
+const BUILD = '296';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -4685,12 +4685,13 @@ function sheetPsetEdit(){
 /* 목록에서 고르기 — 스트레칭 / 마사지 */
 function sheetPsetLib(){
   const p = S.pse; if(!p) return;
-  const 갈 = S.pslk || 's', 줄 = 갈==='s' ? ST : MS, 담긴 = new Set(p.items.filter(x=>x.k==='lib').map(x=>x.i));
-  openSheet(()=>`<div class="h2">목록에서 고르기 <small>${담긴.size}개 담음</small></div>
+  /* ⛔ 체크 표시를 만드는 값은 **그릴 때마다** 다시 센다 — 밖에서 한 번만 세면 눌러도 표시가 안 바뀐다 (2026-10-07 대표 「체크박스가 눌러지지 않아」) */
+  openSheet(()=>{ const 갈 = S.pslk || 's', 줄 = 갈==='s' ? ST : MS, 담긴 = new Set(p.items.filter(x=>x.k==='lib').map(x=>x.i));
+    return `<div class="h2">목록에서 고르기 <small>${담긴.size}개 담음</small></div>
     <div class="seg">${[['s','스트레칭 '+ST.length],['m','마사지 '+MS.length]].map(k=>`<button class="${갈===k[0]?'on':''}" data-act="pslk:${k[0]}">${k[1]}</button>`).join('')}</div>
     <div class="pickbox"><div class="megrp">${줄.map(x=>`<button class="mrow2 ${담긴.has(x.i)?'pson':''}" data-act="pstog:${x.i}">
       <span class="ck">${담긴.has(x.i)?'✓':''}</span><span class="mt"><b>${esc(x.n)}</b><small>${esc(x.t)} · ${esc(x.d)}</small></span></button>`).join('')}</div></div>
-    <button class="btn main" data-act="psedit2">다 골랐어요</button>`);
+    <button class="btn main" data-act="psedit2">다 골랐어요</button>`; });
 }
 /* 직접 올리기 — 이름 · 시간/횟수 · 설명 · 사진 여러 장 또는 영상 한 개 */
 function sheetPsetOwn(){
