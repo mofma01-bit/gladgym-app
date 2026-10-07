@@ -2564,7 +2564,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '322';
+const BUILD = '323';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -7472,7 +7472,7 @@ function sheetRM(){
       <div class="fld"><span class="fn">한 번 든 최고 무게 (kg)</span>
         <input class="search" type="number" inputmode="decimal" data-k="rmkg" placeholder="0"></div>
       <button class="btn main" data-act="rmsave">기록 남기기</button>
-      <div class="note">측정 루틴 없이, 이미 잰 1RM 을 바로 적는 길이에요. 프로필·랭킹에 <b>실측</b>으로 남습니다.</div>`}
+      <div class="note">측정 루틴 없이, 이미 잰 1RM 을 바로 입력하는 방법이에요. 프로필·랭킹에 <b>실측</b>으로 남습니다.</div>`}
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 /* 직접 입력 — 운동 기록 없이, 고른 종목마다 무게만 적는다 */
@@ -7847,8 +7847,8 @@ function sheetFoodPick(mealId){
         ${rec.map(x=>`<button class="fitem" data-act="frec:${esc(x.name)}">
           <span class="n2">${esc(x.name)}<small>${x.brand?esc(x.brand)+' · ':''}${kgfmt(x.qty)}${x.unit?' × '+esc(x.unit):'인분'}</small></span>
           <span class="k2">${Math.round(x.kcal)}<span style="font-size:11px;font-weight:600;color:#8f8a83"> kcal</span></span></button>`).join('')}`:''}
-      ${res===null && !rec.length?'<div class="note">이름을 적고 <b>검색</b>를 누르세요. 없으면 <b>직접 입력</b>로 새로 만듭니다.</div>':''}
-      ${res==='loading'?'<div class="empty">찾는 중이에요…</div>':''}
+      ${res===null && !rec.length?'<div class="note">이름을 입력하고 <b>검색</b>을 누르세요. 없으면 <b>직접 입력</b>으로 새로 만듭니다.</div>':''}
+      ${res==='loading'?'<div class="empty">검색 중이에요…</div>':''}
       ${Array.isArray(res)? (res.length? `<span class="lbl">${res.length}가지 찾았어요</span>${res.map(row).join('')}`
         : '<div class="empty">못 찾았어요<br>「직접 입력」으로 새로 만들 수 있어요</div>') : ''}
       <button class="btn ghost sm" data-act="close">닫기</button>
@@ -7891,7 +7891,7 @@ function sheetFoodQty(f){
       <div class="chips" style="justify-content:center">
         ${[0.5,1,1.5,2,3].map(x=>`<button class="chip ${q===x?'on':''}" data-act="fq:${x}">${kgfmt(x)}${f.unit?' × '+esc(f.unit):'인분'}</button>`).join('')}
       </div>
-      ${amt?`<div class="note">지금 담는 양은 <b>${gram}g</b> 입니다.</div>`:''}`}
+      ${amt?`<div class="note">지금 추가하는 양은 <b>${gram}g</b> 입니다.</div>`:''}`}
       <div class="calc" style="gap:9px">
         <div class="krow"><span class="k">칼로리</span><span class="v" style="color:var(--gold)">${Math.round(k)} kcal</span></div>
         <div class="krow"><span class="k">탄수 · 단백 · 지방</span><span class="v">${Math.round(f.carb*q)} · ${Math.round(f.protein*q)} · ${Math.round(f.fat*q)} g</span></div>
@@ -9226,7 +9226,7 @@ function sheetIbPick(mid, side){
         <span class="c">${x.m?ib수(x.m):'—'}</span>
         <span class="c">${x.fp?ib수(x.fp):'—'}</span></button>`).join('')}
     </div>
-    <div class="note">${side==='F' ? '누르면 그 날을 <b>최근</b> 칸에 놓고, 바로 앞 기록과 비교합니다.' : '누르면 그 날짜로 바꿉니다.'}
+    <div class="note">${side==='F' ? '누르면 그 날을 <b>최근</b> 칸에 놓고, 바로 앞 기록과 비교합니다.' : '누르면 그 날짜로 변경합니다.'}
       <br><i class="ibdot"></i> 인바디 기계로 잰 기록</div>
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
@@ -10130,7 +10130,7 @@ function tRoutines(){
       <button class="btn sub sm" data-act="raddpick">루틴 추가하기</button></div>
     ${t?`<button class="btn ghost" data-act="unassign:${mid}">오늘 지정 풀기</button>`:''}
     <div class="note">위 칩은 <b>루틴 그룹</b>입니다 — 근지구력 · 파워 · 생리주기처럼 원하는 이름으로 만들어 쓰세요.
-      회원은 오른쪽 위 이름을 눌러 바꿉니다.</div>` };
+      회원은 오른쪽 위 이름을 눌러 전환합니다.</div>` };
 }
 
 /* 회원 고르기 */
@@ -11881,7 +11881,7 @@ document.addEventListener('click', async ev=>{
       openSheet(()=>`<div class="h2">이대로 수정할까요?</div>
         <div class="card">${E.items.map(it=>`<div class="frow"><span class="fk">${esc(exName(it.ex,it.va))}</span>
           <span class="fv">${it.sets.map(x=>setTxt(it.ex,x)).join(' · ')||'세트 없음'}</span></div>`).join('')}</div>
-        <div class="note">세트 ${n}개로 바꿉니다. <b>운동이 다시 시작되지 않습니다</b> — 기록만 수정합니다.</div>
+        <div class="note">세트 ${n}개로 변경합니다. <b>운동이 다시 시작되지 않습니다</b> — 기록만 수정합니다.</div>
         <button class="btn blue" data-act="recsavego">수정</button>
         <button class="btn ghost sm" data-act="close">닫기</button>`);
       return; }
