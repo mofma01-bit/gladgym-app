@@ -1915,25 +1915,28 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
   display:flex;flex-direction:column;align-items:center;justify-content:center;padding:34px;
   transition:opacity .5s}
 #splash.out{opacity:0;pointer-events:none}
-#splash .logo{font-size:25px;letter-spacing:.3em;margin-right:-.3em;color:var(--gold);font-weight:800;
-  opacity:0;transform:translateY(46px);animation:spLift .62s cubic-bezier(.2,.9,.25,1.12) .12s forwards}
-/* 바벨 — 아래에서 들려 올라와 로고 밑줄이 된다. 양 끝 원판은 다 들린 뒤 접힌다 */
-#splash .bbar{position:relative;width:168px;height:3px;border-radius:2px;margin-top:16px;background:linear-gradient(90deg,#d6b87e,#f3d9a8,#d6b87e);
-  opacity:0;transform:translateY(46px);animation:spLift .62s cubic-bezier(.2,.9,.25,1.12) .12s forwards, spBar .45s ease .95s forwards}
-#splash .bbar::before,#splash .bbar::after{content:'';position:absolute;top:-11px;width:7px;height:25px;border-radius:2px;background:#e2c184;
-  box-shadow:9px 0 0 -1px #c9a86a;animation:spPlate .3s ease .9s forwards}
-#splash .bbar::before{left:6px}#splash .bbar::after{right:6px;box-shadow:-9px 0 0 -1px #c9a86a}
-#splash .today{min-height:24px;margin-top:30px;font-size:15.5px;font-weight:600;color:var(--cream);text-align:center;opacity:0;transform:translateY(8px);transition:opacity .35s,transform .35s}
+/* 오프닝 2판 (2026-10-07 대표가 고른 참고: 심볼이 선으로 그려지고 → 글자가 옆으로 펼쳐지는 로고 오프닝)
+   --k = 빠르기(1 = 그날 처음 · .55 = 같은 날 다시) */
+#splash{--k:1}#splash.quick{--k:.55}
+#splash .lk{display:flex;align-items:center;justify-content:center}
+#splash .sym{width:62px;height:62px;flex:none;fill:none;stroke:var(--gold);stroke-width:12;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 10px rgba(240,211,160,.28))}
+#splash .sym path{stroke-dasharray:1;stroke-dashoffset:1;animation:spDraw calc(var(--k)*.55s) cubic-bezier(.5,0,.2,1) forwards}
+#splash .sym path:nth-child(2){animation-delay:calc(var(--k)*.12s)}#splash .sym path:nth-child(3){animation-delay:calc(var(--k)*.3s)}
+#splash .sym path:nth-child(4){animation-delay:calc(var(--k)*.36s)}#splash .sym path:nth-child(5){animation-delay:calc(var(--k)*.5s)}
+#splash .wm{display:flex;align-items:center;overflow:hidden;white-space:nowrap;max-width:0;margin-left:0;animation:spOpen calc(var(--k)*.55s) cubic-bezier(.2,.8,.2,1) calc(var(--k)*.95s) forwards}
+#splash .wm i{font-style:normal;font-size:27px;font-weight:800;letter-spacing:.1em;color:var(--cream);opacity:0;transform:translateX(-14px);animation:spLet calc(var(--k)*.4s) ease forwards}
+#splash .wm i.sp{width:9px}
+#splash .wm i:nth-child(1){animation-delay:calc(var(--k)*1s)}#splash .wm i:nth-child(2){animation-delay:calc(var(--k)*1.05s)}#splash .wm i:nth-child(3){animation-delay:calc(var(--k)*1.1s)}
+#splash .wm i:nth-child(4){animation-delay:calc(var(--k)*1.15s)}#splash .wm i:nth-child(6){animation-delay:calc(var(--k)*1.22s)}#splash .wm i:nth-child(7){animation-delay:calc(var(--k)*1.27s)}#splash .wm i:nth-child(8){animation-delay:calc(var(--k)*1.32s)}
+#splash .today{min-height:24px;margin-top:26px;font-size:15.5px;font-weight:600;color:var(--cream);text-align:center;opacity:0;transform:translateY(8px);transition:opacity .35s,transform .35s}
 #splash .today.on{opacity:1;transform:none}#splash .today b{color:var(--gold);font-weight:800}
-#splash .copy{position:absolute;bottom:44px;left:0;right:0;text-align:center;font-size:12.5px;font-weight:500;letter-spacing:.02em;color:#7d766e;
-  opacity:0;animation:spFade .5s ease .9s forwards}
-#splash.hi .today{transition:none;animation:spFade .35s ease .45s both}
-#splash.quick .logo,#splash.quick .bbar{animation-duration:.4s,.3s;animation-delay:0s,.45s}#splash.quick .bbar::before,#splash.quick .bbar::after{animation-delay:.4s}
-@keyframes spLift{to{opacity:1;transform:none}}
-@keyframes spBar{to{width:44px}}
-@keyframes spPlate{to{transform:scaleY(0);opacity:0}}
+#splash.hi .today{transition:none;transform:none;animation:spFade .35s ease .9s forwards}
+#splash .copy{position:absolute;bottom:44px;left:0;right:0;text-align:center;font-size:12.5px;font-weight:500;letter-spacing:.02em;color:#7d766e;opacity:0;animation:spFade .5s ease 1.5s forwards}
+@keyframes spDraw{to{stroke-dashoffset:0}}
+@keyframes spOpen{to{max-width:230px;margin-left:15px}}
+@keyframes spLet{to{opacity:1;transform:none}}
 @keyframes spFade{to{opacity:1}}
-@media (prefers-reduced-motion:reduce){#splash .logo,#splash .bbar{animation:none;opacity:1;transform:none}#splash .bbar{width:44px}#splash .bbar::before,#splash .bbar::after{display:none}#splash .copy{animation:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){#splash .sym path{animation:none;stroke-dashoffset:0}#splash .wm{animation:none;max-width:230px;margin-left:15px}#splash .wm i{animation:none;opacity:1;transform:none}#splash .copy{animation:none;opacity:1}}
 
 /* 체크리스트 · 폼 */
 .frow{display:flex;align-items:flex-start;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}
@@ -2028,8 +2031,7 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
 <div class="pwabar" id="pwabar"></div>
 <div id="frame">
   <div id="splash">
-    <div class="logo">GLAD GYM</div>
-    <div class="bbar"></div>
+    <div class="lk"><svg class="sym" viewBox="-6 -6 295 295" aria-hidden="true"><path pathLength="1" d="M236 4H140A91 91 0 0 0 49 95A91 91 0 0 0 140 186"/><path pathLength="1" d="M236 95H49V280H142"/><path pathLength="1" d="M142 95V280"/><path pathLength="1" d="M142 95A92.5 92.5 0 0 1 142 280"/><path pathLength="1" d="M49 280L142 187"/></svg><span class="wm"><i>G</i><i>L</i><i>A</i><i>D</i><i class="sp"></i><i>G</i><i>Y</i><i>M</i></span></div>
     <div class="today" id="sptoday"></div>
     <div class="copy" id="spcopy">소중한 나를 위한 선택</div>
   </div>
@@ -2371,7 +2373,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '288';
+const BUILD = '289';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -11529,14 +11531,15 @@ function 오늘한줄(){
     return `${이름}님, 이번 달 첫 운동을 시작해요`;
   }catch(e){ return ''; }
 }
+const 로고잠금 = '<div class="lk"><svg class="sym" viewBox="-6 -6 295 295" aria-hidden="true"><path pathLength="1" d="M236 4H140A91 91 0 0 0 49 95A91 91 0 0 0 140 186"/><path pathLength="1" d="M236 95H49V280H142"/><path pathLength="1" d="M142 95V280"/><path pathLength="1" d="M142 95A92.5 92.5 0 0 1 142 280"/><path pathLength="1" d="M49 280L142 187"/></svg><span class="wm"><i>G</i><i>L</i><i>A</i><i>D</i><i class="sp"></i><i>G</i><i>Y</i><i>M</i></span></div>';
 /* 회원을 고른 직후 — 로고 + 오늘 한 줄을 잠깐(1.1초). 하루에 회원마다 한 번만 */
 function 인사(){
   const 줄 = 오늘한줄(); if(!줄 || document.getElementById('splash')) return;
   const 키 = 'gg_hi_' + S.mid + '_' + TODAY; try{ if(sessionStorage.getItem(키)) return; sessionStorage.setItem(키, '1'); }catch(e){}
   const d = document.createElement('div'); d.id = 'splash'; d.className = 'quick hi';
-  d.innerHTML = `<div class="logo">GLAD GYM</div><div class="bbar"></div><div class="today on">${줄}</div>`;
+  d.innerHTML = 로고잠금 + `<div class="today">${줄}</div>`;      /* on 을 붙이지 않는다 — 로고가 다 펼쳐진 뒤에 뜬다 */
   (document.getElementById('top').parentNode).appendChild(d);
-  setTimeout(hideSplash, 1150);
+  setTimeout(hideSplash, 1700);
 }
 async function start(){
   checkBuild();                     /* 새 판이 올라왔으면 조용히 받아온다 */
@@ -11548,8 +11551,8 @@ async function start(){
     const t0=Date.now();
     await boot();
     const 줄 = 오늘한줄(), el = document.getElementById('sptoday');
-    if(줄 && el){ el.innerHTML = 줄; setTimeout(()=>el.classList.add('on'), Math.max(0, (처음 ? 950 : 500) - (Date.now()-t0))); }
-    const wait=Math.max(줄 ? 650 : 0, (처음 ? (줄 ? 1900 : 1400) : (줄 ? 1150 : 700)) - (Date.now()-t0));
+    if(줄 && el){ el.innerHTML = 줄; setTimeout(()=>el.classList.add('on'), Math.max(0, (처음 ? 1600 : 900) - (Date.now()-t0))); }
+    const wait=Math.max(줄 ? 650 : 0, (처음 ? (줄 ? 2700 : 2300) : (줄 ? 1600 : 1150)) - (Date.now()-t0));
     setTimeout(hideSplash, wait);
     render();
   }catch(e){
