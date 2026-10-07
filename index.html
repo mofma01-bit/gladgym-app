@@ -1127,6 +1127,13 @@ body .ootdnudge .ic{color:var(--gold);display:flex}
 .tmsum.btn3>button.t{border-color:#3f7281;background:linear-gradient(170deg,#1b2d33,#171a19 70%)}.tmsum.btn3>button.t b{color:var(--teal)}
 .tmsum.btn3>button.zero{opacity:.45}.tmsum.btn3 small em{font-style:normal;color:var(--gold)}
 .tmsum.btn3>button:not(.zero):active{transform:scale(.97)}
+.mrow2.favrow{padding:0;gap:0}
+.favrow .tmgo{flex:1;min-width:0;display:flex;align-items:center;gap:12px;text-align:left;padding:12px 14px 12px 4px}
+.favrow .tmgo>i{font-style:normal;color:var(--sub);font-size:17px;flex:none}
+.favbtn{flex:none;width:44px;height:48px;display:flex;align-items:center;justify-content:center;color:#5d5a54;padding:0}
+.favbtn.on{color:var(--gold);filter:drop-shadow(0 0 6px rgba(240,211,160,.45))}.favbtn:active{transform:scale(.88)}
+#top .favbtn.top{width:34px;height:34px;margin-left:6px}
+.chip.fav{color:var(--gold-2)}.chip.fav.on{color:var(--gold)}
 .regtag{width:40px;height:36px;border-radius:11px;flex:none;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--gold);border:1px solid rgba(240,211,160,.45);background:rgba(240,211,160,.07)}
 .regtag.r{color:var(--teal);border-color:rgba(169,216,230,.5);background:rgba(169,216,230,.07)}.regtag.x{color:#6f6c66;border-color:#34332d;background:none}
 body .tmsum>div,body .sstat3>div,body .dgrid>div,body .hcard,body .lvme,body .mehead,body .tmhead,body .megoal,body .mealcd,body .dwk,body .wk,body .gbox,body .card,body .pcard,body .cm.cm2,body .sspick{box-shadow:none}
@@ -2574,7 +2581,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '325';
+const BUILD = '326';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -10007,35 +10014,46 @@ function tTools(){
       <div class="sm">계정 선택 화면으로</div></div><span class="rt">›</span></button>` };
 }
 
+/* 회원 즐겨찾기 — 트레이너가 별을 켠 회원. 목록 맨 위로 올라오고 「★ 즐겨찾기」 칩으로 그 회원만 본다 (2026-10-07 대표 「회원 즐겨찾기 · 해당 페이지에 별표」)
+   ⚠ 지금은 **이 기기에만** 남는다(localStorage · 트레이너 이름별). 폰과 PC 가 같이 보이게 하려면 서버 칸이 필요하다 — 대표 결정 뒤에. */
+const 즐찾키 = () => 'gg_fav_' + TRAINER;
+function 즐찾(){ try{ return JSON.parse(localStorage.getItem(즐찾키()) || '[]'); }catch(e){ return []; } }
+function 즐찾바꿈(mid){ const a = 즐찾(), i = a.indexOf(mid); if(i >= 0) a.splice(i,1); else a.push(mid);
+  try{ localStorage.setItem(즐찾키(), JSON.stringify(a)); }catch(e){} return i < 0; }
+const 별 = on => `<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 3.2l2.7 5.6 6.1.8-4.5 4.3 1.1 6.1L12 17.1 6.6 20l1.1-6.1L3.2 9.6l6.1-.8z" fill="${on?'currentColor':'none'}" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
 function tMembers(){
   return { top: bar('회원 목록', `<span class="sub">담당 ${MEMBERS.length}명</span>`), body:
     (()=>{ const 거름 = S.tmreg || '';
       const 수 = { 신규: MEMBERS.filter(m=>m.reg==='신규').length, 재등록: MEMBERS.filter(m=>m.reg==='재등록').length };
-      const 줄 = MEMBERS.filter(m => !거름 || m.reg === 거름).map(m=>{
+      const 별들 = 즐찾().filter(id => MEMBERS.some(m=>m.id===id));
+      const 줄 = MEMBERS.filter(m => !거름 || (거름==='★' ? 별들.includes(m.id) : m.reg === 거름)).map(m=>{
         const ws=D.workouts.filter(w=>w.mid===m.id&&w.done).slice().sort(byDateDesc), last=ws[0];
         const lv=liveOf(m.id), nofb=last && !D.cm.some(c=>c.mid===m.id && c.at==='방금');
-        return { m, last, lv, nofb }; });
+        return { m, last, lv, nofb, fav: 별들.includes(m.id) }; }).sort((a,b)=>(b.fav?1:0)-(a.fav?1:0));      /* 즐겨찾기가 맨 위 (나머지 차례는 그대로) */
       /* 맨 위 숫자 셋 — 실제 수. 그래프는 안 넣는다(넣을 실제 자료가 없다) */
       return `<div class="tmsum">
           <div><small>담당 회원</small><b>${줄.length}<i>명</i></b></div>
           <div class="t"><small>지금 운동 중</small><b>${줄.filter(x=>x.lv).length}<i>명</i></b></div>
           <div><small>안 본 기록</small><b>${줄.filter(x=>!x.lv && x.nofb).length}<i>명</i></b></div></div>
-        <div class="chips">${[['','전체',MEMBERS.length],['신규','신규',수.신규],['재등록','재등록',수.재등록]].map(k=>`<button class="chip ${거름===k[0]?'on':''}" data-act="tmreg:${k[0]}">${k[1]} ${k[2]}</button>`).join('')}</div>
+        <div class="chips">${[['','전체',MEMBERS.length],['신규','신규',수.신규],['재등록','재등록',수.재등록],['★','★ 즐겨찾기',별들.length]].map(k=>`<button class="chip ${k[0]==='★'?'fav':''} ${거름===k[0]?'on':''}" data-act="tmreg:${k[0]}">${k[1]} ${k[2]}</button>`).join('')}</div>
         <input class="search" type="text" data-filter="1" placeholder="회원 이름으로 검색">
-        <div class="megrp">${줄.length ? '' : '<div class="empty">해당하는 회원이 없어요</div>'}${줄.map(({m,last,lv,nofb})=>`<button class="mrow2" data-nm="${esc(m.n)}" data-act="tm:${m.id}">
+        <div class="megrp">${줄.length ? '' : `<div class="empty">${거름==='★' ? '아직 즐겨찾기한 회원이 없어요<br>회원 이름 옆 별을 눌러 보세요' : '해당하는 회원이 없어요'}</div>`}${줄.map(({m,last,lv,nofb,fav})=>`<div class="mrow2 favrow" data-nm="${esc(m.n)}">
+          <button class="favbtn ${fav?'on':''}" data-act="tmfav:${m.id}" aria-label="${fav?'즐겨찾기 해제':'즐겨찾기'}">${별(fav)}</button>
+          <button class="tmgo" data-act="tm:${m.id}">
           <span class="regtag ${m.reg==='신규'?'n':(m.reg==='재등록'?'r':'x')}">${m.reg==='신규'?'신규':(m.reg==='재등록'?'재등':'–')}</span>
           <span class="mt"><b>${esc(m.n)}</b><small>${lv?`지금 운동 중 · ${esc((it0=>it0?exName(it0.ex,it0.va):'')(lv.items[lv.cur]||lv.items[0]))}`
             :(last?`${dateTxt(last.date)} · ${esc(last.kind||'')}`:'기록 없음')}</small></span>
           ${lv?'<span class="pill t">진행 중</span>'
-            :(!last?'<span class="pill q">기록 없음</span>':(nofb?'<span class="pill">안 본 기록</span>':'<span class="pill q">봤음</span>'))}<i>›</i></button>`).join('')}</div>`; })()
-    + `<button class="btn sub" data-act="newmem" style="margin-top:4px">＋ 회원 새로 만들기</button>` };
+            :(!last?'<span class="pill q">기록 없음</span>':(nofb?'<span class="pill">안 본 기록</span>':'<span class="pill q">봤음</span>'))}<i>›</i></button></div>`).join('')}</div>`; })()
+    + `<button class="btn sub" data-act="newmem" style="margin-top:4px;flex:none">＋ 회원 새로 만들기</button>` };
 }
 function tMember(){
   const m=MEMBERS.find(x=>x.id===S.tmid), ws=D.workouts.filter(w=>w.mid===m.id&&w.done).slice().sort(byDateDesc);
   const t=D.today[m.id], r=t?rOf(t.rid):null, g=GOALS[m.id]||{};
   const bench=ws.slice().reverse().map(w=>w.items.find(i=>i.ex==='bp')).filter(Boolean).map(it=>Math.max(...it.sets.map(s=>s.kg)));
   const mx=Math.max(...bench,1);
-  return { top: bar(m.n, `<span class="sub">최근 ${ws.length}회</span>`, 'go:t_members'), body:`
+  const 내별 = 즐찾().includes(m.id);
+  return { top: bar(m.n, `<span class="sub">최근 ${ws.length}회</span><button class="favbtn top ${내별?'on':''}" data-act="tmfav:${m.id}" aria-label="${내별?'즐겨찾기 해제':'즐겨찾기'}">${별(내별)}</button>`, 'go:t_members'), body:`
     ${(()=>{ /* 맨 위 — 목표 · 이번 주 횟수 고리 · 단추 둘 */
       const 주 = weekOf(TODAY), 이번주 = ws.filter(w => w.date >= 주[0] && w.date <= 주[6] && 세트있나(w)).length;
       const 목 = Number(g.freq) || Number(((g.work||'').match(/\d+/)||[])[0]) || 0;
@@ -11800,6 +11818,7 @@ document.addEventListener('click', async ev=>{
     case 'rks': S.rks=rest[0]; render(); return;
     case 'rkmine': sheetRkMine(); return;
     case 'tmreg': S.tmreg = rest[0] || ''; render(); return;
+    case 'tmfav': { const 켬 = 즐찾바꿈(rest[0]); toast(켬 ? '즐겨찾기에 추가했어요' : '즐겨찾기에서 제외했어요'); render(); return; }
     case 'tdlive': sheetTdLive(); return;
     case 'tdtodo': sheetTdTodo(); return;
     case 'tdmeal': sheetTdMeal(); return;
