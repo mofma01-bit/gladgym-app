@@ -1423,7 +1423,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '185';
+const BUILD = '186';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -2357,7 +2357,7 @@ async function 동의요청보내기(){
   }catch(e){
     const msg = (e && e.message) || '';
     toast(/PGRST204|column/i.test(msg)
-      ? '동의 칸이 아직 서버에 없어요 — 설계서의 8단계_SQL_동의칸.sql 을 먼저 돌려 주세요'
+      ? '동의 항목이 아직 서버에 없어요 — 설계서의 8단계_SQL_동의칸.sql 을 먼저 돌려 주세요'
       : '요청을 보내지 못했어요 — ' + msg);
   }
 }
@@ -3985,8 +3985,8 @@ function vRoutine(){
     + '<div class="fld"><span class="fn">운동 방향 · 목적</span>'
       + '<input class="inp" type="text" data-r="purpose" value="' + esc(r.purpose||'') + '"' + dis('routine') + '></div>'
     + (준비
-        ? '<div class="note">이 묶음은 <b>준비운동</b>으로 저장됩니다. 회원 앱의'
-          + ' 준비운동 → 트레이너 지정 칸에 바로 떠요.</div>'
+        ? '<div class="note">이 그룹은 <b>준비운동</b>으로 저장됩니다. 회원 앱의'
+          + ' 준비운동 → 트레이너 지정 항목에 바로 떠요.</div>'
           + '<input type="hidden" data-r="grp" value="준비운동">'
         : '<div class="fld"><span class="fn">그룹</span>'
       + '<input class="inp" type="text" data-r="grp" value="' + esc(r.grp||'') + '" placeholder="근지구력 · 파워 …"'
@@ -5035,7 +5035,7 @@ document.addEventListener('mousemove', function(ev){
     const g = document.createElement('div');
     g.className = 'tx-ghost';
     g.innerHTML = '<i>' + 끌대상[끌.종류].딱지 + '</i>'
-      + esc((끌.el.textContent || '').replace(/\s+/g,' ').trim().slice(0, 22) || '칸');
+      + esc((끌.el.textContent || '').replace(/\s+/g,' ').trim().slice(0, 22) || '항목');
     document.body.appendChild(g);
     끌.유령 = g;
     끌.el.classList.add('drag');
@@ -5071,7 +5071,7 @@ document.addEventListener('mouseup', async function(){
   let at = z.까지 + (z.아래 ? 1 : 0); if(z.부터 < at) at--;
   다.splice(Math.max(0, Math.min(at, 다.length)), 0, m);
   if(z.종류 === '탭') await 보기순서저장(z.key, 다);
-  else if(await 보기칸바꾸기(z.key, 다)) toast('칸 순서를 변경했어요');
+  else if(await 보기칸바꾸기(z.key, 다)) toast('항목 순서를 변경했어요');
 });
 
 /* 끌고 놓은 직후의 click 은 삼킨다 — 탭이 눌려 보기가 바뀌면 안 된다 */
@@ -5312,7 +5312,7 @@ function 범위넓히기(쪽){
 }
 /* 첫 칸 값을 범위 전체에 채운다 */
 async function 범위채우기(어디){
-  if(!범위) { toast('Shift+방향키로 칸을 먼저 선택하세요'); return; }
+  if(!범위) { toast('Shift+방향키로 항목을 먼저 선택하세요'); return; }
   const key = 범위.key, z = 표자리(key); if(!z) return;
   const r0 = Math.min(범위.r1, 범위.r2), r9 = Math.max(범위.r1, 범위.r2);
   const c0 = Math.min(범위.c1, 범위.c2), c9 = Math.max(범위.c1, 범위.c2);
@@ -5336,7 +5336,7 @@ async function 범위채우기(어디){
     }
   }
   범위칠하기();
-  toast(몇 + '칸을 채웠습니다');
+  toast(몇 + '항목을 채웠습니다');
 }
 document.addEventListener('keydown', function(e){
   if(!고른칸 || 칸편집) return;
@@ -5395,11 +5395,11 @@ function 내변경(key){
   const st = 표상태[key] || {}, mk = 모양키(key), 다 = [];
   const 같나 = (a, b) => 굳히기(a) === 굳히기(b);
   const 내칸 = ((내설정[key] || {}).칸 || {})[v.k];
-  if(내칸 && !같나(내칸, v.칸)) 다.push('칸 차례');
+  if(내칸 && !같나(내칸, v.칸)) 다.push('항목 순서');
   const 내순 = (내설정[key] || {}).보기순;
   if(내순 && !같나(내순, 보기들(key, true).map(x => x.k))) 다.push('보기 차례');
   if(표모양[mk] && 표모양[mk] !== (v.모양 || 'table')) 다.push('모양');
-  if(표얼림[mk] != null && !!표얼림[mk] !== (v.고정 == null ? true : !!v.고정)) 다.push('첫 칸 고정');
+  if(표얼림[mk] != null && !!표얼림[mk] !== (v.고정 == null ? true : !!v.고정)) 다.push('첫 항목 고정');
   if(!같나(st.규칙 || [], v.규칙 || []) || (st.op || 'and') !== (v.op || 'and')) 다.push('필터');
   if(!같나(st.정렬, v.ord)) 다.push('정렬');
   if(!같나(st.그룹, v.그룹)) 다.push('그룹');
@@ -5462,7 +5462,7 @@ function txFilterBar(key, v, 순){
               + 'title="'+esc(바뀜.join(' · '))+'을 모두에게 적용합니다">모두에게 저장</button>' : '')
         : '')
     + (관리자() ? '<button class="tx-fadd '+(잠겼나(key)?'on':'')+'" data-act="tx:lock" data-k="'+key+'" '
-        + 'title="'+(잠겼나(key)?'잠겨 있어요 — 순서·칸을 못 바꿉니다':'풀려 있어요 — 끌어서 옮길 수 있어요')+'">'
+        + 'title="'+(잠겼나(key)?'잠겨 있어요 — 순서·항목을 변경할 수 없습니다':'풀려 있어요 — 끌어서 옮길 수 있어요')+'">'
         + (잠겼나(key)?'🔒 잠금':'🔓 잠금 풀림') + '</button>' : '')
     + '<button class="tx-fadd" data-act="tx:layout" data-k="'+key+'" title="목록 ↔ 표">'
       + (모양(key)==='table' ? '▤ 표' : '☰ 목록') + '</button>'
@@ -5513,7 +5513,7 @@ function 그룹판(key){
   const cs = 열들(key).filter(c => ['select','multi','person','people','check'].indexOf(c.타입) >= 0);
   판열기('그룹화',
     '<div class="tx-menu">'
-    + '<button data-act="tx:grpset" data-k="'+key+'" data-v2="">묶음 풀기</button>'
+    + '<button data-act="tx:grpset" data-k="'+key+'" data-v2="">그룹 해제</button>'
     + cs.map(c => '<button data-act="tx:grpset" data-k="'+key+'" data-v2="'+esc(c.k)+'">'+esc(c.이름)
         + (st.그룹===c.k ? '<small style="margin-left:auto;color:var(--gold)">지금 이것</small>' : '') + '</button>').join('')
     + '</div><button class="btn ghost" data-act="popclose">닫기</button>');
@@ -5871,8 +5871,8 @@ function 속성줄들(key, r, 편집){
       + '<button class="tx-pval'+(편집?'':' ro')+'"'+(편집 ? ' data-act="tx:pedit" data-k="'+key+'" data-v2="vis"' : '')+'>'
       + esc(VIS[r.vis||'owners'])
       + (r.vis === 'picked' ? ' <span class="tx-pmut">'+((r.viewers||[]).length)+'명</span>' : '') + '</button></div>'
-    + (빈속성숨김 && 빈수 ? '<button class="tx-padd" data-act="tx:pempty">값이 빈 칸 '+빈수+'개 표시</button>'
-       : 빈수 ? '<button class="tx-padd" data-act="tx:pempty">값이 빈 칸 '+빈수+'개 숨기기</button>' : '')
+    + (빈속성숨김 && 빈수 ? '<button class="tx-padd" data-act="tx:pempty">값이 빈 항목 '+빈수+'개 표시</button>'
+       : 빈수 ? '<button class="tx-padd" data-act="tx:pempty">값이 빈 항목 '+빈수+'개 숨기기</button>' : '')
     + (관리자() ? '<button class="tx-padd" data-act="tx:padd" data-k="'+key+'">＋ 속성 추가</button>' : '')
     + '</div>';
 }
@@ -6046,8 +6046,8 @@ function 속성이름메뉴(key, k, el){
     + (관리자() ? '<button data-act="tx:vhidecol" data-k="'+key+'" data-v2="'+esc(c.k)+'"><i>🙈</i>이 보기에서 숨기기</button>' : '')
     + (c.k === 표정의[key].제목열
         ? '<button data-act="tx:freeze" data-k="'+key+'"><i>📌</i>'
-          + (얼렸나(key) ? '첫 칸 고정 풀기' : '첫 칸 고정하기') + '</button>' : '')
-    + '<button data-act="tx:vcols" data-k="'+key+'"><i>▤</i>이 보기의 칸</button>'
+          + (얼렸나(key) ? '첫 항목 고정 풀기' : '첫 항목 고정하기') + '</button>' : '')
+    + '<button data-act="tx:vcols" data-k="'+key+'"><i>▤</i>이 보기의 항목</button>'
     + '<button data-act="tx:cols" data-k="'+key+'"><i>⠿</i>속성 편집</button>'
     + '</div>', 235);
 }
@@ -6057,14 +6057,14 @@ function 보기칸판(key){
   const 제 = 표정의[key].제목열;
   const 줄들 = 보임.map(k => 다.find(c => c.k === k)).filter(Boolean)
     .concat(다.filter(c => 보임.indexOf(c.k) < 0));
-  판열기('「' + esc(v ? v.이름 : '') + '」 보기의 칸',
+  판열기('「' + esc(v ? v.이름 : '') + '」 보기의 항목',
     '<div class="tx-cols"><div class="tx-clist" id="txvclist" data-vck="'+key+'">'
     + 줄들.map((c,i) => { const 보이나 = 보임.indexOf(c.k) >= 0;
         return '<div class="tx-cl'+(보이나?'':' off')+'" data-vci="'+i+'">'
         + '<span class="g"'+(보이나 ? ' data-vcgrip="'+i+'" title="끌어서 순서 변경"' : '')+'>'+(보이나?'⠿':'·')+'</span>'
         + '<b>'+esc(c.이름)+'</b><small>'+타입이름(c.타입)+'</small>'
         + (c.k === 제
-           ? '<button style="margin-left:auto;opacity:.3;cursor:default" title="제목 칸은 늘 보입니다">👁</button>'
+           ? '<button style="margin-left:auto;opacity:.3;cursor:default" title="제목 항목은 늘 보입니다">👁</button>'
            : '<button style="margin-left:auto" data-act="tx:vcol" data-k="'+key+'" data-v2="'+esc(c.k)+'" title="'+(보이나?'숨기기':'보이기')+'">'+(보이나?'👁':'🙈')+'</button>')
         + '</div>'; }).join('')
     + '</div><div class="tx-meta">여기서 선택한 것이 <b>이 보기</b>에만 적용됩니다</div></div>',
@@ -6838,7 +6838,7 @@ async function 보기칸바꾸기(key, 새칸들){
 }
 async function 보기칸숨기기(key, k){
   const 지금 = 표칸들(key).map(c => c.k);
-  if(k === 표정의[key].제목열) { toast('제목 칸은 숨길 수 없어요'); return false; }
+  if(k === 표정의[key].제목열) { toast('제목 항목은 숨길 수 없어요'); return false; }
   return await 보기칸바꾸기(key, 지금.filter(x => x !== k));
 }
 async function 보기칸보이기(key, k){
@@ -7623,7 +7623,7 @@ function txMe(갈래){
 
   } else if(갈래 === 'home'){
     속 = '<div class="note" style="margin-bottom:10px">홈은 <b>왼쪽 · 오른쪽 두 단</b>이에요.<br>'
-      + '· 칸에 마우스를 올리면 왼쪽 위에 <b>⠿</b> 가 나와요 — 누르면 <b>위·아래·옆 단</b>으로 옮깁니다<br>'
+      + '· 항목에 마우스를 올리면 왼쪽 위에 <b>⠿</b> 가 나와요 — 누르면 <b>위·아래·옆 단</b>으로 옮깁니다<br>'
       + '· 두 단 사이를 <b>잡아 끌면</b> 좌우 넓이가 바뀌어요 (두 번 누르면 원래대로)</div>'
       + '<button class="btn ghost" style="width:100%" data-act="tx:hmreset">홈 배치 처음으로</button>';
 
@@ -7758,7 +7758,7 @@ async function txAct(a, el){
         { locked: !m.locked, updated_at: new Date().toISOString() }, 'return=representation');
       if(o && o[0]){ const i = W.meta.findIndex(x=>x.tbl===표정의[k].table);
         if(i>=0) W.meta[i] = o[0]; else W.meta.push(o[0]); }
-      render(); toast(!m.locked ? '잠갔습니다 — 순서·칸을 못 바꿉니다' : '풀었습니다 — 끌어서 옮길 수 있습니다');
+      render(); toast(!m.locked ? '잠갔습니다 — 순서·항목을 변경할 수 없습니다' : '풀었습니다 — 끌어서 옮길 수 있습니다');
     }catch(e){ toast('변경하지 못했어요 — '+e.message); }
     return; }
   if(a==='vpush'){ await 모두에게저장(k); return; }
@@ -7826,7 +7826,7 @@ async function txAct(a, el){
     render(); return; }
   if(a==='freeze'){ if(!바꿀수있나(k)) return toast('잠겨 있어요 — 자물쇠를 풀어 주세요');
     const 새 = !얼렸나(k); 표얼림[모양키(k)] = 새; 표얼림저장(); popClose();
-    render(); toast(새 ? '이름 칸을 왼쪽에 붙였습니다' : '고정을 풀었습니다 — 이름 칸도 같이 밀립니다'); return; }
+    render(); toast(새 ? '이름 항목을 왼쪽에 붙였습니다' : '고정을 풀었습니다 — 이름 항목도 같이 밀립니다'); return; }
   if(a==='pmenu'){ 속성이름메뉴(k, v2, el); return; }
   if(a==='padd'){ 속성추가쪽지(k, el); return; }
   if(a==='pempty'){ 빈속성숨김 = !빈속성숨김;
@@ -8947,7 +8947,7 @@ document.addEventListener('click', async function(ev){
       toast(끈다 ? '코멘트 안내를 껐습니다' : '다시 받기로 되돌렸습니다');
       회원판그리기(); render();
     }catch(e){
-      toast(/cm_optout/.test(String(e.message)) ? '표에 칸이 아직 없어요 — 11단계 SQL 을 먼저 돌려 주세요'
+      toast(/cm_optout/.test(String(e.message)) ? '표에 항목이 아직 없어요 — 11단계 SQL 을 먼저 돌려 주세요'
                                                 : '변경하지 못했어요 — ' + e.message); }
     return; }
   /* ══ 자료 한 장 ══ 2026-09-30 대표 「대시보드에서 한방에 해결하고 싶은 거야」 */
@@ -9057,7 +9057,7 @@ document.addEventListener('click', async function(ev){
       toast(m.name + ' 회원님께 알림톡을 보냅니다 — 10분 안에 나가요');
       render();
     }catch(e){
-      toast(/cm_optout/.test(String(e.message)) ? '표에 칸이 아직 없어요 — 11단계 SQL 을 먼저 돌려 주세요'
+      toast(/cm_optout/.test(String(e.message)) ? '표에 항목이 아직 없어요 — 11단계 SQL 을 먼저 돌려 주세요'
                                                 : '못 만들었어요 — ' + e.message); }
     return; }
   if(a==='dnsave'){ await 사유적기(); return; }
