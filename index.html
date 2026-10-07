@@ -1065,6 +1065,29 @@ body .set.now{border-color:var(--gold);background:radial-gradient(120% 140% at 0
 .lvh.sm{color:var(--sub);border:1px dashed #5a4c33;border-radius:20px;padding:2px 9px}
 .lvnews{width:100%;flex:none;display:flex;flex-direction:column;gap:7px;padding:12px 14px;border-radius:16px;border:1px solid #34332d;background:linear-gradient(180deg,#1f1e1b,#171615)}
 .lvnews div{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--sub)}.lvnews svg{color:var(--gold);flex:none}.lvnews b{color:var(--cream)}
+/* 달력 — 동그란 날짜 · 한 날은 금색 고리 · 고른 날은 금색 채움 · 오늘은 밑줄 (2026-10-07) */
+body .cal2{gap:4px 0}
+body .cal2 .hd{font-size:11px;font-weight:700;color:#6f6c66;padding:2px 0 6px}body .cal2 .hd:first-child{color:#c98b7a}
+body .cal2 .pad{height:42px}
+body .cal2 .cday{height:42px;background:none;border:0;border-radius:0;display:flex;align-items:center;justify-content:center;color:#8b8780;font-size:14px;font-weight:600}
+body .cal2 .cday u{text-decoration:none;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1.5px solid transparent}
+body .cal2 .cday.has{border:0;color:var(--cream)}
+body .cal2 .cday.has u{border-color:rgba(240,211,160,.6);background:rgba(240,211,160,.08);color:var(--gold);font-weight:800}
+body .cal2 .cday.tdy u{box-shadow:0 0 0 3px rgba(169,216,230,.18);border-color:var(--teal);color:var(--teal)}
+body .cal2 .cday.sel u{background:linear-gradient(180deg,#f3d9a8,#e2c184);border-color:transparent;color:#2a1c14;font-weight:800;box-shadow:0 2px 10px rgba(240,211,160,.3)}
+body .cal2 .cday.sel{background:none;color:#2a1c14}
+body .cal2 .cday.fut{opacity:.28}
+body .cal2 .cday .cdot{display:none}
+body .cal2 .cday i{right:2px;top:0;min-width:15px;height:15px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800;color:#0d2027;background:var(--teal);padding:0 3px}
+body .cal2 .cday.sel i{color:#0d2027}
+#sheetbox .wkhd{margin-bottom:12px}#sheetbox .wkhd .d{background:#1c1b19;border:1px solid #34332d}
+/* 리포트 — 융합 */
+.rpt-hd2{display:flex;align-items:center;gap:12px;width:100%;flex:none}
+.rpt-hd2 .sym{width:38px;height:38px;flex:none;fill:none;stroke:var(--gold);stroke-width:13;stroke-linecap:round;stroke-linejoin:round}
+.rpt-hd2 span{display:flex;flex-direction:column;min-width:0}.rpt-hd2 small{font-size:12px;color:var(--sub)}.rpt-hd2 b{font-size:19px;font-weight:800;line-height:1.3}
+.megrp.rptrows{padding:4px 14px}
+body .rpcm{border-radius:12px;background:linear-gradient(160deg,#1b2d33,#161918 80%);border:1px solid #3f7281}
+body .rpcm.none{border-color:var(--gold-2);background:var(--gold-dim)}
 .megoal{width:100%;flex:none;display:flex;flex-direction:column;gap:8px;text-align:left;padding:14px 14px 13px;border-radius:18px;border:1px solid #34332d;background:linear-gradient(180deg,#201f1c,#171615);box-shadow:inset 0 1px 0 rgba(240,211,160,.14)}
 .mgh{display:grid;grid-template-columns:1fr auto;align-items:center;width:100%}.mgh small{grid-column:1/-1;font-size:11.5px;color:var(--sub)}
 .mgh b{font-size:17px;font-weight:800}.mgh i{font-style:normal;color:var(--sub);font-size:17px}
@@ -2373,7 +2396,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '289';
+const BUILD = '290';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -5476,16 +5499,16 @@ function vReport(){
   return { top: bar('수업 리포트', `<span class="sub">${esc(이름)} 회원님</span>`,
       만보기 ? null : (tr ? 'fendview:'+w.id : 'tab:home')),
     tabs: (tr || 만보기) ? 0 : 1, body:`
-    <div class="rpt-hd"><b>GLAD GYM</b><span>${esc(이름)} 회원님</span></div>
-    <div class="rpt-title">${esc(수업제목(w))}</div>
+    <div class="rpt-hd2"><svg class="sym" viewBox="-6 -6 295 295" aria-hidden="true"><path d="M236 4H140A91 91 0 0 0 49 95A91 91 0 0 0 140 186M236 95H49V280H142M142 95V280M142 95A92.5 92.5 0 0 1 142 280M49 280L142 187"/></svg>
+      <span><small>${esc(이름)} 회원님</small><b>${esc(수업제목(w))}</b></span></div>
     ${끝카드(w)}
-    ${줄 ? `<span class="lbl">오늘 한 운동 · 지난번과 비교</span><div class="card" style="padding:6px 14px">${줄}</div>` : ''}
+    ${줄 ? `<span class="lbl">오늘 한 운동 · 지난번과 비교</span><div class="megrp rptrows">${줄}</div>` : ''}
 
     <span class="lbl">${m}월 운동</span>
-    <div class="gsum">
-      <div><span class="k">운동 횟수</span><span class="v">${이달.length}<small> 회</small></span></div>
-      <div><span class="k">수업 · 개인</span><span class="v">${수업}<small> · </small>${개인}</span></div>
-      <div><span class="k">총 무게</span><span class="v">${(합.vol/1000).toFixed(1)}<small> 톤</small></span></div>
+    <div class="sstat3">
+      <div><span class="k">운동 횟수</span><span class="v">${이달.length}<small>회</small></span></div>
+      <div class="t"><span class="k">수업 · 개인</span><span class="v">${수업}<small>·</small>${개인}</span></div>
+      <div><span class="k">총 무게</span><span class="v">${(합.vol/1000).toFixed(1)}<small>톤</small></span></div>
     </div>
     <div class="gbox"><div class="cal2 rpt-cal">${달력.cells}</div></div>
 
@@ -5788,8 +5811,8 @@ function sheetFbCal(){
     for(let d=1; d<=last; d++){
       const ds = y + '-' + String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0');
       const n = cmOnDay(S.mid, ds).length;
-      cells += `<button class="cday ${ds===sel?'sel':''} ${n?'has':''} ${ds>TODAY?'fut':''}"
-        data-act="fbd:${ds}">${d}${n?`<i>${n}</i>`:''}</button>`;
+      cells += `<button class="cday ${ds===sel?'sel':''} ${n?'has':''} ${ds>TODAY?'fut':''} ${ds===TODAY?'tdy':''}"
+        data-act="fbd:${ds}"><u>${d}</u>${n?`<i>${n}</i>`:''}</button>`;
     }
     return `<div class="h2">날짜 고르기 <small>코멘트 온 날에 표시</small></div>
       <div class="wkhd"><button data-act="fbmon:-1">‹</button>
@@ -5810,8 +5833,8 @@ function 달칸(base, sel, 표시, act){
   for(let d=1; d<=last; d++){
     const ds = y + '-' + String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0');
     const 점 = 표시(ds);
-    cells += `<button class="cday ${ds===sel?'sel':''} ${점?'has':''} ${ds>TODAY?'fut':''}"
-      data-act="${act}:${ds}">${d}${점?'<b class="cdot"></b>':''}</button>`;
+    cells += `<button class="cday ${ds===sel?'sel':''} ${점?'has':''} ${ds>TODAY?'fut':''} ${ds===TODAY?'tdy':''}"
+      data-act="${act}:${ds}"><u>${d}</u>${점?'<b class="cdot"></b>':''}</button>`;
   }
   return { y, m, cells };
 }
