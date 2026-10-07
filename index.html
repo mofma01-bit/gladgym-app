@@ -1187,6 +1187,19 @@ body .prephd .ph1{font-size:21px}
 .ikdays span{aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#6f6a63;border:1.2px solid #34332d}
 .ikdays span.on{color:#2a1c14;border-color:transparent;background:linear-gradient(180deg,#f3d9a8,#e2c184)}
 .sstat3.ib4.plg>div{grid-template-columns:1fr}
+.kcv{width:100%;flex:none;display:flex;flex-direction:column;align-items:center;gap:2px;padding:18px 14px 16px;border-radius:20px;border:1px solid #5a4c33;text-align:center;
+  background:radial-gradient(90% 110% at 50% 0%,rgba(240,211,160,.2),transparent 65%),linear-gradient(180deg,#221e17,#161513)}
+.kcv .kl{font-size:12px;font-weight:700;color:var(--sub)}
+.kcv .kb{font-size:44px;font-weight:800;letter-spacing:-.04em;color:var(--gold);line-height:1.1}.kcv .kb small{font-size:14px;font-weight:700;color:var(--cream);margin-left:4px;letter-spacing:0}
+.kcv .ks{font-size:12px;color:var(--sub);line-height:1.5}.kcv .ks b{color:var(--cream)}
+.kmac{width:100%;flex:none;padding:14px 14px 12px;border-radius:18px;border:1px solid #34332d;background:linear-gradient(180deg,#1f1e1b,#171615);display:flex;flex-direction:column;gap:11px}
+.kbar{display:flex;gap:3px;height:9px}.kbar i{border-radius:5px;min-width:6px}
+.kleg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.kleg span{display:grid;grid-template-columns:auto 1fr;column-gap:6px;align-items:center}
+.kleg span>i{width:8px;height:8px;border-radius:50%}.kleg small{font-size:11px;color:var(--sub);white-space:nowrap}
+.kleg b{grid-column:1/-1;font-size:20px;font-weight:800;letter-spacing:-.02em}.kleg b u{text-decoration:none;font-size:11px;font-weight:600;color:var(--sub);margin-left:2px}
+.kwarn{width:100%;flex:none;padding:12px 14px;border-radius:16px;border:1px solid #6a3f36;background:rgba(229,139,123,.06);display:flex;flex-direction:column;gap:5px}
+.kwarn p{margin:0;font-size:12.5px;line-height:1.5;color:#e9a497;font-weight:600}.kwarn p.s{color:var(--sub);font-weight:500}.kwarn p.s b{color:var(--gold)}
 .megoal{width:100%;flex:none;display:flex;flex-direction:column;gap:8px;text-align:left;padding:14px 14px 13px;border-radius:18px;border:1px solid #34332d;background:linear-gradient(180deg,#201f1c,#171615);box-shadow:inset 0 1px 0 rgba(240,211,160,.14)}
 .mgh{display:grid;grid-template-columns:1fr auto;align-items:center;width:100%}.mgh small{grid-column:1/-1;font-size:11.5px;color:var(--sub)}
 .mgh b{font-size:17px;font-weight:800}.mgh i{font-style:normal;color:var(--sub);font-size:17px}
@@ -2538,7 +2551,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '305';
+const BUILD = '306';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -8574,6 +8587,39 @@ function calcBrief(g, ed){
   </div>`;
 }
 
+/* 보기 화면용 — 숫자는 `calcOf()` 그대로, 보여 주는 꼴만 다르다 (2026-10-07 융합). 수정 화면은 calcBrief + calcHTML 을 쓴다 */
+function calcView(g){
+  const r = calcOf(g), kg = v => (Math.round(v*10)/10).toFixed(1);
+  if(!r.bmr) return `<div class="cyfoot"><span>${!r.w ? '몸무게를 넣으면 계산해 드려요' : '체지방률, 또는 생년월일과 키를 넣으면 계산해 드려요'}</span></div>`;
+  const 도착 = !r.gw ? '' : !r.hitDate ? '안 빠짐' : (r.goal && r.hitDate > r.goal ? dateTxt(r.hitDate) : (r.goal ? '날짜 안에' : dateTxt(r.hitDate)));
+  const 합 = (r.kk.c + r.kk.p + r.kk.f) || 1;
+  return `
+    <div class="kcv">
+      <span class="kl">하루 이만큼 드세요</span>
+      <span class="kb">${r.kcal ? r.kcal.toLocaleString() : '—'}<small>kcal</small></span>
+      <span class="ks">${r.day > 0 ? `유지 ${r.total.toLocaleString()}에서 <b>${r.day.toLocaleString()}kcal</b> 줄인 값 · ${esc(foodTxt(r.day))}` : `유지 칼로리 ${r.total.toLocaleString()}kcal 과 같아요`}</span>
+    </div>
+    <div class="sstat3">
+      <div><span class="k">한 달 예상</span><span class="v">${r.moKg > 0 ? '−'+kg(r.moKg) : '0'}<small>kg</small></span></div>
+      <div><span class="k">목표까지</span><span class="v">${r.daysTo ? r.daysTo : '—'}<small>${r.daysTo ? '일' : ''}</small></span></div>
+      <div class="t"><span class="k">${r.gw ? r.gw+'kg 도착' : '도착 예상'}</span><span class="v cyv" style="${(도착==='안 빠짐' || (r.goal && r.hitDate && r.hitDate > r.goal)) ? 'color:var(--warn)' : ''}">${도착 || '—'}</span></div>
+    </div>
+    <div class="kmac">
+      <div class="kbar"><i style="flex:${r.kk.c/합};background:var(--gold)"></i><i style="flex:${r.kk.p/합};background:var(--teal)"></i><i style="flex:${r.kk.f/합};background:#b08968"></i></div>
+      <div class="kleg">
+        <span><i style="background:var(--gold)"></i><small>탄수화물 ${r.rc}%</small><b>${r.gg.c}<u>g</u></b></span>
+        <span><i style="background:var(--teal)"></i><small>단백질 ${r.rp}%</small><b>${r.gg.p}<u>g</u></b></span>
+        <span><i style="background:#b08968"></i><small>지방 ${r.rf}%</small><b>${r.gg.f}<u>g</u></b></span>
+      </div>
+    </div>
+    <div class="megrp ikg">${[['기초대사량', r.bmr.toLocaleString()+' kcal'], ['유지 칼로리', r.total.toLocaleString()+' kcal'],
+        ['한 주에', r.week > 0 ? r.week.toLocaleString()+' kcal · '+kg(r.wkKg)+'kg' : ''], ['단백질', r.perKg ? '체중 1kg당 '+r.perKg+'g' : ''],
+        ['BMI', r.bmi ? r.bmi + (r.bmiTo ? ' → 목표 '+r.bmiTo : '') : ''], ['하루 물', r.water ? (r.water/1000).toFixed(1)+' L' : '']].filter(p=>p[1])
+      .map(p=>`<div class="mrow2"><span class="ikk">${p[0]}</span><span class="ikv">${esc(p[1])}</span></div>`).join('')}</div>
+    ${r.warn.length ? `<div class="kwarn">${r.warn.map(x=>`<p>${esc(x)}</p>`).join('')}
+      ${r.safeDate ? `<p class="s">안전 가이드 안에서는 <b>${esc(dateTxt(r.safeDate))}</b> 쯤이 여유로워요</p>` : ''}</div>` : ''}`;
+}
+
 function calcHTML(g, ed){
   const r = calcOf(g);
   const c = g.calc || {};
@@ -8770,7 +8816,7 @@ function vPlan(){
     <span class="lbl">목표${(g.now.date||g.to.date) ? ` <small style="font-weight:600;color:var(--sub)">${esc(g.now.date||'—')} → ${esc(g.to.date||'—')}${남!=null&&남>=0 ? ' · '+남+'일 남음' : ''}</small>` : ''}</span>
     ${칸들 ? `<div class="sstat3 ib4 plg">${칸들}</div>` : '<div class="cyfoot"><span>아직 정한 목표가 없어요</span></div>'}
     <span class="lbl">맞춤 칼로리 · 얼마나 빠질까</span>
-    ${(g.calc && (g.now.w||g.calc.bmr)) ? calcBrief(g)+calcHTML(g) : ''}
+    ${(g.calc && (g.now.w||g.calc.bmr)) ? calcView(g) : '<div class="cyfoot"><span>몸무게와 활동량을 넣으면 계산해 드려요</span></div>'}
     ${(g.kcal||g.ratio||g.wk||g.mo) ? `<span class="lbl">직접 적어 둔 값</span>
     <div class="megrp ikg">${[['하루 칼로리', g.kcal ? g.kcal+' kcal' : ''], ['탄 / 단 / 지', g.ratio], ['1주 감량 예상', g.wk], ['한 달 감량 예상', g.mo]].filter(p=>p[1])
       .map(p=>`<div class="mrow2"><span class="ikk">${p[0]}</span><span class="ikv">${esc(p[1])}</span></div>`).join('')}</div>` : ''}
