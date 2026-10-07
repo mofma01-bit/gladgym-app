@@ -1915,12 +1915,25 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
   display:flex;flex-direction:column;align-items:center;justify-content:center;padding:34px;
   transition:opacity .5s}
 #splash.out{opacity:0;pointer-events:none}
-#splash .logo{font-size:13px;letter-spacing:.34em;color:var(--gold-2);font-weight:700;margin-bottom:26px}
-#splash .copy{font-size:25px;font-weight:900;letter-spacing:-.035em;line-height:1.5;text-align:center;color:var(--cream)}
-#splash .rule{width:44px;height:1px;background:var(--gold-2);margin:26px 0}
-#splash .mission{position:absolute;bottom:38px;left:0;right:0;text-align:center;
-  font-size:12px;font-weight:500;color:#6f6a63;line-height:1.9}
-#splash .mission b{display:block;font-size:10.5px;letter-spacing:.24em;color:#57534d;font-weight:700;margin-bottom:5px}
+#splash .logo{font-size:25px;letter-spacing:.3em;margin-right:-.3em;color:var(--gold);font-weight:800;
+  opacity:0;transform:translateY(46px);animation:spLift .62s cubic-bezier(.2,.9,.25,1.12) .12s forwards}
+/* 바벨 — 아래에서 들려 올라와 로고 밑줄이 된다. 양 끝 원판은 다 들린 뒤 접힌다 */
+#splash .bbar{position:relative;width:168px;height:3px;border-radius:2px;margin-top:16px;background:linear-gradient(90deg,#d6b87e,#f3d9a8,#d6b87e);
+  opacity:0;transform:translateY(46px);animation:spLift .62s cubic-bezier(.2,.9,.25,1.12) .12s forwards, spBar .45s ease .95s forwards}
+#splash .bbar::before,#splash .bbar::after{content:'';position:absolute;top:-11px;width:7px;height:25px;border-radius:2px;background:#e2c184;
+  box-shadow:9px 0 0 -1px #c9a86a;animation:spPlate .3s ease .9s forwards}
+#splash .bbar::before{left:6px}#splash .bbar::after{right:6px;box-shadow:-9px 0 0 -1px #c9a86a}
+#splash .today{min-height:24px;margin-top:30px;font-size:15.5px;font-weight:600;color:var(--cream);text-align:center;opacity:0;transform:translateY(8px);transition:opacity .35s,transform .35s}
+#splash .today.on{opacity:1;transform:none}#splash .today b{color:var(--gold);font-weight:800}
+#splash .copy{position:absolute;bottom:44px;left:0;right:0;text-align:center;font-size:12.5px;font-weight:500;letter-spacing:.02em;color:#7d766e;
+  opacity:0;animation:spFade .5s ease .9s forwards}
+#splash.hi .today{transition:none;animation:spFade .35s ease .45s both}
+#splash.quick .logo,#splash.quick .bbar{animation-duration:.4s,.3s;animation-delay:0s,.45s}#splash.quick .bbar::before,#splash.quick .bbar::after{animation-delay:.4s}
+@keyframes spLift{to{opacity:1;transform:none}}
+@keyframes spBar{to{width:44px}}
+@keyframes spPlate{to{transform:scaleY(0);opacity:0}}
+@keyframes spFade{to{opacity:1}}
+@media (prefers-reduced-motion:reduce){#splash .logo,#splash .bbar{animation:none;opacity:1;transform:none}#splash .bbar{width:44px}#splash .bbar::before,#splash .bbar::after{display:none}#splash .copy{animation:none;opacity:1}}
 
 /* 체크리스트 · 폼 */
 .frow{display:flex;align-items:flex-start;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}
@@ -2016,9 +2029,9 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
 <div id="frame">
   <div id="splash">
     <div class="logo">GLAD GYM</div>
-    <div class="copy">소중한 나를 위한<br>선택</div>
-    <div class="rule"></div>
-    <div class="mission"><b>MISSION</b>모든 사람이 운동을 잘하게 돕는다</div>
+    <div class="bbar"></div>
+    <div class="today" id="sptoday"></div>
+    <div class="copy" id="spcopy">소중한 나를 위한 선택</div>
   </div>
   <div id="top"></div><div id="main"></div><div id="foot"></div><div id="tabs"></div>
   <div id="sheet"><div id="sheetbox"></div></div><div id="toast"></div>
@@ -2358,7 +2371,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '286';
+const BUILD = '288';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -10412,7 +10425,7 @@ document.addEventListener('click', async ev=>{
     }
     case 'as':
       if(rest[0]==='tr'){ S.who='tr'; S.ttab='t_today'; go('t_today'); }
-      else { S.who='m'; S.mid=rest[0]; S.tab='home';
+      else { S.who='m'; S.mid=rest[0]; S.tab='home'; S.screen='home'; 인사();
         /* 잠근 채로 앱을 껐다면 운동 화면으로 바로 되돌린다 */
         if(D.live && D.live.mid===rest[0] && D.live.lock) go('workout'); else go('home'); } return;
     case 'reset': reset(); toast('처음 상태로 되돌렸어요'); return;
@@ -11503,12 +11516,40 @@ function hideSplash(){
   sp.classList.add('out'); setTimeout(()=>{ if(sp.parentNode) sp.remove(); }, 600);
 }
 
+/* 오프닝의 「오늘 한 줄」 — 내 기록에서 뽑는다. 회원으로 들어와 있을 때만 (로그인 전·트레이너는 비워 둔다) */
+function 오늘한줄(){
+  try{
+    /* ⚠ 지금은 켤 때마다 「누구세요」 고르기 화면이 먼저라 오프닝 때는 누군지 모른다(S.mid 는 임시로 첫 회원이 들어 있다).
+       그래서 고르기 화면이면 비우고, **회원을 고른 직후** `인사()` 가 같은 줄을 띄운다. 로그인이 붙으면 오프닝에서 바로 나온다 */
+    if(S.screen === 'login' || S.screen === 'boot' || S.who === 'tr' || !S.mid || !MEMBERS.some(m=>m.id===S.mid)) return '';
+    const 이름 = esc(닉of(S.mid) || (me()||{}).n || ''), st = profStat(S.mid), 달 = TODAY.slice(0,7);
+    const n = new Set(D.workouts.filter(w=>w.mid===S.mid && w.done && w.date.slice(0,7)===달 && 세트있나(w)).map(w=>w.date)).size;
+    if(st.연속 > 1) return `${이름}님, <b>${st.연속}일째</b> 이어서 운동 중`;
+    if(n) return `${이름}님, 이번 달 <b>${n}번</b> 운동했어요`;
+    return `${이름}님, 이번 달 첫 운동을 시작해요`;
+  }catch(e){ return ''; }
+}
+/* 회원을 고른 직후 — 로고 + 오늘 한 줄을 잠깐(1.1초). 하루에 회원마다 한 번만 */
+function 인사(){
+  const 줄 = 오늘한줄(); if(!줄 || document.getElementById('splash')) return;
+  const 키 = 'gg_hi_' + S.mid + '_' + TODAY; try{ if(sessionStorage.getItem(키)) return; sessionStorage.setItem(키, '1'); }catch(e){}
+  const d = document.createElement('div'); d.id = 'splash'; d.className = 'quick hi';
+  d.innerHTML = `<div class="logo">GLAD GYM</div><div class="bbar"></div><div class="today on">${줄}</div>`;
+  (document.getElementById('top').parentNode).appendChild(d);
+  setTimeout(hideSplash, 1150);
+}
 async function start(){
   checkBuild();                     /* 새 판이 올라왔으면 조용히 받아온다 */
+  /* 그날 처음 열 때만 길게(문구까지). 같은 날 다시 열면 짧게 — 하루에도 몇 번씩 여는 앱이다 */
+  let 처음 = true; try{ 처음 = localStorage.getItem('gg_splash_day') !== ymd(new Date()); localStorage.setItem('gg_splash_day', ymd(new Date())); }catch(e){}
+  const sp0 = document.getElementById('splash');
+  if(sp0 && !처음){ sp0.classList.add('quick'); const c = document.getElementById('spcopy'); if(c) c.remove(); }
   try{
     const t0=Date.now();
     await boot();
-    const wait=Math.max(0, 1500-(Date.now()-t0));
+    const 줄 = 오늘한줄(), el = document.getElementById('sptoday');
+    if(줄 && el){ el.innerHTML = 줄; setTimeout(()=>el.classList.add('on'), Math.max(0, (처음 ? 950 : 500) - (Date.now()-t0))); }
+    const wait=Math.max(줄 ? 650 : 0, (처음 ? (줄 ? 1900 : 1400) : (줄 ? 1150 : 700)) - (Date.now()-t0));
     setTimeout(hideSplash, wait);
     render();
   }catch(e){
