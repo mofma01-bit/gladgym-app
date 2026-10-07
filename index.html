@@ -1169,6 +1169,16 @@ body .prephd .ph1{font-size:21px}
 .prg .prow.m .no{border-color:rgba(169,216,230,.5);color:var(--teal);background:rgba(169,216,230,.06)}
 .prg .prow .kd{flex:none;align-self:flex-start;margin-top:5px;font-size:10.5px;letter-spacing:0;border:1px solid currentColor;border-radius:999px;padding:1px 8px;opacity:.85}
 .tmsum.btn3 b .td안{font-style:normal;font-size:10.5px;font-weight:700;color:var(--teal);margin-left:6px;white-space:nowrap}
+.pkparts{display:flex;gap:7px;overflow-x:auto;flex:none;width:100%;scrollbar-width:none;padding-bottom:1px}.pkparts::-webkit-scrollbar{display:none}
+.pkparts .chip{flex:none;padding:9px 15px;font-size:13.5px}
+.pkmini{display:flex;gap:7px;flex:none;width:100%}
+.pkmini button{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:5px;padding:9px 4px;border-radius:12px;border:1px solid #34332d;background:#191816;font-size:12.5px;font-weight:700;color:var(--cream);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pkmini button.on{border-color:#3f7281;color:var(--teal);background:rgba(169,216,230,.07)}.pkmini button.g{color:var(--gold);border-color:#5a4c33}
+.pkeq{margin:0;flex:none}
+.pkg .mrow2{border-top:0;border-bottom:1px solid #2c2b27;padding:13px 14px}
+.pkg .mrow2 .mt small u{text-decoration:none;color:var(--gold-2)}
+.pkadd{font-style:normal;flex:none;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:var(--sub);border:1.2px solid #4a463d}
+.pson .pkadd{color:#2a1c14;border-color:transparent;background:linear-gradient(180deg,#f3d9a8,#e2c184);font-size:13px;font-weight:800}
 .megoal{width:100%;flex:none;display:flex;flex-direction:column;gap:8px;text-align:left;padding:14px 14px 13px;border-radius:18px;border:1px solid #34332d;background:linear-gradient(180deg,#201f1c,#171615);box-shadow:inset 0 1px 0 rgba(240,211,160,.14)}
 .mgh{display:grid;grid-template-columns:1fr auto;align-items:center;width:100%}.mgh small{grid-column:1/-1;font-size:11.5px;color:var(--sub)}
 .mgh b{font-size:17px;font-weight:800}.mgh i{font-style:normal;color:var(--sub);font-size:17px}
@@ -2520,7 +2530,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '302';
+const BUILD = '303';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -4363,39 +4373,26 @@ function vPick(){
   const 처음 = 추가중 ? Math.min(S.addFrom||0, w.items.length) : 0;
   const 담은 = w ? w.items.length - 처음 : 0;
   return { top: bar('종목 고르기','', (w&&w.begun)?'go:workout':'go:start'), body:`
-    <div class="ptools">
-      <input class="search" type="text" data-k="exq" placeholder="찾기 — 스쿼트 · 레그컬 · bp · 코어 · 맨몸">
-      <button class="pbtn" data-act="partopen">
-        <span class="ic">☰</span>
-        <span class="tx"><b>부위 · 기구 고르기</b><span>지금 ${esc(S.pickPart)}${S.pickEq==='전체'?'':' · '+esc(S.pickEq)}</span></span>
-        <span class="ar">${S.pickOpen?'▲':'▼'}</span></button>
-      ${S.pickOpen?`<div class="chips">${PARTS.map(x=>`<button class="chip ${x===S.pickPart?'on':''}" data-act="part:${x}">${x}</button>`).join('')}</div>
-        <div class="eqlbl">기구</div>
-        <div class="chips">${EQS().map(x=>`<button class="chip ${x===S.pickEq?'on t':''}" data-act="peq:${x}">${x}</button>`).join('')}</div>`:''}
-      <div id="pickhint">
-        <button class="pbtn etc" data-act="memoadd">
-          <span class="ic">＋</span>
-          <span class="tx"><b>기타운동 추가</b><span>검색에 없는 것</span></span>
-          <span class="ar">›</span></button>
-        <button class="pbtn etc" data-act="rmaddpick">
-          <span class="ic gi2">${svg('h_crown',19)}</span>
-          <span class="tx"><b>1RM 종목 추가</b><span>스쿼트 · 벤치 · 데드 등 측정 종목</span></span>
-          <span class="ar">›</span></button></div>
+    <input class="search" type="text" data-k="exq" placeholder="찾기 — 스쿼트 · 레그컬 · bp · 코어 · 맨몸">
+    <div class="pkparts">${PARTS.map(x=>`<button class="chip ${x===S.pickPart?'on':''}" data-act="part:${x}">${x}</button>`).join('')}</div>
+    <div class="pkmini" id="pickhint">
+      <button class="${(S.pickOpen || S.pickEq!=='전체')?'on':''}" data-act="partopen">기구 · ${esc(S.pickEq)} ${S.pickOpen?'▴':'▾'}</button>
+      <button data-act="memoadd">＋ 기타운동</button>
+      <button class="g" data-act="rmaddpick">${svg('h_crown',14)} 1RM 종목</button>
     </div>
-    <button class="card rowc gold" data-exrow="1rm 원알엠 일알엠 원rm 1알엠 1rm측정 측정 최대중량 맥스 max onerepmax" data-part="__1rm" data-eq="" style="display:none" data-act="rmaddpick">
-      <div><div class="nm g">1RM 측정 종목 담기</div><div class="sm">스쿼트 · 벤치 · 데드 · 오버헤드 프레스 등 — 담으면 바로 측정 계획을 엽니다</div></div>
-      <span class="rt">＋</span></button>
-    ${EX.filter(고를수있나).map(e=>{ const vs=vars(e.id), n=cmOf(S.mid,e.id).length, last=lastSet(e.id);
-      return `<button class="card rowc" data-exrow="${esc(exKey(e))}" data-part="${esc(e.p)}"
+    ${S.pickOpen?`<div class="chips pkeq">${EQS().map(x=>`<button class="chip ${x===S.pickEq?'on t':''}" data-act="peq:${x}">${x}</button>`).join('')}</div>`:''}
+    <div class="megrp pkg">
+    <button class="mrow2" data-exrow="1rm 원알엠 일알엠 원rm 1알엠 1rm측정 측정 최대중량 맥스 max onerepmax" data-part="__1rm" data-eq="" style="display:none" data-act="rmaddpick">
+      <span class="mt"><b style="color:var(--gold)">1RM 측정 종목 담기</b><small>스쿼트 · 벤치 · 데드 등 — 담으면 바로 측정 계획을 엽니다</small></span><em class="pkadd">＋</em></button>
+    ${EX.filter(고를수있나).map(e=>{ const vs=vars(e.id), n=cmOf(S.mid,e.id).length, last=lastSet(e.id), 담 = w ? w.items.slice(처음).filter(it=>it.ex===e.id).length : 0;
+      return `<button class="mrow2 ${담?'pson':''}" data-exrow="${esc(exKey(e))}" data-part="${esc(e.p)}"
         data-eq="${esc(e.e||'')}"
         style="${(e.p===S.pickPart && (S.pickEq==='전체'||e.e===S.pickEq))?'':'display:none'}"
         data-act="add:${e.id}:${vs[0].k}">
-        <div><div class="nm">${esc(e.n)}</div>
-        <div class="sm">${esc(e.e)}${last?` · 지난번 ${setTxt(e.id,last)}`:' · 기록 없음'}${n?` · 코멘트 ${n}`:''}
-        ${vs.length>1?`<br><span style="color:var(--gold-2)">하는 법 ${vs.length}가지 — 기록하면서 고릅니다</span>`:''}</div></div>
-        <span class="rt">＋</span></button>`; }).join('')}
-    <div class="note">「레그컬 · legcurl · 햄스트링」처럼 <b>붙여 써도, 영어로도, 다른 이름으로도</b> 찾아집니다.
-      찾는 게 없으면 위 「기타운동 추가」로 넣어 주세요.</div>`,
+        <span class="mt"><b>${esc(e.n)}</b>
+          <small>${esc(e.e)}${last?` · 지난번 ${setTxt(e.id,last)}`:''}${n?` · 코멘트 ${n}`:''}${vs.length>1?` · <u>하는 법 ${vs.length}가지</u>`:''}</small></span>
+        <em class="pkadd">${담 ? '✓' + (담>1 ? 담 : '') : '＋'}</em></button>`; }).join('')}
+    </div>`,
     foot: 담은
       ? `<button class="picked ${S.just?'bump':''}" data-act="askstart">
            <span class="c">${추가중?'추가한':'담은'} 종목 ${담은}개 ›</span>
@@ -11273,7 +11270,7 @@ document.addEventListener('click', async ev=>{
     case 'empty': newLive('빈 운동', [], '개인운동'); return;
 
     case 'part': S.pickPart=rest[0]; render(); setTimeout(칠하기,0); return;
-    case 'peq': S.pickEq=rest[0]; render(); setTimeout(칠하기,0); return;
+    case 'peq': S.pickEq=rest[0]; S.pickOpen=false; render(); setTimeout(칠하기,0); return;      /* 고르면 접는다 — 펼친 채면 종목이 두세 개만 보인다 */
     case 'pickvar': sheetPickVar(rest[0]); return;
     case 'add': { const [ex,va]=rest;
       if(!w) newLive('빈 운동', [], '개인운동');
