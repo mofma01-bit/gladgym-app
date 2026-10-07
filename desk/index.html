@@ -1423,7 +1423,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '179';
+const BUILD = '180';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -3231,7 +3231,8 @@ async function 운동종목손잡이(a, act){
     catch(e){ toast('파일을 못 올렸어요 — ' + (e.message||'').slice(0,60)); return true; }
     const row = { id:EXN.id, name:EXN.name, part:EXN.part, equip:EXN.equip, cardio: EXN.part === '유산소', sort:9000, owner:나이름(), media };
     const vrow = { id:EXN.id + ':a', ex_id:EXN.id, vkey:'a', name:'', descr:EXN.descr, demo:false, sort:0 };
-    try{ await ssend('exercises?on_conflict=id', 'POST', [row], 'resolution=merge-duplicates');
+    try{ const 뺀 = ((D.ex.find(z => z.id === row.id)||{}).media||[]).map(m => m.path).filter(p => !media.some(m => m.path === p));
+      await ssend('exercises?on_conflict=id', 'POST', [row], 'resolution=merge-duplicates'); await 파일지우기(뺀, 'exmedia/' + row.id + '/');
       await ssend('variants?on_conflict=id', 'POST', [vrow], 'resolution=merge-duplicates');
       D.ex = D.ex.filter(z => z.id !== row.id).concat([row]);
       const v0 = D.va.find(z => z.id === vrow.id); if(v0) Object.assign(v0, vrow); else D.va.push(vrow);
@@ -3240,10 +3241,17 @@ async function 운동종목손잡이(a, act){
   if(a==='exdel'){ const 쓰는 = (D.ri||[]).some(x => String(x.variant_id||'').indexOf(EXN.id + ':') === 0) || (D.wi||[]).some(x => String(x.variant_id||'').indexOf(EXN.id + ':') === 0);
     if(쓰는){ toast('루틴이나 기록에 담긴 종목은 지울 수 없어요 — 루틴에서 먼저 빼 주세요'); return true; }
     if(!confirm('이 종목을 지울까요?')) return true;
-    try{ await ssend('variants?ex_id=eq.' + encodeURIComponent(EXN.id), 'DELETE'); await ssend('exercises?id=eq.' + encodeURIComponent(EXN.id), 'DELETE');
+    try{ const 옛파일 = ((D.ex.find(z => z.id === EXN.id)||{}).media||[]).map(m => m.path);
+      await ssend('variants?ex_id=eq.' + encodeURIComponent(EXN.id), 'DELETE'); await ssend('exercises?id=eq.' + encodeURIComponent(EXN.id), 'DELETE'); await 파일지우기(옛파일, 'exmedia/' + EXN.id + '/');
       D.va = D.va.filter(z => z.ex_id !== EXN.id); D.ex = D.ex.filter(z => z.id !== EXN.id); EXN = null; 세트창(); 팝업다시(); toast('지웠어요'); }
     catch(e){ toast('못 지웠어요 — ' + e.message); } return true; }
   return false;
+}
+/* 종목을 지우거나 사진·영상을 뺄 때 저장소의 파일도 같이 지운다 (2026-10-07 · 회원앱과 같은 규칙 — 그 종목 자기 폴더만) */
+async function 파일지우기(paths, 앞){
+  for(const p of (paths||[])){ if(!p || p.indexOf(앞) !== 0) continue;
+    try{ await fetch(SB_URL+'/storage/v1/object/media/'+p, { method:'DELETE', headers:{ apikey:SB_KEY, Authorization:'Bearer '+SB_KEY } }); }
+    catch(e){ console.warn('파일 못 지움', p, e); } }
 }
 const 새종목 = () => ({ id:'pi'+Date.now(), name:'', time:'', descr:'', media:[], 새:true });
 async function 종목손잡이(a, act){
@@ -3267,7 +3275,8 @@ async function 종목손잡이(a, act){
         media.push({ kind: 영상 ? 'video' : 'photo', path }); } }
     catch(e){ toast('파일을 못 올렸어요 — ' + (e.message||'').slice(0,60)); return true; }
     const row = { id:PI.id, trainer:나이름(), name:PI.name, time:PI.time, descr:PI.descr, media, updated_at:new Date().toISOString() };
-    try{ await ssend('prep_items?on_conflict=id', 'POST', [row], 'resolution=merge-duplicates');
+    try{ const 뺀 = (((D.pi||[]).find(z => z.id === row.id)||{}).media||[]).map(m => m.path).filter(p => !media.some(m => m.path === p));
+      await ssend('prep_items?on_conflict=id', 'POST', [row], 'resolution=merge-duplicates'); await 파일지우기(뺀, 'prep/items/' + row.id + '/');
       D.pi = (D.pi||[]).filter(z => z.id !== row.id).concat([row]);
       if(PZ && PI.새){ PZ.items.push({ k:'my', i:row.id }); PZ.갈 = 'y'; PI = null; }      /* 세트를 고치다 만든 종목은 바로 담고 세트 창으로 */
       else PI = 새종목();
@@ -3275,7 +3284,8 @@ async function 종목손잡이(a, act){
     catch(e){ toast('못 저장했어요 — ' + e.message); } return true; }
   if(a==='pidel'){ const 쓰는 = 내세트().filter(x => (x.items||[]).some(z => z.k==='my' && z.i===PI.id));
     if(!confirm(쓰는.length ? '이 종목을 지울까요? 세트 ' + 쓰는.length + '개에서도 빠집니다.' : '이 종목을 지울까요?')) return true;
-    try{ await ssend('prep_items?id=eq.' + encodeURIComponent(PI.id), 'DELETE');
+    try{ const 옛파일 = (((D.pi||[]).find(z => z.id === PI.id)||{}).media||[]).map(m => m.path);
+      await ssend('prep_items?id=eq.' + encodeURIComponent(PI.id), 'DELETE'); await 파일지우기(옛파일, 'prep/items/' + PI.id + '/');
       for(const x of 쓰는){ x.items = x.items.filter(z => !(z.k==='my' && z.i===PI.id));
         await ssend('prep_sets?id=eq.' + encodeURIComponent(x.id), 'PATCH', { items:x.items, updated_at:new Date().toISOString() }); }
       if(PZ) PZ.items = PZ.items.filter(z => !(z.k==='my' && z.i===PI.id));
