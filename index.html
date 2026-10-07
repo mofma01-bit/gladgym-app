@@ -1200,6 +1200,11 @@ body .prephd .ph1{font-size:21px}
 .kleg b{grid-column:1/-1;font-size:20px;font-weight:800;letter-spacing:-.02em}.kleg b u{text-decoration:none;font-size:11px;font-weight:600;color:var(--sub);margin-left:2px}
 .kwarn{width:100%;flex:none;padding:12px 14px;border-radius:16px;border:1px solid #6a3f36;background:rgba(229,139,123,.06);display:flex;flex-direction:column;gap:5px}
 .kwarn p{margin:0;font-size:12.5px;line-height:1.5;color:#e9a497;font-weight:600}.kwarn p.s{color:var(--sub);font-weight:500}.kwarn p.s b{color:var(--gold)}
+.qag .mrow2{align-items:flex-start;padding:14px 14px}.qag .mrow2 .mt b{font-size:14.5px;line-height:1.45;white-space:normal}
+.qag .mrow2 .mt p{margin:8px 0 2px;font-size:13.5px;line-height:1.7;color:#ded9d2;font-weight:500;white-space:pre-wrap}
+.qag .mrow2.on{background:rgba(240,211,160,.05)}.qag .mrow2.on .mt b{color:var(--gold)}.qag .mrow2>i{font-size:12px;margin-top:9px}
+.fbg .mrow2 em.go.q{color:var(--sub)}.fbg .mrow2.more{justify-content:center}.fbg .mrow2.more .mt b{font-size:13px;color:var(--gold);font-weight:700}
+.megrp.fbg.g{border-color:#6b5a33}
 .megoal{width:100%;flex:none;display:flex;flex-direction:column;gap:8px;text-align:left;padding:14px 14px 13px;border-radius:18px;border:1px solid #34332d;background:linear-gradient(180deg,#201f1c,#171615);box-shadow:inset 0 1px 0 rgba(240,211,160,.14)}
 .mgh{display:grid;grid-template-columns:1fr auto;align-items:center;width:100%}.mgh small{grid-column:1/-1;font-size:11.5px;color:var(--sub)}
 .mgh b{font-size:17px;font-weight:800}.mgh i{font-style:normal;color:var(--sub);font-size:17px}
@@ -2551,7 +2556,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '306';
+const BUILD = '307';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -9724,10 +9729,10 @@ function 주기고리(c, t){
 
 /* ── Q&A ── */
 function vQa(){
-  return { top: bar('자주 묻는 질문','', S.who==='tr'?'go:t_members':'tab:me'), body:
-    QA.map((x,i)=>`<div class="card"><div class="nm">${i+1}. ${esc(x.q)}</div>
-      <div class="fv" style="color:#ded9d2;font-size:13.5px">${esc(x.a)}</div></div>`).join('')
-    + `<div class="note">플래너에 있던 Q&A 그대로입니다.</div>` };
+  const 열 = S.qaOpen == null ? 0 : S.qaOpen;
+  return { top: bar('자주 묻는 질문', `<span class="sub">${QA.length}개</span>`, S.who==='tr'?'go:t_tools':'tab:me'), body:
+    `<div class="megrp qag">${QA.map((x,i)=>`<button class="mrow2 ${열===i?'on':''}" data-act="qaopen:${i}">
+      <span class="mi pt">${i+1}</span><span class="mt"><b>${esc(x.q)}</b>${열===i ? `<p>${esc(x.a)}</p>` : ''}</span><i>${열===i?'▴':'▾'}</i></button>`).join('')}</div>` };
 }
 
 /* ═══ 트레이너 ═══ */
@@ -9822,11 +9827,9 @@ function tFeed(){
   const asks = openAsks();
   return { top: bar('피드백', `<span class="sub">${dateTxt(sel)}</span>`), body: head + `
     ${asks.length?`<span class="lbl">회원이 봐 달라고 한 것 · ${asks.length}건</span>
-      ${asks.map(a=>`<button class="card gold rowc" data-act="exd:${a.ex}:${a.va}:${a.mid}">
-        <div><div class="nm g">${esc(nm(a.mid))} 회원 · ${esc(exName(a.ex,a.va))}</div>
-        <div class="sm">${esc(a.note||'따로 적은 말은 없습니다')} · ${esc(agoTxt(a.ts))}</div></div>
-        <span class="pill">코멘트 쓰기 ›</span></button>`).join('')}
-      <div class="hr"></div>`:''}
+      <div class="megrp fbg g">${asks.map(a=>`<button class="mrow2" data-act="exd:${a.ex}:${a.va}:${a.mid}">
+        <span class="mi nm1">${esc(nm(a.mid).slice(0,1))}</span>
+        <span class="mt"><b>${esc(nm(a.mid))} · ${esc(exName(a.ex,a.va))}</b><small>${esc(a.note||'따로 적은 말은 없어요')} · ${esc(agoTxt(a.ts))}</small></span><em class="go">쓰기 ›</em></button>`).join('')}</div>`:''}
     <div class="wk">
       <div class="wkhd">
         <button data-act="tfmove:-1">‹</button>
@@ -9836,20 +9839,19 @@ function tFeed(){
       ${주간줄(wkd, sel, 'tfd', d => { const n = dayWs(d).length; return { has: n > 0, n }; })}
     </div>
     <span class="lbl">${dateTxt(sel)} 수업 ${list.length?`· ${list.length}명`:''}</span>
-    ${list.length ? list.map(w=>{
-      const miss = noCmItems(w).length;
-      return `<button class="card rowc ${unseen(w)?'gold':''}" data-act="tw:${w.id}">
-        <div><div class="nm ${unseen(w)?'g':''}">${esc(nm(w.mid))} 회원</div>
-        <div class="sm">${esc(w.kind||'')}${w.title?' · '+esc(w.title):''} · ${durTxt(w.dur)}
-          <br>${w.items.filter(i=>i.sets.length).map(i=>esc(exName(i.ex,i.va))).slice(0,3).join(' · ')}${w.items.filter(i=>i.sets.length).length>3?' 외':''}</div></div>
-        <span class="pill${unseen(w)?'':' q'}">${miss?`코멘트 없는 종목 ${miss}`:'다 남겼어요'} ›</span></button>`; }).join('')
+    ${list.length ? `<div class="megrp fbg">${list.map(w=>{
+      const miss = noCmItems(w).length, 종 = w.items.filter(i=>i.sets.length);
+      return `<button class="mrow2 ${unseen(w)?'pson':''}" data-act="tw:${w.id}">
+        <span class="mi nm1">${esc(nm(w.mid).slice(0,1))}</span>
+        <span class="mt"><b>${esc(nm(w.mid))} 회원</b><small>${esc(w.kind||'')}${w.title?' · '+esc(w.title):''} · ${durTxt(w.dur)}</small>
+          <small>${종.map(i=>esc(exName(i.ex,i.va))).slice(0,3).join(' · ')}${종.length>3?' 외':''}</small></span>
+        <em class="go ${miss?'':'q'}">${miss?`코멘트 ${miss}개 남음 ›`:'다 남겼어요'}</em></button>`; }).join('')}</div>`
      : '<div class="empty">이 날은 기록된 수업이 없어요</div>'}
-    ${todo.length?`<div class="hr"></div>
-      <span class="lbl">아직 코멘트 안 단 기록 · ${todo.length}건</span>
-      ${todo.slice(0,8).map(w=>`<button class="card rowc" data-act="tw:${w.id}">
-        <div><div class="nm">${esc(nm(w.mid))} · ${dateTxt(w.date)}</div>
-        <div class="sm">${esc(w.kind||'')} · 코멘트 없는 종목 ${noCmItems(w).length}개</div></div>
-        <span class="pill">쓰기 ›</span></button>`).join('')}`:''}` };
+    ${todo.length?`<span class="lbl">아직 코멘트 안 단 기록 · ${todo.length}건</span>
+      <div class="megrp fbg">${todo.slice(0,4).map(w=>`<button class="mrow2" data-act="tw:${w.id}">
+        <span class="mi nm1">${esc(nm(w.mid).slice(0,1))}</span>
+        <span class="mt"><b>${esc(nm(w.mid))} · ${dateTxt(w.date)}</b><small>${esc(w.kind||'')} · 코멘트 없는 종목 ${noCmItems(w).length}개</small></span><em class="go">쓰기 ›</em></button>`).join('')}
+        ${todo.length > 4 ? `<button class="mrow2 more" data-act="tdtodo"><span class="mt"><b>${todo.length}건 모두 보기</b></span><i>›</i></button>` : ''}</div>`:''}` };
 }
 
 /* 회원 한 명의 식단 모아보기 */
@@ -11284,7 +11286,8 @@ document.addEventListener('click', async ev=>{
     case 'cycpick':  { const mid=rest[0], 날=rest[1];
       if(날 > TODAY){ toast('앞날은 고를 수 없어요'); return; }
       closeSheet(); 주기시작(mid, 날); return; }
-    case 'qa': go('qa'); return;
+    case 'qa': S.qaOpen = 0; go('qa'); return;
+    case 'qaopen': S.qaOpen = (S.qaOpen == null ? 0 : S.qaOpen) === +rest[0] ? -1 : +rest[0]; render(); return;
     case 'fbp': S.fbPart=rest[0]; render(); return;
     case 'newvar': sheetNewVar(rest[0]); return;
     case 'savevar': {
