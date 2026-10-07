@@ -1117,6 +1117,15 @@ body .ootdnudge .ic{color:var(--gold);display:flex}
 .regtag.r{color:var(--teal);border-color:rgba(169,216,230,.5);background:rgba(169,216,230,.07)}.regtag.x{color:#6f6c66;border-color:#34332d;background:none}
 body .tmsum>div,body .sstat3>div,body .dgrid>div,body .hcard,body .lvme,body .mehead,body .tmhead,body .megoal,body .mealcd,body .dwk,body .wk,body .gbox,body .card,body .pcard,body .cm.cm2,body .sspick{box-shadow:none}
 body .hero.photo{background-origin:border-box;background-clip:border-box}
+/* 스트레칭 세트 */
+.pschk{flex:1;min-width:0;display:flex;align-items:center;gap:12px;text-align:left}
+.ck{width:26px;height:26px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;border:1.5px solid #4a463d;font-size:15px;font-weight:800;color:#2a1c14}
+.pschk.on .ck,.mrow2.pson .ck{background:linear-gradient(180deg,#f3d9a8,#e2c184);border-color:transparent}
+.mrow2.pson .mt b,.pschk.on .mt b{color:var(--gold)}
+.psed{flex:none;font-size:12px;font-weight:700;color:var(--gold);border:1px solid #6b5a33;border-radius:999px;padding:5px 11px}.psed.w{color:var(--warn);border-color:#5a3830}.psed[disabled]{opacity:.25}
+.psmedia{display:flex;flex-direction:column;gap:7px;margin-top:7px}.psmedia img,.psmedia video{width:100%;border-radius:12px;border:1px solid #34332d;background:#0d0d0c;display:block}
+.pgrid .pg video{width:100%;height:100%;object-fit:cover}
+#sheetbox .hrow .btn{flex:1}
 .megoal{width:100%;flex:none;display:flex;flex-direction:column;gap:8px;text-align:left;padding:14px 14px 13px;border-radius:18px;border:1px solid #34332d;background:linear-gradient(180deg,#201f1c,#171615);box-shadow:inset 0 1px 0 rgba(240,211,160,.14)}
 .mgh{display:grid;grid-template-columns:1fr auto;align-items:center;width:100%}.mgh small{grid-column:1/-1;font-size:11.5px;color:var(--sub)}
 .mgh b{font-size:17px;font-weight:800}.mgh i{font-style:normal;color:var(--sub);font-size:17px}
@@ -2427,7 +2436,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '294';
+const BUILD = '295';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2575,6 +2584,7 @@ async function boot(){
   ]);
   D.badges = (bdgs||[]).map(b => ({ mid:b.member_id, key:b.key, at:b.earned_at||'' }));
   커뮤니티담기(psts, pcms, plks);
+  try{ 세트담기(await sget('prep_sets?select=*&order=created_at').catch(()=>[])); }catch(e){ D.psets = []; }
   D.rm = (rms||[]).map(r => { const [ex,va] = splitV(r.variant_id);
     return { id:r.id, mid:r.member_id, ex, va, kg:Number(r.kg||0), reps:Number(r.reps||1), kind:r.kind||'추정', date:r.on_date, wid:r.workout_id||'', by:r.by||'' }; });
 
@@ -4622,9 +4632,107 @@ const 갈래사진 = k => k==='s' ? PREPIMG.s_back : (k==='m' ? PREPIMG.m_back :
 const 카드꾸밈 = x => '--h1:' + x.h1 + ';--h2:' + x.h2
   + (x.img ? ';--img:url(' + x.img + ')' : '');
 
+/* ══ 트레이너 스트레칭 세트 ══ 2026-10-07 대표
+   「트레이너 스트레칭 루틴으로 아예 세팅 · 하나의 영상을 여러 회원에게 · 앱과 PC 전부 · 만든 트레이너만 사용」 */
+function 세트담기(rows){ D.psets = (rows||[]).map(r => ({ id:r.id, tr:r.trainer, n:r.name||'', memo:r.memo||'',
+  items: Array.isArray(r.items) ? r.items : [], mids: Array.isArray(r.member_ids) ? r.member_ids : [] })); }
+const 내세트 = () => (D.psets||[]).filter(x => x.tr === TRAINER);
+const 받은세트 = mid => (D.psets||[]).filter(x => x.mids.includes(mid) && x.items.length);
+/* 동작 하나를 화면용으로 — 목록 동작은 사전에서, 직접 올린 것은 그대로 */
+const 세트동작 = it => it.k === 'lib' ? (사전[it.i] ? Object.assign({ lib:1 }, 사전[it.i]) : null)
+  : { i:'x', n:it.n||'', t:it.t||'', d:it.d||'', media:it.media||[] };
+function 세트저장(x){
+  return sv(spost('prep_sets', [{ id:x.id, trainer:x.tr, name:x.n, memo:x.memo, items:x.items, member_ids:x.mids,
+    updated_at:new Date().toISOString() }], {on:'id'}), '스트레칭 세트 저장');
+}
+/* 목록 — mid 를 주면 「그 회원에게 지정」 모드 (회원 화면 · 수업 시작 창에서) */
+function sheetPsets(mid){
+  S.psMid = mid || '';
+  const m = mid ? (MEMBERS.find(x=>x.id===mid) || {n:''}) : null;
+  openSheet(()=>{ const ss = 내세트();
+    return `<div class="h2">스트레칭 세트 <small>${m ? esc(m.n)+' 회원에게 지정' : '내가 만든 세트 '+ss.length+'개'}</small></div>
+    <div class="pickbox">${ss.length ? `<div class="megrp">${ss.map(x=>{ const on = mid && x.mids.includes(mid);
+        return `<div class="mrow2"><button class="pschk ${on?'on':''}" ${mid ? `data-act="psasg:${x.id}:${mid}"` : `data-act="psedit:${x.id}"`}>
+            ${mid ? `<span class="ck">${on?'✓':''}</span>` : `<span class="mi">${svg('h_roll',19)}</span>`}
+            <span class="mt"><b>${esc(x.n||'이름 없는 세트')}</b><small>${x.items.length}동작 · ${x.mids.length}명에게 지정${x.memo ? ' · '+esc(x.memo) : ''}</small></span></button>
+          <button class="psed" data-act="psedit:${x.id}">고치기</button></div>`; }).join('')}</div>`
+      : 빔('prep','아직 만든 세트가 없어요','한 번 만들어 두면 여러 회원에게 지정할 수 있어요')}</div>
+    <button class="btn main" data-act="psnew">＋ 새 세트 만들기</button>
+    <button class="btn ghost sm" data-act="close">닫기</button>`; });
+}
+/* 고치기 — S.pse 에 들고 있다가 「저장」 때 한 번에 쓴다 */
+function 세트글담기(){ const p = S.pse; if(!p) return;
+  const a = document.querySelector('[data-k="psn"]'), b = document.querySelector('[data-k="psm"]');
+  if(a) p.n = a.value; if(b) p.memo = b.value; }
+function sheetPsetEdit(){
+  const p = S.pse; if(!p) return;
+  openSheet(()=>`<div class="h2">${p.새 ? '새 세트' : '세트 고치기'}</div>
+    <div class="fld"><span class="fn">세트 이름</span><input class="search" type="text" data-k="psn" maxlength="24" value="${esc(p.n)}" placeholder="예) 하체 수업 전 풀기"></div>
+    <div class="fld"><span class="fn">한 줄 메모 <small>회원에게 보여요</small></span><input class="search" type="text" data-k="psm" maxlength="60" value="${esc(p.memo)}" placeholder="예) 골반 앞쪽 위주로 30초씩"></div>
+    <span class="lbl">동작 ${p.items.length}개</span>
+    ${p.items.length ? `<div class="megrp">${p.items.map((it,i)=>{ const v = 세트동작(it) || { n:'(없는 동작)', t:'', media:[] };
+        const 붙 = (v.media||[]).length ? ((v.media.some(z=>z.kind==='video') ? '영상' : '사진') + ' ' + v.media.length) : '';
+        return `<div class="mrow2"><span class="mi pt">${i+1}</span><span class="mt"><b>${esc(v.n)}</b><small>${it.k==='lib' ? '목록 동작' : '직접 올림'}${v.t ? ' · '+esc(v.t) : ''}${붙 ? ' · '+붙 : ''}</small></span>
+          <button class="psed" data-act="psup:${i}" ${i===0?'disabled':''}>▲</button><button class="psed w" data-act="psrm:${i}">빼기</button></div>`; }).join('')}</div>` : '<div class="empty">아직 담은 동작이 없어요</div>'}
+    <div class="hrow"><button class="hcard teal" data-act="pslib">${홈머리('h_roll','목록에서 고르기')}<span class="hs">스트레칭 ${ST.length} · 마사지 ${MS.length}</span></button>
+      <button class="hcard gold2" data-act="psown">${홈머리('h_cam','직접 올리기')}<span class="hs">이름 · 사진 · 영상</span></button></div>
+    <button class="card rowc" data-act="psmem"><div><div class="nm">받을 회원 ${p.mids.length}명</div>
+      <div class="sm">${p.mids.length ? esc(p.mids.map(id=>(MEMBERS.find(m=>m.id===id)||{}).n||'').filter(Boolean).slice(0,4).join(' · ')) + (p.mids.length>4?' 외':'') : '눌러서 고르기 — 나중에 해도 돼요'}</div></div><span class="rt">›</span></button>
+    <button class="btn main" data-act="pssave">저장</button>
+    ${p.새 ? '' : `<button class="dngr" data-act="psdel">이 세트 지우기</button>`}
+    <button class="btn ghost sm" data-act="psback">‹ 세트 목록</button>`);
+}
+/* 목록에서 고르기 — 스트레칭 / 마사지 */
+function sheetPsetLib(){
+  const p = S.pse; if(!p) return;
+  const 갈 = S.pslk || 's', 줄 = 갈==='s' ? ST : MS, 담긴 = new Set(p.items.filter(x=>x.k==='lib').map(x=>x.i));
+  openSheet(()=>`<div class="h2">목록에서 고르기 <small>${담긴.size}개 담음</small></div>
+    <div class="seg">${[['s','스트레칭 '+ST.length],['m','마사지 '+MS.length]].map(k=>`<button class="${갈===k[0]?'on':''}" data-act="pslk:${k[0]}">${k[1]}</button>`).join('')}</div>
+    <div class="pickbox"><div class="megrp">${줄.map(x=>`<button class="mrow2 ${담긴.has(x.i)?'pson':''}" data-act="pstog:${x.i}">
+      <span class="ck">${담긴.has(x.i)?'✓':''}</span><span class="mt"><b>${esc(x.n)}</b><small>${esc(x.t)} · ${esc(x.d)}</small></span></button>`).join('')}</div></div>
+    <button class="btn main" data-act="psedit2">다 골랐어요</button>`);
+}
+/* 직접 올리기 — 이름 · 시간/횟수 · 설명 · 사진 여러 장 또는 영상 한 개 */
+function sheetPsetOwn(){
+  const p = S.pse; if(!p) return; const d = S.pso || (S.pso = { n:'', t:'', d:'', files:[] });
+  openSheet(()=>`<div class="h2">직접 올리기</div>
+    <div class="fld"><span class="fn">동작 이름</span><input class="search" type="text" data-k="pon" maxlength="24" value="${esc(d.n)}" placeholder="예) 장요근 늘이기"></div>
+    <div class="fld"><span class="fn">시간 · 횟수</span><input class="search" type="text" data-k="pot" maxlength="16" value="${esc(d.t)}" placeholder="예) 좌우 30초"></div>
+    <div class="fld"><span class="fn">설명</span><textarea class="search" data-k="pod" rows="2" maxlength="140" placeholder="예) 뒷다리 골반을 앞으로 밀며 허리는 꺾지 않아요">${esc(d.d)}</textarea></div>
+    ${d.files.length ? `<div class="pgrid">${d.files.map((f,i)=>`<button class="pg" data-act="pofrm:${i}">${f.kind==='video' ? `<video src="${f.url}" muted playsinline></video>` : `<img src="${f.url}" alt="">`}<span class="pgd">빼기</span></button>`).join('')}</div>` : ''}
+    <div class="hrow"><button class="btn sub" data-act="pofile:pic">${svg('h_cam',18)} 사진</button><button class="btn sub" data-act="pofile:vid">${svg('play',18)} 영상</button></div>
+    <button class="btn main" data-act="poadd">이 동작 담기</button>
+    <button class="btn ghost sm" data-act="psedit2">‹ 돌아가기</button>`);
+}
+function 세트파일고르기(종){
+  const d = S.pso; if(!d) return;
+  ['pon','pot','pod'].forEach(k=>{ const el = document.querySelector('[data-k="'+k+'"]'); if(el) d[{pon:'n',pot:'t',pod:'d'}[k]] = el.value; });
+  const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 종==='pic' ? 'image/*' : 'video/*'; if(종==='pic') inp.multiple = true;
+  inp.style.display = 'none'; document.body.appendChild(inp);
+  inp.addEventListener('change', async () => { const fs = Array.from(inp.files||[]); inp.remove(); if(!fs.length) return;
+    try{
+      if(종==='pic'){ for(const f of fs){ const u = await shrinkPhoto(f), blob = await (await fetch(u)).blob(); d.files.push({ kind:'photo', blob, ext:'jpg', url:URL.createObjectURL(blob) }); } }
+      else { const r = await 영상줄이기(fs[0], null, true); d.files.push({ kind:'video', blob:r.blob, ext:r.ext, url:URL.createObjectURL(r.blob) }); }
+      sheetPsetOwn();
+    }catch(e){ console.error(e); toast(e.message || '파일을 읽지 못했어요'); } });
+  inp.click();
+}
+/* 받을 회원 고르기 */
+function sheetPsetMem(){
+  const p = S.pse; if(!p) return; const ms = (typeof myMembers==='function' ? myMembers() : MEMBERS);
+  openSheet(()=>`<div class="h2">받을 회원 <small>${p.mids.length}명</small></div>
+    <div class="pickbox"><div class="megrp">${ms.map(m=>`<button class="mrow2 ${p.mids.includes(m.id)?'pson':''}" data-act="psmt:${m.id}">
+      <span class="ck">${p.mids.includes(m.id)?'✓':''}</span><span class="mt"><b>${esc(m.n)}</b></span></button>`).join('')}</div></div>
+    <button class="btn main" data-act="psedit2">다 골랐어요</button>`);
+}
+
 /* ── 준비운동 · 갈래 고르기 ── */
 function vPrep(){
   return { top: bar('준비운동','', 'go:home'), body:`
+    ${(()=>{ const ss = S.who==='tr' ? [] : 받은세트(S.mid); if(!ss.length) return '';
+      return `<span class="lbl">트레이너가 정해 준 스트레칭</span>` + ss.map(x=>`<button class="sspick" data-act="pset:${x.id}">
+        <span class="sst"><small>${esc(x.tr)} 트레이너</small><b>${esc(x.n||'스트레칭')}</b><i>${x.items.length}동작${x.memo ? ' · '+esc(x.memo) : ''}</i></span><em>보기 ›</em></button>`).join('')
+        + `<span class="lbl">공통 준비운동</span>`; })()}
     <div class="note">몸을 <b>풀고 늘이는</b> 것부터 하고 운동을 시작합니다. 시간을 재지 않아요 —
       보고 그대로 따라 하시면 됩니다.</div>
     ${PREPKIND.map(x=>{ const im=갈래사진(x.k); return `<button class="hero2 tall ${im?'shot':''}"
@@ -4699,7 +4807,13 @@ function vPrep3(){
   const w = live();
   let 이름, 밑말, 꼬리, list;
 
-  if(S.prepRid){                                  /* 트레이너 지정 */
+  if(S.prepPset){                                 /* 트레이너 스트레칭 세트 */
+    const x = (D.psets||[]).find(z=>z.id===S.prepPset);
+    if(!x) return vPrep();
+    이름 = x.n || '스트레칭'; 밑말 = x.memo || (x.tr + ' 트레이너가 정해 준 스트레칭');
+    꼬리 = `${x.items.length}동작 · ${esc(x.tr)} 트레이너`;
+    list = x.items.map(세트동작).filter(Boolean);
+  } else if(S.prepRid){                           /* 트레이너 지정 */
     const r = rOf(S.prepRid);
     if(!r) return vPrep2();
     이름 = r.n; 밑말 = r.purpose || '트레이너가 직접 짠 준비운동';
@@ -4714,8 +4828,8 @@ function vPrep3(){
 
   const 갈래 = x => !x.i || x.i[0]==='x' ? 'x' : x.i[0];      /* m 풀기 · s 늘이기 · x 트레이너가 담은 종목 */
   const 갈래말 = { m:'풀기', s:'늘이기', x:'운동' };
-  return { top: bar('준비운동', `<span class="sub">${S.prepRid?'트레이너 지정':esc(kd.n)}</span>`, 'go:prep2'), body:`
-    <div class="prephd ${S.prepRid?'t':''}">
+  return { top: bar('준비운동', `<span class="sub">${(S.prepRid||S.prepPset)?'트레이너 지정':esc(kd.n)}</span>`, S.prepPset ? 'go:prep' : 'go:prep2'), body:`
+    <div class="prephd ${(S.prepRid||S.prepPset)?'t':''}">
       <div class="ph1">${esc(이름)}</div>
       <div class="ph2">${esc(밑말)}</div>
       <div class="ph3">${꼬리}</div>
@@ -4725,7 +4839,10 @@ function vPrep3(){
       <span class="tx">
         <span class="nm">${esc(x.n)}<span class="tm">${esc(x.t)}</span></span>
         <span class="sm">${esc(x.d)}</span>
-        <span class="kd">${갈래말[갈래(x)]}</span>
+        ${(x.media||[]).length ? `<span class="psmedia">${x.media.map(z => z.kind==='video'
+            ? `<video src="${esc(phURL(z.path))}" controls playsinline preload="metadata"></video>`
+            : `<img src="${esc(phURL(z.path))}" alt="" loading="lazy" onerror="picFail(this)">`).join('')}</span>` : ''}
+        <span class="kd">${x.media ? '트레이너' : 갈래말[갈래(x)]}</span>
       </span></div>`).join('') : 빔('prep','담긴 동작이 없어요')}
     <div class="note">
       늘이는 동작은 <b>아프지 않고 살짝 당기는</b> 정도까지만. 반동을 주지 마세요.<br>
@@ -9591,6 +9708,8 @@ function tTools(){
   return { top: bar('자료'), body:`
     <button class="card rowc" data-act="go:t_routines"><div><div class="nm">루틴 만들기 · 지정</div>
       <div class="sm">회원별 루틴 세트</div></div><span class="rt">›</span></button>
+    <button class="card rowc gold" data-act="psets"><div><div class="nm g">스트레칭 세트</div>
+      <div class="sm">내가 만든 세트 ${내세트().length}개 · 한 번 만들어 여러 회원에게</div></div><span class="rt">›</span></button>
     <button class="card rowc" data-act="go:t_ex"><div><div class="nm">종목 사전</div>
       <div class="sm">${EX.length}종목 · 하는 법 ${EX.reduce((a,e)=>a+vars(e.id).length,0)}가지 · 기본 설명</div></div><span class="rt">›</span></button>
     <button class="card rowc" data-act="qa"><div><div class="nm">자주 묻는 질문</div>
@@ -9663,6 +9782,7 @@ function tMember(){
         ['plan','운동계획', (g.now&&g.now.w)?`${g.now.w}kg → ${(g.to&&g.to.w)||'?'}kg`:'아직 없음', 'tsub:plan:'+m.id, ''],
         ['bowl','식단', mealsOf(m.id).length?`${mealsOf(m.id).length}장 · 최근 ${dateTxt(mealsOf(m.id)[0].date)}`:'아직 없음', 'tsub:diet:'+m.id, ''],
         ['h_cam','오운완 · 인증샷', 모.length ? `${모.length}장` : '아직 없음 — 수업 마친 화면에서 「같이 찍기」', 'tprof:'+m.id, 요 ? `삭제 요청 ${요}` : ''],
+        ['h_roll','스트레칭 세트', (n => n ? `${n}개 지정함` : '아직 지정 안 함 — 눌러서 지정')(내세트().filter(x=>x.mids.includes(m.id)).length), 'psets:'+m.id, ''],
         ['chart','인/아웃바디', `${Object.keys(checksOf(m.id)).length}개 표시 · ${roundsOf(m.id).length}회차 · 사진 ${((D.bph||[]).filter(x=>x.mid===m.id)).length}장`, 'tsub:body:'+m.id, '']]
         .map(x=>`<button class="mrow2" data-act="${x[3]}"><span class="mi">${svg(x[0],19)}</span>
           <span class="mt"><b>${x[1]}</b><small>${x[2]}</small></span>${x[4]?`<em class="nb w">${x[4]}</em>`:''}<i>›</i></button>`).join(''); })()}</div>
@@ -9954,6 +10074,7 @@ function sheetStartSession(mid){
       <button class="hcard" data-act="tstart:${mid}:0:수업">${홈머리('h_note','빈 운동으로')}
         <span class="hs">종목을 그때그때<br>담습니다</span></button>
     </div>
+    <button class="hline gold" data-act="psets:${mid}">${svg('h_roll',18)}<b>준비운동 먼저</b><small>${(n => n ? `스트레칭 세트 ${n}개 지정함` : '스트레칭 세트 지정하기')(내세트().filter(x=>x.mids.includes(mid)).length)}</small><i>›</i></button>
     <button class="btn ghost sm" data-act="close">닫기</button>
     <div class="note">트레이너가 시작해도 <b>회원 기록으로</b> 남습니다. 회원 폰에서도 같은 운동이 보입니다.</div>`);
 }
@@ -11121,10 +11242,50 @@ document.addEventListener('click', async ev=>{
       const nm = vaName(cur.ex, vk);
       toast(nm ? nm + '으로 바꿨어요' : '기본으로 바꿨어요');
       render(); return; }
-    case 'pk': S.prepKind = rest[0]; S.prepRid = null; go('prep2'); return;
+    case 'pk': S.prepKind = rest[0]; S.prepRid = null; S.prepPset = null; go('prep2'); return;
+    case 'pset': S.prepPset = rest[0]; S.prepRid = null; go('prep3'); return;
+    /* ── 트레이너 스트레칭 세트 ── */
+    case 'psets': sheetPsets(rest[0] || ''); return;
+    case 'psnew': S.pse = { id:'ps'+Date.now(), tr:TRAINER, n:'', memo:'', items:[], mids: S.psMid ? [S.psMid] : [], 새:true }; sheetPsetEdit(); return;
+    case 'psedit': { const x = 내세트().find(z=>z.id===rest[0]); if(!x) return;
+      S.pse = { id:x.id, tr:x.tr, n:x.n, memo:x.memo, items:x.items.map(z=>Object.assign({}, z)), mids:x.mids.slice() }; sheetPsetEdit(); return; }
+    case 'psedit2': sheetPsetEdit(); return;
+    case 'psback': S.pse = null; sheetPsets(S.psMid); return;
+    case 'pslib': 세트글담기(); S.pslk = 's'; sheetPsetLib(); return;
+    case 'pslk': S.pslk = rest[0]; sheetPsetLib(); return;
+    case 'pstog': { const p = S.pse; if(!p) return; const i = p.items.findIndex(z=>z.k==='lib' && z.i===rest[0]);
+      if(i >= 0) p.items.splice(i,1); else p.items.push({ k:'lib', i:rest[0] }); drawSheet(); return; }
+    case 'psown': 세트글담기(); S.pso = null; sheetPsetOwn(); return;
+    case 'pofile': 세트파일고르기(rest[0]); return;
+    case 'pofrm': { const d = S.pso; if(d){ d.files.splice(+rest[0],1); drawSheet(); } return; }
+    case 'poadd': { const p = S.pse, d = S.pso; if(!p || !d) return;
+      ['pon','pot','pod'].forEach(k=>{ const el = document.querySelector('[data-k="'+k+'"]'); if(el) d[{pon:'n',pot:'t',pod:'d'}[k]] = el.value.trim(); });
+      if(!d.n){ toast('동작 이름을 적어 주세요'); return; }
+      toast(d.files.length ? '올리는 중이에요' : '담았어요');
+      const media = [];
+      try{ for(let i=0;i<d.files.length;i++){ const f = d.files[i], path = `prep/${p.id}/${Date.now()}_${i}.${f.ext}`;
+          await 파일올리기(path, f.blob, f.kind==='photo' ? 'image/jpeg' : (f.ext==='webm' ? 'video/webm' : 'video/mp4')); media.push({ kind:f.kind, path }); } }
+      catch(e){ console.error(e); toast('파일을 못 올렸어요'); return; }
+      p.items.push({ k:'own', n:d.n, t:d.t, d:d.d, media }); S.pso = null; sheetPsetEdit(); return; }
+    case 'psup': { const p = S.pse, i = +rest[0]; if(!p || i < 1) return; 세트글담기(); [p.items[i-1], p.items[i]] = [p.items[i], p.items[i-1]]; drawSheet(); return; }
+    case 'psrm': { const p = S.pse; if(!p) return; 세트글담기(); p.items.splice(+rest[0],1); drawSheet(); return; }
+    case 'psmem': 세트글담기(); sheetPsetMem(); return;
+    case 'psmt': { const p = S.pse; if(!p) return; const i = p.mids.indexOf(rest[0]); if(i >= 0) p.mids.splice(i,1); else p.mids.push(rest[0]); drawSheet(); return; }
+    case 'pssave': { const p = S.pse; if(!p) return; 세트글담기(); p.n = (p.n||'').trim(); p.memo = (p.memo||'').trim();
+      if(!p.n){ toast('세트 이름을 적어 주세요'); return; }
+      if(!p.items.length){ toast('동작을 하나 이상 담아 주세요'); return; }
+      const x = { id:p.id, tr:TRAINER, n:p.n, memo:p.memo, items:p.items, mids:p.mids };
+      D.psets = (D.psets||[]).filter(z=>z.id!==x.id).concat([x]); await 세트저장(x);
+      S.pse = null; toast('세트를 저장했어요'); sheetPsets(S.psMid); render(); return; }
+    case 'psdel': { const p = S.pse; if(!p) return; if(!confirm('이 세트를 지울까요? 받은 회원 화면에서도 사라집니다.')) return;
+      D.psets = (D.psets||[]).filter(z=>z.id!==p.id); await sv(sdel('prep_sets','id=eq.'+p.id), '세트 지우기');
+      S.pse = null; toast('지웠어요'); sheetPsets(S.psMid); render(); return; }
+    case 'psasg': { const x = 내세트().find(z=>z.id===rest[0]); if(!x) return; const mid = rest[1], i = x.mids.indexOf(mid);
+      if(i >= 0) x.mids.splice(i,1); else x.mids.push(mid);
+      drawSheet(); await 세트저장(x); toast(i >= 0 ? '지정을 풀었어요' : '지정했어요 — 회원 「준비운동」 맨 위에 떠요'); return; }
     case 'pt': S.prepTab = rest[0]; render(); return;
-    case 'ps': S.prepSet = rest[0]; S.prepRid = null; go('prep3'); return;
-    case 'pr': S.prepRid = rest[0]; go('prep3'); return;
+    case 'ps': S.prepSet = rest[0]; S.prepRid = null; S.prepPset = null; go('prep3'); return;
+    case 'pr': S.prepRid = rest[0]; S.prepPset = null; go('prep3'); return;
     case 'dopen': S.dayOpen = (S.dayOpen===rest[0]) ? null : rest[0]; render(); return;
     case 'prevopen': S.prevOpen = !S.prevOpen; render(); return;
     case 'trio': { const z=지금종목(); if(!z) return;
