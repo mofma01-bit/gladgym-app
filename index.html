@@ -2219,6 +2219,39 @@ const 별칭기구 = { '맨몸':'bodyweight 자중 홈트 기구없이', '바벨
   '원판':'plate 플레이트', '폼롤러':'foamroller 마사지', '땅콩볼':'peanut 피넛볼 트윈볼 마사지',
   '마사지볼':'ball 라크로스볼 마사지', '도구':'tool 소도구', '유산소':'cardio' };
 const 검색키 = t => (t||'').toLowerCase().replace(/[\s·()\-—_/,]/g,'');
+/* 내가 만든 운동 종목 — 사전에 없는 운동을 트레이너가 만들어 루틴에 넣는다 (2026-10-07 대표).
+   고르기 목록에는 **공용 사전 + 내가 만든 것**만 보인다. 이미 루틴·기록에 담긴 것은 누구에게나 그대로 보인다. */
+const 고를수있나 = e => !e.owner || (S.who==='tr' && e.owner === TRAINER);
+const 내운동 = () => EX.filter(e => e.owner && e.owner === TRAINER);
+function 운동글담기(){ const d = S.exn; if(!d) return;
+  [['exn','n'],['exe','e'],['exd','d']].forEach(([k,f]) => { const el = document.querySelector('[data-k="'+k+'"]'); if(el) d[f] = el.value.trim(); }); }
+function sheetExNew(){
+  const d = S.exn; if(!d) return;
+  openSheet(()=>`<div class="h2">${d.새 ? '새 종목 만들기' : '종목 고치기'}</div>
+    <div class="fld"><span class="fn">종목 이름</span><input class="search" type="text" data-k="exn" maxlength="24" value="${esc(d.n)}" placeholder="예) 케이블 우드찹"></div>
+    <span class="lbl">부위</span>
+    <div class="chips">${PARTS.map(x=>`<button class="chip ${x===d.p?'on':''}" data-act="exnp:${x}">${x}</button>`).join('')}</div>
+    <div class="fld"><span class="fn">기구 <small>없으면 비워 두세요</small></span><input class="search" type="text" data-k="exe" maxlength="12" value="${esc(d.e)}" placeholder="예) 케이블 · 덤벨 · 맨몸"></div>
+    <div class="fld"><span class="fn">설명</span><textarea class="search" data-k="exd" rows="3" maxlength="300" placeholder="예) 골반은 정면에 두고 몸통만 돌립니다">${esc(d.d)}</textarea></div>
+    ${(d.media.length || d.files.length) ? `<div class="pgrid">${d.media.map((f,i)=>`<button class="pg" data-act="exmrm:${i}">${f.kind==='video' ? `<video src="${esc(phURL(f.path))}" muted playsinline preload="metadata"></video>` : `<img src="${esc(phURL(f.path))}" alt="">`}<span class="pgd">빼기</span></button>`).join('')
+      }${d.files.map((f,i)=>`<button class="pg" data-act="exfrm:${i}">${f.kind==='video' ? `<video src="${f.url}" muted playsinline></video>` : `<img src="${f.url}" alt="">`}<span class="pgd">빼기</span></button>`).join('')}</div>` : ''}
+    <div class="hrow"><button class="btn sub" data-act="exfile:pic">${svg('h_cam',18)} 사진</button><button class="btn sub" data-act="exfile:vid">${svg('play',18)} 영상</button></div>
+    <button class="btn main" data-act="exsave">저장</button>
+    ${d.새 ? '' : `<button class="dngr" data-act="exdel">이 종목 지우기</button>`}
+    <button class="btn ghost sm" data-act="close">닫기</button>`);
+}
+function 운동파일고르기(종){
+  const d = S.exn; if(!d) return; 운동글담기();
+  const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 종==='pic' ? 'image/*' : 'video/*'; if(종==='pic') inp.multiple = true;
+  inp.style.display = 'none'; document.body.appendChild(inp);
+  inp.addEventListener('change', async () => { const fs = Array.from(inp.files||[]); inp.remove(); if(!fs.length) return;
+    try{
+      if(종==='pic'){ for(const f of fs){ const u = await shrinkPhoto(f), blob = await (await fetch(u)).blob(); d.files.push({ kind:'photo', blob, ext:'jpg', url:URL.createObjectURL(blob) }); } }
+      else { const r = await 영상줄이기(fs[0], null, true); d.files.push({ kind:'video', blob:r.blob, ext:r.ext, url:URL.createObjectURL(r.blob) }); }
+      sheetExNew();
+    }catch(e){ console.error(e); toast(e.message || '파일을 읽지 못했어요'); } });
+  inp.click();
+}
 function exKey(e){
   let t = e.n + ' ' + e.p + ' ' + (e.e||'');
   for(const a of 별칭이름) if(t.indexOf(a[0])>=0) t += ' ' + a[1];
@@ -2385,6 +2418,14 @@ const demoBox = (e, v, 접어둠) => {
      예전에 GPT 로 만든 그림 두 장을 번갈아 보여 주던 「그림 시범」은 전부 뺐다 —
      캐릭터가 종목마다 달라 보이고 동작이 정석과 멀었다.
      영상이 없는 종목은 「준비중」으로 둔다. 억지로 채우지 않는다. */
+  if(!영상시범(v) && e && (e.media||[]).length){
+    const 몸2 = `<div class="psmedia">${e.media.map(m => m.kind==='video'
+      ? `<video src="${esc(phURL(m.path))}" controls playsinline preload="metadata" controlsList="nodownload noremoteplayback" disablePictureInPicture></video>`
+      : `<img src="${esc(phURL(m.path))}" alt="" loading="lazy" onerror="picFail(this)">`).join('')}</div>`;
+    if(!접어둠) return 몸2;
+    return `<div class="foldb"><button class="foldh" data-act="demoopen"><span class="fk">${svg('play',15)}</span>
+      <span class="ft">트레이너 시범</span>${접개(S.demoOpen)}</button>${S.demoOpen ? 몸2 : ''}</div>`;
+  }
   if(!영상시범(v)) return 접어둠
     ? `<div class="foldb"><div class="foldh off">
         <span class="fk">${svg('play',15)}</span>
@@ -2456,7 +2497,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '299';
+const BUILD = '300';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2609,7 +2650,7 @@ async function boot(){
   D.rm = (rms||[]).map(r => { const [ex,va] = splitV(r.variant_id);
     return { id:r.id, mid:r.member_id, ex, va, kg:Number(r.kg||0), reps:Number(r.reps||1), kind:r.kind||'추정', date:r.on_date, wid:r.workout_id||'', by:r.by||'' }; });
 
-  EX = exs.map(e => ({ id:e.id, n:e.name, p:e.part, e:e.equip, cardio: e.cardio ? 1 : 0,
+  EX = exs.map(e => ({ id:e.id, n:e.name, p:e.part, e:e.equip, cardio: e.cardio ? 1 : 0, owner:e.owner||'', media: Array.isArray(e.media) ? e.media : [],
     vars: vrs.filter(v => v.ex_id === e.id).map(v => ({ k:v.vkey, n:v.name||'', desc:v.descr||'', demo: v.demo?1:0, du: v.demo_url||'' })) }));
   MEMBERS = mems.filter(m => m.role === 'member').map(m => ({ id:m.id, n:m.name, tr:m.trainer, reg:(m.reg_kind||'').trim(),
     /* 동의 칸 — 설계서\8단계_SQL_동의칸.sql (없으면 undefined 로 들어와 「미동의」로 본다) */
@@ -4321,7 +4362,7 @@ function vPick(){
     <button class="card rowc gold" data-exrow="1rm 원알엠 일알엠 원rm 1알엠 1rm측정 측정 최대중량 맥스 max onerepmax" data-part="__1rm" data-eq="" style="display:none" data-act="rmaddpick">
       <div><div class="nm g">1RM 측정 종목 담기</div><div class="sm">스쿼트 · 벤치 · 데드 · 오버헤드 프레스 등 — 담으면 바로 측정 계획을 엽니다</div></div>
       <span class="rt">＋</span></button>
-    ${EX.map(e=>{ const vs=vars(e.id), n=cmOf(S.mid,e.id).length, last=lastSet(e.id);
+    ${EX.filter(고를수있나).map(e=>{ const vs=vars(e.id), n=cmOf(S.mid,e.id).length, last=lastSet(e.id);
       return `<button class="card rowc" data-exrow="${esc(exKey(e))}" data-part="${esc(e.p)}"
         data-eq="${esc(e.e||'')}"
         style="${(e.p===S.pickPart && (S.pickEq==='전체'||e.e===S.pickEq))?'':'display:none'}"
@@ -4404,14 +4445,14 @@ function 세칸(e, v, cur, mid, tr, cms, nw, dsc){
   if(isMemo(cur.ex)) return '';
   const p = 직전요약(e, cur, mid);
   const 화 = p.방향==='up' ? '↑' : (p.방향==='down' ? '↓' : '');
-  const 시범 = 영상시범(v) ? '영상' : '준비중';
+  const 내시범 = !영상시범(v) && (e.media||[]).length, 시범 = 영상시범(v) ? '영상' : 내시범 ? (e.media.some(z=>z.kind==='video') ? '영상' : '사진') : '준비중';
   const rm가능 = rm종목인가(cur.ex), rmb = rm가능 ? rm최고(mid, cur.ex) : null;
   return `<div class="trio ${rm가능?'four':''}">
     <button class="t1" data-act="trio:prev">
       <span class="k">직전기록</span>
       <span class="v">${esc(p.v)}${화?`<i class="${p.방향}">${화}</i>`:''}</span></button>
-    <button class="t2${영상시범(v)?'':' off'}" data-act="trio:demo">
-      <span class="k">기구 사용법</span>
+    <button class="t2${(영상시범(v)||내시범)?'':' off'}" data-act="trio:demo">
+      <span class="k">${내시범 ? '트레이너 시범' : '기구 사용법'}</span>
       <span class="v">${시범}</span></button>
     <button class="t3" data-act="exd:${cur.ex}:${cur.va}${tr?':'+mid:''}">
       <span class="k">${tr?'코멘트 남기기':'설명 · 코멘트'}</span>
@@ -4431,7 +4472,7 @@ function sheetPrev(){
 }
 function sheetDemo(){
   openSheet(()=>{ const z=지금종목(); if(!z) return '<button class="btn ghost sm" data-act="close">닫기</button>';
-    return `<div class="h2">기구 사용법 <small>${esc(exName(z.cur.ex,z.cur.va))}</small></div>
+    return `<div class="h2">${(!영상시범(z.v) && (z.e.media||[]).length) ? '트레이너 시범' : '기구 사용법'} <small>${esc(exName(z.cur.ex,z.cur.va))}</small></div>
       ${demoBox(z.e, z.v)}
       <button class="btn ghost sm" data-act="close">닫기</button>`; });
 }
@@ -10167,15 +10208,16 @@ function sheetRecentPick(mid){
 /* ── 루틴에 담을 종목 고르기 ── */
 function tPickEx(){
   const r=rOf(S.redit); if(!r) return tRoutines();
-  const list = EX.filter(e=>e.p===S.pickPart);
+  const list = EX.filter(e=>e.p===S.pickPart && 고를수있나(e)).sort((a,b)=>(b.owner?1:0)-(a.owner?1:0));     /* 내가 만든 종목이 위로 */
   const cnt = k => r.items.filter(it=>VID(it.ex,it.va)===k).length;
   return { top: bar('종목 담기', `<span class="sub">담은 ${r.items.length}개</span>`, 're:'+r.id), keepScroll:true, body:`
     <input class="search" type="text" data-filter="1" placeholder="종목 이름으로 찾기">
     <div class="chips">${PARTS.map(x=>`<button class="chip ${x===S.pickPart?'on':''}" data-act="rpart:${x}">${x}</button>`).join('')}</div>
+    <button class="hline gold" data-act="exnew">${svg('h_dumb',18)}<b>＋ 종목 만들기</b><small>사전에 없는 운동 · 내 종목 ${내운동().length}개</small></button>
     ${list.map(e=>vars(e.id).map(v=>{ const k=VID(e.id,v.k), n=cnt(k), just=(S.just===k);
       return `<button class="card rowc ${just?'just':(n?'done2':'')}" data-nm="${esc(e.n+' '+(v.n||''))}" data-act="raddv:${r.id}:${e.id}:${v.k}">
         <div><div class="nm">${esc(e.n)}${v.n?` (${esc(v.n)})`:''}</div>
-        <div class="sm">${esc(e.e)}${v.desc?' · 설명 있음':''}</div></div>
+        <div class="sm">${e.owner ? '<span style="color:var(--gold)">내 종목</span> · ' : ''}${esc(e.e)}${v.desc?' · 설명 있음':''}</div></div>
         ${just?'<span class="pill">방금 담음</span>':(n?`<span class="pill t">담김 ${n>1?n:'✓'}</span>`:'<span class="rt">＋</span>')}</button>`;
       }).join('')).join('')}
     <div class="note">눌러서 <b>여러 개를 이어서</b> 담으세요. 다 담았으면 아래 버튼을 누릅니다.</div>`,
@@ -10217,9 +10259,13 @@ async function svRoutineItems(rid){
       variant_id:VID(it.ex,it.va), kg:it.kg, reps:it.reps, sets:it.sets, rest:it.rest }))), '루틴 저장');
 }
 function tEx(){
-  return { top: bar('종목 사전', `<span class="sub">${EX.length}종목</span>`, 'go:t_members'), body:
+  return { top: bar('종목 사전', `<span class="sub">${EX.filter(고를수있나).length}종목</span>`, 'go:t_members'), body:
+    `<span class="lbl">내가 만든 종목 ${내운동().length}개</span>
+    ${내운동().length ? `<div class="megrp">${내운동().map(e=>`<button class="mrow2" data-act="exedit:${e.id}"><span class="mi pt">${esc(e.p.slice(0,2))}</span>
+      <span class="mt"><b>${esc(e.n)}</b><small>${esc([e.e, e.media.length ? ((e.media.some(z=>z.kind==='video') ? '영상 ' : '사진 ') + e.media.length) : '사진·영상 없음'].filter(Boolean).join(' · '))}</small></span><i>›</i></button>`).join('')}</div>` : ''}
+    <button class="hline gold" data-act="exnew">${svg('h_dumb',18)}<b>＋ 종목 만들기</b><small>사전에 없는 운동</small></button><div class="hr"></div>` +
     PARTS.map(p=>`<span class="lbl">${p}</span>`+
-      EX.filter(e=>e.p===p).map(e=>{ const vs=vars(e.id);
+      EX.filter(e=>e.p===p && 고를수있나(e)).map(e=>{ const vs=vars(e.id);
         return `<div class="card"><div class="rowc"><div><div class="nm">${esc(e.n)}</div>
           <div class="sm">${esc(e.e)} · 하는 법 ${vs.length}가지</div></div>
           <button class="chip t" style="margin-left:auto" data-act="newvar:${e.id}">＋ 하는 법</button></div>
@@ -10627,6 +10673,35 @@ document.addEventListener('click', async ev=>{
       sv(spatch('routines','id=eq.'+r.id,{ name:r.n, purpose:r.purpose, no:r.no }), '루틴 저장');
       toast('저장했어요'); render(); return; }
     case 'raddex': S.redit=rest[0]; go('t_pickex'); return;
+    /* ── 내가 만든 운동 종목 ── */
+    case 'exnew': 초안지움('exn','exe','exd'); S.exn = { id:'x'+Date.now(), n:'', p:(S.pickPart && PARTS.includes(S.pickPart)) ? S.pickPart : '기타', e:'', d:'', media:[], files:[], 새:true }; sheetExNew(); return;
+    case 'exedit': { const e = 내운동().find(z=>z.id===rest[0]); if(!e) return; 초안지움('exn','exe','exd');
+      S.exn = { id:e.id, n:e.n, p:e.p, e:e.e||'', d:((e.vars[0]||{}).desc)||'', media:e.media.slice(), files:[] }; sheetExNew(); return; }
+    case 'exnp': { const d = S.exn; if(!d) return; 운동글담기(); d.p = rest[0]; drawSheet(); return; }
+    case 'exfile': 운동파일고르기(rest[0]); return;
+    case 'exfrm': { const d = S.exn; if(d){ 운동글담기(); d.files.splice(+rest[0],1); drawSheet(); } return; }
+    case 'exmrm': { const d = S.exn; if(d){ 운동글담기(); d.media.splice(+rest[0],1); drawSheet(); } return; }
+    case 'exsave': { const d = S.exn; if(!d) return; 운동글담기();
+      if(!d.n){ toast('종목 이름을 적어 주세요'); return; }
+      if(EX.some(e => e.id !== d.id && 고를수있나(e) && e.n.replace(/\s/g,'') === d.n.replace(/\s/g,''))){ toast('같은 이름의 종목이 이미 있어요'); return; }
+      if(d.files.length) toast('올리는 중이에요');
+      const media = d.media.slice();
+      try{ for(let i=0;i<d.files.length;i++){ const f = d.files[i], path = `exmedia/${d.id}/${Date.now()}_${i}.${f.ext}`;
+          await 파일올리기(path, f.blob, f.kind==='photo' ? 'image/jpeg' : (f.ext==='webm' ? 'video/webm' : 'video/mp4')); media.push({ kind:f.kind, path }); } }
+      catch(e){ console.error(e); toast('파일을 못 올렸어요'); return; }
+      const 옛 = EX.find(e => e.id === d.id), cardio = d.p === '유산소' ? 1 : 0;
+      if(옛){ Object.assign(옛, { n:d.n, p:d.p, e:d.e, cardio, media }); if(옛.vars[0]) 옛.vars[0].desc = d.d; }
+      else EX.push({ id:d.id, n:d.n, p:d.p, e:d.e, cardio, owner:TRAINER, media, vars:[{ k:'a', n:'', desc:d.d, demo:0, du:'' }] });
+      await sv(spost('exercises', [{ id:d.id, name:d.n, part:d.p, equip:d.e, cardio:!!cardio, sort:9000, owner:TRAINER, media }], {on:'id'}), '종목 저장');
+      await sv(spost('variants', [{ id:VID(d.id,'a'), ex_id:d.id, vkey:'a', name:'', descr:d.d, demo:false, sort:0 }], {on:'id'}), '종목 설명 저장');
+      S.exn = null; S.pickPart = d.p; closeSheet(); toast(d.새 ? '만들었어요 — 목록 맨 위에 있어요' : '고쳤어요'); render(); return; }
+    case 'exdel': { const d = S.exn; if(!d) return;
+      const 쓰는 = D.routines.some(r => (r.items||[]).some(it => it.ex === d.id)) || D.workouts.some(w => (w.items||[]).some(it => it.ex === d.id));
+      if(쓰는){ toast('루틴이나 기록에 담긴 종목은 지울 수 없어요 — 루틴에서 먼저 빼 주세요'); return; }
+      if(!confirm('이 종목을 지울까요?')) return;
+      EX = EX.filter(e => e.id !== d.id);
+      await sv(sdel('variants','ex_id=eq.'+d.id), '종목 설명 지우기'); await sv(sdel('exercises','id=eq.'+d.id), '종목 지우기');
+      S.exn = null; closeSheet(); toast('지웠어요'); render(); return; }
     case 'rpart': S.pickPart=rest[0]; render(); return;
     case 'raddv': { const [rid,ex,va]=rest, r=rOf(rid); if(!r) return;
       r.items.push({ ex, va, kg: exOf(ex).cardio?0:20, reps: exOf(ex).cardio?20:10, sets:3, rest:60 });
@@ -11374,7 +11449,7 @@ document.addEventListener('click', async ev=>{
     case 'prevopen': S.prevOpen = !S.prevOpen; render(); return;
     case 'trio': { const z=지금종목(); if(!z) return;
       if(rest[0]==='prev') sheetPrev();
-      else if(!z.v.du) toast('이 종목은 사용법이 아직 준비중이에요');
+      else if(!z.v.du && !(z.e.media||[]).length) toast('이 종목은 사용법이 아직 준비중이에요');      /* 트레이너가 만든 종목은 올린 사진·영상을 보여 준다 */
       else sheetDemo();
       return; }
     case 'usekg': {
