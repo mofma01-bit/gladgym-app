@@ -642,6 +642,10 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .pf2 .pfa .crown{position:absolute;top:-17px;left:50%;transform:translateX(-50%);width:24px;height:18px;color:var(--gold)}
 .pf2n{display:flex;flex-direction:column;gap:3px;min-width:0}.pf2n b{font-size:22px;font-weight:800;letter-spacing:-.02em}
 .pf2n small{font-size:12.5px;color:var(--sub);line-height:1.5}.pf2n em{font-style:normal;font-size:11.5px;font-weight:700;color:var(--gold);display:flex;align-items:center;gap:3px}
+.pfedit{align-self:flex-start;margin-top:7px;font-size:12.5px;font-weight:700;color:var(--gold);border:1px solid #6b5a33;border-radius:999px;padding:6px 13px;background:rgba(240,211,160,.06)}
+.pfedit:active{background:rgba(240,211,160,.16)}
+.pf2 button.pfa{padding:0;flex:none}
+.pfcam{position:absolute;right:-3px;bottom:-3px;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#241f17;border:1.5px solid var(--gold-2);color:var(--gold)}
 .pf2s{display:grid;grid-template-columns:repeat(3,1fr);border-radius:14px;border:1px solid #34332d;background:rgba(20,19,17,.6);padding:10px 0}
 .pf2s>span{display:flex;align-items:center;gap:8px;padding:0 10px;border-left:1px solid #34332d;color:var(--gold);min-width:0}.pf2s>span:first-child{border-left:0}
 .pf2s i{font-style:normal;display:flex;flex-direction:column;min-width:0}.pf2s b{font-size:18px;font-weight:800;color:var(--cream);line-height:1.15}.pf2s small{font-size:10.5px;color:var(--sub);white-space:nowrap}
@@ -2570,7 +2574,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '324';
+const BUILD = '325';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -8109,16 +8113,17 @@ function vProfile(){
   const pf = profOf(mid), st = profStat(mid), 사진 = 사진모음(mid, 내것);
   const 나 = MEMBERS.find(m=>m.id===mid) || {};
   const 첫자 = (나.n || '').slice(0,1) || '회';
-  return { top: bar('프로필', 내것?`<button class="tbtn" data-act="profedit">수정</button>`:'',
-      S.who==='tr' ? 'tm:'+mid : 'tab:me'), tabs: 내것?1:0, body:`
+  /* 「수정」 단추가 윗줄 오른쪽 끝에 떨어져 있어 못 찾았다 (2026-10-07 대표 「엉뚱하게 있는 느낌 · 프로필 수정이면 바로 옆에」) → 이름 바로 아래 「프로필 편집」 · 사진에 사진기 표시(누르면 같은 창). 카카오톡 프로필과 같은 자리 */
+  return { top: bar('프로필', '', S.who==='tr' ? 'tm:'+mid : 'tab:me'), tabs: 내것?1:0, body:`
     <div class="pf2">
       <div class="pf2a">
-        <span class="pfa">${st.연속>1 ? 왕관 : ''}${pf.avatar
+        <${내것?'button':'span'} class="pfa" ${내것?'data-act="profedit" aria-label="프로필 사진 변경"':''}>${st.연속>1 ? 왕관 : ''}${pf.avatar
           ? `<img src="${esc(phURL(pf.avatar))}" alt="" onerror="picFail(this)">`
-          : `<b>${esc(첫자)}</b>`}</span>
+          : `<b>${esc(첫자)}</b>`}${내것 ? `<i class="pfcam">${svg('h_cam',13)}</i>` : ''}</${내것?'button':'span'}>
         <span class="pf2n"><b>${esc(나.n||'')}</b>
           <small>${pf.bio ? esc(pf.bio) : (내것 ? '한 줄 소개를 입력해 보세요' : '')}</small>
-          ${st.연속>1?`<em>${svg('h_fire',14)}${st.연속}일 이어서 운동 중</em>`:''}</span>
+          ${st.연속>1?`<em>${svg('h_fire',14)}${st.연속}일 이어서 운동 중</em>`:''}
+          ${내것 ? `<button class="pfedit" data-act="profedit">✎ 프로필 편집</button>` : ''}</span>
       </div>
       <div class="pf2s">${[['h_cal',수(st.일수),'운동한 날'],['h_dumb',수(Math.round(st.vol/1000)*1||0),'총 무게(톤)'],['h_cam',수(st.오운완),'오운완']]
         .map(x=>`<span>${svg(x[0],22)}<i><b>${x[1]}</b><small>${x[2]}</small></i></span>`).join('')}</div>
@@ -8165,7 +8170,7 @@ function sheetOotdView(id){
 function sheetProfEdit(){
   const mid = S.mid, pf = profOf(mid);
   openSheet(()=>`
-    <div class="h2">프로필 수정</div>
+    <div class="h2">프로필 편집</div>
     <div class="fld"><span class="fn">닉네임 <small>커뮤니티 · 랭킹에 이 이름으로 나와요</small></span>
       <input class="search" type="text" data-k="pf:nick" maxlength="12"
         value="${esc(pf.nick||'')}" placeholder="예) 덤벨요정"></div>
