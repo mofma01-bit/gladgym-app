@@ -2456,7 +2456,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '298';
+const BUILD = '299';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2605,6 +2605,7 @@ async function boot(){
   D.badges = (bdgs||[]).map(b => ({ mid:b.member_id, key:b.key, at:b.earned_at||'' }));
   커뮤니티담기(psts, pcms, plks);
   try{ 세트담기(await sget('prep_sets?select=*&order=created_at').catch(()=>[])); }catch(e){ D.psets = []; }
+  try{ 종목담기(await sget('prep_items?select=*&order=created_at').catch(()=>[])); }catch(e){ D.pitems = []; }
   D.rm = (rms||[]).map(r => { const [ex,va] = splitV(r.variant_id);
     return { id:r.id, mid:r.member_id, ex, va, kg:Number(r.kg||0), reps:Number(r.reps||1), kind:r.kind||'추정', date:r.on_date, wid:r.workout_id||'', by:r.by||'' }; });
 
@@ -4660,7 +4661,21 @@ const 내세트 = () => (D.psets||[]).filter(x => x.tr === TRAINER);
 const 받은세트 = mid => (D.psets||[]).filter(x => x.mids.includes(mid) && x.items.length);
 /* 동작 하나를 화면용으로 — 목록 동작은 사전에서, 직접 올린 것은 그대로 */
 const 세트동작 = it => it.k === 'lib' ? (사전[it.i] ? Object.assign({ lib:1 }, 사전[it.i]) : null)
-  : { i:'x', n:it.n||'', t:it.t||'', d:it.d||'', media:it.media||[] };
+  : it.k === 'my' ? ((z => z ? { i:'x', n:z.n, t:z.t, d:z.d, media:z.media } : null)((D.pitems||[]).find(z=>z.id===it.i)))
+  : { i:'x', n:it.n||'', t:it.t||'', d:it.d||'', media:it.media||[] };       /* own = 예전에 세트 안에 바로 올린 것 (그대로 보인다) */
+/* 내 스트레칭 종목 — 트레이너가 이름·사진/영상을 붙여 만든 것. 세트는 이것과 기성 목록에서 고르기만 한다 (2026-10-07 대표 「종목 만들기 · 루틴 만들기 둘로 나눠서」) */
+function 종목담기(rows){ D.pitems = (rows||[]).map(r => ({ id:r.id, tr:r.trainer, n:r.name||'', t:r.time||'', d:r.descr||'', media: Array.isArray(r.media) ? r.media : [] })); }
+const 내종목 = () => (D.pitems||[]).filter(x => x.tr === TRAINER);
+function sheetPitems(){
+  openSheet(()=>{ const ss = 내종목();
+    return `<div class="h2">스트레칭 종목 <small>내가 만든 종목 ${ss.length}개</small></div>
+    <div class="pickbox">${ss.length ? `<div class="megrp">${ss.map(x=>{ const 붙 = x.media.length ? ((x.media.some(z=>z.kind==='video') ? '영상' : '사진') + ' ' + x.media.length) : '사진·영상 없음';
+        return `<button class="mrow2" data-act="piedit:${x.id}"><span class="mi">${svg('h_cam',18)}</span>
+          <span class="mt"><b>${esc(x.n)}</b><small>${x.t ? esc(x.t)+' · ' : ''}${붙}</small></span><i>›</i></button>`; }).join('')}</div>`
+      : 빔('prep','아직 만든 종목이 없어요','목록에 없는 동작을 이름·사진·영상으로 만들어 두세요')}</div>
+    <button class="btn main" data-act="pinew">＋ 새 종목 만들기</button>
+    <button class="btn ghost sm" data-act="close">닫기</button>`; });
+}
 function 세트저장(x){
   return sv(spost('prep_sets', [{ id:x.id, trainer:x.tr, name:x.n, memo:x.memo, items:x.items, member_ids:x.mids,
     updated_at:new Date().toISOString() }], {on:'id'}), '스트레칭 세트 저장');
@@ -4681,6 +4696,8 @@ function sheetPsets(mid){
     <button class="btn ghost sm" data-act="close">닫기</button>`; });
 }
 /* 고치기 — S.pse 에 들고 있다가 「저장」 때 한 번에 쓴다 */
+/* ⛔ 글 칸은 초안(S.draft)이 값을 덮는다 — 새로 열 때 지우지 않으면 **앞에 적던 이름·설명이 새 창에 그대로** 뜬다 (2026-10-07 시험에서 잡음) */
+function 초안지움(...ks){ if(S.draft) ks.forEach(k => delete S.draft[k]); }
 function 세트글담기(){ const p = S.pse; if(!p) return;
   const a = document.querySelector('[data-k="psn"]'), b = document.querySelector('[data-k="psm"]');
   if(a) p.n = a.value; if(b) p.memo = b.value; }
@@ -4692,10 +4709,9 @@ function sheetPsetEdit(){
     <span class="lbl">동작 ${p.items.length}개</span>
     ${p.items.length ? `<div class="megrp">${p.items.map((it,i)=>{ const v = 세트동작(it) || { n:'(없는 동작)', t:'', media:[] };
         const 붙 = (v.media||[]).length ? ((v.media.some(z=>z.kind==='video') ? '영상' : '사진') + ' ' + v.media.length) : '';
-        return `<div class="mrow2"><span class="mi pt">${i+1}</span><span class="mt"><b>${esc(v.n)}</b><small>${it.k==='lib' ? '목록 동작' : '직접 올림'}${v.t ? ' · '+esc(v.t) : ''}${붙 ? ' · '+붙 : ''}</small></span>
+        return `<div class="mrow2"><span class="mi pt">${i+1}</span><span class="mt"><b>${esc(v.n)}</b><small>${it.k==='lib' ? '목록 동작' : '내 종목'}${v.t ? ' · '+esc(v.t) : ''}${붙 ? ' · '+붙 : ''}</small></span>
           <button class="psed" data-act="psup:${i}" ${i===0?'disabled':''}>▲</button><button class="psed w" data-act="psrm:${i}">빼기</button></div>`; }).join('')}</div>` : '<div class="empty">아직 담은 동작이 없어요</div>'}
-    <div class="hrow"><button class="hcard teal" data-act="pslib">${홈머리('h_roll','목록에서 고르기')}<span class="hs">스트레칭 ${ST.length} · 마사지 ${MS.length}</span></button>
-      <button class="hcard gold2" data-act="psown">${홈머리('h_cam','직접 올리기')}<span class="hs">이름 · 사진 · 영상</span></button></div>
+    <button class="hline gold" data-act="pslib">${svg('h_roll',18)}<b>동작 고르기</b><small>스트레칭 · 마사지 · 내 종목 ${내종목().length}</small></button>
     <button class="card rowc" data-act="psmem"><div><div class="nm">받을 회원 ${p.mids.length}명</div>
       <div class="sm">${p.mids.length ? esc(p.mids.map(id=>(MEMBERS.find(m=>m.id===id)||{}).n||'').filter(Boolean).slice(0,4).join(' · ')) + (p.mids.length>4?' 외':'') : '눌러서 고르기 — 나중에 해도 돼요'}</div></div><span class="rt">›</span></button>
     <button class="btn main" data-act="pssave">저장</button>
@@ -4706,24 +4722,29 @@ function sheetPsetEdit(){
 function sheetPsetLib(){
   const p = S.pse; if(!p) return;
   /* ⛔ 체크 표시를 만드는 값은 **그릴 때마다** 다시 센다 — 밖에서 한 번만 세면 눌러도 표시가 안 바뀐다 (2026-10-07 대표 「체크박스가 눌러지지 않아」) */
-  openSheet(()=>{ const 갈 = S.pslk || 's', 줄 = 갈==='s' ? ST : MS, 담긴 = new Set(p.items.filter(x=>x.k==='lib').map(x=>x.i));
-    return `<div class="h2">목록에서 고르기 <small>${담긴.size}개 담음</small></div>
-    <div class="seg">${[['s','스트레칭 '+ST.length],['m','마사지 '+MS.length]].map(k=>`<button class="${갈===k[0]?'on':''}" data-act="pslk:${k[0]}">${k[1]}</button>`).join('')}</div>
-    <div class="pickbox"><div class="megrp">${줄.map(x=>`<button class="mrow2 ${담긴.has(x.i)?'pson':''}" data-act="pstog:${x.i}">
-      <span class="ck">${담긴.has(x.i)?'✓':''}</span><span class="mt"><b>${esc(x.n)}</b><small>${esc(x.t)} · ${esc(x.d)}</small></span></button>`).join('')}</div></div>
+  openSheet(()=>{ const 갈 = S.pslk || 's', 내 = 내종목(), 줄 = 갈==='s' ? ST : 갈==='m' ? MS : 내,
+      담긴 = new Set(p.items.filter(x=>x.k==='lib' || x.k==='my').map(x=>x.k+':'+x.i)), 키 = x => (갈==='y' ? 'my:'+x.id : 'lib:'+x.i);
+    return `<div class="h2">동작 고르기 <small>${p.items.length}개 담음</small></div>
+    <div class="seg">${[['s','스트레칭 '+ST.length],['m','마사지 '+MS.length],['y','내 종목 '+내.length]].map(k=>`<button class="${갈===k[0]?'on':''}" data-act="pslk:${k[0]}">${k[1]}</button>`).join('')}</div>
+    <div class="pickbox">${줄.length ? `<div class="megrp">${줄.map(x=>`<button class="mrow2 ${담긴.has(키(x))?'pson':''}" data-act="pstog:${키(x)}">
+      <span class="ck">${담긴.has(키(x))?'✓':''}</span><span class="mt"><b>${esc(x.n)}</b><small>${esc([x.t, x.d].filter(Boolean).join(' · '))}</small></span></button>`).join('')}</div>`
+      : 빔('prep','아직 만든 종목이 없어요','목록에 없는 동작은 직접 만들어 담을 수 있어요')}
+      ${갈==='y' ? `<button class="hline" data-act="pinew">${svg('h_cam',18)}<b>＋ 새 종목 만들기</b><small>이름 · 사진 · 영상</small></button>` : ''}</div>
     <button class="btn main" data-act="psedit2">다 골랐어요</button>`; });
 }
-/* 직접 올리기 — 이름 · 시간/횟수 · 설명 · 사진 여러 장 또는 영상 한 개 */
+/* 종목 만들기 · 고치기 — 이름 · 시간/횟수 · 설명 · 사진 여러 장 또는 영상 */
 function sheetPsetOwn(){
-  const p = S.pse; if(!p) return; const d = S.pso || (S.pso = { n:'', t:'', d:'', files:[] });
-  openSheet(()=>`<div class="h2">직접 올리기</div>
-    <div class="fld"><span class="fn">동작 이름</span><input class="search" type="text" data-k="pon" maxlength="24" value="${esc(d.n)}" placeholder="예) 장요근 늘이기"></div>
+  const d = S.pso; if(!d) return;
+  openSheet(()=>`<div class="h2">${d.새 ? '새 종목 만들기' : '종목 고치기'}</div>
+    <div class="fld"><span class="fn">종목 이름</span><input class="search" type="text" data-k="pon" maxlength="24" value="${esc(d.n)}" placeholder="예) 장요근 늘이기"></div>
     <div class="fld"><span class="fn">시간 · 횟수</span><input class="search" type="text" data-k="pot" maxlength="16" value="${esc(d.t)}" placeholder="예) 좌우 30초"></div>
     <div class="fld"><span class="fn">설명</span><textarea class="search" data-k="pod" rows="2" maxlength="140" placeholder="예) 뒷다리 골반을 앞으로 밀며 허리는 꺾지 않아요">${esc(d.d)}</textarea></div>
-    ${d.files.length ? `<div class="pgrid">${d.files.map((f,i)=>`<button class="pg" data-act="pofrm:${i}">${f.kind==='video' ? `<video src="${f.url}" muted playsinline></video>` : `<img src="${f.url}" alt="">`}<span class="pgd">빼기</span></button>`).join('')}</div>` : ''}
+    ${(d.media.length || d.files.length) ? `<div class="pgrid">${d.media.map((f,i)=>`<button class="pg" data-act="pomrm:${i}">${f.kind==='video' ? `<video src="${esc(phURL(f.path))}" muted playsinline preload="metadata"></video>` : `<img src="${esc(phURL(f.path))}" alt="">`}<span class="pgd">빼기</span></button>`).join('')
+      }${d.files.map((f,i)=>`<button class="pg" data-act="pofrm:${i}">${f.kind==='video' ? `<video src="${f.url}" muted playsinline></video>` : `<img src="${f.url}" alt="">`}<span class="pgd">빼기</span></button>`).join('')}</div>` : ''}
     <div class="hrow"><button class="btn sub" data-act="pofile:pic">${svg('h_cam',18)} 사진</button><button class="btn sub" data-act="pofile:vid">${svg('play',18)} 영상</button></div>
-    <button class="btn main" data-act="poadd">이 동작 담기</button>
-    <button class="btn ghost sm" data-act="psedit2">‹ 돌아가기</button>`);
+    <button class="btn main" data-act="pisave">저장</button>
+    ${d.새 ? '' : `<button class="dngr" data-act="pidel">이 종목 지우기</button>`}
+    <button class="btn ghost sm" data-act="piback">‹ 돌아가기</button>`);
 }
 function 세트파일고르기(종){
   const d = S.pso; if(!d) return;
@@ -4858,7 +4879,7 @@ function vPrep3(){
     ${list.length ? list.map((x,i)=>`<div class="prow ${갈래(x)}">
       <span class="no">${i+1}</span>
       <span class="tx">
-        <span class="nm">${esc(x.n)}<span class="tm">${esc(x.t)}</span></span>
+        <span class="nm">${esc(x.n)}${x.t ? `<span class="tm">${esc(x.t)}</span>` : ''}</span>
         <span class="sm">${esc(x.d)}</span>
         ${(x.media||[]).length ? `<span class="psmedia">${x.media.map(z => z.kind==='video'
             ? `<video src="${esc(phURL(z.path))}" controls playsinline preload="metadata"></video>`
@@ -9753,8 +9774,10 @@ function tTools(){
   return { top: bar('자료'), body:`
     <button class="card rowc" data-act="go:t_routines"><div><div class="nm">루틴 만들기 · 지정</div>
       <div class="sm">회원별 루틴 세트</div></div><span class="rt">›</span></button>
-    <button class="card rowc gold" data-act="psets"><div><div class="nm g">스트레칭 세트</div>
-      <div class="sm">내가 만든 세트 ${내세트().length}개 · 한 번 만들어 여러 회원에게</div></div><span class="rt">›</span></button>
+    <button class="card rowc gold" data-act="psets"><div><div class="nm g">스트레칭 세트 만들기 · 지정</div>
+      <div class="sm">내가 만든 세트 ${내세트().length}개 · 있는 종목을 골라 담아 회원에게</div></div><span class="rt">›</span></button>
+    <button class="card rowc gold" data-act="pitems"><div><div class="nm g">스트레칭 종목 만들기</div>
+      <div class="sm">내가 만든 종목 ${내종목().length}개 · 목록에 없는 동작을 사진·영상으로</div></div><span class="rt">›</span></button>
     <button class="card rowc" data-act="go:t_ex"><div><div class="nm">종목 사전</div>
       <div class="sm">${EX.length}종목 · 하는 법 ${EX.reduce((a,e)=>a+vars(e.id).length,0)}가지 · 기본 설명</div></div><span class="rt">›</span></button>
     <button class="card rowc" data-act="qa"><div><div class="nm">자주 묻는 질문</div>
@@ -11291,27 +11314,43 @@ document.addEventListener('click', async ev=>{
     case 'pset': S.prepPset = rest[0]; S.prepRid = null; go('prep3'); return;
     /* ── 트레이너 스트레칭 세트 ── */
     case 'psets': sheetPsets(rest[0] || ''); return;
-    case 'psnew': S.pse = { id:'ps'+Date.now(), tr:TRAINER, n:'', memo:'', items:[], mids: S.psMid ? [S.psMid] : [], 새:true }; sheetPsetEdit(); return;
-    case 'psedit': { const x = 내세트().find(z=>z.id===rest[0]); if(!x) return;
+    case 'psnew': 초안지움('psn','psm'); S.pse = { id:'ps'+Date.now(), tr:TRAINER, n:'', memo:'', items:[], mids: S.psMid ? [S.psMid] : [], 새:true }; sheetPsetEdit(); return;
+    case 'psedit': { const x = 내세트().find(z=>z.id===rest[0]); if(!x) return; 초안지움('psn','psm');
       S.pse = { id:x.id, tr:x.tr, n:x.n, memo:x.memo, items:x.items.map(z=>Object.assign({}, z)), mids:x.mids.slice() }; sheetPsetEdit(); return; }
     case 'psedit2': sheetPsetEdit(); return;
     case 'psback': S.pse = null; sheetPsets(S.psMid); return;
     case 'pslib': 세트글담기(); S.pslk = 's'; sheetPsetLib(); return;
     case 'pslk': S.pslk = rest[0]; sheetPsetLib(); return;
-    case 'pstog': { const p = S.pse; if(!p) return; const i = p.items.findIndex(z=>z.k==='lib' && z.i===rest[0]);
-      if(i >= 0) p.items.splice(i,1); else p.items.push({ k:'lib', i:rest[0] }); drawSheet(); return; }
-    case 'psown': 세트글담기(); S.pso = null; sheetPsetOwn(); return;
+    case 'pstog': { const p = S.pse; if(!p) return; const i = p.items.findIndex(z=>z.k===rest[0] && z.i===rest[1]);
+      if(i >= 0) p.items.splice(i,1); else p.items.push({ k:rest[0], i:rest[1] }); drawSheet(); return; }
+    /* 내 스트레칭 종목 — 세트를 고치다 들어오면(S.pse) 저장 뒤 고르기 창으로, 아니면 종목 목록으로 돌아간다 */
+    case 'pitems': S.pse = null; sheetPitems(); return;
+    case 'pinew': 초안지움('pon','pot','pod'); S.pso = { id:'pi'+Date.now(), n:'', t:'', d:'', media:[], files:[], 새:true }; sheetPsetOwn(); return;
+    case 'piedit': { const x = 내종목().find(z=>z.id===rest[0]); if(!x) return; 초안지움('pon','pot','pod');
+      S.pso = { id:x.id, n:x.n, t:x.t, d:x.d, media:x.media.slice(), files:[] }; sheetPsetOwn(); return; }
+    case 'piback': S.pso = null; if(S.pse){ S.pslk = 'y'; sheetPsetLib(); } else sheetPitems(); return;
+    case 'pomrm': { const d = S.pso; if(d){ d.media.splice(+rest[0],1); drawSheet(); } return; }
+    case 'pidel': { const d = S.pso; if(!d) return; const 쓰는 = 내세트().filter(x=>x.items.some(z=>z.k==='my' && z.i===d.id)).length;
+      if(!confirm(쓰는 ? `이 종목을 지울까요? 세트 ${쓰는}개에서도 빠집니다.` : '이 종목을 지울까요?')) return;
+      D.pitems = (D.pitems||[]).filter(z=>z.id!==d.id); await sv(sdel('prep_items','id=eq.'+d.id), '종목 지우기');
+      for(const x of 내세트()){ const n = x.items.length; x.items = x.items.filter(z=>!(z.k==='my' && z.i===d.id)); if(x.items.length !== n) await 세트저장(x); }
+      S.pso = null; toast('지웠어요'); sheetPitems(); render(); return; }
     case 'pofile': 세트파일고르기(rest[0]); return;
     case 'pofrm': { const d = S.pso; if(d){ d.files.splice(+rest[0],1); drawSheet(); } return; }
-    case 'poadd': { const p = S.pse, d = S.pso; if(!p || !d) return;
+    case 'pisave': { const d = S.pso; if(!d) return;
       ['pon','pot','pod'].forEach(k=>{ const el = document.querySelector('[data-k="'+k+'"]'); if(el) d[{pon:'n',pot:'t',pod:'d'}[k]] = el.value.trim(); });
-      if(!d.n){ toast('동작 이름을 적어 주세요'); return; }
-      toast(d.files.length ? '올리는 중이에요' : '담았어요');
-      const media = [];
-      try{ for(let i=0;i<d.files.length;i++){ const f = d.files[i], path = `prep/${p.id}/${Date.now()}_${i}.${f.ext}`;
+      if(!d.n){ toast('종목 이름을 적어 주세요'); return; }
+      if(d.files.length) toast('올리는 중이에요');
+      const media = d.media.slice();
+      try{ for(let i=0;i<d.files.length;i++){ const f = d.files[i], path = `prep/items/${d.id}/${Date.now()}_${i}.${f.ext}`;
           await 파일올리기(path, f.blob, f.kind==='photo' ? 'image/jpeg' : (f.ext==='webm' ? 'video/webm' : 'video/mp4')); media.push({ kind:f.kind, path }); } }
       catch(e){ console.error(e); toast('파일을 못 올렸어요'); return; }
-      p.items.push({ k:'own', n:d.n, t:d.t, d:d.d, media }); S.pso = null; sheetPsetEdit(); return; }
+      const x = { id:d.id, tr:TRAINER, n:d.n, t:d.t, d:d.d, media };
+      D.pitems = (D.pitems||[]).filter(z=>z.id!==x.id).concat([x]);
+      await sv(spost('prep_items', [{ id:x.id, trainer:x.tr, name:x.n, time:x.t, descr:x.d, media:x.media, updated_at:new Date().toISOString() }], {on:'id'}), '스트레칭 종목 저장');
+      S.pso = null; toast('종목을 저장했어요');
+      if(S.pse){ if(d.새) S.pse.items.push({ k:'my', i:x.id }); S.pslk = 'y'; sheetPsetLib(); } else sheetPitems();
+      render(); return; }
     case 'psup': { const p = S.pse, i = +rest[0]; if(!p || i < 1) return; 세트글담기(); [p.items[i-1], p.items[i]] = [p.items[i], p.items[i-1]]; drawSheet(); return; }
     case 'psrm': { const p = S.pse; if(!p) return; 세트글담기(); p.items.splice(+rest[0],1); drawSheet(); return; }
     case 'psmem': 세트글담기(); sheetPsetMem(); return;
