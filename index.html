@@ -1059,6 +1059,7 @@ body .set.now{border-color:var(--gold);background:radial-gradient(120% 140% at 0
 .lvnm{display:flex;flex-wrap:wrap;gap:6px;padding-left:58px}
 .lvnm i{font-style:normal;display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:5px 10px;border-radius:999px;background:#252420;border:1px solid #34332d}
 .lvnm i u{text-decoration:none;font-size:11.5px;font-weight:800;color:var(--gold)}
+.lvnm button{font-size:12.5px;font-weight:700;color:var(--gold);padding:5px 8px}
 .lvnm i.me{border-color:var(--gold);color:var(--gold);background:rgba(240,211,160,.1)}
 .lvrv.solo{border-top:0;padding:0 2px 4px}
 .lvh.sm{color:var(--sub);border:1px dashed #5a4c33;border-radius:20px;padding:2px 9px}
@@ -2357,7 +2358,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '285';
+const BUILD = '286';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2902,7 +2903,7 @@ function drawSheet(){
     if(!초안칸(t)) return; const d=S.draft&&S.draft[t.getAttribute('data-k')]; if(d) t.value=d; });
 }
 function closeSheet(){ sheetRender=null; $('#sheet').classList.remove('open'); $('#sheetbox').innerHTML=''; }
-$('#sheet').addEventListener('click', e=>{ if(e.target.id==='sheet') closeSheet(); });
+$('#sheet').addEventListener('click', e=>{ if(e.target.id==='sheet' && !(sheetRender && sheetRender.닉)) closeSheet(); });   /* 닉네임 창은 바깥을 눌러도 안 닫힌다 */
 
 const live = () => D.live;
 const me = () => MEMBERS.find(m=>m.id===S.mid);
@@ -4032,7 +4033,21 @@ function 홈코멘트(mid){
     ${최근 ? `<span class="hq">“${esc(String(최근.tx||'').replace(/\s+/g,' ').slice(0,38))}${String(최근.tx||'').length>38?'…':''}”</span>
       <span class="hs">– ${esc(최근.tr)} · ${esc(최근.at)}</span>` : `<span class="hs">아직 없어요</span>`}</button>`;
 }
+/* 닉네임이 없으면 홈에 들어올 때 먼저 정하게 한다. 닫을 수 없다 — 정해야 넘어간다. 바꾸는 건 프로필 수정에서 */
+function 닉네임먼저(){
+  if(S.who === 'tr' || !S.mid || !MEMBERS.some(m=>m.id===S.mid) || 닉of(S.mid)) return false;
+  if(sheetRender && sheetRender.닉) return true;
+  const f = ()=>`<div class="h2">닉네임을 정해 주세요</div>
+    <div class="fld"><input class="search" type="text" data-k="nick0" maxlength="12" placeholder="예) 덤벨요정" autocomplete="off"></div>
+    <button class="btn main" data-act="nick0ok">시작하기</button>
+    <div class="sm" style="text-align:center;color:var(--sub)">커뮤니티 · 랭킹에 이 이름으로 나와요. 프로필에서 바꿀 수 있어요</div>`;
+  f.닉 = true; setTimeout(()=>{ if(!닉of(S.mid) && S.screen==='home'){ openSheet(f); const el=document.querySelector('[data-k="nick0"]'); if(el) el.focus(); } }, 60);
+  return true;
+}
+const 닉검사 = 닉 => !닉 ? '닉네임을 적어 주세요' : (닉.length < 2 ? '두 글자 이상으로 적어 주세요'
+  : (MEMBERS.some(m => m.id !== S.mid && (m.n === 닉 || 닉of(m.id) === 닉)) ? '이미 쓰고 있는 이름이에요' : ''));
 function vHome(){
+  닉네임먼저();
   const u = unreadOf(S.mid), t = D.today[S.mid], r = t ? rOf(t.rid) : null;
   const lw = liveOf(S.mid), g = GOALS[S.mid] || {};
   const sel = S.day || TODAY, st = dayStat(S.mid, sel), past = sel !== TODAY;
@@ -6630,10 +6645,10 @@ const 파트너부위 = ['가슴','등','어깨','팔','하체','복근','유산
 const 회원성별 = mid => ((D.intake||{})[mid]||{}).sex || '';
 function 랭킹계산(시작, 끝){
   const 안 = d => d && d >= 시작 && d <= 끝;
-  const row = (mid, v, t) => ({ mid, v, t: t || '' });
+  const row = (mid, v, t, ds) => ({ mid, v, t: t || '', ds: ds || null });      /* ds = 기록한 날짜들(오름차순) — 레벨에 닿은 날을 잰다 */
   const 끝날 = ds => ds.length ? ds.slice().sort()[ds.length-1] : '';
-  const 운동 = MEMBERS.map(m => { const ds = D.workouts.filter(w=>w.mid===m.id && w.done && 안(w.date) && 세트있나(w)).map(w=>w.date); return row(m.id, ds.length, 끝날(ds)); });
-  const 오운완 = MEMBERS.map(m => { const ds = (D.bph||[]).filter(x=>x.mid===m.id && x.kind==='ootd' && 안(x.date)).map(x=>x.date); return row(m.id, ds.length, 끝날(ds)); });
+  const 운동 = MEMBERS.map(m => { const ds = D.workouts.filter(w=>w.mid===m.id && w.done && 안(w.date) && 세트있나(w)).map(w=>w.date).sort(); return row(m.id, ds.length, 끝날(ds), ds); });
+  const 오운완 = MEMBERS.map(m => { const ds = (D.bph||[]).filter(x=>x.mid===m.id && x.kind==='ootd' && 안(x.date)).map(x=>x.date).sort(); return row(m.id, ds.length, 끝날(ds), ds); });
   const 무게 = MEMBERS.map(m => row(m.id, Math.round(D.workouts.filter(w=>w.mid===m.id && w.done && 안(w.date)).reduce((a,w)=>a+totalKg(w),0)/1000)));
   const 삼대 = MEMBERS.map(m => { const s = ['sq','bp','dl'].map(e => { let b=0; (D.rm||[]).forEach(r=>{ if(r.mid===m.id && r.ex===e && r.date<=끝 && r.kg>b) b=r.kg; }); return b; });
     return Object.assign(row(m.id, s.reduce((a,b)=>a+b,0)), { 상세:s }); });
@@ -6667,10 +6682,10 @@ const 얼굴 = mid => { const a = profOf(mid).avatar;
    켜져 있으면 랭킹 화면은 **가짜 사람·가짜 숫자만** 보여 준다. 실제 회원 기록은 한 줄도 안 섞는다(나만 가운데쯤에 끼워 화면이 어떻게 보이는지 보여 준다).
    공식 집계는 아직 카톡 인증방 기준이다. 앱 집계로 넘어갈 때 **이 값을 false 로** 바꾸면 실제 기록으로 돈다. */
 const 랭킹샘플 = true;
-const 샘플이름 = { s01:'덤벨요정', s02:'새벽러너', s03:'스쿼트왕', s04:'단백질곰', s05:'플랭크킹', s06:'런지여신', s07:'벤치장군', s08:'요가토끼', s09:'데드리프터', s10:'버피천사', s11:'철봉고수', s12:'물통지기' };   /* 사람 이름처럼 안 짓는다 — 실제 회원 이름과 겹치면 안 된다 */
-const 샘플성 = { s01:'남', s02:'여', s03:'남', s04:'여', s05:'여', s06:'여', s07:'남', s08:'여', s09:'남', s10:'여', s11:'남', s12:'여' };
+const 샘플이름 = { s01:'덤벨요정', s02:'새벽러너', s03:'스쿼트왕', s04:'단백질곰', s05:'플랭크킹', s06:'런지여신', s07:'벤치장군', s08:'요가토끼', s09:'데드리프터', s10:'버피천사', s11:'철봉고수', s12:'물통지기', s13:'케틀벨러', s14:'폼롤러맨', s15:'스텝퍼퀸', s16:'로잉보이', s17:'풀업새싹', s18:'밴드마스터', s19:'코어지킴이', s20:'쿨다운' };   /* 사람 이름처럼 안 짓는다 — 실제 회원 이름과 겹치면 안 된다 */
+const 샘플성 = { s01:'남', s02:'여', s03:'남', s04:'여', s05:'여', s06:'여', s07:'남', s08:'여', s09:'남', s10:'여', s11:'남', s12:'여', s13:'남', s14:'남', s15:'여', s16:'남', s17:'여', s18:'남', s19:'여', s20:'남' };
 function 샘플순위(판, 성, 지난중){
-  const 값 = { 오운완:[19,16,15,13,11,9,8,6,5,4,2,1], 운동:[21,18,15,14,12,9,7,6,4,3,2,1], 무게:[46,38,27,22,17,12,9,6,4,3,2,1] }[판];
+  const 값 = { 오운완:[19,17,16,15,15,13,12,11,10,9,8,8,7,6,5,4,3,2,1,1], 운동:[21,18,17,15,15,14,12,11,10,9,8,7,7,6,5,4,3,2,2,1], 무게:[46,41,38,27,24,22,21,17,14,12,11,9,8,6,5,4,3,2,1,1] }[판];
   let 줄;
   if(판 === '삼대'){ const 남 = [[520,[190,130,200]],[455,[165,115,175]],[410,[150,100,160]],[340,[120,90,130]],[280,[100,70,110]],[215,[80,50,85]]],
                           여 = [[305,[110,60,135]],[260,[95,50,115]],[225,[80,45,100]],[190,[70,40,80]],[150,[55,30,65]],[110,[40,25,45]]];
@@ -6758,7 +6773,11 @@ function sheetRkLadder(){
       return `<div class="lvrow col ${내lv===n?'me':''} ${ms.length?'':'none'}">
         <span class="lvhd">${레벨고리(n, ms.length > 0)}
           <span class="lrt"><b>${esc(L[n-1][1])}</b><small>${구간(n-1)} · ${ms.length}명</small></span></span>
-        ${ms.length ? `<span class="lvnm">${ms.map(r=>`<i class="${r.mid===S.mid?'me':''}">${esc(이름of(r.mid))}<u>${수(r.v)}</u></i>`).join('')}</span>` : ''}</div>`; }).join('')}</div></div>
+        ${ms.length ? (()=>{ /* 그 레벨에 **먼저 닿은 순서**로 3명만. 닿은 날 = 기준 횟수째 기록 날짜. 날짜를 모르는 판(총 무게·3대)은 순위 순 */
+            const 기준 = L[n-1][0], 닿 = r => (r.ds && r.ds[기준-1]) || '';
+            const 순 = ms.map((r,i)=>({ r, i })).sort((a,b)=> (닿(a.r) && 닿(b.r) ? (닿(a.r) < 닿(b.r) ? -1 : 닿(a.r) > 닿(b.r) ? 1 : 0) : 0) || a.i - b.i).map(x=>x.r);
+            const 내 = 순.find(r => r.mid === S.mid), 앞 = 순.slice(0,3), 더 = 순.length - 앞.length;
+            return `<span class="lvnm">${앞.map(r=>`<i class="${r.mid===S.mid?'me':''}">${esc(이름of(r.mid))}</i>`).join('')}${내 && !앞.includes(내) ? `<i class="me">${esc(이름of(내.mid))}</i>` : ''}${더 > 0 ? `<button data-act="rklv:${n}">외 ${더 - (내 && !앞.includes(내) ? 1 : 0)}명 ›</button>` : ''}</span>`; })() : ''}</div>`; }).join('')}</div></div>
     <button class="btn sub sm" data-act="rkall">전체 랭킹 보기</button>
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
@@ -7759,7 +7778,7 @@ function sheetProfEdit(){
   const mid = S.mid, pf = profOf(mid);
   openSheet(()=>`
     <div class="h2">프로필 수정</div>
-    <div class="fld"><span class="fn">닉네임 <small>커뮤니티 · 랭킹에 이 이름으로 나와요 (비우면 이름)</small></span>
+    <div class="fld"><span class="fn">닉네임 <small>커뮤니티 · 랭킹에 이 이름으로 나와요</small></span>
       <input class="search" type="text" data-k="pf:nick" maxlength="12"
         value="${esc(pf.nick||'')}" placeholder="예) 덤벨요정"></div>
     <div class="fld"><span class="fn">한 줄 소개</span>
@@ -11113,11 +11132,14 @@ document.addEventListener('click', async ev=>{
       closeSheet(); toast('지웠어요'); render(); return; }
     case 'profedit': sheetProfEdit(); return;
     case 'profpic': profPick(); return;
+    case 'nick0ok': { const el = document.querySelector('[data-k="nick0"]'), 닉 = el ? el.value.trim().replace(/\s+/g,' ') : '', 말 = 닉검사(닉);
+      if(말){ toast(말); return; }
+      await profSave(S.mid, { nick: 닉 }); closeSheet(); toast(닉 + '님, 반가워요'); render(); return; }
     case 'profok': {
       const el = document.querySelector('[data-k="pf:bio"]');
       const nk = document.querySelector('[data-k="pf:nick"]'), 닉 = nk ? nk.value.trim().replace(/\s+/g,' ') : (profOf(S.mid).nick||'');
       /* 남이 쓰는 닉네임·남의 이름과 같으면 받지 않는다 — 랭킹에서 누군지 헷갈린다 */
-      if(닉 && MEMBERS.some(m => m.id !== S.mid && (m.n === 닉 || 닉of(m.id) === 닉))){ toast('이미 쓰고 있는 이름이에요'); return; }
+      { const 말 = 닉검사(닉); if(말){ toast(말); return; } }      /* 프로필에서는 바꿀 수만 있다 — 비울 수 없다 */
       profSave(S.mid, { bio: el ? el.value.trim() : '', nick: 닉 });   /* 저장은 뒤에서 마저 */
       closeSheet(); toast('저장했어요'); render(); return; }
     case 'ootdre': closeSheet(); ootdPick(rest[0]); return;
