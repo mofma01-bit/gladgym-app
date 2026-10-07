@@ -1423,7 +1423,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '182';
+const BUILD = '183';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -6774,7 +6774,7 @@ function 속성판(key){
             + '<small data-act="tx:ctype" data-k="'+key+'" data-id="'+c.늘림.id+'" title="종류 바꾸기">'+타입이름(c.타입)
               + (['select','multi'].indexOf(c.타입)>=0 ? ' '+(c.옵션||[]).length+'개' : '') + '</small>'
             + '<button data-act="tx:chide" data-k="'+key+'" data-id="'+c.늘림.id+'" title="'+(c.숨김?'목록에서 숨김 — 눌러서 보이기':'목록에 보임 — 눌러서 숨기기')+'">'+(c.숨김?'🙈':'👁')+'</button>'
-            + '<button data-act="tx:clock" data-k="'+key+'" data-id="'+c.늘림.id+'" title="'+(c.관리자만?'관리자만 고침 — 눌러서 풀기':'누구나 고침 — 눌러서 잠그기')+'">'+(c.관리자만?'🔒':'🔓')+'</button>'
+            + '<button data-act="tx:clock" data-k="'+key+'" data-id="'+c.늘림.id+'" title="'+(c.관리자만?'관리자만 수정 — 눌러서 풀기':'누구나 수정 — 눌러서 잠그기')+'">'+(c.관리자만?'🔒':'🔓')+'</button>'
             + '<button class="wn" data-act="tx:cdel" data-k="'+key+'" data-id="'+c.늘림.id+'" title="지우기">✕</button>'
           + '</div>').join('') + '</div>'
       : '')
