@@ -1053,6 +1053,9 @@ body .set.now{border-color:var(--gold);background:radial-gradient(120% 140% at 0
 .rksample{width:100%;flex:none;display:flex;flex-direction:column;gap:3px;padding:11px 13px;margin-bottom:8px;border-radius:14px;border:1px dashed #b98a4a;background:rgba(240,211,160,.07)}
 .rksample b{font-size:12.5px;font-weight:800;color:var(--gold)}.rksample span{font-size:12px;line-height:1.5;color:var(--sub)}.rksample u{color:var(--cream);text-decoration:none;font-weight:700}
 .rksample.one{flex-direction:row;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;width:auto;align-self:flex-start}
+.rk2btn{display:grid;grid-template-columns:1fr 1fr;gap:9px;width:100%;flex:none}
+.rk2btn button{display:flex;align-items:center;justify-content:center;gap:7px;padding:13px 6px;border-radius:14px;font-size:14.5px;font-weight:800;color:var(--gold);border:1px solid #6b5a33;background:linear-gradient(180deg,#241f17,#171614)}
+.lvrv.solo{border-top:0;padding:0 2px 4px}
 .lvh.sm{color:var(--sub);border:1px dashed #5a4c33;border-radius:20px;padding:2px 9px}
 .lvnews{width:100%;flex:none;display:flex;flex-direction:column;gap:7px;padding:12px 14px;border-radius:16px;border:1px solid #34332d;background:linear-gradient(180deg,#1f1e1b,#171615)}
 .lvnews div{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--sub)}.lvnews svg{color:var(--gold);flex:none}.lvnews b{color:var(--cream)}
@@ -2349,7 +2352,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '283';
+const BUILD = '284';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -6727,23 +6730,39 @@ function 랭킹판(){
         ${나 ? (다음 ? `<div class="lvbar"><u style="width:${Math.max(4, Math.min(100, Math.round((나.v - L[내lv-1][0]) / (다음[0] - L[내lv-1][0]) * 100)))}%"></u></div>
             <div class="lvnx">Lv.${내lv+1}까지 <b>${수(다음[0]-나.v)}${단위}</b></div>`
           : `<div class="lvnx top">가장 높은 레벨이에요 👑</div>`) : ''}
-        ${라이벌 ? `<div class="lvrv">${라이벌}</div>` : ''}
       </div>` : ''}
-
-    <span class="lbl">레벨</span>
-    <div class="lvlad">${[5,4,3,2,1].map(n => { const ms = 줄.filter(r => 레벨of(판, r.v) === n), 내것 = 내lv === n;
-      return `<button class="lvrow ${내것?'me':''} ${ms.length?'':'none'}" data-act="rklv:${n}">
-        ${레벨고리(n, ms.length > 0)}
-        <span class="lrt"><b>${esc(L[n-1][1])}</b><small>${구간(n-1)} · ${ms.length}명</small></span>
-        <span class="lrf">${ms.slice(0,5).map(r=>`<i class="${r.mid===S.mid?'me':''}">${얼굴(r.mid)}</i>`).join('')}${ms.length>5?`<em>+${ms.length-5}</em>`:''}</span></button>`; }).join('')}</div>
 
     ${줄.length >= 3 ? `<span class="lbl">TOP 3</span>
         <div class="podwrap"><div class="podium">${대(줄[1],2)}${대(줄[0],1)}${대(줄[2],3)}</div></div>
 `
       : (줄.length ? '' : 빔('pic', '아직 기록이 없어요', 제목+' 첫 기록의 주인공이 되어 보세요'))}
 
+    <div class="rk2btn"><button data-act="rkladder">${svg('h_medal',18)}등급 보기</button><button data-act="rkall">${svg('h_trophy',18)}랭킹 보기</button></div>
     ${판==='삼대' && R.미입력 ? `<div class="note">성별이 상담일지에 없는 ${R.미입력}명은 3대 순위에서 빠져 있어요.</div>` : ''}
 `;
+}
+/* 등급 보기 — 레벨 사다리 (누가 어느 레벨에 있나). 칸을 누르면 그 레벨 명단 */
+function sheetRkLadder(){
+  const Q = 랭킹지금(), L = 랭킹레벨[Q.판], 나 = S.who==='tr' ? null : Q.줄.find(r=>r.mid===S.mid), 내lv = 나 ? 레벨of(Q.판, 나.v) : 0;
+  const 구간 = i => 수(L[i][0]) + (L[i+1] ? (L[i+1][0]-1 > L[i][0] ? '~' + 수(L[i+1][0]-1) : '') : '↑') + Q.단위;
+  openSheet(()=>`<div class="h2">등급 <small>${Q.제목} · ${판이름[Q.k]}</small></div>
+    <div class="lvlad">${[5,4,3,2,1].map(n => { const ms = Q.줄.filter(r => 레벨of(Q.판, r.v) === n);
+      return `<button class="lvrow ${내lv===n?'me':''} ${ms.length?'':'none'}" data-act="rklv:${n}">
+        ${레벨고리(n, ms.length > 0)}
+        <span class="lrt"><b>${esc(L[n-1][1])}</b><small>${구간(n-1)} · ${ms.length}명</small></span>
+        <span class="lrf">${ms.slice(0,5).map(r=>`<i class="${r.mid===S.mid?'me':''}">${얼굴(r.mid)}</i>`).join('')}${ms.length>5?`<em>+${ms.length-5}</em>`:''}</span></button>`; }).join('')}</div>
+    <button class="btn ghost sm" data-act="close">닫기</button>`);
+}
+/* 랭킹 보기 — 전체 순위 (창 안에서 스크롤). 내 줄은 금색, 바로 위 사람과의 차이를 맨 위에 한 줄 */
+function sheetRkAll(){
+  const Q = 랭킹지금(), L = 랭킹레벨[Q.판], 내i = S.who==='tr' ? -1 : Q.줄.findIndex(r=>r.mid===S.mid);
+  const 나 = 내i >= 0 ? Q.줄[내i] : null, 위 = 내i > 0 ? Q.줄[내i-1] : null;
+  openSheet(()=>`<div class="h2">랭킹 <small>${Q.제목} · ${판이름[Q.k]} · ${Q.줄.length}명</small></div>
+    ${나 ? `<div class="lvrv solo">${위 ? (위.v === 나.v ? `<span class="up">${esc(이름of(위.mid))}님과 동점</span>` : `<span class="up">${esc(이름of(위.mid))}님까지 <b>${수(위.v-나.v)}${Q.단위}</b></span>`) : `<span class="up">지금 1위</span>`}</div>` : ''}
+    <div class="pickbox">${Q.줄.length ? `<div class="rklist">${Q.줄.map((r,i)=>`<div class="rk2 ${r.mid===S.mid?'me':''}"><b>${i+1}</b><span class="rka">${얼굴(r.mid)}</span>
+        <span class="rkn">${esc(이름of(r.mid))}<small>Lv.${레벨of(Q.판, r.v)} ${esc(L[레벨of(Q.판, r.v)-1][1])}</small></span><em>${수(r.v)}<small>${Q.단위}</small></em></div>`).join('')}</div>`
+      : '<div class="empty">아직 기록이 없어요</div>'}</div>
+    <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 /* 레벨 한 칸의 명단 — 창 안에서 스크롤 */
 function sheetRkLevel(n){
@@ -11149,6 +11168,8 @@ document.addEventListener('click', async ev=>{
     case 'rks': S.rks=rest[0]; render(); return;
     case 'rkmine': sheetRkMine(); return;
     case 'rklv': sheetRkLevel(+rest[0]); return;
+    case 'rkladder': sheetRkLadder(); return;
+    case 'rkall': sheetRkAll(); return;
     case 'bdall': sheetBadges(rest[0]); return;
     case 'cfilt': S.cfilt=rest[0]; render(); return;
     case 'cmode': S.cmode=rest[0]; S.cfilt='전체'; render(); return;
