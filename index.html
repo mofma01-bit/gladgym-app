@@ -1130,6 +1130,22 @@ body .hero.photo{background-origin:border-box;background-clip:border-box}
 .psmedia{display:flex;flex-direction:column;gap:7px;margin-top:7px}.psmedia img,.psmedia video{width:100%;border-radius:12px;border:1px solid #34332d;background:#0d0d0c;display:block}
 .pgrid .pg video{width:100%;height:100%;object-fit:cover}
 #sheetbox .hrow .btn{flex:1}
+.cyhead{width:100%;flex:none;display:flex;align-items:center;gap:12px;padding:16px 14px 16px 17px;border-radius:20px;border:1px solid #5a4c33;
+  background:radial-gradient(120% 100% at 100% 0%,color-mix(in srgb,var(--cc) 20%,transparent),transparent 60%),linear-gradient(180deg,#221e17,#161513)}
+.cyt{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}.cyt small{font-size:12px;font-weight:700;color:var(--sub)}
+.cyt b{font-size:27px;font-weight:800;letter-spacing:-.03em;color:var(--cc);line-height:1.15}.cyt i{font-style:normal;font-size:12.5px;color:var(--cream);line-height:1.4}
+.cyt em{font-style:normal;align-self:flex-start;margin-top:6px;font-size:11.5px;font-weight:700;color:var(--gold);border:1px solid rgba(240,211,160,.4);border-radius:999px;padding:4px 10px}
+.cyring{position:relative;width:118px;height:118px;flex:none}.cyring svg{width:100%;height:100%}
+.cyring>i{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-style:normal;line-height:1.1}
+.cyring>i b{font-size:30px;font-weight:800;letter-spacing:-.03em}.cyring>i small{font-size:11px;color:var(--sub)}
+.cyleg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%;flex:none}
+.cyleg span{display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 2px 8px;border-radius:14px;border:1px solid #2f2e29;background:#191816;opacity:.6}
+.cyleg span.on{opacity:1;border-color:var(--cc);background:color-mix(in srgb,var(--cc) 12%,#191816)}
+.cyleg i{width:18px;height:4px;border-radius:2px;background:var(--cc)}.cyleg b{font-size:12.5px;font-weight:800}.cyleg small{font-size:10.5px;color:var(--sub);white-space:nowrap}
+.cytip .mrow2{padding:13px 15px}.cyd{width:7px;height:7px;border-radius:50%;background:var(--cc);flex:none}
+.sstat3 .v.cyv{font-size:17px;color:var(--teal);padding-top:6px}
+.cyfoot{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;flex:none;font-size:11.5px;color:var(--sub)}
+.cyfoot button{flex:none;font-size:12px;color:var(--sub);text-decoration:underline;padding:6px 2px}
 .megoal{width:100%;flex:none;display:flex;flex-direction:column;gap:8px;text-align:left;padding:14px 14px 13px;border-radius:18px;border:1px solid #34332d;background:linear-gradient(180deg,#201f1c,#171615);box-shadow:inset 0 1px 0 rgba(240,211,160,.14)}
 .mgh{display:grid;grid-template-columns:1fr auto;align-items:center;width:100%}.mgh small{grid-column:1/-1;font-size:11.5px;color:var(--sub)}
 .mgh b{font-size:17px;font-weight:800}.mgh i{font-style:normal;color:var(--sub);font-size:17px}
@@ -2440,7 +2456,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '297';
+const BUILD = '298';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -9555,26 +9571,34 @@ function vCycle(){
       <button class="btn main" data-act="cycon:${mid}">주기 켜기</button>`
     :'<div class="note">회원님이 앱에서 직접 켜야 보입니다. 트레이너가 대신 켜지 않습니다.</div>'}` };
   return { top: bar('생리주기', `<span class="sub">${esc(subjName())}</span>`, tr?'tm:'+mid:'tab:me'), body:`
-    <div class="card gold">
-      <div class="nm g">오늘 ${t.day}일차 · ${esc(t.ph)}</div>
-      <div class="sm">${esc(t.why)}<br>다음 생리 예정까지 ${t.left}일</div></div>
-    <span class="lbl">주기 ${c.len}일 — 오늘은 ${t.day}일차</span>
-    ${cycBar(c)}
+    ${주기고리(c, t)}
+    <div class="cyleg">${cycSeg(c).map(([nm,a,b])=>`<span class="${nm===t.ph?'on':''}" style="--cc:${주기색[nm]}"><i></i><b>${nm}</b><small>${a}~${b}일</small></span>`).join('')}</div>
     <span class="lbl">${esc(t.ph)}에는 이렇게</span>
-    <div class="card">${CYC_TIP[t.ph].map(x=>`<div class="frow"><span class="fk" style="min-width:20px;color:var(--gold)">·</span><span class="fv">${esc(x)}</span></div>`).join('')}</div>
-    ${!tr?`<div class="hr"></div><span class="lbl">내 주기</span>
-      <div class="card"><div class="frow"><span class="fk">최근 시작일</span><span class="fv">${esc(c.last)}</span></div>
-        <div class="frow"><span class="fk">주기</span><span class="fv">${c.len}일</span></div>
-        <div class="frow"><span class="fk">생리 기간</span><span class="fv">${c.period}일</span></div>
-        <div class="frow"><span class="fk">다음 예정</span><span class="fv">${esc(dateTxt(t.다음))}</span></div></div>
-      <div style="display:flex;gap:9px;flex-wrap:wrap">
-        <button class="btn main sm" data-act="cycstart:${mid}">오늘 시작했어요</button>
-        <button class="btn sub sm" data-act="cyccal:${mid}">달력에서 고르기</button>
-        <button class="btn ghost sm" data-act="cycoff:${mid}">주기 끄기</button></div>
-      <div class="note">생각보다 <b>빨리 시작하셨으면 그 날짜를 골라 주세요.</b>
-        고르신 날에 맞춰 주기를 다시 잡아 드립니다.</div>
-      <div class="note">회원님만 고칠 수 있습니다. 트레이너는 <b>오늘 어느 시기인지만</b> 봅니다 — 날짜는 안 보입니다.</div>`
-    :`<div class="note">회원님이 켜 둬서 보입니다. <b>시기만</b> 보이고 날짜는 보이지 않습니다. 루틴을 지정할 때 참고하세요.</div>`}` };
+    <div class="megrp cytip" style="--cc:${주기색[t.ph]}">${CYC_TIP[t.ph].map(x=>`<div class="mrow2"><span class="cyd"></span><span class="mt"><b>${esc(x)}</b></span></div>`).join('')}</div>
+    ${!tr?`<span class="lbl">내 주기</span>
+      <div class="sstat3">
+        <div><span class="k">주기</span><span class="v">${c.len}<small>일</small></span></div>
+        <div><span class="k">생리 기간</span><span class="v">${c.period}<small>일</small></span></div>
+        <div class="t"><span class="k">다음 예정</span><span class="v cyv">${esc(dateTxt(t.다음))}</span></div>
+      </div>
+      <div class="megrp"><button class="mrow2" data-act="cyccal:${mid}"><span class="mi">${svg('h_cal',18)}</span>
+        <span class="mt"><b>최근 시작일 · ${esc(dateTxt(c.last))}</b><small>날짜가 다르면 달력에서 고쳐 주세요</small></span><i>›</i></button></div>
+      <button class="btn main" data-act="cycstart:${mid}">오늘 시작했어요</button>
+      <div class="cyfoot"><span>트레이너에게는 시기만 보이고 날짜는 보이지 않아요</span><button data-act="cycoff:${mid}">주기 끄기</button></div>`
+    :`<div class="cyfoot"><span>회원님이 켜 둬서 보입니다 · 시기만 보이고 날짜는 보이지 않습니다</span></div>`}` };
+}
+/* 주기 고리 — 네 시기를 고리의 네 토막으로, 오늘 자리에 점. 지금 시기만 진하게 (2026-10-07 융합) */
+function 주기고리(c, t){
+  const R = 46, C = 2*Math.PI*R, 틈 = 5, seg = cycSeg(c);
+  const 토막 = seg.map(([nm,a,b])=>{ const 시작 = (a-1)/c.len*C + 틈/2, 길 = Math.max(2, (b-a+1)/c.len*C - 틈), 지금 = nm===t.ph;
+    return `<circle cx="60" cy="60" r="${R}" fill="none" stroke="${주기색[nm]}" stroke-width="${지금?9:6}" stroke-linecap="round" opacity="${지금?1:.3}"
+      stroke-dasharray="${길.toFixed(1)} ${(C-길).toFixed(1)}" stroke-dashoffset="${(-시작).toFixed(1)}" transform="rotate(-90 60 60)"/>`; }).join('');
+  const 각 = ((t.day-.5)/c.len)*2*Math.PI - Math.PI/2, x = 60 + R*Math.cos(각), y = 60 + R*Math.sin(각);
+  return `<div class="cyhead" style="--cc:${주기색[t.ph]}">
+    <span class="cyt"><small>오늘 ${t.day}일차</small><b>${esc(t.ph)}</b><i>${esc(t.why)}</i><em>다음 생리까지 ${t.left}일</em></span>
+    <span class="cyring"><svg viewBox="0 0 120 120" aria-hidden="true">${토막}
+      <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="7.5" fill="#151513" stroke="#fff" stroke-width="2.6"/></svg>
+      <i><b>${t.day}</b><small>/ ${c.len}일</small></i></span></div>`;
 }
 
 /* ── Q&A ── */
