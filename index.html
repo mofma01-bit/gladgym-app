@@ -2562,7 +2562,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '313';
+const BUILD = '314';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -6960,7 +6960,8 @@ function 랭킹계산(시작, 끝){
   const 안 = d => d && d >= 시작 && d <= 끝;
   const row = (mid, v, t, ds) => ({ mid, v, t: t || '', ds: ds || null });      /* ds = 기록한 날짜들(오름차순) — 레벨에 닿은 날을 잰다 */
   const 끝날 = ds => ds.length ? ds.slice().sort()[ds.length-1] : '';
-  const 운동 = MEMBERS.map(m => { const ds = D.workouts.filter(w=>w.mid===m.id && w.done && 안(w.date) && 세트있나(w)).map(w=>w.date).sort(); return row(m.id, ds.length, 끝날(ds), ds); });
+  /* ⛔ 운동 기록도 **하루 1번만** 인정 — 같은 날 두 번 기록해도 1회 (2026-10-07 대표 · 오운완과 같은 셈) */
+  const 운동 = MEMBERS.map(m => { const ds = [...new Set(D.workouts.filter(w=>w.mid===m.id && w.done && 안(w.date) && 세트있나(w)).map(w=>w.date))].sort(); return row(m.id, ds.length, 끝날(ds), ds); });
   /* ⛔ 오운완은 **하루 1번만** 인정 — 같은 날 사진을 여러 장 올려도 1회 (2026-10-07 대표). 날짜를 겹치지 않게 센다 */
   const 오운완 = MEMBERS.map(m => { const ds = [...new Set((D.bph||[]).filter(x=>x.mid===m.id && x.kind==='ootd' && 안(x.date)).map(x=>x.date))].sort(); return row(m.id, ds.length, 끝날(ds), ds); });
   const 무게 = MEMBERS.map(m => row(m.id, Math.round(D.workouts.filter(w=>w.mid===m.id && w.done && 안(w.date)).reduce((a,w)=>a+totalKg(w),0)/1000)));
@@ -6972,7 +6973,7 @@ function 랭킹계산(시작, 끝){
            미입력: 삼대.filter(r=>r.v>0 && !회원성별(r.mid)).length };
 }
 /* 오운완과 운동 기록이 헷갈린다 (2026-10-07 대표 「나처럼 무슨 차이인지 모르는 사람이 있을 거라 구분이 되어야」) — 이름을 「인증」「기록」으로 가르고, 판 아래에 무엇을 세는지 한 줄 */
-const 판설명 = { 오운완:'인증 사진을 올린 날 · 하루 1번', 운동:'앱에 세트를 기록하고 마친 운동', 무게:'이번 달에 든 무게를 모두 더한 값', 삼대:'스쿼트 + 벤치 + 데드 1RM 합' };
+const 판설명 = { 오운완:'인증 사진을 올린 날 · 하루 1번', 운동:'앱에 운동을 기록한 날 · 하루 1번', 무게:'이번 달에 든 무게를 모두 더한 값', 삼대:'스쿼트 + 벤치 + 데드 1RM 합' };
 const 판이름 = { 오운완:'오운완 인증', 운동:'운동 기록', 무게:'총 무게', 삼대남:'3대 중량 (남)', 삼대여:'3대 중량 (여)' };
 const 판단위 = { 오운완:'회', 운동:'회', 무게:'톤', 삼대남:'kg', 삼대여:'kg' };
 /* ══ 레벨 기준표 ══ 판마다 다섯 단계 [이상, 이름]. **이 표 한 곳만 고치면** 화면·집계가 같이 바뀐다.
