@@ -1152,6 +1152,23 @@ body .hero.photo{background-origin:border-box;background-clip:border-box}
 .sstat3.ib4 i{grid-column:1/-1;font-style:normal;font-size:10.5px;color:#75706a}
 .sstat3.ib4>div.t .v{color:var(--teal)}
 .ibcmp{background:none;border:0;padding:0}
+body .hero2.tall.pk1{min-height:188px}
+.home2.pk2 .hero2.half{min-height:136px}.home2.pk2 .hero2.half .tt{font-size:15.5px;line-height:1.3}.home2.pk2 .hero2.half .dd{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.home2.pk2 .hero2.half .tag2{font-size:10.5px;padding:2px 8px}
+body .seg2{gap:0;border:1px solid #4a3f2a;border-radius:16px;overflow:hidden;background:#171614;width:100%;flex:none}
+body .seg2 button{border:0;border-radius:0;border-left:1px solid #34332d;background:none;padding:14px 4px;font-size:14px;font-weight:800}
+body .seg2 button:first-child{border-left:0}
+body .seg2 button.on{color:var(--gold);background:linear-gradient(180deg,rgba(240,211,160,.2),rgba(240,211,160,.04));box-shadow:inset 0 -2px 0 var(--gold)}
+body .prephd{border:1px solid #5a4c33;border-radius:20px;padding:17px 17px 15px;gap:4px;
+  background:radial-gradient(110% 100% at 0% 0%,rgba(240,211,160,.17),transparent 62%),linear-gradient(180deg,#221e17,#161513)}
+body .prephd.t{border-color:#3f7281;background:radial-gradient(110% 100% at 0% 0%,rgba(169,216,230,.16),transparent 62%),linear-gradient(180deg,#1b2d33,#161717)}
+body .prephd .ph1{font-size:21px}
+.prg .prow{background:none;border:0 !important;border-top:1px solid #2c2b27 !important;border-radius:0 !important;padding:14px 14px;align-items:flex-start}
+.prg .prow:first-child{border-top:0 !important}
+.prg .prow .no{width:30px;height:30px;border-radius:50%;background:rgba(240,211,160,.05);border:1.2px solid rgba(240,211,160,.4);color:var(--gold);font-size:12.5px;margin-top:0}
+.prg .prow.m .no{border-color:rgba(169,216,230,.5);color:var(--teal);background:rgba(169,216,230,.06)}
+.prg .prow .kd{flex:none;align-self:flex-start;margin-top:5px;font-size:10.5px;letter-spacing:0;border:1px solid currentColor;border-radius:999px;padding:1px 8px;opacity:.85}
+.tmsum.btn3 b .td안{font-style:normal;font-size:10.5px;font-weight:700;color:var(--teal);margin-left:6px;white-space:nowrap}
 .megoal{width:100%;flex:none;display:flex;flex-direction:column;gap:8px;text-align:left;padding:14px 14px 13px;border-radius:18px;border:1px solid #34332d;background:linear-gradient(180deg,#201f1c,#171615);box-shadow:inset 0 1px 0 rgba(240,211,160,.14)}
 .mgh{display:grid;grid-template-columns:1fr auto;align-items:center;width:100%}.mgh small{grid-column:1/-1;font-size:11.5px;color:var(--sub)}
 .mgh b{font-size:17px;font-weight:800}.mgh i{font-style:normal;color:var(--sub);font-size:17px}
@@ -2503,7 +2520,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '301';
+const BUILD = '302';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -4822,17 +4839,13 @@ function vPrep(){
       return `<span class="lbl">트레이너가 정해 준 스트레칭</span>` + ss.map(x=>`<button class="sspick" data-act="pset:${x.id}">
         <span class="sst"><small>${esc(x.tr)} 트레이너</small><b>${esc(x.n||'스트레칭')}</b><i>${x.items.length}동작${x.memo ? ' · '+esc(x.memo) : ''}</i></span><em>보기 ›</em></button>`).join('')
         + `<span class="lbl">공통 준비운동</span>`; })()}
-    <div class="note">몸을 <b>풀고 늘이는</b> 것부터 하고 운동을 시작합니다. 시간을 재지 않아요 —
-      보고 그대로 따라 하시면 됩니다.</div>
-    ${PREPKIND.map(x=>{ const im=갈래사진(x.k); return `<button class="hero2 tall ${im?'shot':''}"
-        data-act="pk:${x.k}"
-        style="--h1:${x.h1};--h2:${x.h2}${im?';--img:url('+im+')':''}">
-      <span class="art ${x.art}"></span>
-      <span class="tt">${esc(x.n)}</span>
-      <span class="dd">${esc(x.sm)}</span></button>`; }).join('')}
-    <div class="note" style="margin-top:4px">
-      <b>뼈와 관절 위는 굴리지 않습니다.</b> 허리(요추)에 폼롤러를 직접 대지 마세요.
-      아프면 힘을 빼고, 아픈 자리는 20~30초 지그시 눌러 주세요.</div>` };
+    ${(()=>{ const 카드 = (x, 꼴) => { const im = 갈래사진(x.k); return `<button class="hero2 ${꼴} ${im?'shot':''}"
+          data-act="pk:${x.k}" style="--h1:${x.h1};--h2:${x.h2}${im?';--img:url('+im+')':''}">
+        <span class="art ${x.art}"></span>
+        <span class="tt">${esc(x.n)}</span>
+        <span class="dd">${esc(x.sm)}</span></button>`; };
+      return 카드(PREPKIND[0], 'tall pk1') + `<div class="home2 pk2">${PREPKIND.slice(1).map(x=>카드(x, 'half')).join('')}</div>`; })()}
+    <div class="cyfoot"><span>뼈와 관절 위는 굴리지 않아요 · 허리에는 폼롤러를 직접 대지 마세요</span></div>` };
 }
 
 /* 트레이너가 지정한 준비운동 — 루틴에 grp='준비운동' 으로 담긴다 */
@@ -4862,29 +4875,19 @@ function vPrep2(){
     <button class="${tab==='trainer'?'on':''}" data-act="pt:trainer">트레이너 지정${rs.length?` ${rs.length}`:''}</button>
   </div>`;
 
-  const 공통 = PREPSET.map(x=>{ const n = prepList(x.k, S.prepKind).length;
-      const im = 묶음사진(x.k);
-      return `<button class="hero2 ${im?'shot':''}" data-act="ps:${x.k}"
+  const 묶음 = (x, 꼴) => { const n = prepList(x.k, S.prepKind).length, im = 묶음사진(x.k);
+      return `<button class="hero2 ${꼴} ${im?'shot':''}" data-act="ps:${x.k}"
         style="--h1:${x.h1};--h2:${x.h2}${im?';--img:url('+im+')':''}">
       <span class="art ${x.art}"></span>
       <span class="tag2">${n}가지</span>
       <span class="tt">${esc(x.n)}</span>
-      <span class="dd">${esc(x.sm)}</span></button>`; }).join('')
-    + `<div class="note">묶음은 <b>주마다 바뀝니다.</b> 같은 주에는 같은 것이 나오고,
-      다음 주가 되면 다른 조합으로 섞입니다 — 몸이 한 가지에만 익숙해지지 않게.</div>`;
+      <span class="dd">${esc(x.sm)}</span></button>`; };
+  const 공통 = 묶음(PREPSET[0], 'tall pk1') + `<div class="home2 pk2">${PREPSET.slice(1).map(x=>묶음(x, 'half')).join('')}</div>`;
 
   const 지정 = rs.length
-    ? rs.map(r=>`<button class="hero2" data-act="pr:${r.id}" style="--h1:#3b3018;--h2:#15120c">
-        <span class="art s3"></span>
-        <span class="gl">트레이너 지정</span>
-        <span class="tag2">${(r.items||[]).length}가지</span>
-        <span class="tt">${esc(r.n)}</span>
-        <span class="dd">${r.purpose?esc(r.purpose):'트레이너가 직접 짠 준비운동'}</span></button>`).join('')
-      + `<div class="note">트레이너가 회원님께 맞춰 직접 담아 둔 것입니다.
-          <b>공통 추천보다 이쪽을 먼저</b> 하세요.</div>`
-    : `<div class="empty">아직 지정받은 준비운동이 없어요</div>
-       <div class="note">트레이너가 준비운동을 짜서 지정하면 여기에 뜹니다.
-         그때까지는 <b>공통 추천</b>을 쓰시면 됩니다.</div>`;
+    ? rs.map(r=>`<button class="sspick" data-act="pr:${r.id}">
+        <span class="sst"><small>트레이너 지정</small><b>${esc(r.n)}</b><i>${(r.items||[]).length}가지${r.purpose ? ' · '+esc(r.purpose) : ''}</i></span><em>보기 ›</em></button>`).join('')
+    : 빔('prep','아직 지정받은 준비운동이 없어요','트레이너가 짜서 지정하면 여기에 떠요');
 
   return { top: bar('준비운동', `<span class="sub">${esc(kd.n)}</span>`, 'go:prep'), body:
     세그 + (tab==='common' ? 공통 : 지정) };
@@ -4923,7 +4926,7 @@ function vPrep3(){
       <div class="ph2">${esc(밑말)}</div>
       <div class="ph3">${꼬리}</div>
     </div>
-    ${list.length ? list.map((x,i)=>`<div class="prow ${갈래(x)}">
+    ${list.length ? `<div class="megrp prg">` + list.map((x,i)=>`<div class="prow ${갈래(x)}">
       <span class="no">${i+1}</span>
       <span class="tx">
         <span class="nm">${esc(x.n)}${x.t ? `<span class="tm">${esc(x.t)}</span>` : ''}</span>
@@ -4931,11 +4934,8 @@ function vPrep3(){
         ${(x.media||[]).length ? `<span class="psmedia">${x.media.map(z => z.kind==='video'
             ? `<video src="${esc(phURL(z.path))}" controls playsinline preload="metadata"></video>`
             : `<img src="${esc(phURL(z.path))}" alt="" loading="lazy" onerror="picFail(this)">`).join('')}</span>` : ''}
-        <span class="kd">${x.media ? '트레이너' : 갈래말[갈래(x)]}</span>
-      </span></div>`).join('') : 빔('prep','담긴 동작이 없어요')}
-    <div class="note">
-      늘이는 동작은 <b>아프지 않고 살짝 당기는</b> 정도까지만. 반동을 주지 마세요.<br>
-      푸는 동작은 <b>천천히</b>, 아픈 자리에서 멈춰 20~30초 눌러 줍니다. 뼈·관절 위는 피하세요.</div>`,
+      </span><span class="kd">${x.media ? '트레이너' : 갈래말[갈래(x)]}</span></div>`).join('') + `</div>` : 빔('prep','담긴 동작이 없어요')}
+    <div class="cyfoot"><span>아프지 않게, 살짝 당기는 정도까지만 · 반동 없이 천천히 · 뼈·관절 위는 피하세요</span></div>`,
     foot: w
       ? `<button class="btn sub" data-act="go:home">홈으로</button>
          <button class="btn main" style="flex:1" data-act="go:workout">운동으로 돌아가기</button>`
@@ -9700,7 +9700,7 @@ function tToday(){
       return `<div class="tmsum btn3">
       <button class="t ${live.length?'':'zero'}" ${live.length ? `data-act="${live.length===1 ? 'tgo:'+live[0].m.id : 'tdlive'}"` : 'disabled'}><small>기록 중인 수업</small><b>${live.length}<i>명</i></b></button>
       <button class="${todo.length?'':'zero'}" ${todo.length ? 'data-act="tdtodo"' : 'disabled'}><small>코멘트 안 단 기록</small><b>${todo.length}<i>건</i></b></button>
-      <button class="${식.length?'':'zero'}" ${식.length ? 'data-act="tdmeal"' : 'disabled'}><small>오늘 올라온 식단${안단 ? ` · <em>안 단 것 ${안단}</em>` : ''}</small><b>${식.length}<i>장</i></b></button>
+      <button class="${식.length?'':'zero'}" ${식.length ? 'data-act="tdmeal"' : 'disabled'}><small>오늘 올라온 식단</small><b>${식.length}<i>장</i>${안단 ? `<em class="td안">안 단 것 ${안단}</em>` : ''}</b></button>
     </div>`; })()}
     <div class="hrow">
       <button class="hcard teal" data-act="pickasg">${홈머리('h_cal','루틴 지정하기')}
