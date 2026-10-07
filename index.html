@@ -1055,6 +1055,11 @@ body .set.now{border-color:var(--gold);background:radial-gradient(120% 140% at 0
 .rksample.one{flex-direction:row;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;width:auto;align-self:flex-start}
 .rk2btn{display:grid;grid-template-columns:1fr 1fr;gap:9px;width:100%;flex:none}
 .rk2btn button{display:flex;align-items:center;justify-content:center;gap:7px;padding:13px 6px;border-radius:14px;font-size:14.5px;font-weight:800;color:var(--gold);border:1px solid #6b5a33;background:linear-gradient(180deg,#241f17,#171614)}
+.lvrow.col{flex-direction:column;align-items:stretch;gap:9px}.lvhd{display:flex;align-items:center;gap:12px}
+.lvnm{display:flex;flex-wrap:wrap;gap:6px;padding-left:58px}
+.lvnm i{font-style:normal;display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:5px 10px;border-radius:999px;background:#252420;border:1px solid #34332d}
+.lvnm i u{text-decoration:none;font-size:11.5px;font-weight:800;color:var(--gold)}
+.lvnm i.me{border-color:var(--gold);color:var(--gold);background:rgba(240,211,160,.1)}
 .lvrv.solo{border-top:0;padding:0 2px 4px}
 .lvh.sm{color:var(--sub);border:1px dashed #5a4c33;border-radius:20px;padding:2px 9px}
 .lvnews{width:100%;flex:none;display:flex;flex-direction:column;gap:7px;padding:12px 14px;border-radius:16px;border:1px solid #34332d;background:linear-gradient(180deg,#1f1e1b,#171615)}
@@ -2352,7 +2357,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '284';
+const BUILD = '285';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -6606,7 +6611,10 @@ async function 커뮤니티받기(){
   }catch(e){ console.warn('커뮤니티 받기', e); }
 }
 const 글쓴이 = () => (S.who==='tr') ? { mid:'', who:(TRAINER||'트레이너') + ' 트레이너' } : { mid:S.mid, who:(MEMBERS.find(m=>m.id===S.mid)||{}).n||'회원' };
-const 이름of = mid => (MEMBERS.find(m=>m.id===mid)||{}).n || 샘플이름[mid] || '회원';
+/* 커뮤니티·랭킹에 보이는 이름 — **닉네임이 있으면 닉네임**, 없으면 이름. 트레이너에게는 「닉네임 (이름)」으로 보여 누군지 안다 */
+const 닉of = mid => ((typeof GOALS !== 'undefined' && GOALS[mid] || {}).prof || {}).nick || '';
+const 이름of = mid => { const 본 = (MEMBERS.find(m=>m.id===mid)||{}).n || 샘플이름[mid] || '회원', 닉 = 닉of(mid);
+  return 닉 ? (S.who==='tr' ? 닉 + ' (' + 본 + ')' : 닉) : 본; };
 /* 내 글은 내려 둔 것도 본다(다시 올리거나 지우려면 보여야 한다) · 남의 글은 센터 범위이고 안 내린 것만 · 트레이너는 안 내린 것 전부 */
 const 글볼수있나 = p => (p.mid===S.mid && S.who!=='tr') ? true : (!p.hid && (p.vis==='센터' || S.who==='tr'));
 const 좋아요수 = pid => (D.plk||[]).filter(l=>l.pid===pid).length;
@@ -6746,11 +6754,12 @@ function sheetRkLadder(){
   const Q = 랭킹지금(), L = 랭킹레벨[Q.판], 나 = S.who==='tr' ? null : Q.줄.find(r=>r.mid===S.mid), 내lv = 나 ? 레벨of(Q.판, 나.v) : 0;
   const 구간 = i => 수(L[i][0]) + (L[i+1] ? (L[i+1][0]-1 > L[i][0] ? '~' + 수(L[i+1][0]-1) : '') : '↑') + Q.단위;
   openSheet(()=>`<div class="h2">등급 <small>${Q.제목} · ${판이름[Q.k]}</small></div>
-    <div class="lvlad">${[5,4,3,2,1].map(n => { const ms = Q.줄.filter(r => 레벨of(Q.판, r.v) === n);
-      return `<button class="lvrow ${내lv===n?'me':''} ${ms.length?'':'none'}" data-act="rklv:${n}">
-        ${레벨고리(n, ms.length > 0)}
-        <span class="lrt"><b>${esc(L[n-1][1])}</b><small>${구간(n-1)} · ${ms.length}명</small></span>
-        <span class="lrf">${ms.slice(0,5).map(r=>`<i class="${r.mid===S.mid?'me':''}">${얼굴(r.mid)}</i>`).join('')}${ms.length>5?`<em>+${ms.length-5}</em>`:''}</span></button>`; }).join('')}</div>
+    <div class="pickbox"><div class="lvlad">${[5,4,3,2,1].map(n => { const ms = Q.줄.filter(r => 레벨of(Q.판, r.v) === n);
+      return `<div class="lvrow col ${내lv===n?'me':''} ${ms.length?'':'none'}">
+        <span class="lvhd">${레벨고리(n, ms.length > 0)}
+          <span class="lrt"><b>${esc(L[n-1][1])}</b><small>${구간(n-1)} · ${ms.length}명</small></span></span>
+        ${ms.length ? `<span class="lvnm">${ms.map(r=>`<i class="${r.mid===S.mid?'me':''}">${esc(이름of(r.mid))}<u>${수(r.v)}</u></i>`).join('')}</span>` : ''}</div>`; }).join('')}</div></div>
+    <button class="btn sub sm" data-act="rkall">전체 랭킹 보기</button>
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 /* 랭킹 보기 — 전체 순위 (창 안에서 스크롤). 내 줄은 금색, 바로 위 사람과의 차이를 맨 위에 한 줄 */
@@ -7750,6 +7759,9 @@ function sheetProfEdit(){
   const mid = S.mid, pf = profOf(mid);
   openSheet(()=>`
     <div class="h2">프로필 수정</div>
+    <div class="fld"><span class="fn">닉네임 <small>커뮤니티 · 랭킹에 이 이름으로 나와요 (비우면 이름)</small></span>
+      <input class="search" type="text" data-k="pf:nick" maxlength="12"
+        value="${esc(pf.nick||'')}" placeholder="예) 덤벨요정"></div>
     <div class="fld"><span class="fn">한 줄 소개</span>
       <input class="search" type="text" data-k="pf:bio" maxlength="40"
         value="${esc(pf.bio||'')}" placeholder="예) 주 3회 · 하체 집중"></div>
@@ -11103,7 +11115,10 @@ document.addEventListener('click', async ev=>{
     case 'profpic': profPick(); return;
     case 'profok': {
       const el = document.querySelector('[data-k="pf:bio"]');
-      profSave(S.mid, { bio: el ? el.value.trim() : '' });   /* 저장은 뒤에서 마저 */
+      const nk = document.querySelector('[data-k="pf:nick"]'), 닉 = nk ? nk.value.trim().replace(/\s+/g,' ') : (profOf(S.mid).nick||'');
+      /* 남이 쓰는 닉네임·남의 이름과 같으면 받지 않는다 — 랭킹에서 누군지 헷갈린다 */
+      if(닉 && MEMBERS.some(m => m.id !== S.mid && (m.n === 닉 || 닉of(m.id) === 닉))){ toast('이미 쓰고 있는 이름이에요'); return; }
+      profSave(S.mid, { bio: el ? el.value.trim() : '', nick: 닉 });   /* 저장은 뒤에서 마저 */
       closeSheet(); toast('저장했어요'); render(); return; }
     case 'ootdre': closeSheet(); ootdPick(rest[0]); return;
     /* ── 커뮤니티 ── */
