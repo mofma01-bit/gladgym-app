@@ -1310,6 +1310,22 @@ body.resizing{cursor:col-resize;user-select:none}
 .wcl{display:flex;justify-content:space-between;font-size:12px;color:var(--sub);margin-top:4px}.wcl b{color:var(--cream);font-size:13.5px;margin-left:3px}.wcl .n b{color:var(--gold)}.wcl .t b{color:var(--teal)}
 .mtb tbody tr:hover,.tb tbody tr:hover{background:rgba(240,211,160,.05)}
 .mtb th,.tb th{color:#a9a29a}
+
+/* 스트레칭 세트 */
+.pzrow{gap:11px;margin-bottom:7px}
+.pzck{width:26px;height:26px;border-radius:8px;flex:none;border:1.5px solid #4a463d;color:#2a1c14;font-size:15px;font-weight:800;display:flex;align-items:center;justify-content:center;background:none}
+.pzck.on{background:linear-gradient(180deg,#f3d9a8,#e2c184);border-color:transparent}
+#pzmodal{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.62);display:flex;align-items:center;justify-content:center;padding:24px}
+.pzbox{width:min(980px,100%);max-height:calc(100vh - 48px);display:flex;flex-direction:column;border-radius:18px;border:1px solid #4a3f2a;background:linear-gradient(180deg,#201f1c,#161514)}
+.pzhd,.pzft{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line)}.pzhd b{flex:1;font-size:16px}.pzft{border-bottom:0;border-top:1px solid var(--line)}
+.pzbody{display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:16px 18px;overflow:auto}.pzcol{min-width:0;display:flex;flex-direction:column;gap:6px}
+.pzlist{max-height:330px;overflow:auto;border:1px solid var(--line);border-radius:12px}
+.pzit{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:9px 12px;border-bottom:1px solid #262622;background:none;color:var(--cream)}
+.pzit i{width:20px;height:20px;border-radius:6px;flex:none;border:1.5px solid #4a463d;font-style:normal;font-size:12px;font-weight:800;color:#2a1c14;display:flex;align-items:center;justify-content:center}
+.pzit.on i{background:linear-gradient(180deg,#f3d9a8,#e2c184);border-color:transparent}.pzit.on b{color:var(--gold)}
+.pzit span{min-width:0;display:flex;flex-direction:column}.pzit b{font-size:13.5px}.pzit small{font-size:11.5px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pzmem{display:flex;flex-wrap:wrap;gap:6px}
+@media (max-width:760px){.pzbody{grid-template-columns:1fr}}
 </style></head><body>
 
 <div class="tx-login" id="txlogin">
@@ -1407,7 +1423,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '175';
+const BUILD = '176';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -3088,7 +3104,107 @@ function tabRoutine(){
     + 준비
     + '<div class="note" style="margin-top:9px">여기 담아 둔 것은 회원 앱의 <b>준비운동 → 트레이너 지정</b>에 그대로 뜹니다.'
     + ' 스트레칭 ' + ST.length + '가지 · 셀프 마사지 ' + MS.length + '가지 중에서 골라 담습니다.</div>'
+    + 세트칸()
     + '</div></div>';
+}
+/* ══ 트레이너 스트레칭 세트 ══ 2026-10-07 대표 — 한 번 만들어 여러 회원에게 · 만든 트레이너만 본다 (회원앱과 같은 표 prep_sets) */
+const 나이름 = () => (ME && ME.name) || '';
+const 내세트 = () => (D.ps || []).filter(x => x.trainer === 나이름());
+const 세트사전 = {}; ST.concat(MS).forEach(x => { 세트사전[x.i] = x; });
+function 세트칸(){
+  const ss = 내세트();
+  return '<div class="lbl" style="margin-top:16px">스트레칭 세트 ' + ss.length + '개'
+    + '<span class="r"><button class="btn sub sm" data-act="pznew">＋ 새 세트</button></span></div>'
+    + (ss.length ? ss.map(function(x){ const on = (x.member_ids||[]).includes(S.mid);
+        return '<div class="card rowc pzrow' + (on?' gold':'') + '">'
+          + '<button class="pzck' + (on?' on':'') + '" data-act="pzasg" data-ps="' + esc(x.id) + '" title="이 회원에게 지정">' + (on?'✓':'') + '</button>'
+          + '<div style="flex:1;min-width:0"><div class="t1">' + esc(x.name || '이름 없는 세트') + '</div>'
+          + '<div class="t2">' + (x.items||[]).length + '동작 · ' + (x.member_ids||[]).length + '명에게 지정' + (x.memo ? ' · ' + esc(x.memo) : '') + '</div></div>'
+          + '<button class="btn ghost sm" data-act="pzedit" data-ps="' + esc(x.id) + '">고치기</button></div>'; }).join('')
+      : '<div class="empty">아직 만든 세트가 없어요</div>')
+    + '<div class="note" style="margin-top:9px">체크하면 이 회원 앱의 <b>준비운동 맨 위</b>에 뜹니다. 세트 하나를 여러 회원에게 지정할 수 있어요. 내가 만든 세트만 보입니다.</div>';
+}
+let PZ = null;      /* 고치는 중인 세트 */
+function 세트창(){
+  let el = document.getElementById('pzmodal');
+  if(!PZ){ if(el) el.remove(); return; }
+  if(!el){ el = document.createElement('div'); el.id = 'pzmodal'; document.body.appendChild(el); }
+  const 담긴 = new Set(PZ.items.filter(x => x.k==='lib').map(x => x.i));
+  const 회원들 = D.m.filter(m => (m.role||'member') === 'member' && (내담당(m.id) || PZ.member_ids.includes(m.id)));
+  const 갈 = PZ.갈 || 's', 줄 = 갈==='s' ? ST : MS;
+  el.innerHTML = '<div class="pzbox">'
+    + '<div class="pzhd"><b>' + (PZ.새 ? '새 스트레칭 세트' : '스트레칭 세트 고치기') + '</b><button class="btn ghost sm" data-act="pzclose">닫기</button></div>'
+    + '<div class="pzbody"><div class="pzcol">'
+      + '<div class="lbl">세트 이름</div><input class="inp" id="pzname" maxlength="24" value="' + esc(PZ.name) + '" placeholder="예) 하체 수업 전 풀기">'
+      + '<div class="lbl" style="margin-top:10px">한 줄 메모 (회원에게 보여요)</div><input class="inp" id="pzmemo" maxlength="60" value="' + esc(PZ.memo) + '" placeholder="예) 골반 앞쪽 위주로 30초씩">'
+      + '<div class="lbl" style="margin-top:14px">담은 동작 ' + PZ.items.length + '개</div>'
+      + (PZ.items.length ? PZ.items.map(function(it, i){ const v = it.k==='lib' ? (세트사전[it.i] || {n:'(없는 동작)', t:''}) : it;
+          const 붙 = (it.media||[]).length ? ' · ' + (it.media.some(z=>z.kind==='video') ? '영상' : '사진') + ' ' + it.media.length : '';
+          return '<div class="card rowc" style="padding:8px 12px"><span class="tag gold">' + (i+1) + '</span><div style="flex:1;min-width:0"><div class="t1">' + esc(v.n) + '</div>'
+            + '<div class="t2">' + (it.k==='lib' ? '목록 동작' : '직접 올림') + (v.t ? ' · ' + esc(v.t) : '') + 붙 + '</div></div>'
+            + (i ? '<button class="btn ghost sm" data-act="pzup" data-i="' + i + '">▲</button>' : '')
+            + '<button class="btn ghost sm" data-act="pzrm" data-i="' + i + '">빼기</button></div>'; }).join('') : '<div class="empty">오른쪽에서 고르거나 아래에서 직접 올리세요</div>')
+      + '<div class="lbl" style="margin-top:14px">직접 올리기</div>'
+      + '<input class="inp" id="pzon" maxlength="24" placeholder="동작 이름  예) 장요근 늘이기">'
+      + '<input class="inp" id="pzot" maxlength="16" placeholder="시간 · 횟수  예) 좌우 30초" style="margin-top:6px">'
+      + '<input class="inp" id="pzod" maxlength="140" placeholder="설명" style="margin-top:6px">'
+      + '<input type="file" id="pzfile" accept="image/*,video/*" multiple style="margin-top:8px;font-size:12.5px;color:var(--sub)">'
+      + '<button class="btn sub sm" data-act="pzown" style="margin-top:8px">이 동작 담기</button>'
+    + '</div><div class="pzcol">'
+      + '<div class="lbl">목록에서 고르기 <span class="r"><button class="chip' + (갈==='s'?' on':'') + '" data-act="pzk" data-v2="s">스트레칭 ' + ST.length + '</button> <button class="chip' + (갈==='m'?' on':'') + '" data-act="pzk" data-v2="m">마사지 ' + MS.length + '</button></span></div>'
+      + '<div class="pzlist">' + 줄.map(x => '<button class="pzit' + (담긴.has(x.i)?' on':'') + '" data-act="pztog" data-v2="' + x.i + '"><i>' + (담긴.has(x.i)?'✓':'') + '</i><span><b>' + esc(x.n) + '</b><small>' + esc(x.t) + ' · ' + esc(x.d) + '</small></span></button>').join('') + '</div>'
+      + '<div class="lbl" style="margin-top:14px">받을 회원 ' + PZ.member_ids.length + '명</div>'
+      + '<div class="pzmem">' + 회원들.map(m => '<button class="chip' + (PZ.member_ids.includes(m.id)?' on':'') + '" data-act="pzmt" data-v2="' + esc(m.id) + '">' + esc(m.name) + '</button>').join('') + '</div>'
+    + '</div></div>'
+    + '<div class="pzft">' + (PZ.새 ? '' : '<button class="btn ghost sm" data-act="pzdel" style="color:var(--warn)">이 세트 지우기</button>')
+      + '<span style="flex:1"></span><button class="btn gold" data-act="pzsave">저장</button></div></div>';
+}
+function 세트글담기(){ if(!PZ) return; const a = document.getElementById('pzname'), b = document.getElementById('pzmemo');
+  if(a) PZ.name = a.value; if(b) PZ.memo = b.value; }
+async function 세트손잡이(a, act){
+  if(a==='pznew'){ PZ = { id:'ps'+Date.now(), trainer:나이름(), name:'', memo:'', items:[], member_ids: S.mid ? [S.mid] : [], 새:true }; 세트창(); return true; }
+  if(a==='pzedit'){ const x = 내세트().find(z => z.id === act.dataset.ps); if(!x) return true;
+    PZ = { id:x.id, trainer:x.trainer, name:x.name||'', memo:x.memo||'', items:(x.items||[]).map(z=>Object.assign({}, z)), member_ids:(x.member_ids||[]).slice() }; 세트창(); return true; }
+  if(a==='pzasg'){ const x = 내세트().find(z => z.id === act.dataset.ps); if(!x || !S.mid) return true;
+    const ids = (x.member_ids||[]).slice(), i = ids.indexOf(S.mid); if(i >= 0) ids.splice(i,1); else ids.push(S.mid);
+    try{ await ssend('prep_sets?id=eq.' + encodeURIComponent(x.id), 'PATCH', { member_ids: ids, updated_at: new Date().toISOString() });
+      x.member_ids = ids; toast(i >= 0 ? '지정을 풀었어요' : '지정했어요 — 회원 앱 준비운동 맨 위에 떠요'); render(); }
+    catch(e){ toast('못 바꿨어요 — ' + e.message); } return true; }
+  if(!PZ) return false;
+  if(a==='pzclose'){ PZ = null; 세트창(); return true; }
+  세트글담기();
+  if(a==='pzk'){ PZ.갈 = act.dataset.v2; 세트창(); return true; }
+  if(a==='pztog'){ const k = act.dataset.v2, i = PZ.items.findIndex(z => z.k==='lib' && z.i===k); if(i >= 0) PZ.items.splice(i,1); else PZ.items.push({ k:'lib', i:k });
+    const sc = (document.querySelector('.pzlist')||{}).scrollTop || 0; 세트창(); const l = document.querySelector('.pzlist'); if(l) l.scrollTop = sc; return true; }
+  if(a==='pzmt'){ const k = act.dataset.v2, i = PZ.member_ids.indexOf(k); if(i >= 0) PZ.member_ids.splice(i,1); else PZ.member_ids.push(k); 세트창(); return true; }
+  if(a==='pzup'){ const i = +act.dataset.i; if(i > 0){ const t = PZ.items[i-1]; PZ.items[i-1] = PZ.items[i]; PZ.items[i] = t; } 세트창(); return true; }
+  if(a==='pzrm'){ PZ.items.splice(+act.dataset.i, 1); 세트창(); return true; }
+  if(a==='pzown'){ const n = (document.getElementById('pzon').value||'').trim(); if(!n){ toast('동작 이름을 적어 주세요'); return true; }
+    const t = (document.getElementById('pzot').value||'').trim(), d = (document.getElementById('pzod').value||'').trim();
+    const fs = Array.from((document.getElementById('pzfile').files)||[]), media = [];
+    try{ for(let i=0;i<fs.length;i++){ const f = fs[i], 영상 = /^video\//.test(f.type);
+        if(!영상 && !/^image\//.test(f.type)) continue;
+        if(영상 && f.size > 60*1024*1024){ toast('영상은 60MB 까지 올릴 수 있어요'); return true; }
+        toast('올리는 중이에요 (' + (i+1) + '/' + fs.length + ')');
+        const blob = 영상 ? f : await 줄이기(f), ext = 영상 ? (/webm/.test(f.type) ? 'webm' : 'mp4') : 'jpg', path = 'prep/' + PZ.id + '/' + Date.now() + '_' + i + '.' + ext;
+        const r = await fetch(SB_URL+'/storage/v1/object/media/'+path, { method:'POST',
+          headers:{ apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type': 영상 ? (ext==='webm' ? 'video/webm' : 'video/mp4') : 'image/jpeg' }, body: blob });
+        if(!r.ok) throw new Error(await r.text());
+        media.push({ kind: 영상 ? 'video' : 'photo', path }); } }
+    catch(e){ toast('파일을 못 올렸어요 — ' + (e.message||'').slice(0,60)); return true; }
+    PZ.items.push({ k:'own', n, t, d, media }); toast('담았어요'); 세트창(); return true; }
+  if(a==='pzsave'){ PZ.name = (PZ.name||'').trim(); PZ.memo = (PZ.memo||'').trim();
+    if(!PZ.name){ toast('세트 이름을 적어 주세요'); return true; }
+    if(!PZ.items.length){ toast('동작을 하나 이상 담아 주세요'); return true; }
+    const row = { id:PZ.id, trainer:나이름(), name:PZ.name, memo:PZ.memo, items:PZ.items, member_ids:PZ.member_ids, updated_at:new Date().toISOString() };
+    try{ await ssend('prep_sets?on_conflict=id', 'POST', [row], 'resolution=merge-duplicates');
+      D.ps = (D.ps||[]).filter(z => z.id !== row.id).concat([row]); PZ = null; 세트창(); toast('세트를 저장했어요'); render(); }
+    catch(e){ toast('못 저장했어요 — ' + e.message); } return true; }
+  if(a==='pzdel'){ if(!confirm('이 세트를 지울까요? 받은 회원 화면에서도 사라집니다.')) return true;
+    try{ await ssend('prep_sets?id=eq.' + encodeURIComponent(PZ.id), 'DELETE');
+      D.ps = (D.ps||[]).filter(z => z.id !== PZ.id); PZ = null; 세트창(); toast('지웠어요'); render(); }
+    catch(e){ toast('못 지웠어요 — ' + e.message); } return true; }
+  return false;
 }
 
 /* ── 회원 상세 · 운동 기록 ── 최근 7일 · 달력 · 세트 고치기 */
@@ -8285,6 +8401,7 @@ async function load(){
     D.m=g[0]; D.w=g[1]; D.wi=g[2]; D.r=g[3]; D.ri=g[4]; D.c=g[5];
     D.aAll=g[6]; D.a=g[6].filter(x=>x.on_date===TODAY);
     D.ex=g[7]; D.va=g[8]; D.asks=g[9]||[];
+    try{ D.ps = await sget('prep_sets?select=*&order=created_at'); }catch(e){ D.ps = []; }      /* 스트레칭 세트 (2026-10-07) */
     const trs = [...new Set(D.m.map(x=>x.trainer).filter(Boolean))];
     $('#whosel').innerHTML = ['전체'].concat(trs).map(t =>
       '<option value="' + esc(t) + '">' + esc(t==='전체'?'전체 보기':t+' 트레이너') + '</option>').join('');
@@ -8633,6 +8750,7 @@ document.addEventListener('click', async function(ev){
      두 손잡이가 같은 이름을 쓰면 어느 쪽에 적든 돈다. */
   const a = act.dataset.act, id = +act.dataset.i, v2 = act.dataset.v2;
   if(a.indexOf('tx:')===0){ ev.preventDefault(); await txAct(a.slice(3), act); return; }
+  if(a.indexOf('pz')===0 && await 세트손잡이(a, act)) return;      /* 스트레칭 세트 (2026-10-07) */
 
   if(a==='mfull'){ const mid = (회원판 && 회원판.mid) || S.mid;
     회원판 = null; $('#pop').classList.remove('on');
