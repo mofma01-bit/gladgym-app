@@ -2560,7 +2560,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '309';
+const BUILD = '310';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2710,6 +2710,10 @@ async function boot(){
   커뮤니티담기(psts, pcms, plks);
   try{ 세트담기(await sget('prep_sets?select=*&order=created_at').catch(()=>[])); }catch(e){ D.psets = []; }
   try{ 종목담기(await sget('prep_items?select=*&order=created_at').catch(()=>[])); }catch(e){ D.pitems = []; }
+  /* 트레이너가 올린 스트레칭·운동 종목 사진/영상도 주소를 미리 받아 둔다 — 버킷을 잠가도 보이게 (2026-10-07) */
+  try{ await 주소받기([].concat((D.pitems||[]).flatMap(x => x.media.map(m => m.path)),
+      (D.psets||[]).flatMap(x => x.items.flatMap(i => (i.media||[]).map(m => m.path))),
+      (exs||[]).flatMap(e => (Array.isArray(e.media) ? e.media : []).map(m => m.path)))); }catch(e){ console.warn('종목 사진 주소 받기 건너뜀', e); }
   D.rm = (rms||[]).map(r => { const [ex,va] = splitV(r.variant_id);
     return { id:r.id, mid:r.member_id, ex, va, kg:Number(r.kg||0), reps:Number(r.reps||1), kind:r.kind||'추정', date:r.on_date, wid:r.workout_id||'', by:r.by||'' }; });
 
@@ -10762,6 +10766,7 @@ document.addEventListener('click', async ev=>{
       try{ for(let i=0;i<d.files.length;i++){ const f = d.files[i], path = `exmedia/${d.id}/${Date.now()}_${i}.${f.ext}`;
           await 파일올리기(path, f.blob, f.kind==='photo' ? 'image/jpeg' : (f.ext==='webm' ? 'video/webm' : 'video/mp4')); media.push({ kind:f.kind, path }); } }
       catch(e){ console.error(e); toast('파일을 못 올렸어요'); return; }
+      try{ await 주소받기(media.map(m => m.path)); }catch(e){}
       const 옛 = EX.find(e => e.id === d.id), cardio = d.p === '유산소' ? 1 : 0;
       if(옛){ Object.assign(옛, { n:d.n, p:d.p, e:d.e, cardio, media }); if(옛.vars[0]) 옛.vars[0].desc = d.d; }
       else EX.push({ id:d.id, n:d.n, p:d.p, e:d.e, cardio, owner:TRAINER, media, vars:[{ k:'a', n:'', desc:d.d, demo:0, du:'' }] });
@@ -11494,6 +11499,7 @@ document.addEventListener('click', async ev=>{
       try{ for(let i=0;i<d.files.length;i++){ const f = d.files[i], path = `prep/items/${d.id}/${Date.now()}_${i}.${f.ext}`;
           await 파일올리기(path, f.blob, f.kind==='photo' ? 'image/jpeg' : (f.ext==='webm' ? 'video/webm' : 'video/mp4')); media.push({ kind:f.kind, path }); } }
       catch(e){ console.error(e); toast('파일을 못 올렸어요'); return; }
+      try{ await 주소받기(media.map(m => m.path)); }catch(e){}
       const x = { id:d.id, tr:TRAINER, n:d.n, t:d.t, d:d.d, media };
       D.pitems = (D.pitems||[]).filter(z=>z.id!==x.id).concat([x]);
       await sv(spost('prep_items', [{ id:x.id, trainer:x.tr, name:x.n, time:x.t, descr:x.d, media:x.media, updated_at:new Date().toISOString() }], {on:'id'}), '스트레칭 종목 저장');
