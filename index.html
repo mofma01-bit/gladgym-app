@@ -2644,7 +2644,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '334';
+const BUILD = '335';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -4409,10 +4409,15 @@ function 닉네임먼저(){
   if(sheetRender && sheetRender.닉) return true;
   if(S.닉확인 === S.mid) return true;
   const mid = S.mid; S.닉확인 = mid;
+  /* 추천 닉네임이 미리 들어가 있다 — 그대로 쓰거나 바로 고친다 (2026-10-08 대표 「예시 닉네임이 자동으로 들어가게」) */
+  if(S.draft) delete S.draft['nick0'];
+  let 추천 = 닉추천();
   const f = ()=>`<div class="h2">닉네임을 정해 주세요</div>
-    <div class="fld"><input class="search" type="text" data-k="nick0" maxlength="12" placeholder="예) 덤벨요정" autocomplete="off"></div>
-    <button class="btn main" data-act="nick0ok">시작하기</button>
-    <div class="sm" style="text-align:center;color:var(--sub)">커뮤니티 · 랭킹에 이 이름으로 나와요. 프로필에서 변경할 수 있어요</div>`;
+    <div class="fld" style="flex-direction:row;gap:8px;align-items:center"><input class="search" style="flex:1" type="text" data-k="nick0" maxlength="12" value="${esc(추천)}" autocomplete="off">
+      <button class="btn sub sm" style="flex:none;width:auto;padding:0 13px" data-act="nick0re">다른 추천</button></div>
+    <button class="btn main" data-act="nick0ok">이 닉네임으로 시작</button>
+    <div class="sm" style="text-align:center;color:var(--sub)">그대로 써도 되고 바꿔도 돼요 · 나중에 프로필에서 변경할 수 있어요</div>`;
+  f.다시 = () => { 추천 = 닉추천(); const el = document.querySelector('#sheetbox [data-k="nick0"]'); if(el) el.value = 추천; if(S.draft && 'nick0' in S.draft) S.draft['nick0'] = 추천; };
   f.닉 = true;
   /* 묻기 전에 **서버에 정말 없는지** 먼저 본다 — 처음 불러올 때 계획을 못 받았거나 낡은 사본이면 있는데도 물었다.
      서버에서 지워졌는데 이 기기가 기억하고 있으면 되살린다. 확인을 못 했으면(통신 끊김) 묻지 않는다 */
@@ -4430,8 +4435,21 @@ function 닉네임먼저(){
   })();
   return true;
 }
+/* 욕설 · 비하 말 — 띄어쓰기 · 숫자 · 기호를 사이에 끼워 넣어도 걸리게 글자만 남겨서 본다 */
+const 나쁜말 = ['시발','씨발','씨팔','시팔','씨바','ㅅㅂ','ㅆㅂ','병신','븅신','ㅂㅅ','좆','좃','존나','졸라','ㅈㄴ','개새','새끼','새키','쉐끼','지랄','ㅈㄹ','미친놈','미친년','썅','쌍놈','쌍년','염병','엿먹','꺼져','닥쳐','등신','호구','찐따','느금','니애미','니미','애미','애비','창녀','걸레','보지','자지','섹스','성기','야동','한남','김치녀','개년','개놈','년놈','죽어','자살','fuck','shit','bitch','sex','porn','asshole'];
+const 욕인가 = 닉 => { const t = String(닉||'').toLowerCase().replace(/[^a-z가-힣ㄱ-ㅎㅏ-ㅣ]/g, ''); return 나쁜말.some(w => t.includes(w)); };
 const 닉검사 = 닉 => !닉 ? '닉네임을 입력해 주세요' : (닉.length < 2 ? '두 글자 이상으로 입력해 주세요'
-  : (MEMBERS.some(m => m.id !== S.mid && (m.n === 닉 || 닉of(m.id) === 닉)) ? '이미 쓰고 있는 이름이에요' : ''));
+  : 욕인가(닉) ? '쓸 수 없는 말이 들어 있어요'
+  : (MEMBERS.some(m => m.id !== S.mid && (m.n === 닉 || 닉of(m.id) === 닉)) ? '이미 쓰고 있는 닉네임이에요 · 다른 닉네임을 입력해 주세요' : ''));
+/* 추천 닉네임 — 꾸밈말 + 운동 낱말. 남이 쓰는 것과 겹치면 다시 뽑고, 그래도 겹치면 숫자를 붙인다 */
+function 닉추천(){
+  const 앞 = ['꾸준한','새벽','든든한','씩씩한','묵직한','가뿐한','성실한','불타는','단단한','유쾌한','조용한','날쌘','끈질긴','산뜻한','당찬'];
+  const 뒤 = ['덤벨','스쿼트','바벨','런닝','플랭크','케틀벨','데드리프트','벤치','풀업','런지','근육','헬린이','오운완','득근','땀방울'];
+  const 뽑 = a => a[Math.floor(Math.random()*a.length)];
+  for(let i = 0; i < 40; i++){ const 닉 = 뽑(앞) + ' ' + 뽑(뒤); if(닉.length <= 12 && !닉검사(닉)) return 닉; }
+  for(let n = 2; n < 999; n++){ const 닉 = '글래드 회원' + n; if(!닉검사(닉)) return 닉; }
+  return '';
+}
 function vHome(){
   닉네임먼저();
   const u = unreadOf(S.mid), t = D.today[S.mid], r = t ? rOf(t.rid) : null;
@@ -11951,6 +11969,7 @@ document.addEventListener('click', async ev=>{
       closeSheet(); toast('삭제했어요'); render(); return; }
     case 'profedit': sheetProfEdit(); return;
     case 'profpic': profPick(); return;
+    case 'nick0re': if(sheetRender && sheetRender.다시) sheetRender.다시(); return;
     case 'nick0ok': { const el = document.querySelector('[data-k="nick0"]'), 닉 = el ? el.value.trim().replace(/\s+/g,' ') : '', 말 = 닉검사(닉);
       if(말){ toast(말); return; }
       await profSave(S.mid, { nick: 닉 }); closeSheet(); toast(닉 + '님, 반가워요'); render(); return; }
