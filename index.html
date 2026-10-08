@@ -1058,6 +1058,10 @@ body .figbox2{background:radial-gradient(80% 50% at 50% 30%,rgba(240,211,160,.09
 .wrs .pm2{display:flex;align-items:center;gap:4px;flex:none}.wrs .pm2 button{width:34px;height:34px;border-radius:10px;border:1px solid #57524a;font-size:18px;font-weight:700;padding:0}.wrs .pm2 em{font-style:normal;font-family:Archivo,sans-serif;font-size:15px;font-weight:700;color:var(--gold);min-width:38px;text-align:center}
 .wrestbar{display:flex;align-items:center;gap:8px;flex:none;border-radius:14px;border:1px solid #5a4c33;background:#221e17;padding:9px 12px}
 .wrestbar b{font-family:Archivo,sans-serif;font-size:24px;font-weight:700;color:var(--gold);min-width:64px}.wrestbar span{flex:1;font-size:12px;color:var(--sub)}.wrestbar button{font-size:12px;font-weight:700;border:1px solid #57524a;border-radius:999px;padding:7px 10px;color:var(--cream)}
+/* 폰 폭(375)에서 두세 글자만 다음 줄로 떨어지던 곳 (2026-10-08 글줄점검) */
+.ktxt b,.mealcd .hd2 .k,.ktxt b.solo{white-space:nowrap}.ktxt b.solo{font-size:30px}
+.big2 .bt b,.big2 .bt i{white-space:nowrap}.big2.row{gap:9px;padding-left:11px;padding-right:9px}.big2 .bt b{font-size:14.5px;letter-spacing:-.03em}.big2 .bt i{font-size:11px;letter-spacing:-.03em}
+.hline small,.cyfoot span{text-wrap:pretty}.note,.agnote,.sm,.dd,.hs{text-wrap:pretty;word-break:keep-all}
 .stickup{position:sticky;bottom:-1px;z-index:5;display:flex;gap:9px;flex:none;padding:10px 0 4px;background:linear-gradient(180deg,transparent,var(--dark) 26%)}.stickup .btn{flex:1}.stickup .btn.main{flex:2}
 .fcars .nopic,.mp2 .nopic{width:100%;height:100%}.fcars .nopic svg{width:34%}#sheetbox .fsum{padding:8px 2px 0}
 .big2.row{min-height:0;flex-direction:row;align-items:center;gap:11px;padding:13px 12px}
@@ -2685,7 +2689,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '344';
+const BUILD = '345';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -4165,7 +4169,7 @@ function vNewMem(){
     <div class="fld"><span class="fn">담당 트레이너</span>
       <input class="search" type="text" data-k="nm:tr" placeholder="${esc(TRAINER)}"></div>
     <button class="btn main" data-act="nmsave">만들기</button>
-    <div class="note">만들면 <b>상담일지 · 운동계획 · 체형분석</b>이 빈 채로 생깁니다. 트레이너 화면에서 하나씩 채워 넣으시면 됩니다.</div>` };
+    <div class="cyfoot"><span>상담일지 · 운동계획 · 체형분석은 빈 채로 생겨요</span></div>` };
 }
 
 /* ── 홈 ── */
@@ -4364,7 +4368,7 @@ function sheetAttend(mid){
         <span class="e">${+x.첫.slice(5,7)}/${+x.첫.slice(8)} ~ ${+x.끝.slice(8)}</span>
         <span class="n">개인 ${x.개인.size}</span>
         <span class="v" style="color:var(--teal)">PT ${x.수업}</span></div>`).join('')}</div>
-      <div class="note">개인운동은 운동을 기록한 날, PT 수업은 수업 횟수로 셉니다.</div>
+      <div class="cyfoot"><span>개인운동 = 기록한 날 · PT 수업 = 수업 횟수</span></div>
       <button class="btn ghost sm" data-act="close">닫기</button>`; });
 }
 
@@ -4538,7 +4542,7 @@ function vHome(){
     <div class="hgoal">${목표칸(S.mid)}</div>
     ${인증샷홈(S.mid)}
     <div class="hrow wide">${홈최근(S.mid)}${홈코멘트(S.mid)}</div>
-    <button class="hline gold" data-act="rmstart:${S.mid}">${svg('h_crown',18)}<b>1RM 측정</b><small>목표만 입력하면 무게 · 횟수 · 쉬는 시간 자동</small><i>›</i></button>`,
+    <button class="hline gold" data-act="rmstart:${S.mid}">${svg('h_crown',18)}<b>1RM 측정</b><small>무게 · 횟수 · 휴식 자동</small><i>›</i></button>`,
     /* 맨 아래 고정 단추 — 기록 중일 때만. 평소엔 맨 위 큰 카드가 같은 일을 한다 (2026-10-06 홈 줄이기) */
     foot: lw ? `<button class="btn main go live" data-act="go:workout"><span class="gdot"></span>운동기록 계속하기</button>` : undefined };
 }
@@ -4560,7 +4564,7 @@ function vRoutines(){
       <div class="sm">${esc(r.purpose)}<br>${r.items.length}종목 · 예상 ${estMin(r)}분</div></div>
       ${t&&t.rid===r.id?`<span class="pill">오늘 ${esc(t.kind)}</span>`:'<span class="rt">›</span>'}</button>`; }).join('')
     : 빔('routine','아직 받은 루틴이 없어요','트레이너가 추가해 두면 여기에 보여요'))
-    + `<div class="note">루틴은 수업 전에 운동 방향에 맞춰 미리 짜 둡니다. <b>수업용과 혼자 할 때 쓰는 루틴</b>을 트레이너가 지정하거나, 직접 선택해 시작할 수 있어요.</div>` };
+    + `<div class="cyfoot"><span>트레이너가 지정하거나 직접 선택해 시작할 수 있어요</span></div>` };
 }
 function vRoutine(){
   const r=rOf(S.rid); if(!r) return vRoutines();
@@ -4592,7 +4596,7 @@ function vStart(){
             <div><div class="nm g">${esc(x.slot)} · 루틴 ${r0.no} ${esc(r0.n)}</div>
             <div class="sm">${r0.purpose?esc(r0.purpose)+' · ':''}${r0.items.length}종목 · 예상 ${estMin(r0)}분</div></div>
             <span class="rt">›</span></button>`; }).join('')
-        + `<div class="note">트레이너가 <b>다음 개인운동</b>에 하시라고 추가해 둔 루틴이에요. 개인운동을 한 번 기록하면 사라집니다.</div>`;
+        + `<div class="cyfoot"><span>트레이너 추천 루틴이에요 · 한 번 기록하면 사라져요</span></div>`;
     })()}
 
     ${/* 큰 사진 카드는 맨 위 하나만. 지정 루틴이 없는 날은 「내 루틴」이 그 자리에 온다 (2026-10-06 융합) */''}
@@ -4611,11 +4615,11 @@ function vStart(){
       ${ws[0]
         ? `<button class="hero2 half ${사진있나('again')}" data-act="myrecs"
             style="${사진꾸밈('again','#3a2a20','#15110d')}">
-          <span class="tt">지난 기록으로 시작</span>
+          <span class="tt">지난 기록으로</span>
           <span class="dd">${dateTxt(ws[0].date)} · ${ws[0].items.filter(i=>i.sets&&i.sets.length)
             .map(i=>exName(i.ex,i.va)).slice(0,1).join('')}${ws[0].items.length>1?' 외':''}</span></button>`
         : `<button class="hero2 half dimc" data-act="noprev" style="--h1:#2b2a26;--h2:#141311">
-          <span class="tt">지난 기록으로 시작</span>
+          <span class="tt">지난 기록으로</span>
           <span class="dd">한 번 하고 나면 여기서 다시</span></button>`}
       <button class="hero2 half ${r ? 'wide2' : ''} ${사진있나('pickex')}" data-act="empty"
           style="${사진꾸밈('pickex','#4a3b1c','#17130b')}">
@@ -4712,8 +4716,7 @@ function sheetPickVar(exid){
         <div><div class="nm">${esc(벌이름(exid, v))}</div>
         <div class="sm">${last?`지난번 ${setTxt(exid,last)}`:'기록 없음'}${n?` · 코멘트 ${n}`:''}${v.desc?' · 설명 있음':''}</div></div>
         <span class="rt">＋</span></button>`; }).join('')}
-    <div class="note">잘 모르시면 <b style="color:var(--gold)">(기본)</b> 으로 하세요 — 그 기구에서 가장 흔한 잡는 법입니다.<br>
-      같은 기구라도 <b>잡는 법과 자극 부위가 다르면</b> 따로 기록합니다. 그래야 증량 그래프와 코멘트가 섞이지 않아요.</div>
+    <div class="cyfoot"><span>잘 모르면 <b style="color:var(--gold)">(기본)</b>을 선택하세요</span></div>
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 
@@ -4906,7 +4909,7 @@ const PREPSET = [
        ['s10','s11','s12','s32'],
        ['s18','s19'] ] },
  { k:'shoulder', n:'어깨 운동 전 추천', art:'c2', h1:'#1f4048', h2:'#0e1517',
-   sm:'목 · 어깨 뒤 · 흉추. 어깨는 등이 받쳐 줘야 안 아픕니다',
+   sm:'목 · 어깨 뒤 · 흉추',
    m:[ ['m05','m06','m08','m04'],
        ['m01','m02','m20','m07'] ],
    s:[ ['s01','s02','s06','s07'],
@@ -4919,7 +4922,7 @@ const PREPKIND = [
  { k:'m',  n:'셀프 마사지', art:'c2', h1:'#3f2a1c', h2:'#15100c',
    sm:'폼롤러 · 땅콩볼로 뭉친 곳을 풀어 줍니다 · 4가지' },
  { k:'sm', n:'스트레칭 + 마사지', art:'s3', h1:'#453a22', h2:'#16130d',
-   sm:'풀고 나서 늘입니다 · 5가지' },
+   sm:'풀고 늘이기 · 5가지' },
 ];
 
 /* 주마다 다른 조합 — 같은 주에는 늘 같게, 주가 바뀌면 바뀐다 */
@@ -5108,7 +5111,7 @@ function vPrep(){
         <span class="tt">${esc(x.n)}</span>
         <span class="dd">${esc(x.sm)}</span></button>`; };
       return 카드(PREPKIND[0], 'tall pk1') + `<div class="home2 pk2">${PREPKIND.slice(1).map(x=>카드(x, 'half')).join('')}</div>`; })()}
-    <div class="cyfoot"><span>뼈와 관절 위는 굴리지 않아요 · 허리에는 폼롤러를 직접 대지 마세요</span></div>` };
+    <div class="cyfoot"><span>뼈 · 관절 · 허리 위는 굴리지 마세요</span></div>` };
 }
 
 /* 트레이너가 지정한 준비운동 — 루틴에 grp='준비운동' 으로 담긴다 */
@@ -5477,13 +5480,13 @@ function sheetExDesc(exid, vk, mid){
       <div class="desc" style="margin-top:6px"><div class="hd"><b>기본 설명</b>
         ${isEdited(mid,exid,vk)?'<span class="pill q">이 회원용</span>':'<span class="pill q">공통</span>'}
         <button class="chip t" style="margin-left:auto" data-act="editdesc:${exid}:${vk}">수정</button></div>
-        <div class="tx">${dsc? esc(dsc) : '아직 설명이 없어요 — 수정을 눌러 입력해 주세요'}</div></div>
+        <div class="tx">${dsc? esc(dsc) : '아직 설명이 없어요'}</div></div>
       <button class="btn ghost sm" data-act="close">닫기</button>`;
     return head + `
       <div class="desc"><div class="hd"><b>기본 설명</b>
         ${isEdited(mid,exid,vk)?'<span class="pill q">이 회원용</span>':'<span class="pill q">공통</span>'}
         ${tr?`<button class="chip t" style="margin-left:auto" data-act="editdesc:${exid}:${vk}">수정</button>`:''}</div>
-        <div class="tx">${dsc? esc(dsc) : '아직 설명이 없어요'+(tr?' — 수정을 눌러 입력해 주세요':'')}</div></div>
+        <div class="tx">${dsc? esc(dsc) : '아직 설명이 없어요'}</div></div>
       ${S.screen==='workout' ? '' : demoBox(exOf(exid), v)}
       <span class="lbl">코멘트 ${cms.length?`${cms.length}개`:''}</span>
       ${cms.length ? 코멘트회차(cms, K, tr)
@@ -5718,7 +5721,7 @@ function sheetNewVar(exid){
     <textarea data-k="vd:${exid}" placeholder="이렇게 하는 법을 입력해 주세요"></textarea>
     <button class="btn main sm" data-act="savevar:${exid}">추가</button>
     <button class="btn ghost sm" data-act="close">닫기</button>
-    <div class="note">잡는 법이나 자극 부위가 달라 <b>따로 기록해야 하는 경우</b>에만 나눕니다. 시범 영상도 따로 붙습니다.</div>`);
+    <div class="cyfoot"><span>잡는 법 · 자극 부위가 다를 때만 나눠요</span></div>`);
 }
 
 /* ── 요약 · 기록 ── */
@@ -6185,7 +6188,7 @@ function vRecords(){
           <span class="d ${t.diff===null?'eq':cl}">${ar}</span></div>`; }).join('')
       : '<div class="empty">이 부위 기록이 없어요</div>'}
     </div>
-    <div class="note">기간 안 <b>처음과 마지막</b>의 가장 무거운 세트를 비교합니다. 기간에 한 번만 했다면 <b>그 직전 기록</b>과 비교합니다.</div>` };
+    <div class="cyfoot"><span>기간의 처음과 마지막 최고 무게를 비교해요</span></div>` };
 }
 
 /* ── 지난 운동기록 — 날짜로 보기 ──
@@ -7614,7 +7617,7 @@ function sheetPartnerWrite(){
       <textarea class="search" data-k="pt:body" rows="3" maxlength="400" placeholder="예) 하체 날 같이 하실 분! 스쿼트 보조 서로 봐 드려요. 센터에서 뵙고 맞으면 꾸준히 해요.">${esc(n.body)}</textarea></div>
     <button class="btn main" data-act="partsend">모집 글 올리기</button>
     <button class="btn ghost sm" data-act="close">닫기</button>
-    <div class="note">같은 센터 회원끼리만 보여요. 연락은 댓글로 주고받고, 모집이 끝나면 「마감하기」를 눌러 주세요.</div>`);
+    <div class="cyfoot"><span>센터 회원끼리만 보여요 · 연락은 댓글로 해요</span></div>`);
 }
 function 파트너입력담기(){
   const n = S.part; if(!n) return;
@@ -7787,7 +7790,7 @@ function sheetRMStart(mid, 추가){
     <button class="btn main" data-act="rmgo:${mid}">1RM 측정 루틴으로 시작 <small style="opacity:.75;font-weight:500">· 워밍업부터 자동</small></button>
     <button class="btn sub" data-act="rmdirect:${mid}">1RM 기록 직접 입력하기 <small style="opacity:.75;font-weight:500">· 이미 잰 무게</small></button>
     <button class="btn ghost sm" data-act="close">닫기</button>
-    <div class="note">종목마다 「1RM 재기」에서 목표를 입력하면 워밍업 → 준비 3단계 → 본 시도까지 세트가 자동으로 깔립니다 (NSCA 절차).</div>`);
+    <div class="cyfoot"><span>목표를 입력하면 세트가 자동으로 만들어져요</span></div>`);
 }
 
 function sheetRM(){
@@ -8748,7 +8751,7 @@ function cycBar(c){
 const CYC_TIP = {
   '월경기':['가벼운 유산소와 스트레칭 위주로','무게는 평소의 60~70%로 낮춰서','아프면 그날은 쉬어도 괜찮아요'],
   '난포기':['증량하기 제일 좋은 때예요','고중량·복합운동을 이 시기에 몰아 주세요','새 기록 노려볼 만합니다'],
-  '배란기':['힘은 가장 잘 나는 때예요','다만 인대가 느슨해져 삐끗하기 쉬워요','무릎·발목 쓰는 동작은 자세를 먼저 챙겨 주세요'],
+  '배란기':['힘은 가장 잘 나는 때예요','다만 인대가 느슨해져 삐끗하기 쉬워요','무릎 · 발목 동작은 자세 먼저'],
   '황체기':['무게보다 횟수로 채우는 편이 편해요','붓기 때문에 몸무게가 늘어 보일 수 있어요 — 괜찮아요','수분·염분만 조금 신경 써 주세요'],
 };
 
@@ -9169,7 +9172,7 @@ function intakeNote(mid){
   if(!has('birth')) need.push('생년월일');
   if(!has('height')) need.push('신장');
   if(!has('sex')) need.push('성별');
-  if(!need.length) return `<div class="note" style="padding:8px 10px">상담일지에서 <b>생년월일 · 신장 · 성별</b>을 가져왔습니다.</div>`;
+  if(!need.length) return `<div class="cyfoot"><span>생년월일 · 신장 · 성별은 상담일지에서 가져왔어요</span></div>`;
   return `<div class="note" style="border-color:var(--warn);padding:9px 11px">
     <div style="color:var(--warn);font-weight:700">상담일지에 ${need.join(' · ')}이(가) 비어 있습니다</div>
     <div>여기 입력하시면 <b>상담일지에도 같이 들어갑니다.</b></div>
@@ -9237,7 +9240,7 @@ function vPlanEdit(){
     <div class="grid2">
       <div class="fld"><span class="fn">최소 섭취 kcal</span>
         <input class="search" type="text" inputmode="numeric" data-k="pc:floor" value="${esc(c.floor||'')}" placeholder="${c.sex==='남'?1500:1200}"></div>
-      <div class="fld"><span class="fn">한 주에 줄일 수 있는 한도 %</span>
+      <div class="fld"><span class="fn">주간 감량 한도 %</span>
         <input class="search" type="text" inputmode="decimal" data-k="pc:wkmax" value="${esc(c.wkmax||'')}" placeholder="1"></div>
     </div>
     </div>
@@ -9597,8 +9600,7 @@ function sheetIbPick(mid, side){
         <span class="c">${x.m?ib수(x.m):'—'}</span>
         <span class="c">${x.fp?ib수(x.fp):'—'}</span></button>`).join('')}
     </div>
-    <div class="note">${side==='F' ? '누르면 그 날을 <b>최근</b> 칸에 놓고, 바로 앞 기록과 비교합니다.' : '누르면 그 날짜로 변경합니다.'}
-      <br><i class="ibdot"></i> 인바디 기계로 잰 기록</div>
+    <div class="cyfoot"><span>${side==='F' ? '누르면 그 날이 「최근」이 되고 바로 앞 기록과 비교해요' : '누르면 그 날짜로 바뀌어요'}</span></div>
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 
@@ -9665,8 +9667,7 @@ function sheetBlAdd(mid){
       <div class="fld"><span class="fn">체지방률 %</span>
         <input class="search" type="text" inputmode="decimal" data-k="bl:fp" value="${v('fp')}"></div>
     </div>
-    <div class="note">몸무게만 입력해도 됩니다. <b>같은 날에 또 입력하면 덮어씁니다.</b>
-      가장 최근 기록은 <b>칼로리 계산</b>의 현재 몸무게로도 들어갑니다.</div>
+    <div class="cyfoot"><span>몸무게만 입력해도 돼요 · 같은 날 다시 입력하면 덮어써요</span></div>
     <button class="btn blue sm" data-act="blgo:${mid}">저장</button>
     ${cur?`<button class="btn ghost sm" data-act="bldel:${cur.id}" style="color:var(--warn)">이 날 기록 삭제</button>`:''}
     <button class="btn ghost sm" data-act="close">닫기</button>`);
@@ -9900,7 +9901,7 @@ function vBody(){
   const mid = subj(), tr = (S.who==='tr');
   const n = (D.bph||[]).filter(x=>x.mid===mid).length;
   const 체 = S.bodyPart === 'pose';
-  return { top: bar(체 ? '체형분석 기록' : '인바디 · 비포애프터', `<span class="sub">${tr ? esc(subjName()) : (체 ? '' : '사진 '+n+'장')}</span>`, tr?'tm:'+mid:'tab:me'),
+  return { top: bar(체 ? '체형분석 기록' : '인바디', `<span class="sub">${tr ? esc(subjName()) : (체 ? '' : '사진 '+n+'장')}</span>`, tr?'tm:'+mid:'tab:me'),
     body: bodyPane(mid, 체 ? 'pose' : 'in') };
 }
 
@@ -10219,8 +10220,8 @@ function tToday(){
     ${(()=>{ const 식 = (D.meals||[]).filter(m=>m.date===TODAY), 안단 = 식.filter(m=>!m.note).length;
       return `<div class="tmsum btn3">
       <button class="t ${live.length?'':'zero'}" ${live.length ? `data-act="${live.length===1 ? 'tgo:'+live[0].m.id : 'tdlive'}"` : 'disabled'}><small>기록 중인 수업</small><b>${live.length}<i>명</i></b></button>
-      <button class="${todo.length?'':'zero'}" ${todo.length ? 'data-act="tdtodo"' : 'disabled'}><small>코멘트 안 단 기록</small><b>${todo.length}<i>건</i></b></button>
-      <button class="${식.length?'':'zero'}" ${식.length ? 'data-act="tdmeal"' : 'disabled'}><small>오늘 올라온 식단</small><b>${식.length}<i>장</i>${안단 ? `<em class="td안">안 단 것 ${안단}</em>` : ''}</b></button>
+      <button class="${todo.length?'':'zero'}" ${todo.length ? 'data-act="tdtodo"' : 'disabled'}><small>코멘트 대기</small><b>${todo.length}<i>건</i></b></button>
+      <button class="${식.length?'':'zero'}" ${식.length ? 'data-act="tdmeal"' : 'disabled'}><small>오늘 식단</small><b>${식.length}<i>장</i>${안단 ? `<em class="td안">안 단 것 ${안단}</em>` : ''}</b></button>
     </div>`; })()}
     <div class="hrow">
       <button class="hcard teal" data-act="pickasg">${홈머리('h_cal','루틴 지정하기')}
@@ -10524,8 +10525,7 @@ function tRoutines(){
       <button class="btn main sm" data-act="rblank">＋ 새 루틴 만들기</button>
       <button class="btn sub sm" data-act="raddpick">루틴 추가하기</button></div>
     ${t?`<button class="btn ghost" data-act="unassign:${mid}">오늘 지정 풀기</button>`:''}
-    <div class="note">위 칩은 <b>루틴 그룹</b>입니다 — 근지구력 · 파워 · 생리주기처럼 원하는 이름으로 만들어 쓰세요.
-      회원은 오른쪽 위 이름을 눌러 전환합니다.</div>` };
+    <div class="cyfoot"><span>위 칩은 루틴 그룹이에요 · 원하는 이름으로 만들어 쓰세요</span></div>` };
 }
 
 /* 회원 고르기 */
@@ -10573,8 +10573,7 @@ function sheetRAdd(){
       ${others.map(o=>`<span class="lbl">${esc(o.m.n)} 회원 루틴 — 가져오기</span>
         ${o.rs.map(r=>row(r, o.m.n)).join('')}`).join('')}
       <button class="btn ghost sm" data-act="close">닫기</button>
-      <div class="note">＋ 를 눌러 선택하고, <b>추가하기</b>를 누르면 한 번 더 여쭤봅니다.
-        같은 루틴을 여러 번 추가해도 됩니다.</div>`;
+      <div class="cyfoot"><span>＋ 로 선택한 뒤 「추가하기」를 누르세요</span></div>`;
   });
 }
 
@@ -10616,7 +10615,7 @@ function sheetGrpMan(){
     <input class="search" type="text" data-k="grpnew" placeholder="예 · 근지구력, 황체기">
     <div class="chips">${GRP_SUGGEST.filter(x=>gs.indexOf(x)<0).map(x=>
       `<button class="chip" data-act="grpfill:${x}">${x}</button>`).join('')}</div>
-    <div class="note">만들면 그 그룹으로 바로 넘어갑니다 — 거기서 <b>새 루틴 만들기</b>나 <b>루틴 추가하기</b>로 채우세요.</div>
+    <div class="cyfoot"><span>만들면 그 그룹으로 바로 넘어가요</span></div>
     <button class="btn main sm" data-act="grpadd">만들기</button>
     <button class="btn ghost sm" data-act="close">닫기</button>`;
   });
@@ -10820,7 +10819,7 @@ function tEx(){
             <span class="sm" style="color:${v.desc?'var(--gold-2)':'var(--sub)'}">· ${esc(벌이름(e.id, v))}${v.desc?' — 설명 있음':' — 설명 없음'}${영상시범(v)?' · 영상 ▶':''}</span>
             <span class="rt">›</span></button>`).join('')}</div>`; }).join('')
     ).join('<div class="hr"></div>')
-    + `<div class="note">잡는 법이나 자극 부위가 달라 <b>따로 기록해야 하는 종목</b>만 나눕니다. 랫풀다운·시티드로우·하이로우·리니어로우·RDL이 그렇게 나뉘어 있습니다.</div>` };
+    + `<div class="cyfoot"><span>잡는 법 · 자극 부위가 다른 종목만 나눠요</span></div>` };
 }
 
 /* 고르기 화면 — 찾는 말 · 부위 · 기구를 한꺼번에 걸러 보여준다 */
