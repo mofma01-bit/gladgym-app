@@ -2601,7 +2601,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '329';
+const BUILD = '330';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -6893,7 +6893,8 @@ function ootdDraw(img, w){
   글(25, 700, OOTD_A, '#fff', 3);
   x.fillText('GLAD GYM', 여, 98);
   글(19, 600, OOTD_A, 'rgba(255,255,255,.78)', 4);
-  x.fillText((w.date||TODAY).replace(/-/g,'.'), 여, 130);
+  /* 날짜 옆에 **찍은 시각** (2026-10-08 대표 「촬영 시각도 간단하게 표기」) — 오운완은 그날에만 찍으니 지금 시각이 곧 찍은 시각이다. 식단 사진(stampPhoto)은 원래 시각까지 찍는다 */
+  x.fillText((w.date||TODAY).replace(/-/g,'.') + '  ' + (d => String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0'))(new Date()), 여, 130);
   자간끄기();
 
   /* ── 주인공 : 총 볼륨 ──
