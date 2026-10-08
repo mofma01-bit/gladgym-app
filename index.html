@@ -1019,6 +1019,38 @@ body .figbox2{background:radial-gradient(80% 50% at 50% 30%,rgba(240,211,160,.09
 .fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;width:100%;flex:none}
 .fgc{position:relative;aspect-ratio:1;overflow:hidden;border-radius:4px;background:var(--dark-3);padding:0}.fgc img,.fgc .nopic{width:100%;height:100%;object-fit:cover;display:block}.fgc .nopic{display:flex}
 .fgk,.fgn{position:absolute;top:5px;font-size:10.5px;font-weight:800;color:#fff;background:rgba(0,0,0,.55);border-radius:8px;padding:2px 5px;line-height:1.2}.fgk{left:5px;color:var(--teal)}.fgk svg{display:block}.fgn{right:5px}
+/* 운동 중 — 세트 표 */
+.wtb{display:flex;flex-direction:column;gap:2px;flex:none}
+.wtr{display:grid;grid-template-columns:30px 1fr 1fr 1fr 44px;align-items:center;gap:6px;padding:5px 4px;border-radius:12px;cursor:pointer}
+.wtb.c3 .wtr{grid-template-columns:26px .8fr 1fr 1fr 1fr 40px;gap:4px}
+.wtr.hd{font-size:10.5px;color:var(--sub);font-weight:600;padding-bottom:1px;cursor:default}.wtr.hd span{text-align:center}
+.wtr .s{font-family:Archivo,sans-serif;font-size:14px;font-weight:700;color:var(--sub);text-align:center}
+.wtr .pv{font-size:12px;color:#77736c;text-align:center;font-variant-numeric:tabular-nums;white-space:nowrap}
+.wc{height:40px;border-radius:10px;background:#262521;border:1px solid #38362f;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--cream);padding:0;min-width:0}
+.wc small{font-size:10.5px;color:var(--sub);font-weight:600;margin-left:2px}.wtb.c3 .wc{font-size:14.5px}.wtb.c3 .wc small{font-size:9.5px}
+.wck{width:40px;height:40px;border-radius:10px;border:1.5px solid #4a463d;color:#5d5a54;font-size:18px;font-weight:800;justify-self:center;padding:0}
+.wtr.ok{background:rgba(240,211,160,.07)}.wtr.ok .wc{background:none;border-color:transparent;color:var(--gold)}.wtr.ok .wck{background:var(--gold);border-color:var(--gold);color:#1a1814}.wtr.ok .s{color:var(--gold)}
+.wtr.on .wc{border-color:var(--teal);background:#1e2c30}.wtr.on .s{color:var(--teal)}.wtr.on:not(.ok) .wck{border-color:var(--teal);color:var(--teal)}.wtr.ok.on{outline:1.5px solid var(--teal);outline-offset:-1px}
+.wadj{flex:none;border-radius:14px;border:1px solid #3f7281;background:linear-gradient(170deg,#1b2d33,#171a19 70%);padding:10px 10px 12px}
+.wadj .lab{display:flex;justify-content:space-between;gap:8px;font-size:12px;font-weight:700;color:var(--teal);margin-bottom:8px;padding:0 2px}.wadj .lab span+span{color:var(--sub);font-weight:500;white-space:nowrap}
+.wadj .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.wadj.w3 .two{grid-template-columns:1fr 1fr 1fr;gap:6px}
+.wadj .nm{font-size:11px;color:var(--sub);text-align:center;margin-bottom:5px}
+.wstp{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;gap:2px}.wadj.w3 .wstp{grid-template-columns:32px 1fr 32px}
+.wstp .pm{height:48px;border-radius:12px;background:#22383f;border:1px solid #3f7281;font-size:24px;font-weight:700;color:var(--cream);line-height:1;padding:0 0 3px}.wstp .pm:active{background:#2c4a53}
+.wstp .num{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0}
+.wstp .num input{width:100%;background:none;border:0;border-radius:0;padding:0;text-align:center;font-size:21px;font-weight:800;color:var(--cream);font-variant-numeric:tabular-nums;height:28px;min-height:0}
+.wadj.w3 .wstp .num input{font-size:17px}.wstp .num small{font-size:10.5px;color:var(--sub);font-weight:600;line-height:1.1}
+.wdone{flex:none;width:100%;height:52px;border-radius:14px;background:var(--teal);color:#10181a;font-size:16px;font-weight:800}.wdone.g{background:var(--gold)}
+.wdone2{display:grid;grid-template-columns:1fr 1.3fr;gap:9px;flex:none}
+.wexf{display:flex;flex:none;border-top:1px dashed #3b3a35;margin:0 -2px}.wexf button{flex:1;padding:11px 4px;font-size:12.5px;font-weight:700;color:var(--gold)}.wexf button+button{border-left:1px dashed #3b3a35;color:var(--sub)}
+.wlock{display:flex;justify-content:space-between;align-items:center;flex:none;font-size:12px;color:var(--sub)}.wlock button{font-size:12.5px;font-weight:700;color:var(--cream);border:1px solid #57524a;border-radius:999px;padding:7px 14px}
+.wrs{display:flex;align-items:center;gap:10px;flex:none;padding:9px 11px;border-radius:12px;border:1px solid #34332d;background:#1a1917}
+.wrs .t{flex:1;min-width:0}.wrs b{font-size:13px;display:block}.wrs small{font-size:11px;color:var(--sub)}
+.wrs .sw{width:44px;height:26px;border-radius:13px;background:#34332d;position:relative;flex:none;padding:0}.wrs .sw i{position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:50%;background:#8f8a83;transition:.15s}
+.wrs.on{border-color:#5a4c33}.wrs.on .sw{background:var(--gold-2,#b9965f)}.wrs.on .sw i{left:21px;background:#fff}
+.wrs .pm2{display:flex;align-items:center;gap:4px;flex:none}.wrs .pm2 button{width:34px;height:34px;border-radius:10px;border:1px solid #57524a;font-size:18px;font-weight:700;padding:0}.wrs .pm2 em{font-style:normal;font-family:Archivo,sans-serif;font-size:15px;font-weight:700;color:var(--gold);min-width:38px;text-align:center}
+.wrestbar{display:flex;align-items:center;gap:8px;flex:none;border-radius:14px;border:1px solid #5a4c33;background:#221e17;padding:9px 12px}
+.wrestbar b{font-family:Archivo,sans-serif;font-size:24px;font-weight:700;color:var(--gold);min-width:64px}.wrestbar span{flex:1;font-size:12px;color:var(--sub)}.wrestbar button{font-size:12px;font-weight:700;border:1px solid #57524a;border-radius:999px;padding:7px 10px;color:var(--cream)}
 .stickup{position:sticky;bottom:-1px;z-index:5;display:flex;gap:9px;flex:none;padding:10px 0 4px;background:linear-gradient(180deg,transparent,var(--dark) 26%)}.stickup .btn{flex:1}.stickup .btn.main{flex:2}
 .fcars .nopic,.mp2 .nopic{width:100%;height:100%}.fcars .nopic svg{width:34%}#sheetbox .fsum{padding:8px 2px 0}
 .big2.row{min-height:0;flex-direction:row;align-items:center;gap:11px;padding:13px 12px}
@@ -2646,7 +2678,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '339';
+const BUILD = '340';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -3847,6 +3879,7 @@ setInterval(()=>{
       /* 카드 안 휴식 버튼도 「쉬는 중」으로 바뀌고 숫자가 흐른다.
          시트를 어떻게 닫든(시작·닫기·건너뛰기) 여기서 맞춰지므로 손잡이마다 안 챙겨도 된다 */
       const rv=$('#restleft'); if(rv) rv.textContent=mmss(left);
+      const rv2=$('#restleft2'); if(rv2) rv2.textContent=mmss(left);
       const rb=$('.restt'); if(rb) rb.classList.add('run'); }
   }
 },250);
@@ -5297,24 +5330,7 @@ function vWorkout(){
              <div style="display:flex;gap:7px"><button class="btn main sm" style="flex:1" data-act="rmok">성공 — 실측으로 남기기</button>
                <button class="btn sub sm" style="flex:1" data-act="rmmore">＋${RM종목[cur.ex]==='상체'?'2.5':'5'}% 한 번 더</button></div>`)}</div>`; })() : ''}
     ${세칸(e, v, cur, wmid, tr, cms, nw, dsc)}
-    ${isMemo(cur.ex)
-      ? ''
-      : cur.sets.map((s,i)=> (!cur.locked && i===보일칸) ? '' :
-        `<button class="set ${cur.locked?'lock':(s.done?'done':(i===openIdx?'now':''))}" data-act="edit:${i}">
-      <span class="i">${i+1}${e.cardio?'구간':'세트'}</span>
-      ${cur.locked ? '' : '<span class="setedit">수정</span>'}
-      ${e.cardio
-        ? `<span class="n">${s.reps}</span><span class="u">분</span><span class="sl">/</span>
-           <span class="n" style="margin-left:0">${s.spd||0}</span><span class="u">km/h</span>`
-          + (경사최대(cur.ex) ? `<span class="sl">/</span>
-           <span class="n" style="margin-left:0">${kgfmt(s.kg)}</span><span class="u">°</span>` : '')
-        : `<span class="n">${kgfmt(s.kg)}</span><span class="u">kg</span><span class="sl">/</span>
-           <span class="n" style="margin-left:0">${s.reps}</span><span class="u">회</span>`}
-    </button>`).join('')}
-    ${isMemo(cur.ex) ? '' : (cur.locked
-      ? `<button class="btn sub" data-act="redo">재기록</button>`
-      : 세로입력(cur, e, 보일칸))}
-    ${cur.locked ? '' : `<button class="btn main fin" data-act="fin">${esc(e.n)} 완료</button>`}
+    ${isMemo(cur.ex) ? (cur.locked ? '' : `<button class="btn main fin" data-act="fin">${esc(e.n)} 완료</button>`) : 세트표(cur, e, wmid)}
   </div>`;
 
   return {
@@ -5500,6 +5516,42 @@ function sheetExDesc(exid, vk, mid){
 /* ── 세로 입력 기둥 ── 지금 하는 세트를 카드 안에서 바로 고친다 (2026-09-04).
    예전에는 세트 줄을 눌러 팝업을 띄워야 했다 — 두 걸음이었고,
    화면 전체가 똑같은 가로 막대라 무엇을 눌러야 할지 눈에 안 들어왔다.   */
+/* ── 세트 표 (2026-10-08 대표 「앱에 넣어줘」 · 시험 페이지 운동중_새안_4판) ──
+   한 줄 = 세트 · 지난번 · 값 · ✓.  줄을 누르면 그 세트가 골라지고 표 아래 조절 칸에서 − ＋ 로 바꾼다(숫자를 누르면 직접 입력).
+   ⛔ 예전 규칙 그대로 : 완료는 잠그기만 한다 — 새 줄은 「＋ 세트 추가」(nextset)를 눌러야 생긴다 (2026-09-17 대표) */
+const 쉼설정 = () => { let on = false, sec = 90; try{ on = localStorage.getItem('gg_rest_on') === '1'; sec = +localStorage.getItem('gg_rest_sec') || 90; }catch(e){} return { on, sec }; };
+/* 쉬는 시간은 **켠 사람만** — 켜 두면 세트를 끝낼 때마다 돈다. 1RM 측정은 단계마다 정해진 시간이 따로 돈다 */
+function 쉼자동(cur){ const c = 쉼설정(); if(!c.on || (cur && cur.rmPlan)) return; S.rest = { sec:c.sec, until: Date.now() + c.sec*1000 }; }
+function 세트표(cur, e, mid){
+  const 유 = !!e.cardio, 경 = 유 && 경사최대(cur.ex), 단위 = 유 ? '구간' : '세트';
+  const 칸들 = 유 ? [['reps','setreps','시간','분',1], ['spd','setspd','속도','km/h',0.5]].concat(경 ? [['kg','setkg','경사','도',1]] : [])
+                  : [['kg','setkg','무게','kg',2.5], ['reps','setreps','횟수','회',1]];
+  const 값 = (x, f) => f==='kg' ? kgfmt(x.kg) : f==='spd' ? (x.spd||0) : x.reps;
+  const 지난 = (lastRuns(cur.ex, cur.va, mid, 1)[0] || {}).sets || [];
+  const 지난글 = p => !p ? '—' : 유 ? `${p.reps}분` : `${kgfmt(p.kg)}×${p.reps}`;
+  const 열림 = cur.sets.findIndex(x => !x.done), 끝 = cur.sets.length - 1, 잠 = !!cur.locked;
+  const sel = 잠 ? -1 : (S.wsel != null && S.wsel <= 끝) ? S.wsel : (열림 >= 0 ? 열림 : 끝);
+  const 표 = `<div class="wtb c${칸들.length}"><div class="wtr hd"><span>${단위}</span><span>지난번</span>${칸들.map(c=>`<span>${c[2]}</span>`).join('')}<span>완료</span></div>
+    ${cur.sets.map((x,i)=>`<div class="wtr ${x.done||잠?'ok':''} ${i===sel?'on':''}"${잠?'':` data-act="ws:${i}"`}><span class="s">${i+1}</span><span class="pv">${지난글(지난[i])}</span>
+      ${칸들.map(c=>`<button class="wc"${잠?'':` data-act="wsf:${i}:${c[1]}"`}>${값(x,c[0])}<small>${c[3]}</small></button>`).join('')}
+      <button class="wck"${잠?'':` data-act="${!x.done && i===끝 ? 'rep' : 'wsd:'+i}"`} aria-label="${i+1}${단위} 완료">✓</button></div>`).join('')}</div>`;
+  if(잠) return 표 + `<div class="wlock"><span>끝낸 종목이에요 · 잠겨 있어요</span><button data-act="redo">재기록</button></div>`;
+  const x = cur.sets[sel], p = 지난[sel], 할 = x.done ? 열림 : sel, c0 = 쉼설정(), 도는중 = !!(S.rest && S.rest.until);
+  return `${cur.rmPlan ? '' : `<div class="wrs ${c0.on?'on':''}"><button class="sw" data-act="wrest" aria-label="쉬는 시간 ${c0.on?'끄기':'켜기'}"><i></i></button>
+      <span class="t"><b>쉬는 시간</b><small>${c0.on ? '세트를 끝낼 때마다 '+mmss(c0.sec)+' 을 재요' : '꺼져 있어요 · 켜면 세트마다 자동으로 재요'}</small></span>
+      ${c0.on ? `<span class="pm2"><button data-act="wrestd:-15" aria-label="15초 줄이기">−</button><em>${mmss(c0.sec)}</em><button data-act="wrestd:15" aria-label="15초 늘리기">＋</button></span>` : ''}</div>`}
+    ${표}
+    <div class="wadj ${칸들.length > 2 ? 'w3' : ''}"><div class="lab"><span>${sel+1}${단위} ${x.done ? '수정' : '조절'}</span><span>지난번 ${p ? (유 ? p.reps+'분' : kgfmt(p.kg)+'kg × '+p.reps+'회') : '없음'}</span></div>
+      <div class="two">${칸들.map(c=>`<div><div class="nm">${c[2]}</div><div class="wstp">
+        <button class="pm" data-act="d:${c[0]}:${sel}:-${c[4]}" data-rep="1" aria-label="${c[2]} 내리기">−</button>
+        <span class="num"><input type="text" inputmode="decimal" data-k="${c[1]}" data-i="${sel}" value="${값(x,c[0])}" aria-label="${c[2]}"><small>${c[3]}</small></span>
+        <button class="pm" data-act="d:${c[0]}:${sel}:${c[4]}" data-rep="1" aria-label="${c[2]} 올리기">＋</button></div></div>`).join('')}</div></div>
+    ${도는중 ? `<div class="wrestbar"><b id="restleft2">${mmss(Math.max(0,(S.rest.until-Date.now())/1000))}</b><span>쉬는 중</span><button data-act="wrestadd">+15초</button><button data-act="wrestx">건너뛰기</button></div>` : ''}
+    ${열림 >= 0
+      ? `<button class="wdone" data-act="${할 === 끝 ? 'rep' : 'wsd:'+할}">${할+1}${단위} 완료</button>`
+      : `<div class="wdone2"><button class="wdone" data-act="nextset">＋ ${끝+2}${단위} 추가</button><button class="wdone g" data-act="fin">${esc(e.n)} 완료</button></div>`}
+    <div class="wexf"><button data-act="nextset">＋ ${단위} 추가</button><button data-act="wspop">마지막 ${단위} 제거</button>${열림 >= 0 ? `<button data-act="fin">종목 완료</button>` : ''}</div>`;
+}
 function 세로입력(cur, e, i){
   const s = cur.sets[i] || {};
   const 잠 = !!s.done;                       /* 완료한 세트는 잠긴다 */
@@ -11825,7 +11877,7 @@ document.addEventListener('click', async ev=>{
       if(w.cur >= w.items.length) w.cur = Math.max(0, w.items.length-1);
       save(); toast('제거했어요'); render(); return; }
 
-    case 'jump': S.demoOpen = false;
+    case 'jump': S.demoOpen = false; S.wsel = null;
       S.prevOpen=false; { const i=+rest[0];
       if(S.moveIdx!=null && S.moveIdx!==i) S.moveIdx=null;   /* 순서 바꾸다 다른 걸 누르면 나간다 */
       S.fold = (i===w.cur) ? !S.fold : false;                /* 같은 걸 또 누르면 접는다 */
@@ -11846,6 +11898,18 @@ document.addEventListener('click', async ev=>{
     /* 운동 중에는 다른 데로 못 나간다 */
     case 'askleave': sheetLeave(); return;
     case 'edit': sheetEdit(+rest[0]); return;
+    case 'ws': S.wsel = +rest[0]; render(); return;
+    case 'wsf': { S.wsel = +rest[0]; render(); const el2 = document.querySelector('#main .wadj input[data-k="' + rest[1] + '"]'); if(el2){ el2.focus(); try{ el2.select(); }catch(e){} } return; }
+    case 'wsd': { const cur = w.items[w.cur], x = cur.sets[+rest[0]]; if(!x || cur.locked) return;
+      x.done = !x.done; S.wsel = null;
+      if(x.done){ x.at = Date.now(); try{ rm추정확인(w, cur, x); }catch(e){ console.warn('1RM 추정', e); } 쉼자동(cur); }
+      save(); render(); return; }
+    case 'wspop': { const cur = w.items[w.cur]; if(cur.locked) return; if(cur.sets.length < 2){ toast('세트가 하나뿐이에요'); return; }
+      cur.sets.pop(); S.wsel = null; save(); toast('마지막 세트를 제거했어요'); render(); return; }
+    case 'wrest': { const c = 쉼설정(); try{ localStorage.setItem('gg_rest_on', c.on ? '0' : '1'); }catch(e){} if(c.on) S.rest = null; toast(c.on ? '쉬는 시간을 껐어요' : '쉬는 시간을 켰어요 · 세트를 끝내면 자동으로 재요'); render(); return; }
+    case 'wrestd': { const c = 쉼설정(), n = Math.max(15, Math.min(600, c.sec + (+rest[0]))); try{ localStorage.setItem('gg_rest_sec', String(n)); }catch(e){} if(S.repeating){ const em = document.querySelector('#main .wrs .pm2 em'); if(em) em.textContent = mmss(n); } else render(); return; }
+    case 'wrestadd': if(S.rest && S.rest.until){ S.rest.until += 15000; render(); } return;
+    case 'wrestx': S.rest = null; render(); return;
     case 'd': { const [f,i,dv]=rest, s=w.items[w.cur].sets[+i];
       /* 유산소면 kg 칸이 「경사」다 — 기구가 올라가는 만큼만 */
       if(f==='kg'){ const 위 = 경사최대(w.items[w.cur].ex) || 9999;
@@ -11865,7 +11929,7 @@ document.addEventListener('click', async ev=>{
        이제 완료는 잠그기만 하고, 새 줄은 「다음 세트」를 눌러야 생긴다. */
     case 'rep': { const cur=w.items[w.cur], last=cur.sets[cur.sets.length-1];
       if(!last || last.done) return;
-      last.done=true; last.at=Date.now(); save();
+      last.done=true; last.at=Date.now(); S.wsel=null; if(!cur.rmPlan) 쉼자동(cur); save();
       try{ rm추정확인(w, cur, last); }catch(e){ console.warn('1RM 추정', e); }
       /* 1RM 측정 계획 중이면 다음 단계를 바로 깐다 */
       if(cur.rmPlan){ const nx = cur.rmPlan[cur.sets.length];
@@ -11876,7 +11940,7 @@ document.addEventListener('click', async ev=>{
       render(); return; }
     case 'nextset': { const cur=w.items[w.cur], last=cur.sets[cur.sets.length-1];
       if(!last || !last.done) return toast('이번 세트를 먼저 완료해 주세요');
-      cur.sets.push({kg:last.kg, reps:last.reps, spd:last.spd, done:false});
+      cur.sets.push({kg:last.kg, reps:last.reps, spd:last.spd, done:false}); S.wsel=null;
       save(); render(); return; }
     case 'unlock': { const cur=w.items[w.cur], last=cur.sets[cur.sets.length-1];
       if(!last) return; last.done=false; save(); toast('다시 수정할 수 있어요'); render(); return; }
@@ -12013,7 +12077,7 @@ document.addEventListener('click', async ev=>{
     case 'rd': { if(S.rest.until) S.rest.until+=(+rest[0])*1000; else S.rest.sec=Math.max(10,S.rest.sec+(+rest[0])); drawSheet(); return; }
     case 'rgo': S.rest.until=Date.now()+S.rest.sec*1000; drawSheet(); return;
     case 'rskip': S.rest=null; closeSheet(); return;
-    case 'fin': { S.fold=false; const cur=w.items[w.cur];
+    case 'fin': { S.fold=false; S.wsel=null; const cur=w.items[w.cur];
       if(!cur.locked){
         cur.sets.forEach(s=>s.done=true); cur.locked=true;
         cur.sec=(cur.sec||0)+(cur.startAt ? (Date.now()-cur.startAt)/1000 : 0);
