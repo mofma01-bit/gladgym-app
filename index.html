@@ -1003,6 +1003,7 @@ body .figbox2{background:radial-gradient(80% 50% at 50% 30%,rgba(240,211,160,.09
 .dayfeed em{font-style:normal;font-size:13px;font-weight:800;color:var(--teal);flex:none}
 .dayfeed.on{border-color:#5a4c33;background:linear-gradient(180deg,#221e17,#171615)}.dayfeed.on b{color:var(--gold)}
 .dayfeed.on button{flex:none;font-size:12.5px;font-weight:700;color:var(--sub);border:1px solid #3b3a35;border-radius:999px;padding:7px 13px}
+.dayfeed.q{border-color:#4a463d;background:linear-gradient(180deg,#201f1c,#181816)}.dayfeed.q em{color:var(--gold)}
 .dayfeed.off{border-color:#34332d;background:#191817}.dayfeed.off b{color:#8f8a83}
 .fcar{position:relative;background:#000}.fcars{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;cursor:pointer}.fcars::-webkit-scrollbar{display:none}
 .fcars>div{flex:none;width:100%;aspect-ratio:1;scroll-snap-align:center;position:relative}.fcars img{width:100%;height:100%;object-fit:cover;display:block}
@@ -2644,7 +2645,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '336';
+const BUILD = '338';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -6775,6 +6776,62 @@ function 식단넘김(p, 누름){
     ${ms.length > 1 ? `<div class="fdots">${ms.map((_,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</div>` : ''}
     <div class="fsum"><span>${esc(dateTxt(d.day))}</span>${합.k ? `<span><b>${Math.round(합.k).toLocaleString()} kcal</b></span><span>탄 <b>${Math.round(합.c)}g</b></span><span>단 <b>${Math.round(합.p)}g</b></span><span>지 <b>${Math.round(합.f)}g</b></span>` : `<span>사진 ${ms.length}장</span>`}</div>`;
 }
+/* ── 식단 캡쳐 — 하루 식단을 한 장으로 (갤러리 저장 · 공유용). 오운완 한 장과 같은 크기(1080×1350) ──
+   사진은 주소를 받아 **파일로 가져와서** 그린다 — 주소를 그대로 그리면 그림판이 잠겨 내보내지 못한다 */
+async function 식단캡쳐(mid, day){
+  const ms = 식단사진들(mid, day).slice(0, 6); if(!ms.length) throw new Error('사진 없음');
+  const st = dietStat(mid, day, day), 끼수 = mealsOf(mid, day).length;
+  const 그림 = await Promise.all(ms.map(async m => { const b = await 사진받기(m.path);
+    return await new Promise((ok, no) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => no(new Error('사진을 못 읽었어요')); i.src = URL.createObjectURL(b); }); }));
+  try{ if(document.fonts && document.fonts.load) await Promise.all([document.fonts.load('700 40px Archivo'), document.fonts.load('400 40px "Archivo Black"')]); }catch(e){}
+  const W = OOTD_W, H = OOTD_H, 여 = 80, cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const x = cv.getContext('2d');
+  const 바 = x.createLinearGradient(0, 0, 0, H); 바.addColorStop(0, '#7a5239'); 바.addColorStop(1, '#5a3b2a'); x.fillStyle = 바; x.fillRect(0, 0, W, H);
+  const 글 = (크기, 굵기, 글꼴, 색, 자간) => { x.font = 굵기 + ' ' + 크기 + 'px ' + 글꼴; x.fillStyle = 색; try{ x.letterSpacing = (자간||0) + 'px'; }catch(e){} };
+  x.textBaseline = 'alphabetic'; x.textAlign = 'left';
+  글(25, 700, OOTD_A, '#fff', 3); x.fillText('GLAD GYM', 여, 98);
+  const 지금 = new Date(), 시각 = String(지금.getHours()).padStart(2,'0') + ':' + String(지금.getMinutes()).padStart(2,'0');
+  글(19, 600, OOTD_A, 'rgba(255,255,255,.78)', 4); x.fillText(day.replace(/-/g, '.') + (day === TODAY ? '  ' + 시각 : ''), 여, 130);
+  const 먹 = Math.round(st.eaten || 0);
+  글(190, 400, OOTD_B, '#fff', -6); x.fillText(먹.toLocaleString('en-US'), 여 - 6, 330);
+  글(19, 600, OOTD_A, 'rgba(255,255,255,.62)', 4); x.fillText('KCAL', 여, 368);
+  [['CARB', st.carb], ['PROTEIN', st.prot], ['FAT', st.fat]].forEach((p, i) => { const px = 여 + i * 200;
+    글(46, 700, OOTD_A, '#fff', 0); x.fillText(Math.round(p[1] || 0) + 'g', px, 452);
+    글(16, 600, OOTD_A, 'rgba(255,255,255,.62)', 3); x.fillText(p[0], px, 482); });
+  try{ x.letterSpacing = '0px'; }catch(e){}
+  /* 끼니 사진 — 아래쪽에 모아 놓는다. 1장은 크게, 2~3장은 한 줄, 4~6장은 두 줄 */
+  const n = 그림.length, 칸 = Math.min(n, 3), 줄 = Math.ceil(n / 칸), 틈 = 14, 넓 = W - 여*2, 높최 = 660;
+  const cw = (넓 - 틈*(칸-1)) / 칸, ch = n === 1 ? 높최 : 줄 === 1 ? Math.min(높최, cw * 1.5) : Math.min(cw, (높최 - 틈*(줄-1)) / 줄), 전체높 = ch*줄 + 틈*(줄-1), y0 = 1228 - 전체높;
+  const 둥근 = (px, py, w, h, r) => { x.beginPath(); x.moveTo(px+r, py); x.arcTo(px+w, py, px+w, py+h, r); x.arcTo(px+w, py+h, px, py+h, r); x.arcTo(px, py+h, px, py, r); x.arcTo(px, py, px+w, py, r); x.closePath(); };
+  그림.forEach((img, i) => { const px = 여 + (i % 칸) * (cw + 틈), py = y0 + Math.floor(i / 칸) * (ch + 틈), m = ms[i];
+    x.save(); 둥근(px, py, cw, ch, 14); x.clip();
+    const 비 = Math.max(cw / img.naturalWidth, ch / img.naturalHeight); x.drawImage(img, px + (cw - img.naturalWidth*비)/2, py + (ch - img.naturalHeight*비)/2, img.naturalWidth*비, img.naturalHeight*비);
+    const g = x.createLinearGradient(0, py + ch - 96, 0, py + ch); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.78)'); x.fillStyle = g; x.fillRect(px, py + ch - 96, cw, 96);
+    const k = Math.round(mealSum(m).kcal || 0);
+    글(n > 3 ? 22 : 26, 700, '"Noto Sans KR",sans-serif', '#fff', 0); x.fillText(끼니이름(m, i) + (k ? ' ' + k.toLocaleString() : ''), px + 16, py + ch - 40);
+    글(18, 600, OOTD_A, 'rgba(255,255,255,.8)', 1); x.fillText(m.at || '', px + 16, py + ch - 15);
+    x.restore(); try{ URL.revokeObjectURL(img.src); }catch(e){} });
+  글(20, 500, '"Noto Sans KR",sans-serif', 'rgba(255,255,255,.72)', 0);
+  x.fillText(끼수 + '끼' + (st.ready && st.target ? ' · 목표 ' + Math.round(st.target).toLocaleString() + ' kcal 의 ' + Math.round(먹 / st.target * 100) + '%' : ''), 여, 1290);
+  x.textAlign = 'right'; x.fillText('글래드짐 구산역촌점', W - 여, 1290); x.textAlign = 'left';
+  return await new Promise((ok, no) => cv.toBlob(b => b ? ok(b) : no(new Error('그림을 못 만들었어요')), 'image/jpeg', 0.9));
+}
+async function sheetDayCap(mid, day){
+  toast('한 장으로 만드는 중이에요');
+  let blob; try{ blob = await 식단캡쳐(mid, day); }catch(e){ console.error(e); toast('한 장으로 만들지 못했어요'); return; }
+  try{ if(S.dcap && S.dcap.url) URL.revokeObjectURL(S.dcap.url); }catch(e){}
+  S.dcap = { blob, url: URL.createObjectURL(blob), day };
+  openSheet(()=>`<div class="h2">식단 한 장 <small>${esc(dateTxt(day))}</small></div>
+    <img class="shot ootdimg" src="${S.dcap.url}" alt="">
+    <div style="display:flex;gap:9px"><button class="btn main" style="flex:1" data-act="dcapdl">갤러리에 저장</button><button class="btn sub" style="flex:1" data-act="dcapshare">공유하기</button></div>
+    <button class="btn ghost sm" data-act="close">닫기</button>`);
+}
+async function 식단캡쳐내보내기(blob, day, 공유){
+  const file = new File([blob], '글래드짐_식단_' + day + '.jpg', { type:'image/jpeg' });
+  if((공유 || 아이폰()) && navigator.canShare && navigator.canShare({ files:[file] })){
+    try{ await navigator.share({ files:[file] }); return; }catch(e){ if(e.name === 'AbortError') return; } }
+  내려받기(blob, file.name); toast(공유 ? '공유를 못 열어 내려받았어요' : '갤러리에 저장했어요');
+}
 function carMove(el){
   const n = Math.round(el.scrollLeft / Math.max(1, el.clientWidth)), w = el.parentElement, c = w.querySelector('.fcnt');
   if(c) c.textContent = (n+1) + ' / ' + el.children.length;
@@ -6841,6 +6898,7 @@ function vDiet(){
      : 빔('bowl','이 날은 올린 식단이 없어요','사진을 찍거나 검색해서 추가해 보세요')}
     ${tr||!seqs.length?'':`<button class="btn ghost sm" data-act="fadd:new">＋ 식사 추가하기</button>`}
     ${tr?'':식단올리기줄(mid, day)}
+    ${!tr && 식단사진들(mid, day).length ? `<button class="dayfeed q" data-act="daycap:${day}"><span><b>${day===TODAY?'오늘':esc(dateTxt(day))} 식단 한 장으로 저장</b><small>갤러리 저장 · 공유용</small></span><em>만들기 ›</em></button>` : ''}
     ${(모 => 모 ? `<div class="hr"></div><span class="lbl">지금까지 모은 것</span>${모}` : '')(kcalSummary(mid))}
     <div class="cyfoot" style="justify-content:center"><span>음식 정보 출처 · 식품영양성분 데이터베이스 (식품의약품안전처)</span></div>` };
 }
@@ -7592,8 +7650,8 @@ function sheetPost(id){
 async function postShareSave(id, 공유){
   const p = (D.posts||[]).find(x=>x.id===id); if(!p) return;
   try{
-    const 첫 = (d => d ? 식단사진들(d.mid, d.day)[0] : null)(식단날of(p));
-    const blob = await 사진받기(첫 ? 첫.path : p.path);      /* 저장소가 잠겨 있어 주소를 받아서 가져온다 — 공개 주소로 받으면 깨진 파일이 저장된다 (2026-10-08 대표 「피드에 올리면 다운로드가 안 되는 것 같다」) */
+    const 날 = 식단날of(p), 첫 = 날 ? 식단사진들(날.mid, 날.day)[0] : null;
+    const blob = 첫 ? await 식단캡쳐(날.mid, 날.day) : await 사진받기(p.path);      /* 저장소가 잠겨 있어 주소를 받아서 가져온다 — 공개 주소로 받으면 깨진 파일이 저장된다 (2026-10-08 대표 「피드에 올리면 다운로드가 안 되는 것 같다」) */
     const file = new File([blob], '글래드짐_'+(p.ts||'').slice(0,10)+'.jpg', { type:'image/jpeg' });
     if((공유 || 아이폰()) && navigator.canShare && navigator.canShare({ files:[file] })){
       try{ await navigator.share({ files:[file], text:p.cap||'' }); return; }catch(e){ if(e.name==='AbortError') return; }
@@ -8504,9 +8562,10 @@ function vMe(){
     </div>
 
     <span class="lbl">내 기록장</span>
-    <div class="megrp">${[['note','상담일지','첫 상담 때 트레이너가 입력한 내용','sub:intake'],
+    <div class="megrp">${[['note','PT 상담일지', D.intake[S.mid] && Object.keys(D.intake[S.mid]).length ? '눌러서 보기 · 수정' : '아직 없어요 — 눌러서 작성', 'sub:intake'],
        ['plan','운동계획','목표 · 맞춤 칼로리 · 다짐','sub:plan'],
-       ['chart','인/아웃바디','인바디 · 비포애프터 · 체형분석','sub:body'],
+       ['chart','인바디 · 비포애프터','인바디 기록 · 몸 사진 · 영상','sub:body'],
+       ['h_user','체형분석 기록','트레이너가 본 체형 · 체크리스트','posture'],
        ...(여성인가(S.mid) ? [['moon','생리주기', (cycOf(S.mid)&&cycOf(S.mid).on)
           ? `현재 ${esc(cycToday(cycOf(S.mid)).ph)} · ${cycToday(cycOf(S.mid)).day}일차`
           : '켜면 시기에 맞춰 운동을 조절합니다 — 선택이에요', 'sub:cycle']] : []),
@@ -8680,7 +8739,7 @@ function vIntake(){
       <div><span class="k">신장</span><span class="v">${esc(String(d.height||'—').replace(/cm/i,''))}<small>${d.height ? 'cm' : ''}</small></span></div>
       <div class="t"><span class="k">성별</span><span class="v cyv" style="font-size:22px;padding-top:2px">${esc(d.sex||'—')}</span></div>
     </div>
-    ${tr?`<button class="hline gold" data-act="editintake:${mid}">${svg('h_note',18)}<b>상담일지 수정</b><small>눌러서 수정</small></button>`:''}
+    ${tr || mid===S.mid ?`<button class="hline gold" data-act="editintake:${mid}">${svg('h_note',18)}<b>PT 상담일지 작성 · 수정</b><small>눌러서 입력</small></button>`:''}
     ${묶음('기본', [['생년월일', d.birth ? (birthYmd(d.birth)||d.birth) : ''], ['직업', d.job], ['직업환경', d.jobenv], ['교대근무', d.shift]])}
     ${(d.route||[]).length ? `<span class="lbl">글래드짐을 알게 된 경로</span><div class="chips">${d.route.map(x=>`<span class="chip on">${esc(x)}</span>`).join('')}</div>` : (빈++, '')}
     ${묶음('운동 · 스트레스', [['경험한 운동', d.expr], ['스트레스 요인', d.stress], ['스트레스 강도', d.stressLv], ['해소 방법', (d.relief||[]).join(', ')]])}
@@ -8691,9 +8750,9 @@ function vIntake(){
       ${d.timeTxt ? `<div class="cyfoot"><span>${esc(d.timeTxt)}</span></div>` : ''}` : (빈++, '')}
     ${d.needs ? `<span class="lbl">회원님이 원하는 것</span><div class="megrp ikg"><div class="mrow2"><span class="ikv">${esc(d.needs)}</span></div></div>` : (빈++, '')}
     ${tr && d.notes ? `<span class="lbl">특이사항 · 트레이너만 봅니다</span><div class="megrp ikg t"><div class="mrow2"><span class="ikv">${esc(d.notes)}</span></div></div>` : ''}`;
-  return { top: bar('상담일지', `<span class="sub">${esc(subjName())}</span>`, tr?'tm:'+mid:'tab:me'), body: 몸 + (빈
-    ? (tr ? `<button class="hline" data-act="editintake:${mid}">${svg('h_note',18)}<b>입력 안 한 항목 ${빈}개</b><small>눌러서 채우기</small></button>`
-          : `<div class="cyfoot"><span>아직 입력 안 한 항목 ${빈}개 · 바뀐 것이 있으면 트레이너에게 말씀해 주세요</span></div>`)
+  return { top: bar('PT 상담일지', `<span class="sub">${esc(subjName())}</span>`, tr?'tm:'+mid:'tab:me'), body: 몸 + (빈
+    ? (tr || mid===S.mid ? `<button class="hline" data-act="editintake:${mid}">${svg('h_note',18)}<b>입력 안 한 항목 ${빈}개</b><small>눌러서 채우기</small></button>`
+          : '')
     : '') };
 }
 
@@ -8702,14 +8761,14 @@ function vIntakeEdit(){
   d.meals = d.meals || {};
   const F = k => fieldEditor('ik', d, INTAKE_FIELDS.find(f => f.k === k));
   const 상자 = (제목, 몸) => `<div class="fsec"><span class="fsh">${제목}</span>${몸}</div>`;
-  return { top: bar('상담일지 수정', `<span class="sub">${esc(subjName())}</span>`, 'sub2:intake:'+mid), body:
+  return { top: bar('PT 상담일지 작성', `<span class="sub">${esc(subjName())}</span>`, 'sub2:intake:'+mid), body:
       상자('기본', `<div class="grid2">${F('birth')}${F('height')}</div>${F('sex')}`)
     + 상자('하는 일', F('job') + F('jobenv') + F('shift'))
     + 상자('오게 된 길', F('route'))
     + 상자('운동 · 스트레스', F('expr') + F('stress') + F('stressLv') + F('relief'))
     + 상자('건강', F('cond') + F('hist'))
     + 상자('운동 가능 시간', F('time') + F('timeTxt'))
-    + 상자('원하는 것 · 특이사항', F('needs') + F('notes'))
+    + (S.who==='tr' ? 상자('원하는 것 · 특이사항', F('needs') + F('notes')) : 상자('원하는 것', F('needs')))
     + 상자('나의 식습관', `<div class="grid2">${MEAL_KEYS.map(k=>`<div class="fld"><span class="fn">${k}</span>
         <input class="search" type="text" data-k="ikm:${k}" value="${esc(d.meals[k]||'')}"></div>`).join('')}</div>`),
     foot: `<button class="btn main" style="flex:1" data-act="saveintake:${mid}">저장</button>` };
@@ -9671,7 +9730,7 @@ function sheetBpMark(id){
 }
 
 /* 체형분석 알맹이 — 분석 탭과 체형분석 화면이 같은 것을 씁니다 */
-function bodyPane(mid){
+function bodyPane(mid, 부분){
   const tr = (S.who==='tr');
   const b0 = (D.body && D.body[mid]) || {checks:{}, photos:{}, memo:''};
   const b = { checks: checksOf(mid), photos: b0.photos||{}, memo: b0.memo||'' };
@@ -9703,7 +9762,7 @@ function bodyPane(mid){
         return g2 ? `<br><span style="color:var(--gold)">${kgfmt(g2.w)}kg</span>${g2.fp?` · 체지방 ${kgfmt(g2.fp)}%`:''}` : ''; })()}</div></div>`;
   };
 
-  return `
+  const 인바디쪽 = `
     ${blPane(mid)}
 
     <div class="hr"></div>
@@ -9721,14 +9780,6 @@ function bodyPane(mid){
     ${tr?'':'<div class="note">집에서 찍으실 때는 <b>같은 자리 · 같은 옷 · 같은 밝기</b>로 찍어야 비교하기 좋습니다.</div>'}
 
     <div class="hr"></div>
-    <span class="lbl">AI 체형분석 장비 사진 · ${ai.length}장</span>
-    ${ai.length
-      ? `<div class="phstrip">${ai.slice().reverse().map(x=>`<button class="pt" data-act="bpview:${x.id}">
-          <img src="${esc(phURL(x.path))}" alt="" onerror="picFail(this)"><span>${mdTxt(x.date)}</span></button>`).join('')}</div>`
-      : '<div class="empty">아직 없어요</div>'}
-    ${tr?`<button class="btn sub sm" data-act="bpadd:ai">＋ AI 사진 추가</button>`:''}
-
-    <div class="hr"></div>
     <span class="lbl">영상 · ${vids.length}개</span>
     ${vids.length
       ? `<div class="phstrip">${vids.slice().reverse().map(x=>`<button class="pt vid" data-act="bpview:${x.id}">
@@ -9742,7 +9793,8 @@ function bodyPane(mid){
       <div class="phstrip">${all.slice().reverse().map(x=>`<button class="pt" data-act="bpview:${x.id}">
         <img src="${esc(phURL(x.path))}" alt="" onerror="picFail(this)"><span>${mdTxt(x.date)} ${esc(x.pose)}</span></button>`).join('')}</div>` : ''}
 
-    <div class="hr"></div>
+`;
+  const 체형쪽 = `
     ${roundPane(mid)}
 
     <div class="hr"></div>
@@ -9767,14 +9819,25 @@ function bodyPane(mid){
     <div class="card"><div class="fv" style="white-space:pre-wrap">${esc(b.memo||'없음')}</div></div>
     ${tr?`<button class="btn sub sm" data-act="bmemo:${mid}">메모 수정</button>`:''}
     ${tr?'<div class="note">플래너 7쪽 체크리스트 그대로입니다. 눌러서 표시하면 <b>회원 화면에도 바로</b> 보입니다.</div>'
-        :'<div class="note">트레이너가 체형을 보고 표시한 것입니다. <b>골드로 켜진 항목</b>이 지금 신경 쓰고 있는 부분이에요.</div>'}`;
+        :'<div class="note">트레이너가 체형을 보고 표시한 것입니다. <b>골드로 켜진 항목</b>이 지금 신경 쓰고 있는 부분이에요.</div>'}
+    <div class="hr"></div>
+    <span class="lbl">AI 체형분석 장비 사진 · ${ai.length}장</span>
+    ${ai.length
+      ? `<div class="phstrip">${ai.slice().reverse().map(x=>`<button class="pt" data-act="bpview:${x.id}">
+          <img src="${esc(phURL(x.path))}" alt="" onerror="picFail(this)"><span>${mdTxt(x.date)}</span></button>`).join('')}</div>`
+      : '<div class="empty">아직 없어요</div>'}
+    ${tr?`<button class="btn sub sm" data-act="bpadd:ai">＋ AI 사진 추가</button>`:''}
+
+`;
+  return 부분==='in' ? 인바디쪽 : 부분==='pose' ? 체형쪽 : 인바디쪽 + '<div class="hr"></div>' + 체형쪽;
 }
 
 function vBody(){
   const mid = subj(), tr = (S.who==='tr');
   const n = (D.bph||[]).filter(x=>x.mid===mid).length;
-  return { top: bar('인/아웃바디', `<span class="sub">사진 ${n}장</span>`, tr?'tm:'+mid:'tab:me'),
-    body: bodyPane(mid) };
+  const 체 = S.bodyPart === 'pose';
+  return { top: bar(체 ? '체형분석 기록' : '인바디 · 비포애프터', `<span class="sub">${tr ? esc(subjName()) : (체 ? '' : '사진 '+n+'장')}</span>`, tr?'tm:'+mid:'tab:me'),
+    body: bodyPane(mid, 체 ? 'pose' : 'in') };
 }
 
 /* 사진 고르기 → 줄이기 → 올리기 */
@@ -10299,12 +10362,13 @@ function tMember(){
 
     <span class="lbl">회원 자료</span>
     <div class="megrp">${(()=>{ const 모 = 사진모음(m.id, false), 요 = 모.filter(x=>x.dreq).length;
-      return [['note','상담일지', D.intake[m.id]?'작성됨 — 눌러서 보기':'아직 없음', 'tsub:intake:'+m.id, ''],
+      return [['note','PT 상담일지', D.intake[m.id] && Object.keys(D.intake[m.id]).length ? '작성됨 — 눌러서 보기 · 수정' : '아직 없음 — 눌러서 작성', (D.intake[m.id] && Object.keys(D.intake[m.id]).length ? 'tsub:intake:' : 'editintake:')+m.id, ''],
         ['plan','운동계획', (g.now&&g.now.w)?`${g.now.w}kg → ${(g.to&&g.to.w)||'?'}kg`:'아직 없음', 'tsub:plan:'+m.id, ''],
         ['bowl','식단', mealsOf(m.id).length?`${mealsOf(m.id).length}장 · 최근 ${dateTxt(mealsOf(m.id)[0].date)}`:'아직 없음', 'tsub:diet:'+m.id, ''],
         ['h_cam','오운완 · 인증샷', 모.length ? `${모.length}장` : '아직 없음 — 수업 마친 화면에서 「같이 찍기」', 'tprof:'+m.id, 요 ? `삭제 요청 ${요}` : ''],
         ['h_roll','스트레칭 세트', (n => n ? `${n}개 지정함` : '아직 지정 안 함 — 눌러서 지정')(내세트().filter(x=>x.mids.includes(m.id)).length), 'psets:'+m.id, ''],
-        ['chart','인/아웃바디', `${Object.keys(checksOf(m.id)).length}개 표시 · ${roundsOf(m.id).length}회차 · 사진 ${((D.bph||[]).filter(x=>x.mid===m.id)).length}장`, 'tsub:body:'+m.id, '']]
+        ['chart','인바디 · 비포애프터', `사진 ${((D.bph||[]).filter(x=>x.mid===m.id && x.kind!=='ootd' && x.kind!=='pair')).length}장`, 'tsub:body:'+m.id, ''],
+        ['h_user','체형분석 기록', `${Object.keys(checksOf(m.id)).length}개 표시 · ${roundsOf(m.id).length}회차 — 눌러서 입력 · 수정`, 'tposture:'+m.id, '']]
         .map(x=>`<button class="mrow2" data-act="${x[3]}"><span class="mi">${svg(x[0],19)}</span>
           <span class="mt"><b>${x[1]}</b><small>${x[2]}</small></span>${x[4]?`<em class="nb w">${x[4]}</em>`:''}<i>›</i></button>`).join(''); })()}</div>
     ${(()=>{ if(!여성인가(m.id)) return '';
@@ -10996,7 +11060,7 @@ document.addEventListener('click', async ev=>{
     case 'sub2': S.subj=rest[1]; go(rest[0]); return;
 
     /* 상담일지 · 운동계획 편집 */
-    case 'editintake': S.subj=rest[0]; go('intake_edit'); return;
+    case 'editintake': if(S.who !== 'tr' && rest[0] !== S.mid) return; S.subj=rest[0]; go('intake_edit'); return;
     case 'editplan': S.subj=rest[0]; go('plan_edit'); return;
     case 'pick1': { const [pre,k,val]=rest;
       const d = pre==='ik' ? (D.intake[subj()]||(D.intake[subj()]={})) : (GOALS[subj()]||(GOALS[subj()]={}));
@@ -11017,6 +11081,7 @@ document.addEventListener('click', async ev=>{
       d.meals=d.meals||{};
       MEAL_KEYS.forEach(k=>{ const el=document.querySelector('[data-k="ikm:'+k+'"]'); if(el) d.meals[k]=el.value.trim(); });
       if(S.draft) Object.keys(S.draft).forEach(k=>{ if(k.startsWith('ik:')||k.startsWith('ikm:')) delete S.draft[k]; });
+      if(S.who !== 'tr' && mid !== S.mid) return;
       sv(spost('intake',[{ member_id:mid, data:d, updated_at:new Date().toISOString() }], {on:'member_id'}), '상담일지 저장');
       toast('저장했어요'); S.subj=mid; go('intake'); return; }
     case 'kcalstep': {
@@ -11504,8 +11569,10 @@ document.addEventListener('click', async ev=>{
       return; }
     case 'play': S.vplay=rest[0]; drawSheet(); return;
     case 'fbm': S.fbMode=rest[0]; render(); return;
-    case 'sub': S.subj=S.mid; go(rest[0]); return;
-    case 'tsub': S.subj=rest[1]; S.tmid=rest[1]; go(rest[0]); return;
+    case 'sub': S.subj=S.mid; S.bodyPart='in'; go(rest[0]); return;
+    case 'tsub': S.subj=rest[1]; S.tmid=rest[1]; S.bodyPart='in'; go(rest[0]); return;
+    case 'posture': S.subj=S.mid; S.bodyPart='pose'; go('body'); return;
+    case 'tposture': S.subj=rest[0]; S.tmid=rest[0]; S.bodyPart='pose'; go('body'); return;
     case 'anat': S.anaT = rest[0]; render(); return;
     case 'figa': S.figA = Number(rest[0]) * Math.PI/180; S.figSel = null; drawFig(); return;
     case 'figk': { if(figMoved) return;
@@ -12064,6 +12131,9 @@ document.addEventListener('click', async ev=>{
       p.state = p.state==='마감' ? '모집중' : '마감'; sv(spatch('posts','id=eq.'+p.id,{ state:p.state }), '모집 상태'); render(); return; }
     case 'postnew': sheetPostNew(); return;
     case 'dfold': S.dfold = !S.dfold; render(); return;
+    case 'daycap': sheetDayCap(S.mid, rest[0]); return;
+    case 'dcapdl': if(S.dcap) 식단캡쳐내보내기(S.dcap.blob, S.dcap.day, false); return;
+    case 'dcapshare': if(S.dcap) 식단캡쳐내보내기(S.dcap.blob, S.dcap.day, true); return;
     case 'daypost': { const day=rest[0], ps=식단사진들(S.mid, day); if(S.who==='tr' || !ps.length || 식단글(S.mid, day)) return;
       S.pnew = { kind:'식단', photo_id:'day:'+S.mid+':'+day, path:ps[0].path, url:phURL(ps[0].path), vis:'센터', cap:'', n:ps.length, 날: day===TODAY ? '오늘' : dateTxt(day) };
       sheetPostWrite(); return; }
