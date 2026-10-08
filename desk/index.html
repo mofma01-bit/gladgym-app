@@ -1424,7 +1424,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '190';
+const BUILD = '191';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -1972,6 +1972,7 @@ const memOf = id => D.m.find(x=>x.id===id) || {name:''};
       트레이너가 더 할 일은 없다 (2026-09-22 대표 「한 번 더 확인할 필요 없이 바로」).
    만든 곳 — 글래드짐 자동화\대시보드\앱회원.py */
 const GG_API = 'https://dash.gladgym.co.kr';
+let PTST_막힘 = false;         /* 브로제이 자료를 못 받는 중 — 회원 기록은 그대로 된다(앱 자료라서). 화면에 알리고 수기 추가를 연다 */
 let PTST = {};                    /* "이름|뒷4" → {상태, 잔여, 담당, 끝날} */
 /* 잠수 사유 — 한 회원에 **여러 줄이 쌓인다.** 고치지 않고 쌓는다
    (2026-09-22 대표 「여러 번 잠수가 될 수 있으니 날짜별로 볼 수 있게」).
@@ -2280,8 +2281,8 @@ async function 잔여받기(){
   if(!목록.length){ PTST = {}; return; }
   try{
     const d = await crm('states', { 목록 });
-    PTST = d['사람'] || {}; PTST_때 = Date.now();
-  }catch(e){ PTST = {}; console.warn('잔여 못 받음 —', e.message); }
+    PTST = d['사람'] || {}; PTST_때 = Date.now(); PTST_막힘 = false;
+  }catch(e){ PTST = {}; PTST_막힘 = true; console.warn('잔여 못 받음 —', e.message); }
 }
 const 잔여of = m => (m && m.phone4) ? (PTST[m.name + '|' + m.phone4] || null) : null;
 
@@ -2418,7 +2419,9 @@ function vMembers(){
     + '<div class="sumit teal" title="트레이너가 남긴 코멘트를 회원이 앱에서 아직 안 연 것">'
       + '<span class="k2">회원이 안 본 코멘트</span><span class="v2">' + 안읽음 + '</span></div>'
     + '<div class="sumit warn"><span class="k2">2주 넘게 안 옴</span><span class="v2">' + 뜸한수 + '</span></div>'
-    + '</div>' + 갈래탭() + 상태막대(전체줄)
+    + '</div>'
+    + (PTST_막힘 ? '<div class="card" style="margin:8px 0;border-color:#8a5a3a;font-size:12.5px">브로제이 자료를 지금 못 받고 있어요 — <b>회원 기록 · 루틴 · 코멘트는 그대로 됩니다.</b> 남은 횟수 · 상태 칸만 비어 보입니다. 새 회원은 「회원 추가」에서 직접 입력으로 넣을 수 있어요.</div>' : '')
+    + 갈래탭() + 상태막대(전체줄)
     + (나이름 && 내별.size ? '<div style="margin:8px 0 2px"><button class="chip' + (S.favOnly ? ' on' : '') + '" data-act="favonly">★ 즐겨찾기 ' + 내별.size + '</button></div>' : '');
 
   if(!rows.length) return 요약 + '<div class="empty">해당하는 회원이 없어요</div>';
@@ -2749,10 +2752,18 @@ function 추가판그리기(){
     + '<input class="inp" id="crmq" placeholder="이름 또는 전화번호 뒷자리" value="' + esc(추가판.q) + '" style="flex:1">'
     + '<button class="btn main" data-act="memfind">검색</button></div>'
     + (추가판.찾는중 ? '<div class="empty">검색 중이에요…</div>'
-       : 추가판.왜 ? '<div class="empty">' + esc(추가판.왜) + '</div>'
+       : 추가판.왜 ? '<div class="empty">브로제이에서 찾지 못했어요 — ' + esc(추가판.왜) + '</div>'
        : 줄 ? 줄
        : (추가판.q ? '<div class="empty">그런 분이 없어요 — PT 수강권이 없으면 안 나옵니다</div>'
                   : '<div class="empty">검색어를 입력해 주세요</div>'))
+    /* ⭐ 브로제이가 막혀도 회원을 넣을 수 있어야 한다 (2026-10-08 대표 「api 가 막혔을 때 갑자기 회원 기록이 안 되면 정말 큰 문제 · 수기로 대비」).
+       평소엔 안 보인다 — 브로제이에 닿지 못했을 때만 열린다 (아무나 넣지 않게) */
+    + ((추가판.왜 || PTST_막힘) ? '<div class="card" style="margin-top:12px;border-color:#5a4c33">'
+        + '<div class="t1" style="margin-bottom:4px">직접 입력해서 추가</div>'
+        + '<div class="t2" style="margin-bottom:9px">브로제이에 닿지 않을 때 쓰는 방법이에요. 이름과 전화번호 뒷 4자리만 넣습니다.</div>'
+        + '<div style="display:flex;gap:6px"><input class="inp" id="hand_n" placeholder="이름" style="flex:1.3">'
+        + '<input class="inp" id="hand_p" placeholder="뒷 4자리" inputmode="numeric" maxlength="4" style="flex:1">'
+        + '<button class="btn main" data-act="memhand">추가</button></div></div>' : '')
     + '</div>');
   setTimeout(function(){ const el = $('#crmq'); if(el){ el.focus();
     el.onkeydown = function(ev){ if(ev.key==='Enter') 회원찾기(); }; } }, 40);
@@ -8954,6 +8965,10 @@ document.addEventListener('click', async function(ev){
   if(a==='jout'){ try{ await authPost('logout', {}, AUTH.access_token); }catch(e){}
     authSave(null); location.reload(); return; }
   if(a==='memadd'){ 회원추가열기(); return; }
+  if(a==='memhand'){ const n = ($('#hand_n')||{}).value || '', p4 = (($('#hand_p')||{}).value || '').replace(/[^0-9]/g,'');
+    if(n.trim().length < 2){ toast('이름을 입력해 주세요'); return; }
+    if(p4.length !== 4){ toast('전화번호 뒷 4자리를 입력해 주세요'); return; }
+    await 회원넣기(p4, n.trim(), ''); return; }
   if(a==='dnopen'){ 사유판열기(act.dataset.m); return; }
   /* ── 코멘트 안내 그만 받기 (2026-09-30) ── */
   if(a==='cmoffnow' || a==='cmoffx'){
