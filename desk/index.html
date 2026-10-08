@@ -1423,7 +1423,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '187';
+const BUILD = '188';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -3151,7 +3151,7 @@ function 세트창(){
           return '<div class="card rowc" style="padding:8px 12px"><span class="tag gold">' + (i+1) + '</span><div style="flex:1;min-width:0"><div class="t1">' + esc(v.n) + '</div>'
             + '<div class="t2">' + (it.k==='lib' ? '목록 동작' : '내 종목') + (v.t ? ' · ' + esc(v.t) : '') + 붙 + '</div></div>'
             + (i ? '<button class="btn ghost sm" data-act="pzup" data-i="' + i + '">▲</button>' : '')
-            + '<button class="btn ghost sm" data-act="pzrm" data-i="' + i + '">제외</button></div>'; }).join('') : '<div class="empty">오른쪽에서 선택해 추가하세요</div>')
+            + '<button class="btn ghost sm" data-act="pzrm" data-i="' + i + '">제거</button></div>'; }).join('') : '<div class="empty">오른쪽에서 선택해 추가하세요</div>')
     + '</div><div class="pzcol">'
       + '<div class="lbl">동작 선택 <span class="r">' + [['s','스트레칭 '+ST.length],['m','마사지 '+MS.length],['y','내 종목 '+내.length]].map(k => '<button class="chip' + (갈===k[0]?' on':'') + '" data-act="pzk" data-v2="' + k[0] + '">' + k[1] + '</button>').join(' ') + '</span></div>'
       + '<div class="pzlist">' + (줄.length ? 줄.map(x => '<button class="pzit' + (담긴.has(x.k)?' on':'') + '" data-act="pztog" data-v2="' + esc(x.k) + '"><i>' + (담긴.has(x.k)?'✓':'') + '</i><span><b>' + esc(x.n) + '</b><small>' + esc(x.s) + '</small></span></button>').join('')
@@ -3239,7 +3239,7 @@ async function 운동종목손잡이(a, act){
       const 새 = EXN.새; S.part = EXN.part; S.exq = ''; EXN = null; 세트창(); 팝업다시(); toast(새 ? '만들었어요 — 목록 맨 위에 있어요' : '수정했어요'); }
     catch(e){ toast('못 저장했어요 — ' + e.message); } return true; }
   if(a==='exdel'){ const 쓰는 = (D.ri||[]).some(x => String(x.variant_id||'').indexOf(EXN.id + ':') === 0) || (D.wi||[]).some(x => String(x.variant_id||'').indexOf(EXN.id + ':') === 0);
-    if(쓰는){ toast('루틴이나 기록에 추가된 종목은 삭제할 수 없어요 — 루틴에서 먼저 제외해 주세요'); return true; }
+    if(쓰는){ toast('루틴이나 기록에 추가된 종목은 삭제할 수 없어요 — 루틴에서 먼저 제거해 주세요'); return true; }
     if(!confirm('이 종목을 삭제할까요?')) return true;
     try{ const 옛파일 = ((D.ex.find(z => z.id === EXN.id)||{}).media||[]).map(m => m.path);
       await ssend('variants?ex_id=eq.' + encodeURIComponent(EXN.id), 'DELETE'); await ssend('exercises?id=eq.' + encodeURIComponent(EXN.id), 'DELETE'); await 파일지우기(옛파일, 'exmedia/' + EXN.id + '/');
@@ -3283,7 +3283,7 @@ async function 종목손잡이(a, act){
       세트창(); toast('종목을 저장했어요'); render(); }
     catch(e){ toast('못 저장했어요 — ' + e.message); } return true; }
   if(a==='pidel'){ const 쓰는 = 내세트().filter(x => (x.items||[]).some(z => z.k==='my' && z.i===PI.id));
-    if(!confirm(쓰는.length ? '이 종목을 삭제할까요? 세트 ' + 쓰는.length + '개에서도 제외됩니다.' : '이 종목을 삭제할까요?')) return true;
+    if(!confirm(쓰는.length ? '이 종목을 삭제할까요? 세트 ' + 쓰는.length + '개에서도 제거됩니다.' : '이 종목을 삭제할까요?')) return true;
     try{ const 옛파일 = (((D.pi||[]).find(z => z.id === PI.id)||{}).media||[]).map(m => m.path);
       await ssend('prep_items?id=eq.' + encodeURIComponent(PI.id), 'DELETE'); await 파일지우기(옛파일, 'prep/items/' + PI.id + '/');
       for(const x of 쓰는){ x.items = x.items.filter(z => !(z.k==='my' && z.i===PI.id));
@@ -5444,7 +5444,7 @@ function txFilterBar(key, v, 순){
   const st = 표상태[key];
   const 바뀜 = 내변경(key);
   const 조건 = (st.규칙||[]).map((q,i) => '<span class="tx-fchip">'+규칙말(q, key)
-      + '<button data-act="tx:fdrop" data-k="'+key+'" data-i="'+i+'" title="제외">✕</button></span>').join('');
+      + '<button data-act="tx:fdrop" data-k="'+key+'" data-i="'+i+'" title="제거">✕</button></span>').join('');
   const 순말 = 순 && 순.k ? ((열들(key).find(z=>z.k===순.k)||{}).이름 || 순.k) + (순.dir==='desc'?' 내림차순':' 오름차순') : '';
   return '<div class="tx-fbar">'
     + '<button class="tx-fadd" data-act="tx:fnew" data-k="'+key+'">필터</button>'
@@ -7603,7 +7603,7 @@ function txMe(갈래){
       + '<div style="flex:1"><div class="t1">' + esc(ME.name) + '</div><div class="t2">'
       + ({admin:'관리자',trainer:'트레이너',fc:'FC'}[ME.role]||ME.role) + ' · ' + esc((AUTH.user||{}).email||'') + '</div></div>'
       + '<button class="btn ghost sm" data-act="tx:photo">' + (ME.photo?'사진 변경':'＋ 사진') + '</button>'
-      + (ME.photo ? '<button class="btn ghost sm" data-act="tx:photox">제외</button>' : '') + '</div>'
+      + (ME.photo ? '<button class="btn ghost sm" data-act="tx:photox">제거</button>' : '') + '</div>'
       + '<div class="fld"><span class="fn">슬로건</span><input class="inp" id="txg1" value="' + esc(g.value||'') + '" placeholder="예: 변하지 않는 진정성으로 회원님의 도전을 서포트한다"></div>'
       + '<div class="fld"><span class="fn">' + esc(이번분기()) + ' 목표</span>'
         + '<input class="inp" id="txg2" value="' + esc(g.quarter||'') + '" placeholder="예: 평균 매출 800 이상"></div>'
@@ -8098,8 +8098,8 @@ async function txAct(a, el){
   if(a==='photox'){
     try{ await usend('staff?id=eq.'+ME.id, 'PATCH', { photo:null }); ME.photo = null;
       const i = W.staff.findIndex(x=>x.id===ME.id); if(i>=0) W.staff[i].photo = null;
-      toast('사진을 제외했어요'); txMe(); render(); }
-    catch(e){ toast('제외하지 못했어요 — '+e.message); } return; }
+      toast('사진을 제거했어요'); txMe(); render(); }
+    catch(e){ toast('제거하지 못했어요 — '+e.message); } return; }
   if(a==='pw'){ const pw = $('#txpw').value; if(pw.length<8){ toast('8자 이상이어야 해요'); return; }
     try{ await 비번바꾸기(pw); toast('비밀번호를 변경했어요'); $('#txpw').value=''; }catch(e){ toast('변경하지 못했어요 — '+e.message); } return; }
   if(a==='out'){ await signOut(); return; }
@@ -8895,7 +8895,7 @@ document.addEventListener('click', async function(ev){
   if(a==='mdel'){
     if(!최고관리자()) return toast('최고 관리자만 할 수 있어요');
     const m = memOf(S.mid); if(!m || !m.id) return;
-    if(!confirm(m.name + ' 님을 앱 명단에서 제외할까요?' + String.fromCharCode(10,10)
+    if(!confirm(m.name + ' 님을 앱 명단에서 제거할까요?' + String.fromCharCode(10,10)
       + '운동기록·코멘트는 삭제하지 않습니다.' + String.fromCharCode(10)
       + '휴지통에서 60일 안에 복원할 수 있어요.')) return;
     try{
