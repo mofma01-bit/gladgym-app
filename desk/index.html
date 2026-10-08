@@ -1424,7 +1424,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '191';
+const BUILD = '192';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -2402,6 +2402,8 @@ function vMembers(){
     return S.st === '모름' ? !x : (x && x['상태'] === S.st); });
   const 나이름 = (ME && ME.name) || '', 내별 = new Set((D.favs||[]).filter(f => f.trainer === 나이름).map(f => f.member_id));
   if(S.favOnly) list = list.filter(m => 내별.has(m.id));
+  const 수기수 = all.filter(수기회원인가).length;
+  if(S.handOnly) list = list.filter(수기회원인가);
   const rows = list.map(m => ({ m, i: info(m) }));
   /* 별 준 회원이 맨 위 — 그 안에서는 예전처럼 오래 안 온 순 */
   rows.sort((a,b)=>{ const fa = 내별.has(a.m.id) ? 0 : 1, fb = 내별.has(b.m.id) ? 0 : 1; if(fa !== fb) return fa - fb;
@@ -2420,9 +2422,12 @@ function vMembers(){
       + '<span class="k2">회원이 안 본 코멘트</span><span class="v2">' + 안읽음 + '</span></div>'
     + '<div class="sumit warn"><span class="k2">2주 넘게 안 옴</span><span class="v2">' + 뜸한수 + '</span></div>'
     + '</div>'
-    + (PTST_막힘 ? '<div class="card" style="margin:8px 0;border-color:#8a5a3a;font-size:12.5px">브로제이 자료를 지금 못 받고 있어요 — <b>회원 기록 · 루틴 · 코멘트는 그대로 됩니다.</b> 남은 횟수 · 상태 칸만 비어 보입니다. 새 회원은 「회원 추가」에서 직접 입력으로 넣을 수 있어요.</div>' : '')
+    + (PTST_막힘 ? '<div class="card" style="margin:8px 0;border-color:#8a5a3a;font-size:12.5px">브로제이 자료를 지금 못 받고 있어요 — <b>회원 기록 · 루틴 · 코멘트는 그대로 됩니다.</b> 남은 횟수 · 상태 칸만 비어 보입니다. 새 회원은 「회원 추가」에서 수기로 넣을 수 있어요.</div>' : '')
     + 갈래탭() + 상태막대(전체줄)
-    + (나이름 && 내별.size ? '<div style="margin:8px 0 2px"><button class="chip' + (S.favOnly ? ' on' : '') + '" data-act="favonly">★ 즐겨찾기 ' + 내별.size + '</button></div>' : '');
+    + ((나이름 && 내별.size) || 수기수 ? '<div style="margin:8px 0 2px;display:flex;gap:6px">'
+        + (나이름 && 내별.size ? '<button class="chip' + (S.favOnly ? ' on' : '') + '" data-act="favonly">★ 즐겨찾기 ' + 내별.size + '</button>' : '')
+        + (수기수 ? '<button class="chip' + (S.handOnly ? ' on' : '') + '" data-act="handonly" title="브로제이에 닿지 않을 때 직접 입력으로 넣은 회원">수기로 넣은 회원 ' + 수기수 + '</button>' : '')
+        + '</div>' : '');
 
   if(!rows.length) return 요약 + '<div class="empty">해당하는 회원이 없어요</div>';
 
@@ -2435,7 +2440,8 @@ function vMembers(){
     + rows.map(function(o){ const m=o.m, i=o.i;
         return '<tr data-m="' + esc(m.id) + '">'
         + '<td><span class="dot2 ' + 상태(i) + '"></span></td>'
-        + '<td><div class="nm2">' + (나이름 ? '<button class="favb' + (내별.has(m.id) ? ' on' : '') + '" data-act="fav" data-mm="' + esc(m.id) + '" title="' + (내별.has(m.id) ? '즐겨찾기에서 제거' : '즐겨찾기에 추가') + '">' + (내별.has(m.id) ? '★' : '☆') + '</button>' : '') + esc(m.name) + ' ' + 끔딱지(m) + '</div>'
+        + '<td><div class="nm2">' + (나이름 ? '<button class="favb' + (내별.has(m.id) ? ' on' : '') + '" data-act="fav" data-mm="' + esc(m.id) + '" title="' + (내별.has(m.id) ? '즐겨찾기에서 제거' : '즐겨찾기에 추가') + '">' + (내별.has(m.id) ? '★' : '☆') + '</button>' : '') + esc(m.name) + ' ' + 끔딱지(m)
+            + (수기회원인가(m) ? ' <span class="tag warn" title="브로제이에 닿지 않을 때 직접 입력으로 넣은 회원">수기' + (PTST_막힘 ? '' : (잔여of(m) ? ' · 브로제이 확인됨' : ' · 브로제이에 없음')) + '</span>' : '') + '</div>'
           + (function(){ const s2 = 잔여of(m);
               /* 번호는 **앱에 저장돼 있지 않다.** 서버에서 받아온 것이 있을 때만 보여 준다.
                  (2026-09-22 대표 「중간 번호 안 나오네」 — 뒷 4자리만으론 사람을 못 가린다) */
@@ -2723,9 +2729,22 @@ function 상태막대(mems){
    · 전화번호는 앱에 **뒷 4자리만** 남긴다 — 전체 번호는 서버 밖으로 안 나간다 */
 let 추가판 = null;            /* {q, 결과:[], 찾는중, 왜} */
 
+/* ⛔ 수기 추가는 **대비책**이다 (2026-10-08 대표 「아무 때나 발동해서도 안 되고 섞여도 안 돼」).
+   · 여는 조건은 하나 — **이 판을 연 지금** 브로제이 서버에 두 번 물어 둘 다 실패했을 때. 검색 한 번 삐끗한 것 · 로그인이 풀린 것으로는 안 열린다.
+   · 수기로 넣은 회원은 id 가 `mh…` 로 시작한다 — 목록에 「수기」 딱지가 붙고 따로 모아 볼 수 있다. 브로제이가 돌아오면 맞는 사람이 있는지 같이 보여 준다. */
+async function 브로제이닿나(){
+  for(let i = 0; i < 2; i++){
+    try{ await crm('search', { q:'__닿는지__' }); return true; }
+    catch(e){ if(/로그인/.test(e.message || '')) return null;      /* 로그인 문제는 「막힘」이 아니다 */
+      if(i === 0) await new Promise(r => setTimeout(r, 1200)); }
+  }
+  return false;
+}
+const 수기회원인가 = m => /^mh\d/.test(String((m && m.id) || ''));
 function 회원추가열기(){
-  추가판 = { q:'', 결과:[], 찾는중:false, 왜:'' };
+  추가판 = { q:'', 결과:[], 찾는중:false, 왜:'', 막힘:false, 확인중:true };
   추가판그리기();
+  브로제이닿나().then(r => { if(!추가판) return; 추가판.확인중 = false; 추가판.막힘 = (r === false); PTST_막힘 = (r === false) ? true : (r === true ? false : PTST_막힘); 추가판그리기(); render(); });
 }
 
 function 추가판그리기(){
@@ -2758,9 +2777,9 @@ function 추가판그리기(){
                   : '<div class="empty">검색어를 입력해 주세요</div>'))
     /* ⭐ 브로제이가 막혀도 회원을 넣을 수 있어야 한다 (2026-10-08 대표 「api 가 막혔을 때 갑자기 회원 기록이 안 되면 정말 큰 문제 · 수기로 대비」).
        평소엔 안 보인다 — 브로제이에 닿지 못했을 때만 열린다 (아무나 넣지 않게) */
-    + ((추가판.왜 || PTST_막힘) ? '<div class="card" style="margin-top:12px;border-color:#5a4c33">'
-        + '<div class="t1" style="margin-bottom:4px">직접 입력해서 추가</div>'
-        + '<div class="t2" style="margin-bottom:9px">브로제이에 닿지 않을 때 쓰는 방법이에요. 이름과 전화번호 뒷 4자리만 넣습니다.</div>'
+    + (추가판.막힘 ? '<div class="card" style="margin-top:12px;border-color:#8a5a3a">'
+        + '<div class="t1" style="margin-bottom:4px">브로제이에 닿지 않아요 — 수기로 추가</div>'
+        + '<div class="t2" style="margin-bottom:9px">지금만 열리는 대비용이에요. 이름과 전화번호 뒷 4자리만 넣습니다. 이렇게 넣은 회원에는 <b>「수기」 표시</b>가 붙어요.</div>'
         + '<div style="display:flex;gap:6px"><input class="inp" id="hand_n" placeholder="이름" style="flex:1.3">'
         + '<input class="inp" id="hand_p" placeholder="뒷 4자리" inputmode="numeric" maxlength="4" style="flex:1">'
         + '<button class="btn main" data-act="memhand">추가</button></div></div>' : '')
@@ -2784,11 +2803,11 @@ async function 회원찾기(){
   추가판.찾는중 = false; 추가판그리기();
 }
 
-async function 회원넣기(전화, 이름, 담당){
+async function 회원넣기(전화, 이름, 담당, 수기){
   const 뒤4 = String(전화||'').slice(-4);
   if(!이름 || !뒤4){ toast('자료가 모자라요'); return; }
   if(D.m.some(m => m.name===이름 && m.phone4===뒤4)){ toast('이미 있는 회원이에요'); return; }
-  const id = 'm' + Date.now();
+  const id = (수기 ? 'mh' : 'm') + Date.now();
   const 줄 = { id, name:이름, phone4:뒤4, role:'member',
                trainer: 담당 || (ME && ME.name) || '' };
   try{
@@ -8738,6 +8757,7 @@ document.addEventListener('click', async function(ev){
     else { D.favs.push({ trainer:나2, member_id:mid }); ssend('trainer_favs?on_conflict=trainer,member_id', 'POST', [{ trainer:나2, member_id:mid }], 'resolution=merge-duplicates').catch(e => { console.error(e); toast('즐겨찾기를 저장하지 못했어요'); }); }
     render(); return; }
   if(t.closest('[data-act="favonly"]')){ S.favOnly = !S.favOnly; render(); return; }
+  if(t.closest('[data-act="handonly"]')){ S.handOnly = !S.handOnly; render(); return; }
   const 내담당 = t.closest('[data-act="mymem"]');
   if(내담당){
     const m = memOf(내담당.dataset.mm);
@@ -8968,7 +8988,10 @@ document.addEventListener('click', async function(ev){
   if(a==='memhand'){ const n = ($('#hand_n')||{}).value || '', p4 = (($('#hand_p')||{}).value || '').replace(/[^0-9]/g,'');
     if(n.trim().length < 2){ toast('이름을 입력해 주세요'); return; }
     if(p4.length !== 4){ toast('전화번호 뒷 4자리를 입력해 주세요'); return; }
-    await 회원넣기(p4, n.trim(), ''); return; }
+    if(!(추가판 && 추가판.막힘)){ toast('브로제이에 닿을 때는 검색해서 추가해 주세요'); return; }      /* 판이 열려 있는 사이 풀렸으면 받지 않는다 */
+    if((await 브로제이닿나()) !== false){ 추가판.막힘 = false; PTST_막힘 = false; toast('브로제이가 다시 열렸어요 — 검색해서 추가해 주세요'); 추가판그리기(); render(); return; }
+    if(!confirm('브로제이에 닿지 않아 수기로 넣습니다.' + String.fromCharCode(10) + n.trim() + ' · 뒷자리 ' + p4 + String.fromCharCode(10, 10) + '이 회원에는 「수기」 표시가 붙습니다. 넣을까요?')) return;
+    await 회원넣기(p4, n.trim(), '', true); return; }
   if(a==='dnopen'){ 사유판열기(act.dataset.m); return; }
   /* ── 코멘트 안내 그만 받기 (2026-09-30) ── */
   if(a==='cmoffnow' || a==='cmoffx'){
