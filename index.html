@@ -2685,7 +2685,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '343';
+const BUILD = '344';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2842,6 +2842,7 @@ async function boot(){
   커뮤니티담기(psts, pcms, plks);
   try{ 세트담기(await sget('prep_sets?select=*&order=created_at').catch(()=>[])); }catch(e){ D.psets = []; }
   try{ 종목담기(await sget('prep_items?select=*&order=created_at').catch(()=>[])); }catch(e){ D.pitems = []; }
+  try{ D.favs = (await sget('trainer_favs?select=trainer,member_id').catch(()=>[])) || []; }catch(e){ D.favs = []; }
   /* 트레이너가 올린 스트레칭·운동 종목 사진/영상도 주소를 미리 받아 둔다 — 버킷을 잠가도 보이게 (2026-10-07) */
   try{ await 주소받기([].concat((D.pitems||[]).flatMap(x => x.media.map(m => m.path)),
       (D.psets||[]).flatMap(x => x.items.flatMap(i => (i.media||[]).map(m => m.path))),
@@ -10361,10 +10362,18 @@ function tTools(){
 
 /* 회원 즐겨찾기 — 트레이너가 별을 켠 회원. 목록 맨 위로 올라오고 「★ 즐겨찾기」 칩으로 그 회원만 본다 (2026-10-07 대표 「회원 즐겨찾기 · 해당 페이지에 별표」)
    ⚠ 지금은 **이 기기에만** 남는다(localStorage · 트레이너 이름별). 폰과 PC 가 같이 보이게 하려면 서버 칸이 필요하다 — 대표 결정 뒤에. */
+/* 즐겨찾기는 **서버에**(trainer_favs) — 트레이너 계정에 붙어 어느 기기 · 대시보드에서도 같다 (2026-10-08 대표 「폰이 중요한 게 아니라 어떤 계정으로 로그인하냐」) */
 const 즐찾키 = () => 'gg_fav_' + TRAINER;
-function 즐찾(){ try{ return JSON.parse(localStorage.getItem(즐찾키()) || '[]'); }catch(e){ return []; } }
-function 즐찾바꿈(mid){ const a = 즐찾(), i = a.indexOf(mid); if(i >= 0) a.splice(i,1); else a.push(mid);
-  try{ localStorage.setItem(즐찾키(), JSON.stringify(a)); }catch(e){} return i < 0; }
+function 즐찾(){ return (D.favs||[]).filter(f => f.trainer === TRAINER).map(f => f.member_id); }
+function 즐찾바꿈(mid){ D.favs = D.favs || []; const i = D.favs.findIndex(f => f.trainer === TRAINER && f.member_id === mid);
+  if(i >= 0){ D.favs.splice(i,1); sv(sdel('trainer_favs','trainer=eq.'+encodeURIComponent(TRAINER)+'&member_id=eq.'+encodeURIComponent(mid)), '즐겨찾기 제거'); }
+  else { D.favs.push({ trainer:TRAINER, member_id:mid }); sv(spost('trainer_favs', [{ trainer:TRAINER, member_id:mid }], {on:'trainer,member_id'}), '즐겨찾기 추가'); }
+  return i < 0; }
+/* 예전에 이 기기에만 남겨 둔 별을 서버로 한 번 옮긴다 */
+function 즐찾옮김(){ let 옛 = []; try{ 옛 = JSON.parse(localStorage.getItem(즐찾키()) || '[]'); }catch(e){} if(!옛.length) return;
+  const 새 = 옛.filter(id => MEMBERS.some(m => m.id === id) && !즐찾().includes(id));
+  if(새.length){ 새.forEach(id => D.favs.push({ trainer:TRAINER, member_id:id })); sv(spost('trainer_favs', 새.map(id => ({ trainer:TRAINER, member_id:id })), {on:'trainer,member_id'}), '즐겨찾기 옮기기'); }
+  try{ localStorage.removeItem(즐찾키()); }catch(e){} }
 const 별 = on => `<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 3.2l2.7 5.6 6.1.8-4.5 4.3 1.1 6.1L12 17.1 6.6 20l1.1-6.1L3.2 9.6l6.1-.8z" fill="${on?'currentColor':'none'}" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
 function tMembers(){
   return { top: bar('회원 목록', `<span class="sub">담당 ${MEMBERS.length}명</span>`), body:
@@ -12185,7 +12194,7 @@ document.addEventListener('click', async ev=>{
     case 'rks': S.rks=rest[0]; render(); return;
     case 'rkmine': sheetRkMine(); return;
     case 'tmreg': S.tmreg = rest[0] || ''; render(); return;
-    case 'tmfav': { const 켬 = 즐찾바꿈(rest[0]); toast(켬 ? '즐겨찾기에 추가했어요' : '즐겨찾기에서 제거했어요'); render(); return; }
+    case 'tmfav': { 즐찾옮김(); const 켬 = 즐찾바꿈(rest[0]); toast(켬 ? '즐겨찾기에 추가했어요' : '즐겨찾기에서 제거했어요'); render(); return; }
     case 'tdlive': sheetTdLive(); return;
     case 'tdtodo': sheetTdTodo(); return;
     case 'tdmeal': sheetTdMeal(); return;
