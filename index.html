@@ -55,7 +55,7 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
   border:1px solid var(--line);border-radius:8px;padding:6px 11px}
 #top .tbtn:active{background:var(--dark-3)}
 #top .tm{font-size:15px;font-weight:700;color:var(--gold);margin-left:auto}
-#top .back{font-size:20px;color:var(--sub);width:22px;flex:none;line-height:1}
+#top .back{font-size:25px;color:var(--cream);width:36px;height:36px;flex:none;line-height:1;border-radius:50%;border:1px solid #57524a;background:#262521;display:flex;align-items:center;justify-content:center;padding:0 2px 4px 0}
 #top .logo{font-size:10.5px;letter-spacing:.2em;color:var(--gold-2);font-weight:700;
   border:1px solid var(--line);border-radius:7px;padding:5px 8px;flex:none}
 #top .logo:active{background:var(--dark-3)}
@@ -1011,6 +1011,7 @@ body .figbox2{background:radial-gradient(80% 50% at 50% 30%,rgba(240,211,160,.09
 .fdots{display:flex;justify-content:center;gap:5px;padding:9px 0 2px}.fdots i{width:6px;height:6px;border-radius:50%;background:#4a463d}.fdots i.on{background:var(--gold)}
 .fsum{display:flex;flex-wrap:wrap;gap:4px 10px;padding:8px 14px 0;font-size:12px;color:var(--sub)}.fsum b{color:var(--gold);font-weight:800}
 #sheetbox .fcar{border-radius:14px;overflow:hidden}
+#sheetbox .tagwrap.on:has(img.tagph){width:fit-content;max-width:100%;align-self:center}#sheetbox .tagwrap.on img.tagph{width:auto;max-width:100%;max-height:46vh}
 .stickup{position:sticky;bottom:-1px;z-index:5;display:flex;gap:9px;flex:none;padding:10px 0 4px;background:linear-gradient(180deg,transparent,var(--dark) 26%)}.stickup .btn{flex:1}.stickup .btn.main{flex:2}
 .fcars .nopic,.mp2 .nopic{width:100%;height:100%}.fcars .nopic svg{width:34%}#sheetbox .fsum{padding:8px 2px 0}
 .big2.row{min-height:0;flex-direction:row;align-items:center;gap:11px;padding:13px 12px}
@@ -2638,7 +2639,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '332';
+const BUILD = '333';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -6513,16 +6514,16 @@ function sheetTagPhoto(mealId){
     return `<div class="h2">${미리?'식단 올리기':`음식 추가 <small>${esc(m.slot)}</small>`}</div>
       ${태그판(m, 1)}
       ${미리?`<div class="chips">${SLOTS.map(x=>`<button class="chip ${S.shotSlot===x?'on':''}" data-act="slot:${x}">${x}</button>`).join('')}</div>`:''}
-      ${밖.length?`<span class="lbl">태그 안 한 음식</span>
+      ${밖.length?`<span class="lbl">검색해서 추가한 음식</span>
         ${밖.map(x=>`<button class="frow2" data-act="fdel:${m.id}:${x.id}">
           <span class="fe">${음식그림(x.name)}</span>
           <span class="fn2">${esc(x.name)}</span>
           <span class="fk">${Math.round(x.kcal)}</span></button>`).join('')}`:''}
       ${t.kcal?`<div class="msum"><b>${Math.round(t.kcal)} kcal</b>
         <span>탄 ${Math.round(t.carb)}g · 단 ${Math.round(t.protein)}g · 지 ${Math.round(t.fat)}g</span></div>`:''}
-      <button class="btn sub sm" data-act="fadd:${m.id}">사진에 없는 음식 추가</button>
+      <button class="btn sub sm" data-act="fadd:${m.id}">검색해서 음식 추가</button>
       ${미리
-        ? `<textarea data-k="mmemo" rows="1" style="min-height:0;height:46px" placeholder="한마디 (안 써도 돼요)"></textarea>
+        ? `<textarea data-k="mmemo" rows="1" style="min-height:0;height:46px;flex:none;resize:none" placeholder="한마디 (안 써도 돼요)"></textarea>
            <div class="stickup"><button class="btn ghost" data-act="shotcancel">취소</button><button class="btn main" data-act="shotup">올리기</button></div>`
         : `<button class="btn main" data-act="tagdone">완료</button>`}`;
   });
