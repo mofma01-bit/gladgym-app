@@ -2644,7 +2644,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '335';
+const BUILD = '336';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -7585,7 +7585,7 @@ function sheetPost(id){
       <button class="ic" data-act="pshare:${id}" aria-label="공유">${svg('h_share',19)}</button><button class="ic" data-act="psave:${id}" aria-label="저장">${svg('h_save',19)}</button></div>`}
     ${!파 && p.mid===S.mid && !트 ? `<div style="display:flex;gap:9px"><button class="btn sub" style="flex:1" data-act="psave:${id}">갤러리에 저장</button><button class="btn sub" style="flex:1" data-act="pshare:${id}">공유하기</button></div>` : ''}
     <span class="lbl">댓글 ${cs.length ? '· '+cs.length : ''}</span>
-    ${cs.length ? `<div class="pcms">${cs.map(c=>`<div class="pcm"><b>${esc(c.who)}</b> ${esc(c.body)}<small>${언제(c.ts)}${(c.mid && c.mid===S.mid && !트) || 트 ? ` · <button data-act="pcdel:${c.id}">삭제</button>` : ''}</small></div>`).join('')}</div>` : '<div class="note">첫 댓글을 남겨 보세요</div>'}
+    ${cs.length ? `<div class="pcms">${cs.map(c=>`<div class="pcm"><b>${esc(c.mid ? 이름of(c.mid) : c.who)}</b> ${esc(c.body)}<small>${언제(c.ts)}${(c.mid && c.mid===S.mid && !트) || 트 ? ` · <button data-act="pcdel:${c.id}">삭제</button>` : ''}</small></div>`).join('')}</div>` : '<div class="note">첫 댓글을 남겨 보세요</div>'}
     <div class="pcmin"><input class="search" type="text" data-k="pcm" maxlength="120" placeholder="응원 한마디"><button class="btn main sm" data-act="pcsend:${id}">남기기</button></div>
     <button class="btn ghost sm" data-act="close">닫기</button>`; });
 }
