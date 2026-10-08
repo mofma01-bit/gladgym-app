@@ -976,6 +976,42 @@ body .figbox2{background:radial-gradient(80% 50% at 50% 30%,rgba(240,211,160,.09
 .mealcd .hd2 .k{font-size:16px}
 .mealcd .tagwrap{margin:0 12px 10px;border-radius:13px !important;border:1px solid #34332d}.mealcd .tagwrap .tagph{border-radius:13px !important}
 .mealcd{box-shadow:inset 0 1px 0 rgba(240,211,160,.14)}
+/* 식단 새 안 (2026-10-08) — 도넛 카드 · 사진 왼쪽 끼니 · 하루 단위 피드 */
+.kcard.kd{display:block;flex:none;width:100%;border-radius:20px;border:1px solid #5a4c33;padding:16px 16px 10px;background:radial-gradient(110% 100% at 0% 0%,rgba(240,211,160,.17),transparent 62%),linear-gradient(180deg,#221e17,#161513)}
+.khead{display:flex;align-items:center;gap:16px}
+.donut{position:relative;width:112px;height:112px;flex:none}.donut svg{width:100%;height:100%;transform:rotate(-90deg)}
+.donut i{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-style:normal;line-height:1.05}
+.donut b{font-size:25px;font-weight:800;letter-spacing:-.03em;color:var(--gold)}.donut small{font-size:10.5px;color:var(--sub);margin-top:2px}
+.ktxt{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}.ktxt small{font-size:11.5px;color:var(--sub)}
+.ktxt b{font-size:22px;font-weight:800;letter-spacing:-.02em;color:var(--cream)}.ktxt b u{text-decoration:none;font-size:13px;color:var(--sub);font-weight:600;margin-left:4px}
+.ktxt b.solo{font-size:34px;color:var(--gold)}
+.ktxt .goal{display:inline-flex;align-items:center;gap:4px;margin-top:5px;font-size:11.5px;font-weight:700;color:var(--gold);border:1px solid rgba(240,211,160,.4);border-radius:999px;padding:4px 10px;align-self:flex-start}
+.ktxt .goal.off{color:var(--sub);border-color:#3b3a35;font-weight:600}
+.dmac{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:14px;padding-top:12px;border-top:1px solid #34332d}
+.dmac>div{display:flex;flex-direction:column;gap:5px}.dmac small{font-size:11px;color:var(--sub);display:flex;flex-direction:column;gap:2px;white-space:nowrap}.dmac small b{color:var(--cream);font-weight:700;font-size:12.5px}
+.dmac .bar{display:block;height:6px;border-radius:3px;background:#2a2925;overflow:hidden}.dmac .bar i{display:block;height:100%;border-radius:3px}
+.dmac .c .bar i{background:var(--gold)}.dmac .p .bar i{background:var(--teal)}.dmac .f .bar i{background:#b08968}
+.kflow{margin-top:12px;padding-top:8px;border-top:1px solid #34332d}.kflow .dkg{display:block;width:100%;height:auto}
+.kfold{display:flex;justify-content:center;margin-top:6px}.kfold button{font-size:11.5px;color:var(--sub);padding:6px 12px}
+.mealcd .hd2 .k small{font-size:11px;color:var(--sub);font-weight:600;margin-left:2px}
+.mb2{display:flex;gap:12px;padding:0 14px 12px}
+.mp2{width:78px;height:78px;border-radius:12px;flex:none;overflow:hidden;border:1px solid #34332d;background:#0d0d0c;padding:0}.mp2 img{width:100%;height:100%;object-fit:cover;display:block}
+.ml2{flex:1;min-width:0;display:flex;flex-direction:column}
+.ml2 .frow2{padding:7px 0}.ml2 .frow2:first-child{border-top:0;padding-top:1px}
+.dayfeed{display:flex;align-items:center;gap:10px;width:100%;flex:none;text-align:left;padding:14px 15px;border-radius:16px;border:1px solid #3f7281;background:linear-gradient(170deg,#1b2d33,#171a19 70%)}
+.dayfeed span{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.dayfeed b{font-size:14.5px;color:var(--cream)}.dayfeed small{font-size:11.5px;color:var(--sub)}
+.dayfeed em{font-style:normal;font-size:13px;font-weight:800;color:var(--teal);flex:none}
+.dayfeed.on{border-color:#5a4c33;background:linear-gradient(180deg,#221e17,#171615)}.dayfeed.on b{color:var(--gold)}
+.dayfeed.on button{flex:none;font-size:12.5px;font-weight:700;color:var(--sub);border:1px solid #3b3a35;border-radius:999px;padding:7px 13px}
+.dayfeed.off{border-color:#34332d;background:#191817}.dayfeed.off b{color:#8f8a83}
+.fcar{position:relative;background:#000}.fcars{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;cursor:pointer}.fcars::-webkit-scrollbar{display:none}
+.fcars>div{flex:none;width:100%;aspect-ratio:1;scroll-snap-align:center;position:relative}.fcars img{width:100%;height:100%;object-fit:cover;display:block}
+.ftag{position:absolute;left:12px;top:12px;font-size:12px;font-weight:800;color:#fff;background:rgba(0,0,0,.6);border-radius:999px;padding:5px 11px}.ftag u{text-decoration:none;color:var(--gold);margin-left:6px}
+.fcnt{position:absolute;right:12px;top:12px;font-size:12px;font-weight:700;color:#fff;background:rgba(0,0,0,.6);border-radius:999px;padding:4px 10px}
+.fdots{display:flex;justify-content:center;gap:5px;padding:9px 0 2px}.fdots i{width:6px;height:6px;border-radius:50%;background:#4a463d}.fdots i.on{background:var(--gold)}
+.fsum{display:flex;flex-wrap:wrap;gap:4px 10px;padding:8px 14px 0;font-size:12px;color:var(--sub)}.fsum b{color:var(--gold);font-weight:800}
+#sheetbox .fcar{border-radius:14px;overflow:hidden}
+.fcars .nopic,.mp2 .nopic{width:100%;height:100%}.fcars .nopic svg{width:34%}#sheetbox .fsum{padding:8px 2px 0}
 .big2.row{min-height:0;flex-direction:row;align-items:center;gap:11px;padding:13px 12px}
 .big2.row .ic.ring{width:42px;height:42px;margin:0;flex:none}
 .big2.row .bt{display:flex;flex-direction:column;gap:1px;min-width:0}.big2.row b{font-size:14.5px}.big2.row i{font-size:11px}
@@ -2601,7 +2637,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '330';
+const BUILD = '331';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -6613,22 +6649,52 @@ function weekStart(){ const d=new Date(); const w=(d.getDay()+6)%7; d.setDate(d.
 function monthStart(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-01'; }
 
 function kcalCard(mid, day){
-  const st = dietStat(mid, day, day);
-  if(!st.ready) return `<div class="note">운동계획에서 <b>인바디 값(기초대사량)과 활동량</b>을 먼저 입력해 주세요.
-    입력하면 여기에 <b>오늘 남은 칼로리</b>와 탄단지가 나옵니다.
-    ${S.who==='tr'?'<br>트레이너 → 회원 → 운동계획 → 계획 수정':''}</div>`;
-  const left = st.target - st.eaten, over = left < 0;
-  const pct = Math.min(100, Math.round(st.eaten / st.target * 100));
-  const mm = (nm, got, goal) => `<div><span class="t">${nm} ${got}/${goal}g</span>
-    <span class="bar"><i class="${got>goal?'over':''}" style="width:${Math.min(100, goal?Math.round(got/goal*100):0)}%"></i></span></div>`;
-  return `<div class="kcard">
-    <div class="kbig"><span class="v ${over?'w':'g'}">${over ? '+'+Math.abs(left).toLocaleString() : left.toLocaleString()}</span>
-      <span class="u">kcal ${over ? '초과' : '남음'}</span></div>
-    <span class="bar"><i class="${over?'over':''}" style="width:${pct}%"></i></span>
-    <div class="krow"><span class="k">먹은 칼로리</span><span class="v">${st.eaten.toLocaleString()} / ${st.target.toLocaleString()} kcal</span></div>
-    <div class="m3">
-      ${mm('탄수', st.carb, st.gm.c)}${mm('단백', st.prot, st.gm.p)}${mm('지방', st.fat, st.gm.f)}
-    </div></div>`;
+  const st = dietStat(mid, day, day), 먹 = Math.round(st.eaten), g = st.ready ? Math.round(st.target) : 0;
+  const R = 46, C = 2*Math.PI*R, p = g ? Math.min(1, 먹/g) : 0, 넘 = g && 먹 > g, 색 = 넘 ? '#e58b7b' : '#f0d3a0';
+  const 날 = day===TODAY ? '오늘' : '이 날';
+  const 막 = (k, 이름, v, m) => { v = Math.round(v||0); m = g ? Math.round(m||0) : 0;
+    return `<div class="${k}"><small>${이름}<b>${v}g${m ? ' / '+m+'g' : ''}</b></small><span class="bar"><i style="width:${m ? Math.min(100, Math.round(v/m*100)) : 0}%"></i></span></div>`; };
+  const 곡선 = S.dfold ? dietStrip(mid, 1) : '';
+  return `<div class="kcard kd">
+    ${g ? `<div class="khead">
+      <span class="donut"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="${R}" fill="none" stroke="#2a2925" stroke-width="10"/><circle cx="60" cy="60" r="${R}" fill="none" stroke="${색}" stroke-width="10" stroke-linecap="round" stroke-dasharray="${(C*p).toFixed(1)} ${C.toFixed(1)}"/></svg>
+        <i><b style="color:${색}">${넘 ? '+'+(먹-g).toLocaleString() : (g-먹).toLocaleString()}</b><small>${넘 ? 'kcal 넘김' : 'kcal 남음'}</small></i></span>
+      <span class="ktxt"><small>${날} 먹은 칼로리</small><b>${먹.toLocaleString()}<u>/ ${g.toLocaleString()} kcal</u></b>
+        <span class="goal">${넘 ? '목표보다 '+Math.round((먹-g)/g*100)+'% 더 먹었어요' : Math.round(p*100)+'% 채웠어요'}</span></span>
+    </div>` : `<div class="khead">
+      <span class="ktxt"><small>${날} 먹은 칼로리</small><b class="solo">${먹.toLocaleString()}<u>kcal</u></b>
+        <span class="goal off">${S.who==='tr' ? '운동계획에서 기초대사량 · 활동량을 입력하면 목표가 나와요' : '목표 칼로리는 운동계획에서 정해져요'}</span></span>
+    </div>`}
+    <div class="dmac">${막('c','탄수화물',st.carb,st.gm.c)}${막('p','단백질',st.prot,st.gm.p)}${막('f','지방',st.fat,st.gm.f)}</div>
+    ${곡선 ? `<div class="kflow">${곡선}</div>` : ''}
+    <div class="kfold"><button data-act="dfold">최근 7일 흐름 ${S.dfold ? '접기 ▴' : '보기 ▾'}</button></div></div>`;
+}
+/* ── 하루 식단을 글 하나로 — 글은 「그 날」을 가리키고, 사진은 볼 때 그날 것을 불러온다 (올린 뒤 찍은 끼니도 자동으로 붙는다) ── */
+const 식단사진들 = (mid, day) => mealsSeq(mid, day).filter(m => m.path);
+const 식단글 = (mid, day) => (D.posts||[]).find(p => p.photo_id === 'day:'+mid+':'+day);
+const 식단날of = p => { const m = /^day:(.+):(\d{4}-\d\d-\d\d)$/.exec((p && p.photo_id) || ''); return m ? { mid:m[1], day:m[2] } : null; };
+const 끼니이름 = (m, i) => m.slot || ((i+1)+'번째 식사');
+function 식단올리기줄(mid, day){
+  const ps = 식단사진들(mid, day), 글 = 식단글(mid, day), 날 = day===TODAY ? '오늘' : dateTxt(day);
+  const 합 = Math.round(ps.reduce((a,m)=>a+(mealSum(m).kcal||0), 0));
+  if(글) return `<div class="dayfeed on"><span><b>${날} 식단을 피드에 올렸어요</b><small>사진 ${ps.length}장 · 새로 찍은 끼니도 이 글에 붙어요</small></span><button data-act="dayunpost:${day}">내리기</button></div>`;
+  if(!ps.length) return `<div class="dayfeed off"><span><b>${날} 식단 피드에 올리기</b><small>사진으로 기록한 끼니가 있어야 올릴 수 있어요</small></span></div>`;
+  return `<button class="dayfeed" data-act="daypost:${day}"><span><b>${날} 식단 피드에 올리기</b><small>사진 ${ps.length}장${합 ? ' · '+합.toLocaleString()+' kcal' : ''} · 하루에 글 하나</small></span><em>올리기 ›</em></button>`;
+}
+function 식단넘김(p, 누름){
+  const d = 식단날of(p); if(!d) return '';
+  const ms = 식단사진들(d.mid, d.day); if(!ms.length) return '';
+  const 합 = ms.reduce((a,m)=>{ const t = mealSum(m); return { k:a.k+(t.kcal||0), c:a.c+(t.carb||0), p:a.p+(t.protein||0), f:a.f+(t.fat||0) }; }, {k:0,c:0,p:0,f:0});
+  return `<div class="fcar"><div class="fcars" onscroll="carMove(this)"${누름 ? ` data-act="popen:${p.id}"` : ''}>${ms.map((m,i)=>{ const k = Math.round(mealSum(m).kcal||0);
+      return `<div><img src="${esc(phURL(m.path))}" alt="" loading="lazy" onerror="picFail(this)"><span class="ftag">${esc(끼니이름(m,i))}${k ? `<u>${k.toLocaleString()} kcal</u>` : ''}</span></div>`; }).join('')}</div>
+    ${ms.length > 1 ? `<span class="fcnt">1 / ${ms.length}</span>` : ''}</div>
+    ${ms.length > 1 ? `<div class="fdots">${ms.map((_,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</div>` : ''}
+    <div class="fsum"><span>${esc(dateTxt(d.day))}</span>${합.k ? `<span><b>${Math.round(합.k).toLocaleString()} kcal</b></span><span>탄 <b>${Math.round(합.c)}g</b></span><span>단 <b>${Math.round(합.p)}g</b></span><span>지 <b>${Math.round(합.f)}g</b></span>` : `<span>사진 ${ms.length}장</span>`}</div>`;
+}
+function carMove(el){
+  const n = Math.round(el.scrollLeft / Math.max(1, el.clientWidth)), w = el.parentElement, c = w.querySelector('.fcnt');
+  if(c) c.textContent = (n+1) + ' / ' + el.children.length;
+  const d = w.nextElementSibling; if(d && d.classList.contains('fdots')) [...d.children].forEach((x,i)=>x.classList.toggle('on', i===n));
 }
 
 function kcalSummary(mid){
@@ -6666,34 +6732,33 @@ function vDiet(){
         <span class="ic ring">${svg('h_lens',22)}</span>
         <span class="bt"><b>검색해서 기록</b><i>18,000가지 음식</i></span></button>
     </div>`}
-    ${seqs.length? seqs.map((m,i)=>{ const t=mealSum(m);
+    ${seqs.length? seqs.map((m,i)=>{ const t=mealSum(m), 것 = m.items||[];
       return `<div class="mealcd">
-        <div class="hd2"><span class="mno">${i+1}</span><span class="n">${i+1}번째 식사</span>
+        <div class="hd2"><span class="mno">${i+1}</span><span class="n">${esc(끼니이름(m,i))}</span>
           <span class="t">${esc(m.at||'')}</span>
-          <span class="k">${Math.round(t.kcal)||0} kcal</span></div>
-        ${m.path?태그판(m,0):''}
-        ${(m.path?자리없는것(m):(m.items||[])).map(x=>`<button class="frow2" data-act="fdel:${m.id}:${x.id}">
-          <span class="fe">${음식그림(x.name)}</span>
-          <span class="fn2">${esc(x.name)}${x.brand?` <span style="color:var(--sub);font-weight:600">${esc(x.brand)}</span>`:''}</span>
-          <span class="fq">${kgfmt(x.qty)}${x.unit?' × '+esc(x.unit):'인분'}</span>
-          <span class="fk">${Math.round(x.kcal)}</span></button>`).join('')}
-        ${(!m.items||!m.items.length) && m.memo?`<div class="frow2"><span class="fe">${음식그림(m.memo)}</span><span class="fn2">${esc(m.memo)}</span>
-          <span class="fk">${Math.round(t.kcal)||''}</span></div>`:''}
+          <span class="k">${Math.round(t.kcal)||0}<small>kcal</small></span></div>
+        <div class="mb2">
+          ${m.path ? `<button class="mp2" data-act="meal:${m.id}" aria-label="사진 크게 보기"><img src="${esc(phURL(m.path))}" alt="" loading="lazy" onerror="picFail(this)"></button>` : ''}
+          <div class="ml2">
+            ${것.map(x=>`<button class="frow2" data-act="fdel:${m.id}:${x.id}">
+              <span class="fe">${음식그림(x.name)}</span>
+              <span class="fn2">${esc(x.name)}${x.brand?` <span style="color:var(--sub);font-weight:600">${esc(x.brand)}</span>`:''}</span>
+              <span class="fq">${kgfmt(x.qty)}${x.unit?' × '+esc(x.unit):'인분'}</span>
+              <span class="fk">${Math.round(x.kcal)}</span></button>`).join('')}
+            ${!것.length && m.memo?`<div class="frow2"><span class="fe">${음식그림(m.memo)}</span><span class="fn2">${esc(m.memo)}</span>
+              <span class="fk">${Math.round(t.kcal)||''}</span></div>`:''}
+            ${!것.length && !m.memo ? `<div class="frow2"><span class="fn2" style="color:var(--sub);font-weight:500">${m.path ? '태그한 음식이 아직 없어요' : '음식을 추가해 주세요'}</span></div>` : ''}
+          </div></div>
         ${m.note?`<div class="frow2"><span class="fn2" style="color:var(--teal)">트레이너 · ${esc(m.note)}</span></div>`:''}
         ${tr?'':(m.path
-          ? `<div class="addf2"><button data-act="tagedit:${m.id}">＋ 음식 태그하기</button>
-              ${(D.posts||[]).some(p=>p.photo_id===String(m.id))
-                ? `<span class="done">${svg('h_share',15)}피드에 올렸어요</span>`
-                : `<button class="g" data-act="mealpost:${m.id}">${svg('h_share',15)}피드에 올리기</button>`}</div>`
+          ? `<div class="addf2"><button data-act="tagedit:${m.id}">＋ 음식 태그하기</button></div>`
           : `<button class="addf" data-act="fadd:${m.id}">＋ 이 식사에 음식 추가</button>`)}
       </div>`; }).join('')
      : 빔('bowl','이 날은 올린 식단이 없어요','사진을 찍거나 검색해서 추가해 보세요')}
     ${tr||!seqs.length?'':`<button class="btn ghost sm" data-act="fadd:new">＋ 식사 추가하기</button>`}
-    <div class="hr"></div>
-    <span class="lbl">지금까지 모은 것</span>
-    ${kcalSummary(mid)}
-    <div class="note">사진은 <b>긴 변 1600px</b> 로 줄여 올라갑니다. 아래에 글래드짐 표시와 찍은 날짜·시간이 찍힙니다.
-      <br>음식 정보 출처 · <b>식품영양성분 데이터베이스</b> (식품의약품안전처)</div>` };
+    ${tr?'':식단올리기줄(mid, day)}
+    ${(모 => 모 ? `<div class="hr"></div><span class="lbl">지금까지 모은 것</span>${모}` : '')(kcalSummary(mid))}
+    <div class="cyfoot" style="justify-content:center"><span>음식 정보 출처 · 식품영양성분 데이터베이스 (식품의약품안전처)</span></div>` };
 }
 
 const IC_DUMB = `<svg viewBox="0 0 28 20" width="26" height="19" aria-hidden="true" fill="none"
@@ -6724,7 +6789,7 @@ function mealDayStat(mid, d){
   let goal = 0; try{ const rr = calcOf(GOALS[mid]||{}); goal = rr.bmr ? rr.kcal : 0; }catch(e){}
   return { n: ms.length, kcal, goal, p: goal ? Math.min(1, kcal/goal) : 0 };
 }
-function dietStrip(mid){
+function dietStrip(mid, 곡선만){
   const sel = S.dietDay || TODAY, wk = weekOf(sel), st = mealDayStat(mid, sel);
   const 날들 = wk.map(d => Object.assign({ d }, mealDayStat(mid, d)));
   /* 동그라미 — 테두리가 그날 먹은 칼로리(권장 대비)만큼 찬다. 안에 날짜 */
@@ -6752,7 +6817,7 @@ function dietStrip(mid){
       ${si >= 0 ? `<line x1="${xs[si].toFixed(1)}" x2="${xs[si].toFixed(1)}" y1="${(ys[si]+5).toFixed(1)}" y2="${H-PB}" stroke="var(--gold-2)" stroke-width=".7" stroke-dasharray="2 3" opacity=".7"/>
         <circle cx="${xs[si].toFixed(1)}" cy="${ys[si].toFixed(1)}" r="6.5" fill="#f0d3a0" opacity=".16"/>
         <circle cx="${xs[si].toFixed(1)}" cy="${ys[si].toFixed(1)}" r="3.6" fill="#1b1a18" stroke="var(--gold)" stroke-width="2"/>` : ''}</svg>`; })();
-  const 남 = st.goal ? st.goal - st.kcal : null;
+  if(곡선만) return 곡선;
   return `<div class="dwk">
     <div class="wkhd">
       <button data-act="dmove2:-1">‹</button>
@@ -6762,13 +6827,7 @@ function dietStrip(mid){
     <div class="dwkd">${날들.map((t,i)=>`<button data-act="dday:${t.d}" class="${t.d===sel?'sel':''} ${t.d>TODAY?'fut':''}">
         <span class="dn ${i===0?'sun':''} ${t.d===TODAY?'tdy':''}">${t.d===TODAY ? '오늘' : DOW[i]}</span>${고리(t, t.d===sel)}</button>`).join('')}</div>
   </div>
-  <div class="dgrid">
-    <div class="dph"><span class="k">올린 사진</span><b>${st.n}<small>장</small></b>
-      <span class="s">${st.n ? '이 날 올린 식단' : '아직 없어요'}</span></div>
-    <div class="dkc"><span class="k">먹은 칼로리</span><b>${st.kcal ? st.kcal.toLocaleString() : 0}<small>kcal</small></b>
-      <span class="s">${st.goal ? `권장 ${st.goal.toLocaleString()} · ${남 >= 0 ? `<em class="ok">${남.toLocaleString()} 남음</em>` : `<em class="ov">${(-남).toLocaleString()} 넘음</em>`}` : '최근 7일 흐름'}</span>
-      ${곡선}</div>
-  </div>`;
+`;
 }
 
 function sheetMeal(id){
@@ -7300,7 +7359,7 @@ function 글카드(p){
       <span class="pwho">${esc(이름of(p.mid))}<small>${p.by && p.kind==='인증샷' ? esc(p.by)+' 찍음 · ' : ''}${언제(p.ts)}${p.hid ? ' · <b style="color:var(--warn)">내려둠</b>' : (p.vis==='나만' ? ' · 나만 보기' : '')}</small></span>
       <span class="pkind k-${p.kind==='식단'?'d':'o'}">${esc(p.kind)}</span>
       ${내글 || S.who==='tr' ? `<button class="pmore" data-act="pmore:${p.id}">⋯</button>` : ''}</div>
-    <button class="pimgw" data-act="popen:${p.id}"><img class="pimg" src="${esc(phURL(p.path))}" alt="" loading="lazy" onerror="picFail(this)"></button>
+    ${식단넘김(p, 1) || `<button class="pimgw" data-act="popen:${p.id}"><img class="pimg" src="${esc(phURL(p.path))}" alt="" loading="lazy" onerror="picFail(this)"></button>`}
     ${p.cap ? `<div class="pcap">${esc(p.cap)}</div>` : ''}
     <div class="pacts">
       <button class="${내좋아요(p.id)?'on':''}" data-act="plike:${p.id}">${svg('h_heart',19)}${n좋||''}</button>
@@ -7369,24 +7428,20 @@ async function partnerSend(){
 function sheetPostNew(){
   const 사진 = 사진모음(S.mid, true).filter(x => !(D.posts||[]).some(p=>p.photo_id===x.id)).slice(0, 12);
   openSheet(()=>`
-    <div class="h2">피드에 올리기 <small>앱에서 찍은 오운완 · 식단 사진</small></div>
+    <div class="h2">피드에 올리기 <small>앱에서 찍은 오운완 사진</small></div>
     ${사진.length ? `<div class="pgrid">${사진.map(x=>`<button class="pg" data-act="postfrom:${x.id}">
         <img src="${esc(phURL(x.path))}" alt="" loading="lazy" onerror="picFail(this)">${x.kind==='pair'?`<span class="pgk">${svg('h_hands',13)}</span>`:''}
         <span class="pgd">${(x.date||'').slice(5).replace('-','.')}</span></button>`).join('')}</div>` : '<div class="empty">올릴 수 있는 오운완이 아직 없어요<br>운동을 마치고 오운완을 찍어 보세요</div>'}
-    ${(()=>{ const 끼 = (D.meals||[]).filter(m => m.mid===S.mid && m.path && !(D.posts||[]).some(p=>p.photo_id===String(m.id)))
-        .sort((a,b)=> a.date<b.date ? 1 : -1).slice(0, 6);
-      return 끼.length ? `<span class="lbl">내 식단 사진</span><div class="pgrid">${끼.map(m=>`<button class="pg" data-act="mealpost:${m.id}">
-        <img src="${esc(phURL(m.path))}" alt="" loading="lazy" onerror="picFail(this)"><span class="pgk">${svg('bowl',13)}</span>
-        <span class="pgd">${(m.date||'').slice(5).replace('-','.')}</span></button>`).join('')}</div>` : ''; })()}
-    <div class="cyfoot" style="justify-content:center"><span>갤러리 사진은 올릴 수 없어요 · 운동을 마치고 찍은 오운완과 식단 사진만 올라갑니다</span></div>
+    <div class="cyfoot" style="justify-content:center"><span>갤러리 사진은 올릴 수 없어요 · 식단은 식단 화면에서 하루 단위로 올려요</span></div>
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 function sheetPostWrite(){
   const n = S.pnew; if(!n) return;
   openSheet(()=>`
     <div class="h2">한마디 <small>입력하지 않아도 돼요</small></div>
-    <img class="shot ootdimg" src="${esc(n.url)}" alt="">
-    <textarea class="search" data-k="pcap" rows="2" maxlength="140" placeholder="예) 오늘 스쿼트 50kg 성공!">${esc(n.cap||'')}</textarea>
+    <img class="shot ootdimg" src="${esc(n.url)}" alt="" onerror="picFail(this)">
+    ${n.n ? `<div class="cyfoot" style="justify-content:center"><span>${esc(n.날)} 식단 사진 ${n.n}장이 글 하나로 올라가요 · 나중에 찍은 끼니도 붙어요</span></div>` : ''}
+    <textarea class="search" data-k="pcap" rows="2" maxlength="140" placeholder="${n.n ? '예) 단백질 목표 채우는 중' : '예) 오늘 스쿼트 50kg 성공!'}">${esc(n.cap||'')}</textarea>
     <div class="seg">${['센터','나만'].map(v=>`<button class="${(n.vis||'센터')===v?'on':''}" data-act="postvis:${v}">${v==='센터'?'센터 회원끼리':'나만 보기'}</button>`).join('')}</div>
     <button class="btn main" data-act="postsend">올리기</button>
     <button class="btn ghost sm" data-act="close">닫기</button>`);
@@ -7433,7 +7488,7 @@ function sheetPost(id){
   openSheet(()=>{ const cs = 댓글들(id); return `
     <div class="h2">${esc(이름of(p.mid))} <small>${파 ? '운동 파트너 모집 · '+(p.state==='마감'?'마감':'모집중') : esc(p.kind)} · ${언제(p.ts)}</small></div>
     ${파 ? `<div class="ptgrid"><i>성별</i><b>${esc(p.sex)}</b><i>운동경력</i><b>${esc(p.career)}</b><i>운동시간</i><b>${esc(p.ptime)}</b><i>3대 중량</i><b>${esc(p.big3)}</b><i>운동부위</i><b>${esc(p.parts)}</b></div>`
-        : `<img class="shot ootdimg" src="${esc(phURL(p.path))}" alt="" onerror="picFail(this)">`}
+        : (식단넘김(p, 0) || `<img class="shot ootdimg" src="${esc(phURL(p.path))}" alt="" onerror="picFail(this)">`)}
     ${p.cap ? `<div class="pcap">${esc(p.cap)}</div>` : ''}
     ${파 ? '' : `<div class="pacts">
       <button class="${내좋아요(id)?'on':''}" data-act="plike:${id}">${svg('h_heart',19)}${좋아요수(id)||''}</button><span class="psp"></span>
@@ -7447,7 +7502,8 @@ function sheetPost(id){
 async function postShareSave(id, 공유){
   const p = (D.posts||[]).find(x=>x.id===id); if(!p) return;
   try{
-    const blob = await 사진받기(p.path);      /* 저장소가 잠겨 있어 주소를 받아서 가져온다 — 공개 주소로 받으면 깨진 파일이 저장된다 (2026-10-08 대표 「피드에 올리면 다운로드가 안 되는 것 같다」) */
+    const 첫 = (d => d ? 식단사진들(d.mid, d.day)[0] : null)(식단날of(p));
+    const blob = await 사진받기(첫 ? 첫.path : p.path);      /* 저장소가 잠겨 있어 주소를 받아서 가져온다 — 공개 주소로 받으면 깨진 파일이 저장된다 (2026-10-08 대표 「피드에 올리면 다운로드가 안 되는 것 같다」) */
     const file = new File([blob], '글래드짐_'+(p.ts||'').slice(0,10)+'.jpg', { type:'image/jpeg' });
     if((공유 || 아이폰()) && navigator.canShare && navigator.canShare({ files:[file] })){
       try{ await navigator.share({ files:[file], text:p.cap||'' }); return; }catch(e){ if(e.name==='AbortError') return; }
@@ -10810,6 +10866,8 @@ document.addEventListener('click', async ev=>{
     case 'mealdel': { const id=rest[0], m=(D.meals||[]).find(x=>x.id===id); if(!m) return;
       D.meals=D.meals.filter(x=>x.id!==id);
       sv(sdel('meals','id=eq.'+id), '식단 삭제');
+      { const g = 식단글(m.mid, m.date);      /* 그날 사진이 하나도 안 남으면 식단 글도 같이 내린다 — 빈 글이 피드에 남지 않게 */
+        if(g && !식단사진들(m.mid, m.date).length){ D.posts = D.posts.filter(x=>x.id!==g.id); sv(sdel('posts','id=eq.'+g.id), '식단 글 내리기'); } }
       if(m.path) fetch(SB_URL+'/storage/v1/object/media/'+m.path,{method:'DELETE',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}}).catch(()=>{});
       closeSheet(); toast('삭제했어요'); render(); return; }
     case 'tstartask': S.tmid=rest[0]; sheetStartSession(rest[0]);
@@ -11898,10 +11956,15 @@ document.addEventListener('click', async ev=>{
     case 'partclose': { const p=(D.posts||[]).find(x=>x.id===rest[0]); if(!p || p.mid!==S.mid) return;
       p.state = p.state==='마감' ? '모집중' : '마감'; sv(spatch('posts','id=eq.'+p.id,{ state:p.state }), '모집 상태'); render(); return; }
     case 'postnew': sheetPostNew(); return;
-    case 'mealpost': { const m=(D.meals||[]).find(y=>String(y.id)===rest[0]); if(!m || !m.path) return;
-      const 이름들 = (m.items||[]).map(x=>x.name).slice(0,3).join(' · ');
-      S.pnew = { kind:'식단', photo_id:String(m.id), path:m.path, url:phURL(m.path), vis:'센터', cap: m.memo || 이름들 || '' };
+    case 'dfold': S.dfold = !S.dfold; render(); return;
+    case 'daypost': { const day=rest[0], ps=식단사진들(S.mid, day); if(S.who==='tr' || !ps.length || 식단글(S.mid, day)) return;
+      S.pnew = { kind:'식단', photo_id:'day:'+S.mid+':'+day, path:ps[0].path, url:phURL(ps[0].path), vis:'센터', cap:'', n:ps.length, 날: day===TODAY ? '오늘' : dateTxt(day) };
       sheetPostWrite(); return; }
+    case 'dayunpost': { if(!식단글(S.mid, rest[0])) return;
+      sheet끄기확인('피드에서 내릴까요?', '식단 기록과 사진은 그대로 남아요.<br>이 글에 달린 <b>좋아요 · 댓글은 삭제</b>됩니다.', '피드에서 내리기', 'dayunpostok:'+rest[0]); return; }
+    case 'dayunpostok': { const p=식단글(S.mid, rest[0]); if(!p){ closeSheet(); return; }
+      D.posts = D.posts.filter(x=>x.id!==p.id); D.pcm = (D.pcm||[]).filter(c=>c.pid!==p.id); D.plk = (D.plk||[]).filter(l=>l.pid!==p.id);
+      sv(sdel('posts','id=eq.'+p.id), '식단 글 내리기'); closeSheet(); toast('피드에서 내렸어요'); render(); return; }
     case 'postfrom': { const x=(D.bph||[]).find(y=>y.id===rest[0]); if(!x) return;
       S.pnew = { kind: x.kind==='pair'?'인증샷':'오운완', photo_id:x.id, path:x.path, url:phURL(x.path), vis:'센터', cap:'', by:x.by||'' };
       sheetPostWrite(); return; }
