@@ -2678,7 +2678,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '340';
+const BUILD = '341';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -5294,8 +5294,7 @@ function 윗시계(w){
   if(w.title === '1RM 측정') return `<span class="tmwrap">${쉼칩(w)}</span>`;
   return `<span class="tmwrap">
     ${w.startAt ? `<span class="tm" id="tm">${mmss((Date.now()-w.startAt)/1000)}</span>`
-                : `<button class="chip t" data-act="timego">시간 재기 ▶</button>`}
-    ${쉼칩(w)}</span>`;
+                : `<button class="chip t" data-act="timego">시간 재기 ▶</button>`}</span>`;   /* 쉬는 시간 칩은 뺐다 — 종목 카드 안 스위치와 겹친다 (2026-10-08 대표). 1RM 측정 모드에만 남는다 */
 }
 
 function vWorkout(){
@@ -5355,7 +5354,7 @@ function vWorkout(){
         ? `<button class="ordbtn" data-act="ordmv:${i}:-1" ${i===0?'disabled':''}>▲</button>
            <button class="ordbtn" data-act="ordmv:${i}:1" ${i===w.items.length-1?'disabled':''}>▼</button>
            <button class="chip t" data-act="ordend" style="flex:none;padding:6px 10px">여기에 놓기</button>`
-        : `${on&&!it.locked?'<span class="pill t">지금</span>':(it.locked?'<span class="pill q">완료</span>':'')}
+        : `${on&&!it.locked?'<span class="pill t">운동중</span>':(it.locked?'<span class="pill q">완료</span>':'')}
            <button class="chip rm" data-act="wdel:${i}">제거</button>`}
       </div>${(on && !S.fold) ? 펼침() : ''}`;
     }).join('')}
