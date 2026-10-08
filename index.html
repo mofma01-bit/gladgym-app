@@ -1041,11 +1041,12 @@ body .figbox2{background:radial-gradient(80% 50% at 50% 30%,rgba(240,211,160,.09
 .wstp .num input{width:100%;background:none;border:0;border-radius:0;padding:0;text-align:center;font-size:21px;font-weight:800;color:var(--cream);font-variant-numeric:tabular-nums;height:28px;min-height:0}
 .wadj.w3 .wstp .num input{font-size:17px}.wstp .num small{font-size:10.5px;color:var(--sub);font-weight:600;line-height:1.1}
 .wdone{flex:none;width:100%;height:52px;border-radius:14px;background:var(--teal);color:#10181a;font-size:16px;font-weight:800}.wdone.g{background:var(--gold)}
+.wend{flex:none;width:100%;height:46px;border-radius:14px;border:1.5px solid var(--gold-2,#b9965f);background:rgba(240,211,160,.08);color:var(--gold);font-size:14.5px;font-weight:800}
 .wdone2{display:grid;grid-template-columns:1fr 1.3fr;gap:9px;flex:none}
 .wexf{display:flex;flex:none;border-top:1px dashed #3b3a35;margin:0 -2px}.wexf button{flex:1;padding:11px 4px;font-size:12.5px;font-weight:700;color:var(--gold)}.wexf button+button{border-left:1px dashed #3b3a35;color:var(--sub)}
 .wlock{display:flex;justify-content:space-between;align-items:center;flex:none;font-size:12px;color:var(--sub)}.wlock button{font-size:12.5px;font-weight:700;color:var(--cream);border:1px solid #57524a;border-radius:999px;padding:7px 14px}
 .wrs{display:flex;align-items:center;gap:10px;flex:none;padding:9px 11px;border-radius:12px;border:1px solid #34332d;background:#1a1917}
-.wrs .t{flex:1;min-width:0}.wrs b{font-size:13px;display:block}.wrs small{font-size:11px;color:var(--sub)}
+.wrs .t{flex:1;min-width:0}.wrs b{font-size:13px;display:block;white-space:nowrap}.wrs small{font-size:11px;color:var(--sub);white-space:nowrap}
 .wrs .sw{width:44px;height:26px;border-radius:13px;background:#34332d;position:relative;flex:none;padding:0}.wrs .sw i{position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:50%;background:#8f8a83;transition:.15s}
 .wrs.on{border-color:#5a4c33}.wrs.on .sw{background:var(--gold-2,#b9965f)}.wrs.on .sw i{left:21px;background:#fff}
 .wrs .pm2{display:flex;align-items:center;gap:4px;flex:none}.wrs .pm2 button{width:34px;height:34px;border-radius:10px;border:1px solid #57524a;font-size:18px;font-weight:700;padding:0}.wrs .pm2 em{font-style:normal;font-family:Archivo,sans-serif;font-size:15px;font-weight:700;color:var(--gold);min-width:38px;text-align:center}
@@ -2678,7 +2679,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '341';
+const BUILD = '342';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -5537,7 +5538,7 @@ function 세트표(cur, e, mid){
   if(잠) return 표 + `<div class="wlock"><span>끝낸 종목이에요 · 잠겨 있어요</span><button data-act="redo">재기록</button></div>`;
   const x = cur.sets[sel], p = 지난[sel], 할 = x.done ? 열림 : sel, c0 = 쉼설정(), 도는중 = !!(S.rest && S.rest.until);
   return `${cur.rmPlan ? '' : `<div class="wrs ${c0.on?'on':''}"><button class="sw" data-act="wrest" aria-label="쉬는 시간 ${c0.on?'끄기':'켜기'}"><i></i></button>
-      <span class="t"><b>쉬는 시간</b><small>${c0.on ? '세트를 끝낼 때마다 '+mmss(c0.sec)+' 을 재요' : '꺼져 있어요 · 켜면 세트마다 자동으로 재요'}</small></span>
+      <span class="t"><b>세트 사이 휴식</b><small>${c0.on ? '세트 끝나면 시작' : '꺼짐'}</small></span>
       ${c0.on ? `<span class="pm2"><button data-act="wrestd:-15" aria-label="15초 줄이기">−</button><em>${mmss(c0.sec)}</em><button data-act="wrestd:15" aria-label="15초 늘리기">＋</button></span>` : ''}</div>`}
     ${표}
     <div class="wadj ${칸들.length > 2 ? 'w3' : ''}"><div class="lab"><span>${sel+1}${단위} ${x.done ? '수정' : '조절'}</span><span>지난번 ${p ? (유 ? p.reps+'분' : kgfmt(p.kg)+'kg × '+p.reps+'회') : '없음'}</span></div>
@@ -5547,9 +5548,10 @@ function 세트표(cur, e, mid){
         <button class="pm" data-act="d:${c[0]}:${sel}:${c[4]}" data-rep="1" aria-label="${c[2]} 올리기">＋</button></div></div>`).join('')}</div></div>
     ${도는중 ? `<div class="wrestbar"><b id="restleft2">${mmss(Math.max(0,(S.rest.until-Date.now())/1000))}</b><span>쉬는 중</span><button data-act="wrestadd">+15초</button><button data-act="wrestx">건너뛰기</button></div>` : ''}
     ${열림 >= 0
-      ? `<button class="wdone" data-act="${할 === 끝 ? 'rep' : 'wsd:'+할}">${할+1}${단위} 완료</button>`
-      : `<div class="wdone2"><button class="wdone" data-act="nextset">＋ ${끝+2}${단위} 추가</button><button class="wdone g" data-act="fin">${esc(e.n)} 완료</button></div>`}
-    <div class="wexf"><button data-act="nextset">＋ ${단위} 추가</button><button data-act="wspop">마지막 ${단위} 제거</button>${열림 >= 0 ? `<button data-act="fin">종목 완료</button>` : ''}</div>`;
+      ? `<button class="wdone" data-act="${할 === 끝 ? 'rep' : 'wsd:'+할}">${할+1}${단위} 완료</button>
+         <button class="wend" data-act="fin">이 종목 끝내기</button>`
+      : `<div class="wdone2"><button class="wdone" data-act="nextset">＋ ${끝+2}${단위} 추가</button><button class="wdone g" data-act="fin">이 종목 끝내기</button></div>`}
+    <div class="wexf"><button data-act="nextset">＋ ${단위} 추가</button><button data-act="wspop">마지막 ${단위} 제거</button></div>`;
 }
 function 세로입력(cur, e, i){
   const s = cur.sets[i] || {};
@@ -11905,7 +11907,7 @@ document.addEventListener('click', async ev=>{
       save(); render(); return; }
     case 'wspop': { const cur = w.items[w.cur]; if(cur.locked) return; if(cur.sets.length < 2){ toast('세트가 하나뿐이에요'); return; }
       cur.sets.pop(); S.wsel = null; save(); toast('마지막 세트를 제거했어요'); render(); return; }
-    case 'wrest': { const c = 쉼설정(); try{ localStorage.setItem('gg_rest_on', c.on ? '0' : '1'); }catch(e){} if(c.on) S.rest = null; toast(c.on ? '쉬는 시간을 껐어요' : '쉬는 시간을 켰어요 · 세트를 끝내면 자동으로 재요'); render(); return; }
+    case 'wrest': { const c = 쉼설정(); try{ localStorage.setItem('gg_rest_on', c.on ? '0' : '1'); }catch(e){} if(c.on) S.rest = null; toast(c.on ? '휴식 타이머를 껐어요' : '휴식 타이머를 켰어요'); render(); return; }
     case 'wrestd': { const c = 쉼설정(), n = Math.max(15, Math.min(600, c.sec + (+rest[0]))); try{ localStorage.setItem('gg_rest_sec', String(n)); }catch(e){} if(S.repeating){ const em = document.querySelector('#main .wrs .pm2 em'); if(em) em.textContent = mmss(n); } else render(); return; }
     case 'wrestadd': if(S.rest && S.rest.until){ S.rest.until += 15000; render(); } return;
     case 'wrestx': S.rest = null; render(); return;
