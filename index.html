@@ -2666,7 +2666,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '346';
+const BUILD = '347';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -4387,7 +4387,7 @@ function 홈현황(mid){
 function 홈주기(mid){
   const c = cycOf(mid), t = cycToday(c); if(!t || !여성인가(mid)) return '';
   return `<button class="hcard hcy" data-act="sub:cycle" style="--cc:${주기색[t.ph]||'var(--gold)'}">${홈머리('h_drop','생리주기')}
-    <span class="hpill"><b>${esc(t.ph)} · ${t.day}일차</b><small>다음 생리 ${t.left}일 뒤</small></span></button>`;
+    <span class="hpill"><b>${esc(주기말(t.ph))} · ${t.day}일차</b><small>${다음말(t)}</small></span></button>`;
 }
 function 홈오운완(mid){
   const w = 오운완남음(mid); if(!w) return '';
@@ -8502,7 +8502,7 @@ function vMe(){
        ['chart','인바디 · 비포애프터','인바디 기록 · 몸 사진 · 영상','sub:body'],
        ['h_user','체형분석 기록','트레이너가 본 체형 · 체크리스트','posture'],
        ...(여성인가(S.mid) ? [['moon','생리주기', (cycOf(S.mid)&&cycOf(S.mid).on)
-          ? `현재 ${esc(cycToday(cycOf(S.mid)).ph)} · ${cycToday(cycOf(S.mid)).day}일차`
+          ? `${cycToday(cycOf(S.mid)).ph==='월경기' ? '' : '현재 '}${esc(주기말(cycToday(cycOf(S.mid)).ph))} · ${cycToday(cycOf(S.mid)).day}일차`
           : '켜면 시기에 맞춰 운동을 조절합니다 — 선택이에요', 'sub:cycle']] : []),
        ['chat','자주 묻는 질문','식사 · 유산소 · 빈도','sub:qa']]
       .map(x=>`<button class="mrow2" data-act="${x[3]}"><span class="mi">${svg(x[0],19)}</span>
@@ -8575,6 +8575,9 @@ function cycToday(c){
   return {day, ph, why, left, ovul:c.len-14, 다음: ymd(다음)};
 }
 /* 오늘 주기 한 줄 — 회원 홈 · 트레이너 루틴 고르기에 같이 쓴다 (2026-10-02 대표) */
+/* 한 줄 요약에서는 「생리 · 월경기」 대신 **「그날」** (2026-10-08 대표). 속 이름(월경기)과 설정 화면의 「생리 시작일 · 기간」은 그대로 — 정확해야 하는 자리 */
+const 주기말 = ph => ph === '월경기' ? '그날' : ph;
+const 다음말 = t => t.ph === '월경기' ? `다음은 ${t.left}일 뒤` : `그날까지 ${t.left}일`;      /* 그날 중에는 「그날까지」가 어색하다 */
 const 주기색 = { '월경기':'#c8605a', '난포기':'#5aa97a', '배란기':'#d9a441', '황체기':'#7f74c7' };
 /* 단계마다 권장 — 트레이너가 루틴을 고를 때 바로 쓰는 말 */
 const 주기권장 = {
@@ -8586,9 +8589,9 @@ const 주기권장 = {
 function 주기줄(mid, act, 짧게){
   const c = cycOf(mid), t = cycToday(c); if(!t || !여성인가(mid)) return '';
   if(짧게) return `<button class="cycline one" data-act="${act}" style="--cc:${주기색[t.ph]||'var(--gold)'}">
-    <span class="ch">현재 <b>${esc(t.ph)}</b> · ${t.day}일차</span><span class="c1">다음 생리 ${t.left}일 뒤 ›</span></button>`;
+    <span class="ch">${t.ph==='월경기' ? `<b>그날</b> ${t.day}일차` : `현재 <b>${esc(t.ph)}</b> · ${t.day}일차`}</span><span class="c1">${다음말(t)} ›</span></button>`;
   return `<button class="cycline" data-act="${act}" style="--cc:${주기색[t.ph]||'var(--gold)'}">
-    <span class="ch">현재 <b>${esc(t.ph)}</b>입니다 <small>${t.day}일차 · 다음 생리 ${t.left}일 뒤 ›</small></span>
+    <span class="ch">${t.ph==='월경기' ? '<b>그날</b>이에요' : `현재 <b>${esc(t.ph)}</b>입니다`} <small>${t.day}일차 · ${다음말(t)} ›</small></span>
     <span class="cw">${esc(주기권장[t.ph]||t.why)}</span></button>`;
 }
 const 여성인가 = mid => (((D.intake||{})[mid]||{}).sex || '') === '여';
@@ -10057,7 +10060,7 @@ function 주기고리(c, t){
       stroke-dasharray="${길.toFixed(1)} ${(C-길).toFixed(1)}" stroke-dashoffset="${(-시작).toFixed(1)}" transform="rotate(-90 60 60)"/>`; }).join('');
   const 각 = ((t.day-.5)/c.len)*2*Math.PI - Math.PI/2, x = 60 + R*Math.cos(각), y = 60 + R*Math.sin(각);
   return `<div class="cyhead" style="--cc:${주기색[t.ph]}">
-    <span class="cyt"><small>오늘 ${t.day}일차</small><b>${esc(t.ph)}</b><i>${esc(t.why)}</i><em>다음 생리까지 ${t.left}일</em></span>
+    <span class="cyt"><small>오늘 ${t.day}일차</small><b>${esc(주기말(t.ph))}</b><i>${esc(t.why)}</i><em>${다음말(t)}</em></span>
     <span class="cyring"><svg viewBox="0 0 120 120" aria-hidden="true">${토막}
       <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="7.5" fill="#151513" stroke="#fff" stroke-width="2.6"/></svg>
       <i><b>${t.day}</b><small>/ ${c.len}일</small></i></span></div>`;
