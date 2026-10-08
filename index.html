@@ -301,6 +301,7 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .btn.kakao{background:#FEE500;color:#1c1a17}
 .btn.blue{background:#4d7f96;color:#f2fafd}
 .anatab{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;flex:0 0 auto;margin-bottom:3px}
+.anatab.four{grid-template-columns:repeat(4,1fr)}.anatab.four button{font-size:13px;letter-spacing:-.03em}
 .anatab button{padding:13px 4px 12px;border-radius:14px;font-size:14px;font-weight:800;
   letter-spacing:-.03em;border:1px solid var(--line);background:var(--dark-2);color:#8b8379;
   display:flex;flex-direction:column;align-items:center;gap:5px;line-height:1}
@@ -2645,7 +2646,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '338';
+const BUILD = '339';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -6053,18 +6054,21 @@ function vRecords(){
 
   const at = S.anaT || 'ex';
   /* 칸 셋 — 지난 기록이 카드 한 줄로 묻혀 안 보인다고 하셔서 칸으로 올렸다 (2026-09-07) */
-  const head = `<div class="anatab">
+  const head = `<div class="anatab four">
     <button class="ex ${at==='ex'?'on':''}" data-act="anat:ex">
       <span class="ic3">${IC_DUMB}</span>운동분석</button>
     <button class="bd ${at==='body'?'on':''}" data-act="anat:body">
-      <span class="ic3">${IC_BODY}</span>인/아웃바디</button>
+      <span class="ic3">${IC_BODY}</span>인바디</button>
+    <button class="bd ${at==='pose'?'on':''}" data-act="anat:pose">
+      <span class="ic3">${IC_BODY}</span>체형분석</button>
     <button class="lg ${at==='log'?'on':''}" data-act="anat:log">
       <span class="ic3">${IC_CAL}</span>지난기록</button></div>`;
-  const topbar = bar('분석', `<span class="sub">${S.who==='tr'?esc((MEMBERS.find(x=>x.id===mid)||{}).n||'')+' · ':''}${at==='body'?'인/아웃바디':esc(per)}</span>`,
+  const topbar = bar('분석', `<span class="sub">${S.who==='tr'?esc((MEMBERS.find(x=>x.id===mid)||{}).n||'')+' · ':''}${at==='body'?'인바디 · 비포애프터':at==='pose'?'체형분석 기록':esc(per)}</span>`,
       S.who==='tr' ? 'tm:'+mid : null);
   const tabn = S.who==='tr' ? 0 : 1;
 
-  if(at === 'body') return { top: topbar, tabs: tabn, body: head + bodyPane(mid) };
+  if(at === 'body') return { top: topbar, tabs: tabn, body: head + bodyPane(mid, 'in') };
+  if(at === 'pose') return { top: topbar, tabs: tabn, body: head + bodyPane(mid, 'pose') };
   if(at === 'log')  return { top: topbar, tabs: tabn, body: head + daysPane(mid) };
 
   return { top: topbar, tabs: tabn, body: head + `
@@ -6892,7 +6896,7 @@ function vDiet(){
           </div></div>
         ${m.note?`<div class="frow2"><span class="fn2" style="color:var(--teal)">트레이너 · ${esc(m.note)}</span></div>`:''}
         ${tr?'':(m.path
-          ? `<div class="addf2"><button data-act="tagedit:${m.id}">＋ 음식 태그하기</button></div>`
+          ? `<div class="addf2"><button data-act="tagedit:${m.id}">＋ 음식 추가</button></div>`
           : `<button class="addf" data-act="fadd:${m.id}">＋ 이 식사에 음식 추가</button>`)}
       </div>`; }).join('')
      : 빔('bowl','이 날은 올린 식단이 없어요','사진을 찍거나 검색해서 추가해 보세요')}
@@ -6995,7 +6999,7 @@ function sheetMeal(id){
              ? `<div class="msum"><b>${Math.round(t.kcal)} kcal</b><span>음식은 아직 안 선택했어요</span></div>`
              : `<div class="note">아직 안 선택했어요. 아래에서 추가하면 <b>칼로리가 저절로 채워집니다.</b></div>`)}
         ${tr?'':(m.path
-          ? `<button class="addf" data-act="tagedit:${m.id}">＋ 음식 태그하기</button>`
+          ? `<button class="addf" data-act="tagedit:${m.id}">＋ 음식 추가</button>`
           : `<button class="addf" data-act="fadd:${m.id}">＋ 음식 추가</button>`)}`; })()}
     ${(m.items&&m.items.length)
       ? `<div class="note">칼로리와 탄단지는 <b>추가한 음식에서 저절로 더해집니다.</b>
