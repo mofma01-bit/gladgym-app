@@ -1603,49 +1603,26 @@ body .prephd .ph1{font-size:21px}
 .btn.ic .pl{font-size:17px;font-weight:800;color:var(--teal)}
 
 /* ── 세로 입력 기둥 ── 지금 하는 세트 */
-.vstep{display:grid;grid-template-columns:1fr 1fr 1.32fr;gap:8px;flex:none;align-items:stretch}
-.vstep.w3{grid-template-columns:1fr 1fr 1fr}
-.vstep.w3 .vdone{grid-column:1/-1;flex-direction:row;gap:8px;padding:13px}
-.vstep.w3 .vdone .vd1{font-size:17px}
-.vcol{display:flex;flex-direction:column;align-items:stretch;gap:5px;min-width:0}
 .varr{background:var(--dark-3);border:1px solid var(--line);border-radius:10px;
   padding:9px 0;font-size:13px;font-weight:800;color:var(--gold-2);line-height:1}
-.varr:active{background:#453a26;color:var(--gold)}
 .vnum{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;
   background:#141412;border:1px solid var(--line);border-radius:11px;padding:8px 4px;flex:1}
 .vnum input{width:100%;min-width:0;background:none;border:none;outline:none;text-align:center;
   font-size:25px;font-weight:900;color:var(--cream);letter-spacing:-.03em;
   font-variant-numeric:tabular-nums;font-family:inherit;padding:0}
-.vnum small{font-size:11px;font-weight:600;color:var(--sub);line-height:1.2}
-.vnum:focus-within{border-color:var(--gold);background:#1b1810}
-.vcap{font-size:11px;font-weight:700;color:#8b8379;text-align:center;letter-spacing:.02em}
 .vdone{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
   background:var(--gold);color:#241a08;border:none;border-radius:12px;padding:8px 6px;
   box-shadow:0 3px 0 #a8874a}
-.vdone:active{transform:translateY(2px);box-shadow:0 1px 0 #a8874a}
-.vdone .vd1{font-size:20px;font-weight:900;line-height:1}
-.vdone .vd2{font-size:14.5px;font-weight:800;letter-spacing:-.01em}
-.vdone .vd3{font-size:10.5px;font-weight:700;opacity:.66}
 /* 완료해서 잠긴 세트 칸 — 담겼다는 게 한눈에 보이게 (2026-09-17) */
-.vstep.lockrow .vnum{border-color:var(--gold-2);background:var(--gold-dim)}
-.vstep.lockrow .vnum input{color:var(--gold)}
-.vstep.lockrow .varr{opacity:.22}
-.vstep.lockrow .vcap{color:var(--gold-2)}
 .vdone.next{background:var(--dark-3);color:var(--gold);box-shadow:0 3px 0 #2a2822;
   border:1px solid var(--gold-2)}
-.vdone.next:active{box-shadow:0 1px 0 #2a2822}
 #main.lite .vstep.lockrow .vnum input{color:#8a6c2f}
 .vsub{display:flex;align-items:center;gap:9px;flex:none;margin-top:-2px}
 .vsub .vh{font-size:10.5px;font-weight:600;color:#7d766e;line-height:1.45;flex:1;min-width:0}
 /* ── 되돌리기 ── 세트 완료 위, 속이 빈 작은 알약. 채워진 것과 확실히 갈린다 */
-.vright{display:flex;flex-direction:column;gap:7px;min-width:0}
-.vright .vdone{flex:1}
 .vundo2{flex:none;height:34px;display:flex;align-items:center;justify-content:center;gap:5px;
   background:none;border:1.5px solid #5d5850;border-radius:999px;
   font-size:12px;font-weight:700;color:var(--sub);white-space:nowrap;padding:0 6px}
-.vundo2 .ur{font-size:14px;font-weight:800;line-height:1}
-.vundo2:active{background:var(--dark-3);color:var(--cream)}
-.vundo2[disabled]{opacity:.28}
 #main.lite .vundo2{border-color:#ded2c0}
 /* 끝난 세트를 누르면 고칠 수 있다는 표시 */
 .setedit{flex:none;font-size:10.5px;font-weight:700;color:var(--gold-2);
@@ -2689,7 +2666,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '345';
+const BUILD = '346';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -4407,20 +4384,6 @@ function 홈현황(mid){
     <span class="h3">${[['h_dumb','개인운동',개인,'회'],['h_user','PT 수업',수업,'회'],['h_clock','운동시간',분.toLocaleString(),'분']]
       .map(x=>`<span>${svg(x[0],17)}<small>${x[1]}</small><b>${x[2]}<i>${x[3]}</i></b></span>`).join('')}</span></button>`;
 }
-function 홈목표(mid){
-  const g = GOALS[mid]||{}, now = g.now||{}, to = g.to||{}, 있다 = v => v!=null && v!=='';
-  const k = ['w','fp','m'].find(u => 있다(to[u]) && 있다(now[u]));
-  if(!k) return `<button class="hcard teal" data-act="sub:plan">${홈머리('h_target','몸 목표')}
-    <span class="hb dim">아직 없어요</span><span class="hs">목표를 정해 보세요</span></button>`;
-  const logs = ((D.blog||{})[mid]||[]).filter(x => +x[k]), first = logs[0], last = logs[logs.length-1];
-  const a = first ? +first[k] : +now[k], b = +to[k], c = last ? +last[k] : a;
-  const p = a===b ? 100 : Math.max(0, Math.min(100, Math.round((a-c)/(a-b)*100)));
-  const 단위 = k==='fp' ? '%' : 'kg';
-  return `<button class="hcard teal" data-act="sub:plan">${홈머리('h_target','몸 목표')}
-    <span class="hb">${k==='w' ? '체중' : k==='fp' ? '체지방률' : '근육량'} <em>${p}%</em></span>
-    <i class="hbar"><u style="width:${p}%"></u></i>
-    <span class="hs">${kgfmt(c)}${단위} / ${kgfmt(b)}${단위}</span></button>`;
-}
 function 홈주기(mid){
   const c = cycOf(mid), t = cycToday(c); if(!t || !여성인가(mid)) return '';
   return `<button class="hcard hcy" data-act="sub:cycle" style="--cc:${주기색[t.ph]||'var(--gold)'}">${홈머리('h_drop','생리주기')}
@@ -5563,85 +5526,8 @@ function 세트표(cur, e, mid){
       : `<div class="wdone2"><button class="wdone" data-act="nextset">＋ ${끝+2}${단위} 추가</button><button class="wdone g" data-act="fin">이 종목 끝내기</button></div>`}
     <div class="wexf"><button data-act="nextset">＋ ${단위} 추가</button><button data-act="wspop">마지막 ${단위} 제거</button></div>`;
 }
-function 세로입력(cur, e, i){
-  const s = cur.sets[i] || {};
-  const 잠 = !!s.done;                       /* 완료한 세트는 잠긴다 */
-  const 칸 = (라벨, f, k, 값, 단, 폭) => `<div class="vcol">
-    <button class="varr" data-act="d:${f}:${i}:${폭}" data-rep="1" aria-label="${라벨} 올리기"
-      ${잠?'disabled':''}>▲</button>
-    <span class="vnum"><input type="text" inputmode="decimal" data-k="${k}" data-i="${i}"
-        value="${값}" aria-label="${라벨}" ${잠?'readonly':''}><small>${단}</small></span>
-    <button class="varr" data-act="d:${f}:${i}:-${폭}" data-rep="1" aria-label="${라벨} 내리기"
-      ${잠?'disabled':''}>▼</button>
-    <span class="vcap">${라벨}</span></div>`;
-  const 칸들 = e.cardio
-    ? [ 칸('시간','reps','setreps',s.reps,'분',1),
-        칸('속도','spd','setspd',s.spd||0,'km/h',0.5) ]
-        .concat(경사최대(cur.ex) ? [ 칸('경사','kg','setkg',kgfmt(s.kg),'도',1) ] : [])
-    : [ 칸('무게','kg','setkg',kgfmt(s.kg),'kg',2.5),
-        칸('횟수','reps','setreps',s.reps,'회',1) ];
-  const 단위 = e.cardio ? '구간' : '세트';
-  /* 되돌리기는 「세트 완료」 바로 위에. 크기와 모양을 확 다르게 둔다 —
-     채워진 큰 덩어리 = 앞으로 가는 것, 속이 빈 작은 알약 = 되돌리는 것 (2026-09-07). */
-  /* 완료한 뒤에는 칸이 잠긴다. 「완료 풀기」로 열고, 「다음 ○○」로 새 줄을 만든다
-     (2026-09-17 대표: 「세트완료하면 기록잠김 → 다음세트 누르면 새로운 열생성」) */
-  return `<div class="vstep ${칸들.length > 2 ? 'w3' : ''} ${잠?'lockrow':''}">
-      ${칸들.join('')}
-      <div class="vright">
-        ${잠
-          ? `<button class="vundo2" data-act="unlock"><span class="ur">🔓</span>완료 풀기</button>
-             <button class="vdone next" data-act="nextset">
-               <span class="vd1">＋</span>
-               <span class="vd2">다음 ${단위}</span>
-               <span class="vd3">${i+2}${단위}째 만들기</span></button>`
-          : `<button class="vundo2" data-act="undo" ${cur.sets.length<2?'disabled':''}>
-               <span class="ur">↺</span>되돌리기</button>
-             <button class="vdone" data-act="rep">
-               <span class="vd1">✓</span>
-               <span class="vd2">이번 ${단위} 완료</span>
-               <span class="vd3">${i+1}${단위}째 기록</span></button>`}
-      </div>
-    </div>
-    `;
-}
 
 /* ── 시트들 ── */
-function sheetEdit(i){
-  const w=live(), cur=w.items[w.cur], s=cur.sets[i], e=exOf(cur.ex);
-  openSheet(()=>`
-    <div class="h2">${esc(exName(cur.ex,cur.va))} · ${i+1}${e.cardio?'구간':'세트'}</div>
-    ${e.cardio?`
-      <div class="step"><span class="k">시간</span><button data-act="d:reps:${i}:-1" data-rep="1">−</button>
-        <span class="vin"><input type="text" inputmode="numeric" data-k="setreps" data-i="${i}"
-          value="${s.reps}"><small>분</small></span>
-        <button data-act="d:reps:${i}:1" data-rep="1">＋</button></div>
-      <div class="step"><span class="k">속도</span><button data-act="d:spd:${i}:-0.5" data-rep="1">−</button>
-        <span class="vin"><input type="text" inputmode="decimal" data-k="setspd" data-i="${i}"
-          value="${s.spd||0}"><small>km/h</small></span>
-        <button data-act="d:spd:${i}:0.5" data-rep="1">＋</button></div>
-      ${경사최대(cur.ex) ? `
-      <div class="step"><span class="k">경사</span><button data-act="d:kg:${i}:-1" data-rep="1">−</button>
-        <span class="vin"><input type="text" inputmode="decimal" data-k="setkg" data-i="${i}"
-          value="${kgfmt(s.kg)}"><small>도</small></span>
-        <button data-act="d:kg:${i}:1" data-rep="1">＋</button></div>
-      <div class="unitlbl">이 기구는 경사가 <b>${경사최대(cur.ex)}도</b>까지 올라갑니다</div>` : ''}
-      `
-    :`<div class="step"><span class="k">무게</span>
-        <button data-act="d:kg:${i}:-2.5" data-rep="1">−</button>
-        <span class="vin"><input type="text" inputmode="decimal" data-k="setkg" data-i="${i}"
-          value="${kgfmt(s.kg)}"><small>kg</small></span>
-        <button data-act="d:kg:${i}:2.5" data-rep="1">＋</button></div>
-      <div class="step"><span class="k">횟수</span>
-        <button data-act="d:reps:${i}:-1" data-rep="1">−</button>
-        <span class="vin"><input type="text" inputmode="numeric" data-k="setreps" data-i="${i}"
-          value="${s.reps}"><small>회</small></span>
-        <button data-act="d:reps:${i}:1" data-rep="1">＋</button></div>
-      `}
-    <div style="display:flex;gap:9px">
-      ${s.done?`<button class="btn ghost" data-act="undone:${i}">완료 풀기</button>`
-              :`<button class="btn gold" data-act="done:${i}">세트 완료</button>`}
-      <button class="btn ghost" data-act="close">닫기</button></div>`);
-}
 /* 길게 누르는 동안에는 화면 전체를 다시 그리지 않고 숫자만 고친다 */
 function 숫자만갱신(){
   const w=live(); if(!w) return;
@@ -8295,24 +8181,6 @@ function sheetFoodNew(){
 }
 
 /* 마지막 걸음 — 언제 먹었는지와 한마디. 뭐가 뭔지는 앞에서 이미 골랐다 */
-function sheetShot(){
-  if(!S.shotSlot) S.shotSlot = 지금끼니();     /* 끼니 짐작은 한 군데서만 한다 */
-  openSheet(()=>{
-    const m = S.dm || { id:'draft', path:null, items:[] };
-    const t = mealSum(m);
-    return `<div class="h2">언제 먹은 건가요</div>
-    ${태그판(m, 0)}
-    <div class="chips">${SLOTS.map(x=>`<button class="chip ${S.shotSlot===x?'on':''}" data-act="slot:${x}">${x}</button>`).join('')}</div>
-    ${t.kcal?`<div class="msum"><b>${Math.round(t.kcal)} kcal</b>
-      <span>탄 ${Math.round(t.carb)}g · 단 ${Math.round(t.protein)}g · 지 ${Math.round(t.fat)}g</span></div>`
-      :`<div class="note">추가한 음식이 없어요. <b>뒤로</b> 가서 사진을 눌러 선택할 수 있습니다.</div>`}
-    <textarea data-k="mmemo" placeholder="한마디 (입력하지 않아도 됩니다)"></textarea>
-    <div style="display:flex;gap:9px">
-      <button class="btn main" data-act="shotup">올리기</button>
-      <button class="btn ghost" data-act="tagback">뒤로</button></div>
-    <button class="btn ghost sm" data-act="shotcancel">취소</button>`;
-  });
-}
 
 function syncMealTotal(m){
   const t = mealSum(m);
@@ -10839,6 +10707,8 @@ function 칠하기(){
 }
 
 /* ═══ 동작 ═══ */
+/* 조절 칸에 직접 친 값은 칸에서 나올 때 표에 반영한다 (치는 동안에는 다시 그리지 않으므로) */
+document.addEventListener('focusout', ev=>{ if(ev.target.closest && ev.target.closest('#main .wadj input')) setTimeout(()=>{ const a2 = document.activeElement; if(!(a2 && a2.closest && a2.closest('#main .wadj input')) && S.screen==='workout' && !S.repeating) render(); }, 180); });
 document.addEventListener('input', ev=>{
   const k = ev.target.getAttribute && ev.target.getAttribute('data-k');
   if(k === 'setkg' || k === 'setreps' || k === 'setspd'){   /* 세트 값 직접 적기 */
@@ -10853,7 +10723,7 @@ document.addEventListener('input', ev=>{
       else st.reps=Math.max(1, Math.round(v));
       /* 카드 안 기둥에 적는 중이면 다시 그리지 않는다 — 그리면 치던 칸이 날아간다 */
       save();
-      if(!ev.target.closest('.vstep')) render();   /* 기둥에 치는 중이면 그대로 둔다 */
+      if(!ev.target.closest('.wadj')) render();   /* 조절 칸에 치는 중이면 그대로 둔다 — 그리면 치던 칸이 날아간다 (세트 표로 바꾸며 .vstep → .wadj · 2026-10-08) */
     }
     return;
   }
@@ -11083,9 +10953,7 @@ document.addEventListener('click', async ev=>{
       return; }
     case 'slot': S.shotSlot=rest[0]; drawSheet(); return;
     case 'shotup': uploadMeal(); return;
-    case 'tagback': sheetTagPhoto('draft'); return;
     case 'tagdone': S.tagBack=null; S.tagXY=null; closeSheet(); render(); return;
-    case 'tagnext': S.tagBack=null; S.tagXY=null; sheetShot(); return;
     case 'shotcancel': S.shot=null; S.dm=null; S.tagBack=null; S.tagXY=null;
       closeSheet(); toast('그만뒀어요'); return;
     case 'tagedit': sheetTagPhoto(rest[0]); return;
@@ -11912,7 +11780,6 @@ document.addEventListener('click', async ev=>{
       save(); render(); return; }
     /* 운동 중에는 다른 데로 못 나간다 */
     case 'askleave': sheetLeave(); return;
-    case 'edit': sheetEdit(+rest[0]); return;
     case 'ws': S.wsel = +rest[0]; render(); return;
     case 'wsf': { S.wsel = +rest[0]; render(); const el2 = document.querySelector('#main .wadj input[data-k="' + rest[1] + '"]'); if(el2){ el2.focus(); try{ el2.select(); }catch(e){} } return; }
     case 'wsd': { const cur = w.items[w.cur], x = cur.sets[+rest[0]]; if(!x || cur.locked) return;
@@ -11935,9 +11802,6 @@ document.addEventListener('click', async ev=>{
       if(S.repeating) 숫자만갱신();          /* 길게 누르는 중 — 숫자만 */
       else { drawSheet(); render(); }
       return; }
-    case 'done': { const s=w.items[w.cur].sets[+rest[0]];
-      s.done=true; s.at=Date.now(); save(); closeSheet(); render(); return; }
-    case 'undone': w.items[w.cur].sets[+rest[0]].done=false; save(); closeSheet(); render(); return;
     /* ⛔ 예전에는 「완료」 하나가 잠그기와 새 줄 만들기를 같이 했다.
        그래서 한 세트를 진짜 한 것인지, 그냥 줄만 생긴 것인지 구별이 안 됐다.
        (2026-09-17 대표: 「세트를 진행한것과 완료한것에 구분이 있으면 좋겠어」)
@@ -11957,10 +11821,6 @@ document.addEventListener('click', async ev=>{
       if(!last || !last.done) return toast('이번 세트를 먼저 완료해 주세요');
       cur.sets.push({kg:last.kg, reps:last.reps, spd:last.spd, done:false}); S.wsel=null;
       save(); render(); return; }
-    case 'unlock': { const cur=w.items[w.cur], last=cur.sets[cur.sets.length-1];
-      if(!last) return; last.done=false; save(); toast('다시 수정할 수 있어요'); render(); return; }
-    case 'undo': { const cur=w.items[w.cur]; if(cur.sets.length<2) return;
-      cur.sets.pop(); cur.sets[cur.sets.length-1].done=false; save(); toast('한 세트 되돌렸어요'); render(); return; }
     case 'setvar': {
       const cur = w.items[w.cur]; if(!cur) return;
       const vk = rest[0]; if(cur.va === vk) return;
