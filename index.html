@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>/* 폭 360 보다 좁은 폰(옛 아이폰 SE 320)은 화면을 360 폭으로 줄여 그린다 — 글씨를 하나하나 줄이지 않는다 */
+try{ if(Math.min(screen.width, window.innerWidth || screen.width) < 360) document.querySelector('meta[name="viewport"]').setAttribute('content', 'width=360, viewport-fit=cover'); }catch(e){}</script>
 <meta name="theme-color" content="#131312">
 <meta name="color-scheme" content="dark">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -41,9 +43,13 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
   border:1px solid var(--line);border-radius:26px}
 @media (max-width:440px){ #frame{max-width:none;height:100vh;height:100dvh;border:none;border-radius:0} }
 @supports (padding: env(safe-area-inset-bottom)){
-  #tabs{padding-bottom:calc(13px + env(safe-area-inset-bottom))}
-  #foot{padding-bottom:calc(11px + env(safe-area-inset-bottom))}
-  #top{padding-top:calc(13px + env(safe-area-inset-top))}
+  /* ⛔ 앞에 #frame 을 붙여 둔다 — 이 줄이 아래 `#top{padding:13px 16px}` 보다 먼저 나와서, 같은 무게면 아래 것이 이겨 위쪽 여백이 사라졌다.
+     홈 화면에 추가한 아이폰(노치)에서 윗줄이 시계 · 노치 밑으로 들어가 잘렸다 (2026-10-08 대표 「아이폰 미니에서 상단이 잘려」) */
+  #frame #tabs{padding-bottom:calc(13px + env(safe-area-inset-bottom))}
+  #frame #foot{padding-bottom:calc(11px + env(safe-area-inset-bottom))}
+  #frame #top{padding-top:calc(13px + env(safe-area-inset-top))}
+  #frame #sheetbox{padding-bottom:calc(20px + env(safe-area-inset-bottom))}
+  #frame #splash{padding-top:env(safe-area-inset-top)}
 }
 
 #top{background:#1a1a17;border-bottom:1px solid var(--line);padding:13px 16px;
@@ -2679,7 +2685,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '342';
+const BUILD = '343';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
