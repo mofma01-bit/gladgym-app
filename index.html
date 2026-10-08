@@ -1230,6 +1230,12 @@ body .prephd .ph1{font-size:21px}
 .rkcap{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;flex:none;margin:-2px 0 4px;font-size:12px;font-weight:600;color:var(--sub)}.rkcap svg{color:var(--gold);flex:none}
 .sstat3>button{display:flex;flex-direction:column;gap:2px;padding:13px 12px 11px;border-radius:16px;background:linear-gradient(180deg,#221f1a,#181816);border:1px solid #34332d;min-width:0;text-align:left;box-shadow:inset 0 1px 0 rgba(240,211,160,.22)}
 .sstat3 .k u{text-decoration:none;font-size:10px;font-weight:700;color:var(--gold-2);margin-left:3px}
+.chip.rm{flex:none;padding:7px 13px;font-weight:800;color:#f0a898;border-color:#7a463c;background:rgba(229,139,123,.1)}
+.chip.rm:active{background:rgba(229,139,123,.24)}
+.psed.w{color:#f0a898;border-color:#7a463c;background:rgba(229,139,123,.1);font-weight:800}
+.sstat3.fin2{grid-template-columns:1fr 1fr}.sstat3.fin2>div{align-items:center;text-align:center}
+.finleft{text-align:center;line-height:1.7;margin:0}.finleft b{color:var(--gold)}.finleft span{color:var(--sub);font-size:12px}
+.nopicx{display:flex;align-items:center;justify-content:center;width:100%;height:100%;color:#5d5a54}
 .megoal{width:100%;flex:none;display:flex;flex-direction:column;gap:8px;text-align:left;padding:14px 14px 13px;border-radius:18px;border:1px solid #34332d;background:linear-gradient(180deg,#201f1c,#171615);box-shadow:inset 0 1px 0 rgba(240,211,160,.14)}
 .mgh{display:grid;grid-template-columns:1fr auto;align-items:center;width:100%}.mgh small{grid-column:1/-1;font-size:11.5px;color:var(--sub)}
 .mgh b{font-size:17px;font-weight:800}.mgh i{font-style:normal;color:var(--sub);font-size:17px}
@@ -2317,8 +2323,8 @@ function sheetExNew(){
     <div class="chips">${PARTS.map(x=>`<button class="chip ${x===d.p?'on':''}" data-act="exnp:${x}">${x}</button>`).join('')}</div>
     <div class="fld"><span class="fn">기구 <small>없으면 비워 두세요</small></span><input class="search" type="text" data-k="exe" maxlength="12" value="${esc(d.e)}" placeholder="예) 케이블 · 덤벨 · 맨몸"></div>
     <div class="fld"><span class="fn">설명</span><textarea class="search" data-k="exd" rows="3" maxlength="300" placeholder="예) 골반은 정면에 두고 몸통만 돌립니다">${esc(d.d)}</textarea></div>
-    ${(d.media.length || d.files.length) ? `<div class="pgrid">${d.media.map((f,i)=>`<button class="pg" data-act="exmrm:${i}">${f.kind==='video' ? `<video src="${esc(phURL(f.path))}" muted playsinline preload="metadata"></video>` : `<img src="${esc(phURL(f.path))}" alt="">`}<span class="pgd">제외</span></button>`).join('')
-      }${d.files.map((f,i)=>`<button class="pg" data-act="exfrm:${i}">${f.kind==='video' ? `<video src="${f.url}" muted playsinline></video>` : `<img src="${f.url}" alt="">`}<span class="pgd">제외</span></button>`).join('')}</div>` : ''}
+    ${(d.media.length || d.files.length) ? `<div class="pgrid">${d.media.map((f,i)=>`<button class="pg" data-act="exmrm:${i}">${f.kind==='video' ? `<video src="${esc(phURL(f.path))}" muted playsinline preload="metadata"></video>` : `<img src="${esc(phURL(f.path))}" alt="">`}<span class="pgd">제거</span></button>`).join('')
+      }${d.files.map((f,i)=>`<button class="pg" data-act="exfrm:${i}">${f.kind==='video' ? `<video src="${f.url}" muted playsinline></video>` : `<img src="${f.url}" alt="">`}<span class="pgd">제거</span></button>`).join('')}</div>` : ''}
     <div class="hrow"><button class="btn sub" data-act="exfile:pic">${svg('h_cam',18)} 사진</button><button class="btn sub" data-act="exfile:vid">${svg('play',18)} 영상</button></div>
     <button class="btn main" data-act="exsave">저장</button>
     ${d.새 ? '' : `<button class="dngr" data-act="exdel">이 종목 삭제</button>`}
@@ -2488,7 +2494,16 @@ const MEMO_EX = { id:'memo', n:'운동 메모', p:'기타', e:'자유 입력', c
    영상 파일은 저장소 `vid/…` 밑에 있고, 그 밖의 주소는 시범으로 치지 않는다. */
 const DEMOV = '4';   /* 시범 파일을 새로 올릴 때마다 하나씩 올린다 */
 /* 받은 주소가 있으면 그걸, 없으면 공개 주소 (버킷을 잠그기 전까지의 길) */
-const 사진주소 = p => p ? (SIGNED[p] || (SB_URL + '/storage/v1/object/public/media/' + p)) : '';
+/* ⛔ 저장소(media)가 잠겨 있어 **공개 주소는 있는 파일도 400** 이다. 부팅 때 받은 주소(SIGNED)에 없는 경로 = 방금 올린 사진 · 남이 방금 올린 글의 사진.
+   그런 경로를 만나면 모아서 주소를 받고 화면을 한 번 다시 그린다 (2026-10-08 대표 「오운완 올렸는데 사진이 안 뜨고 밥그릇 사진이 떠 있음」 — 올린 뒤 앱을 다시 켜야만 보였다). */
+const 주소시도 = {}; let 주소모음 = [], 주소타이머 = null;
+function 주소예약(p){
+  if(!p || SIGNED[p] || 주소시도[p]) return; 주소시도[p] = 1; 주소모음.push(p);
+  clearTimeout(주소타이머); 주소타이머 = setTimeout(async () => { const 묶 = 주소모음; 주소모음 = [];
+    try{ await 주소받기(묶); }catch(e){}
+    if(묶.some(x => SIGNED[x])){ try{ render(); if(typeof sheetRender === 'function' && sheetRender) drawSheet(); }catch(e){} } }, 60);
+}
+const 사진주소 = p => { if(!p) return ''; if(!SIGNED[p]) 주소예약(p); return SIGNED[p] || (SB_URL + '/storage/v1/object/public/media/' + p); };
 const demoURL = p => (SIGNED[p] || (SB_URL + '/storage/v1/object/public/media/' + p + '?v=' + DEMOV));
 /* 접고 펴는 표시는 앱 어디서나 이 한 가지 모양으로 쓴다 (2026-09-04 통일).
    예전에는 「보기 ▾」·「자세히 ▾」·「▾ 눌러서 펼치기」가 제각각이었고,
@@ -2581,7 +2596,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '326';
+const BUILD = '327';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -3690,7 +3705,7 @@ function 붙인것(K){
       ${x.kind==='video' ? `<video src="${x.url}#t=0.1" controls playsinline preload="metadata" muted></video>`
                          : `<img src="${x.url}" alt="">`}
       <b class="no">${i+1}</b>
-      <button data-act="attx:f:${K}:${i}" aria-label="제외">✕</button></span>`).join('')}</div>`;
+      <button data-act="attx:f:${K}:${i}" aria-label="제거">✕</button></span>`).join('')}</div>`;
 }
 function 넘겨보기(전부, cid){
   const np = 전부.filter(m=>m.kind!=='video').length, nv = 전부.length - np;
@@ -4346,6 +4361,7 @@ function vHome(){
         style="--h1:#22424b;--h2:#101719;--img:url(img/card-both.jpg)">
       <span class="tt">준비운동</span>
       <span class="dd">스트레칭 · 셀프 마사지 — 굳은 곳을 먼저 풀고 시작합니다</span></button>
+    ${workoutsOf(S.mid).some(w=>세트있나(w)) ? `<button class="hline" data-act="myrecs">${svg('h_clock',18)}<b>지난 기록으로 시작</b><small>그날 종목 · 무게 그대로</small></button>` : ''}
     ${주기줄(S.mid, 'sub:cycle', true)}
     ${(w => w ? `<button class="hline" data-act="ootd:${w.id}">${svg('h_cam',18)}<b>오늘 오운완 찍기</b><small>오늘만 찍을 수 있어요</small><i>›</i></button>` : '')(오운완남음(S.mid))}
     <div class="hrow wide">${홈현황(S.mid)}${홈목표(S.mid)}</div>
@@ -4423,13 +4439,13 @@ function vStart(){
         <span class="tt">내 루틴</span>
         <span class="dd">${myRoutines(S.mid).length}개 중에서 선택</span></button>` : ''}
       ${ws[0]
-        ? `<button class="hero2 half ${사진있나('again')}" data-act="again:${ws[0].id}"
+        ? `<button class="hero2 half ${사진있나('again')}" data-act="myrecs"
             style="${사진꾸밈('again','#3a2a20','#15110d')}">
-          <span class="tt">지난 운동 그대로</span>
+          <span class="tt">지난 기록으로 시작</span>
           <span class="dd">${dateTxt(ws[0].date)} · ${ws[0].items.filter(i=>i.sets&&i.sets.length)
             .map(i=>exName(i.ex,i.va)).slice(0,1).join('')}${ws[0].items.length>1?' 외':''}</span></button>`
         : `<button class="hero2 half dimc" data-act="noprev" style="--h1:#2b2a26;--h2:#141311">
-          <span class="tt">지난 운동 그대로</span>
+          <span class="tt">지난 기록으로 시작</span>
           <span class="dd">한 번 하고 나면 여기서 다시</span></button>`}
       <button class="hero2 half ${r ? 'wide2' : ''} ${사진있나('pickex')}" data-act="empty"
           style="${사진꾸밈('pickex','#4a3b1c','#17130b')}">
@@ -4500,7 +4516,7 @@ function sheetStart(){
         ${mv?`<button class="ordbtn" data-act="sordmv:${i}:-1" ${i===0?'disabled':''}>▲</button>
               <button class="ordbtn" data-act="sordmv:${i}:1" ${i===w.items.length-1?'disabled':''}>▼</button>
               <button class="chip t" data-act="sordend" style="flex:none;padding:6px 10px">여기에 놓기</button>`
-            :`<button class="chip" data-act="spdel:${i}" style="flex:none;padding:6px 10px">제외</button>`}
+            :`<button class="chip rm" data-act="spdel:${i}">제거</button>`}
       </div>`; }).join('')}
     <button class="btn main" data-act="startgo">${추가중 ? '추가하기' : '시작하기'}</button>
     <div style="display:flex;gap:9px">
@@ -4851,7 +4867,7 @@ function sheetPsetEdit(){
     ${p.items.length ? `<div class="megrp">${p.items.map((it,i)=>{ const v = 세트동작(it) || { n:'(없는 동작)', t:'', media:[] };
         const 붙 = (v.media||[]).length ? ((v.media.some(z=>z.kind==='video') ? '영상' : '사진') + ' ' + v.media.length) : '';
         return `<div class="mrow2"><span class="mi pt">${i+1}</span><span class="mt"><b>${esc(v.n)}</b><small>${it.k==='lib' ? '목록 동작' : '내 종목'}${v.t ? ' · '+esc(v.t) : ''}${붙 ? ' · '+붙 : ''}</small></span>
-          <button class="psed" data-act="psup:${i}" ${i===0?'disabled':''}>▲</button><button class="psed w" data-act="psrm:${i}">제외</button></div>`; }).join('')}</div>` : '<div class="empty">아직 추가한 동작이 없어요</div>'}
+          <button class="psed" data-act="psup:${i}" ${i===0?'disabled':''}>▲</button><button class="psed w" data-act="psrm:${i}">제거</button></div>`; }).join('')}</div>` : '<div class="empty">아직 추가한 동작이 없어요</div>'}
     <button class="hline gold" data-act="pslib">${svg('h_roll',18)}<b>동작 선택</b><small>스트레칭 · 마사지 · 내 종목 ${내종목().length}</small></button>
     <button class="card rowc" data-act="psmem"><div><div class="nm">받을 회원 ${p.mids.length}명</div>
       <div class="sm">${p.mids.length ? esc(p.mids.map(id=>(MEMBERS.find(m=>m.id===id)||{}).n||'').filter(Boolean).slice(0,4).join(' · ')) + (p.mids.length>4?' 외':'') : '눌러서 선택 — 나중에 해도 돼요'}</div></div><span class="rt">›</span></button>
@@ -4880,8 +4896,8 @@ function sheetPsetOwn(){
     <div class="fld"><span class="fn">종목 이름</span><input class="search" type="text" data-k="pon" maxlength="24" value="${esc(d.n)}" placeholder="예) 장요근 늘이기"></div>
     <div class="fld"><span class="fn">시간 · 횟수</span><input class="search" type="text" data-k="pot" maxlength="16" value="${esc(d.t)}" placeholder="예) 좌우 30초"></div>
     <div class="fld"><span class="fn">설명</span><textarea class="search" data-k="pod" rows="2" maxlength="140" placeholder="예) 뒷다리 골반을 앞으로 밀며 허리는 꺾지 않아요">${esc(d.d)}</textarea></div>
-    ${(d.media.length || d.files.length) ? `<div class="pgrid">${d.media.map((f,i)=>`<button class="pg" data-act="pomrm:${i}">${f.kind==='video' ? `<video src="${esc(phURL(f.path))}" muted playsinline preload="metadata"></video>` : `<img src="${esc(phURL(f.path))}" alt="">`}<span class="pgd">제외</span></button>`).join('')
-      }${d.files.map((f,i)=>`<button class="pg" data-act="pofrm:${i}">${f.kind==='video' ? `<video src="${f.url}" muted playsinline></video>` : `<img src="${f.url}" alt="">`}<span class="pgd">제외</span></button>`).join('')}</div>` : ''}
+    ${(d.media.length || d.files.length) ? `<div class="pgrid">${d.media.map((f,i)=>`<button class="pg" data-act="pomrm:${i}">${f.kind==='video' ? `<video src="${esc(phURL(f.path))}" muted playsinline preload="metadata"></video>` : `<img src="${esc(phURL(f.path))}" alt="">`}<span class="pgd">제거</span></button>`).join('')
+      }${d.files.map((f,i)=>`<button class="pg" data-act="pofrm:${i}">${f.kind==='video' ? `<video src="${f.url}" muted playsinline></video>` : `<img src="${f.url}" alt="">`}<span class="pgd">제거</span></button>`).join('')}</div>` : ''}
     <div class="hrow"><button class="btn sub" data-act="pofile:pic">${svg('h_cam',18)} 사진</button><button class="btn sub" data-act="pofile:vid">${svg('play',18)} 영상</button></div>
     <button class="btn main" data-act="pisave">저장</button>
     ${d.새 ? '' : `<button class="dngr" data-act="pidel">이 종목 삭제</button>`}
@@ -5195,7 +5211,7 @@ function vWorkout(){
            <button class="ordbtn" data-act="ordmv:${i}:1" ${i===w.items.length-1?'disabled':''}>▼</button>
            <button class="chip t" data-act="ordend" style="flex:none;padding:6px 10px">여기에 놓기</button>`
         : `${on&&!it.locked?'<span class="pill t">지금</span>':(it.locked?'<span class="pill q">완료</span>':'')}
-           <button class="chip" data-act="wdel:${i}" style="flex:none;padding:6px 10px">제외</button>`}
+           <button class="chip rm" data-act="wdel:${i}">제거</button>`}
       </div>${(on && !S.fold) ? 펼침() : ''}`;
     }).join('')}
     ${/* 담고 끝내는 건 아래 고정바로 갔다. 여기엔 되돌릴 수 없는 것만 작게 남긴다 */''}
@@ -5472,20 +5488,29 @@ function sheetFinish(){
   const items=w.items, sets=items.reduce((a,it)=>a+it.sets.filter(x=>x.done).length,0);
   const left=items.filter(it=>!it.locked && !it.sets.some(x=>x.done));
   openSheet(()=>`
-    <div class="h2">오늘 운동을 마칠까요</div>
-    <p class="lbl plain" style="line-height:1.85;font-weight:500;color:var(--sub)">
-      한 운동 <b style="color:var(--gold)">${items.filter(it=>it.locked||it.sets.some(x=>x.done)).length}개</b>
-      · 세트 <b style="color:var(--gold)">${sets}개</b>를 기록합니다.<br>
-      ${left.length
-        ? `아직 안 한 운동이 <b style="color:var(--gold)">${left.length}개</b> 남아 있어요 — ${esc(left.map(it=>exOf(it.ex).n).join(', '))}<br>
-           <span style="color:#7d786f">마쳐도 남은 것은 안 한 것으로 넘어갑니다</span>`
-        : '추가한 것을 모두 마쳤어요.'}</p>
+    <div class="h2">오늘 운동을 마칠까요?</div>
+    <div class="sstat3 fin2">
+      <div><span class="k">한 운동</span><span class="v">${items.filter(it=>it.locked||it.sets.some(x=>x.done)).length}<small>개</small></span></div>
+      <div><span class="k">세트</span><span class="v">${sets}<small>개</small></span></div>
+    </div>
+    ${left.length ? `<div class="agbody finleft"><b>아직 안 한 운동 ${left.length}개</b><br>${esc(left.map(it=>exOf(it.ex).n).join(' · '))}<br><span>종료하면 안 한 것으로 넘어갑니다</span></div>` : ''}
     <div style="display:flex;gap:9px">
-      <button class="btn sub" data-act="close">더 할래요</button>
-      <button class="btn gold" data-act="dofin">마치고 기록하기</button></div>
-    <div class="note">마친 뒤에도 <b>이어서 계속하기</b>로 되돌릴 수 있어요.</div>`);
+      <button class="btn sub" style="flex:1" data-act="close">더 할래요</button>
+      <button class="btn gold" style="flex:1" data-act="dofin">운동 종료</button></div>
+    <div class="cyfoot" style="justify-content:center"><span>종료한 뒤에도 「이어서 계속하기」로 되돌릴 수 있어요</span></div>`);
 }
 
+/* 지난 기록으로 시작 — 최근 기록 목록에서 골라 그날 종목 · 무게 그대로 (2026-10-08 대표 「홈화면에서 지난 기록 루틴으로 시작하기가 없음」). 고르면 `again:<id>` */
+function sheetMyRecs(){
+  openSheet(()=>{ const ws = workoutsOf(S.mid).filter(w=>세트있나(w)).slice(0, 15);
+    return `<div class="h2">지난 기록으로 시작 <small>그날 종목 · 무게 그대로</small></div>
+    <div class="pickbox">${ws.length ? `<div class="megrp">${ws.map(w=>{ const its = w.items.filter(it=>it.sets.length);
+      return `<button class="mrow2" data-act="again:${w.id}"><span class="mi pt">${esc(dateTxt(w.date).replace('월 ','/').replace('일',''))}</span>
+        <span class="mt"><b>${w.title ? esc(w.title) : (w.kind==='수업' ? 'PT 수업' : '개인운동')}</b>
+          <small>${w.kind==='수업'?'PT 수업':'개인운동'} · ${its.length}종목 · ${its.slice(0,3).map(it=>esc(exName(it.ex,it.va))).join(' · ')}${its.length>3?' 외':''}</small></span><em class="go">시작 ›</em></button>`; }).join('')}</div>`
+      : 빔('pic','아직 기록이 없어요','한 번 운동하고 나면 여기서 다시 시작할 수 있어요')}</div>
+    <button class="btn ghost sm" data-act="close">닫기</button>`; });
+}
 function sheetCancel(){
   const w=live(), n=(w?w.items:[]).reduce((a,it)=>a+it.sets.filter(s=>s.done).length,0);
   openSheet(()=>`<div class="h2">기록을 삭제하고 나갈까요</div>
@@ -6056,7 +6081,7 @@ function sheetSetEdit(i, j){
           <input class="search" type="text" inputmode="numeric" data-k="se:reps" value="${esc(st.reps)}"></div>`}
     </div>
     <button class="btn blue sm" data-act="rsetsave:${i}:${j}">이 세트 수정</button>
-    <button class="btn ghost sm" data-act="rsetdel:${i}:${j}" style="color:var(--warn)">이 세트 제외</button>
+    <button class="btn ghost sm" data-act="rsetdel:${i}:${j}" style="color:var(--warn)">이 세트 제거</button>
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 
@@ -6367,10 +6392,17 @@ const mealURL = path => 사진주소(path);
 
 /* 사진이 없거나 서버에서 지워졌으면 샐러드 그림으로 갈음합니다 */
 function picFail(img){
+  /* 주소를 아직 못 받은 사진이면 받아서 한 번 더 건다 — 바로 자리 그림으로 바꾸지 않는다 */
+  const m = (img.getAttribute('src')||'').match(/\/object\/public\/media\/([^?]+)/), 길 = m ? decodeURIComponent(m[1]) : '';
+  if(길 && !img.dataset.retry){ img.dataset.retry = '1';
+    주소받기([길]).then(() => { if(SIGNED[길]) img.src = SIGNED[길]; else picFail(img); }).catch(() => picFail(img)); return; }
   const sp = document.createElement('span');
   sp.className = 'nopic ' + (img.className||'');
   if(img.dataset && img.dataset.act) sp.dataset.act = img.dataset.act;
-  sp.innerHTML = (img.classList.contains('shot') || img.classList.contains('ph')) ? SALAD : SALAD_MINI;
+  /* 밥그릇은 **식단 사진**에만. 오운완 · 프로필 · 글 사진이 안 뜰 때 밥그릇이 뜨면 엉뚱하다 */
+  const 식단 = /(^|\/)meals\//.test(길) || (!길 && (img.classList.contains('shot') || img.classList.contains('ph')));
+  const 큰 = img.classList.contains('shot') || img.classList.contains('ph');
+  sp.innerHTML = 식단 ? (큰 ? SALAD : SALAD_MINI) : `<span class="nopicx">${svg('h_cam', 큰 ? 34 : 22)}</span>`;
   img.replaceWith(sp);
 }
 /* 사진 + 그 위 음식 표시. 다는중=1 이면 눌러서 새로 달 수 있다 */
@@ -6417,7 +6449,7 @@ function sheetItemEdit(mealId, itemId){
       <b>똑같은 제품이 없으면</b> 포장에 적힌 값으로 수정해 주세요.</div>
     <button class="btn main" data-act="fsave:${mealId}:${itemId}">저장</button>
     <div style="display:flex;gap:9px">
-      <button class="btn ghost sm" data-act="fdelgo:${mealId}:${itemId}" style="color:var(--warn)">제외</button>
+      <button class="btn ghost sm" data-act="fdelgo:${mealId}:${itemId}" style="color:var(--warn)">제거</button>
       <button class="btn ghost sm" data-act="${mealId==='draft'?'tagback':'close'}">닫기</button></div>`);
 }
 
@@ -6434,7 +6466,7 @@ function sheetTagPhoto(mealId){
       ${태그판(m, 1)}
       <div class="note">사진에서 <b>음식이 있는 자리를 눌러</b> 무엇인지 선택하세요.
         선택하면 <b>칼로리와 탄단지가 저절로 들어갑니다</b> — 숫자를 입력할 필요가 없어요.
-        <br>태그를 누르면 <b>숫자를 수정하거나 제외할 수 있어요.</b></div>
+        <br>태그를 누르면 <b>숫자를 수정하거나 제거할 수 있어요.</b></div>
       ${밖.length?`<span class="lbl">태그 안 한 음식</span>
         ${밖.map(x=>`<button class="frow2" data-act="fdel:${m.id}:${x.id}">
           <span class="fe">${음식그림(x.name)}</span>
@@ -7696,6 +7728,7 @@ async function ootdSave(글도){
     on_date:날, path, memo:S.ootd.wid||'' }]), '오운완 저장');
   D.bph = D.bph || [];
   D.bph.push({ id, mid, kind:'ootd', pose:'오운완', date:날, path, memo:S.ootd.wid||'' });
+  try{ await 주소받기([path]); }catch(e){}      /* 방금 올린 사진 — 주소를 받아야 뜬다 */
   S.ootd = null; toast('프로필에 남겼어요'); render();
   /* 커뮤니티에도 — 방금 올린 그 사진으로 한마디 창을 바로 연다 (사진을 다시 고르지 않는다) */
   if(글도){ S.pnew = { kind:'오운완', photo_id:id, path, url:phURL(path), vis:'센터', cap:'', by:'' }; sheetPostWrite(); }
@@ -10439,7 +10472,7 @@ function sheetRitem(rid, i){
       <button class="btn sub" data-act="rmove:${rid}:${i}:1">▼ 아래로</button></div>
     <div style="display:flex;gap:9px">
       <button class="btn main" data-act="close">다 됐어요</button>
-      <button class="btn ghost" data-act="rdelitem:${rid}:${i}" style="color:var(--warn)">제외</button></div>`);
+      <button class="btn ghost" data-act="rdelitem:${rid}:${i}" style="color:var(--warn)">제거</button></div>`);
 }
 
 /* 루틴 종목을 서버에 통째로 다시 쓴다 */
@@ -10719,12 +10752,12 @@ document.addEventListener('click', async ev=>{
       const [mealId, itemId] = rest; closeSheet();
       if(mealId === 'draft'){                       /* 아직 안 올린 것 — 들고 있던 데서만 뺀다 */
         if(S.dm) S.dm.items = (S.dm.items||[]).filter(x=>String(x.id)!==String(itemId));
-        toast('제외했어요'); sheetTagPhoto('draft'); return; }
+        toast('제거했어요'); sheetTagPhoto('draft'); return; }
       const m = (D.meals||[]).find(x=>x.id===mealId); if(!m) return;
       m.items = (m.items||[]).filter(x=>String(x.id)!==String(itemId));
-      sv(sdel('meal_items','id=eq.'+itemId), '음식 제외');
+      sv(sdel('meal_items','id=eq.'+itemId), '음식 제거');
       syncMealTotal(m);
-      toast('제외했어요'); render();
+      toast('제거했어요'); render();
       if(S.tagBack === mealId) sheetTagPhoto(mealId);
       return; }
     case 'slot': S.shotSlot=rest[0]; drawSheet(); return;
@@ -10892,7 +10925,7 @@ document.addEventListener('click', async ev=>{
       S.exn = null; S.pickPart = d.p; closeSheet(); toast(d.새 ? '만들었어요 — 목록 맨 위에 있어요' : '수정했어요'); render(); return; }
     case 'exdel': { const d = S.exn; if(!d) return;
       const 쓰는 = D.routines.some(r => (r.items||[]).some(it => it.ex === d.id)) || D.workouts.some(w => (w.items||[]).some(it => it.ex === d.id));
-      if(쓰는){ toast('루틴이나 기록에 추가된 종목은 삭제할 수 없어요 — 루틴에서 먼저 제외해 주세요'); return; }
+      if(쓰는){ toast('루틴이나 기록에 추가된 종목은 삭제할 수 없어요 — 루틴에서 먼저 제거해 주세요'); return; }
       if(!confirm('이 종목을 삭제할까요?')) return;
       const 옛파일 = ((EX.find(e => e.id === d.id)||{}).media||[]).map(m=>m.path);
       EX = EX.filter(e => e.id !== d.id);
@@ -10920,7 +10953,7 @@ document.addEventListener('click', async ev=>{
       const tmp=r.items[a]; r.items[a]=r.items[b]; r.items[b]=tmp;
       svRoutineItems(rid); closeSheet(); render(); return; }
     case 'rdelitem': { const [rid,i]=rest, r=rOf(rid); if(!r) return;
-      r.items.splice(+i,1); svRoutineItems(rid); closeSheet(); toast('제외했어요'); render(); return; }
+      r.items.splice(+i,1); svRoutineItems(rid); closeSheet(); toast('제거했어요'); render(); return; }
     case 'rdone': { S.just=null; toast('루틴을 저장했어요'); go('t_routines'); return; }
     case 'rdel': sheetRDel(rest[0]); return;
     case 'rdelgo': { const rid=rest[0]; closeSheet();
@@ -11456,7 +11489,8 @@ document.addEventListener('click', async ev=>{
 
     case 'startr': { const r=rOf(rest[0]), t=D.today[r.mid];
       newLive(`루틴 ${r.no} · ${r.n}`, itemsFromRoutine(r), (t&&t.rid===r.id)?t.kind:'개인운동', r.id); return; }
-    case 'again': { const src=D.workouts.find(x=>x.id===rest[0]);
+    case 'myrecs': sheetMyRecs(); return;
+    case 'again': { closeSheet(); const src=D.workouts.find(x=>x.id===rest[0]);
       if(!src){ toast('그 기록을 찾지 못했어요'); return; }
       /* ⛔ 하던 운동이 있으면 새로 만들지 않는다 — newLive 가 D.live 를 통째로 덮는다 */
       if(liveOf(S.mid)){ toast('하던 운동이 있어요 — 마치고 시작해 주세요'); go('workout'); return; }
@@ -11516,19 +11550,19 @@ document.addEventListener('click', async ev=>{
       return; }
 
     case 'wdel': { const i=+rest[0], it=w&&w.items[i]; if(!it) return;
-      openSheet(()=>`<div class="h2">이 종목을 제외할까요? <small>${esc(exName(it.ex,it.va))}</small></div>
+      openSheet(()=>`<div class="h2">이 종목을 제거할까요? <small>${esc(exName(it.ex,it.va))}</small></div>
         <div class="note">${it.sets.filter(x=>x.done).length?`입력해 둔 <b>${it.sets.filter(x=>x.done).length}세트</b>도 함께 사라집니다.`:'아직 입력한 것이 없습니다.'}</div>
-        <button class="btn main" data-act="wdelgo:${i}" style="background:var(--warn);color:#241310">제외</button>
+        <button class="btn main" data-act="wdelgo:${i}" style="background:var(--warn);color:#241310">제거</button>
         <button class="btn ghost sm" data-act="close">닫기</button>`);
       return; }
     case 'wdelgo': { const i=+rest[0]; closeSheet();
       const it = w && w.items[i]; if(!it) return;
-      if(it._id) sv(sdel('workout_items','id=eq.'+it._id), '종목 제외');
+      if(it._id) sv(sdel('workout_items','id=eq.'+it._id), '종목 제거');
       w.items.splice(i,1);
       const sw=D.workouts.find(x=>x.id===w.id);
       if(sw) sw.items = sw.items.filter(x=>!it._id || x._id!==it._id);
       if(w.cur >= w.items.length) w.cur = Math.max(0, w.items.length-1);
-      save(); toast('제외했어요'); render(); return; }
+      save(); toast('제거했어요'); render(); return; }
 
     case 'jump': S.demoOpen = false;
       S.prevOpen=false; { const i=+rest[0];
@@ -11617,7 +11651,7 @@ document.addEventListener('click', async ev=>{
     case 'piback': S.pso = null; if(S.pse){ S.pslk = 'y'; sheetPsetLib(); } else sheetPitems(); return;
     case 'pomrm': { const d = S.pso; if(d){ d.media.splice(+rest[0],1); drawSheet(); } return; }
     case 'pidel': { const d = S.pso; if(!d) return; const 쓰는 = 내세트().filter(x=>x.items.some(z=>z.k==='my' && z.i===d.id)).length;
-      if(!confirm(쓰는 ? `이 종목을 삭제할까요? 세트 ${쓰는}개에서도 제외됩니다.` : '이 종목을 삭제할까요?')) return;
+      if(!confirm(쓰는 ? `이 종목을 삭제할까요? 세트 ${쓰는}개에서도 제거됩니다.` : '이 종목을 삭제할까요?')) return;
       const 옛파일 = (((D.pitems||[]).find(z=>z.id===d.id)||{}).media||[]).map(m=>m.path);
       D.pitems = (D.pitems||[]).filter(z=>z.id!==d.id); await sv(sdel('prep_items','id=eq.'+d.id), '종목 삭제');
       await 파일지우기(옛파일, 'prep/items/'+d.id+'/');
@@ -11695,7 +11729,7 @@ document.addEventListener('click', async ev=>{
       w.items.forEach((it,k)=>{ if(it._id) sv(spatch('workout_items','id=eq.'+it._id,{sort:k}), '순서 저장'); });
       save(); drawSheet(); return; }
     case 'spdel': { const i=+rest[0]; if(!w) return;
-      const it=w.items[i]; if(it && it._id) sv(sdel('workout_items','id=eq.'+it._id), '종목 제외');
+      const it=w.items[i]; if(it && it._id) sv(sdel('workout_items','id=eq.'+it._id), '종목 제거');
       w.items.splice(i,1); S.sordIdx=null; w.cur=0; save();
       if(!w.items.length){ closeSheet(); render(); return; }
       drawSheet(); render(); return; }
@@ -11708,7 +11742,7 @@ document.addEventListener('click', async ev=>{
       if(이미) toast('추가했어요');
       go('workout'); return; }
     case 'clearpick': { if(!w) return;
-      w.items.forEach(it=>{ if(it._id) sv(sdel('workout_items','id=eq.'+it._id), '종목 제외'); });
+      w.items.forEach(it=>{ if(it._id) sv(sdel('workout_items','id=eq.'+it._id), '종목 제거'); });
       w.items=[]; w.cur=0; save(); closeSheet(); toast('비웠어요'); render(); return; }
     case 'stepu': { const u=[2.5,1,0.5,5]; S.uKg=u[(u.indexOf(S.uKg||2.5)+1)%u.length]; drawSheet(); return; }
     case 'askcancel': sheetCancel(); return;
@@ -11818,7 +11852,7 @@ document.addEventListener('click', async ev=>{
     case 'rks': S.rks=rest[0]; render(); return;
     case 'rkmine': sheetRkMine(); return;
     case 'tmreg': S.tmreg = rest[0] || ''; render(); return;
-    case 'tmfav': { const 켬 = 즐찾바꿈(rest[0]); toast(켬 ? '즐겨찾기에 추가했어요' : '즐겨찾기에서 제외했어요'); render(); return; }
+    case 'tmfav': { const 켬 = 즐찾바꿈(rest[0]); toast(켬 ? '즐겨찾기에 추가했어요' : '즐겨찾기에서 제거했어요'); render(); return; }
     case 'tdlive': sheetTdLive(); return;
     case 'tdtodo': sheetTdTodo(); return;
     case 'tdmeal': sheetTdMeal(); return;
@@ -11910,7 +11944,7 @@ document.addEventListener('click', async ev=>{
     case 'rsetdel': {
       const [i,j] = rest.map(Number);
       S.recEdit.items[i].sets.splice(j,1);
-      closeSheet(); toast('제외했어요 · 아직 저장 전이에요'); render(); return; }
+      closeSheet(); toast('제거했어요 · 아직 저장 전이에요'); render(); return; }
     case 'raddset': {
       const i = Number(rest[0]), it = S.recEdit.items[i];
       const last = it.sets[it.sets.length-1] || { kg:0, reps:10 };
@@ -12039,7 +12073,7 @@ document.addEventListener('click', async ev=>{
       if(S.rgrp===g) S.rgrp='전체';
       toast('그룹을 없앴어요 · 루틴은 그대로 있어요'); drawSheet(); render(); return; }
     case 'rsetgrp': { const rid=rest[0], g=rest.slice(1).join(':');
-      setGrp(rid, g); toast(g?`「${g}」 그룹으로`:'그룹에서 제외했어요'); render(); return; }
+      setGrp(rid, g); toast(g?`「${g}」 그룹으로`:'그룹에서 제거했어요'); render(); return; }
     case 'assign': sheetAssign(rest[0], rest[1]); return;
     case 'assigno': {
       const r=rOf(rest[0]), kind=rest[1], on=(rest[2]==='on');
