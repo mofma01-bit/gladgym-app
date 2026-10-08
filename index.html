@@ -1012,6 +1012,11 @@ body .figbox2{background:radial-gradient(80% 50% at 50% 30%,rgba(240,211,160,.09
 .fsum{display:flex;flex-wrap:wrap;gap:4px 10px;padding:8px 14px 0;font-size:12px;color:var(--sub)}.fsum b{color:var(--gold);font-weight:800}
 #sheetbox .fcar{border-radius:14px;overflow:hidden}
 #sheetbox .tagwrap.on:has(img.tagph){width:fit-content;max-width:100%;align-self:center}#sheetbox .tagwrap.on img.tagph{width:auto;max-width:100%;max-height:46vh}
+.cvsw{margin-left:auto;display:flex;gap:2px;flex:none;border:1px solid #34332d;border-radius:999px;padding:2px}
+.cvsw button{width:34px;height:30px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:#77736c}.cvsw button.on{background:#2c2a25;color:var(--gold)}
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;width:100%;flex:none}
+.fgc{position:relative;aspect-ratio:1;overflow:hidden;border-radius:4px;background:var(--dark-3);padding:0}.fgc img,.fgc .nopic{width:100%;height:100%;object-fit:cover;display:block}.fgc .nopic{display:flex}
+.fgk,.fgn{position:absolute;top:5px;font-size:10.5px;font-weight:800;color:#fff;background:rgba(0,0,0,.55);border-radius:8px;padding:2px 5px;line-height:1.2}.fgk{left:5px;color:var(--teal)}.fgk svg{display:block}.fgn{right:5px}
 .stickup{position:sticky;bottom:-1px;z-index:5;display:flex;gap:9px;flex:none;padding:10px 0 4px;background:linear-gradient(180deg,transparent,var(--dark) 26%)}.stickup .btn{flex:1}.stickup .btn.main{flex:2}
 .fcars .nopic,.mp2 .nopic{width:100%;height:100%}.fcars .nopic svg{width:34%}#sheetbox .fsum{padding:8px 2px 0}
 .big2.row{min-height:0;flex-direction:row;align-items:center;gap:11px;padding:13px 12px}
@@ -2639,7 +2644,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '333';
+const BUILD = '334';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -4177,8 +4182,50 @@ function 뱃지주기(mid){
   목표뱃지저장(mid);
   setTimeout(() => toast('🏅 배지를 받았어요 — ' + 새것.map(b=>b.이름).join(', ')), 300);
 }
+/* 체중 · 체지방률 · 근육량 목표 — 운동계획(now · to)과 **같은 값**이다. 「내 목표」 맨 위 줄로 보이고 회원도 고친다 (2026-10-08 대표) */
+function 몸목표들(mid){
+  const g = GOALS[mid]||{}, now = g.now||{}, to = g.to||{}, 있다 = v => v!=null && v!=='' && +v > 0;
+  return ['w','fp','m'].filter(u => 있다(to[u]) && 있다(now[u])).map(k => {
+    const logs = ((D.blog||{})[mid]||[]).filter(x => +x[k]), first = logs[0], last = logs[logs.length-1];
+    const a = first ? +first[k] : +now[k], b = +to[k], c = last ? +last[k] : +now[k];
+    return { k, 이름: k==='w' ? '체중' : k==='fp' ? '체지방률' : '근육량', 단위: k==='fp' ? '%' : 'kg', b, c,
+      p: a===b ? 1 : Math.max(0, Math.min(1, (a-c)/(a-b))) }; });
+}
+function sheetBodyGoal(){
+  const mid = S.mid, g = GOALS[mid]||{}, now = g.now||{}, to = g.to||{}, v = x => (x==null ? '' : x);
+  openSheet(()=>`<div class="h2">체중 목표</div>
+    <div class="grid2">
+      <div class="fld"><span class="fn">지금 체중 · kg</span><input class="search" type="number" inputmode="decimal" step="0.1" data-k="bg:now" value="${esc(v(now.w))}"></div>
+      <div class="fld"><span class="fn">목표 체중 · kg</span><input class="search" type="number" inputmode="decimal" step="0.1" data-k="bg:w" value="${esc(v(to.w))}"></div>
+    </div>
+    <div class="grid2">
+      <div class="fld"><span class="fn">목표 체지방률 · % <small>선택</small></span><input class="search" type="number" inputmode="decimal" step="0.1" data-k="bg:fp" value="${esc(v(to.fp))}"></div>
+      <div class="fld"><span class="fn">목표 날짜 <small>선택</small></span><input class="search" type="date" data-k="bg:date" value="${esc(v(to.date))}"></div>
+    </div>
+    <div class="cyfoot" style="justify-content:center"><span>운동계획과 같은 값이에요 · 트레이너에게도 보여요</span></div>
+    <button class="btn main" data-act="bodygoalok">저장</button>
+    <button class="btn ghost sm" data-act="close">닫기</button>`);
+}
+function 몸목표저장(){
+  const mid = S.mid, g = GOALS[mid] = GOALS[mid] || {};
+  const v = k => { const el = document.querySelector('#sheetbox [data-k="bg:'+k+'"]'); return el ? el.value.trim() : ''; };
+  const 지금 = +v('now'), 목 = +v('w'), fp = v('fp');
+  if(!(지금 > 0) || !(목 > 0)){ toast('지금 체중과 목표 체중을 입력해 주세요'); return; }
+  if(fp && !(+fp > 0 && +fp < 60)){ toast('체지방률을 다시 확인해 주세요'); return; }
+  g.now = Object.assign({}, g.now||{}, { w:String(지금) }); if(!g.now.date) g.now.date = TODAY;
+  g.to = Object.assign({}, g.to||{}, { w:String(목), fp: fp ? String(+fp) : ((g.to||{}).fp || ''), date: v('date') || '' });
+  if(S.draft) Object.keys(S.draft).forEach(k => { if(k.startsWith('bg:')) delete S.draft[k]; });
+  closeSheet(); toast('목표를 저장했어요'); render();
+  계획올리기(mid, '체중 목표 저장');
+}
 function 목표칸(mid){
   const my = 내목표(mid), bs = 내뱃지(mid).slice().reverse();
+  const 내것 = S.who !== 'tr' && mid === S.mid, 몸 = 몸목표들(mid);
+  const 몸줄 = 몸.map(r => `<${내것?'button':'div'} class="glrow${r.p>=1?' ok':''}"${내것?' data-act="bodygoal"':''}>
+      <span class="gl-t">${r.이름} ${kgfmt(r.b)}${r.단위}까지</span>
+      <span class="gl-v">${r.p>=1?'달성 · ':''}${kgfmt(r.c)}<small>/${kgfmt(r.b)}${r.단위}</small></span>
+      <i class="bar"><b style="width:${Math.round(r.p*100)}%"></b></i></${내것?'button':'div'}>`).join('')
+    + (내것 && !몸.length ? '<button class="gl-add" data-act="bodygoal">＋ 체중 목표 정하기</button>' : '');
   const 줄 = my.map(x => { const r = 목표재기(mid, x); if(!r) return '';
     const 값 = r.단위==='톤' ? r.지금 : (+r.지금).toLocaleString();
     return `<button class="glrow${r.p>=1?' ok':''}" data-act="goal:${x.id}">
@@ -4186,6 +4233,7 @@ function 목표칸(mid){
       <span class="gl-v">${r.p>=1?'달성 · ':''}${값}<small>/${r.단위==='kg'?kgfmt(r.n):(+r.n).toLocaleString()}${r.단위}</small></span>
       <i class="bar"><b style="width:${Math.round(r.p*100)}%"></b></i></button>`; }).join('');
   return `<div class="gl-hd"><b>내 목표</b>${my.length && my.length < 5 ? '<button data-act="goal:new">＋ 목표</button>' : ''}</div>
+    ${몸줄}
     ${my.length ? 줄 : '<button class="gl-add" data-act="goal:new">＋ 내 목표 정하기</button>'}
     ${bs.length ? `<div class="gl-hd"><b>배지 ${bs.length}개</b></div>
       <div class="bdgs">${bs.map(b => `<span class="bdg">🏅<i>${esc(b.이름)}</i></span>`).join('')}</div>` : ''}`;
@@ -4294,7 +4342,7 @@ function 현황판(mid){
     <div class="bd3 two">
       <button data-act="attend"><span class="k">개인운동</span><span class="v">${출.개인}<small>회</small></span>
         <span class="s">이번 달 ›</span></button>
-      <button data-act="sub:plan"><span class="k">몸 목표</span>${목표
+      <button data-act="sub:plan"><span class="k">체중 목표</span>${목표
         ? `<span class="v">${목표.p}<small>%</small></span>
            <span class="s">${목표.이름} ${kgfmt(목표.c)}→${kgfmt(목표.b)}${목표.단위}</span>
            <i class="bar"><b style="width:${목표.p}%"></b></i>`
@@ -4356,13 +4404,30 @@ function 홈코멘트(mid){
 }
 /* 닉네임이 없으면 홈에 들어올 때 먼저 정하게 한다. 닫을 수 없다 — 정해야 넘어간다. 바꾸는 건 프로필 수정에서 */
 function 닉네임먼저(){
-  if(S.who === 'tr' || !S.mid || !MEMBERS.some(m=>m.id===S.mid) || 닉of(S.mid)) return false;
+  if(S.who === 'tr' || !S.mid || !MEMBERS.some(m=>m.id===S.mid)) return false;
+  if(닉of(S.mid)){ 닉기억(S.mid); return false; }
   if(sheetRender && sheetRender.닉) return true;
+  if(S.닉확인 === S.mid) return true;
+  const mid = S.mid; S.닉확인 = mid;
   const f = ()=>`<div class="h2">닉네임을 정해 주세요</div>
     <div class="fld"><input class="search" type="text" data-k="nick0" maxlength="12" placeholder="예) 덤벨요정" autocomplete="off"></div>
     <button class="btn main" data-act="nick0ok">시작하기</button>
     <div class="sm" style="text-align:center;color:var(--sub)">커뮤니티 · 랭킹에 이 이름으로 나와요. 프로필에서 변경할 수 있어요</div>`;
-  f.닉 = true; setTimeout(()=>{ if(!닉of(S.mid) && S.screen==='home'){ openSheet(f); const el=document.querySelector('[data-k="nick0"]'); if(el) el.focus(); } }, 60);
+  f.닉 = true;
+  /* 묻기 전에 **서버에 정말 없는지** 먼저 본다 — 처음 불러올 때 계획을 못 받았거나 낡은 사본이면 있는데도 물었다.
+     서버에서 지워졌는데 이 기기가 기억하고 있으면 되살린다. 확인을 못 했으면(통신 끊김) 묻지 않는다 */
+  (async()=>{ let 서버닉 = '', 실패 = false;
+    try{ const d = ((await sget('plans?select=data&member_id=eq.'+encodeURIComponent(mid)))[0]||{}).data || {};
+      서버닉 = (d.prof||{}).nick || '';
+      if(서버닉){ const g = GOALS[mid] = GOALS[mid] || {}; Object.keys(d).forEach(k => { if(g[k] === undefined) g[k] = d[k]; }); g.prof = Object.assign({}, d.prof, g.prof||{}, { nick: 서버닉 }); }
+    }catch(e){ 실패 = true; }
+    if(!서버닉 && !실패){ let 기억 = ''; try{ 기억 = localStorage.getItem('gg_nick_'+mid) || ''; }catch(e){}
+      if(기억 && !MEMBERS.some(m => m.id !== mid && (m.n === 기억 || 닉of(m.id) === 기억))){ await profSave(mid, { nick: 기억 }); 서버닉 = 기억; } }
+    S.닉확인 = '';
+    if(서버닉){ 닉기억(mid); render(); return; }
+    if(실패 || S.mid !== mid || S.who === 'tr' || S.screen !== 'home' || 닉of(mid)) return;
+    openSheet(f); const el = document.querySelector('[data-k="nick0"]'); if(el) el.focus();
+  })();
   return true;
 }
 const 닉검사 = 닉 => !닉 ? '닉네임을 입력해 주세요' : (닉.length < 2 ? '두 글자 이상으로 입력해 주세요'
@@ -4389,6 +4454,7 @@ function vHome(){
   return { top: bar('글래드짐',
       `<button class="notibell" data-act="go:noti" aria-label="알림${알림수?' '+알림수+'개':''}">
         ${svg('종',20)}${알림수?`<b>${알림수>9?'9+':알림수}</b>`:''}</button>`), tabs:1, body:`
+    ${주기줄(S.mid, 'sub:cycle', true)}
     <button class="hero photo" data-act="${hero.act}">
       ${hero.새 ? `<span class="tag new"><b>NEW</b><em>${hero.새}</em></span>` : `<span class="tag">${hero.tag}</span>`}
       <div class="ht">${hero.ht}</div>
@@ -4405,11 +4471,10 @@ function vHome(){
       <span class="tt">준비운동</span>
       <span class="dd">스트레칭 · 셀프 마사지 — 굳은 곳을 먼저 풀고 시작합니다</span></button>
     ${workoutsOf(S.mid).some(w=>세트있나(w)) ? `<button class="hline" data-act="myrecs">${svg('h_clock',18)}<b>지난 기록으로 시작</b><small>그날 종목 · 무게 그대로</small></button>` : ''}
-    ${주기줄(S.mid, 'sub:cycle', true)}
     ${(w => w ? `<button class="hline" data-act="ootd:${w.id}">${svg('h_cam',18)}<b>오늘 오운완 찍기</b><small>오늘만 찍을 수 있어요</small><i>›</i></button>`
       : (t => t ? `<button class="hline" data-act="orec:${t.id}">${svg('h_cam',18)}<b>${오늘오운완(S.mid) ? '오운완 다시 보기' : '오늘 운동기록 보기'}</b><small>${오늘오운완(S.mid) && !(D.posts||[]).some(p=>p.photo_id===오늘오운완(S.mid).id) ? '피드에 올릴 수 있어요' : '오늘 운동기록'}</small><i>›</i></button>` : '')(오늘끝낸운동(S.mid)))(오운완남음(S.mid))}
-    <div class="hrow wide">${홈현황(S.mid)}${홈목표(S.mid)}</div>
-    ${내목표(S.mid).length ? `<div class="hgoal">${목표칸(S.mid)}</div>` : ''}
+    <div class="hrow solo">${홈현황(S.mid)}</div>
+    <div class="hgoal">${목표칸(S.mid)}</div>
     ${인증샷홈(S.mid)}
     <div class="hrow wide">${홈최근(S.mid)}${홈코멘트(S.mid)}</div>
     <button class="hline gold" data-act="rmstart:${S.mid}">${svg('h_crown',18)}<b>1RM 측정</b><small>목표만 입력하면 무게 · 횟수 · 쉬는 시간 자동</small><i>›</i></button>`,
@@ -7336,6 +7401,12 @@ function 커뮤니티입구(){
     ${칸('파트너','teal','h_hands','운동 파트너 찾기','같이 운동할 사람 모집', 모집.length ? `모집 중 ${모집.length}건` : '모집 중인 글이 없어요')}
     <div class="note">${내것 ? '같은 센터 회원끼리만 보는 공간이에요.' : '회원들이 올린 글과 순위를 봅니다. 문제 글은 ⋯ 에서 삭제할 수 있습니다.'}</div>` };
 }
+const 피드보기 = f => { let v = ''; try{ v = localStorage.getItem('gg_cview_' + (f==='내 글' ? 'my' : 'all')) || ''; }catch(e){} return v || (f==='내 글' ? '판' : '장'); };
+function 글칸(p){
+  const d = 식단날of(p), ms = d ? 식단사진들(d.mid, d.day) : [], 길 = ms.length ? ms[0].path : p.path;
+  return `<button class="fgc" data-act="popen:${p.id}"><img src="${esc(phURL(길))}" alt="" loading="lazy" onerror="picFail(this)">
+    ${p.kind==='식단' ? `<span class="fgk">${svg('bowl',13)}</span>` : ''}${ms.length > 1 ? `<span class="fgn">${ms.length}</span>` : ''}</button>`;
+}
 function vCommunity(){
   if(!S.cmode) return 커뮤니티입구();
   const f = S.cfilt || '전체', 모드 = S.cmode;
@@ -7345,8 +7416,8 @@ function vCommunity(){
   if(f==='오운완') ps = ps.filter(p=>p.kind==='오운완' || p.kind==='인증샷' || p.kind==='사진');
   if(f==='식단') ps = ps.filter(p=>p.kind==='식단');
   return { top: bar(모드==='파트너' ? '운동 파트너 찾기' : (모드==='피드' ? '피드' : '글래드 랭킹'), 내것 && 모드!=='랭킹' ? (모드==='파트너' ? `<button class="tbtn" data-act="partnew">＋ 모집 글</button>` : `<button class="tbtn" data-act="postnew">＋ 올리기</button>`) : '', 'cmode:'), tabs:1, body:`
-    ${모드==='랭킹' ? 랭킹판() : `<div class="chips" style="margin-bottom:4px">${(모드==='피드' ? (내것?['전체','오운완','식단','내 글']:['전체','오운완','식단']) : (내것?['전체','내 글']:['전체'])).map(k=>`<button class="chip ${f===k?'on':''}" data-act="cfilt:${k}">${모드==='피드' ? ({ '전체':'전체 피드', '내 글':'내 피드' }[k] || k) : k}</button>`).join('')}</div>`}
-    ${모드==='랭킹' ? '' : ps.length ? ps.map(p => p.kind==='파트너' ? 파트너카드(p) : 글카드(p)).join('')
+    ${모드==='랭킹' ? 랭킹판() : `<div class="chips" style="margin-bottom:4px">${(모드==='피드' ? (내것?['전체','오운완','식단','내 글']:['전체','오운완','식단']) : (내것?['전체','내 글']:['전체'])).map(k=>`<button class="chip ${f===k?'on':''}" data-act="cfilt:${k}">${모드==='피드' ? ({ '전체':'전체 피드', '내 글':'내 피드' }[k] || k) : k}</button>`).join('')}${모드==='피드' ? `<span class="cvsw">${[['장','한 장씩 보기','<rect x="5" y="4" width="14" height="16" rx="2.5"/>'],['판','여러 장 보기','<rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/>']].map(x=>`<button class="${피드보기(f)===x[0]?'on':''}" data-act="cview:${x[0]}" aria-label="${x[1]}"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">${x[2]}</svg></button>`).join('')}</span>` : ''}</div>`}
+    ${모드==='랭킹' ? '' : ps.length ? (모드==='피드' && 피드보기(f)==='판' ? `<div class="fgrid">${ps.map(글칸).join('')}</div>` : ps.map(p => p.kind==='파트너' ? 파트너카드(p) : 글카드(p)).join(''))
       : (모드==='파트너'
           ? 빔('user', f==='내 글' ? '아직 올린 모집 글이 없어요' : '아직 모집 글이 없어요', 내것 ? '같이 운동할 파트너를 찾아 보세요' : '')
           : 빔('pic', f==='내 글' ? '아직 내 피드에 올린 사진이 없어요' : '아직 글이 없어요', 내것 ? '운동을 마치고 오운완을 찍어 피드에 올려 보세요' : ''))}
@@ -8210,11 +8281,23 @@ const 스위치 = on => `<span class="sw ${on?'on':''}" aria-hidden="true"><i></
 /* ── 프로필 ── 인스타처럼 내 오운완이 쌓이는 곳.
    프로필 정보는 운동계획(plans) 안에 같이 담는다 — 표를 새로 만들지 않는다. */
 const profOf = mid => (GOALS[mid] || {}).prof || {};
+/* 운동계획 · 프로필 · 내 목표는 plans.data 한 덩어리다. **올리기 전에 서버 것을 받아** 내가 모르는 칸은 그대로 두고,
+   닉네임은 내 쪽에 없으면 서버 것을 지킨다 — 낡은 화면(다른 기기 · 트레이너 화면)에서 저장해도 닉네임이 지워지지 않게 (2026-10-08 대표 「닉네임 설정하라고 또 떴다」) */
+async function 계획올리기(mid, 무엇){
+  const g = GOALS[mid] || (GOALS[mid] = {});
+  let 서버 = null;
+  try{ 서버 = ((await sget('plans?select=data&member_id=eq.'+encodeURIComponent(mid)))[0]||{}).data || null; }catch(e){}
+  if(서버){ Object.keys(서버).forEach(k => { if(g[k] === undefined) g[k] = 서버[k]; });
+    const sp = 서버.prof || {}, gp = g.prof || {};
+    if(sp.nick && !gp.nick) g.prof = Object.assign({}, sp, gp, { nick: sp.nick }); }
+  닉기억(mid);
+  return sv(spost('plans', [{ member_id:mid, data:g, updated_at:new Date().toISOString() }], {on:'member_id'}), 무엇);
+}
+function 닉기억(mid){ const 닉 = 닉of(mid); if(닉) try{ localStorage.setItem('gg_nick_'+mid, 닉); }catch(e){} }
 async function profSave(mid, patch){
   const g = GOALS[mid] = GOALS[mid] || {};
   g.prof = Object.assign({}, g.prof || {}, patch);
-  await sv(spost('plans', [{ member_id:mid, data:g, updated_at:new Date().toISOString() }],
-    {on:'member_id'}), '프로필 저장');
+  await 계획올리기(mid, '프로필 저장');
 }
 /* 쌓인 것 세기 — 운동한 날 · 총 볼륨 · 오운완 장수 · 연속 */
 function profStat(mid){
@@ -9037,7 +9120,8 @@ function vPlan(){
     <span class="v">${has(u) ? g.to[u] : g.now[u]}<small>${unit(u)}</small></span><i>${has(u) ? (있(g.now[u]) ? '지금 '+g.now[u]+unit(u) : '목표') : '지금 · 목표 없음'}</i></div>`;
   const 칸들 = 칸('몸무게','w') + 칸('근육량','m') + 칸('체지방량','f') + 칸('체지방률','fp'), 목적 = (g.purpose||[]), 남 = dLeft(g.to.date);
   return { top: bar('운동계획', `<span class="sub">${esc(subjName())}</span>`, tr?'tm:'+mid:'tab:me'), body:`
-    ${tr?`<button class="hline gold" data-act="editplan:${mid}">${svg('h_target',18)}<b>계획 수정 · 칼로리 계산</b><small>눌러서 수정</small></button>`:''}
+    ${tr?`<button class="hline gold" data-act="editplan:${mid}">${svg('h_target',18)}<b>계획 수정 · 칼로리 계산</b><small>눌러서 수정</small></button>`
+       :(mid===S.mid?`<button class="hline gold" data-act="bodygoal">${svg('h_target',18)}<b>체중 목표 수정</b><small>목표 체중 · 체지방률 · 날짜</small></button>`:'')}
     <span class="lbl">나의 운동 목적</span>
     ${목적.length ? `<div class="chips">${목적.map(x=>`<span class="chip on">${esc(x)}</span>`).join('')}</div>` : '<div class="cyfoot"><span>아직 정하지 않았어요</span></div>'}
     <span class="lbl">목표${(g.now.date||g.to.date) ? ` <small style="font-weight:600;color:var(--sub)">${esc(g.now.date||'—')} → ${esc(g.to.date||'—')}${남!=null&&남>=0 ? ' · '+남+'일 남음' : ''}</small>` : ''}</span>
@@ -9466,7 +9550,7 @@ async function blSave(mid){
     if(w) g.now.w = String(w); if(m2) g.now.m = String(m2);
     if(f2) g.now.f = String(f2); if(fp) g.now.fp = String(fp);
     g.now.date = date;
-    sv(spost('plans', [{ member_id:mid, data:g, updated_at:new Date().toISOString() }], {on:'member_id'}), '운동계획 갱신');
+    계획올리기(mid, '운동계획 갱신');
   }
   toast('기록했어요'); render();
 }
@@ -10958,7 +11042,7 @@ document.addEventListener('click', async ev=>{
       g.vows = gv('pg:vows').split('\n').map(x=>x.trim()).filter(Boolean);
       g.promises = gv('pg:promises').split('\n').map(x=>x.trim()).filter(Boolean);
       if(S.draft) Object.keys(S.draft).forEach(k=>{ if(k.startsWith('pg:')||k.startsWith('plnow:')||k.startsWith('plto:')||k.startsWith('pc:')) delete S.draft[k]; });
-      sv(spost('plans',[{ member_id:mid, data:g, updated_at:new Date().toISOString() }], {on:'member_id'}), '운동계획 저장');
+      계획올리기(mid, '운동계획 저장');
       toast('저장했어요'); S.subj=mid; go('plan'); return; }
 
     /* 루틴 만들기 · 고치기 */
@@ -11152,6 +11236,8 @@ document.addEventListener('click', async ev=>{
     case 'goal': S.gd = null; sheetGoal(rest[0]==='new' ? null : rest[0]); return;
     case 'gt': S.gd.t = rest[0]; drawSheet(); return;
     case 'goalsave': 목표저장(); return;
+    case 'bodygoal': if(S.who==='tr') return; sheetBodyGoal(); return;
+    case 'bodygoalok': 몸목표저장(); return;
     case 'goaldel': { const g = GOALS[S.mid]; if(!g) return;
       openSheet(()=>`<div class="h2">이 목표를 삭제할까요?</div>
         <div class="note">이미 받은 배지는 그대로 남아요.</div>
@@ -11947,6 +12033,7 @@ document.addEventListener('click', async ev=>{
     case 'rkall': sheetRkAll(); return;
     case 'bdall': sheetBadges(rest[0]); return;
     case 'cfilt': S.cfilt=rest[0]; render(); return;
+    case 'cview': try{ localStorage.setItem('gg_cview_' + ((S.cfilt||'전체')==='내 글' ? 'my' : 'all'), rest[0]); }catch(e){} render(); return;
     case 'cmode': S.cmode=rest[0]; S.cfilt='전체'; render(); return;
     case 'partnew': S.part=null; sheetPartnerWrite(); return;
     case 'partk': { 파트너입력담기(); const n=S.part; if(!n) return;
