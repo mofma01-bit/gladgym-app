@@ -487,7 +487,7 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .ootdnudge .t{font-size:15.5px;font-weight:800;color:var(--gold)}
 .ootdnudge .s{font-size:12px;font-weight:600;color:var(--sub);margin-top:2px}
 .ootdnudge .go{margin-left:auto;font-size:20px;font-weight:700;color:var(--gold)}
-/* 트레이너 코멘트 — 사진·영상 첨부를 맨 위에 크게 (2026-09-19 대표) */
+/* 트레이너 피드백 — 사진·영상 첨부를 맨 위에 크게 (2026-09-19 대표) */
 .attbig{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
 .attbig button{display:flex;align-items:center;justify-content:center;gap:7px;padding:15px 8px;border-radius:14px;
   border:1.5px dashed var(--teal);background:#1e343b;color:var(--teal);font-size:15px;font-weight:800}
@@ -731,7 +731,7 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
   .fend .flogo,.fend .fmsg,.fend .fnum,.fend .fkg,.fend .fparts,.fend .fdiff{animation:none}
 }
 
-/* 코멘트 — 대화처럼 */
+/* 피드백 — 대화처럼 */
 .cm.cm2{flex-direction:row;align-items:flex-start;gap:11px;text-align:left;
   border:1px solid var(--line);border-radius:14px;padding:13px 14px}
 .cm.cm2.new{border-color:#3f5a63;background:linear-gradient(180deg,var(--teal-dim),var(--dark-2))}
@@ -1089,6 +1089,25 @@ body .figbox2{background:radial-gradient(80% 50% at 50% 30%,rgba(240,211,160,.09
 .rp2fig{flex:none}.rp2fig .figpick{display:none}.rp2ck{flex:none}
 .rp2mo{flex:none;border-radius:16px;border:1px solid var(--line);background:#1a1917;padding:13px 15px;display:flex;align-items:center;gap:14px}
 .rp2mo b{font-size:22px;font-weight:800;color:var(--gold);white-space:nowrap}.rp2mo b small{font-size:12px;color:var(--sub);margin-left:2px}.rp2mo span{font-size:12px;color:var(--sub);line-height:1.5}
+/* 2026-10-09 노션 목록 */
+.hcard.hst3{cursor:default}.hcard.hst3 .h3 button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:0;min-width:0;color:inherit}
+.hcard.hst3 .h3 button small{color:var(--sub)}.hcard.hst3 .h3 button:active{opacity:.6}
+.hsrow{display:flex;align-items:stretch;gap:7px;margin-bottom:7px}.hsrow:last-child{margin-bottom:0}
+.hsm{flex:1;min-width:0;display:flex;align-items:center;gap:10px;text-align:left;padding:11px 12px;border-radius:14px;border:1px solid #34332d;background:linear-gradient(180deg,#1f1e1b,#171615)}
+.hsm .mt{min-width:0;display:flex;flex-direction:column}.hsm .mt b{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hsm .mt small{font-size:11px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hsm .mi.pt{font-size:12px;font-weight:800;color:var(--gold);flex:none;min-width:40px}
+.hsgo{flex:none;width:74px;border-radius:14px;border:1px solid #3f7281;background:linear-gradient(170deg,#1b2d33,#171a19 70%);font-size:11.5px;font-weight:800;color:var(--teal);line-height:1.35}
+.hspt .mrow2{gap:10px}.hspt .ikk{flex:none;width:44px}.hsbar{flex:1;height:8px;border-radius:4px;background:#2a2925;overflow:hidden}.hsbar i{display:block;height:100%;border-radius:4px}.hsv{flex:none;font-size:13px;font-weight:800;color:var(--gold);min-width:42px;text-align:right}
+.blsay{margin-top:6px;border-radius:14px;border:1px solid #34332d;background:#1a1917;padding:12px 13px;display:flex;flex-direction:column;gap:7px}
+.blall{font-size:14px;font-weight:700;line-height:1.5;word-break:keep-all}.blall b{color:var(--gold)}
+.blrow{display:flex;gap:9px;align-items:flex-start;font-size:13px;line-height:1.5;word-break:keep-all}.blrow i{flex:none;width:9px;height:9px;border-radius:50%;margin-top:6px}.blrow b{color:var(--cream)}.blrow span{color:#cfc8bc}
+.blfoot{font-size:11px;color:var(--sub);border-top:1px solid #2c2b27;padding-top:7px}
+.wdel{display:block;margin:9px 0 0 auto;font-size:12px;font-weight:700;color:var(--warn);border:1px solid #5a3830;border-radius:999px;padding:6px 12px}
+/* 지금 기록 중인 종목 — 테두리가 밝게 숨 쉰다 */
+@keyframes nowGlow2{0%,100%{box-shadow:0 0 0 1.5px rgba(169,216,230,.55),0 0 0 0 rgba(169,216,230,.0)}50%{box-shadow:0 0 0 2px rgba(169,216,230,.95),0 0 20px 2px rgba(169,216,230,.35)}}
+body .card.now2{border-color:var(--teal);animation:nowGlow2 1.7s ease-in-out infinite;position:relative;z-index:1}
+body .card.now2 .pill.t{background:var(--teal);color:#10181a;border-color:var(--teal);font-weight:800}
+body .card.now2 .pill.t::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#10181a;margin-right:5px;vertical-align:1px;animation:finPulse 1.2s ease-in-out infinite}
 .stickup{position:sticky;bottom:-1px;z-index:5;display:flex;gap:9px;flex:none;padding:10px 0 4px;background:linear-gradient(180deg,transparent,var(--dark) 26%)}.stickup .btn{flex:1}.stickup .btn.main{flex:2}
 .fcars .nopic,.mp2 .nopic{width:100%;height:100%}.fcars .nopic svg{width:34%}#sheetbox .fsum{padding:8px 2px 0}
 .big2.row{min-height:0;flex-direction:row;align-items:center;gap:11px;padding:13px 12px}
@@ -1719,7 +1738,7 @@ body .prephd .ph1{font-size:21px}
 #main.lite .trio .v{color:#2b231c}
 #main.lite .trio .t1{background:#f6efe3;border-color:#e6ddcf}
 #main.lite .trio .t1 .v{color:#8a6f3f}
-/* 코멘트에 붙인 것 — 보내기 전 미리보기 · 받은 쪽 실물 */
+/* 피드백에 붙인 것 — 보내기 전 미리보기 · 받은 쪽 실물 */
 .attrow{display:flex;gap:7px;flex-wrap:wrap;margin:2px 0 8px}
 .attth{position:relative;width:74px;height:74px;border-radius:10px;overflow:hidden;
   background:#000;border:1px solid var(--line);flex:none}
@@ -1730,7 +1749,7 @@ body .prephd .ph1{font-size:21px}
   background:rgba(0,0,0,.72);color:#fff;font-size:11px;font-weight:800;line-height:22px;padding:0}
 /* 넘겨 보기 — 폰은 옆으로 밀고, PC 는 ‹ › (2026-09-18 대표: 「올린 순서대로 넘기면서 볼 수 있게」) */
 .cs-kind{margin-top:8px}
-/* 코멘트 회차 넘기기 — 좌우 화살표 · 가운데 누르면 회차 목록 (2026-09-29 대표) */
+/* 피드백 회차 넘기기 — 좌우 화살표 · 가운데 누르면 회차 목록 (2026-09-29 대표) */
 /* ⚠ #sheetbox 가 flex 다 — flex:none 을 안 주면 목록이 12px 로 찌그러진다
    (2026-09-29 브라우저에서 잼. 안은 236px 인데 밖이 12px 이었다) */
 .cmnav{display:flex;align-items:center;gap:6px;margin:2px 0 8px;flex:none}
@@ -1777,7 +1796,7 @@ body .prephd .ph1{font-size:21px}
   border-radius:50%;background:rgba(0,0,0,.58);color:#fff;font-size:21px;line-height:32px;padding:0}
 .cs-prev{left:6px} .cs-next{right:6px}
 .cs-prev.end,.cs-next.end{display:none}
-/* 소리 켜기 단추 — 코멘트 영상은 **기본 음소거**로 튼다 (2026-09-21 대표:
+/* 소리 켜기 단추 — 피드백 영상은 **기본 음소거**로 튼다 (2026-09-21 대표:
    「틀자마자 갑자기 소리가 팍 튀어나오면 당황하니까」).
    폰 기본 재생기에는 음소거 버튼이 없는 기기가 있어서 우리가 따로 단다. */
 .vmute{position:absolute;left:8px;bottom:8px;z-index:3;display:inline-flex;align-items:center;gap:5px;
@@ -1972,7 +1991,7 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
 .gsum .v small{font-size:11px;font-weight:600;color:var(--sub)}
 .trow{display:flex;align-items:baseline;gap:9px;padding:9px 2px;border-bottom:1px solid var(--line)}
 .trow:last-child{border-bottom:none}
-/* 리포트 종목 줄 밑의 코멘트 — 있을 때만 나온다 (2026-09-29 대표 「없으면 줄을 안 만드는 것으로」) */
+/* 리포트 종목 줄 밑의 피드백 — 있을 때만 나온다 (2026-09-29 대표 「없으면 줄을 안 만드는 것으로」) */
 .rpcm.none{border-color:var(--gold-2);background:var(--gold-dim)}
 .rpcm.none .ic{color:var(--gold)}
 .rpcm.none .tx{color:var(--gold)}
@@ -2059,7 +2078,7 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
 #main.lite .dtitle{color:#2b231c;border-bottom-color:#e6ddcf}
 #main.lite .dtitle small{color:#a0917f}
 .dhd2{width:100%;display:flex;align-items:center;gap:10px;padding:14px 15px;text-align:left}
-/* 기록 카드 머리 + 오른쪽 「새 코멘트」 (2026-09-18 대표: 「새 코멘트는 여기에 버튼이 바로 보이게」) */
+/* 기록 카드 머리 + 오른쪽 「새 피드백」 (2026-09-18 대표: 「새 피드백은 여기에 버튼이 바로 보이게」) */
 .dhrow{display:flex;align-items:center}
 .dhrow>.dhd2{flex:1;min-width:0}
 .dhrow + .dhrow{border-top:1px solid var(--line)}
@@ -2080,9 +2099,9 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
 .bd3 .bar b{display:block;height:100%;background:var(--gold);border-radius:9px}
 .bd3.two{grid-template-columns:repeat(2,1fr)}
 .dayslink{width:100%}
-/* 홈 — 왼쪽 최근 운동기록(간단히) · 지난 운동기록 / 오른쪽 운동 코멘트 칸
-   (2026-09-18 대표: 「칸 나눠서 우측에 코멘트 칸을 넣으라니까 / 최근 운동기록을 간략하게 하고
-    들어가서 상세하게 보면되니까 / NEW! 하고 운동 코멘트 / NEW는 작게 애니메이션 효과 반짝 거리게」) */
+/* 홈 — 왼쪽 최근 운동기록(간단히) · 지난 운동기록 / 오른쪽 운동 피드백 칸
+   (2026-09-18 대표: 「칸 나눠서 우측에 피드백 칸을 넣으라니까 / 최근 운동기록을 간략하게 하고
+    들어가서 상세하게 보면되니까 / NEW! 하고 운동 피드백 / NEW는 작게 애니메이션 효과 반짝 거리게」) */
 .homerec{display:grid;grid-template-columns:minmax(0,1fr) 108px;gap:8px;align-items:stretch;flex:none}
 .hr-l{display:flex;flex-direction:column;gap:8px;min-width:0}
 .hr-l .dayslink{margin:0}
@@ -2258,7 +2277,7 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
 .posechk .pc.on .bx{color:var(--teal,#4a8f95)}
 .posechk .pc small{font-size:10.5px;opacity:.7}
 
-/* 코멘트 안내 그만 받기 — 한 장짜리 동의 화면 (설치 없이 열린다) */
+/* 피드백 안내 그만 받기 — 한 장짜리 동의 화면 (설치 없이 열린다) */
 .cmoffwrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:22px}
 .cmoffbox{width:100%;max-width:420px;background:var(--card,#1a1a18);border:1px solid var(--line,#33332f);
   border-radius:18px;padding:26px 22px;text-align:left}
@@ -2693,7 +2712,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '348';
+const BUILD = '349';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2767,10 +2786,10 @@ const LIVEKEY = 'gladgym_live_v1';
 function save(){ try{ localStorage.setItem(LIVEKEY, JSON.stringify(D.live)); }catch(e){} }
 function loadLive(){ try{ const r=localStorage.getItem(LIVEKEY); if(r) D.live=JSON.parse(r); }catch(e){} }
 
-let CMEDIA = [];                          /* comment_media — 코멘트에 붙인 사진·영상 */
+let CMEDIA = [];                          /* comment_media — 피드백에 붙인 사진·영상 */
 
 /* ══ 잠깐 쓰는 사진 주소 (서명 주소) ══ 2026-09-29
-   지금 `media` 버킷은 **공개**라 주소만 알면 아무나 받는다 (실측 — 코멘트 영상이 열렸다).
+   지금 `media` 버킷은 **공개**라 주소만 알면 아무나 받는다 (실측 — 피드백 영상이 열렸다).
    리포트에 사진을 얹으면 그 주소가 알림톡을 타고 나간다. 그래서 버킷을 잠근다.
 
    잠그면 `/object/public/...` 이 막히므로, 볼 때마다 **한 시간짜리 주소**를 받아 쓴다.
@@ -2865,7 +2884,7 @@ async function boot(){
     aT:m.agree_terms_at||'', aP:m.agree_privacy_at||'', aS:m.agree_sensitive_at||'',
     aM:m.agree_marketing_at||'', aV:m.agree_version||'',
     askAt:m.sensitive_ask_at||'', askKind:m.sensitive_ask_kind||'', seenAt:m.noti_seen_at||'',
-    /* ⛔ 코멘트 거부 — 이걸 빠뜨리면 거부한 회원인데 「코멘트를 남겨주세요」가 **다시 살아난다.**
+    /* ⛔ 피드백 거부 — 이걸 빠뜨리면 거부한 회원인데 「피드백을 남겨주세요」가 **다시 살아난다.**
        MEMBERS 는 칸을 골라 담는 자리다. 판정에 쓰는 칸은 반드시 여기에 실어야 한다
        (2026-09-30 대표 「거부했는데 다시 살아난다거나」 — 실제로 빠져 있었다).
        막는 기계 = _도구\회원칸점검.py */
@@ -2930,7 +2949,7 @@ async function boot(){
   if(D.live && !D.workouts.some(w => w.id === D.live.id)) D.live = null;   // 서버에서 지워진 것
   S.mid = S.mid || (MEMBERS[0] && MEMBERS[0].id);
   S.tmid = S.tmid || S.mid;
-  /* ══ 코멘트 안내 그만 받기 동의 (?cmoff=열쇠) ══ 2026-09-30 대표
+  /* ══ 피드백 안내 그만 받기 동의 (?cmoff=열쇠) ══ 2026-09-30 대표
        「앱 설치를 어려워하면 거기서 막히니까 … 동의 누르면 분류하는 거야」
      설치도 로그인도 없이 열리는 **한 장**이다. 리포트 링크와 같은 구조.
      ⛔ 열쇠로만 찾는다 — 회원 번호를 링크에 싣지 않는다. 한 번 쓰면 못 쓴다. */
@@ -3081,16 +3100,16 @@ const dkey = (mid,ex,va) => mid+':'+ex+':'+va;
 function descOf(mid,ex,va){ const k=dkey(mid,ex,va); return D.desc[k]!==undefined ? D.desc[k] : ((varOf(ex,va)||{}).desc||''); }
 function isEdited(mid,ex,va){ return D.desc[dkey(mid,ex,va)]!==undefined; }
 function cmOf(mid,ex,va){ return D.cm.filter(c=>c.mid===mid && c.ex===ex && (va===undefined || c.va===va)); }
-/* ══ 코멘트 0개 ══ 2026-09-29 대표 「수업을 2회 이상 했는데 코멘트가 하나도 없는 건 표시가 있어야 해」
-   「단순히 코멘트가 없다가 아니라 **코멘트 0개** 이렇게」
+/* ══ 피드백 0개 ══ 2026-09-29 대표 「수업을 2회 이상 했는데 피드백이 하나도 없는 건 표시가 있어야 해」
+   「단순히 피드백이 없다가 아니라 **피드백 0개** 이렇게」
    ⛔ 트레이너에게만 보인다. 회원 리포트에는 안 띄운다 (「없으면 줄 안 만듦」). */
 const 수업횟수 = mid => D.workouts.filter(w => w.mid===mid && w.done && (w.kind||'')==='수업'
                                              && w.items.some(i=>i.sets && i.sets.length)).length;
-const 코멘트수 = mid => D.cm.filter(c => c.mid===mid).length;
-/* 코멘트 안내 그만 받기 — 회원이 동의해서 껐으면 **재촉을 안 띄운다** (2026-09-30 대표).
+const 피드백수 = mid => D.cm.filter(c => c.mid===mid).length;
+/* 피드백 안내 그만 받기 — 회원이 동의해서 껐으면 **재촉을 안 띄운다** (2026-09-30 대표).
    ⛔ 칸이 아직 없어도 안 터진다 — undefined 면 「안 껐다」다. */
-const 코멘트끔 = mid => { const m = MEMBERS.find(x => x.id === mid); return !!(m && m.cmOff); };
-const 코멘트0개 = mid => !코멘트끔(mid) && 수업횟수(mid) >= 2 && 코멘트수(mid) === 0;
+const 피드백끔 = mid => { const m = MEMBERS.find(x => x.id === mid); return !!(m && m.cmOff); };
+const 피드백0개 = mid => !피드백끔(mid) && 수업횟수(mid) >= 2 && 피드백수(mid) === 0;
 function unreadOf(mid){ return D.cm.filter(c=>c.mid===mid && !c.read).length; }
 
 /* ══ 동의 ══ 2026-09-21
@@ -3173,9 +3192,9 @@ function notiList(mid){
     out.push({ k:'ask', at:a.askAt, 제목:`트레이너가 ${무엇}을 올리려 합니다`,
                줄:'건강정보 동의가 필요합니다', 단추:'확인하고 동의', act:'agree:ask' });
   }
-  /* ② 아직 안 읽은 트레이너 코멘트 */
+  /* ② 아직 안 읽은 트레이너 피드백 */
   D.cm.filter(c=>c.mid===mid && !c.read).forEach(c=>{
-    out.push({ k:'cm', at:c.ts||'', 제목:'트레이너가 코멘트를 남겼습니다',
+    out.push({ k:'cm', at:c.ts||'', 제목:'트레이너가 피드백을 남겼습니다',
                줄:exName(c.ex, c.va), act:`exd:${c.ex}:${c.va}` });
   });
   /* ③ 인바디가 새로 들어옴 (건강정보에 동의한 회원만) */
@@ -3356,9 +3375,9 @@ function 최근카드(mid){
     <span class="s">${종목}종목${무게 ? ` · ${Math.round(무게).toLocaleString()}kg` : ''}</span>
     <span class="go">›</span></button>`;
 }
-/* 운동 코멘트 칸 — 늘 있다. 새 코멘트가 있으면 NEW! 가 반짝이고 청록.
-   누르면: 새 코멘트가 한 종목이면 그 종목 코멘트 창, 아니면 피드백 탭 */
-function 코멘트칸(mid){
+/* 운동 피드백 칸 — 늘 있다. 새 피드백이 있으면 NEW! 가 반짝이고 청록.
+   누르면: 새 피드백이 한 종목이면 그 종목 피드백 창, 아니면 피드백 탭 */
+function 피드백칸(mid){
   const cs = (D.cm||[]).filter(c => c.mid===mid);
   const u = cs.filter(c => !c.read);
   const 한종목 = u.length && new Set(u.map(c=>c.ex+':'+c.va)).size === 1;
@@ -3366,18 +3385,18 @@ function 코멘트칸(mid){
   const 최근 = (u[0] || cs[0]);
   return `<button class="cmcell${u.length?' new':''}" data-act="${act}">
     ${u.length ? '<b class="nwx">새 글</b>' : ''}
-    <span class="k">운동 코멘트</span>
+    <span class="k">운동 피드백</span>
     <span class="v">${u.length || cs.length}<small>개</small></span>
     <span class="s">${최근 ? esc(최근.tr) + ' · ' + esc(최근.at) : '아직 없어요'}</span></button>`;
 }
-function 새코멘트(mid, w){
+function 새피드백(mid, w){
   if(S.who==='tr') return '';
   const 종목 = new Set(w.items.filter(i=>i.sets.length).map(i=>i.ex+':'+i.va));
   const u = (D.cm||[]).filter(c => c.mid===mid && !c.read && 종목.has(c.ex+':'+c.va));
   if(!u.length) return '';
-  /* 한 종목이면 그 종목 코멘트 창으로 바로, 여럿이면 코멘트 모아 보기로 */
+  /* 한 종목이면 그 종목 피드백 창으로 바로, 여럿이면 피드백 모아 보기로 */
   const 한종목 = new Set(u.map(c=>c.ex+':'+c.va)).size === 1;
-  return `<button class="dnew" data-act="${한종목 ? `exd:${u[0].ex}:${u[0].va}` : 'tab:feedback'}">새 코멘트 ${u.length}</button>`;
+  return `<button class="dnew" data-act="${한종목 ? `exd:${u[0].ex}:${u[0].va}` : 'tab:feedback'}">새 피드백 ${u.length}</button>`;
 }
 function dayDetail(mid, date, 제목){
   const T = 제목 || (date === 마지막운동날(mid) ? '최근 운동기록' : '지난 운동기록');
@@ -3419,7 +3438,7 @@ function dayDetail(mid, date, 제목){
           <span class="t">${T}</span>
           <span class="r">${dateTxt(date)} · ${요약(w)}</span>
         </span>
-        <span class="ar">${열림?'▴':'▾'}</span></button>${새코멘트(mid, w)}</div>
+        <span class="ar">${열림?'▴':'▾'}</span></button>${새피드백(mid, w)}</div>
       ${열림 ? 속(w) : ''}</div>`;
   }
 
@@ -3431,7 +3450,7 @@ function dayDetail(mid, date, 제목){
        return `
       <div class="dhrow"><button class="dhd2" data-act="dopen:${w.id}">
         <span class="tx"><span class="t">${요약(w)}</span></span>
-        <span class="ar">${열림?'▴':'▾'}</span></button>${새코멘트(mid, w)}</div>
+        <span class="ar">${열림?'▴':'▾'}</span></button>${새피드백(mid, w)}</div>
       ${열림 ? 속(w) : ''}`; }).join('') + '</div>';
 }
 
@@ -3573,13 +3592,31 @@ const 몸자리 = {
    근비대 연구가 흔히 말하는 「주당 10~20세트」를 가운데로 두었다.        */
 const 등급표 = [
   /* 색 : 칩·글씨에 쓰는 밝은 색 / 몸칠 : 해부도 위에 얹는 색 (hard-light 라 조금 어둡게) */
-  { 키:'과사용', 최소:20, 색:'#ef5350', 몸칠:'#c4413a', 글:'많이 함',   말:'여기서 더 늘려도 이득이 잘 안 붙어요' },
-  { 키:'적정',   최소:10, 색:'#e2a63a', 몸칠:'#c98f28', 글:'적정',      말:'연구가 말하는 알맞은 양이에요' },
-  { 키:'부족',   최소:4,  색:'#4da3e0', 몸칠:'#3d7fae', 글:'부족',      말:'조금 더 해도 돼요' },
-  { 키:'거의',   최소:0.1,색:'#5cc47f', 몸칠:'#4a9e63', 글:'거의 안 함',말:'많이 비었어요' },
-  { 키:'없음',   최소:0,  색:'#4a4842', 몸칠:'#4a4842', 글:'안 함',      말:'한 번도 안 했어요' },
+  { 키:'과사용', 최소:20, 색:'#ef5350', 몸칠:'#c4413a', 글:'많이 함',   말:'충분해요 · 다른 부위에 나눠 보세요' },
+  { 키:'적정',   최소:10, 색:'#e2a63a', 몸칠:'#c98f28', 글:'알맞음',    말:'딱 좋아요 · 지금처럼 해요' },
+  { 키:'부족',   최소:4,  색:'#4da3e0', 몸칠:'#3d7fae', 글:'부족',      말:'조금 부족해요' },
+  { 키:'거의',   최소:0.1,색:'#5cc47f', 몸칠:'#4a9e63', 글:'많이 부족', 말:'많이 부족해요' },
+  { 키:'없음',   최소:0,  색:'#4a4842', 몸칠:'#4a4842', 글:'안 함',      말:'아직 안 했어요' },
 ];
 const 등급 = 주당 => 등급표.find(g => 주당 >= g.최소) || 등급표[등급표.length-1];
+/* 운동 균형 한마디 (2026-10-09 대표 「너무 많이 한 · 너무 부족한 · 전체적으로 해야 하는 등의 피드백 · 00세트까지 늘려보세요」)
+   기준 = 그 기간의 **주당 평균 세트** : 20 이상 많이 함 · 10~20 알맞음 · 4~10 부족 · 4 미만 많이 부족 · 0 안 함.  목표는 주 10세트 */
+function 균형말(ps, W){
+  const 부위 = ['가슴','어깨','등','팔','하체','복근'], 주 = k => (ps[k]||0) / Math.max(1, W), 키 = k => 등급(주(k)).키;
+  const 묶 = x => 부위.filter(k => 키(k) === x), 많 = 묶('과사용'), 알 = 묶('적정'), 부 = 묶('부족').concat(묶('거의')), 안 = 묶('없음');
+  const 한 = 부위.length - 안.length;
+  const 전체 = 한 === 0 ? '아직 근력 운동 기록이 없어요'
+    : 한 <= 2 ? `<b>${부위.filter(k => 키(k) !== '없음').join(' · ')}</b>에 몰려 있어요 — 다른 부위도 골고루 해 보세요`
+    : (!부.length && !안.length) ? '모든 부위를 골고루 잘하고 있어요!'
+    : 안.length ? `${한}개 부위를 했어요 — 빠진 부위를 채우면 더 좋아요` : '골고루 하고 있어요 — 부족한 부위만 조금 더!';
+  const 줄 = (색, 제목, 글) => `<div class="blrow"><i style="background:${색}"></i><span><b>${제목}</b>${글}</span></div>`;
+  return `<div class="blsay"><div class="blall">${전체}</div>
+    ${많.length ? 줄('#ef5350', 많.join(' · '), ' — 충분해요. 세트를 다른 부위에 나눠 보세요') : ''}
+    ${알.length ? 줄('#e2a63a', 알.join(' · '), ' — 딱 좋아요. 지금처럼!') : ''}
+    ${부.length ? 줄('#4da3e0', 부.map(k => `${k} ${Math.round(주(k)*10)/10}`).join(' · '), ' — 주 10세트까지 늘려 보세요!') : ''}
+    ${안.length ? 줄('#6b675f', 안.join(' · '), ' — 아직 안 했어요. 이번 주에 한 번 넣어 보세요!') : ''}
+    <div class="blfoot">숫자는 한 주 평균 세트 · 주 10~20세트가 알맞아요</div></div>`;
+}
 
 /* ── 2.5D 해부 모델 그리기 ── (2026-10-01)
    img/body3/<성>/몸_<각>.webp = 회색 음영 몸 · 부위_<각>.png = 부위마다 단색 ID맵.
@@ -3855,7 +3892,7 @@ function 첨부고르기(종, K){
           const d = await shrinkPhoto(f), blob = await (await fetch(d)).blob();
           A.files.push({ kind:'photo', blob, ext:'jpg', url: URL.createObjectURL(blob) }); }
       } else {
-        const r = await 영상줄이기(fs[0], null, true);   /* 코멘트 영상 = 트레이너 목소리가 알맹이 */
+        const r = await 영상줄이기(fs[0], null, true);   /* 피드백 영상 = 트레이너 목소리가 알맹이 */
         A.files.push({ kind:'video', blob:r.blob, ext:r.ext, url: URL.createObjectURL(r.blob) });
       }
       drawSheet();
@@ -4001,8 +4038,8 @@ function tabBar(){
        +t('community',svg('grid',22),'커뮤니티')
        +t('feedback',svg('mail',22),'피드백',u>0)+t('me',svg('user',22),'내 정보');
 }
-/* 코멘트를 아직 안 단 운동인가 */
-/* 그 수업의 종목 중 코멘트가 하나도 없는 것이 있으면 「쓸 것」 */
+/* 피드백을 아직 안 단 운동인가 */
+/* 그 수업의 종목 중 피드백이 하나도 없는 것이 있으면 「쓸 것」 */
 function unseen(w){
   if(!w.done) return false;
   return w.items.some(it => it.sets.length && cmOf(w.mid, it.ex, it.va).length === 0);
@@ -4144,7 +4181,7 @@ function vLogin(){
     <div class="hr"></div>
     <button class="card rowc teal" data-act="as:tr">
       <div><div class="nm t">${esc(TRAINER)} 트레이너로 들어가기</div>
-      <div class="sm">회원 만들기 · 루틴 · 코멘트</div></div><span class="rt">›</span></button>
+      <div class="sm">회원 만들기 · 루틴 · 피드백</div></div><span class="rt">›</span></button>
     <div class="hr"></div>
     <span class="lbl">회원으로 들어가기 · ${MEMBERS.length}명</span>
     <input class="search" type="text" data-filter="1" placeholder="이름으로 검색">
@@ -4403,14 +4440,52 @@ function 현황판(mid){
 }
 /* ── 홈 칸 (2026-10-06 GPT 시안) — 머리줄(아이콘 · 이름 · ›) 하나에 알맹이 하나 ── */
 const 홈머리 = (ic, 이름) => `<span class="hh">${svg(ic,18)}<b>${이름}</b><i>›</i></span>`;
-function 홈현황(mid){
+function 홈현황(mid){   /* 홈현황셋 */
   const 달 = TODAY.slice(0,7), ws = workoutsOf(mid).filter(w => w.date.slice(0,7)===달 && 세트있나(w));
   const 개인 = new Set(ws.filter(w=>w.kind!=='수업').map(w=>w.date)).size, 수업 = ws.filter(w=>w.kind==='수업').length;
   const 분 = Math.round(ws.reduce((a,w)=>a+(+w.dur||0),0)/60);
-  return `<button class="hcard" data-act="attend"><span class="hh"><b>${+달.slice(5)}월 현황</b><i>›</i></span>
-    <span class="h3">${[['h_dumb','개인운동',개인,'회'],['h_user','PT 수업',수업,'회'],['h_clock','운동시간',분.toLocaleString(),'분']]
-      .map(x=>`<span>${svg(x[0],17)}<small>${x[1]}</small><b>${x[2]}<i>${x[3]}</i></b></span>`).join('')}</span></button>`;
+  return `<div class="hcard hst3"><span class="hh"><b>${+달.slice(5)}월 현황</b></span>
+    <span class="h3">${[['h_dumb','개인운동',개인,'회','개인'],['h_user','PT 수업',수업,'회','수업'],['h_clock','운동시간',분.toLocaleString(),'분','시간']]
+      .map(x=>`<button data-act="hst:${x[4]}">${svg(x[0],17)}<small>${x[1]} ›</small><b>${x[2]}<i>${x[3]}</i></b></button>`).join('')}</span></div>`;
 }
+/* 현황 칸을 누르면 — 개인운동 = 목표 + 지난 개인운동 / PT 수업 = 지난 수업(리포트 · 피드백) / 운동시간 = 부위별 + 날마다.
+   지난 기록 줄마다 「이 루틴으로 시작」(again) 을 붙인다 (2026-10-09 대표 「지난 기록이 있는 곳이면 바로 그 루틴으로 운동기록 할 수 있게」) */
+function sheetHomeStat(종류){
+  const mid = S.mid, 달 = TODAY.slice(0,7), m = +달.slice(5);
+  openSheet(()=>{ const 다 = workoutsOf(mid).filter(w => 세트있나(w)), 이달 = 다.filter(w => w.date.slice(0,7) === 달);
+    const 줄 = (w, 보기) => { const its = w.items.filter(it=>it.sets.length), cn = w.kind==='수업' ? its.reduce((a,it)=> a + 수업피드백수(w, it), 0) : 0;
+      return `<div class="hsrow"><button class="hsm" data-act="${보기}:${w.id}"><span class="mi pt">${esc(dateTxt(w.date).replace('월 ','/').replace('일',''))}</span>
+        <span class="mt"><b>${w.title ? esc(w.title) : (w.rid && rOf(w.rid) ? esc(rOf(w.rid).n) : (w.kind==='수업' ? 'PT 수업' : '개인운동'))}</b>
+          <small>${its.length}종목 · ${Math.round((+w.dur||0)/60)}분${cn ? ' · 피드백 ' + cn : ''} · ${its.slice(0,2).map(it=>esc(exName(it.ex,it.va))).join(' · ')}${its.length>2?' 외':''}</small></span></button>
+        <button class="hsgo" data-act="again:${w.id}">이 루틴으로<br>시작</button></div>`; };
+    const 목록 = (ws, 보기, 빈) => ws.length ? ws.slice(0, 12).map(w => 줄(w, 보기)).join('') : 빔('pic', 빈, '');
+    if(종류 === '수업'){ const ws = 다.filter(w => w.kind==='수업'), n = 이달.filter(w => w.kind==='수업').length;
+      return `<div class="h2">PT 수업 <small>${m}월 ${n}회 · 누르면 그날 리포트</small></div>
+        <div class="pickbox">${목록(ws, 'hsrpt', '아직 PT 수업 기록이 없어요')}</div>
+        <button class="btn ghost sm" data-act="close">닫기</button>`; }
+    if(종류 === '시간'){ const 부 = {}; let 합 = 0;
+      이달.forEach(w => { 합 += (+w.dur||0); const t = partTimes(w); Object.keys(t).forEach(k => 부[k] = (부[k]||0) + t[k]); });
+      const 순 = Object.entries(부).sort((a,b) => b[1]-a[1]), 최 = 순.length ? 순[0][1] : 1;
+      return `<div class="h2">운동시간 <small>${m}월 ${Math.round(합/60).toLocaleString()}분 · ${이달.length}회</small></div>
+        ${순.length ? `<span class="lbl">부위별</span><div class="megrp hspt">${순.map(([k,v]) => `<div class="mrow2"><span class="ikk">${esc(k)}</span>
+            <span class="hsbar"><i style="width:${Math.max(4, Math.round(v/최*100))}%;background:${부위색[k]||'#9a938a'}"></i></span><span class="hsv">${Math.round(v/60)}분</span></div>`).join('')}</div>` : ''}
+        <span class="lbl">날마다</span>
+        <div class="pickbox">${목록(이달.length ? 이달 : 다.slice(0,5), 'orec', '아직 운동 기록이 없어요')}</div>
+        <button class="btn ghost sm" data-act="close">닫기</button>`; }
+    const a = 출석셈(mid), ws = 다.filter(w => w.kind!=='수업');
+    return `<div class="h2">개인운동 <small>${m}월 ${a.개인}회</small></div>
+      <div class="card">
+        <div class="rowc" style="align-items:baseline"><div class="nm" style="font-size:24px;color:var(--gold)">${a.률}<small style="font-size:13px"> %</small></div>
+          <div class="sm">목표 출석률 · ${esc(a.기준)}</div></div>
+        <i class="bar" style="display:block;height:6px;border-radius:9px;background:var(--dark-4);overflow:hidden;margin-top:8px">
+          <b style="display:block;height:100%;width:${Math.min(100,a.률)}%;background:var(--gold)"></b></i>
+        ${a.목표있나 ? '' : `<button class="btn sub sm" style="margin-top:10px" data-act="goal:new">개인운동 목표 정하기</button>`}
+      </div>
+      <span class="lbl">지난 개인운동</span>
+      <div class="pickbox">${목록(ws, 'orec', '아직 개인운동 기록이 없어요')}</div>
+      <button class="btn ghost sm" data-act="close">닫기</button>`; });
+}
+const 수업피드백수 = (w, it) => { try{ return 수업피드백(w, it).length; }catch(e){ return 0; } };
 function 홈주기(mid){
   const c = cycOf(mid), t = cycToday(c); if(!t || !여성인가(mid)) return '';
   return `<button class="hcard hcy" data-act="sub:cycle" style="--cc:${주기색[t.ph]||'var(--gold)'}">${홈머리('h_drop','생리주기')}
@@ -4430,12 +4505,12 @@ function 홈최근(mid){
       const 분 = Math.round(ws.reduce((a,w)=>a+(+w.dur||0),0)/60);
       return `<button data-act="${ws.length===1 ? 'rec:'+ws[0].id : 'dayat:'+d}"><b>${esc(부위)}</b><small>${dateTxt(d)}</small><em>${분}분 ›</em></button>`; }).join('')}</span></div>`;
 }
-function 홈코멘트(mid){
+function 홈피드백(mid){
   const cs = (D.cm||[]).filter(c => c.mid===mid), u = cs.filter(c => !c.read);
   const 한종목 = u.length && new Set(u.map(c=>c.ex+':'+c.va)).size === 1;
   const 최근 = u[0] || cs[0];
   return `<button class="hcard hcm${u.length?' new':''}" data-act="${한종목 ? `exd:${u[0].ex}:${u[0].va}` : 'tab:feedback'}">
-    <span class="hh">${svg('h_user',18)}<b>${u.length ? '코멘트' : '트레이너 코멘트'}</b>${u.length ? `<em class="nw">새 글 ${u.length}</em>` : '<i>›</i>'}</span>
+    <span class="hh">${svg('h_user',18)}<b>${u.length ? '피드백' : '트레이너 피드백'}</b>${u.length ? `<em class="nw">새 글 ${u.length}</em>` : '<i>›</i>'}</span>
     ${최근 ? `<span class="hq">“${esc(String(최근.tx||'').replace(/\s+/g,' ').slice(0,38))}${String(최근.tx||'').length>38?'…':''}”</span>
       <span class="hs">– ${esc(최근.tr)} · ${esc(최근.at)}</span>` : `<span class="hs">아직 없어요</span>`}</button>`;
 }
@@ -4531,7 +4606,7 @@ function vHome(){
     <div class="hrow solo">${홈현황(S.mid)}</div>
     <div class="hgoal">${목표칸(S.mid)}</div>
     ${인증샷홈(S.mid)}
-    <div class="hrow wide">${홈최근(S.mid)}${홈코멘트(S.mid)}</div>
+    <div class="hrow wide">${홈최근(S.mid)}${홈피드백(S.mid)}</div>
     <button class="hline gold" data-act="rmstart:${S.mid}">${svg('h_crown',18)}<b>1RM 측정</b><small>무게 · 횟수 · 휴식 자동</small><i>›</i></button>`,
     /* 맨 아래 고정 단추 — 기록 중일 때만. 평소엔 맨 위 큰 카드가 같은 일을 한다 (2026-10-06 홈 줄이기) */
     foot: lw ? `<button class="btn main go live" data-act="go:workout"><span class="gdot"></span>운동기록 계속하기</button>` : undefined };
@@ -4650,7 +4725,7 @@ function vPick(){
         style="${(e.p===S.pickPart && (S.pickEq==='전체'||e.e===S.pickEq))?'':'display:none'}"
         data-act="add:${e.id}:${vs[0].k}">
         <span class="mt"><b>${esc(e.n)}</b>
-          <small>${esc(e.e)}${last?` · 지난번 ${setTxt(e.id,last)}`:''}${n?` · 코멘트 ${n}`:''}${vs.length>1?` · <u>하는 법 ${vs.length}가지</u>`:''}</small></span>
+          <small>${esc(e.e)}${last?` · 지난번 ${setTxt(e.id,last)}`:''}${n?` · 피드백 ${n}`:''}${vs.length>1?` · <u>하는 법 ${vs.length}가지</u>`:''}</small></span>
         <em class="pkadd">${담 ? '✓' + (담>1 ? 담 : '') : '＋'}</em></button>`; }).join('')}
     </div>`,
     foot: 담은
@@ -4704,13 +4779,13 @@ function sheetPickVar(exid){
     ${vars(exid).map(v=>{ const last=lastSet(exid,v.k), n=cmOf(S.mid,exid,v.k).length;
       return `<button class="card rowc" data-act="add:${exid}:${v.k}">
         <div><div class="nm">${esc(벌이름(exid, v))}</div>
-        <div class="sm">${last?`지난번 ${setTxt(exid,last)}`:'기록 없음'}${n?` · 코멘트 ${n}`:''}${v.desc?' · 설명 있음':''}</div></div>
+        <div class="sm">${last?`지난번 ${setTxt(exid,last)}`:'기록 없음'}${n?` · 피드백 ${n}`:''}${v.desc?' · 설명 있음':''}</div></div>
         <span class="rt">＋</span></button>`; }).join('')}
     <div class="cyfoot"><span>잘 모르면 <b style="color:var(--gold)">(기본)</b>을 선택하세요</span></div>
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 
-/* 세 칸 — 직전기록 · 기구 사용법 · 코멘트 */
+/* 세 칸 — 직전기록 · 기구 사용법 · 피드백 */
 function 직전요약(e, cur, mid){
   const runs = lastRuns(cur.ex, cur.va, mid, 3);
   if(!runs.length) return { v:'처음', 방향:'' };
@@ -4734,7 +4809,7 @@ function 세칸(e, v, cur, mid, tr, cms, nw, dsc){
       <span class="k">${내시범 ? '트레이너 시범' : '기구 사용법'}</span>
       <span class="v">${시범}</span></button>
     <button class="t3" data-act="exd:${cur.ex}:${cur.va}${tr?':'+mid:''}">
-      <span class="k">${tr?'코멘트 남기기':'설명 · 코멘트'}</span>
+      <span class="k">${tr?'피드백 남기기':'설명 · 피드백'}</span>
       <span class="v">${cms.length?`${cms.length}개`:(dsc?'설명 있음':'—')}</span>
       ${(!tr&&nw)?'<b class="nw">NEW</b>':''}</button>
     ${rm가능 ? `<button class="t4" data-act="rm"><span class="k">1RM 재기</span><span class="v">${rmb ? kg표(rmb.kg)+'kg' : '—'}</span></button>` : ''}</div>`;
@@ -5339,7 +5414,7 @@ function vWorkout(){
     ${/* 2026-10-06 융합 — 위쪽 안내는 한 줄씩. 주기 권장 글은 수업 시작 창·회원 화면에서 이미 봤다(눌러도 나온다) */''}
     ${tr ? 주기줄(wmid, 'tsub:cycle:'+wmid, true) : ''}
     ${tr?`<button class="hline" data-act="tlive:${wmid}">${svg('h_chat',18)}<b>${esc((MEMBERS.find(m=>m.id===wmid)||{}).n||'')} 회원 수업 기록 중</b>
-      <small>종목별 코멘트 남기기</small><i>›</i></button>`:''}
+      <small>종목별 피드백 남기기</small><i>›</i></button>`:''}
     <span class="lbl">오늘 한 운동${S.moveIdx!=null?' — <b style="color:var(--teal)">순서 변경 중</b>':''}</span>
     ${w.items.map((it,i)=>{
       const on = (i===w.cur), mv = (S.moveIdx===i);
@@ -5364,13 +5439,13 @@ function vWorkout(){
     foot: 발판(w) };
 }
 
-/* ── 설명 + 코멘트 ── */
-/* ══ 코멘트 회차 넘겨보기 ══ 2026-09-29 대표
+/* ── 설명 + 피드백 ── */
+/* ══ 피드백 회차 넘겨보기 ══ 2026-09-29 대표
    한 번에 하나만 보인다. 좌우 화살표로 넘기고, **가운데를 누르면 회차 목록**이 펼쳐진다.
    회차 번호는 **오래된 것부터 1번** — 회원이 「몇 번째에 뭐라고 하셨더라」로 찾는다.
-   ⛔ 코멘트가 하나면 화살표도 목록도 안 만든다. */
-function 코멘트회차(cms, K, tr){
-  if(!cms.length) return '<div class="empty">아직 코멘트가 없어요</div>';
+   ⛔ 피드백이 하나면 화살표도 목록도 안 만든다. */
+function 피드백회차(cms, K, tr){
+  if(!cms.length) return '<div class="empty">아직 피드백이 없어요</div>';
   /* ⭐ 차례는 **하나로만 센다** — 오래된 것이 1회차. 화살표·목록·번호가 다 이 차례를 쓴다.
      (2026-09-29: 목록은 배열 차례, 번호는 시각으로 매겨 「6·5·4·2·3회차」로 섞였다) */
   const 줄 = cms.slice().sort((a,b) => String(a.ts||'') < String(b.ts||'') ? -1 : 1);
@@ -5387,7 +5462,7 @@ function 코멘트회차(cms, K, tr){
   const 해글 = 날 ? 날.slice(2,4) + '년' : '';
   const 이름 = (날 ? dateTxt(날) : (c.at||'')) + ' · ' + (i+1) + '회차';
 
-  /* 목록은 **달로 묶는다** — 코멘트가 30개든 100개든 목록은 달 수만큼만 늘어난다.
+  /* 목록은 **달로 묶는다** — 피드백이 30개든 100개든 목록은 달 수만큼만 늘어난다.
      기본으로 지금 보고 있는 회차의 달이 열린다. */
   const 해of = x => String(x.ts||'').slice(0,4);
   const 달of = x => String(x.ts||'').slice(0,7);
@@ -5462,41 +5537,42 @@ function sheetExDesc(exid, vk, mid){
         <button data-act="att:pic:${K}"><span class="ic">📷</span>사진 첨부</button>
         <button data-act="att:vid:${K}"><span class="ic">🎬</span>영상 첨부</button></div>
       ${붙인것(K)}
-      <textarea data-k="cm:${K}" placeholder="코멘트를 입력하세요 — 길이 제한 없어요"></textarea>
+      <textarea data-k="cm:${K}" placeholder="피드백을 입력하세요 — 길이 제한 없어요"></textarea>
       <button class="btn main sm" data-act="sendcm:${exid}:${vk}:${mid}">${S.보내는중?'보내는 중…':'보내기'}</button>
       <div class="hr"></div>
-      <span class="lbl">지난 코멘트 ${cms.length?`${cms.length}개`:''}</span>
-      ${코멘트회차(cms, K, true)}
+      <span class="lbl">지난 피드백 ${cms.length?`${cms.length}개`:''}</span>
+      ${피드백회차(cms, K, true)}
       <div class="desc" style="margin-top:6px"><div class="hd"><b>기본 설명</b>
         ${isEdited(mid,exid,vk)?'<span class="pill q">이 회원용</span>':'<span class="pill q">공통</span>'}
         <button class="chip t" style="margin-left:auto" data-act="editdesc:${exid}:${vk}">수정</button></div>
         <div class="tx">${dsc? esc(dsc) : '아직 설명이 없어요'}</div></div>
       <button class="btn ghost sm" data-act="close">닫기</button>`;
-    return head + `
+    const 피드백만 = !tr && S.screen === 'feedback';      /* 피드백 탭에서 열면 설명 · 시범 없이 피드백만 (2026-10-09 대표) */
+    return head + (피드백만 ? '' : `
       <div class="desc"><div class="hd"><b>기본 설명</b>
         ${isEdited(mid,exid,vk)?'<span class="pill q">이 회원용</span>':'<span class="pill q">공통</span>'}
         ${tr?`<button class="chip t" style="margin-left:auto" data-act="editdesc:${exid}:${vk}">수정</button>`:''}</div>
         <div class="tx">${dsc? esc(dsc) : '아직 설명이 없어요'}</div></div>
-      ${S.screen==='workout' ? '' : demoBox(exOf(exid), v)}
-      <span class="lbl">코멘트 ${cms.length?`${cms.length}개`:''}</span>
-      ${cms.length ? 코멘트회차(cms, K, tr)
-        : 빔('chat','아직 코멘트가 없어요','이 종목을 기록하면 트레이너가 봅니다')}
+      ${S.screen==='workout' ? '' : demoBox(exOf(exid), v)}`) + `
+      <span class="lbl">피드백 ${cms.length?`${cms.length}개`:''}</span>
+      ${cms.length ? 피드백회차(cms, K, tr)
+        : 빔('chat','아직 피드백이 없어요','이 종목을 기록하면 트레이너가 봅니다')}
       ${!tr?(()=>{ const mine = askOf(mid, exid, vk);
         return mine.length
           ? `<div class="note" style="border-color:var(--gold-2)">
-              <b style="color:var(--gold)">코멘트를 요청해 두었어요</b>
-              <div>${esc(mine[0].note||'트레이너가 확인하면 여기에 코멘트가 올라옵니다.')}</div>
+              <b style="color:var(--gold)">피드백을 요청해 두었어요</b>
+              <div>${esc(mine[0].note||'트레이너가 확인하면 여기에 피드백이 올라옵니다.')}</div>
               <button class="btn ghost sm" style="margin-top:8px" data-act="unask:${mine[0].id}">요청 취소</button></div>`
           : `<div class="hr"></div>
              <span class="lbl">이 종목 봐 달라고 요청하기</span>
              <textarea data-k="ask:${K}" placeholder="어디가 궁금한지 한 줄 입력해 주세요 (입력하지 않아도 돼요)"></textarea>
-             <button class="btn sub sm" data-act="ask:${exid}:${vk}">코멘트 요청하기</button>`;
+             <button class="btn sub sm" data-act="ask:${exid}:${vk}">피드백 요청하기</button>`;
       })():''}
       ${tr?`<div class="hr"></div>
         ${askOf(mid, exid, vk).length?`<div class="note" style="border-color:var(--gold-2)">
           <b style="color:var(--gold)">회원이 이 종목을 봐 달라고 했어요</b>
           <div>${esc(askOf(mid, exid, vk)[0].note||'따로 입력한 말은 없습니다.')}</div></div>`:''}
-        <span class="lbl">코멘트 남기기 — 길이 제한 없어요</span>
+        <span class="lbl">피드백 남기기 — 길이 제한 없어요</span>
         <textarea data-k="cm:${K}" placeholder="지금 본 것을 입력하세요"></textarea>
         ${붙인것(K)}
         <div class="chips">
@@ -5545,13 +5621,14 @@ function 세트표(cur, e, mid){
       <div class="two">${칸들.map(c=>`<div><div class="nm">${c[2]}</div><div class="wstp">
         <button class="pm" data-act="d:${c[0]}:${sel}:-${c[4]}" data-rep="1" aria-label="${c[2]} 내리기">−</button>
         <span class="num"><input type="text" inputmode="decimal" data-k="${c[1]}" data-i="${sel}" value="${값(x,c[0])}" aria-label="${c[2]}"><small>${c[3]}</small></span>
-        <button class="pm" data-act="d:${c[0]}:${sel}:${c[4]}" data-rep="1" aria-label="${c[2]} 올리기">＋</button></div></div>`).join('')}</div></div>
+        <button class="pm" data-act="d:${c[0]}:${sel}:${c[4]}" data-rep="1" aria-label="${c[2]} 올리기">＋</button></div></div>`).join('')}</div>
+      ${cur.sets.length > 1 ? `<button class="wdel" data-act="wsdel:${sel}">${sel+1}${단위} 삭제</button>` : ''}</div>
     ${도는중 ? `<div class="wrestbar"><b id="restleft2">${mmss(Math.max(0,(S.rest.until-Date.now())/1000))}</b><span>쉬는 중</span><button data-act="wrestadd">+15초</button><button data-act="wrestx">건너뛰기</button></div>` : ''}
     ${열림 >= 0
       ? `<button class="wdone" data-act="${할 === 끝 ? 'rep' : 'wsd:'+할}">${할+1}${단위} 완료</button>
          <button class="wend" data-act="fin">이 종목 끝내기</button>`
       : `<div class="wdone2"><button class="wdone" data-act="nextset">＋ ${끝+2}${단위} 추가</button><button class="wdone g" data-act="fin">이 종목 끝내기</button></div>`}
-    <div class="wexf"><button data-act="nextset">＋ ${단위} 추가</button><button data-act="wspop">마지막 ${단위} 제거</button></div>`;
+`;
 }
 
 /* ── 시트들 ── */
@@ -5617,13 +5694,10 @@ function sheetMyRecs(){
     <button class="btn ghost sm" data-act="close">닫기</button>`; });
 }
 function sheetCancel(){
-  const w=live(), n=(w?w.items:[]).reduce((a,it)=>a+it.sets.filter(s=>s.done).length,0);
-  openSheet(()=>`<div class="h2">기록을 삭제하고 나갈까요</div>
-    <p class="lbl" style="line-height:1.8">${n?`지금까지 입력한 <b style="color:var(--warn)">${n}세트</b>가 사라져요.`:'입력한 기록이 없어서 그냥 닫혀요.'}<br>
-    잠깐 다른 화면만 보실 거면 왼쪽 위 <b style="color:var(--gold)">‹</b> 를 누르세요. 운동은 그대로 남아 있어요.</p>
+  openSheet(()=>`<div class="h2" style="text-align:center;line-height:1.5;padding:6px 0 4px">운동 기록을 정말로<br>삭제하시겠습니까?</div>
     <div style="display:flex;gap:9px">
-      <button class="btn main" data-act="close">계속 운동하기</button>
-      <button class="btn ghost" data-act="cancel" style="color:var(--warn)">삭제하고 나가기</button></div>`);
+      <button class="btn main" style="flex:1" data-act="close">계속 운동하기</button>
+      <button class="btn ghost" style="flex:1;color:var(--warn);border-color:#5a3830" data-act="cancel">삭제하고 나가기</button></div>`);
 }
 function sheetNewVar(exid){
   const e=exOf(exid);
@@ -5684,8 +5758,8 @@ function vSummary(){
 
     <div class="grid2">${Object.entries(times).slice(0,4).map(([k,v])=>
       `<div class="tile"><span class="k">${esc(k)}</span><span class="v">${parseInt(durTxt(v))}<small> ${durTxt(v).slice(-1)}</small></span></div>`).join('')}</div>
-    ${S.who==='tr' && 코멘트0개(w.mid) ? `<div class="note" style="border-color:var(--gold-2)">
-      <b style="color:var(--gold)">코멘트 0개</b> — 수업을 ${수업횟수(w.mid)}번 했는데 아직 하나도 없어요.<br>
+    ${S.who==='tr' && 피드백0개(w.mid) ? `<div class="note" style="border-color:var(--gold-2)">
+      <b style="color:var(--gold)">피드백 0개</b> — 수업을 ${수업횟수(w.mid)}번 했는데 아직 하나도 없어요.<br>
       아래 종목 옆 <b>💬</b> 를 눌러 시작해 보세요.</div>` : ''}
     <span class="lbl">오늘은 여기까지</span>
     ${w.items.map(it=>{ const n = S.who==='tr' ? cmOf(w.mid,it.ex,it.va).length : 0;
@@ -5699,7 +5773,7 @@ function vSummary(){
     <button class="btn ghost" data-act="resume:${w.id}">이어서 계속하기</button>
     <div class="note">잘못 눌러 끝내셨나요? 여기서 <b>그대로 되돌려</b> 이어서 하실 수 있어요. 시간도 이어집니다.</div>`,
     foot: S.who==='tr'
-      ? `<button class="btn sub" data-act="tw:${w.id}">코멘트 남기기</button>
+      ? `<button class="btn sub" data-act="tw:${w.id}">피드백 남기기</button>
          <button class="btn main" data-act="tm:${w.mid}">회원 화면으로</button>`
       : `<button class="btn sub" data-act="tab:records">분석 보기</button>
          <button class="btn main" data-act="tab:home">홈으로</button>` };
@@ -5709,7 +5783,7 @@ const 리포트링크 = wid => location.origin + location.pathname + '?rp=' + wi
 /* ══ 리포트 언제 나가나 ══ 2026-09-29 대표
    「수업기록 완료하면 리포트 보내기가 자동으로 가는 것도 좋을 거 같아」
    「그러면 끝나고 30분 뒤니까 발송 전인지 발송 완료인지만 체킹되면 되겠다」
-   수업을 마치면 **30분 뒤**로 예약한다. 그 사이에 트레이너가 코멘트를 올리거나
+   수업을 마치면 **30분 뒤**로 예약한다. 그 사이에 트레이너가 피드백을 올리거나
    잘못 끝낸 것을 취소할 수 있다. 보내는 때가 아니면(00~05시) 그날 05시로 민다. */
 const 자동분 = 30;
 function 나갈시각(분){
@@ -5745,18 +5819,18 @@ async function 리포트상태(wid){
   try{ return (await sget('report_sends?select=state,send_at,sent_at&id=eq.rs_' + encodeURIComponent(wid)))[0] || null; }
   catch(e){ return null; }
 }
-/* ══ 리포트에 뜨는 코멘트 ══ 2026-09-29 대표
-   「종목에는 그동안의 코멘트가 쌓이고 / 코멘트 남기는 건 수업하고 남길 수 있게」
-   코멘트는 **한 종류**다. 들어가는 문이 수업이고, 서랍은 종목이다.
-     종목 사전에서 보면 → 그 종목의 코멘트 전부
+/* ══ 리포트에 뜨는 피드백 ══ 2026-09-29 대표
+   「종목에는 그동안의 피드백이 쌓이고 / 피드백 남기는 건 수업하고 남길 수 있게」
+   피드백은 **한 종류**다. 들어가는 문이 수업이고, 서랍은 종목이다.
+     종목 사전에서 보면 → 그 종목의 피드백 전부
      수업 리포트에서 보면 → **그 수업에서 남긴 것만**
-   ⚠ 2026-09-29 이전 코멘트에는 `wid` 가 없다(그때는 안 담았다). 그건 **날짜+종목**으로 맞춘다.
+   ⚠ 2026-09-29 이전 피드백에는 `wid` 가 없다(그때는 안 담았다). 그건 **날짜+종목**으로 맞춘다.
       앞으로 쓰는 것부터 정확해진다. */
-function 수업코멘트(w, it){
+function 수업피드백(w, it){
   const 다 = cmOf(w.mid, it.ex, it.va);
   const 이수업 = 다.filter(c => c.wid === w.id);
   if(이수업.length) return 이수업;
-  return 다.filter(c => !c.wid && String(c.ts || '').slice(0,10) === w.date);   /* 옛 코멘트 */
+  return 다.filter(c => !c.wid && String(c.ts || '').slice(0,10) === w.date);   /* 옛 피드백 */
 }
 
 /* ⛔ 사진·영상은 아직 **공개 버킷**에 있다 — 주소만 알면 아무나 받는다 (2026-09-29 실측).
@@ -5764,7 +5838,7 @@ function 수업코멘트(w, it){
    켤 때 고칠 곳은 여기 한 줄뿐이다 — 그리는 코드는 이미 다 있다. */
 const 리포트사진켬 = false;
 
-/* ── 코멘트 안내 그만 받기 · 동의 화면 ── 2026-09-30 */
+/* ── 피드백 안내 그만 받기 · 동의 화면 ── 2026-09-30 */
 async function 끔동의화면(key){
   const 판 = document.getElementById('app') || document.body;
   const 그리기 = h => { 판.innerHTML = '<div class="cmoffwrap">' + h + '</div>'; };
@@ -5782,17 +5856,17 @@ async function 끔동의화면(key){
   }
   if(m.cm_optout_at){
     그리기('<div class="cmoffbox ok"><div class="ttl">이미 그만 받고 계세요</div>'
-      + '<p>' + esc(m.name) + ' 회원님은 코멘트 안내를 받지 않습니다.<br>'
+      + '<p>' + esc(m.name) + ' 회원님은 피드백 안내를 받지 않습니다.<br>'
       + '다시 받고 싶으시면 담당 트레이너에게 말씀해 주세요.</p></div>');
     return;
   }
 
   그리기('<div class="cmoffbox">'
-    + '<div class="ttl">코멘트 안내 그만 받기</div>'
+    + '<div class="ttl">피드백 안내 그만 받기</div>'
     + '<p><b>' + esc(m.name) + '</b> 회원님,<br>'
-    + '앞으로 <b>코멘트 관련 안내를 보내지 않습니다.</b></p>'
+    + '앞으로 <b>피드백 관련 안내를 보내지 않습니다.</b></p>'
     + '<ul><li>수업 기록은 그대로 남습니다</li>'
-    + '<li>트레이너가 코멘트를 남길 수는 있습니다</li>'
+    + '<li>트레이너가 피드백을 남길 수는 있습니다</li>'
     + '<li>언제든 트레이너에게 말씀하시면 되돌립니다</li></ul>'
     + '<button class="cmoffgo" id="cmoffgo">동의합니다</button>'
     + '<div class="sub">누르지 않으시면 아무것도 바뀌지 않습니다</div></div>');
@@ -5804,7 +5878,7 @@ async function 끔동의화면(key){
       await spatch('members?cm_optout_key=eq.' + encodeURIComponent(key),
                    { cm_optout_at:new Date().toISOString(), cm_optout_by:'알림톡', cm_optout_key:null });
       그리기('<div class="cmoffbox ok"><div class="ttl">그만 받기로 했습니다</div>'
-        + '<p>' + esc(m.name) + ' 회원님,<br>앞으로 코멘트 안내를 보내지 않습니다.<br>'
+        + '<p>' + esc(m.name) + ' 회원님,<br>앞으로 피드백 안내를 보내지 않습니다.<br>'
         + '되돌리고 싶으시면 담당 트레이너에게 말씀해 주세요.</p></div>');
     }catch(e){
       this.disabled = false; this.textContent = '동의합니다';
@@ -5877,7 +5951,7 @@ async function 리포트상태받기(wid){
    **영상 자동재생 안 함**(누르고 소리도 따로 켠다) · 지나간 영상 멈춤.
    바둑판을 새로 짜면 같은 것을 두 벌 고쳐야 하고 한쪽을 잊는다.
    「몇 장인지 한눈에」는 나눔 칩과 「1 / 3」이 이미 해 준다. */
-const 코멘트그림 = c => (c.media && c.media.length) ? 넘겨보기(c.media, c.id) : '';
+const 피드백그림 = c => (c.media && c.media.length) ? 넘겨보기(c.media, c.id) : '';
 
 /* 리포트 맨 위 제목 — 「무엇을 보고 있는지」를 한눈에 (2026-09-29 대표
    「가장 상단에 n월n일 수업기록인지 나타내면 좋겠다」).
@@ -5914,14 +5988,14 @@ function vReport(){
     const d = 전==null ? null : Math.round((오늘-전)*10)/10;
     const cl = d==null ? 'eq' : d>0 ? 'up' : d<0 ? 'dn' : 'eq';
     const 글 = d==null ? '처음' : d>0 ? `▲${kgfmt(d)}` : d<0 ? `▼${kgfmt(-d)}` : '그대로';
-    /* 코멘트가 없으면 **줄을 안 만든다** — 「코멘트 없음」도 안 쓴다 (2026-09-29 대표)
-       ⭐ 딱 하나 예외 (2026-09-30 대표 「첫 코멘트 없음이 강조되어야 하고」):
-          그 종목에 코멘트가 **한 번도 없으면** 트레이너에게만 「첫 코멘트 없음」을 띄운다.
-          코멘트는 있는데 이번 회차에만 없는 것은 **지금 그대로** 아무 줄도 안 만든다.
+    /* 피드백이 없으면 **줄을 안 만든다** — 「피드백 없음」도 안 쓴다 (2026-09-29 대표)
+       ⭐ 딱 하나 예외 (2026-09-30 대표 「첫 피드백 없음이 강조되어야 하고」):
+          그 종목에 피드백이 **한 번도 없으면** 트레이너에게만 「첫 피드백 없음」을 띄운다.
+          피드백은 있는데 이번 회차에만 없는 것은 **지금 그대로** 아무 줄도 안 만든다.
           회원 화면에는 안 띄운다 — 트레이너 사정이지 회원이 볼 것이 아니다. */
-    const 다코멘트 = cmOf(w.mid, it.ex, it.va);
-    const 첫없음 = tr && !다코멘트.length && !코멘트끔(w.mid);
-    const cs = 수업코멘트(w, it);
+    const 다피드백 = cmOf(w.mid, it.ex, it.va);
+    const 첫없음 = tr && !다피드백.length && !피드백끔(w.mid);
+    const cs = 수업피드백(w, it);
     const 장 = cs.reduce((a,c)=> a + (+c.pics||0), 0), 영 = cs.reduce((a,c)=> a + (+c.vids||0), 0);
     const 붙 = 리포트사진켬 ? [장 ? '사진 ' + 장 : '', 영 ? '영상 ' + 영 : ''].filter(Boolean).join(' · ') : '';
     return `<div class="trow">
@@ -5934,7 +6008,7 @@ function vReport(){
           ${붙 ? `<span class="at">${esc(붙)}</span>` : ''}
           ${cs.length > 1 ? `<span class="at">＋${cs.length-1}</span>` : ''}</button>`
         : 첫없음 ? `<button class="rpcm none" data-act="rpcm:${it.ex}:${it.va}">
-          <span class="ic">✎</span><span class="tx"><b>첫 코멘트 없음</b> — 이 종목은 아직 하나도 없어요</span>
+          <span class="ic">✎</span><span class="tx"><b>첫 피드백 없음</b> — 이 종목은 아직 하나도 없어요</span>
           <span class="at">남기기 ›</span></button>` : '');
     }).join('');
 
@@ -5957,8 +6031,8 @@ function vReport(){
   const rt = w.rid ? rOf(w.rid) : null, 루틴이름 = rt ? rt.n : (w.title || ''), 담당 = (MEMBERS.find(x=>x.id===mid)||{}).tr || '';
   const 받침 = t => { const c = (t||'').charCodeAt((t||'').length-1); return c >= 0xAC00 && c <= 0xD7A3 && (c - 0xAC00) % 28 !== 0; };
   const 종목수 = w.items.filter(it=>it.sets.length && !isMemo(it.ex)).length, 세트수 = w.items.reduce((a,it)=> a + (isMemo(it.ex) ? 0 : it.sets.length), 0), 무게 = totalKg(w);
-  /* 코멘트 모음 — 종목 순서대로. 수업 날이 지나서 올린 것은 「수업 뒤 추가」 */
-  const 코멘트들 = []; w.items.filter(it=>!isMemo(it.ex)).forEach(it => 수업코멘트(w, it).forEach(c => 코멘트들.push({ c, it })));
+  /* 피드백 모음 — 종목 순서대로. 수업 날이 지나서 올린 것은 「수업 뒤 추가」 */
+  const 피드백들 = []; w.items.filter(it=>!isMemo(it.ex)).forEach(it => 수업피드백(w, it).forEach(c => 피드백들.push({ c, it })));
   const 코카드 = ({c, it}) => { const 뒤 = String(c.ts||'').slice(0,10) > w.date;
     const 붙 = [(+c.pics||0) ? '사진 ' + c.pics : '', (+c.vids||0) ? '영상 ' + c.vids : ''].filter(Boolean).join(' · ');
     return `<button class="rp2cm" data-act="rpcm:${it.ex}:${it.va}">
@@ -5973,11 +6047,11 @@ function vReport(){
     const 전w = workoutsOf(mid).find(x => x.date < w.date && x.items.some(i=>i.ex===it.ex && i.va===it.va && i.sets.length));
     const 전 = 전w ? top(전w.items.find(i=>i.ex===it.ex && i.va===it.va).sets) : null, d = 전==null ? null : Math.round((오늘-전)*10)/10;
     const 최고 = it.sets.reduce((a,x)=> (e.cardio ? (+x.reps||0) : (+x.kg||0)) >= (e.cardio ? (+a.reps||0) : (+a.kg||0)) ? x : a, it.sets[0]);
-    const 첫없음 = tr && !cmOf(mid, it.ex, it.va).length && !코멘트끔(mid);
+    const 첫없음 = tr && !cmOf(mid, it.ex, it.va).length && !피드백끔(mid);
     return `<div class="rp2row"><span class="n">${esc(exName(it.ex,it.va))}<small>${it.sets.length}세트${e.cardio ? '' : ' · ' + (+최고.reps||0) + '회'}</small></span>
         <span class="v">${kgfmt(오늘)}<small>${단위}</small></span>
         <span class="d ${d==null ? 'new' : d>0 ? 'up' : ''}">${d==null ? '처음' : d>0 ? '▲ '+kgfmt(d) : d<0 ? '▼ '+kgfmt(-d) : '그대로'}</span></div>`
-      + (첫없음 ? `<button class="rpcm none" data-act="rpcm:${it.ex}:${it.va}"><span class="ic">✎</span><span class="tx"><b>첫 코멘트 없음</b> — 이 종목은 아직 하나도 없어요</span><span class="at">남기기 ›</span></button>` : '');
+      + (첫없음 ? `<button class="rpcm none" data-act="rpcm:${it.ex}:${it.va}"><span class="ic">✎</span><span class="tx"><b>첫 피드백 없음</b> — 이 종목은 아직 하나도 없어요</span><span class="at">남기기 ›</span></button>` : '');
   }).join('');
   /* 몸의 변화 — **지난 수업 뒤로 새로 올라온 것이 있을 때만**, 건강정보 동의한 회원에게만 */
   const 앞수업 = workoutsOf(mid).filter(x => x.kind==='수업' && x.id!==w.id && x.date < w.date && 세트있나(x)).map(x=>x.date).sort().pop() || '';
@@ -6000,7 +6074,7 @@ function vReport(){
   return { top: bar('수업 리포트', `<span class="sub">${esc(이름)} 회원님</span>`,
       만보기 ? null : (tr ? 'fendview:'+w.id : 'tab:home')),
     tabs: (tr || 만보기) ? 0 : 1, body:`
-    <div class="rp2hd"><span class="lg">GLAD GYM · 수업 리포트</span>
+    <div class="rp2hd"><span class="lg">GLAD GYM · ${(n => n ? n + '번째 ' : '')(w.kind==='수업' ? workoutsOf(mid).filter(x => x.kind==='수업' && 세트있나(x) && (x.date < w.date || (x.date === w.date && x.id <= w.id))).length : 0)}수업 리포트</span>
       <h1>${esc(이름)} 회원님,<br>${루틴이름 ? `오늘 <b>${esc(루틴이름)}</b> ${받침(루틴이름) ? '루틴을' : '루틴을'}<br>끝까지 해내셨어요` : '오늘 수업을<br>끝까지 해내셨어요'}</h1>
       <p>${esc(수업제목(w).replace(/ (수업|개인운동) 기록$/, ''))}${담당 ? ' · ' + esc(담당) + ' 트레이너와 함께' : ''}</p></div>
     <div class="sstat3 rp2big">
@@ -6008,7 +6082,7 @@ function vReport(){
       <div class="t"><span class="k">운동 시간</span><span class="v">${Math.round((w.dur||0)/60)}<small>분</small></span></div>
       <div><span class="k">든 무게</span><span class="v">${무게 >= 1000 ? (무게/1000).toFixed(1) : Math.round(무게)}<small>${무게 >= 1000 ? '톤' : 'kg'}</small></span></div>
     </div>
-    ${코멘트들.length ? `<div class="rp2sec">트레이너 코멘트 <small>${코멘트들.length}개</small></div>${코멘트들.map(코카드).join('')}` : ''}
+    ${피드백들.length ? `<div class="rp2sec">트레이너 피드백 <small>${피드백들.length}개</small></div>${피드백들.map(코카드).join('')}` : ''}
     ${루틴줄 ? `<div class="rp2sec">오늘 한 루틴 <small>지난번과 비교</small></div>
       <div class="rp2rt">${rt ? `<div class="rth"><i>루틴 ${esc(String(rt.no||''))}</i><b>${esc(rt.n)}</b><small>${종목수}종목 · ${세트수}세트</small></div>` : ''}${루틴줄}</div>` : ''}
     ${몸}
@@ -6019,7 +6093,7 @@ function vReport(){
          ${리포트발(w)}`
       : 만보기
       ? `<div class="note" style="margin:0">회원님의 수업 기록입니다.
-           앱에서 지난 기록과 코멘트를 함께 보실 수 있어요.</div>`
+           앱에서 지난 기록과 피드백을 함께 보실 수 있어요.</div>`
       : `<button class="btn main" data-act="tab:home">홈으로</button>` };
 }
 /* ══ 리포트 발 ══ 2026-09-30 대표
@@ -6048,7 +6122,7 @@ function 리포트발(w){
     return `<div class="note" style="margin:0;border-color:var(--gold-2)">
       <b style="color:var(--gold)">리포트는 자동 발송됩니다</b>
       ${st.send_at ? '<br>' + esc(시각글(new Date(st.send_at))) + ' 에 나갑니다.' : ''}
-      <br>그 사이 코멘트나 사진을 올리시면 함께 보입니다.</div>`;
+      <br>그 사이 피드백이나 사진을 올리시면 함께 보입니다.</div>`;
 
   /* 예약 줄이 아직 없다 — 수업을 마치는 순간 저절로 잡힌다 */
   return `<div class="note" style="margin:0">수업을 마치면 <b>30분 뒤 자동으로</b> 나갑니다.</div>`;
@@ -6121,9 +6195,7 @@ function vRecords(){
       ${tot.sets ? bodyMap(ps, anaWeeks(mid, per), (D.intake[mid]||{}).sex) : 빔('chart','이 기간에 기록이 없어요','위에서 기간을 넓혀 보세요')}
       ${tot.sets ? (()=>{ const W = anaWeeks(mid, per);
         const g1 = 등급(ps[hi]/W), g2 = 등급(ps[lo]/W);
-        return `<div class="note" style="margin-top:4px">
-          <b style="color:${g1.색}">${hi} ${ps[hi]}세트</b> — 주당 평균 ${(ps[hi]/W).toFixed(1)}세트로 <b>${g1.글}</b>. ${g1.말}<br>
-          <b style="color:${g2.색}">${lo} ${ps[lo]}세트</b> — 주당 평균 ${(ps[lo]/W).toFixed(1)}세트로 <b>${g2.글}</b>. ${g2.말}</div>`; })() : ''}
+        return 균형말(ps, W); })() : ''}
     </div>
 
     <span class="lbl">종목별 변화</span>
@@ -6170,7 +6242,7 @@ function daysPane(mid){
         ${picImg(m.path)}
         <div><div class="nm">${esc(m.slot)}${m.kcal?` · ${m.kcal}kcal`:''}</div>
         <div class="sm">${esc(m.memo||'')}</div></div>
-        ${m.note?'<span class="pill q">코멘트</span>':''}</button>`).join('')}`
+        ${m.note?'<span class="pill q">피드백</span>':''}</button>`).join('')}`
      : 빔('bowl','이 날은 올린 식단이 없어요')}`;
 }
 function vDays(){
@@ -6196,7 +6268,7 @@ function vRecord(){
     + items.map((it,i)=>`<div class="card">
         <div class="rowc" style="align-items:baseline">
           <div><div class="nm">${esc(exName(it.ex,it.va))}</div></div>
-          ${ed?'':`<button class="chip t" data-act="exd:${it.ex}:${it.va}${S.who==='tr'?':'+w.mid:''}">설명 · 코멘트 ${cmOf(S.who==='tr'?w.mid:S.mid,it.ex,it.va).length}</button>`}
+          ${ed?'':`<button class="chip t" data-act="exd:${it.ex}:${it.va}${S.who==='tr'?':'+w.mid:''}">설명 · 피드백 ${cmOf(S.who==='tr'?w.mid:S.mid,it.ex,it.va).length}</button>`}
         </div>
         ${ed
           ? it.sets.map((st,j)=>`<button class="setrow2 ed" data-act="rset:${i}:${j}">
@@ -6310,7 +6382,7 @@ function sheetFbCal(){
       cells += `<button class="cday ${ds===sel?'sel':''} ${n?'has':''} ${ds>TODAY?'fut':''} ${ds===TODAY?'tdy':''}"
         data-act="fbd:${ds}"><u>${d}</u>${n?`<i>${n}</i>`:''}</button>`;
     }
-    return `<div class="h2">날짜 선택 <small>코멘트 온 날에 표시</small></div>
+    return `<div class="h2">날짜 선택 <small>피드백 온 날에 표시</small></div>
       <div class="wkhd"><button data-act="fbmon:-1">‹</button>
         <span class="d">${y}년 ${m}월</span>
         <button data-act="fbmon:1">›</button></div>
@@ -6377,7 +6449,7 @@ function sheetDietCal(){
   });
 }
 
-/* 코멘트 요청 — 수업 날짜 고르기 */
+/* 피드백 요청 — 수업 날짜 고르기 */
 function wsOnDay(mid, d){ return D.workouts.filter(w=>w.mid===mid && w.done && w.date===d && w.items.some(i=>i.sets.length)); }
 function sheetAskCal(){
   S.askMon = S.askMon || (S.fbDay||TODAY).slice(0,7);
@@ -6405,7 +6477,7 @@ function sheetAskCal(){
 /* 한 종목 요청 보내기 */
 function sheetAskFor(ex, va){
   openSheet(()=>`
-    <div class="h2">${esc(exName(ex,va))} <small>코멘트 요청</small></div>
+    <div class="h2">${esc(exName(ex,va))} <small>피드백 요청</small></div>
     <textarea data-k="ask:${ex}|${va}" placeholder="어디가 궁금한지 한 줄 입력해 주세요 (입력하지 않아도 돼요)"></textarea>
     <button class="btn blue" data-act="ask:${ex}:${va}:x">요청 보내기</button>
     <button class="btn ghost sm" data-act="close">닫기</button>`);
@@ -6416,7 +6488,7 @@ function sheetAskFor(ex, va){
 const 부위색 = { '가슴':'#d98c7a', '어깨':'#e0b070', '등':'#7fa8c9', '팔':'#b39ad6',
   '하체':'#86c19a', '복근':'#e2c96a', '유산소':'#8fd0d6', '기타':'#9a938a' };
 
-/* ── 코멘트 한 장 ── 트레이너 배지 + 말풍선. 안 읽은 것은 테두리로 알려 준다 */
+/* ── 피드백 한 장 ── 트레이너 배지 + 말풍선. 안 읽은 것은 테두리로 알려 준다 */
 function cmCard(c, 날짜보이기){
   const 이름 = (c.tr || '').trim();
   const 첫자 = 이름 ? 이름.slice(0, 1) : '트';   /* 성 한 글자 — 「양인수」면 「양」 */
@@ -6440,14 +6512,14 @@ function vFeedback(){
   const nw=cms.filter(c=>!c.read).length;
   cms.forEach(c=>c.read=true); save();
   const mode = S.fbMode || 'recent';
-  /* 갈래 탭 = 분석과 같은 금테 한 줄 · 그 아래 요약 한 줄 (2026-10-06 융합). 숫자는 실제 코멘트 수 */
+  /* 갈래 탭 = 분석과 같은 금테 한 줄 · 그 아래 요약 한 줄 (2026-10-06 융합). 숫자는 실제 피드백 수 */
   const 트 = [...new Set(cms.map(c=>(c.tr||'').trim()).filter(Boolean))];
   const head = `<div class="anatab fbtab">
     <button class="${mode==='recent'?'on':''}" data-act="fbm:recent">최근</button>
     <button class="${mode==='day'?'on':''}" data-act="fbm:day">최근 수업</button>
     <button class="${mode==='part'?'on':''}" data-act="fbm:part">종목별</button></div>
     <div class="fbsum"><span class="mi">${svg('h_chat',20)}</span>
-      <span class="ft"><b>${nw ? `새 코멘트 ${nw}개` : (cms.length ? '새 코멘트는 없어요' : '아직 받은 코멘트가 없어요')}</b>
+      <span class="ft"><b>${nw ? `새 피드백 ${nw}개` : (cms.length ? '새 피드백은 없어요' : '아직 받은 피드백이 없어요')}</b>
         <small>지금까지 ${cms.length}개${트.length ? ' · ' + esc(트.join(', ')) + ' 트레이너' : ''}</small></span>
       ${nw ? `<em>NEW</em>` : ''}</div>`;
 
@@ -6456,13 +6528,13 @@ function vFeedback(){
     const ws = wsOnDay(S.mid, sel);
     const rows = [];
     ws.forEach(w => w.items.filter(i=>i.sets.length).forEach(it => rows.push({ w, it })));
-    return { top: bar('코멘트 요청', `<span class="sub">${dateTxt(sel)}</span>`), tabs:1, body:
+    return { top: bar('피드백 요청', `<span class="sub">${dateTxt(sel)}</span>`), tabs:1, body:
       (rows.length ? `<span class="lbl">${dateTxt(sel)} · 봐 달라고 할 종목을 누르세요</span>`
         + rows.map(({w,it})=>{ const on = askOf(S.mid,it.ex,it.va).length, n = cmOf(S.mid,it.ex,it.va).length;
           return `<button class="card rowc ${on?'gold':''}" data-act="${on?`unask:${askOf(S.mid,it.ex,it.va)[0].id}`:`askfor:${it.ex}:${it.va}`}">
             <div><div class="nm ${on?'g':''}">${esc(exName(it.ex,it.va))}</div>
-            <div class="sm">${it.sets.map(x=>setShort(it.ex,x)).join(' · ')}${n?` · 코멘트 ${n}개`:''}</div></div>
-            <span class="pill${on?'':' q'}">${on?'요청함 · 거두기':'코멘트 요청'}</span></button>`; }).join('')
+            <div class="sm">${it.sets.map(x=>setShort(it.ex,x)).join(' · ')}${n?` · 피드백 ${n}개`:''}</div></div>
+            <span class="pill${on?'':' q'}">${on?'요청함 · 거두기':'피드백 요청'}</span></button>`; }).join('')
         : '<div class="empty">이 날은 기록된 종목이 없어요</div>'),
       foot:`<button class="btn blue go" data-act="askpick">다른 날 선택</button>` };
   }
@@ -6472,7 +6544,7 @@ function vFeedback(){
     const list = cmOnDay(S.mid, sel).slice().sort((a,b)=> a.ts < b.ts ? 1 : -1);
     const ws = D.workouts.filter(w => w.mid===S.mid && w.date===sel && w.done);
     return { top: bar('피드백', `<span class="sub">${dateTxt(sel)}</span>`), tabs:1,
-      foot:`<button class="btn blue go" data-act="askpick">코멘트 요청하기</button>`, body: head +
+      foot:`<button class="btn blue go" data-act="askpick">피드백 요청하기</button>`, body: head +
       fbStrip(S.mid) + `
       ${ws.length ? `<span class="lbl">그날 한 운동</span>
         ${ws.map(w=>`<button class="card rowc" data-act="rec:${w.id}">
@@ -6480,17 +6552,17 @@ function vFeedback(){
           <div class="sm">${w.items.filter(i=>i.sets.length).map(i=>esc(exName(i.ex,i.va))).join(' · ')||'세트 없음'}</div></div>
           <span class="rt">${durTxt(w.dur)} ›</span></button>`).join('')}`
         : '<div class="empty">이 날은 운동 기록이 없어요</div>'}
-      <span class="lbl">그날 받은 코멘트 ${list.length?`· ${list.length}개`:''}</span>
+      <span class="lbl">그날 받은 피드백 ${list.length?`· ${list.length}개`:''}</span>
       ${list.length ? list.map(c=>cmCard(c, 0)).join('')
-      : 빔('chat','이 날 받은 코멘트가 없어요')}
-      <div class="note">날짜를 눌러 넘기거나, 가운데 날짜를 눌러 <b>달력에서</b> 선택하세요. 코멘트가 온 날에는 <b style="color:var(--gold)">●</b> 가 붙습니다.</div>` };
+      : 빔('chat','이 날 받은 피드백이 없어요')}
+      <div class="note">날짜를 눌러 넘기거나, 가운데 날짜를 눌러 <b>달력에서</b> 선택하세요. 피드백이 온 날에는 <b style="color:var(--gold)">●</b> 가 붙습니다.</div>` };
   }
 
   if(mode==='recent'){
     return { top: bar('피드백', `<span class="sub">${cms.length}개</span>`), tabs:1,
-      foot:`<button class="btn blue go" data-act="askpick">코멘트 요청하기</button>`, body: head +
+      foot:`<button class="btn blue go" data-act="askpick">피드백 요청하기</button>`, body: head +
       (cms.length? cms.map(c=>cmCard(c, 1)).join('')
-      : 빔('chat','아직 받은 코멘트가 없어요','운동을 기록하면 트레이너가 봅니다')) };
+      : 빔('chat','아직 받은 피드백이 없어요','운동을 기록하면 트레이너가 봅니다')) };
   }
 
   /* 종목별 — 부위 → 종목(하는 법) */
@@ -6505,14 +6577,14 @@ function vFeedback(){
   rows.sort((a,b)=>b.n-a.n);
   const has=rows.filter(r=>r.n>0), none=rows.filter(r=>!r.n);
   return { top: bar('피드백', `<span class="sub">${esc(part)}</span>`), tabs:1,
-    foot:`<button class="btn blue go" data-act="askpick">코멘트 요청하기</button>`, body: head + `
+    foot:`<button class="btn blue go" data-act="askpick">피드백 요청하기</button>`, body: head + `
     <div class="chips">${PARTS.map(p=>`<button class="chip ${p===part?'on':''}" data-act="fbp:${p}">${p}</button>`).join('')}</div>
     ${has.length? has.map(r=>`<button class="card rowc" data-act="exd:${r.ex}:${r.va}">
         <div><div class="nm">${esc(exName(r.ex,r.va))}</div>
-        <div class="sm">코멘트 ${r.n}개 · 최근 ${esc(r.at)}<br>${esc(r.pv.slice(0,26))}…</div></div>
+        <div class="sm">피드백 ${r.n}개 · 최근 ${esc(r.at)}<br>${esc(r.pv.slice(0,26))}…</div></div>
         <span class="pill">${r.n}</span></button>`).join('')
-      : `<div class="empty">${esc(part)}에는 아직 코멘트가 없어요</div>`}
-    ${none.length?`<div class="hr"></div><span class="lbl">아직 코멘트 없음</span>
+      : `<div class="empty">${esc(part)}에는 아직 피드백이 없어요</div>`}
+    ${none.length?`<div class="hr"></div><span class="lbl">아직 피드백 없음</span>
       ${none.map(r=>`<button class="card rowc dim" data-act="exd:${r.ex}:${r.va}">
         <div><div class="nm">${esc(exName(r.ex,r.va))}</div><div class="sm">설명만 있어요</div></div>
         <span class="rt">›</span></button>`).join('')}`:''}` };
@@ -6891,7 +6963,7 @@ function vDiet(){
         <span class="bt"><b>사진으로 기록</b><i>날짜·시간이 찍혀요</i></span></button>
       <button class="big2 row b" data-act="fadd:new">
         <span class="ic ring">${svg('h_lens',22)}</span>
-        <span class="bt"><b>검색해서 기록</b><i>18,000가지 음식</i></span></button>
+        <span class="bt"><b>검색해서 기록</b><i>음식 이름으로 찾아요</i></span></button>
     </div>`}
     ${seqs.length? seqs.map((m,i)=>{ const t=mealSum(m), 것 = m.items||[];
       return `<div class="mealcd">
@@ -7029,7 +7101,7 @@ function sheetMeal(id){
       </div>
       <button class="btn sub sm" data-act="mealkcal:${m.id}">저장</button>`}
     ${m.note?`<div class="cm"><span class="who">${esc(TRAINER)} 트레이너</span><span class="tx">${esc(m.note)}</span></div>`:''}
-    ${tr?`<span class="lbl">코멘트 남기기</span>
+    ${tr?`<span class="lbl">피드백 남기기</span>
       <textarea data-k="mn:${m.id}" placeholder="식단에 한마디">${esc(m.note||'')}</textarea>
       <button class="btn main sm" data-act="mealnote:${m.id}">보내기</button>`:''}
     ${!tr?`<button class="btn ghost sm" data-act="mealdel:${m.id}" style="color:var(--warn)">이 사진 삭제</button>`:''}
@@ -8576,7 +8648,7 @@ function vMe(){
         <span class="mt"><b>${x[1]}</b><small>${x[2]}</small></span><i>›</i></button>`).join('')}</div>
     <div class="hr"></div><span class="lbl">시험용 도구</span>
     <button class="card rowc" data-act="as:tr"><div><div class="nm">트레이너 화면 보기</div>
-      <div class="sm">루틴 지정 · 코멘트 · 설명 수정</div></div><span class="rt">›</span></button>
+      <div class="sm">루틴 지정 · 피드백 · 설명 수정</div></div><span class="rt">›</span></button>
     <button class="card rowc" data-act="reset"><div><div class="nm">처음 상태로 되돌리기</div>
       <div class="sm">입력한 기록이 모두 삭제됩니다</div></div><span class="rt">›</span></button>` };
 }
@@ -9864,9 +9936,9 @@ function bpAdd(kind){
 /* ── 영상 넣기 (2026-09-17 대표: 「영상업로드 추가하고 · 직접 올리는거야」) ──
    ⛔ 왜 다시 굽는가 — 폰이 찍은 1080p60 은 1분에 90MB 다. 저장소도 전송량도 못 버틴다.
       긴 변 720 · 1.2Mbps 로 다시 구우면 30초에 4MB 안팎이 된다.
-   ⛔ 소리 규칙이 **둘로 갈린다** (2026-09-21 대표: 「코멘트에 붙이는 영상은 소리가 나야한다」)
+   ⛔ 소리 규칙이 **둘로 갈린다** (2026-09-21 대표: 「피드백에 붙이는 영상은 소리가 나야한다」)
       · **기구 사용법 · 체형분석(비포애프터)** → **무음.** 폼을 보는 영상이고 옆 사람 말소리가 올라가면 안 된다
-      · **트레이너 코멘트 첨부 영상** → **소리 담는다.** 트레이너 목소리가 그 영상의 알맹이다
+      · **트레이너 피드백 첨부 영상** → **소리 담는다.** 트레이너 목소리가 그 영상의 알맹이다
       쓰는 법: 영상줄이기(파일, 알림, 소리=true) — 소리를 뺄 곳에서는 셋째 값을 주지 않는다.
       ⛔ 영상 딱지는 **음소거를 유지한 채** 소리 트랙만 captureStream 으로 뽑는다.
          음소거를 풀면 브라우저가 자동재생을 막고 굽는 동안 소리가 새어 나온다.
@@ -9899,7 +9971,7 @@ function 영상줄이기(file, 알림, 소리){
       const sc = Math.min(1, 720 / Math.max(w, h));
       w = Math.max(2, Math.round(w * sc / 2) * 2);
       h = Math.max(2, Math.round(h * sc / 2) * 2);
-      /* 소리를 담아야 하는 영상(트레이너 코멘트)만 소리 트랙을 뽑는다.
+      /* 소리를 담아야 하는 영상(트레이너 피드백)만 소리 트랙을 뽑는다.
          못 뽑는 브라우저면 조용히 무음으로 간다 — 올리기 자체가 막히면 안 된다 */
       let 소리트랙 = [];
       if(소리){
@@ -10158,7 +10230,7 @@ function tToday(){
     ${(()=>{ const 식 = (D.meals||[]).filter(m=>m.date===TODAY), 안단 = 식.filter(m=>!m.note).length;
       return `<div class="tmsum btn3">
       <button class="t ${live.length?'':'zero'}" ${live.length ? `data-act="${live.length===1 ? 'tgo:'+live[0].m.id : 'tdlive'}"` : 'disabled'}><small>기록 중인 수업</small><b>${live.length}<i>명</i></b></button>
-      <button class="${todo.length?'':'zero'}" ${todo.length ? 'data-act="tdtodo"' : 'disabled'}><small>코멘트 대기</small><b>${todo.length}<i>건</i></b></button>
+      <button class="${todo.length?'':'zero'}" ${todo.length ? 'data-act="tdtodo"' : 'disabled'}><small>피드백 대기</small><b>${todo.length}<i>건</i></b></button>
       <button class="${식.length?'':'zero'}" ${식.length ? 'data-act="tdmeal"' : 'disabled'}><small>오늘 식단</small><b>${식.length}<i>장</i>${안단 ? `<em class="td안">안 단 것 ${안단}</em>` : ''}</b></button>
     </div>`; })()}
     <div class="hrow">
@@ -10180,10 +10252,10 @@ function sheetTdLive(){
 function sheetTdTodo(){
   const nm = id => (MEMBERS.find(x=>x.id===id)||{}).n || '?';
   openSheet(()=>{ const todo = D.workouts.filter(w=>w.done && unseen(w)).sort((a,b)=> a.date < b.date ? -1 : a.date > b.date ? 1 : 0);      /* 오래된 것부터 */
-    return `<div class="h2">코멘트 안 단 기록 <small>${todo.length}건 · 오래된 것부터</small></div>
+    return `<div class="h2">피드백 안 단 기록 <small>${todo.length}건 · 오래된 것부터</small></div>
     <div class="pickbox"><div class="megrp">${todo.map(w=>{ const n = w.items.filter(it => it.sets.length && cmOf(w.mid, it.ex, it.va).length === 0).length;
       return `<button class="mrow2" data-act="tw:${w.id}"><span class="mi nm1">${esc(nm(w.mid).slice(0,1))}</span>
-        <span class="mt"><b>${esc(nm(w.mid))} · ${dateTxt(w.date)}</b><small>${esc(w.kind||'')} · 코멘트 없는 종목 ${n}개</small></span><em class="go">쓰기 ›</em></button>`; }).join('') || '<div class="empty">다 달았어요</div>'}</div></div>
+        <span class="mt"><b>${esc(nm(w.mid))} · ${dateTxt(w.date)}</b><small>${esc(w.kind||'')} · 피드백 없는 종목 ${n}개</small></span><em class="go">쓰기 ›</em></button>`; }).join('') || '<div class="empty">다 달았어요</div>'}</div></div>
     <button class="btn ghost sm" data-act="close">닫기</button>`; });
 }
 function sheetTdMeal(){
@@ -10194,11 +10266,11 @@ function sheetTdMeal(){
         ${picImg(m.path)}
         <div><div class="nm">${esc(nm(m.mid))} · ${esc(m.slot)}</div>
         <div class="sm">${esc(m.memo||'')}</div></div>
-        ${m.note?'<span class="pill q">봤음</span>':'<span class="pill">코멘트</span>'}</button>`).join('')}</div>
+        ${m.note?'<span class="pill q">봤음</span>':'<span class="pill">피드백</span>'}</button>`).join('')}</div>
     <button class="btn ghost sm" data-act="close">닫기</button>`; });
 }
 
-/* 피드백 — 코멘트 쓸 곳 모아보기 */
+/* 피드백 — 피드백 쓸 곳 모아보기 */
 function tFeed(){
   const nm = id => (MEMBERS.find(x=>x.id===id)||{}).n || '?';
   const mode = S.tfeed || 'ex';
@@ -10218,7 +10290,7 @@ function tFeed(){
       ${rows.length ? rows.map(r=>`<button class="card rowc ${r.nw?'gold':''}" data-act="tmeals:${r.m.id}">
           <div><div class="nm ${r.nw?'g':''}">${esc(r.m.n)} 회원${r.nw?` <span class="pill">new ${r.nw}</span>`:''}</div>
           <div class="sm">최근 ${dateTxt(r.last.date)} · ${esc(r.last.slot)}${r.last.memo?' · '+esc(r.last.memo.slice(0,14)):''}
-            <br>모두 ${r.ms.length}장${r.nw?` · 최근 2주에 코멘트 안 단 것 ${r.nw}장`:' · 최근 것은 다 보셨어요'}</div></div>
+            <br>모두 ${r.ms.length}장${r.nw?` · 최근 2주에 피드백 안 단 것 ${r.nw}장`:' · 최근 것은 다 보셨어요'}</div></div>
           <span class="rt">›</span></button>`).join('')
         : '<div class="empty">아직 올라온 식단이 없어요</div>'}
       <div class="note">회원이 식단 탭에서 사진을 올리면 <b>여기 위로 올라오고 new 가 붙습니다.</b></div>` };
@@ -10251,12 +10323,12 @@ function tFeed(){
         <span class="mi nm1">${esc(nm(w.mid).slice(0,1))}</span>
         <span class="mt"><b>${esc(nm(w.mid))} 회원</b><small>${esc(w.kind||'')}${w.title?' · '+esc(w.title):''} · ${durTxt(w.dur)}</small>
           <small>${종.map(i=>esc(exName(i.ex,i.va))).slice(0,3).join(' · ')}${종.length>3?' 외':''}</small></span>
-        <em class="go ${miss?'':'q'}">${miss?`코멘트 ${miss}개 남음 ›`:'다 남겼어요'}</em></button>`; }).join('')}</div>`
+        <em class="go ${miss?'':'q'}">${miss?`피드백 ${miss}개 남음 ›`:'다 남겼어요'}</em></button>`; }).join('')}</div>`
      : '<div class="empty">이 날은 기록된 수업이 없어요</div>'}
-    ${todo.length?`<span class="lbl">아직 코멘트 안 단 기록 · ${todo.length}건</span>
+    ${todo.length?`<span class="lbl">아직 피드백 안 단 기록 · ${todo.length}건</span>
       <div class="megrp fbg">${todo.slice(0,4).map(w=>`<button class="mrow2" data-act="tw:${w.id}">
         <span class="mi nm1">${esc(nm(w.mid).slice(0,1))}</span>
-        <span class="mt"><b>${esc(nm(w.mid))} · ${dateTxt(w.date)}</b><small>${esc(w.kind||'')} · 코멘트 없는 종목 ${noCmItems(w).length}개</small></span><em class="go">쓰기 ›</em></button>`).join('')}
+        <span class="mt"><b>${esc(nm(w.mid))} · ${dateTxt(w.date)}</b><small>${esc(w.kind||'')} · 피드백 없는 종목 ${noCmItems(w).length}개</small></span><em class="go">쓰기 ›</em></button>`).join('')}
         ${todo.length > 4 ? `<button class="mrow2 more" data-act="tdtodo"><span class="mt"><b>${todo.length}건 모두 보기</b></span><i>›</i></button>` : ''}</div>`:''}` };
 }
 
@@ -10272,7 +10344,7 @@ function tMeals(){
     <div class="sm">${esc(x.memo||'')}</div></div>
     ${x.note?'<span class="pill q">봤음</span>':'<span class="pill">쓰기 ›</span>'}</button>`;
   return { top: bar(esc(m.n)+' 식단', `<span class="sub">${ms.length}장</span>`, 'ttab:t_feed'), body:`
-    ${nw.length?`<span class="lbl">최근 2주 · 코멘트 안 단 것 ${nw.length}장</span>${nw.map(row).join('')}<div class="hr"></div>`:''}
+    ${nw.length?`<span class="lbl">최근 2주 · 피드백 안 단 것 ${nw.length}장</span>${nw.map(row).join('')}<div class="hr"></div>`:''}
     <span class="lbl">지난 것 ${ms.length>40?'· 최근 40장':''}</span>
     ${ms.filter(x=>nw.indexOf(x)<0).slice(0,40).map(row).join('') || '<div class="empty">없어요</div>'}` };
 }
@@ -10291,7 +10363,7 @@ function tTools(){
     <button class="card rowc" data-act="qa"><div><div class="nm">자주 묻는 질문</div>
       <div class="sm">플래너 Q&A ${QA.length}개</div></div><span class="rt">›</span></button>
     <button class="card rowc" data-act="tfm2:diet"><div><div class="nm">식단 모아보기</div>
-      <div class="sm">올라온 사진 ${(D.meals||[]).length}장 · 코멘트 안 단 것 ${mealTodo().length}장</div></div><span class="rt">›</span></button>
+      <div class="sm">올라온 사진 ${(D.meals||[]).length}장 · 피드백 안 단 것 ${mealTodo().length}장</div></div><span class="rt">›</span></button>
     <div class="hr"></div>
     <button class="card rowc" data-act="newmem"><div><div class="nm">＋ 회원 새로 만들기</div>
       <div class="sm">상담일지부터 처음부터</div></div><span class="rt">›</span></button>
@@ -10359,7 +10431,7 @@ function tMember(){
             stroke-dasharray="${(C*p).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 38 38)"/>` : ''}</svg>
           <i><b>${이번주}${목 ? `<u>/${목}</u>` : ''}</b><small>이번 주</small></i></span>
         <div class="tmb">${lv
-          ? `<button class="g" data-act="tgo:${m.id}">이어서 기록하기</button><button class="t" data-act="tlive:${m.id}">종목별 코멘트</button>`
+          ? `<button class="g" data-act="tgo:${m.id}">이어서 기록하기</button><button class="t" data-act="tlive:${m.id}">종목별 피드백</button>`
           : `<button class="g" data-act="tstartask:${m.id}">수업 시작</button><button class="t" data-act="go:t_routines">${r ? '오늘 지정 ✓' : '오늘 지정'}</button>`}</div>
         <div class="tmf">${lv ? `지금 운동 중 · ${esc(lv.title||'')}` : (r ? `오늘 지정 · ${esc(t.kind)} · 루틴 ${r.no} ${esc(r.n)}` : '오늘 지정한 루틴이 아직 없어요')}</div>
       </div>`; })()}
@@ -10395,7 +10467,7 @@ function tMember(){
 const 기록줄 = w => `<button class="card rowc" data-act="tw:${w.id}">
       <div><div class="nm">${dateTxt(w.date)} · ${esc(w.kind||'')}</div>
       <div class="sm">${w.items.length}종목 · ${durTxt(w.dur)} · 총 ${Math.round(totalKg(w)).toLocaleString()}kg</div></div>
-      <span class="pill q">코멘트 ›</span></button>`;
+      <span class="pill q">피드백 ›</span></button>`;
 /* 지난 운동 기록 모두 — 화면에 끝없이 늘어놓지 않고 창 안에서 스크롤 (2026-10-05 대표) */
 function sheetTWAll(mid){
   const m = MEMBERS.find(x=>x.id===mid) || {n:''};
@@ -10410,30 +10482,30 @@ function sheetTWAll(mid){
 function tLive(){
   const lv=liveOf(S.tmid); if(!lv) return tMembers();
   const m=MEMBERS.find(x=>x.id===lv.mid);
-  return { top: bar(m.n+' · 코멘트 남기기', (lv.startAt ? `<span class="tm" id="tm">${mmss((Date.now()-lv.startAt)/1000)}</span>`
+  return { top: bar(m.n+' · 피드백 남기기', (lv.startAt ? `<span class="tm" id="tm">${mmss((Date.now()-lv.startAt)/1000)}</span>`
       : `<button class="chip t" data-act="timego">시간 재기 ▶</button>`), 'tm:'+m.id),
     keepScroll:true, body:
     lv.items.map((it,i)=>{ const sent=D.cm.filter(c=>c.mid===m.id&&c.ex===it.ex&&c.va===it.va&&c.at==='방금');
       return `<button class="card ${i===lv.cur?'gold':''}" data-act="exd:${it.ex}:${it.va}:${m.id}">
         <div class="nm ${i===lv.cur?'g':''}">${esc(exName(it.ex,it.va))}${i===lv.cur?' · 하는 중':''}</div>
         <div class="sm">${it.sets.filter(s=>s.done).length?it.sets.filter(s=>s.done).map(x=>setShort(it.ex,x)).join(' · '):'아직 안 했어요'}
-        ${sent.length?`<br>방금 코멘트 ${sent.length}개 보냄`:''}<br>설명 보기 · 코멘트 남기기 ›</div></button>`;
+        ${sent.length?`<br>방금 피드백 ${sent.length}개 보냄`:''}<br>설명 보기 · 피드백 남기기 ›</div></button>`;
     }).join('')
-    + `<div class="note">종목을 누르면 코멘트를 남길 수 있어요. <b>지금 하는 종목</b>이 금색입니다.</div>`,
+    + `<div class="note">종목을 누르면 피드백을 남길 수 있어요. <b>지금 하는 종목</b>이 금색입니다.</div>`,
     foot:`<button class="btn main" data-act="tgo:${m.id}">수업 기록으로 돌아가기</button>` };
 }
 function tWrite(){
   const w=D.workouts.find(x=>x.id===S.twid), m=MEMBERS.find(x=>x.id===w.mid);
   const done = w.items.filter(it=>it.sets.length);
-  return { top: bar('코멘트 남기기', `<span class="sub">${esc(m.n)}</span>`, 'ttab:t_feed'), body:
+  return { top: bar('피드백 남기기', `<span class="sub">${esc(m.n)}</span>`, 'ttab:t_feed'), body:
     `<div class="note">${dateTxt(w.date)} · ${esc(w.kind||'')}${w.title?' · '+esc(w.title):''} · ${durTxt(w.dur)}</div>
-     <span class="lbl">종목을 눌러 코멘트 남기기</span>`
+     <span class="lbl">종목을 눌러 피드백 남기기</span>`
     + (done.length ? done.slice().sort((a,b)=> cmOf(m.id,a.ex,a.va).length - cmOf(m.id,b.ex,b.va).length).map(it=>{
         const n = cmOf(m.id,it.ex,it.va).length, ak = askOf(m.id,it.ex,it.va).length;
         return `<button class="card rowc ${n?'':'gold'}" data-act="exd:${it.ex}:${it.va}:${m.id}">
           <div><div class="nm ${n?'':'g'}">${esc(exName(it.ex,it.va))}${ak?' <span class="pill">요청</span>':''}</div>
           <div class="sm">${it.sets.map(x=>setShort(it.ex,x)).join(' · ')}</div></div>
-          <span class="pill${n?' q':''}">${n?`코멘트 ${n}`:'코멘트 쓰기'} ›</span></button>`; }).join('')
+          <span class="pill${n?' q':''}">${n?`피드백 ${n}`:'피드백 쓰기'} ›</span></button>`; }).join('')
       : '<div class="empty">세트를 입력한 종목이 없어요</div>')
     ,
     foot:`<button class="btn blue go" data-act="recedit:${w.id}">기록 수정하기</button>` };
@@ -10917,8 +10989,8 @@ document.addEventListener('click', async ev=>{
     toast('잠겨 있어요 — 자물쇠를 길게 누르면 풀립니다'); return; }
   /* ⛔ 알림톡 링크로 들어온 사람은 리포트 밖으로 못 나간다 (2026-09-29).
      본인 것만 보이게 하는 진짜 문은 전화 인증이다 — 그건 아직 없다. */
-  /* 리포트 안에서 쓰는 것만 열어 둔다 — 코멘트 팝업(rpcm)과 사진 넘겨보기(csl·csk·vmute).
-     ⚠ 2026-09-29: rpcm 을 빼먹어 코멘트가 안 열렸다. 리포트에 단추를 더하면 여기도 같이 적는다. */
+  /* 리포트 안에서 쓰는 것만 열어 둔다 — 피드백 팝업(rpcm)과 사진 넘겨보기(csl·csk·vmute).
+     ⚠ 2026-09-29: rpcm 을 빼먹어 피드백이 안 열렸다. 리포트에 단추를 더하면 여기도 같이 적는다. */
   if(S.rpOnly && !['noop','close','sheet','rpcm','csl','csk','vmute'].includes(k)){
     toast('수업 기록만 보실 수 있어요'); return; }
   switch(k){
@@ -11037,7 +11109,7 @@ document.addEventListener('click', async ev=>{
     case 'mealnote': { const id=rest[0], m=(D.meals||[]).find(x=>x.id===id); if(!m) return;
       const el=document.querySelector('[data-k="mn:'+id+'"]'); const txt=el?el.value.trim():'';
       m.note=txt;
-      sv(spatch('meals','id=eq.'+id,{ trainer_note:txt }), '식단 코멘트');
+      sv(spatch('meals','id=eq.'+id,{ trainer_note:txt }), '식단 피드백');
       toast('보냈어요'); drawSheet(); render(); return; }
     case 'mealdel': { const id=rest[0], m=(D.meals||[]).find(x=>x.id===id); if(!m) return;
       D.meals=D.meals.filter(x=>x.id!==id);
@@ -11325,6 +11397,8 @@ document.addEventListener('click', async ev=>{
     case 'days': S.day = TODAY; go('days'); return;
     case 'dayat': S.day = rest[0]; go('days'); return;
     case 'attend': sheetAttend(S.mid); return;
+    case 'hst': sheetHomeStat(rest[0]); return;
+    case 'hsrpt': closeSheet(); S.rw = rest[0]; go('report'); return;
     case 'goal': S.gd = null; sheetGoal(rest[0]==='new' ? null : rest[0]); return;
     case 'gt': S.gd.t = rest[0]; drawSheet(); return;
     case 'goalsave': 목표저장(); return;
@@ -11351,19 +11425,19 @@ document.addEventListener('click', async ev=>{
     /* ══ 수업 리포트 알림톡 ══ 2026-09-29 대표
        「기록된 걸 그대로 보내기만 하면 된다」
        ⭐ 리포트 내용은 담지 않는다. 회원이 링크를 열면 **그 순간의 기록**을 읽어 그린다.
-          그래서 코멘트·사진을 나중에 올려도 그때 열면 보인다.
+          그래서 피드백·사진을 나중에 올려도 그때 열면 보인다.
           여기서 넣는 건 `report_sends` 한 줄 = **보내 달라는 요청**뿐이다.
        보내는 때 05:00~24:00. 밖이면 담아 뒀다가 05시에 서버(리포트발송.py)가 보낸다. */
-    /* 리포트에서 코멘트를 누르면 — 글 전부, (스위치 켜지면) 사진은 바둑판으로 */
+    /* 리포트에서 피드백을 누르면 — 글 전부, (스위치 켜지면) 사진은 바둑판으로 */
     case 'rpcm': { const w = D.workouts.find(x=>x.id===S.rw); if(!w) return;
       const it = w.items.find(x=>x.ex===rest[0] && x.va===rest[1]); if(!it) return;
-      const cs = 수업코멘트(w, it);
+      const cs = 수업피드백(w, it);
       if(!cs.length) return;
       openSheet(()=>`<div class="h2">${esc(exName(it.ex,it.va))}</div>`
         + cs.map(c=>`<div class="card" style="margin-bottom:8px">
             <div class="sm" style="margin-bottom:6px">${esc(c.tr||'')} 트레이너 · ${esc(c.at||'')}</div>
             <div style="font-size:14px;line-height:1.8;white-space:pre-wrap">${esc(c.tx||'')}</div>
-            ${리포트사진켬 ? 코멘트그림(c) : ''}
+            ${리포트사진켬 ? 피드백그림(c) : ''}
           </div>`).join('')
         + `<button class="btn ghost sm" data-act="close">닫기</button>`);
       return; }
@@ -11390,7 +11464,7 @@ document.addEventListener('click', async ev=>{
           운동 <b>${esc(요약)}</b><br>
           <span style="color:var(--gold)">${esc(언제)}</span></p>
         <p class="note">알림톡에는 <b>링크만</b> 들어갑니다. 회원님이 열 때 그 시점의 기록이 보이니,
-          코멘트나 사진을 나중에 올리셔도 됩니다.</p>
+          피드백이나 사진을 나중에 올리셔도 됩니다.</p>
         <div style="display:flex;gap:9px">
           <button class="btn main" data-act="rsend2:${w.id}">보내기</button>
           <button class="btn ghost" data-act="close">닫기</button></div>`);
@@ -11404,7 +11478,7 @@ document.addEventListener('click', async ev=>{
       await sv(리포트예약(w, 0).then(v => { at = v; }), '리포트 보내기');
       toast(at ? (시각글(at) + ' 발송 예정입니다') : '보낼 목록에 넣었습니다');
       return; }
-    /* 코멘트 회차 — 좌우 넘김 · 가운데 목록 · 목록에서 고르기 (2026-09-29) */
+    /* 피드백 회차 — 좌우 넘김 · 가운데 목록 · 목록에서 고르기 (2026-09-29) */
     /* ⚠ 종목 열쇠(K)는 `ch05|a` 처럼 **막대(|)** 로 잇는다 — 쌍점(:)이 아니다.
        2026-09-29 에 `rest[0]+':'+rest[1]` 로 쪼개 만들어 가운데 단추가 안 먹었다.
        손잡이 이름은 쌍점으로 나뉘니 **K 는 rest[0] 하나**다. */
@@ -11427,8 +11501,8 @@ document.addEventListener('click', async ev=>{
       S.cmIdx = S.cmIdx || {}; S.cmIdx[K] = +rest[1]; S.cmOpen = null; drawSheet(); return; }
     case 'exd': S.vplay=null; S.editDesc=null; S.cmWid=null;
       S.cmOpen=null; sheetExDesc(rest[0], rest[1], rest[2]); return;
-    /* 수업 기록 화면에서 연 코멘트 — **어느 수업인지** 기억해 뒀다가 같이 담는다 (2026-09-29).
-       그래야 그 수업 리포트에 그 코멘트만 뜬다. 종목 사전에는 그대로 다 쌓인다. */
+    /* 수업 기록 화면에서 연 피드백 — **어느 수업인지** 기억해 뒀다가 같이 담는다 (2026-09-29).
+       그래야 그 수업 리포트에 그 피드백만 뜬다. 종목 사전에는 그대로 다 쌓인다. */
     case 'exdw': S.vplay=null; S.editDesc=null; S.cmWid=rest[3];
       sheetExDesc(rest[0], rest[1], rest[2]); return;
     case 'editdesc': { const K=rest[0]+'|'+rest[1]; if(S.draft) delete S.draft['desc:'+K]; S.editDesc=K; drawSheet(); return; }
@@ -11526,7 +11600,7 @@ document.addEventListener('click', async ev=>{
         const cid='c'+Date.now();
         const 몸 = tx || (영상.length ? '영상 보고 자세 확인해 보세요' : '사진 보고 확인해 보세요');
         try{
-          /* ⛔ 파일부터 올린다 — 코멘트를 먼저 넣으면 회원 화면이 첨부 없는 코멘트를 먼저 받아 간다 */
+          /* ⛔ 파일부터 올린다 — 피드백을 먼저 넣으면 회원 화면이 첨부 없는 피드백을 먼저 받아 간다 */
           /* 붙인 차례 그대로 올린다 — comment_media 의 id 가 곧 보는 차례다 */
           const 올린것 = [], 다 = 파일.length;
           for(let i=0;i<파일.length;i++){ const x=파일[i], path=`cm/${mid}/${cid}_${i}.${x.ext}`;
@@ -11548,14 +11622,14 @@ document.addEventListener('click', async ev=>{
             sv(spatch('asks','id=in.('+open.map(a=>a.id).join(',')+')', { done_at: new Date().toISOString() }), '요청 처리');
           }
           toast('보냈어요 · 회원 화면에 바로 떠요');
-        }catch(e){ console.error('코멘트 보내기', e); toast('못 보냈어요 — ' + (e.message||'').slice(0,60)); }
+        }catch(e){ console.error('피드백 보내기', e); toast('못 보냈어요 — ' + (e.message||'').slice(0,60)); }
         finally{ S.보내는중 = false; drawSheet(); }
       })();
       return; }
     case 'delcm': { const cid=rest[0];
       const i=D.cm.findIndex(c=>c.id===cid); if(i<0) return;
       D.cm.splice(i,1);
-      sv(sdel('comments','id=eq.'+cid), '코멘트 삭제');
+      sv(sdel('comments','id=eq.'+cid), '피드백 삭제');
       save(); toast('삭제했어요'); drawSheet(); render(); return; }
     case 'ask': {
       const [ex,va]=rest, K=ex+'|'+va;
@@ -11565,7 +11639,7 @@ document.addEventListener('click', async ev=>{
       const last=(D.workouts.find(w=>w.mid===S.mid && w.done && w.items.some(i=>i.ex===ex&&i.va===va))||{}).id||null;
       D.asks=D.asks||[]; D.asks.unshift({ id, mid:S.mid, ex, va, wid:last, note, ts:new Date().toISOString(), done:false });
       if(S.draft) delete S.draft['ask:'+K];
-      sv(spost('asks',[{ id, member_id:S.mid, variant_id:VID(ex,va), workout_id:last, note }]), '코멘트 요청');
+      sv(spost('asks',[{ id, member_id:S.mid, variant_id:VID(ex,va), workout_id:last, note }]), '피드백 요청');
       toast('요청했어요 · 트레이너에게 바로 떠요');
       if(rest[2]==='x'){ closeSheet(); render(); } else drawSheet();
       return; }
@@ -11856,6 +11930,8 @@ document.addEventListener('click', async ev=>{
       x.done = !x.done; S.wsel = null;
       if(x.done){ x.at = Date.now(); try{ rm추정확인(w, cur, x); }catch(e){ console.warn('1RM 추정', e); } 쉼자동(cur); }
       save(); render(); return; }
+    case 'wsdel': { const cur = w.items[w.cur], i2 = +rest[0]; if(cur.locked || cur.sets.length < 2 || !cur.sets[i2]) return;
+      cur.sets.splice(i2, 1); S.wsel = null; save(); toast((i2+1) + '세트를 삭제했어요'); render(); return; }
     case 'wspop': { const cur = w.items[w.cur]; if(cur.locked) return; if(cur.sets.length < 2){ toast('세트가 하나뿐이에요'); return; }
       cur.sets.pop(); S.wsel = null; save(); toast('마지막 세트를 제거했어요'); render(); return; }
     case 'wrest': { const c = 쉼설정(); try{ localStorage.setItem('gg_rest_on', c.on ? '0' : '1'); }catch(e){} if(c.on) S.rest = null; toast(c.on ? '휴식 타이머를 껐어요' : '휴식 타이머를 켰어요'); render(); return; }
@@ -12417,7 +12493,7 @@ async function finish(){
   }
   /* ══ 수업을 마치면 리포트를 30분 뒤로 예약한다 ══ 2026-09-29 대표
      ⛔ 안전장치 셋 — ① 「수업」만 (개인운동은 안 보낸다)  ② 기록된 세트가 있어야
-        ③ **30분 뒤** — 그 사이 코멘트를 올리거나 잘못 끝낸 것을 취소할 수 있다
+        ③ **30분 뒤** — 그 사이 피드백을 올리거나 잘못 끝낸 것을 취소할 수 있다
      이미 예약·발송된 수업이면 건드리지 않는다 (두 번 보내기 막기). */
   if((rec.kind || '') === '수업' && 운동요약(rec)){
     try{
@@ -12508,7 +12584,7 @@ setInterval(async ()=>{
     pollSig=sig;
     CMEDIA = await sget('comment_media?select=*&order=id.desc&limit=2000').catch(()=>CMEDIA);
     D.cm = mapCm(cms);
-    /* 첨부가 아직 덜 올라온 새 코멘트가 있으면 다음 번에 다시 받는다 (10분 안의 것만) */
+    /* 첨부가 아직 덜 올라온 새 피드백이 있으면 다음 번에 다시 받는다 (10분 안의 것만) */
     if(D.cm.some(c => ((+c.pics||0)+(+c.vids||0)) > c.media.length
         && c.ts && Date.now() - new Date(c.ts).getTime() < 600000)) pollSig='';
     const ids = wks.map(w=>'"'+w.id+'"').join(',');
