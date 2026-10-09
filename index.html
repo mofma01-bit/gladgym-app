@@ -2716,7 +2716,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '350';
+const BUILD = '351';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -5287,7 +5287,7 @@ async function newLive(title, items, kind, rid, mid, by){
   mid = mid || S.mid;
   const kd = kind || '개인운동';
   const t0 = 시계는손으로({ kind:kd, by }) ? null : Date.now();   /* 수업·트레이너 기록은 시계를 자동으로 켜지 않는다 */
-  D.live={ id, mid, title, kind:kd, rid:rid||null, date:TODAY, startAt:t0, items, cur:0,
+  D.live={ id, mid, title, kind:kd, rid:rid||null, date:TODAY, startAt:t0, born:Date.now(), items, cur:0,
            by:by||'회원', begun: items.length>0 };   /* 담기만 한 상태면 아직 시작 전 */
   if(!t0) items.forEach(it=>{ it.startAt = null; });
   save(); go(items.length ? 'workout' : 'pick');
@@ -12576,6 +12576,7 @@ const isTyping = () => { const a=document.activeElement; return a && (a.tagName=
 let pollSig='';
 setInterval(async ()=>{
   if(document.hidden || S.screen==='boot' || S.screen==='err' || !MEMBERS.length) return;
+  const 물은때 = Date.now();
   try{
     const [cms, wks, mls] = await Promise.all([
       sget('comments?select=*&order=created_at.desc&limit=300'),
@@ -12612,7 +12613,10 @@ setInterval(async ()=>{
     D.workouts = mapWorkouts(wks, witems, wsets);
     if(D.live){
       const mine = D.workouts.find(w=>w.id===D.live.id);
-      if(!mine){ D.live=null; save(); }
+      /* ⛔ 「서버에 없으니 지운다」는 **두 번 연달아** 없고, 이 물음보다 먼저 시작한 운동일 때만.
+         물어본 뒤에 시작한 운동은 이 답에 아직 없다 — 그걸 지워서 방금 시작한 운동이 통째로 사라졌다 (2026-10-09 점검 「세트표」가 3번에 1번 걸려서 찾음) */
+      if(mine) D.live._없음 = 0;
+      else if((D.live.born || 0) < 물은때 - 3000 && (D.live._없음 = (D.live._없음 || 0) + 1) >= 2){ D.live=null; save(); }
     }
     if(!first && !isTyping()){ try{ render(); if(sheetRender) drawSheet(); }catch(e){ console.error('그리기', e); } }
   }catch(e){ console.error('poll', e); }
