@@ -1067,6 +1067,10 @@ body .figbox2{background:radial-gradient(80% 50% at 50% 30%,rgba(240,211,160,.09
 .rp2hd h1{font-size:22px;font-weight:800;margin:10px 0 0;line-height:1.36;letter-spacing:-.02em;word-break:keep-all}.rp2hd h1 b{color:var(--gold)}
 .rp2hd p{font-size:13px;color:var(--sub);margin:6px 0 0}
 .rp2big .v{font-size:22px}
+.rp2one{margin-top:12px;font-size:15px;font-weight:800;color:var(--gold);letter-spacing:-.01em}
+.rp2ask{flex:none;border-radius:16px;border:1px solid #3f7281;background:linear-gradient(170deg,#1b2d33,#171a19 70%);padding:13px 14px;font-size:14px;line-height:1.55;color:var(--cream);word-break:keep-all}
+.rp2ask b{color:var(--teal)}.rp2ask button{display:block;margin-top:10px;width:100%;height:44px;border-radius:12px;background:var(--teal);color:#10181a;font-size:14.5px;font-weight:800}
+.rp2row{grid-template-columns:1fr auto 58px !important}.rp2row .n{font-size:15px !important}.rp2row .v{font-size:16px !important}.rp2cm .tx{font-size:15.5px !important}
 .rp2sec{flex:none;margin:12px 2px -2px;font-size:13px;font-weight:800;color:var(--gold-2);display:flex;align-items:center;gap:8px}.rp2sec small{font-size:11px;font-weight:500;color:var(--sub)}
 .rp2sec em{font-style:normal;font-size:10.5px;font-weight:800;color:#10181a;background:var(--teal);border-radius:999px;padding:2px 8px}
 .rp2cm{flex:none;width:100%;text-align:left;display:flex;flex-direction:column;border-radius:18px;border:1px solid #5a4c33;background:linear-gradient(170deg,#241f17,#171615 75%);padding:14px 15px}
@@ -2712,7 +2716,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '349';
+const BUILD = '350';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2965,6 +2969,7 @@ async function boot(){
 
   /* 알림톡 리포트 링크(?rp=운동id)로 들어왔으면 그 리포트를 바로 연다.
      읽고 나면 주소에서 지운다 — 안 지우면 새로고침할 때마다 리포트로 돌아온다 */
+  if(new URLSearchParams(location.search).get('open') === 'agree'){ S.동의하러 = true; try{ history.replaceState(null, '', location.pathname); }catch(e){} }
   const 리포트id = new URLSearchParams(location.search).get('rp');
   if(리포트id && S.screen === 'boot'){ const rw = D.workouts.find(x=>x.id===리포트id);
     /* ⛔ 링크로 들어온 사람은 **리포트 한 장만** 본다 (2026-09-29).
@@ -6050,7 +6055,7 @@ function vReport(){
     const 첫없음 = tr && !cmOf(mid, it.ex, it.va).length && !피드백끔(mid);
     return `<div class="rp2row"><span class="n">${esc(exName(it.ex,it.va))}<small>${it.sets.length}세트${e.cardio ? '' : ' · ' + (+최고.reps||0) + '회'}</small></span>
         <span class="v">${kgfmt(오늘)}<small>${단위}</small></span>
-        <span class="d ${d==null ? 'new' : d>0 ? 'up' : ''}">${d==null ? '처음' : d>0 ? '▲ '+kgfmt(d) : d<0 ? '▼ '+kgfmt(-d) : '그대로'}</span></div>`
+        ${d!=null && d>0 ? `<span class="d up">▲ ${kgfmt(d)}</span>` : '<span></span>'}</div>`
       + (첫없음 ? `<button class="rpcm none" data-act="rpcm:${it.ex}:${it.va}"><span class="ic">✎</span><span class="tx"><b>첫 피드백 없음</b> — 이 종목은 아직 하나도 없어요</span><span class="at">남기기 ›</span></button>` : '');
   }).join('');
   /* 몸의 변화 — **지난 수업 뒤로 새로 올라온 것이 있을 때만**, 건강정보 동의한 회원에게만 */
@@ -6071,20 +6076,20 @@ function vReport(){
         : tr ? `<div class="cyfoot" style="justify-content:center"><span>새 사진 ${새사진.length}장 — 회원에게는 「앱에서 보기」로 안내돼요</span></div>`
         : `<button class="hline" data-act="sub:body">${svg('h_cam',18)}<b>새 사진 ${새사진.length}장 보기</b><small>인바디 · 비포애프터</small><i>›</i></button>`) : ''}`;
 
+  /* 맨 위 안내 — 동의가 없어 리포트에 못 싣는 것이 있으면 무엇인지 알려 주고 앱의 동의 화면으로 보낸다 */
+  const 동의안내 = (!tr && !건강동의함(mid)) ? `<div class="rp2ask"><b>인바디 · 체형분석</b>은 앱에서 동의해 주셔야<br>리포트에 표시됩니다
+      <button data-act="rpapp:agree">앱에서 동의하기 ›</button></div>` : '';
   return { top: bar('수업 리포트', `<span class="sub">${esc(이름)} 회원님</span>`,
       만보기 ? null : (tr ? 'fendview:'+w.id : 'tab:home')),
     tabs: (tr || 만보기) ? 0 : 1, body:`
+    ${동의안내}
     <div class="rp2hd"><span class="lg">GLAD GYM · ${(n => n ? n + '번째 ' : '')(w.kind==='수업' ? workoutsOf(mid).filter(x => x.kind==='수업' && 세트있나(x) && (x.date < w.date || (x.date === w.date && x.id <= w.id))).length : 0)}수업 리포트</span>
-      <h1>${esc(이름)} 회원님,<br>${루틴이름 ? `오늘 <b>${esc(루틴이름)}</b> ${받침(루틴이름) ? '루틴을' : '루틴을'}<br>끝까지 해내셨어요` : '오늘 수업을<br>끝까지 해내셨어요'}</h1>
-      <p>${esc(수업제목(w).replace(/ (수업|개인운동) 기록$/, ''))}${담당 ? ' · ' + esc(담당) + ' 트레이너와 함께' : ''}</p></div>
-    <div class="sstat3 rp2big">
-      <div><span class="k">${세트수}세트</span><span class="v">${종목수}<small>종목</small></span></div>
-      <div class="t"><span class="k">운동 시간</span><span class="v">${Math.round((w.dur||0)/60)}<small>분</small></span></div>
-      <div><span class="k">든 무게</span><span class="v">${무게 >= 1000 ? (무게/1000).toFixed(1) : Math.round(무게)}<small>${무게 >= 1000 ? '톤' : 'kg'}</small></span></div>
-    </div>
+      <h1>${esc(이름)} 회원님,<br>${루틴이름 ? `오늘 <b>${esc(루틴이름)}</b>${/루틴$/.test(루틴이름.trim()) ? '을' : ' 루틴을'}<br>끝까지 해내셨어요` : '오늘 수업을<br>끝까지 해내셨어요'}</h1>
+      <p>${esc(수업제목(w).replace(/ (수업|개인운동) 기록$/, ''))}${담당 ? ' · ' + esc(담당) + ' 트레이너와 함께' : ''}</p>
+      <div class="rp2one">${종목수}종목 · ${세트수}세트${(w.dur||0) >= 60 ? ' · ' + Math.round(w.dur/60) + '분' : ''}${무게 ? ' · ' + (무게 >= 1000 ? (무게/1000).toFixed(1) + '톤' : Math.round(무게).toLocaleString() + 'kg') : ''}</div></div>
+    ${루틴줄 ? `<div class="rp2sec">오늘 한 운동</div>
+      <div class="rp2rt">${rt ? `<div class="rth"><i>루틴 ${esc(String(rt.no||''))}</i><b>${esc(rt.n)}</b></div>` : ''}${루틴줄}</div>` : ''}
     ${피드백들.length ? `<div class="rp2sec">트레이너 피드백 <small>${피드백들.length}개</small></div>${피드백들.map(코카드).join('')}` : ''}
-    ${루틴줄 ? `<div class="rp2sec">오늘 한 루틴 <small>지난번과 비교</small></div>
-      <div class="rp2rt">${rt ? `<div class="rth"><i>루틴 ${esc(String(rt.no||''))}</i><b>${esc(rt.n)}</b><small>${종목수}종목 · ${세트수}세트</small></div>` : ''}${루틴줄}</div>` : ''}
     ${몸}
     <div class="rp2sec">${m}월 <small>오늘까지</small></div>
     <div class="rp2mo"><b>${이달.length}<small>회</small></b><span>수업 ${수업} · 개인운동 ${개인}<br>${(합.vol/1000).toFixed(1)}톤 들었어요</span></div>`,
@@ -6092,8 +6097,7 @@ function vReport(){
       ? `<button class="btn sub" data-act="rcopy:${w.id}">링크 복사</button>
          ${리포트발(w)}`
       : 만보기
-      ? `<div class="note" style="margin:0">회원님의 수업 기록입니다.
-           앱에서 지난 기록과 피드백을 함께 보실 수 있어요.</div>`
+      ? `<button class="btn main" style="flex:1" data-act="rpapp:home">앱으로 이동하기</button>`
       : `<button class="btn main" data-act="tab:home">홈으로</button>` };
 }
 /* ══ 리포트 발 ══ 2026-09-30 대표
@@ -10991,7 +10995,7 @@ document.addEventListener('click', async ev=>{
      본인 것만 보이게 하는 진짜 문은 전화 인증이다 — 그건 아직 없다. */
   /* 리포트 안에서 쓰는 것만 열어 둔다 — 피드백 팝업(rpcm)과 사진 넘겨보기(csl·csk·vmute).
      ⚠ 2026-09-29: rpcm 을 빼먹어 피드백이 안 열렸다. 리포트에 단추를 더하면 여기도 같이 적는다. */
-  if(S.rpOnly && !['noop','close','sheet','rpcm','csl','csk','vmute'].includes(k)){
+  if(S.rpOnly && !['noop','close','sheet','rpcm','csl','csk','vmute','rpapp'].includes(k)){
     toast('수업 기록만 보실 수 있어요'); return; }
   switch(k){
     case 'kakao': toast('실제 연동은 다음 단계예요'); return;
@@ -11319,7 +11323,8 @@ document.addEventListener('click', async ev=>{
       if(rest[0]==='tr'){ S.who='tr'; S.ttab='t_today'; go('t_today'); }
       else { S.who='m'; S.mid=rest[0]; S.tab='home'; S.screen='home'; 인사();
         /* 잠근 채로 앱을 껐다면 운동 화면으로 바로 되돌린다 */
-        if(D.live && D.live.mid===rest[0] && D.live.lock) go('workout'); else go('home'); } return;
+        if(D.live && D.live.mid===rest[0] && D.live.lock) go('workout'); else go('home');
+        if(S.동의하러){ S.동의하러 = false; setTimeout(() => { if(S.who==='m' && !건강동의함(S.mid)) sheetSensitive('inbody'); else toast('이미 동의하셨어요'); }, 700); } } return;
     case 'reset': reset(); toast('처음 상태로 되돌렸어요'); return;
     case 'go': { if(rest[0]==='workout' && !D.live) adoptLive(S.mid);
       /* 이미 하는 중에 종목을 담으러 가면 「여기서부터가 새로 담은 것」을 표시해 둔다 */
@@ -11414,6 +11419,11 @@ document.addEventListener('click', async ev=>{
       toast('삭제했어요'); render();
       목표뱃지저장(S.mid).then(render); return; }
     case 'rpt': S.rw=rest[0]; go('report'); return;
+    /* 리포트에서 앱으로 — 링크로 온 사람은 앱 첫 화면으로 새로 들어간다(그 회원으로 자동 로그인하지 않는다). 나중에 스토어에 올리면 여기서 미설치는 설치 화면으로 보낸다 */
+    case 'rpapp': { const 동의 = rest[0] === 'agree';
+      if(S.rpOnly){ location.href = location.pathname + (동의 ? '?open=agree' : ''); return; }
+      if(동의){ if(건강동의함(S.mid)) toast('이미 동의하셨어요'); else sheetSensitive('inbody'); return; }
+      goRoot('home'); return; }
     case 'noop': return;
     case 'rcopy': { const u = 리포트링크(rest[0]);
       (navigator.clipboard ? navigator.clipboard.writeText(u) : Promise.reject())
