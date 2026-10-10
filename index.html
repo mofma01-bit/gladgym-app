@@ -1135,6 +1135,7 @@ body .figbox2{background:radial-gradient(80% 50% at 50% 30%,rgba(240,211,160,.09
 .czwk .wb{height:9px;border-radius:9px;background:#24302b;margin:10px 0 7px;overflow:hidden}.czwk .wb i{display:block;height:100%;border-radius:9px;background:var(--run)}.czwk small{font-size:12px;color:var(--sub)}
 .czpick{display:grid;grid-template-columns:1fr 1fr;gap:9px}.czpick button{height:74px;border-radius:16px;border:1px solid #35322d;background:#1b1a18;color:var(--cream);font-size:14.5px;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
 .czpick button.on{border-color:var(--run);background:linear-gradient(170deg,#173328,#1b1a18 75%);color:var(--run)}.czpick svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.scnb{flex:none;border-radius:14px;border:1px solid #8a6d2f;background:rgba(217,164,65,.10);padding:11px 13px;font-size:12.5px;line-height:1.55;color:var(--cream)}.scnb b{display:block;font-size:14px;color:var(--gold);margin-bottom:2px}.scnb .w{display:block;margin-top:5px;color:#e8b65a;font-weight:700}
 .hsgo{flex:none;width:74px;border-radius:14px;border:1px solid #3f7281;background:linear-gradient(170deg,#1b2d33,#171a19 70%);font-size:11.5px;font-weight:800;color:var(--teal);line-height:1.35}
 .hspt .mrow2{gap:10px}.hspt .ikk{flex:none;width:44px}.hsbar{flex:1;height:8px;border-radius:4px;background:#2a2925;overflow:hidden}.hsbar i{display:block;height:100%;border-radius:4px}.hsv{flex:none;font-size:13px;font-weight:800;color:var(--gold);min-width:42px;text-align:right}
 .blsay{margin-top:6px;border-radius:14px;border:1px solid #34332d;background:#1a1917;padding:12px 13px;display:flex;flex-direction:column;gap:7px}
@@ -2751,7 +2752,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '359';
+const BUILD = '360';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -8962,7 +8963,7 @@ function vIntake(){
       <div class="t"><span class="k">성별</span><span class="v cyv" style="font-size:22px;padding-top:2px">${esc(d.sex||'—')}</span></div>
     </div>
     ${tr || mid===S.mid ?`<button class="hline gold" data-act="editintake:${mid}">${svg('h_note',18)}<b>PT 상담일지 작성 · 수정</b><small>눌러서 입력</small></button>`:''}
-    ${tr ? `<button class="hline" data-act="scanpaper:${mid}">${svg('h_note',18)}<b>종이 상담지 올리기</b><small>사진을 읽어서 채워요 · 대시보드에서 열려요</small></button>` : ''}
+    ${tr ? `<button class="hline" data-act="scanpaper:${mid}">${svg('h_note',18)}<b>종이 상담지 올리기</b><small>찍거나 앨범에서 · 읽어서 채워요</small></button>` : ''}
     ${묶음('기본', [['생년월일', d.birth ? (birthYmd(d.birth)||d.birth) : ''], ['직업', d.job], ['직업환경', d.jobenv], ['교대근무', d.shift]])}
     ${(d.route||[]).length ? `<span class="lbl">글래드짐을 알게 된 경로</span><div class="chips">${d.route.map(x=>`<span class="chip on">${esc(x)}</span>`).join('')}</div>` : (빈++, '')}
     ${묶음('운동 · 생활', [['경험한 운동', d.expr], ['스트레스 요인', d.stress], ['스트레스 강도', d.stressLv], ['해소 방법', (d.relief||[]).join(', ')], ['취침 시간', (d.meals||{})['취침']]])}
@@ -8979,12 +8980,72 @@ function vIntake(){
     : '') };
 }
 
+const DESK_KEY = 'gg_desk_auth', GG_API = 'https://dash.gladgym.co.kr';
+async function 직원토큰(){
+  let a = null; try{ a = JSON.parse(localStorage.getItem(DESK_KEY) || 'null'); }catch(e){}
+  if(!a || !a.access_token) return null;
+  if(a.exp && Date.now() > a.exp){ if(!a.refresh_token) return null;
+    try{ const r = await fetch(SB_URL + '/auth/v1/token?grant_type=refresh_token', { method:'POST', headers:{ apikey:SB_KEY, 'Content-Type':'application/json' }, body: JSON.stringify({ refresh_token:a.refresh_token }) });
+      if(!r.ok) return null; const j = await r.json();
+      a = { access_token:j.access_token, refresh_token:j.refresh_token, user:j.user, exp: Date.now() + ((j.expires_in||3600) - 60) * 1000 };
+      localStorage.setItem(DESK_KEY, JSON.stringify(a));      /* 대시보드와 같은 자리에 되돌려 둔다 — 새 열쇠를 한쪽만 알면 다른 쪽 로그인이 풀린다 */
+    }catch(e){ return null; } }
+  return a.access_token;
+}
+function sheetScan(mid){
+  openSheet(() => `<div class="h2">종이 상담지 올리기</div>
+    ${S.scanTok ? `<div class="agbody" style="margin-bottom:10px">상담지 한 장이 다 나오게 찍어 주세요. 읽은 값은 작성 화면에 채워지고, 저장을 눌러야 들어갑니다.</div>
+      <button class="btn main" data-act="scancam:${mid}">카메라로 찍기</button>
+      <button class="btn sub" data-act="scanalb:${mid}">앨범에서 선택</button>`
+    : `<div class="agbody" style="margin-bottom:10px">이 폰에서 처음 한 번만 직원 로그인이 필요해요. 로그인한 뒤 이 화면으로 돌아와 다시 눌러 주세요.</div>
+      <button class="btn main" data-act="scanlogin:${mid}">직원 로그인 (대시보드)</button>`}
+    <button class="btn ghost" data-act="close">닫기</button>`);
+}
+function 상담지고르기(mid, 찍기){
+  const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*'; if(찍기) inp.setAttribute('capture', 'environment'); inp.style.display = 'none'; document.body.appendChild(inp);
+  inp.addEventListener('change', () => { const f = inp.files && inp.files[0]; inp.remove(); if(!f) return;
+    const img = new Image();
+    img.onload = async () => { try{
+        const N = 1600, 비 = Math.min(1, N / Math.max(img.naturalWidth, img.naturalHeight)), cv = document.createElement('canvas');
+        cv.width = Math.round(img.naturalWidth * 비); cv.height = Math.round(img.naturalHeight * 비); cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+        URL.revokeObjectURL(img.src); const b64 = cv.toDataURL('image/jpeg', 0.85).split(',')[1];
+        toast('상담지를 읽는 중이에요 — 10초쯤 걸려요');
+        const d = await 상담지읽기(b64); 상담지채움(mid, d);
+      }catch(e){ console.error(e); toast('상담지를 읽지 못했어요 — ' + e.message); } };
+    img.onerror = () => toast('사진을 열지 못했어요');
+    img.src = URL.createObjectURL(f); });
+  inp.click();
+}
+async function 상담지읽기(b64){
+  const t = await 직원토큰(); if(!t) throw new Error('직원 로그인이 필요해요');
+  const r = await fetch(GG_API + '/app/scan/intake', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ desk:t, image:b64, form:'GG-INTAKE-A4 v2' }) });
+  if(!r.ok) throw new Error('서버에 닿지 못했어요 (' + r.status + ')');
+  const d = await r.json(); if(!d.ok) throw new Error(d.why || '읽지 못했어요'); return d;
+}
+/* 읽은 값을 작성 화면의 **빈칸에만** 채운다. 이미 입력돼 있던 칸은 그대로 둔다. 글 칸은 초안(S.draft)으로 올려 저장 전에는 기록이 안 바뀐다. */
+function 상담지채움(mid, r){
+  const 읽 = (r && r.data) || {}, d = D.intake[mid] || (D.intake[mid] = {}); d.meals = d.meals || {};
+  S.subj = mid; go('intake_edit'); S.draft = S.draft || {}; let n = 0;
+  const 칸에 = (k, v) => { S.draft[k] = v; const el = document.querySelector('[data-k="' + k + '"]'); if(el) el.value = v; };   /* 다시 그릴 때 화면의 칸 값이 초안을 덮으므로 칸에도 같이 넣는다 */
+  INTAKE_FIELDS.forEach(f => { const v = 읽[f.k]; if(v == null || v === '' || (Array.isArray(v) && !v.length)) return;
+    if(f.t === 'one'){ if(f.o.includes(v) && !d[f.k]){ d[f.k] = v; n++; } }
+    else if(f.t === 'many'){ const a = (Array.isArray(v) ? v : []).filter(x => f.o.includes(x)); if(a.length && !(d[f.k]||[]).length){ d[f.k] = a; n++; } }
+    else if(!d[f.k]){ 칸에('ik:' + f.k, String(v)); n++; } });
+  MEAL_KEYS.forEach(k => { const v = (읽.meals || {})[k]; if(v && !d.meals[k]){ 칸에('ikm:' + k, String(v)); n++; } });
+  const m = MEMBERS.find(x => x.id === mid) || {}, 이름 = String(읽.name || '').replace(/\s/g, '');
+  S.scanQ = { mid, n, 모름: (r.모름 || []).map(k => k === 'meals' ? '식습관' : ((INTAKE_FIELDS.find(f => f.k === k) || {}).n || '').replace(/ —.*| \(.*/, '')).filter(Boolean),
+    다른 : 이름 && m.n && 이름 !== String(m.n).replace(/\s/g, '') ? 읽.name : '' };
+  render(); toast(n + '칸을 채웠어요 — 확인하고 저장해 주세요');
+}
 function vIntakeEdit(){
   const mid=subj(), d=D.intake[mid]||(D.intake[mid]={});
   d.meals = d.meals || {};
   const F = k => fieldEditor('ik', d, INTAKE_FIELDS.find(f => f.k === k));
   const 상자 = (제목, 몸) => `<div class="fsec"><span class="fsh">${제목}</span>${몸}</div>`;
+  const q = S.scanQ && S.scanQ.mid === mid ? S.scanQ : null;
   return { top: bar('PT 상담일지 작성', `<span class="sub">${esc(subjName())}</span>`, 'sub2:intake:'+mid), body:
+      (q ? `<div class="scnb"><b>종이에서 읽은 ${q.n}칸을 채웠어요</b>확인하고 맨 아래 「저장」을 눌러야 들어갑니다. 이미 입력돼 있던 칸은 그대로 뒀어요.
+        ${q.모름.length ? `<span class="w">글씨 확인: ${esc(q.모름.join(' · '))}</span>` : ''}${q.다른 ? `<span class="w">종이의 이름이 「${esc(q.다른)}」예요 — 다른 분의 상담지가 아닌지 확인해 주세요</span>` : ''}</div>` : '') +
       상자('기본', `<div class="grid2">${F('birth')}${F('height')}</div>${F('sex')}${F('job')}${F('jobenv')}${F('shift')}`)
     + 상자('글래드짐을 알게 된 경로', F('route'))
     + 상자('운동 · 생활', F('expr') + F('stress') + F('stressLv') + F('relief')
@@ -11299,8 +11360,10 @@ document.addEventListener('click', async ev=>{
     case 'sub2': S.subj=rest[1]; go(rest[0]); return;
 
     /* 상담일지 · 운동계획 편집 */
-    case 'scanpaper': window.open('desk/?m=' + encodeURIComponent(rest[0]) + '&scan=1', '_blank'); return;
-    case 'editintake': if(S.who !== 'tr' && rest[0] !== S.mid) return; S.subj=rest[0]; go('intake_edit'); return;
+    case 'scanpaper': { if(S.who !== 'tr') return; S.scanTok = !!(await 직원토큰()); sheetScan(rest[0]); return; }
+    case 'scanlogin': closeSheet(); window.open('desk/?m=' + encodeURIComponent(rest[0]) + '&scan=1', '_blank'); return;
+    case 'scancam': case 'scanalb': { const mid = rest[0]; closeSheet(); 상담지고르기(mid, k === 'scancam'); return; }
+    case 'editintake': if(S.who !== 'tr' && rest[0] !== S.mid) return; S.scanQ = null; S.subj=rest[0]; go('intake_edit'); return;
     case 'editplan': S.subj=rest[0]; go('plan_edit'); return;
     case 'pick1': { const [pre,k,val]=rest;
       const d = pre==='ik' ? (D.intake[subj()]||(D.intake[subj()]={})) : (GOALS[subj()]||(GOALS[subj()]={}));
@@ -11310,7 +11373,7 @@ document.addEventListener('click', async ev=>{
       const a = Array.isArray(d[k]) ? d[k] : (d[k]=[]);
       const i = a.indexOf(val); if(i>=0) a.splice(i,1); else a.push(val);
       render(); return; }
-    case 'saveintake': {
+    case 'saveintake': { S.scanQ = null;
       const mid=rest[0], d=D.intake[mid]||(D.intake[mid]={});
       INTAKE_FIELDS.forEach(f=>{
         if(f.t==='text'||f.t==='area'){
