@@ -4,7 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <script>/* 폭 360 보다 좁은 폰(옛 아이폰 SE 320)은 화면을 360 폭으로 줄여 그린다 — 글씨를 하나하나 줄이지 않는다 */
-try{ if(Math.min(screen.width, window.innerWidth || screen.width) < 360) document.querySelector('meta[name="viewport"]').setAttribute('content', 'width=360, viewport-fit=cover'); }catch(e){}</script>
+try{ if(Math.min(screen.width, window.innerWidth || screen.width) < 360) document.querySelector('meta[name="viewport"]').setAttribute('content', 'width=360, viewport-fit=cover'); }catch(e){}
+/* 아이폰은 글씨 16px 미만인 입력 칸을 누르면 화면을 저절로 확대한다(누른 뒤 화면이 옆으로 밀린다). maximum-scale=1 이면 그 확대만 꺼지고 손가락 확대는 그대로 된다 — 아이폰에만 건다(안드로이드에선 손가락 확대까지 막힌다). 2026-10-10 기종 조사 */
+try{ if(/iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)){ const v = document.querySelector('meta[name="viewport"]'); v.setAttribute('content', v.getAttribute('content') + ', maximum-scale=1'); } }catch(e){}</script>
 <meta name="theme-color" content="#131312">
 <meta name="color-scheme" content="dark">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -2778,7 +2780,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '365';
+const BUILD = '366';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
