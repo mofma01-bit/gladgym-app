@@ -1426,7 +1426,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '198';
+const BUILD = '199';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -1838,9 +1838,9 @@ function EQS(){
 const IKNAME = {
   sex:'성별', birth:'생년월일', height:'키', job:'직업', jobenv:'근무 자세',
   shift:'교대 근무', time:'운동 요일', timeTxt:'운동 시간대',
-  expr:'운동 경험', hist:'과거 부상', histEtc:'그 밖의 병력', cond:'건강 상태',
+  expr:'그 밖의 운동', exprs:'경험한 운동', goals:'원하는 것', hist:'과거 부상', histEtc:'그 밖의 병력', cond:'건강 상태',
   stress:'스트레스 원인', stressLv:'스트레스 정도', relief:'푸는 방법',
-  route:'알게 된 경로', needs:'바라는 것', notes:'특이사항',
+  route:'알게 된 경로', needs:'메모', notes:'특이사항',
   goal:'목표', meals:'평소 식사'
 };
 
@@ -2748,16 +2748,16 @@ const 수기회원인가 = m => /^mh\d/.test(String((m && m.id) || ''));
    확인 판에서 사람이 보고 고친 뒤 저장한다. 확신 못 한 칸은 노랗게. 이미 값이 있는 칸은 그 값을 두고 종이 값을 옆에 보여 준다.
    규격: 설계서\상담지\스캔_읽기_규격.md · 종이: 설계서\상담지\PT상담지_A4.pdf */
 const 스캔칸 = [['sex','성별',['여','남']], ['birth','생년월일'], ['height','신장'], ['job','직업'], ['jobenv','직업환경',['좌식','활동적','복합적']], ['shift','교대근무',['아니오','예']],
-  ['route','알게 된 경로',['네이버블로그','네이버지도','인스타그램','전단지','외부간판','지인소개','기타'],1], ['expr','경험한 운동'], ['stress','스트레스 요인'], ['stressLv','스트레스 강도',['1~3','4~6','7~10']],
+  ['route','알게 된 경로',['네이버블로그','네이버지도','인스타그램','전단지','외부간판','지인소개','기타'],1], ['exprs','경험한 운동',['헬스','PT','필라테스','요가','수영','러닝','골프'],1], ['expr','그 밖의 운동 · 기간'], ['stress','스트레스 요인'], ['stressLv','스트레스 강도',['1~3','4~6','7~10']],
   ['relief','해소 방법',['음식섭취','운동','쇼핑','인간관계','수면','스마트폰','기타'],1], ['cond','현재 겪는 것',['과민성 대장 증후군','당뇨','고혈압','갑상선질환','불면증'],1],
   ['hist','과거 병력 · 질환',['최근 수술','천식','무릎부상','목디스크','골절','고혈압','심근경색','폐질환','허리디스크','무월경','저혈압','갑상선기능','관절염','허리부상','다낭성난소증후군','당뇨'],1],
-  ['histEtc','그 밖의 병력'], ['time','운동 가능 요일',['월','화','수','목','금','토','일'],1], ['timeTxt','시간대'], ['needs','회원님이 원하는 것'], ['notes','트레이너 메모']];
+  ['histEtc','그 밖의 병력'], ['time','운동 가능 요일',['월','화','수','목','금','토','일'],1], ['timeTxt','시간대'], ['goals','회원님이 원하는 것',['다이어트','근력 향상','체형 교정','통증 개선','체력 향상','바디프로필','기타'],1], ['needs','메모']];
 const 스캔식사 = ['아침','점심','저녁','간식','영양제','음주','취침'];
 let 스캔 = null;
 async function 상담지읽기(b64){
   if(!AUTH || !AUTH.access_token) throw new Error('로그인이 필요해요');
   const r = await fetch(GG_API + '/app/scan/intake', { method:'POST', headers:{ 'Content-Type':'application/json' },
-    body: JSON.stringify({ desk: AUTH.access_token, image: b64, form: 'GG-INTAKE-A4 v2' }) });
+    body: JSON.stringify({ desk: AUTH.access_token, image: b64, form: 'GG-INTAKE-A4 v3' }) });
   if(!r.ok) throw new Error(r.status === 404 ? '서버에 읽기 창구가 아직 없어요' : '서버에 닿지 못했어요 (' + r.status + ')');
   const d = await r.json(); if(!d.ok) throw new Error(d.why || '읽지 못했어요'); return d;
 }
@@ -3974,7 +3974,7 @@ function tabInfo(){
 
   /* 회원 정보 — 담당 · 이름 · 문진까지 모두 고칠 수 있다 */
   const 순서 = ['sex','birth','height','job','jobenv','shift','time','timeTxt',
-                'expr','hist','histEtc','cond','stress','stressLv','relief','route','needs','notes'];
+                'exprs','expr','hist','histEtc','cond','stress','stressLv','relief','route','goals','needs','notes'];
   const 나머지 = Object.keys(ik).filter(k=>k!=='meals' && 순서.indexOf(k)<0);
   const 짧은 = ['sex','birth','height','job','jobenv','shift','timeTxt','stressLv','route'];
   const 값글 = v => Array.isArray(v) ? v.join(' · ')
