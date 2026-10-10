@@ -1145,6 +1145,7 @@ body .figbox2{background:radial-gradient(80% 50% at 50% 30%,rgba(240,211,160,.09
 #stlog input{height:46px;border-radius:12px;border:1px solid #45413a;background:#23211e;color:var(--cream);font-size:15px;padding:0 12px;width:100%}
 #stlog .er{font-size:12.5px;color:#e8b65a;min-height:16px}
 #stlog .go{height:48px;border-radius:14px;background:var(--gold);color:#221b0e;font-size:15px;font-weight:800}#stlog .x{height:40px;color:var(--sub);font-size:13.5px}
+.scnb .num{display:block;margin-top:7px;padding-top:7px;border-top:1px dashed #8a6d2f}.scnb .num b{display:block;font-size:12.5px;color:#e8b65a;margin-bottom:3px}.scnb .num i{display:inline-block;font-style:normal;margin-right:12px;color:var(--sub)}.scnb .num em{font-style:normal;font-weight:800;font-size:15px;color:var(--cream)}
 .scnb .rs{display:inline-block;margin-top:6px;height:32px;padding:0 12px;border-radius:999px;border:1px solid #8a6d2f;color:var(--gold);font-size:12.5px;font-weight:700}
 .agwarn{border-radius:12px;border:1px solid #8a6d2f;background:rgba(217,164,65,.10);padding:11px 13px;font-size:12.5px;line-height:1.6;color:var(--cream);margin-bottom:12px}.agwarn b{color:#e8b65a}
 .scnb{flex:none;border-radius:14px;border:1px solid #8a6d2f;background:rgba(217,164,65,.10);padding:11px 13px;font-size:12.5px;line-height:1.55;color:var(--cream)}.scnb b{display:block;font-size:14px;color:var(--gold);margin-bottom:2px}.scnb .w{display:block;margin-top:5px;color:#e8b65a;font-weight:700}
@@ -2782,7 +2783,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '367';
+const BUILD = '368';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -9086,10 +9087,10 @@ function 상담지고르기(mid, 찍기){
   inp.addEventListener('change', () => { const f = inp.files && inp.files[0]; inp.remove(); if(!f) return;
     const img = new Image();
     img.onload = async () => { try{
-        const N = 1600, 비 = Math.min(1, N / Math.max(img.naturalWidth, img.naturalHeight)), cv = document.createElement('canvas');
-        cv.width = Math.round(img.naturalWidth * 비); cv.height = Math.round(img.naturalHeight * 비); cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
-        URL.revokeObjectURL(img.src); const b64 = cv.toDataURL('image/jpeg', 0.85).split(',')[1];
-        const 흠 = 사진흠(cv, img);
+        const 틀 = 종이자리(img), N = 1600, 비 = Math.min(1, N / Math.max(틀.w, 틀.h)), cv = document.createElement('canvas');
+        cv.width = Math.round(틀.w * 비); cv.height = Math.round(틀.h * 비); cv.getContext('2d').drawImage(img, 틀.x, 틀.y, 틀.w, 틀.h, 0, 0, cv.width, cv.height);
+        URL.revokeObjectURL(img.src); const b64 = cv.toDataURL('image/jpeg', 0.9).split(',')[1];
+        const 흠 = 사진흠(cv, { naturalWidth:틀.w, naturalHeight:틀.h });
         if(흠.length){ S.scanHold = { mid, b64 }; openSheet(() => `<div class="h2">사진을 다시 찍어 주세요</div>
             <div class="agbody" style="margin-bottom:10px">${흠.map(x => '· ' + esc(x)).join('<br>')}<br><br>밝은 곳에서, 종이 한 장이 화면에 꽉 차게, 흔들리지 않게 찍으면 잘 읽습니다.</div>
             <button class="btn main" data-act="scancam:${mid}">다시 찍기</button>
@@ -9100,6 +9101,25 @@ function 상담지고르기(mid, 찍기){
     img.onerror = () => toast('사진을 열지 못했어요');
     img.src = URL.createObjectURL(f); });
   inp.click();
+}
+/* 사진에서 종이가 있는 네모 — 종이는 둘레(책상)보다 밝다. 줄인 흑백에서 밝은 점이 몰린 줄 · 칸의 범위를 잡는다.
+   못 찾거나(종이와 바닥 밝기가 비슷) 이미 꽉 차 있으면 사진 전체를 돌려준다 — 잘못 잘라 글씨를 잃는 것보다 안 자르는 편이 낫다. */
+function 종이자리(img){
+  const W = img.naturalWidth, H = img.naturalHeight, 전체 = { x:0, y:0, w:W, h:H };
+  try{ const w = 160, h = Math.max(1, Math.round(H * w / W)), c = document.createElement('canvas'); c.width = w; c.height = h;
+    const x = c.getContext('2d'); x.drawImage(img, 0, 0, w, h); const d = x.getImageData(0, 0, w, h).data, g = new Uint8Array(w * h); let 합 = 0;
+    for(let i = 0; i < w * h; i++){ g[i] = d[i*4] * .299 + d[i*4+1] * .587 + d[i*4+2] * .114; 합 += g[i]; }
+    const 평 = 합 / (w * h); let 밝합 = 0, 밝n = 0, 어합 = 0, 어n = 0;
+    for(let i = 0; i < w * h; i++){ if(g[i] > 평){ 밝합 += g[i]; 밝n++; } else { 어합 += g[i]; 어n++; } }
+    if(!밝n || !어n) return 전체; const 밝 = 밝합 / 밝n, 어 = 어합 / 어n; if(밝 - 어 < 28) return 전체;      /* 종이와 바닥이 잘 안 갈린다 */
+    const 금 = (밝 + 어) / 2, 줄 = new Array(h).fill(0), 칸 = new Array(w).fill(0);
+    for(let y = 0; y < h; y++) for(let k = 0; k < w; k++) if(g[y*w+k] > 금){ 줄[y]++; 칸[k]++; }
+    const 범 = (a, 길) => { let s0 = -1, e0 = -1; for(let i = 0; i < a.length; i++) if(a[i] > 길 * .45){ if(s0 < 0) s0 = i; e0 = i; } return [s0, e0]; };
+    const [y0, y1] = 범(줄, w), [x0, x1] = 범(칸, h); if(y0 < 0 || x0 < 0) return 전체;
+    const bw = (x1 - x0 + 1) / w, bh = (y1 - y0 + 1) / h; if(bw * bh > .88 || bw * bh < .25 || bw < .4 || bh < .4) return 전체;
+    const 여 = .025, X0 = Math.max(0, x0 / w - 여), Y0 = Math.max(0, y0 / h - 여), X1 = Math.min(1, (x1 + 1) / w + 여), Y1 = Math.min(1, (y1 + 1) / h + 여);
+    return { x: Math.round(X0 * W), y: Math.round(Y0 * H), w: Math.round((X1 - X0) * W), h: Math.round((Y1 - Y0) * H), 잘랐다:true };
+  }catch(e){ return 전체; }
 }
 /* 못 읽을 사진인가 — 줄인 흑백으로 밝기와 또렷함(이웃 점과의 차)을 잰다 */
 function 사진흠(cv, img){
@@ -9139,7 +9159,8 @@ function 상담지채움(mid, r){
   MEAL_KEYS.forEach(k => { const v = (읽.meals || {})[k]; if(v && !d.meals[k]){ 칸에('ikm:' + k, String(v)); n++; } });
   const m = MEMBERS.find(x => x.id === mid) || {}, 이름 = String(읽.name || '').replace(/\s/g, '');
   S.scanQ = { mid, n, 모름: (r.모름 || []).map(k => k === 'meals' ? '식습관' : ((INTAKE_FIELDS.find(f => f.k === k) || {}).n || '').replace(/ —.*| \(.*/, '')).filter(Boolean),
-    다른 : 이름 && m.n && 이름 !== String(m.n).replace(/\s/g, '') ? 읽.name : '' };
+    다른 : 이름 && m.n && 이름 !== String(m.n).replace(/\s/g, '') ? 읽.name : '',
+    숫자: [['신장', 읽.height ? 읽.height + 'cm' : ''], ['생년월일', 읽.birth || ''], ['취침', (읽.meals || {})['취침'] || '']].filter(p => p[1]) };
   render(); toast(n + '칸을 채웠어요 — 확인하고 저장해 주세요');
 }
 function vIntakeEdit(){
@@ -9151,6 +9172,7 @@ function vIntakeEdit(){
   return { top: bar('PT 상담일지 작성', `<span class="sub">${esc(subjName())}</span>`, 'sub2:intake:'+mid), body:
       (q ? `<div class="scnb"><b>종이에서 읽은 ${q.n}칸을 채웠어요</b>확인하고 맨 아래 「저장」을 눌러야 들어갑니다. 이미 입력돼 있던 칸은 그대로 뒀어요.
         ${q.n < 6 ? `<span class="w">읽은 칸이 적어요 — 사진이 잘 안 나왔을 수 있어요</span><button class="rs" data-act="scanpaper:${mid}">다시 찍기</button>` : ''}
+        ${(q.숫자||[]).length ? `<span class="num"><b>숫자는 종이와 꼭 맞춰 보세요</b>${q.숫자.map(p => `<i>${esc(p[0])} <em>${esc(p[1])}</em></i>`).join('')}</span>` : ''}
         ${q.모름.length ? `<span class="w">글씨 확인: ${esc(q.모름.join(' · '))}</span>` : ''}${q.다른 ? `<span class="w">종이의 이름이 「${esc(q.다른)}」예요 — 다른 분의 상담지가 아닌지 확인해 주세요</span>` : ''}</div>` : '') +
       상자('기본', `<div class="grid2">${F('birth')}${F('height')}</div>${F('sex')}${F('job')}${F('jobenv')}${F('shift')}`)
     + 상자('글래드짐을 알게 된 경로', F('route'))
