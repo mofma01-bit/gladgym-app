@@ -1151,6 +1151,11 @@ body .figbox2{background:radial-gradient(80% 50% at 50% 30%,rgba(240,211,160,.09
 .scnb .df button{margin-left:auto;height:30px;padding:0 11px;border-radius:999px;border:1px solid #8a6d2f;color:var(--gold);font-size:12px;font-weight:700;white-space:nowrap}.scnb .df button.all{display:block;margin:8px 0 0;width:100%;height:36px;background:var(--gold);color:#221b0e;border:0}
 .scnb .rs{display:inline-block;margin-top:6px;height:32px;padding:0 12px;border-radius:999px;border:1px solid #8a6d2f;color:var(--gold);font-size:12.5px;font-weight:700}
 .agwarn{border-radius:12px;border:1px solid #8a6d2f;background:rgba(217,164,65,.10);padding:11px 13px;font-size:12.5px;line-height:1.6;color:var(--cream);margin-bottom:12px}.agwarn b{color:#e8b65a}
+#cfm{position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.66);display:flex;align-items:center;justify-content:center;padding:22px}
+#cfm .bx{width:100%;max-width:320px;border-radius:20px;background:#1b1a18;border:1px solid #45413a;padding:22px 18px 16px;color:var(--cream)}
+#cfm p{font-size:16px;font-weight:700;line-height:1.5;text-align:center;margin-bottom:18px}
+#cfm .bx>div{display:flex;gap:9px}#cfm button{flex:1;height:48px;border-radius:14px;font-size:15px;font-weight:800}
+#cfm .no{background:var(--gold);color:#221b0e}#cfm .yes{border:1.5px solid #8a4a3a;color:var(--warn);background:none}
 .scnb{flex:none;border-radius:14px;border:1px solid #8a6d2f;background:rgba(217,164,65,.10);padding:11px 13px;font-size:12.5px;line-height:1.55;color:var(--cream)}.scnb b{display:block;font-size:14px;color:var(--gold);margin-bottom:2px}.scnb .w{display:block;margin-top:5px;color:#e8b65a;font-weight:700}
 #top .logo.sm{padding-left:8px;padding-right:8px;letter-spacing:.06em}
 .modesw{flex:none;display:inline-flex;margin-left:auto;border:1px solid #4a4640;border-radius:999px;padding:2px;background:#191816}
@@ -2786,7 +2791,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '369';
+const BUILD = '370';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -11335,8 +11340,28 @@ document.addEventListener('touchend', e => { if(!밀기) return; const m = 밀�
 
 /* ⛔ async 다 — 동의 저장처럼 서버에 쓰고 기다려야 하는 손잡이가 있다 (2026-09-21).
    click 손잡이는 async 여도 동작이 같다. return 으로 빠져나가는 흐름도 그대로다. */
+/* 지우는 손잡이 → [묻는 말, 단추 글]. ⛔ 이미 제 확인 창을 가진 것(rdel · wdel · goaldel · bpdel · cancel · dayunpost · cycoff · agoff · pdel · psdel · pidel · unfdel)은 넣지 않는다 — 두 번 묻게 된다 */
+const 지움확인 = {
+  fdelgo:['이 음식을 제거할까요?', '제거'], mealdel:['이 식단 사진을 삭제할까요?', '삭제'], rdelitem:['루틴에서 이 종목을 제거할까요?', '제거'],
+  delcm:['이 피드백을 삭제할까요?<br>회원 화면에서도 사라집니다.', '삭제'], unask:['피드백 요청을 취소할까요?', '요청 취소'], bldel:['이 날의 인바디 기록을 삭제할까요?', '삭제'],
+  wsdel:['이 세트를 삭제할까요?', '삭제'], spdel:['이 종목을 제거할까요?', '제거'], clearpick:['추가한 종목을 전부 비울까요?', '전부 비우기'], pcdel:['이 댓글을 삭제할까요?', '삭제'],
+  rsetdel:['이 세트를 제거할까요?', '제거'], psrm:['세트에서 이 종목을 제거할까요?', '제거'], mkclear:['표시를 모두 삭제할까요?', '모두 삭제'], rcartclr:['추가한 것을 전부 비울까요?', '비우기'],
+  grpdel:['이 그룹을 삭제할까요?<br>안에 있던 루틴은 남습니다.', '삭제'], phdreq:['이 사진의 완전 삭제를 요청할까요?', '삭제 요청'], ootddel:['이 사진을 삭제할까요?<br>되돌릴 수 없습니다.', '삭제'],
+  exdel:['이 종목을 삭제할까요?', '삭제'] };
+function 확인창(말, 단추, 하면){
+  let o = document.getElementById('cfm'); if(o) o.remove();
+  o = document.createElement('div'); o.id = 'cfm';
+  o.innerHTML = `<div class="bx"><p>${말}</p><div><button class="no">돌아가기</button><button class="yes">${esc(단추)}</button></div></div>`;
+  document.body.appendChild(o);
+  o.querySelector('.no').addEventListener('click', () => o.remove());
+  o.addEventListener('click', e => { if(e.target === o) o.remove(); });
+  o.querySelector('.yes').addEventListener('click', () => { o.remove(); 하면(); });
+}
 document.addEventListener('click', async ev=>{
   const el=ev.target.closest('[data-act]'); if(!el) return;
+  { const a0 = el.getAttribute('data-act'), k0 = a0.split(':')[0], 묻 = 지움확인[k0] || (k0 === 'phide' && !((D.posts||[]).find(x => x.id === a0.split(':')[1]) || {}).hid ? ['이 글을 피드에서 내릴까요?', '내리기'] : null);
+    if(묻){ if(S._확인 === a0) S._확인 = null;
+      else { 확인창(묻[0], 묻[1], () => { S._확인 = a0; el.isConnected ? el.click() : (b => { b.setAttribute('data-act', a0); b.style.display = 'none'; document.body.appendChild(b); b.click(); b.remove(); })(document.createElement('button')); }); return; } } }
   /* 길게 눌러 끝낸 직후의 「따라오는 눌림」은 흘려보낸다 (풀자마자 다시 잠기지 않게) */
   if(!el.hasAttribute('data-syn') && S.heldAt && Date.now()-S.heldAt < 600){ S.heldAt=0; return; }
   const a=el.getAttribute('data-act'), [k,...rest]=a.split(':'), w=live();
@@ -11505,7 +11530,7 @@ document.addEventListener('click', async ev=>{
       const 넣 = x => { const 칸 = (k, v) => { S.draft = S.draft || {}; S.draft[k] = v; const el = document.querySelector('[data-k="' + k + '"]'); if(el) el.value = v; };
         if(x.t === 'one' || x.t === 'many') d[x.k] = x.v; else if(x.t === 'meal') 칸('ikm:' + x.k, x.v); else 칸('ik:' + x.k, x.v); };
       if(rest[0] === 'all'){ q.다름.forEach(넣); q.n += q.다름.length; q.다름 = []; } else { const x = q.다름[+rest[0]]; if(x){ 넣(x); q.다름.splice(+rest[0], 1); q.n++; } }
-      render(); toast('종이 값으로 바꿨어요 — 저장을 눌러야 들어갑니다'); return; }
+      render(); toast('종이 값으로 변경했어요 — 저장을 눌러야 반영됩니다'); return; }
     case 'scanforce': { const h = S.scanHold; S.scanHold = null; closeSheet(); if(h) await 상담지보냄(h.mid, h.b64); return; }
     case 'scancam': case 'scanalb': { const mid = rest[0]; closeSheet(); 상담지고르기(mid, k === 'scancam'); return; }
     case 'editintake': if(S.who !== 'tr' && rest[0] !== S.mid) return; S.scanQ = null; S.subj=rest[0]; go('intake_edit'); return;
@@ -12529,7 +12554,6 @@ document.addEventListener('click', async ev=>{
     case 'orec': closeSheet(); S.wid = rest[0]; go('summary'); return;
     case 'ootddel': {
       const x = (D.bph||[]).find(y=>y.id===rest[0]); if(!x) return;
-      if(S.who==='tr' && !confirm('이 사진을 삭제할까요? 회원 화면에서도 사라지고 되돌릴 수 없습니다.')) return;
       D.bph = D.bph.filter(y=>y.id!==x.id);
       sv(sdel('body_photos','id=eq.'+x.id), '오운완 삭제');
       fetch(SB_URL+'/storage/v1/object/media/'+x.path,
