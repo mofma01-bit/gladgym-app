@@ -1155,6 +1155,7 @@ body .figbox2{background:radial-gradient(80% 50% at 50% 30%,rgba(240,211,160,.09
 #cfm .bx{width:100%;max-width:320px;border-radius:20px;background:#1b1a18;border:1px solid #45413a;padding:22px 18px 16px;color:var(--cream)}
 #cfm p{font-size:16px;font-weight:700;line-height:1.5;text-align:center;margin-bottom:18px}
 #cfm .bx>div{display:flex;gap:9px}#cfm button{flex:1;height:48px;border-radius:14px;font-size:15px;font-weight:800}
+#cfm .soft .no{background:none;border:1px solid #45413a;color:var(--cream)}#cfm .soft .yes{background:var(--gold);color:#221b0e;border:0}
 #cfm .no{background:var(--gold);color:#221b0e}#cfm .yes{border:1.5px solid #8a4a3a;color:var(--warn);background:none}
 .scnb{flex:none;border-radius:14px;border:1px solid #8a6d2f;background:rgba(217,164,65,.10);padding:11px 13px;font-size:12.5px;line-height:1.55;color:var(--cream)}.scnb b{display:block;font-size:14px;color:var(--gold);margin-bottom:2px}.scnb .w{display:block;margin-top:5px;color:#e8b65a;font-weight:700}
 #top .logo.sm{padding-left:8px;padding-right:8px;letter-spacing:.06em}
@@ -2791,7 +2792,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '370';
+const BUILD = '371';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -11348,10 +11349,20 @@ const 지움확인 = {
   rsetdel:['이 세트를 제거할까요?', '제거'], psrm:['세트에서 이 종목을 제거할까요?', '제거'], mkclear:['표시를 모두 삭제할까요?', '모두 삭제'], rcartclr:['추가한 것을 전부 비울까요?', '비우기'],
   grpdel:['이 그룹을 삭제할까요?<br>안에 있던 루틴은 남습니다.', '삭제'], phdreq:['이 사진의 완전 삭제를 요청할까요?', '삭제 요청'], ootddel:['이 사진을 삭제할까요?<br>되돌릴 수 없습니다.', '삭제'],
   exdel:['이 종목을 삭제할까요?', '삭제'] };
-function 확인창(말, 단추, 하면){
+const 창에 = sel => !!document.querySelector('#sheetbox ' + sel + ', #main ' + sel);
+const 수정확인 = {
+  saveintake: a => { const d = D.intake[a.split(':')[1]] || {}; return Object.keys(d).some(k => k !== 'meals' && d[k] && (!Array.isArray(d[k]) || d[k].length)) || Object.values(d.meals || {}).some(Boolean); },
+  blgo:      () => 창에('[data-act^="bldel:"]'),            /* 같은 날 기록이 이미 있다 — 덮어쓴다 */
+  profok:    () => true, bodygoalok: () => true, goalsave: () => true, savedesc: () => true, rsavename: () => true, grprendo: () => true, bmemogo: () => true,
+  saveplan:  () => !!(D.plans && D.plans[subj()]) || true,
+  mealkcal:  () => true,
+  cycsetok:  () => !(D.cycle && D.cycle[S.mid] && D.cycle[S.mid].새),
+  exsave:    () => 창에('[data-act^="exdel"]'), pisave: () => 창에('[data-act^="pidel"]'), pssave: () => 창에('[data-act^="psdel"]'),
+  fsave:     () => 창에('[data-act^="fdelgo:"]') };
+function 확인창(말, 단추, 하면, 순한){
   let o = document.getElementById('cfm'); if(o) o.remove();
   o = document.createElement('div'); o.id = 'cfm';
-  o.innerHTML = `<div class="bx"><p>${말}</p><div><button class="no">돌아가기</button><button class="yes">${esc(단추)}</button></div></div>`;
+  o.innerHTML = `<div class="bx${순한 ? ' soft' : ''}"><p>${말}</p><div><button class="no">돌아가기</button><button class="yes">${esc(단추)}</button></div></div>`;
   document.body.appendChild(o);
   o.querySelector('.no').addEventListener('click', () => o.remove());
   o.addEventListener('click', e => { if(e.target === o) o.remove(); });
@@ -11360,6 +11371,9 @@ function 확인창(말, 단추, 하면){
 document.addEventListener('click', async ev=>{
   const el=ev.target.closest('[data-act]'); if(!el) return;
   { const a0 = el.getAttribute('data-act'), k0 = a0.split(':')[0], 묻 = 지움확인[k0] || (k0 === 'phide' && !((D.posts||[]).find(x => x.id === a0.split(':')[1]) || {}).hid ? ['이 글을 피드에서 내릴까요?', '내리기'] : null);
+    const 고침 = !묻 && 수정확인[k0] && (() => { try{ return 수정확인[k0](a0); }catch(e){ return false; } })();
+    if(고침){ if(S._확인 === a0) S._확인 = null;
+      else { 확인창('수정한 내용을 저장할까요?', '저장', () => { S._확인 = a0; el.isConnected ? el.click() : (b => { b.setAttribute('data-act', a0); b.style.display = 'none'; document.body.appendChild(b); b.click(); b.remove(); })(document.createElement('button')); }, true); return; } }
     if(묻){ if(S._확인 === a0) S._확인 = null;
       else { 확인창(묻[0], 묻[1], () => { S._확인 = a0; el.isConnected ? el.click() : (b => { b.setAttribute('data-act', a0); b.style.display = 'none'; document.body.appendChild(b); b.click(); b.remove(); })(document.createElement('button')); }); return; } } }
   /* 길게 눌러 끝낸 직후의 「따라오는 눌림」은 흘려보낸다 (풀자마자 다시 잠기지 않게) */
