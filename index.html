@@ -2752,7 +2752,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '360';
+const BUILD = '361';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -4240,8 +4240,8 @@ function vLogin(){
     <div style="height:8px"></div>
     <div class="h1">운동을 기록하고<br>트레이너에게 받습니다</div>
     <p class="lbl">PT 회원님만 쓰는 앱입니다.</p>
-    <button class="btn kakao" data-act="kakao">카카오로 시작하기</button>
-    <div class="note"><b>시험 단계</b> — 실제 카카오 로그인은 다음입니다. 지금은 아래에서 선택해 들어갑니다.</div>
+    <button class="btn main" data-act="kakao">전화번호로 시작하기</button>
+    <div class="note"><b>시험 단계</b> — 실제 로그인(전화번호 + 문자 인증)은 다음입니다. 지금은 아래에서 선택해 들어갑니다.</div>
     <div class="hr"></div>
     <button class="card rowc teal" data-act="as:tr">
       <div><div class="nm t">${esc(TRAINER)} 트레이너로 들어가기</div>
