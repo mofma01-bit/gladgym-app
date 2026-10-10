@@ -2751,7 +2751,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '358';
+const BUILD = '359';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -8962,6 +8962,7 @@ function vIntake(){
       <div class="t"><span class="k">성별</span><span class="v cyv" style="font-size:22px;padding-top:2px">${esc(d.sex||'—')}</span></div>
     </div>
     ${tr || mid===S.mid ?`<button class="hline gold" data-act="editintake:${mid}">${svg('h_note',18)}<b>PT 상담일지 작성 · 수정</b><small>눌러서 입력</small></button>`:''}
+    ${tr ? `<button class="hline" data-act="scanpaper:${mid}">${svg('h_note',18)}<b>종이 상담지 올리기</b><small>사진을 읽어서 채워요 · 대시보드에서 열려요</small></button>` : ''}
     ${묶음('기본', [['생년월일', d.birth ? (birthYmd(d.birth)||d.birth) : ''], ['직업', d.job], ['직업환경', d.jobenv], ['교대근무', d.shift]])}
     ${(d.route||[]).length ? `<span class="lbl">글래드짐을 알게 된 경로</span><div class="chips">${d.route.map(x=>`<span class="chip on">${esc(x)}</span>`).join('')}</div>` : (빈++, '')}
     ${묶음('운동 · 생활', [['경험한 운동', d.expr], ['스트레스 요인', d.stress], ['스트레스 강도', d.stressLv], ['해소 방법', (d.relief||[]).join(', ')], ['취침 시간', (d.meals||{})['취침']]])}
@@ -11298,6 +11299,7 @@ document.addEventListener('click', async ev=>{
     case 'sub2': S.subj=rest[1]; go(rest[0]); return;
 
     /* 상담일지 · 운동계획 편집 */
+    case 'scanpaper': window.open('desk/?m=' + encodeURIComponent(rest[0]) + '&scan=1', '_blank'); return;
     case 'editintake': if(S.who !== 'tr' && rest[0] !== S.mid) return; S.subj=rest[0]; go('intake_edit'); return;
     case 'editplan': S.subj=rest[0]; go('plan_edit'); return;
     case 'pick1': { const [pre,k,val]=rest;
