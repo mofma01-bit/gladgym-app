@@ -2424,7 +2424,7 @@ const 별칭이름 = 합친이름.concat([
   ['마운틴','mountain climber'], ['버피','burpee'], ['할로우','hollow'],
   ['데드버그','deadbug'], ['버드독','birddog'],
   /* 센터 기구 — 렉스코 사이클·런닝머신 (2026-09-04 대표 확인) */
-  ['트레드밀','treadmill 러닝머신 런닝머신 달리기 걷기 렉스코 lexco'],
+  ['트레드밀','treadmill 러닝머신 런닝머신 달리기 걷기 렉스코 lexco'], ['런닝머신','treadmill 트레드밀 러닝머신 달리기 걷기 렉스코 lexco'], ['천국의계단','stepmill 스텝밀 천국계단 계단기구 스테퍼'],
   ['사이클','cycle bike 자전거 싸이클 렉스코 lexco'],
   ['싸이클','cycle bike 자전거 사이클 렉스코 lexco'], ['로잉','rowing'], ['일립티컬','elliptical'],
   ['줄넘기','jumprope rope'], ['배틀로프','batttlerope 로프'],
@@ -2751,7 +2751,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '355';
+const BUILD = '356';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
