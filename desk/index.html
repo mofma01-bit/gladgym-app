@@ -1426,7 +1426,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '196';
+const BUILD = '197';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -8251,6 +8251,13 @@ async function 구글버튼(){
   for(let i=0;i<40;i++){ if(await gsiReady()) return; await new Promise(r=>setTimeout(r,250)); }
   $('#txgoogle').style.display=''; $('#txgoogle').textContent = '구글 버튼을 못 불러왔어요 — 이메일로 들어가세요';
 }
+try{ const q = new URLSearchParams(location.search); if(q.get('m')){ sessionStorage.setItem('gg_open', JSON.stringify({ m:q.get('m'), scan:q.get('scan') === '1', t:Date.now() })); history.replaceState(null, '', location.pathname + location.hash); } }catch(e){}
+async function 들어온회원열기(){
+  let o = null; try{ o = JSON.parse(sessionStorage.getItem('gg_open') || 'null'); sessionStorage.removeItem('gg_open'); }catch(e){}
+  if(!o || !o.m || Date.now() - o.t > 15*60*1000 || !D.m.find(x => x.id === o.m)) return;
+  S.mid = o.m; S.view = 'member'; S.tab = 'info'; render(); await loadMember(o.m); S.tab = 'info'; render();
+  if(o.scan) setTimeout(() => { const b = document.querySelector('[data-act="scanpick"]'); if(b){ b.scrollIntoView({ block:'center' }); b.classList.add('main'); toast('「종이 상담지 올리기」를 눌러 사진을 선택해 주세요'); } else toast('이 회원의 정보를 수정할 권한이 없어요'); }, 500);
+}
 async function boot(){
   authLoad();
   if(await 구글돌아옴()) authLoad();
@@ -8276,6 +8283,7 @@ async function boot(){
     document.querySelectorAll('.nav').forEach(x=>x.classList.toggle('on', x.dataset.v==='home'));
     setTimeout(팝업받기, 1200);          /* 들어오면 공지 팝업을 한 번 본다 */
     await load();
+    들어온회원열기().catch(() => {});
     /* 브로제이 잔여를 받은 뒤라야 잠수 회원을 셀 수 있다 */
     잔여받기().then(주간올리기).catch(()=>{});
     /* ⛔ 앞서는 리포트 화면에 들어가야만 읽었다 — 그래서 홈에서 「발송 실패」를 셀 수 없었다 */
