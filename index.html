@@ -2823,7 +2823,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '375';
+const BUILD = '376';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -9596,7 +9596,7 @@ function 계획답(g){
       <span class="kv"><input type="text" inputmode="numeric" data-k="pc:kcal" value="${esc(c.kcal||'')}" placeholder="${r.kcal}" aria-label="하루 칼로리"><small>kcal</small></span>
       <button data-act="kcalstep:50" aria-label="50 늘리기">＋</button></div>
     <div class="why">${r.kcalAuto ? '자동으로 계산한 값이에요 · 조정할 수 있어요' : '트레이너가 조정한 값이에요'}</div>
-    <div class="ln"><span>하루에 쓰는 양</span><b>${r.total.toLocaleString()} kcal</b></div>
+    <div class="ln"><span>유지 칼로리</span><b>${r.total.toLocaleString()} kcal</b></div>
     <div class="ln"><span>한 달에 빠지는 양</span><b class="g">${r.moKg > 0 ? kg(r.moKg) : '0'} kg</b></div>
     ${그날 != null ? `<div class="ln"><span>${esc(dateTxt(r.goal))}에는</span><b class="g">${r.hitDate && r.hitDate <= r.goal ? r.gw + 'kg 도착' : 그날 + ' kg쯤'}</b></div>` : ''}
     ${경.map(x => `<div class="warn"><b>${esc(x[0])}</b>${esc(x[1])}</div>`).join('')}
