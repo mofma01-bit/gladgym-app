@@ -2823,7 +2823,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '374';
+const BUILD = '375';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -4967,7 +4967,7 @@ function 세칸(e, v, cur, mid, tr, cms, nw, dsc){
   const rm가능 = rm종목인가(cur.ex), rmb = rm가능 ? rm최고(mid, cur.ex) : null;
   return `<div class="trio ${rm가능?'four':''}">
     <button class="t1" data-act="trio:prev">
-      <span class="k">지난 기록</span>
+      <span class="k">직전기록</span>
       <span class="v">${esc(p.v)}${화?`<i class="${p.방향}">${화}</i>`:''}</span></button>
     <button class="t2${(영상시범(v)||내시범)?'':' off'}" data-act="trio:demo">
       <span class="k">${내시범 ? '트레이너 시범' : '기구 사용법'}</span>
@@ -4984,7 +4984,7 @@ function 지금종목(){ const w=live(); if(!w) return null;
   return { w, cur, e:exOf(cur.ex), v:varOf(cur.ex,cur.va), mid:w.mid||S.mid }; }
 function sheetPrev(){
   openSheet(()=>{ const z=지금종목(); if(!z) return '<button class="btn ghost sm" data-act="close">닫기</button>';
-    return `<div class="h2">지난 기록 <small>${esc(exName(z.cur.ex,z.cur.va))}</small></div>
+    return `<div class="h2">직전기록 <small>${esc(exName(z.cur.ex,z.cur.va))}</small></div>
       ${prevBox(z.e, z.cur, z.mid, true)}
       <button class="btn ghost sm" data-act="close">닫기</button>`; });
 }
@@ -5001,7 +5001,7 @@ function prevBox(e, cur, mid, 늘펼침){
   const runs = lastRuns(cur.ex, cur.va, mid, 3);
   const 단위 = e.cardio ? '분' : 'kg';
   if(!runs.length) return `<div class="prevb flat"><div class="prevh">
-    <span class="pk">지난 기록</span>
+    <span class="pk">직전기록</span>
     <span class="pv" style="font-weight:600">처음 하는 종목이에요</span></div></div>`;
 
   const top = r => e.cardio ? Math.max(...r.sets.map(x=>+x.reps||0))
@@ -5016,7 +5016,7 @@ function prevBox(e, cur, mid, 늘펼침){
   const 지금 = oi>=0 ? (e.cardio ? +cur.sets[oi].reps : +cur.sets[oi].kg) : null;
   const 다름 = (지금!=null && 최근!=null && 지금!==최근);
 
-  const 줄안 = `<span class="pk">지난 기록</span>
+  const 줄안 = `<span class="pk">직전기록</span>
     <span class="pv">${값.map((x,i)=> i===값.length-1
         ? `<b>${kgfmt(x)}${단위}</b>` : kgfmt(x)).join('<i>→</i>')}</span>
     ${화살?`<span class="ar ${방향}">${화살}</span>`:''}
@@ -6451,7 +6451,7 @@ function vRecords(){
         const cl = t.diff > 0 ? 'up' : t.diff < 0 ? 'dn' : 'eq';
         const ar = t.diff === null ? '처음' : t.diff > 0 ? `▲${kgfmt(t.diff)}` : t.diff < 0 ? `▼${kgfmt(-t.diff)}` : '그대로';
         return `<div class="trow">
-          <span class="e">${esc(exName(t.ex,t.va))}${t.prev?'<span style="font-size:10.5px;font-weight:600;color:#6f6a64"> 지난번보다</span>':''}</span>
+          <span class="e">${esc(exName(t.ex,t.va))}${t.prev?'<span style="font-size:10.5px;font-weight:600;color:#6f6a64"> 직전 대비</span>':''}</span>
           <span class="n">${t.n}회</span>
           <span class="v">${kgfmt(t.last)}<span style="font-size:11px;font-weight:600;color:#8f8a83">${u}</span></span>
           <span class="d ${t.diff===null?'eq':cl}">${ar}</span></div>`; }).join('')
@@ -9397,8 +9397,8 @@ function calcOf(g){
   const water = w ? Math.round(w*33/10)*10 : 0;           /* 물 ml */
   const wkPct = w ? (week/FAT_KCAL)/w*100 : 0;            /* 주당 감량 % */
   const warn = [];
-  if(kcal && kcal < floor) warn.push(`너무 적게 드시는 계획이에요 — 하루 ${floor.toLocaleString()}kcal 아래는 권하지 않습니다`);
-  else if(kcal && bmr && kcal < bmr) warn.push('기초대사량보다 적게 드시는 계획이에요 — 오래 이어가면 근육이 빠집니다');
+  if(kcal && kcal < floor) warn.push(`하루 ${floor}kcal 아래입니다 — 안전 가이드보다 낮게 잡으셨습니다`);
+  else if(kcal && bmr && kcal < bmr) warn.push('권장 칼로리가 기초대사량보다 낮습니다 — 오래 끌면 근육이 빠집니다');
   if(wkPct > wkMax) warn.push(`너무 빨리 빠지는 계획이에요 — 한 주에 몸무게의 ${Math.round(wkPct*10)/10}%씩 (권하는 한도 ${wkMax}%)`);
   if(dayNeed && dayNeed > total - floor)
     warn.push(`이 날짜에 맞추려면 하루 ${dayNeed.toLocaleString()}kcal 를 줄여야 하는데, 최소 섭취 ${floor.toLocaleString()}kcal 를 지키면 ${Math.max(0,total-floor).toLocaleString()}kcal 까지가 한계입니다`);
@@ -9446,7 +9446,7 @@ function calcView(g){
     <div class="kcv">
       <span class="kl">하루 이만큼 드세요</span>
       <span class="kb">${r.kcal ? r.kcal.toLocaleString() : '—'}<small>kcal</small></span>
-      <span class="ks">${r.day > 0 ? `하루에 쓰는 ${r.total.toLocaleString()}kcal 에서 <b>${r.day.toLocaleString()}kcal</b> 줄인 값 · ${esc(foodTxt(r.day))}` : `하루에 쓰는 양(${r.total.toLocaleString()}kcal)과 같아요`}</span>
+      <span class="ks">${r.day > 0 ? `유지 ${r.total.toLocaleString()}에서 <b>${r.day.toLocaleString()}kcal</b> 줄인 값 · ${esc(foodTxt(r.day))}` : `유지 칼로리 ${r.total.toLocaleString()}kcal 과 같아요`}</span>
     </div>
     <div class="sstat3">
       <div><span class="k">한 달 예상</span><span class="v">${r.moKg > 0 ? '−'+kg(r.moKg) : '0'}<small>kg</small></span></div>
@@ -9461,7 +9461,7 @@ function calcView(g){
         <span><i style="background:#b08968"></i><small>지방 ${r.rf}%</small><b>${r.gg.f}<u>g</u></b></span>
       </div>
     </div>
-    <div class="megrp ikg">${[['기초대사량', r.bmr.toLocaleString()+' kcal'], ['하루에 쓰는 양', r.total.toLocaleString()+' kcal'],
+    <div class="megrp ikg">${[['기초대사량', r.bmr.toLocaleString()+' kcal'], ['유지 칼로리', r.total.toLocaleString()+' kcal'],
         ['한 주에', r.week > 0 ? r.week.toLocaleString()+' kcal · '+kg(r.wkKg)+'kg' : ''], ['단백질', r.perKg ? '체중 1kg당 '+r.perKg+'g' : ''],
         ['BMI', r.bmi ? r.bmi + (r.bmiTo ? ' → 목표 '+r.bmiTo : '') : ''], ['하루 물', r.water ? (r.water/1000).toFixed(1)+' L' : '']].filter(p=>p[1])
       .map(p=>`<div class="mrow2"><span class="ikk">${p[0]}</span><span class="ikv">${esc(p[1])}</span></div>`).join('')}</div>
@@ -9483,8 +9483,8 @@ function calcHTML(g, ed){
         <span class="kl">하루 이만큼 드세요${r.kcalAuto?(r.dayNeed?' · 목표 날짜 기준':''):' · 직접 정함'}</span>
         <span class="kb">${r.kcal?수(r.kcal,1):'—'}<small>kcal</small></span>
         <span class="ks">${r.total && r.day>0
-          ? `하루에 쓰는 ${r.total.toLocaleString()}kcal 에서 <b>${r.day}kcal</b> 줄인 값 — ${esc(foodTxt(r.day))}`
-          : (r.total ? `하루에 쓰는 양(${r.total.toLocaleString()}kcal)과 같습니다` : '몸무게와 활동량을 입력해 주세요')}</span>
+          ? `유지 ${r.total.toLocaleString()} 에서 <b>${r.day}kcal</b> 줄인 값 — ${esc(foodTxt(r.day))}`
+          : (r.total ? `유지 칼로리 ${r.total.toLocaleString()}kcal 과 같습니다` : '몸무게와 활동량을 입력해 주세요')}</span>
       </div>
       <div class="ksub">
         <div><span class="n">목표 날짜까지</span>
@@ -9498,10 +9498,10 @@ function calcHTML(g, ed){
       </div>
     </div>
 
-    <span class="lbl plain">이렇게 계산했어요</span>
+    <span class="lbl plain">계산 근거</span>
     <div class="crow"><span class="ck">기초대사량 <span style="color:var(--gold-2)">${esc(r.how||'')}</span></span>
       <span class="cv">${r.bmr||'—'}<span class="cs"> kcal</span></span></div>
-    <div class="crow"><span class="ck">하루에 쓰는 양</span>
+    <div class="crow"><span class="ck">유지 칼로리</span>
       <span class="cv">${r.total||'—'}<span class="cs"> kcal</span></span></div>
     <div class="crow"><span class="ck">한 주에 줄어드는 양</span>
       <span class="cv">${r.week>0?r.week.toLocaleString():0}<span class="cs"> kcal · ${kg(r.wkKg)}kg</span></span></div>
@@ -9530,7 +9530,7 @@ function calcHTML(g, ed){
         </div>`}`:''}
     ${r.perKg?`<div class="crow"><span class="ck">단백질 — 체중 1kg당</span>
       <span class="cv">${r.perKg}<span class="cs"> g/kg</span></span></div>`:''}
-    ${r.bmi?`<div class="crow"><span class="ck">BMI <small style="font-weight:400;color:var(--sub)">키에 견준 몸무게</small></span>
+    ${r.bmi?`<div class="crow"><span class="ck">체질량지수 BMI</span>
       <span class="cv">${r.bmi}${r.bmiTo?`<span class="cs"> → 목표 ${r.bmiTo}</span>`:''}</span></div>`:''}
     ${r.water?`<div class="crow"><span class="ck">하루 물</span>
       <span class="cv">${(r.water/1000).toFixed(1)}<span class="cs"> L</span></span></div>`:''}
