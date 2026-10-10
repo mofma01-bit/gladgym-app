@@ -1426,7 +1426,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '197';
+const BUILD = '198';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -3422,7 +3422,7 @@ async function 세트손잡이(a, act){
     const sc = (document.querySelector('.pzlist')||{}).scrollTop || 0; 세트창(); const l = document.querySelector('.pzlist'); if(l) l.scrollTop = sc; return true; }
   if(a==='pzmt'){ const k = act.dataset.v2, i = PZ.member_ids.indexOf(k); if(i >= 0) PZ.member_ids.splice(i,1); else PZ.member_ids.push(k); 세트창(); return true; }
   if(a==='pzup'){ const i = +act.dataset.i; if(i > 0){ const t = PZ.items[i-1]; PZ.items[i-1] = PZ.items[i]; PZ.items[i] = t; } 세트창(); return true; }
-  if(a==='pzrm'){ PZ.items.splice(+act.dataset.i, 1); 세트창(); return true; }
+  if(a==='pzrm'){ if(!confirm('세트에서 이 동작을 제거할까요?')) return true; PZ.items.splice(+act.dataset.i, 1); 세트창(); return true; }
   if(a==='pzsave'){ PZ.name = (PZ.name||'').trim(); PZ.memo = (PZ.memo||'').trim();
     if(!PZ.name){ toast('세트 이름을 입력해 주세요'); return true; }
     if(!PZ.items.length){ toast('동작을 하나 이상 추가해 주세요'); return true; }
@@ -8041,7 +8041,7 @@ async function txAct(a, el){
   /* 페이지 댓글 — ⛔ 회원 화면에도 `cmsend`·`cmdel` 이 있다(회원 피드백).
      `tx:` 하나로 갈리면 엉뚱한 것이 지워진다. 그래서 이름을 갈랐다 (2026-09-29) */
   if(a==='pgcmsend'){ await txCmSend(); return; }
-  if(a==='pgcmdel'){ await txCmDel(id); return; }
+  if(a==='pgcmdel'){ if(!confirm('이 글을 휴지통으로 보낼까요?')) return; await txCmDel(id); return; }
   if(a==='tick'){ await txTick(el); return; }
   /* ── 블록 ── */
   if(a==='badd'){ 글자넣기();
@@ -8211,7 +8211,7 @@ async function txAct(a, el){
       if(!/^image\//.test(f.type)) return toast('사진만 올릴 수 있어요');
       await 프로필올리기(f); };
     inp.click(); return; }
-  if(a==='photox'){
+  if(a==='photox'){ if(!confirm('프로필 사진을 제거할까요?')) return;
     try{ await usend('staff?id=eq.'+ME.id, 'PATCH', { photo:null }); ME.photo = null;
       const i = W.staff.findIndex(x=>x.id===ME.id); if(i>=0) W.staff[i].photo = null;
       toast('사진을 제거했어요'); txMe(); render(); }
