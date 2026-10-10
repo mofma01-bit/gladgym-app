@@ -1146,6 +1146,9 @@ body .figbox2{background:radial-gradient(80% 50% at 50% 30%,rgba(240,211,160,.09
 #stlog .er{font-size:12.5px;color:#e8b65a;min-height:16px}
 #stlog .go{height:48px;border-radius:14px;background:var(--gold);color:#221b0e;font-size:15px;font-weight:800}#stlog .x{height:40px;color:var(--sub);font-size:13.5px}
 .scnb .num{display:block;margin-top:7px;padding-top:7px;border-top:1px dashed #8a6d2f}.scnb .num b{display:block;font-size:12.5px;color:#e8b65a;margin-bottom:3px}.scnb .num i{display:inline-block;font-style:normal;margin-right:12px;color:var(--sub)}.scnb .num em{font-style:normal;font-weight:800;font-size:15px;color:var(--cream)}
+.scnb .df{display:block;margin-top:7px;padding-top:7px;border-top:1px dashed #8a6d2f}.scnb .df b{display:block;font-size:13px;color:#e8b65a;margin-bottom:4px}
+.scnb .df i{display:flex;align-items:center;flex-wrap:wrap;gap:4px 6px;font-style:normal;padding:5px 0;color:var(--sub);border-bottom:1px solid rgba(138,109,47,.3)}.scnb .df u{text-decoration:none;color:var(--cream);font-weight:700;min-width:52px}.scnb .df em{font-style:normal;font-weight:800;color:var(--cream)}
+.scnb .df button{margin-left:auto;height:30px;padding:0 11px;border-radius:999px;border:1px solid #8a6d2f;color:var(--gold);font-size:12px;font-weight:700;white-space:nowrap}.scnb .df button.all{display:block;margin:8px 0 0;width:100%;height:36px;background:var(--gold);color:#221b0e;border:0}
 .scnb .rs{display:inline-block;margin-top:6px;height:32px;padding:0 12px;border-radius:999px;border:1px solid #8a6d2f;color:var(--gold);font-size:12.5px;font-weight:700}
 .agwarn{border-radius:12px;border:1px solid #8a6d2f;background:rgba(217,164,65,.10);padding:11px 13px;font-size:12.5px;line-height:1.6;color:var(--cream);margin-bottom:12px}.agwarn b{color:#e8b65a}
 .scnb{flex:none;border-radius:14px;border:1px solid #8a6d2f;background:rgba(217,164,65,.10);padding:11px 13px;font-size:12.5px;line-height:1.55;color:var(--cream)}.scnb b{display:block;font-size:14px;color:var(--gold);margin-bottom:2px}.scnb .w{display:block;margin-top:5px;color:#e8b65a;font-weight:700}
@@ -2783,7 +2786,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '368';
+const BUILD = '369';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -3373,7 +3376,7 @@ function drawSheet(){
   box.innerHTML='<div class="grip"></div>'+sheetRender();
   if(옛제목 && 제목(box) === 옛제목){ box.scrollTop = 옛자리[0]; [...box.querySelectorAll('.pickbox')].forEach((e,i)=>{ if(옛자리[i+1]) e.scrollTop = 옛자리[i+1]; }); }
   box.querySelectorAll('textarea[data-k],input[data-k]').forEach(t=>{
-    if(!초안칸(t)) return; const d=S.draft&&S.draft[t.getAttribute('data-k')]; if(d) t.value=d; });
+    if(!초안칸(t)) return; const d=S.draft&&S.draft[t.getAttribute('data-k')]; if(d !== undefined) t.value=d; });      /* 비운 것('')도 초안이다 */
 }
 function closeSheet(){ sheetRender=null; $('#sheet').classList.remove('open'); $('#sheetbox').innerHTML=''; }
 $('#sheet').addEventListener('click', e=>{ if(e.target.id==='sheet' && !(sheetRender && sheetRender.닉)) closeSheet(); });   /* 닉네임 창은 바깥을 눌러도 안 닫힌다 */
@@ -4101,7 +4104,7 @@ function render(){
   }
   document.querySelectorAll('#main textarea[data-k],#main input[data-k]').forEach(t=>{
     if(!초안칸(t)) return;
-    const d=S.draft&&S.draft[t.getAttribute('data-k')]; if(d) t.value=d; });
+    const d=S.draft&&S.draft[t.getAttribute('data-k')]; if(d !== undefined) t.value=d; });      /* 비운 것('')도 초안이다 — 안 그러면 옛 값이 되살아난다 */
   S.dctx = dctx;
   $('#main').scrollTop = (v.keepScroll || sameView) ? keepAt : 0;
   const 새수 = [...$('#main').querySelectorAll('.cnt')].map(e=>e.getAttribute('data-cnt')).join(',');
@@ -9156,9 +9159,15 @@ function 상담지채움(mid, r){
     if(f.t === 'one'){ if(f.o.includes(v) && !d[f.k]){ d[f.k] = v; n++; } }
     else if(f.t === 'many'){ const a = (Array.isArray(v) ? v : []).filter(x => f.o.includes(x)); if(a.length && !(d[f.k]||[]).length){ d[f.k] = a; n++; } }
     else if(!d[f.k]){ 칸에('ik:' + f.k, String(v)); n++; } });
+  const 같나 = (a, b) => String(a).replace(/\s|cm/gi, '') === String(b).replace(/\s|cm/gi, ''), 다름 = [];
+  INTAKE_FIELDS.forEach(f => { const v = 읽[f.k], 옛 = d[f.k], 이름 = f.n.replace(/ —.*| \(.*/, ''); if(v == null || v === '' || (Array.isArray(v) && !v.length)) return;
+    if(f.t === 'one'){ if(f.o.includes(v) && 옛 && 옛 !== v) 다름.push({ k:f.k, t:'one', 이름, 옛, 새:v, v }); }
+    else if(f.t === 'many'){ const a = (Array.isArray(v) ? v : []).filter(x => f.o.includes(x)), b = Array.isArray(옛) ? 옛 : []; if(a.length && b.length && a.slice().sort().join() !== b.slice().sort().join()) 다름.push({ k:f.k, t:'many', 이름, 옛:b.join(' · '), 새:a.join(' · '), v:a }); }
+    else if(옛 && !같나(옛, v)) 다름.push({ k:f.k, t:'text', 이름, 옛:String(옛), 새:String(v), v:String(v) }); });
+  MEAL_KEYS.forEach(k => { const v = (읽.meals || {})[k], 옛 = d.meals[k]; if(v && 옛 && !같나(옛, v)) 다름.push({ k, t:'meal', 이름:k, 옛:String(옛), 새:String(v), v:String(v) }); });
   MEAL_KEYS.forEach(k => { const v = (읽.meals || {})[k]; if(v && !d.meals[k]){ 칸에('ikm:' + k, String(v)); n++; } });
   const m = MEMBERS.find(x => x.id === mid) || {}, 이름 = String(읽.name || '').replace(/\s/g, '');
-  S.scanQ = { mid, n, 모름: (r.모름 || []).map(k => k === 'meals' ? '식습관' : ((INTAKE_FIELDS.find(f => f.k === k) || {}).n || '').replace(/ —.*| \(.*/, '')).filter(Boolean),
+  S.scanQ = { mid, n, 다름, 모름: (r.모름 || []).map(k => k === 'meals' ? '식습관' : ((INTAKE_FIELDS.find(f => f.k === k) || {}).n || '').replace(/ —.*| \(.*/, '')).filter(Boolean),
     다른 : 이름 && m.n && 이름 !== String(m.n).replace(/\s/g, '') ? 읽.name : '',
     숫자: [['신장', 읽.height ? 읽.height + 'cm' : ''], ['생년월일', 읽.birth || ''], ['취침', (읽.meals || {})['취침'] || '']].filter(p => p[1]) };
   render(); toast(n + '칸을 채웠어요 — 확인하고 저장해 주세요');
@@ -9170,8 +9179,10 @@ function vIntakeEdit(){
   const 상자 = (제목, 몸) => `<div class="fsec"><span class="fsh">${제목}</span>${몸}</div>`;
   const q = S.scanQ && S.scanQ.mid === mid ? S.scanQ : null;
   return { top: bar('PT 상담일지 작성', `<span class="sub">${esc(subjName())}</span>`, 'sub2:intake:'+mid), body:
-      (q ? `<div class="scnb"><b>종이에서 읽은 ${q.n}칸을 채웠어요</b>확인하고 맨 아래 「저장」을 눌러야 들어갑니다. 이미 입력돼 있던 칸은 그대로 뒀어요.
-        ${q.n < 6 ? `<span class="w">읽은 칸이 적어요 — 사진이 잘 안 나왔을 수 있어요</span><button class="rs" data-act="scanpaper:${mid}">다시 찍기</button>` : ''}
+      (q ? `<div class="scnb"><b>종이에서 읽은 ${q.n}칸을 채웠어요</b>확인하고 맨 아래 「저장」을 눌러야 들어갑니다.
+        ${(q.다름||[]).length ? `<span class="df"><b>이미 있던 값과 종이가 달라요 — ${q.다름.length}칸</b>${q.다름.map((x, i) => `<i><u>${esc(x.이름)}</u> ${esc(x.옛)} → 종이 <em>${esc(x.새)}</em> <button data-act="scanuse:${i}">종이 값으로</button></i>`).join('')}
+          ${q.다름.length > 1 ? `<button class="all" data-act="scanuse:all">전부 종이 값으로</button>` : ''}</span>` : ''}
+        ${q.n < 6 && !(q.다름||[]).length ? `<span class="w">읽은 칸이 적어요 — 사진이 잘 안 나왔을 수 있어요</span><button class="rs" data-act="scanpaper:${mid}">다시 찍기</button>` : ''}
         ${(q.숫자||[]).length ? `<span class="num"><b>숫자는 종이와 꼭 맞춰 보세요</b>${q.숫자.map(p => `<i>${esc(p[0])} <em>${esc(p[1])}</em></i>`).join('')}</span>` : ''}
         ${q.모름.length ? `<span class="w">글씨 확인: ${esc(q.모름.join(' · '))}</span>` : ''}${q.다른 ? `<span class="w">종이의 이름이 「${esc(q.다른)}」예요 — 다른 분의 상담지가 아닌지 확인해 주세요</span>` : ''}</div>` : '') +
       상자('기본', `<div class="grid2">${F('birth')}${F('height')}</div>${F('sex')}${F('job')}${F('jobenv')}${F('shift')}`)
@@ -11490,6 +11501,11 @@ document.addEventListener('click', async ev=>{
     /* 상담일지 · 운동계획 편집 */
     case 'scanpaper': { if(S.who !== 'tr') return; S.scanTok = !!(await 직원토큰()); sheetScan(rest[0]); return; }
     case 'scanlogin': { const mid = rest[0]; closeSheet(); 직원로그인창(() => { S.scanTok = true; sheetScan(mid); }); return; }
+    case 'scanuse': { const q = S.scanQ; if(!q || !q.다름) return; const d = D.intake[q.mid] || (D.intake[q.mid] = {}); d.meals = d.meals || {};
+      const 넣 = x => { const 칸 = (k, v) => { S.draft = S.draft || {}; S.draft[k] = v; const el = document.querySelector('[data-k="' + k + '"]'); if(el) el.value = v; };
+        if(x.t === 'one' || x.t === 'many') d[x.k] = x.v; else if(x.t === 'meal') 칸('ikm:' + x.k, x.v); else 칸('ik:' + x.k, x.v); };
+      if(rest[0] === 'all'){ q.다름.forEach(넣); q.n += q.다름.length; q.다름 = []; } else { const x = q.다름[+rest[0]]; if(x){ 넣(x); q.다름.splice(+rest[0], 1); q.n++; } }
+      render(); toast('종이 값으로 바꿨어요 — 저장을 눌러야 들어갑니다'); return; }
     case 'scanforce': { const h = S.scanHold; S.scanHold = null; closeSheet(); if(h) await 상담지보냄(h.mid, h.b64); return; }
     case 'scancam': case 'scanalb': { const mid = rest[0]; closeSheet(); 상담지고르기(mid, k === 'scancam'); return; }
     case 'editintake': if(S.who !== 'tr' && rest[0] !== S.mid) return; S.scanQ = null; S.subj=rest[0]; go('intake_edit'); return;
