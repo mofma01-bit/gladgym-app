@@ -2751,7 +2751,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '356';
+const BUILD = '357';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -3261,9 +3261,15 @@ const notiCount = mid => {
   return notiList(mid).filter(n => !본때 || String(n.at) > 본때).length;
 };
 
+/* 유산소 한 줄의 뒷부분 — 「 · 2.3km · 6.8km/h · 경사 1도」 / 야외는 페이스 / 기구는 강도 */
+function 유덧글(e, s){ const 종 = /^야외/.test(e.n) ? '야외' : 경사최대(e.id) ? '속경' : '강도', 초 = (+s.reps||0) * 60;
+  const km = s.dist != null ? +s.dist : (종 !== '강도' && s.spd ? +((s.spd * 초 / 3600).toFixed(2)) : null);
+  if(종 === '야외') return (km ? ` · ${km}km` : '') + (km && 초 ? ` · 1km ${Math.floor(초/km/60)}분 ${String(Math.round(초/km%60)).padStart(2,'0')}초` : '');
+  if(종 === '속경') return (km ? ` · ${km}km` : '') + (s.spd ? ` · ${s.spd}km/h` : '') + (s.kg ? ` · 경사 ${kgfmt(s.kg)}도` : '');
+  return s.spd ? ` · 강도 ${s.spd}` : ''; }
 function setTxt(id,s){ if(isMemo(id)) return '기록함';
   return exOf(id).cardio
-    ? `${s.reps}분`+(s.spd?` · ${s.spd}km/h`:'')+(s.kg?` · 경사 ${kgfmt(s.kg)}°`:'')
+    ? `${s.reps}분` + 유덧글(exOf(id), s)
     : `${kgfmt(s.kg)}kg × ${s.reps}회`; }
 function setShort(id,s){ if(isMemo(id)) return '메모';
   return exOf(id).cardio ? `${s.reps}분`+(s.kg?` ${kgfmt(s.kg)}°`:'') : `${kgfmt(s.kg)}×${s.reps}`; }
@@ -6187,7 +6193,7 @@ function vReport(){
     const 전 = 전w ? top(전w.items.find(i=>i.ex===it.ex && i.va===it.va).sets) : null, d = 전==null ? null : Math.round((오늘-전)*10)/10;
     const 최고 = it.sets.reduce((a,x)=> (e.cardio ? (+x.reps||0) : (+x.kg||0)) >= (e.cardio ? (+a.reps||0) : (+a.kg||0)) ? x : a, it.sets[0]);
     const 첫없음 = tr && !cmOf(mid, it.ex, it.va).length && !피드백끔(mid);
-    return `<div class="rp2row"><span class="n">${esc(exName(it.ex,it.va))}<small>${it.sets.length}세트${e.cardio ? '' : ' · ' + (+최고.reps||0) + '회'}</small></span>
+    return `<div class="rp2row"><span class="n">${esc(exName(it.ex,it.va))}<small>${e.cardio ? (it.sets.length > 1 ? it.sets.length + '구간' : (유덧글(e, it.sets[0]).replace(/^ · /, '') || '유산소')) : it.sets.length + '세트 · ' + (+최고.reps||0) + '회'}</small></span>
         <span class="v">${kgfmt(오늘)}<small>${단위}</small></span>
         ${d!=null && d>0 ? `<span class="d up">▲ ${kgfmt(d)}</span>` : '<span></span>'}</div>`
       + (첫없음 ? `<button class="rpcm none" data-act="rpcm:${it.ex}:${it.va}"><span class="ic">✎</span><span class="tx"><b>첫 피드백 없음</b> — 이 종목은 아직 하나도 없어요</span><span class="at">남기기 ›</span></button>` : '');
