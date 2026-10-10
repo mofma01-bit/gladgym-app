@@ -2769,7 +2769,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '362';
+const BUILD = '363';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -4102,7 +4102,8 @@ function bar(title, right, back, sub){
   const 직원 = !bare && !!직원줄 && !S.rpOnly && (S.who === 'tr' || !!S.self);
   const logo = bare || (직원 && title) ? '' : `<button class="logo" data-act="${S.who==='tr' ? 'ttab:t_today' : 'tab:home'}" aria-label="홈으로">GLAD GYM</button>`;
   const 전환 = 직원 ? `<span class="modesw${S.self ? ' me' : ''}"><button class="${S.self ? '' : 'on'}" data-act="mode:tr">트레이너</button><button class="${S.self ? 'on' : ''}" data-act="mode:self">내 운동</button></span>` : '';
-  if(직원 && right) right = right.replace(/<span class="sub">(?:\d+월 \d+일[^<]*|최근 \d+회|오늘[^<]*)<\/span>/g, '');      /* 날짜 같은 글 자리에 전환 단추가 온다 */
+  /* 날짜 · 「최근 n회」 자리에 전환 단추가 온다 — 그 글은 제목 바로 아래 작은 글씨로 옮긴다 (2026-10-10 대표 「1번으로」) */
+  if(직원 && right) right = right.replace(/<span class="sub">((?:\d+월 \d+일|최근 \d+회|오늘)[^<]*)<\/span>/g, (m, 글) => { if(!sub) sub = 글; return ''; });
   const 첫화면 = S.who !== 'tr' && !bare && ['home','records','diet','community','feedback','me'].includes(S.screen) && MEMBERS.some(m=>m.id===S.mid);
   if(첫화면){ const n = notiCount(S.mid);
     right = (right && right.indexOf('notibell') < 0 ? right : '') + `<span class="tright">
