@@ -1135,6 +1135,14 @@ body .figbox2{background:radial-gradient(80% 50% at 50% 30%,rgba(240,211,160,.09
 .czwk .wb{height:9px;border-radius:9px;background:#24302b;margin:10px 0 7px;overflow:hidden}.czwk .wb i{display:block;height:100%;border-radius:9px;background:var(--run)}.czwk small{font-size:12px;color:var(--sub)}
 .czpick{display:grid;grid-template-columns:1fr 1fr;gap:9px}.czpick button{height:74px;border-radius:16px;border:1px solid #35322d;background:#1b1a18;color:var(--cream);font-size:14.5px;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
 .czpick button.on{border-color:var(--run);background:linear-gradient(170deg,#173328,#1b1a18 75%);color:var(--run)}.czpick svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#stlog{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:18px}
+#stlog .bx{width:100%;max-width:340px;border-radius:20px;background:#1b1a18;border:1px solid #45413a;padding:20px 18px;display:flex;flex-direction:column;gap:10px;color:var(--cream)}
+#stlog b{font-size:18px}#stlog p{font-size:13px;color:var(--sub);line-height:1.5;margin:-4px 0 4px}
+#stgsi{min-height:44px;display:flex;justify-content:center;align-items:center}#stgsi span{font-size:12px;color:var(--sub)}
+#stlog .or{font-size:11.5px;color:var(--sub);text-align:center;margin:2px 0}
+#stlog input{height:46px;border-radius:12px;border:1px solid #45413a;background:#23211e;color:var(--cream);font-size:15px;padding:0 12px;width:100%}
+#stlog .er{font-size:12.5px;color:#e8b65a;min-height:16px}
+#stlog .go{height:48px;border-radius:14px;background:var(--gold);color:#221b0e;font-size:15px;font-weight:800}#stlog .x{height:40px;color:var(--sub);font-size:13.5px}
 .scnb{flex:none;border-radius:14px;border:1px solid #8a6d2f;background:rgba(217,164,65,.10);padding:11px 13px;font-size:12.5px;line-height:1.55;color:var(--cream)}.scnb b{display:block;font-size:14px;color:var(--gold);margin-bottom:2px}.scnb .w{display:block;margin-top:5px;color:#e8b65a;font-weight:700}
 .modesw{flex:none;display:inline-flex;margin-left:auto;border:1px solid #4a4640;border-radius:999px;padding:2px;background:#191816}
 .modesw button{height:28px;padding:0 9px;border-radius:999px;font-size:11.5px;font-weight:700;color:var(--sub);white-space:nowrap}
@@ -2769,7 +2777,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '363';
+const BUILD = '364';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -9015,13 +9023,40 @@ async function 직원토큰(){
     }catch(e){ return null; } }
   return a.access_token;
 }
+const G_CLIENT = '237947648980-4ajr650ji6o88ss3nsua3aj2cqnt2m8u.apps.googleusercontent.com';   /* 대시보드와 같은 공개 값 */
+function 직원로그인창(다음){
+  let o = document.getElementById('stlog'); if(o) o.remove();
+  o = document.createElement('div'); o.id = 'stlog';
+  o.innerHTML = `<div class="bx"><b>직원 로그인</b><p>대시보드와 같은 계정으로 들어와 주세요.<br>이 폰에서 한 번만 하면 됩니다.</p>
+    <div id="stgsi"><span>구글 단추를 불러오는 중…</span></div><div class="or">또는 이메일로</div>
+    <input id="stem" type="email" placeholder="이메일" autocomplete="username"><input id="stpw" type="password" placeholder="비밀번호" autocomplete="current-password">
+    <div class="er" id="ster"></div><button class="go" id="stgo">로그인</button><button class="x" id="stx">닫기</button></div>`;
+  document.body.appendChild(o);
+  const 글 = t => { const e = document.getElementById('ster'); if(e) e.textContent = t || ''; };
+  const 담 = j => { try{ localStorage.setItem(DESK_KEY, JSON.stringify({ access_token:j.access_token, refresh_token:j.refresh_token, user:j.user, exp: Date.now() + ((j.expires_in||3600) - 60) * 1000 })); }catch(e){}
+    o.remove(); toast('로그인했어요'); if(다음) 다음(); };
+  const 보냄 = async (q, body) => { const r = await fetch(SB_URL + '/auth/v1/' + q, { method:'POST', headers:{ apikey:SB_KEY, 'Content-Type':'application/json' }, body: JSON.stringify(body) });
+    const j = await r.json().catch(() => ({})); if(!r.ok) throw new Error(j.error_description || j.msg || j.message || ('auth ' + r.status)); return j; };
+  o.querySelector('#stx').addEventListener('click', () => o.remove());
+  o.querySelector('#stgo').addEventListener('click', async () => { const em = o.querySelector('#stem').value.trim(), pw = o.querySelector('#stpw').value; if(!em || !pw){ 글('이메일과 비밀번호를 입력해 주세요'); return; }
+    글('확인하는 중…'); try{ 담(await 보냄('token?grant_type=password', { email:em, password:pw })); }catch(e){ 글(/invalid/i.test(e.message) ? '이메일이나 비밀번호가 달라요' : e.message); } });
+  const 구글 = async () => { const box = document.getElementById('stgsi'); if(!box) return;
+    if(!(window.google && google.accounts && google.accounts.id) || !(window.crypto && crypto.subtle)){ box.innerHTML = '<span>구글 단추를 불러오지 못했어요 — 이메일로 들어와 주세요</span>'; return; }
+    const nonce = crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2) + Date.now();
+    const hex = [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(nonce)))].map(x => x.toString(16).padStart(2,'0')).join('');
+    google.accounts.id.initialize({ client_id:G_CLIENT, nonce:hex, ux_mode:'popup', auto_select:false, itp_support:true,
+      callback: async res => { 글('확인하는 중…'); try{ 담(await 보냄('token?grant_type=id_token', { provider:'google', id_token:res.credential, nonce })); }catch(e){ 글('구글로 못 들어왔어요 — ' + e.message); } } });
+    box.innerHTML = ''; google.accounts.id.renderButton(box, { theme:'filled_black', size:'large', width:280, text:'signin_with', locale:'ko', shape:'pill' }); };
+  if(window.google && google.accounts) 구글();
+  else { const sc = document.createElement('script'); sc.src = 'https://accounts.google.com/gsi/client'; sc.async = true; sc.onload = 구글; sc.onerror = 구글; document.head.appendChild(sc); }
+}
 function sheetScan(mid){
   openSheet(() => `<div class="h2">종이 상담지 올리기</div>
     ${S.scanTok ? `<div class="agbody" style="margin-bottom:10px">상담지 한 장이 다 나오게 찍어 주세요. 읽은 값은 작성 화면에 채워지고, 저장을 눌러야 들어갑니다.</div>
       <button class="btn main" data-act="scancam:${mid}">카메라로 찍기</button>
       <button class="btn sub" data-act="scanalb:${mid}">앨범에서 선택</button>`
-    : `<div class="agbody" style="margin-bottom:10px">이 폰에서 처음 한 번만 직원 로그인이 필요해요. 로그인한 뒤 이 화면으로 돌아와 다시 눌러 주세요.</div>
-      <button class="btn main" data-act="scanlogin:${mid}">직원 로그인 (대시보드)</button>`}
+    : `<div class="agbody" style="margin-bottom:10px">이 폰에서 처음 한 번만 직원 로그인이 필요해요. 대시보드와 같은 계정입니다.</div>
+      <button class="btn main" data-act="scanlogin:${mid}">직원 로그인</button>`}
     <button class="btn ghost" data-act="close">닫기</button>`);
 }
 function 상담지고르기(mid, 찍기){
@@ -11384,7 +11419,7 @@ document.addEventListener('click', async ev=>{
 
     /* 상담일지 · 운동계획 편집 */
     case 'scanpaper': { if(S.who !== 'tr') return; S.scanTok = !!(await 직원토큰()); sheetScan(rest[0]); return; }
-    case 'scanlogin': closeSheet(); window.open('desk/?m=' + encodeURIComponent(rest[0]) + '&scan=1', '_blank'); return;
+    case 'scanlogin': { const mid = rest[0]; closeSheet(); 직원로그인창(() => { S.scanTok = true; sheetScan(mid); }); return; }
     case 'scancam': case 'scanalb': { const mid = rest[0]; closeSheet(); 상담지고르기(mid, k === 'scancam'); return; }
     case 'editintake': if(S.who !== 'tr' && rest[0] !== S.mid) return; S.scanQ = null; S.subj=rest[0]; go('intake_edit'); return;
     case 'editplan': S.subj=rest[0]; go('plan_edit'); return;
