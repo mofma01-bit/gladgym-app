@@ -1202,6 +1202,7 @@ body .figbox2{background:radial-gradient(80% 50% at 50% 30%,rgba(240,211,160,.09
 .pgoal .ends{display:flex;justify-content:space-between;font-size:11.5px;color:var(--sub)}
 .pgoal .two{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.pgoal .two div{border-radius:13px;background:rgba(0,0,0,.25);padding:9px 10px;text-align:center}.pgoal .two b{display:block;font-size:19px}.pgoal .two small{font-size:11.5px;color:var(--sub)}
 .pchart{border-radius:18px;background:#1b1a18;border:1px solid #35322d;padding:14px 14px 10px;margin-bottom:12px}.pchart .ph{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px}.pchart .ph b{font-size:15px}.pchart .ph span{font-size:12px;color:var(--sub)}
+.pfold{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;height:42px;border-radius:12px;border:1px solid #35322d;background:none;color:#9a938a;font-size:13px;font-weight:600;margin:10px 0}.pfold i{font-style:normal;transform:rotate(90deg);transition:transform .15s}.pfold.on i{transform:rotate(-90deg)}
 .pchart svg{display:block;width:100%;height:auto}.pchart .cap{display:flex;justify-content:space-between;font-size:11.5px;color:var(--sub);margin-top:2px}.plact button.on i{border-color:var(--gold);background:radial-gradient(circle,var(--gold) 45%,transparent 50%)}
 #calcout{flex:none;display:flex;flex-direction:column;gap:12px}
 .plres{border-radius:20px;border:1.5px solid var(--gold);background:linear-gradient(170deg,#2a2417,#1b1a18 70%);padding:16px 14px}.plres.none{border-style:dashed;border-color:#4a4640;background:none;text-align:center;font-size:13.5px;color:var(--sub)}
@@ -2864,7 +2865,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '384';
+const BUILD = '386';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -9085,7 +9086,7 @@ const INTAKE_FIELDS = [
   {k:'act',      n:'평소 활동량', t:'one',  o:['앉아서 일해요','가볍게 움직여요','자주 움직여요','많이 움직여요','아주 많이 움직여요']},   /* 종이 v4 · 운동계획 칼로리 계산의 활동량으로 넘어간다 */
   {k:'sleepH',   n:'하루 평균 수면 — 예) 6시간 30분', t:'text'},
   {k:'cond',     n:'현재 겪는 것',t:'many', o:['과민성 대장 증후군','당뇨','고혈압','갑상선질환','불면증']},
-  {k:'hist',     n:'과거 병력·질환', t:'many', o:['최근 수술','천식','무릎부상','목디스크','골절','고혈압','심근경색','폐질환','허리디스크','무월경','저혈압','갑상선기능','관절염','허리부상','다낭성난소증후군','당뇨']},
+  {k:'hist',     n:'과거 병력·질환', t:'many', o:['최근 수술','천식','무릎부상','목디스크','골절','고혈압','폐질환','허리디스크','무월경','저혈압','갑상선기능','관절염','허리부상','다낭성난소증후군','당뇨']},
   {k:'histEtc',  n:'그 밖의 병력', t:'text'},
   {k:'time',     n:'운동 가능 요일', t:'many', o:['월','화','수','목','금','토','일']},
   {k:'timeTxt',  n:'시간대',      t:'text'},
@@ -9522,11 +9523,6 @@ function calcView(g){
       <span class="kb">${r.kcal ? r.kcal.toLocaleString() : '—'}<small>kcal</small></span>
       <span class="ks">${r.day > 0 ? `유지 ${r.total.toLocaleString()}에서 <b>${r.day.toLocaleString()}kcal</b> 줄인 값 · ${esc(foodTxt(r.day))}` : `유지 칼로리 ${r.total.toLocaleString()}kcal 과 같아요`}</span>
     </div>
-    <div class="sstat3">
-      <div><span class="k">한 달 예상</span><span class="v">${r.moKg > 0 ? '−'+kg(r.moKg) : '0'}<small>kg</small></span></div>
-      <div><span class="k">목표까지</span><span class="v">${r.daysTo ? r.daysTo : '—'}<small>${r.daysTo ? '일' : ''}</small></span></div>
-      <div class="t"><span class="k">${r.gw ? r.gw+'kg 도착' : '도착 예상'}</span><span class="v cyv" style="${(도착==='안 빠짐' || (r.goal && r.hitDate && r.hitDate > r.goal)) ? 'color:var(--warn)' : ''}">${도착 || '—'}</span></div>
-    </div>
     <div class="kmac">
       <div class="kbar"><i style="flex:${r.kk.c/합};background:var(--gold)"></i><i style="flex:${r.kk.p/합};background:var(--teal)"></i><i style="flex:${r.kk.f/합};background:#b08968"></i></div>
       <div class="kleg">
@@ -9535,10 +9531,18 @@ function calcView(g){
         <span><i style="background:#b08968"></i><small>지방 ${r.rf}%</small><b>${r.gg.f}<u>g</u></b></span>
       </div>
     </div>
+    <button class="pfold ${S.plShow ? 'on' : ''}" data-act="plfold">${S.plShow ? '계산 접기' : '계산 자세히 보기'}<i>›</i></button>
+    <div class="pfoldin" style="${S.plShow ? '' : 'display:none'}">
+    <div class="sstat3">
+      <div><span class="k">한 달 예상</span><span class="v">${r.moKg > 0 ? '−'+kg(r.moKg) : '0'}<small>kg</small></span></div>
+      <div><span class="k">목표까지</span><span class="v">${r.daysTo ? r.daysTo : '—'}<small>${r.daysTo ? '일' : ''}</small></span></div>
+      <div class="t"><span class="k">${r.gw ? r.gw+'kg 도착' : '도착 예상'}</span><span class="v cyv" style="${(도착==='안 빠짐' || (r.goal && r.hitDate && r.hitDate > r.goal)) ? 'color:var(--warn)' : ''}">${도착 || '—'}</span></div>
+    </div>
     <div class="megrp ikg">${[['기초대사량', r.bmr.toLocaleString()+' kcal'], ['유지 칼로리', r.total.toLocaleString()+' kcal'],
         ['한 주에', r.week > 0 ? r.week.toLocaleString()+' kcal · '+kg(r.wkKg)+'kg' : ''], ['단백질', r.perKg ? '체중 1kg당 '+r.perKg+'g' : ''],
         ['BMI', r.bmi ? r.bmi + (r.bmiTo ? ' → 목표 '+r.bmiTo : '') : ''], ['하루 물', r.water ? (r.water/1000).toFixed(1)+' L' : '']].filter(p=>p[1])
       .map(p=>`<div class="mrow2"><span class="ikk">${p[0]}</span><span class="ikv">${esc(p[1])}</span></div>`).join('')}</div>
+    </div>
     ${r.warn.length ? `<div class="kwarn">${r.warn.map(x=>`<p>${esc(x)}</p>`).join('')}
       ${r.safeDate ? `<p class="s">무리 없이 가려면 <b>${esc(dateTxt(r.safeDate))}</b> 쯤이 좋아요</p>` : ''}</div>` : ''}`;
 }
@@ -11441,9 +11445,8 @@ document.addEventListener('change', ev => { const el = ev.target, k = el && el.d
   const 카드 = el.closest('.rcard'), 말 = 카드 && 카드.querySelector('.rnote'); if(말 && (!빈값(it.kg) || !빈값(it.reps))) 말.remove(); });
 document.addEventListener('keydown', ev => { if(ev.key !== 'Enter' || !(ev.target.dataset && ev.target.dataset.ri)) return; ev.preventDefault();
   const 다 = [...document.querySelectorAll('#main [data-ri]')], 다음 = 다[다.indexOf(ev.target) + 1]; if(다음){ 다음.focus(); 다음.select && 다음.select(); } else ev.target.blur(); });
-let 루틴찍 = 0;      /* 손가락으로 칸을 눌렀을 때만 안의 숫자를 통째로 고른다 — 화면이 다시 그려져 초점이 돌아올 때 고르면, 치던 숫자가 다음 글자에 지워진다 (전체 점검에서 「80」이 「2」가 됨) */
-document.addEventListener('pointerdown', ev => { if(ev.target.dataset && ev.target.dataset.ri) 루틴찍 = Date.now(); });
-document.addEventListener('focusin', ev => { if(ev.target.dataset && ev.target.dataset.ri && ev.target.select && Date.now() - 루틴찍 < 600) setTimeout(() => { try{ if(document.activeElement === ev.target) ev.target.select(); }catch(e){} }, 0); });      /* 늦게 도는 select() 는 그 칸으로 초점을 도로 끌고 온다 — 이미 옆 칸으로 갔으면 건드리지 않는다 (「80 · 12」가 「2 · 1」이 됨) */
+/* 칸을 손가락으로 누르면 안의 숫자를 통째로 고른다 — **누른 그 순간(click)에 바로**. 나중에(setTimeout) 고르면, 그 사이 친 글자가 골라져 다음 글자에 지워지거나(「80」→「0」) 이미 옆 칸으로 간 초점을 도로 끌고 온다(「80 · 12」→「2 · 1」) — 전체 점검이 두 번 잡음 */
+document.addEventListener('click', ev => { const el = ev.target; if(el && el.dataset && el.dataset.ri && el.select && document.activeElement === el){ try{ el.select(); }catch(e){} } });
 document.addEventListener('change', ev => { const el = ev.target; if(!el || !el.dataset || !el.dataset.cz) return; const 키 = el.dataset.cz, n = Number(String(el.value).replace(/[^0-9.]/g, ''));
   if(!isFinite(n)) return;
   if(키 === 'goal'){ const g = Math.max(5, Math.min(180, Math.round(n) || 유목표()));
@@ -11951,6 +11954,7 @@ document.addEventListener('click', async ev=>{
       r.items.splice(+i,1); svRoutineItems(rid); closeSheet(); toast('제거했어요'); render(); return; }
     case 'rdone': { S.just=null; document.activeElement && document.activeElement.blur && document.activeElement.blur(); await 루틴바로저장(rest[0]); toast('루틴을 저장했어요'); go('t_routines'); return; }
     case 'rcm': S.rcm = rest[0] === '1'; render(); return;
+    case 'plfold': S.plShow = !S.plShow; render(); return;      /* 운동계획 보기 — 계산 근거(한 달 예상 · 기초대사량 …)는 접어 둔다 (2026-10-11 대표 「접고」) */
     case 'rdefall': { const r = rOf(rest[0]); if(!r) return;
       const 읽 = k => { const el = document.querySelector('[data-k="rdef:' + k + '"]'), t = el ? String(el.value).replace(/[^0-9]/g, '') : ''; return t === '' ? null : Math.max(0, +t); }, 세 = 읽('sets'), 쉬 = 읽('rest');
       if(세 == null && 쉬 == null){ toast('세트나 쉬는 시간을 입력해 주세요'); return; }
