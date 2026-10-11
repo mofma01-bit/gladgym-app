@@ -500,6 +500,14 @@ textarea.inp{min-height:76px;resize:vertical;line-height:1.6}
   padding:11px 18px;border-radius:11px;font-size:13px;font-weight:600;
   opacity:0;pointer-events:none;transition:.18s;z-index:80}
 #toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+/* ── 로딩 그림 (설계서\시험페이지\로딩_모음.html 과 같은 것 · 금색 하나 · 그림 파일 없음) ── */
+@keyframes glspin{to{transform:rotate(360deg)}}@keyframes gllift{0%,100%{transform:translateY(9px)}50%{transform:translateY(-9px)}}@keyframes glbn{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+.gload{display:flex;justify-content:center;margin:0 0 14px;color:#e9cf9b}.gload svg{width:56px;height:56px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;overflow:visible}.gload .bar{animation:gllift 1.4s ease-in-out infinite}
+.gring{display:inline-block;width:15px;height:15px;border-radius:50%;border:2.5px solid rgba(233,207,155,.25);border-top-color:#e9cf9b;animation:glspin 1s linear infinite;vertical-align:-3px;margin-right:8px}
+.gdots{display:inline-flex;gap:5px;margin-right:8px;vertical-align:1px}.gdots i{width:6px;height:6px;border-radius:50%;background:#e9cf9b;animation:glbn .9s ease-in-out infinite}.gdots i:nth-child(2){animation-delay:.15s}.gdots i:nth-child(3){animation-delay:.3s}
+#toast.busy::before{content:"";display:inline-block;width:13px;height:13px;border-radius:50%;border:2.5px solid rgba(233,207,155,.25);border-top-color:#e9cf9b;animation:glspin 1s linear infinite;vertical-align:-2px;margin-right:8px}
+@media (prefers-reduced-motion:reduce){.gload .bar,.gring,.gdots i,#toast.busy::before{animation:none}}
+
 #toast.act{pointer-events:auto}
 #toast button{margin-left:11px;color:var(--gold);font-weight:800;text-decoration:underline;font-size:13px}
 
@@ -1415,7 +1423,7 @@ body.resizing{cursor:col-resize;user-select:none}
 <input type="file" id="kitfile" multiple accept="image/*,video/*,.pdf,.hwp,.hwpx,.docx,.xlsx" style="display:none">
     <div class="top" id="top"></div>
     <div class="topline" id="topline"></div>
-    <div class="body" id="body"><div class="empty">불러오는 중…</div></div>
+    <div class="body" id="body"><div class="empty"><div class="gload"><svg viewBox="0 0 56 56"><g class="bar"><path d="M8 28h40"/><path d="M14 19v18M42 19v18" stroke-width="5"/><path d="M8 23v10M48 23v10"/></g></svg></div>불러오는 중…</div></div>
   </div>
 </div>
 </div>
@@ -1426,7 +1434,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <script>
 "use strict";
-const BUILD = '199';
+const BUILD = '201';
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
 const HD = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
@@ -1839,7 +1847,7 @@ const IKNAME = {
   sex:'성별', birth:'생년월일', height:'키', job:'직업', jobenv:'근무 자세',
   shift:'교대 근무', time:'운동 요일', timeTxt:'운동 시간대',
   expr:'그 밖의 운동', exprs:'경험한 운동', goals:'원하는 것', hist:'과거 부상', histEtc:'그 밖의 병력', cond:'건강 상태',
-  stress:'스트레스 원인', stressLv:'스트레스 정도', relief:'푸는 방법',
+  stress:'스트레스 원인', stressLv:'스트레스 정도', relief:'푸는 방법', act:'평소 활동량', sleepH:'하루 평균 수면',
   route:'알게 된 경로', needs:'메모', notes:'특이사항',
   goal:'목표', meals:'평소 식사'
 };
@@ -1867,7 +1875,7 @@ function toast(msg, 되돌리기){                 /* 되돌리기를 주면 알
   const t = $('#toast');
   되돌리기함 = 되돌리기 || null;
   t.innerHTML = esc(msg) + (되돌리기 ? ' <button id="toastundo">되돌리기</button>' : '');
-  t.classList.toggle('act', !!되돌리기);
+  t.classList.toggle('act', !!되돌리기); t.classList.toggle('busy', /중이에요|올리는 중|저장 중/.test(msg));
   t.classList.add('on');
   clearTimeout(toastT);
   toastT = setTimeout(() => { t.classList.remove('on'); 되돌리기함 = null; }, 되돌리기 ? 6000 : 1800);
@@ -2072,7 +2080,7 @@ function 팝업판그리기(){
            + '<button class="btn main sm" data-act="ppsave" data-i="' + esc(새것 ? '' : 고칠) + '">저장</button></div>'
          : '<button class="btn main" style="width:100%" data-act="ppnew">＋ 새 공지 쓰기</button>')
     + '<div class="lbl" style="margin-top:18px">지난 공지 ' + 팝업판.목록.length + '건</div>'
-    + (팝업판.받는중 ? '<div class="empty">불러오는 중이에요…</div>'
+    + (팝업판.받는중 ? '<div class="empty"><i class="gring"></i>불러오는 중이에요…</div>'
        : 팝업판.왜 ? '<div class="empty">' + esc(팝업판.왜) + '</div>'
        : (줄 || '<div class="empty">아직 공지가 없어요</div>'))
     + '</div>');
@@ -2129,7 +2137,7 @@ function 승인판그리기(){
 
   판열기('앱 가입 승인',
     '<div style="padding:4px 2px">'
-    + (승인판.받는중 ? '<div class="empty">불러오는 중이에요…</div>'
+    + (승인판.받는중 ? '<div class="empty"><i class="gring"></i>불러오는 중이에요…</div>'
        : 승인판.왜 ? '<div class="empty">' + esc(승인판.왜) + '</div>'
        : '<div class="lbl">승인을 기다리는 분 ' + 기다림.length + '명</div>'
          + (기다림.length ? 기다림.map(줄).join('') : '<div class="empty">기다리는 분이 없어요</div>')
@@ -2749,7 +2757,7 @@ const 수기회원인가 = m => /^mh\d/.test(String((m && m.id) || ''));
    규격: 설계서\상담지\스캔_읽기_규격.md · 종이: 설계서\상담지\PT상담지_A4.pdf */
 const 스캔칸 = [['sex','성별',['여','남']], ['birth','생년월일'], ['height','신장'], ['job','직업'], ['jobenv','직업환경',['좌식','활동적','복합적']], ['shift','교대근무',['아니오','예']],
   ['route','알게 된 경로',['네이버블로그','네이버지도','인스타그램','전단지','외부간판','지인소개','기타'],1], ['exprs','경험한 운동',['헬스','PT','필라테스','요가','수영','러닝','골프'],1], ['expr','그 밖의 운동 · 기간'], ['stress','스트레스 요인'], ['stressLv','스트레스 강도',['1~3','4~6','7~10']],
-  ['relief','해소 방법',['음식섭취','운동','쇼핑','인간관계','수면','스마트폰','기타'],1], ['cond','현재 겪는 것',['과민성 대장 증후군','당뇨','고혈압','갑상선질환','불면증'],1],
+  ['relief','해소 방법',['음식섭취','운동','쇼핑','인간관계','수면','스마트폰','기타'],1], ['act','평소 활동량',['앉아서 일해요','가볍게 움직여요','자주 움직여요','많이 움직여요','아주 많이 움직여요']], ['sleepH','하루 평균 수면'], ['cond','현재 겪는 것',['과민성 대장 증후군','당뇨','고혈압','갑상선질환','불면증'],1],
   ['hist','과거 병력 · 질환',['최근 수술','천식','무릎부상','목디스크','골절','고혈압','심근경색','폐질환','허리디스크','무월경','저혈압','갑상선기능','관절염','허리부상','다낭성난소증후군','당뇨'],1],
   ['histEtc','그 밖의 병력'], ['time','운동 가능 요일',['월','화','수','목','금','토','일'],1], ['timeTxt','시간대'], ['goals','회원님이 원하는 것',['다이어트','근력 향상','체형 교정','통증 개선','체력 향상','바디프로필','기타'],1], ['needs','메모']];
 const 스캔식사 = ['아침','점심','저녁','간식','영양제','음주','취침'];
@@ -2757,7 +2765,7 @@ let 스캔 = null;
 async function 상담지읽기(b64){
   if(!AUTH || !AUTH.access_token) throw new Error('로그인이 필요해요');
   const r = await fetch(GG_API + '/app/scan/intake', { method:'POST', headers:{ 'Content-Type':'application/json' },
-    body: JSON.stringify({ desk: AUTH.access_token, image: b64, form: 'GG-INTAKE-A4 v3' }) });
+    body: JSON.stringify({ desk: AUTH.access_token, image: b64, form: 'GG-INTAKE-A4 v4' }) });
   if(!r.ok) throw new Error(r.status === 404 ? '서버에 읽기 창구가 아직 없어요' : '서버에 닿지 못했어요 (' + r.status + ')');
   const d = await r.json(); if(!d.ok) throw new Error(d.why || '읽지 못했어요'); return d;
 }
@@ -3134,7 +3142,7 @@ function 체중곡선(logs, gw){
     + '<text x="'+(bx+bw/2).toFixed(1)+'" y="'+(by+12.5).toFixed(1)+'" text-anchor="middle" font-size="10" font-weight="800" fill="#f0d3a0">'+글+'</text></svg>';
 }
 function tabStat(){
-  if(!M.plan && !M.wi.length && !M.meals.length) return '<div class="empty">불러오는 중…</div>';
+  if(!M.plan && !M.wi.length && !M.meals.length) return '<div class="empty"><i class="gring"></i>불러오는 중…</div>';
   const a = 현황셈(S.mid);
   const 막대 = p => '<i class="st-bar"><b style="width:'+Math.round(p)+'%"></b></i>';
   return '<div class="cols">'
@@ -6435,7 +6443,7 @@ function 블록칸(b, i, 편집, urls, 번호){
   if(b.t==='hr')   속 = '<hr>';
   if(b.t==='img' || b.t==='vid' || b.t==='file'){
     const u = urls[b.path] || '';
-    속 = !b.path ? '<div class="tx-med wait">불러오는 중…</div>'
+    속 = !b.path ? '<div class="tx-med wait"><i class="gring"></i>불러오는 중…</div>'
       : !u ? '<div class="tx-med wait">🔒 열 수 없음</div>'
       : b.t==='img' ? '<div class="tx-med"><a href="'+u+'" target="_blank" rel="noopener"><img src="'+u+'" alt="'+esc(b.name||'')+'" loading="lazy"></a>'+(b.name?'<div class="cap">'+esc(b.name)+'</div>':'')+'</div>'
       : b.t==='vid' ? '<div class="tx-med"><video src="'+u+'" controls preload="metadata" playsinline></video>'+(b.name?'<div class="cap">'+esc(b.name)+'</div>':'')+'</div>'
