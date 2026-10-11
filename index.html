@@ -1183,9 +1183,26 @@ body .figbox2{background:radial-gradient(80% 50% at 50% 30%,rgba(240,211,160,.09
 .plin{display:flex;flex-direction:column;gap:11px}.fsec .fn small{font-size:11px;color:#6f6a64;font-weight:400}
 .plmore{height:38px;border-radius:11px;border:1px dashed #4a4640;color:var(--sub);font-size:13px}.plmore.sm{height:32px;padding:0 12px;flex:none}
 .plsay{font-size:13.5px;color:var(--teal);font-weight:700}
-.plact{display:flex;flex-direction:column;gap:7px}.plact button{display:flex;align-items:center;gap:10px;min-height:50px;border-radius:13px;border:1px solid var(--line);background:var(--dark-3);color:var(--cream);padding:8px 12px;text-align:left}
-.plact b{display:block;font-size:14.5px}.plact small{display:block;font-size:12px;color:var(--sub);margin-top:1px}.plact i{font-style:normal;margin-left:auto;width:20px;height:20px;border-radius:50%;border:1.5px solid #5a554d;flex:none}
-.plact button.on{border-color:var(--gold);background:linear-gradient(170deg,#2c2618,#1b1a18 80%)}.plact button.on i{border-color:var(--gold);background:radial-gradient(circle,var(--gold) 45%,transparent 50%)}
+.plact{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.plact button{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:6px;min-height:86px;border-radius:14px;border:1px solid var(--line);background:var(--dark-3);color:var(--sub);padding:11px 2px 8px;text-align:center}
+.plact svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.plact b{display:block;font-size:11.5px;line-height:1.25;font-weight:700}
+.plact button.on{border-color:var(--gold);background:linear-gradient(170deg,#2c2618,#1b1a18 80%);color:var(--gold)}
+.pcards{display:grid;gap:6px}.pcards.n5{grid-template-columns:repeat(5,1fr)}.pcards.n3{grid-template-columns:repeat(3,1fr)}.pcards.n4{grid-template-columns:repeat(4,1fr)}
+.pcards button{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:5px;min-height:78px;border-radius:14px;border:1px solid var(--line);background:var(--dark-3);color:var(--sub);padding:11px 2px 8px;text-align:center}
+.pcards svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.pcards b{display:block;font-size:11.5px;line-height:1.25;font-weight:700}.pcards.n3 b{font-size:13.5px}.pcards small{font-size:10.5px;color:var(--sub);font-weight:500}
+.pcards button.on{border-color:var(--gold);background:linear-gradient(170deg,#2c2618,#1b1a18 80%);color:var(--gold)}
+.plactsay{font-size:13px;color:#a9d8e6;font-weight:700;text-align:center;margin-top:9px}
+/* ── 운동계획 맨 위 그림 ── */
+.pgoal{border-radius:20px;border:1.5px solid var(--gold);background:linear-gradient(170deg,#2a2417,#1b1a18 70%);padding:16px 15px;margin-bottom:12px}
+.pgoal .t{display:flex;align-items:baseline;gap:8px}.pgoal .t b{font-size:30px;font-weight:800}.pgoal .t b.g{color:var(--gold)}.pgoal .t i{font-style:normal;color:var(--gold);font-size:20px}.pgoal .t small{font-size:13px;color:var(--sub)}
+.pgoal .pgb{position:relative;height:12px;border-radius:12px;background:#2f2a1f;margin:26px 6px 8px}.pgoal .pgb u{position:absolute;left:0;top:0;bottom:0;border-radius:12px;background:linear-gradient(90deg,#8a6d2f,#e9cf9b)}
+.pgoal .pgb em{position:absolute;top:-22px;transform:translateX(-50%);font-style:normal;font-size:11.5px;font-weight:700;color:var(--gold);white-space:nowrap}.pgoal .pgb i{position:absolute;top:-3px;width:18px;height:18px;border-radius:50%;background:#f2ead9;border:3px solid #e9cf9b;transform:translateX(-50%)}
+.pgoal .ends{display:flex;justify-content:space-between;font-size:11.5px;color:var(--sub)}
+.pgoal .two{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.pgoal .two div{border-radius:13px;background:rgba(0,0,0,.25);padding:9px 10px;text-align:center}.pgoal .two b{display:block;font-size:19px}.pgoal .two small{font-size:11.5px;color:var(--sub)}
+.pchart{border-radius:18px;background:#1b1a18;border:1px solid #35322d;padding:14px 14px 10px;margin-bottom:12px}.pchart .ph{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px}.pchart .ph b{font-size:15px}.pchart .ph span{font-size:12px;color:var(--sub)}
+.pchart svg{display:block;width:100%;height:auto}.pchart .cap{display:flex;justify-content:space-between;font-size:11.5px;color:var(--sub);margin-top:2px}.plact button.on i{border-color:var(--gold);background:radial-gradient(circle,var(--gold) 45%,transparent 50%)}
 #calcout{flex:none;display:flex;flex-direction:column;gap:12px}
 .plres{border-radius:20px;border:1.5px solid var(--gold);background:linear-gradient(170deg,#2a2417,#1b1a18 70%);padding:16px 14px}.plres.none{border-style:dashed;border-color:#4a4640;background:none;text-align:center;font-size:13.5px;color:var(--sub)}
 .plres h3{font-size:13px;color:var(--gold);font-weight:700}.plres .big{display:flex;align-items:center;justify-content:center;gap:10px;margin:8px 0 4px}
@@ -2847,7 +2864,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '382';
+const BUILD = '384';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -9078,8 +9095,19 @@ const INTAKE_FIELDS = [
 ];
 const MEAL_KEYS = ['아침','점심','저녁','간식','영양제','음주','취침'];   /* 취침은 식습관이 아니라 「운동 · 생활」 칸에서 입력한다 — 저장 자리는 예전 그대로 meals.취침 */
 
+/* 상담일지 — 글 칩 대신 그림 카드로 고르는 칸 (2026-10-11 · 누르는 손잡이는 칩과 같다) · 그림은 Tabler Icons (MIT) */
+const 칸그림 = { stressLv: {"1~3": ["<path d=\"M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0\"/><path d=\"M9 10l.01 0\"/><path d=\"M15 10l.01 0\"/><path d=\"M9.5 15a3.5 3.5 0 0 0 5 0\"/>", "약해요"], "4~6": ["<path d=\"M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0\"/><path d=\"M9 10l.01 0\"/><path d=\"M15 10l.01 0\"/><path d=\"M9 15l6 0\"/>", "보통이에요"], "7~10": ["<path d=\"M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0\"/><path d=\"M9 10l.01 0\"/><path d=\"M15 10l.01 0\"/><path d=\"M9.5 15.25a3.5 3.5 0 0 1 5 0\"/>", "심해요"]},
+  goals: {"다이어트": "<path d=\"M3 3m0 4a4 4 0 0 1 4 -4h10a4 4 0 0 1 4 4v10a4 4 0 0 1 -4 4h-10a4 4 0 0 1 -4 -4z\"/><path d=\"M12 7c1.956 0 3.724 .802 5 2.095l-2.956 2.904a3 3 0 0 0 -2.038 -.799a3 3 0 0 0 -2.038 .798l-2.956 -2.903a6.979 6.979 0 0 1 5 -2.095z\"/>", "근력 향상": "<path d=\"M2 12h1\"/><path d=\"M6 8h-2a1 1 0 0 0 -1 1v6a1 1 0 0 0 1 1h2\"/><path d=\"M6 7v10a1 1 0 0 0 1 1h1a1 1 0 0 0 1 -1v-10a1 1 0 0 0 -1 -1h-1a1 1 0 0 0 -1 1z\"/><path d=\"M9 12h6\"/><path d=\"M15 7v10a1 1 0 0 0 1 1h1a1 1 0 0 0 1 -1v-10a1 1 0 0 0 -1 -1h-1a1 1 0 0 0 -1 1z\"/><path d=\"M18 8h2a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-2\"/><path d=\"M22 12h-1\"/>", "체형 교정": "<path d=\"M16 5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0\"/><path d=\"M5 20l5 -.5l1 -2\"/><path d=\"M18 20v-5h-5.5l2.5 -6.5l-5.5 1l1.5 2\"/>", "통증 개선": "<path d=\"M14 12l0 .01\"/><path d=\"M10 12l0 .01\"/><path d=\"M12 10l0 .01\"/><path d=\"M12 14l0 .01\"/><path d=\"M4.5 12.5l8 -8a4.94 4.94 0 0 1 7 7l-8 8a4.94 4.94 0 0 1 -7 -7\"/>", "체력 향상": "<path d=\"M19.5 13.572l-7.5 7.428l-2.896 -2.868m-6.117 -8.104a5 5 0 0 1 9.013 -3.022a5 5 0 1 1 7.5 6.572\"/><path d=\"M3 13h2l2 3l2 -6l1 3h3\"/>", "바디프로필": "<path d=\"M5 7h1a2 2 0 0 0 2 -2a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2\"/><path d=\"M9 13a3 3 0 1 0 6 0a3 3 0 0 0 -6 0\"/>", "기타": "<path d=\"M5 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0\"/><path d=\"M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0\"/><path d=\"M19 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0\"/>"} };
+function 그림칸(pre, d, f){
+  const v = d[f.k], 여러 = f.t === 'many', arr = Array.isArray(v) ? v : [], 켬 = x => 여러 ? arr.includes(x) : v === x;
+  const 그 = x => f.k === 'act' ? [ACT그림[Object.keys(ACT말).find(k => ACT말[k][0] === x)] || '', x.replace(' ', '<br>').replace('아주<br>많이 ', '아주 많이<br>'), ''] : f.k === 'stressLv' ? [칸그림.stressLv[x][0], 칸그림.stressLv[x][1], x] : [칸그림.goals[x] || '', x, ''];
+  return `<div class="fld"><span class="fn">${esc(f.n)}</span>
+    <div class="pcards n${f.k === 'goals' ? 4 : f.o.length}">${f.o.map(x => { const g = 그(x); return `<button class="${켬(x) ? 'on' : ''}" data-act="${여러 ? 'pickn' : 'pick1'}:${pre}:${f.k}:${x}"><svg viewBox="0 0 24 24" aria-hidden="true">${g[0]}</svg><b>${g[1]}</b>${g[2] ? `<small>${g[2]}</small>` : ''}</button>`; }).join('')}</div>
+    ${f.k === 'act' && v ? `<div class="plactsay">${esc((ACT말[Object.keys(ACT말).find(k => ACT말[k][0] === v)] || [])[1] || '')}</div>` : ''}</div>`;
+}
 function fieldEditor(pre, d, f){
   const v = d[f.k];
+  if(pre === 'ik' && (f.k === 'act' || f.k === 'stressLv' || f.k === 'goals')) return 그림칸(pre, d, f);
   if(f.t==='text')  return `<div class="fld"><span class="fn">${esc(f.n)}</span>
     <input class="search" type="text" data-k="${pre}:${f.k}" value="${esc(v||'')}"></div>`;
   if(f.t==='area')  return `<div class="fld"><span class="fn">${esc(f.n)}</span>
@@ -9624,6 +9652,10 @@ function intakeNote(mid){
 }
 
 /* ── 운동계획 편집 ── */
+/* 활동량 그림 — Tabler Icons (MIT License · Copyright (c) 2020-2024 Paweł Kuna) */
+const ACT그림 = { '저활동':'<path d="M5 11a2 2 0 0 1 2 2v2h10v-2a2 2 0 1 1 4 0v4a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-4a2 2 0 0 1 2 -2z"/><path d="M5 11v-5a3 3 0 0 1 3 -3h8a3 3 0 0 1 3 3v5"/><path d="M6 19v2"/><path d="M18 19v2"/>',
+  '가벼운활동': 유선.걷기, '보통의활동': 유선.달리기, '적극적인 활동': 유선.바벨,
+  '매우 적극적인 활동':'<path d="M12 12c2 -2.96 0 -7 -1 -8c0 3.038 -1.773 4.741 -3 6c-1.226 1.26 -2 3.24 -2 5a6 6 0 1 0 12 0c0 -1.532 -1.056 -3.94 -2 -5c-1.786 3 -2.791 3 -4 2z"/>' };
 const ACT말 = { '저활동':['앉아서 일해요','운동은 거의 안 해요'], '가벼운활동':['가볍게 움직여요','주 1~3번 가벼운 운동'], '보통의활동':['자주 움직여요','주 3~5번 운동'],
   '적극적인 활동':['많이 움직여요','거의 매일 운동 · 몸 쓰는 일'], '매우 적극적인 활동':['아주 많이 움직여요','매일 강하게 · 하루 두 번 · 육체노동'] };
 /* 답 한 장 — 하루에 이만큼 드세요. 경고는 걸릴 때만, 제목 한 줄 + 설명 한 줄 */
@@ -9703,7 +9735,8 @@ function vPlanEdit(){
 
     <div class="fsec"><div class="plq"><i>3</i>평소 얼마나 움직이세요?</div>
       <div class="plact">${Object.keys(ACT).map(x=>
-        `<button class="${(c.act||'가벼운활동')===x?'on':''}" data-act="pc1:act:${x}"><span><b>${esc(ACT말[x][0])}</b><small>${esc(ACT말[x][1])}</small></span><i></i></button>`).join('')}</div>
+        `<button class="${(c.act||'가벼운활동')===x?'on':''}" data-act="pc1:act:${x}"><svg viewBox="0 0 24 24" aria-hidden="true">${ACT그림[x]}</svg><b>${esc(ACT말[x][0]).replace(' ', '<br>').replace('아주<br>많이 ', '아주 많이<br>')}</b></button>`).join('')}</div>
+      <div class="plactsay">${esc(ACT말[c.act||'가벼운활동'][1])}</div>
     </div>
 
     <div id="calcout">${계획답(g)}</div>
@@ -9772,6 +9805,29 @@ function sheetKcalEx(mid){
 }
 
 /* ── 운동계획 ── */
+/* 운동계획 맨 위 그림 둘 (2026-10-11) — 글을 읽기 전에 그림으로: 지금 어디쯤인지 · 이대로 가면 언제 어디에 닿는지 */
+function 목표막대(mid, g){
+  const 몸 = 몸목표들(mid).find(x => x.k === 'w'); if(!몸) return '';
+  const logs = ((D.blog||{})[mid]||[]).filter(x => +x.w), 시작 = logs.length ? +logs[0].w : +g.now.w, 남 = dLeft(g.to.date), p = Math.round(몸.p * 100), 차 = Math.abs(Math.round((몸.c - 몸.b) * 10) / 10);
+  return `<div class="pgoal"><div class="t"><b>${kgfmt(시작)}</b><i>→</i><b class="g">${kgfmt(몸.b)}</b><small>kg</small></div>
+    <div class="pgb"><u style="width:${p}%"></u><em style="left:${Math.min(84, Math.max(16, p))}%">지금 ${kgfmt(몸.c)}kg</em><i style="left:${Math.min(98, Math.max(2, p))}%"></i></div>
+    <div class="ends"><span>시작 ${kgfmt(시작)}</span><span>목표 ${kgfmt(몸.b)}</span></div>
+    <div class="two"><div><b>${몸.p >= 1 ? '도착' : kgfmt(차) + '<small> kg</small>'}</b><small>${몸.p >= 1 ? '목표에 닿았어요' : '남은 몸무게'}</small></div>
+      <div><b>${남 != null && 남 >= 0 ? 'D-' + 남 : '–'}</b><small>${남 != null && 남 >= 0 ? esc(dateTxt(g.to.date)) + '까지' : (g.to.date ? '목표 날짜가 지났어요' : '목표 날짜 없음')}</small></div></div></div>`;
+}
+function 이대로그림(g){
+  const r = calcOf(g); if(!(r.bmr && r.w && r.goal && r.daysTo > 0 && r.day > 0)) return '';
+  const 그날 = Math.round((r.w - (r.day * r.daysTo) / FAT_KCAL) * 10) / 10, 도착 = !!(r.gw && r.hitDate && r.hitDate <= r.goal), 끝 = 도착 ? r.gw : 그날;
+  const lo = Math.min(끝, r.gw || 끝) - 1, hi = r.w + .6, y = v => Math.round(18 + (hi - v) / (hi - lo) * 84), y0 = y(r.w), y1 = y(끝), yg = r.gw ? y(r.gw) : null;
+  return `<div class="pchart"><div class="ph"><b>이대로 가면</b><span>한 달에 ${(Math.round(r.moKg * 10) / 10).toFixed(1)}kg</span></div>
+    <svg viewBox="0 0 340 128" aria-hidden="true"><defs><linearGradient id="pcg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9cf9b" stop-opacity=".32"/><stop offset="1" stop-color="#e9cf9b" stop-opacity="0"/></linearGradient></defs>
+      ${yg != null ? `<line x1="12" y1="${yg}" x2="328" y2="${yg}" stroke="#7fe0b0" stroke-dasharray="4 4" stroke-width="1.2"/><text x="12" y="${Math.min(124, yg + 14)}" font-size="10.5" fill="#7fe0b0">목표 ${kgfmt(r.gw)}kg</text>` : ''}
+      <path d="M12 ${y0} L328 ${y1} L328 124 L12 124z" fill="url(#pcg)"/><path d="M12 ${y0} L328 ${y1}" stroke="#e9cf9b" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <circle cx="12" cy="${y0}" r="5.5" fill="#121211" stroke="#e9cf9b" stroke-width="3"/><circle cx="328" cy="${y1}" r="5" fill="#e9cf9b"/>
+      <text x="22" y="${Math.max(12, y0 - 9)}" font-size="11" font-weight="700" fill="#f2ead9">${kgfmt(r.w)}kg</text>
+      <text x="324" y="${Math.max(12, y1 - 10)}" text-anchor="end" font-size="11.5" font-weight="700" fill="#e9cf9b">${도착 ? kgfmt(r.gw) + 'kg 도착' : kgfmt(그날) + 'kg쯤'}</text></svg>
+    <div class="cap"><span>오늘</span><span>${esc(dateTxt(r.goal))}</span></div></div>`;
+}
 function vPlan(){
   const mid=subj(), tr=(S.who==='tr');
   const g=GOALS[mid]||{}; g.now=g.now||{}; g.to=g.to||{};
@@ -9784,6 +9840,7 @@ function vPlan(){
   return { top: bar('운동계획', `<span class="sub">${esc(subjName())}</span>`, tr?'tm:'+mid:'tab:me'), body:`
     ${tr?`<button class="hline gold" data-act="editplan:${mid}">${svg('h_target',18)}<b>계획 수정 · 칼로리 계산</b><small>눌러서 수정</small></button>`
        :(mid===S.mid?`<div class="cyfoot"><span>목표 체중 · 칼로리는 트레이너와 함께 정해요</span></div>`:'')}
+    ${목표막대(mid, g)}${이대로그림(g)}
     <span class="lbl">나의 운동 목적</span>
     ${목적.length ? `<div class="chips">${목적.map(x=>`<span class="chip on">${esc(x)}</span>`).join('')}</div>` : '<div class="cyfoot"><span>아직 정하지 않았어요</span></div>'}
     <span class="lbl">목표${(g.now.date||g.to.date) ? ` <small style="font-weight:600;color:var(--sub)">${esc(g.now.date||'—')} → ${esc(g.to.date||'—')}${남!=null&&남>=0 ? ' · '+남+'일 남음' : ''}</small>` : ''}</span>
@@ -11384,7 +11441,9 @@ document.addEventListener('change', ev => { const el = ev.target, k = el && el.d
   const 카드 = el.closest('.rcard'), 말 = 카드 && 카드.querySelector('.rnote'); if(말 && (!빈값(it.kg) || !빈값(it.reps))) 말.remove(); });
 document.addEventListener('keydown', ev => { if(ev.key !== 'Enter' || !(ev.target.dataset && ev.target.dataset.ri)) return; ev.preventDefault();
   const 다 = [...document.querySelectorAll('#main [data-ri]')], 다음 = 다[다.indexOf(ev.target) + 1]; if(다음){ 다음.focus(); 다음.select && 다음.select(); } else ev.target.blur(); });
-document.addEventListener('focusin', ev => { if(ev.target.dataset && ev.target.dataset.ri && ev.target.select) setTimeout(() => { try{ ev.target.select(); }catch(e){} }, 0); });
+let 루틴찍 = 0;      /* 손가락으로 칸을 눌렀을 때만 안의 숫자를 통째로 고른다 — 화면이 다시 그려져 초점이 돌아올 때 고르면, 치던 숫자가 다음 글자에 지워진다 (전체 점검에서 「80」이 「2」가 됨) */
+document.addEventListener('pointerdown', ev => { if(ev.target.dataset && ev.target.dataset.ri) 루틴찍 = Date.now(); });
+document.addEventListener('focusin', ev => { if(ev.target.dataset && ev.target.dataset.ri && ev.target.select && Date.now() - 루틴찍 < 600) setTimeout(() => { try{ if(document.activeElement === ev.target) ev.target.select(); }catch(e){} }, 0); });      /* 늦게 도는 select() 는 그 칸으로 초점을 도로 끌고 온다 — 이미 옆 칸으로 갔으면 건드리지 않는다 (「80 · 12」가 「2 · 1」이 됨) */
 document.addEventListener('change', ev => { const el = ev.target; if(!el || !el.dataset || !el.dataset.cz) return; const 키 = el.dataset.cz, n = Number(String(el.value).replace(/[^0-9.]/g, ''));
   if(!isFinite(n)) return;
   if(키 === 'goal'){ const g = Math.max(5, Math.min(180, Math.round(n) || 유목표()));
