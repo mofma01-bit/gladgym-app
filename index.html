@@ -2364,6 +2364,14 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
   border:1px solid var(--line);border-radius:11px;padding:11px 17px;font-size:13.5px;font-weight:700;
   white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .22s;z-index:30}
 #toast.on{opacity:1}
+/* ── 로딩 그림 (설계서\시험페이지\로딩_모음.html 과 같은 것 · 금색 하나 · 그림 파일 없음) ── */
+@keyframes glspin{to{transform:rotate(360deg)}}@keyframes gllift{0%,100%{transform:translateY(9px)}50%{transform:translateY(-9px)}}@keyframes glbn{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+.gload{display:flex;justify-content:center;margin:0 0 14px;color:#e9cf9b}.gload svg{width:56px;height:56px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;overflow:visible}.gload .bar{animation:gllift 1.4s ease-in-out infinite}
+.gring{display:inline-block;width:15px;height:15px;border-radius:50%;border:2.5px solid rgba(233,207,155,.25);border-top-color:#e9cf9b;animation:glspin 1s linear infinite;vertical-align:-3px;margin-right:8px}
+.gdots{display:inline-flex;gap:5px;margin-right:8px;vertical-align:1px}.gdots i{width:6px;height:6px;border-radius:50%;background:#e9cf9b;animation:glbn .9s ease-in-out infinite}.gdots i:nth-child(2){animation-delay:.15s}.gdots i:nth-child(3){animation-delay:.3s}
+#toast.busy::before{content:"";display:inline-block;width:13px;height:13px;border-radius:50%;border:2.5px solid rgba(233,207,155,.25);border-top-color:#e9cf9b;animation:glspin 1s linear infinite;vertical-align:-2px;margin-right:8px}
+@media (prefers-reduced-motion:reduce){.gload .bar,.gring,.gdots i,#toast.busy::before{animation:none}}
+
 
 /* 네 방향 찍기 — 뭐가 없는지 한눈에 */
 .posechk{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:2px 0 10px}
@@ -2823,7 +2831,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '376';
+const BUILD = '379';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -3350,7 +3358,7 @@ function setShort(id,s){ if(isMemo(id)) return '메모';
   return exOf(id).cardio ? `${s.reps}분`+(s.kg?` ${kgfmt(s.kg)}°`:'') : `${kgfmt(s.kg)}×${s.reps}`; }
 
 let toastT=null;
-function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('on'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('on'),1700); }
+function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.toggle('busy', /중이에요|올리는 중|저장 중/.test(m)); t.classList.add('on'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('on'),1700); }
 function go(sc, patch){
   if(S.screen && S.screen!==sc && S.screen!=='boot' && S.screen!=='err'){
     S.stack = S.stack || [];
@@ -4321,7 +4329,7 @@ function vTerms(){
       <div class="sm">Supabase(대한민국 서울) · ㈜인바디</div></div><span class="rt">›</span></button>` };
 }
 
-function vBoot(){ return { top: bar('글래드짐'), body:`<div class="empty">서버에서 불러오는 중이에요…</div>` }; }
+function vBoot(){ return { top: bar('글래드짐'), body:`<div class="empty"><div class="gload"><svg viewBox="0 0 56 56"><g class="bar"><path d="M8 28h40"/><path d="M14 19v18M42 19v18" stroke-width="5"/><path d="M8 23v10M48 23v10"/></g></svg></div>서버에서 불러오는 중이에요…</div>` }; }
 function vErr(){ return { top: bar('글래드짐'), body:`
   <div class="empty">서버에 닿지 못했어요</div>
   <div class="note">${esc(S.errMsg||'')}</div>
@@ -8471,7 +8479,7 @@ function sheetFoodPick(mealId){
           <span class="n2">${esc(x.name)}<small>${x.brand?esc(x.brand)+' · ':''}${kgfmt(x.qty)}${x.unit?' × '+esc(x.unit):'인분'}</small></span>
           <span class="k2">${Math.round(x.kcal)}<span style="font-size:11px;font-weight:600;color:#8f8a83"> kcal</span></span></button>`).join('')}`:''}
       ${res===null && !rec.length?'<div class="note">이름으로 검색해 주세요 · 없으면 직접 입력</div>':''}
-      ${res==='loading'?'<div class="empty">검색 중이에요…</div>':''}
+      ${res==='loading'?'<div class="empty"><span class="gdots"><i></i><i></i><i></i></span>검색 중이에요…</div>':''}
       ${Array.isArray(res)? (res.length? `<span class="lbl">${res.length}가지 찾았어요</span>${res.map(row).join('')}`
         : '<div class="empty">못 찾았어요<br>「직접 입력」으로 새로 만들 수 있어요</div>') : ''}
       <button class="btn ghost sm" data-act="close">닫기</button>
@@ -9021,6 +9029,8 @@ const INTAKE_FIELDS = [
   {k:'stress',   n:'스트레스 요인', t:'text'},
   {k:'stressLv', n:'스트레스 강도', t:'one', o:['1~3','4~6','7~10']},
   {k:'relief',   n:'해소 방법',   t:'many', o:['음식섭취','운동','쇼핑','인간관계','수면','스마트폰','기타']},
+  {k:'act',      n:'평소 활동량', t:'one',  o:['앉아서 일해요','가볍게 움직여요','자주 움직여요','많이 움직여요','아주 많이 움직여요']},   /* 종이 v4 · 운동계획 칼로리 계산의 활동량으로 넘어간다 */
+  {k:'sleepH',   n:'하루 평균 수면 — 예) 6시간 30분', t:'text'},
   {k:'cond',     n:'현재 겪는 것',t:'many', o:['과민성 대장 증후군','당뇨','고혈압','갑상선질환','불면증']},
   {k:'hist',     n:'과거 병력·질환', t:'many', o:['최근 수술','천식','무릎부상','목디스크','골절','고혈압','심근경색','폐질환','허리디스크','무월경','저혈압','갑상선기능','관절염','허리부상','다낭성난소증후군','당뇨']},
   {k:'histEtc',  n:'그 밖의 병력', t:'text'},
@@ -9061,11 +9071,11 @@ function vIntake(){
       <div><span class="k">신장</span><span class="v">${esc(String(d.height||'—').replace(/cm/i,''))}<small>${d.height ? 'cm' : ''}</small></span></div>
       <div class="t"><span class="k">성별</span><span class="v cyv" style="font-size:22px;padding-top:2px">${esc(d.sex||'—')}</span></div>
     </div>
-    ${tr || mid===S.mid ?`<button class="hline gold" data-act="editintake:${mid}">${svg('h_note',18)}<b>PT 상담일지 작성 · 수정</b><small>눌러서 입력</small></button>`:''}
+    ${tr ?`<button class="hline gold" data-act="editintake:${mid}">${svg('h_note',18)}<b>PT 상담일지 작성 · 수정</b><small>눌러서 입력</small></button>`:''}
     ${tr ? `<button class="hline" data-act="scanpaper:${mid}">${svg('h_note',18)}<b>종이 상담지 올리기</b><small>찍거나 앨범에서 · 읽어서 채워요</small></button>` : ''}
     ${묶음('기본', [['생년월일', d.birth ? (birthYmd(d.birth)||d.birth) : ''], ['직업', d.job], ['직업환경', d.jobenv], ['교대근무', d.shift]])}
     ${(d.route||[]).length ? `<span class="lbl">글래드짐을 알게 된 경로</span><div class="chips">${d.route.map(x=>`<span class="chip on">${esc(x)}</span>`).join('')}</div>` : (빈++, '')}
-    ${묶음('운동 · 생활', [['경험한 운동', [(d.exprs||[]).join(', '), d.expr].filter(Boolean).join(' · ')], ['스트레스 요인', d.stress], ['스트레스 강도', d.stressLv], ['해소 방법', (d.relief||[]).join(', ')], ['취침 시간', (d.meals||{})['취침']]])}
+    ${묶음('운동 · 생활', [['경험한 운동', [(d.exprs||[]).join(', '), d.expr].filter(Boolean).join(' · ')], ['스트레스 요인', d.stress], ['스트레스 강도', d.stressLv], ['해소 방법', (d.relief||[]).join(', ')], ['평소 활동량', d.act], ['취침 시간', (d.meals||{})['취침']], ['하루 평균 수면', d.sleepH]])}
     ${묶음('건강 상태', [['현재 겪는 것', (d.cond||[]).join(', ')], ['과거 병력·질환', (d.hist||[]).join(', ')], ['그 밖의 병력', d.histEtc]])}
     ${((d.time||[]).length || d.timeTxt) ? `<span class="lbl">운동 가능 시간</span>
       <div class="ikdays">${['월','화','수','목','금','토','일'].map(x=>`<span class="${(d.time||[]).includes(x)?'on':''}">${x}</span>`).join('')}</div>
@@ -9074,7 +9084,7 @@ function vIntake(){
     ${((d.goals||[]).length || d.needs) ? `<span class="lbl">회원님이 원하는 것</span>${(d.goals||[]).length ? `<div class="chips">${d.goals.map(x=>`<span class="chip on">${esc(x)}</span>`).join('')}</div>` : ''}${d.needs ? `<div class="megrp ikg"><div class="mrow2"><span class="ikv">${esc(d.needs)}</span></div></div>` : ''}` : (빈++, '')}
     ${tr && d.notes ? `<span class="lbl">특이사항 · 트레이너만 봅니다</span><div class="megrp ikg t"><div class="mrow2"><span class="ikv">${esc(d.notes)}</span></div></div>` : ''}`;
   return { top: bar('PT 상담일지', `<span class="sub">${esc(subjName())}</span>`, tr?'tm:'+mid:'tab:me'), body: 몸 + (빈
-    ? (tr || mid===S.mid ? `<button class="hline" data-act="editintake:${mid}">${svg('h_note',18)}<b>입력 안 한 항목 ${빈}개</b><small>눌러서 채우기</small></button>`
+    ? (tr ? `<button class="hline" data-act="editintake:${mid}">${svg('h_note',18)}<b>입력 안 한 항목 ${빈}개</b><small>눌러서 채우기</small></button>`
           : '')
     : '') };
 }
@@ -9188,7 +9198,7 @@ async function 상담지보냄(mid, b64){
 }
 async function 상담지읽기(b64){
   const t = await 직원토큰(); if(!t) throw new Error('직원 로그인이 필요해요');
-  const r = await fetch(GG_API + '/app/scan/intake', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ desk:t, image:b64, form:'GG-INTAKE-A4 v3' }) });
+  const r = await fetch(GG_API + '/app/scan/intake', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ desk:t, image:b64, form:'GG-INTAKE-A4 v4' }) });
   if(!r.ok) throw new Error('서버에 닿지 못했어요 (' + r.status + ')');
   const d = await r.json(); if(!d.ok) throw new Error(d.why || '읽지 못했어요'); return d;
 }
@@ -9229,8 +9239,8 @@ function vIntakeEdit(){
         ${q.모름.length ? `<span class="w">글씨 확인: ${esc(q.모름.join(' · '))}</span>` : ''}${q.다른 ? `<span class="w">종이의 이름이 「${esc(q.다른)}」예요 — 다른 분의 상담지가 아닌지 확인해 주세요</span>` : ''}</div>` : '') +
       상자('기본', `<div class="grid2">${F('birth')}${F('height')}</div>${F('sex')}${F('job')}${F('jobenv')}${F('shift')}`)
     + 상자('글래드짐을 알게 된 경로', F('route'))
-    + 상자('운동 · 생활', F('exprs') + F('expr') + F('stress') + F('stressLv') + F('relief')
-        + `<div class="fld"><span class="fn">취침 시간</span><input class="search" type="text" data-k="ikm:취침" placeholder="예) 23시 30분" value="${esc(d.meals['취침']||'')}"></div>`)
+    + 상자('운동 · 생활', F('exprs') + F('expr') + F('stress') + F('stressLv') + F('relief') + F('act')
+        + `<div class="grid2"><div class="fld"><span class="fn">취침 시간</span><input class="search" type="text" data-k="ikm:취침" placeholder="예) 23시 30분" value="${esc(d.meals['취침']||'')}"></div>${F('sleepH')}</div>`)
     + 상자('건강', F('cond') + F('hist') + F('histEtc'))
     + 상자('운동 가능 시간', F('time') + F('timeTxt'))
     + 상자('나의 식습관', `<div class="grid2">${MEAL_KEYS.filter(k => k !== '취침').map(k=>`<div class="fld"><span class="fn">${k}</span>
@@ -9608,7 +9618,7 @@ function vPlanEdit(){
   g.now=g.now||{}; g.to=g.to||{}; g.vows=g.vows||[]; g.promises=g.promises||[];
   const c=g.calc||(g.calc={}), d=D.intake[mid]||{}, Fd = S.plF || (S.plF = {});
   /* 상담일지에 있는 것은 미리 채운다 — 활동량은 직업환경에서, 운동 목적은 「원하는 것」에서 (비어 있을 때만) */
-  if(!c.act) c.act = ({ '좌식':'저활동', '복합적':'가벼운활동', '활동적':'보통의활동' })[d.jobenv] || '가벼운활동';
+  if(!c.act) c.act = Object.keys(ACT말).find(k => ACT말[k][0] === d.act) || ({ '좌식':'저활동', '복합적':'가벼운활동', '활동적':'보통의활동' })[d.jobenv] || '가벼운활동';   /* 상담일지의 평소 활동량이 먼저 */
   if(!(g.purpose||[]).length && (d.goals||[]).length){ const 짝 = { '다이어트':'다이어트', '근력 향상':'근육증가', '체형 교정':'교정운동', '통증 개선':'건강', '체력 향상':'건강', '바디프로필':'그 밖에', '기타':'그 밖에' };
     g.purpose = [...new Set(d.goals.map(x => 짝[x]).filter(Boolean))]; }
   c.sex    = c.sex    || d.sex || '';
@@ -11659,8 +11669,8 @@ document.addEventListener('click', async ev=>{
       render(); toast('종이 값으로 변경했어요 — 저장을 눌러야 반영됩니다'); return; }
     case 'scanforce': { const h = S.scanHold; S.scanHold = null; closeSheet(); if(h) await 상담지보냄(h.mid, h.b64); return; }
     case 'scancam': case 'scanalb': { const mid = rest[0]; closeSheet(); 상담지고르기(mid, k === 'scancam'); return; }
-    case 'editintake': if(S.who !== 'tr' && rest[0] !== S.mid) return; S.scanQ = null; S.subj=rest[0]; go('intake_edit'); return;
-    case 'editplan': S.subj=rest[0]; go('plan_edit'); return;
+    case 'editintake': if(S.who !== 'tr') return;   /* 상담일지 · 운동계획은 트레이너만 수정한다 (2026-10-11 대표) */ S.scanQ = null; S.subj=rest[0]; go('intake_edit'); return;
+    case 'editplan': if(S.who !== 'tr') return; S.subj=rest[0]; go('plan_edit'); return;
     case 'pick1': { const [pre,k,val]=rest;
       const d = pre==='ik' ? (D.intake[subj()]||(D.intake[subj()]={})) : (GOALS[subj()]||(GOALS[subj()]={}));
       d[k] = (d[k]===val) ? '' : val; render(); return; }
@@ -11669,7 +11679,7 @@ document.addEventListener('click', async ev=>{
       const a = Array.isArray(d[k]) ? d[k] : (d[k]=[]);
       const i = a.indexOf(val); if(i>=0) a.splice(i,1); else a.push(val);
       render(); return; }
-    case 'saveintake': { S.scanQ = null;
+    case 'saveintake': { if(S.who !== 'tr') return; S.scanQ = null;
       const mid=rest[0], d=D.intake[mid]||(D.intake[mid]={});
       INTAKE_FIELDS.forEach(f=>{
         if(f.t==='text'||f.t==='area'){
@@ -11710,7 +11720,7 @@ document.addEventListener('click', async ev=>{
       calcSync();
       g.calc[k] = (String(g.calc[k])===String(v)) ? '' : v;
       render(); return; }
-    case 'saveplan': {
+    case 'saveplan': { if(S.who !== 'tr') return;
       const mid=rest[0], g=GOALS[mid]||(GOALS[mid]={});
       g.now=g.now||{}; g.to=g.to||{};
       const gv=k=>{ const el=document.querySelector('[data-k="'+k+'"]'); return el?el.value.trim():''; };
