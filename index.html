@@ -2451,6 +2451,11 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
 .pwabar button{flex:none;padding:8px 13px;border-radius:9px;border:1px solid var(--gold-2);
   background:var(--gold);color:#1b1a17;font-size:12.5px;font-weight:800}
 .pwabar button.x{background:transparent;color:var(--sub);border-color:transparent;padding:8px 6px}
+/* 운동 목표 창 · 알림 (2026-10-12 · 387) */
+.wgst{display:flex;align-items:center;gap:10px;padding:13px 2px;border-top:1px solid var(--line)}.wgst span{flex:1;font-size:15px;font-weight:700}.wgst span i{display:inline-block;width:11px;height:11px;border-radius:4px;margin-right:8px}
+.wgst button{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--dark-3);color:var(--cream);font-size:21px}.wgst b{width:54px;text-align:center;font-size:24px}.wgst b small{font-size:13px;opacity:.7;font-weight:600}
+.wgsum{display:flex;justify-content:space-between;align-items:baseline;border-top:2px solid var(--line);padding:13px 2px 6px;font-size:15px;font-weight:800}.wgsum b{color:var(--gold);font-size:19px}
+.wgnote{display:flex;align-items:center;gap:10px;margin-top:8px;border-radius:14px;padding:11px 13px;background:rgba(232,182,90,.1);border:1px solid rgba(232,182,90,.45);font-size:13.5px;line-height:1.5}.wgnote span{flex:1}.wgnote small{opacity:.7;font-size:13px}.wgnote button{border:0;background:none;color:var(--gold);font-size:13.5px;font-weight:700;text-decoration:underline;flex:none}
 </style>
 
 </head>
@@ -2865,7 +2870,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '386';
+const BUILD = '388';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -4586,27 +4591,48 @@ function 목표저장(){
   목표뱃지저장(mid).then(render);
 }
 
-/* 이번 달 출석 — 개인운동 · PT 수업 · 목표 대비 출석률 */
+/* ══ 운동 목표 · 운동 달성률 ══ 2026-10-12 대표 「PT회원은 설정이 없으면 기본이 2/2 · 일반 회원은 2 기본 / 수업 수와 개인운동 수를 구별만 / 운동 달성률」
+   목표 = 주 「수업 n · 개인 n」 — plans.data.wgoal = { s, p, by:'tr'|'me', at, was, seenTr, seenMe }. 회원도 트레이너도 바로 고친다(동의 창 없음). 바꾸면 상대 화면에 알림이 뜬다.
+   없으면 기본 — PT회원(plans.data.gal === 'PT회원') 수업 2 · 개인 2 / 그 밖 개인 2.
+   달성률 = 이번 달 (수업 횟수 + 개인운동 한 날) ÷ round(주 목표 합 × 오늘 날짜 ÷ 7) · 100 에서 멈춘다.
+   ⛔ 데스크 `운동목표` · `달성셈` 과 **같은 식**이다. 한쪽을 고치면 같이 고친다.
+   「이번 주 개인운동 n회」 같은 내 목표(목표종류)는 회원의 도전 과제로 그대로 남는다 — 달성률에는 더 쓰지 않는다 */
+function 운동목표(mid){ const wg = (GOALS[mid]||{}).wgoal, 갈 = (GOALS[mid]||{}).gal || '';      /* gal = 브로제이 갈래 — 데스크가 회원을 열 때 적어 준다(앱은 브로제이를 모른다) */
+  if(wg && ((+wg.s || 0) + (+wg.p || 0)) > 0) return { 수: +wg.s || 0, 개: +wg.p || 0, by: wg.by === 'me' ? 'me' : 'tr', 날: wg.at || '', 새: wg.by !== 'me' && !wg.seenMe, 옛: wg.was || '', 기본: false };
+  return 갈 === 'PT회원' ? { 수: 2, 개: 2, 기본: true } : { 수: 0, 개: 2, 기본: true }; }      /* ⛔ 「담당이 있나」로 가르지 않는다 — 데스크로 추가한 회원은 담당이 늘 채워진다 */
+const 목표글 = g => (g.수 ? '수업 ' + g.수 + ' · ' : '') + '개인 ' + g.개;
+async function 운동목표저장(mid, 바꿈){      /* 서버의 최신 운동계획 위에 wgoal 만 얹는다 — 트레이너가 방금 바꾼 다른 칸을 덮지 않게 */
+  const g = GOALS[mid] || (GOALS[mid] = {}); let 서버 = null;
+  try{ 서버 = ((await sget('plans?select=data&member_id=eq.'+encodeURIComponent(mid)))[0]||{}).data || null; }catch(e){}
+  const 합 = Object.assign({}, 서버 || g); if(g.my) 합.my = g.my;
+  합.wgoal = Object.assign({}, 합.wgoal || {}, 바꿈); GOALS[mid] = 합;
+  await sv(spost('plans', [{ member_id:mid, data:합, updated_at:new Date().toISOString() }], {on:'member_id'}), '운동 목표 저장');
+}
+function sheetWgoal(mid){
+  const g0 = 운동목표(mid); if(!S.wg || S.wg.mid !== mid) S.wg = { mid, s: g0.수, p: g0.개 };
+  openSheet(()=>{ const g = S.wg, 줄 = (k, 색, 이름) => `<div class="wgst"><span><i style="background:${색}"></i>${이름}</span><button data-act="wgst:${k}:-1">−</button><b>${g[k]}<small>번</small></b><button data-act="wgst:${k}:1">＋</button></div>`;
+    return `<div class="h2">운동 목표 <small>일주일에 몇 번</small></div>
+      ${줄('s', 'var(--teal)', 'PT 수업')}${줄('p', 'var(--gold)', '개인운동')}
+      <div class="wgsum"><span>일주일에 모두</span><b>${g.s + g.p}번</b></div>
+      <div class="note">${S.who === 'tr' ? '회원도 앱에서 수정할 수 있어요.' : '트레이너도 수정할 수 있어요.'} 누가 수정하든 상대 화면에 알림이 뜨고, 언제 수정했는지 남습니다.</div>
+      <button class="btn main" data-act="wgsave">저장</button>
+      <button class="btn ghost sm" data-act="close">닫기</button>`; });
+}
+/* 이번 달 운동 — 개인운동 · PT 수업 · 운동 달성률 */
 function 출석셈(mid){
   const 달 = TODAY.slice(0,7), 오늘 = +TODAY.slice(8);
   const ws = workoutsOf(mid).filter(w => w.date.slice(0,7)===달 && 세트있나(w));
   const 개인ws = ws.filter(w=>w.kind!=='수업'), 수업ws = ws.filter(w=>w.kind==='수업');
   const 개인 = new Set(개인ws.map(w=>w.date)).size, 수업 = 수업ws.length;
-  const g = GOALS[mid]||{}, my = g.my||[];
-  const 월 = my.find(x=>x.t==='월운동'), 주 = my.find(x=>x.t==='주운동');
-  /* 목표 — 달 목표가 있으면 그걸로, 없으면 주 목표 × 지난 주 수, 그것도 없으면 주 3회 */
-  let 목표수, 기준;
-  if(월){ 목표수 = +월.n; 기준 = `이번 달 목표 ${+월.n}회`; }
-  else { const n = (주 && +주.n) || +g.freq || 3; 목표수 = n * 오늘 / 7;
-    기준 = `주 ${n}회 목표 · 오늘까지 ${Math.round(목표수*10)/10}회`; }
-  const 률 = 목표수 ? Math.round(개인 / 목표수 * 100) : 0;
+  const wg = 운동목표(mid), 목표수 = Math.max(1, Math.round((wg.수 + wg.개) * 오늘 / 7)), 한 = 개인 + 수업;
+  const 률 = Math.min(100, Math.round(한 / 목표수 * 100)), 기준 = `수업 ${수업} · 개인 ${개인} · 총 ${한} / ${목표수}번`;
   /* 주마다 — 달력 주(일~토) */
   const 주들 = [];
   for(let d=1; d<=오늘; d++){ const ds = 달 + '-' + String(d).padStart(2,'0'), wk = weekOf(ds)[0];
     let x = 주들.find(y=>y.wk===wk); if(!x){ x = { wk, 첫:ds, 끝:ds, 개인:new Set(), 수업:0 }; 주들.push(x); } x.끝 = ds; }
   개인ws.forEach(w => { const x = 주들.find(y=>w.date>=y.첫 && w.date<=y.끝); if(x) x.개인.add(w.date); });
   수업ws.forEach(w => { const x = 주들.find(y=>w.date>=y.첫 && w.date<=y.끝); if(x) x.수업++; });
-  return { m:+달.slice(5), 개인, 수업, 률, 기준, 목표있나:!!(월||주), 주들 };
+  return { m:+달.slice(5), 개인, 수업, 률, 기준, 목표있나:!wg.기본, 주들, wg, 한, 목표수 };
 }
 function sheetAttend(mid){
   openSheet(()=>{ const a = 출석셈(mid);
@@ -4616,13 +4642,13 @@ function sheetAttend(mid){
         <div><span class="k">PT 수업</span><span class="v" style="color:var(--teal)">${a.수업}<small> 회</small></span></div>
         <div><span class="k">합계</span><span class="v">${a.개인 + a.수업}<small> 회</small></span></div>
       </div>
-      <span class="lbl">목표 출석률 · 개인운동</span>
+      <span class="lbl">운동 달성률 <small style="font-weight:500;opacity:.75">· 목표 주 ${목표글(a.wg)}${a.wg.기본 ? ' (기본값)' : ''}</small></span>
       <div class="card">
         <div class="rowc" style="align-items:baseline"><div class="nm" style="font-size:26px;color:var(--gold)">${a.률}<small style="font-size:13px"> %</small></div>
           <div class="sm">${esc(a.기준)}</div></div>
         <i class="bar" style="display:block;height:6px;border-radius:9px;background:var(--dark-4);overflow:hidden;margin-top:8px">
           <b style="display:block;height:100%;width:${Math.min(100,a.률)}%;background:var(--gold)"></b></i>
-        ${a.목표있나 ? '' : `<button class="btn sub sm" style="margin-top:10px" data-act="goal:new">개인운동 목표 정하기</button>`}
+        <button class="btn sub sm" style="margin-top:10px" data-act="wgoal:${mid}">${a.목표있나 ? '운동 목표 수정' : '운동 목표 정하기'}</button>
       </div>
       <span class="lbl">주마다</span>
       <div class="card" style="padding:6px 14px">${a.주들.map(x=>`<div class="trow">
@@ -4633,8 +4659,7 @@ function sheetAttend(mid){
       <button class="btn ghost sm" data-act="close">닫기</button>`; });
 }
 
-/* 이번 달 현황판 — 출석 · 출석률 · 목표 달성
-   출석률 기준 = 주 N회(운동계획 freq, 없으면 3회) × 이번 달 지난 주 수 */
+/* 이번 달 현황판 — 운동 · 체중 목표 · 내 목표 (운동 달성률의 식은 위 `출석셈` · `운동목표`) */
 function 현황판(mid){
   const 달 = TODAY.slice(0,7);
   const 출 = 출석셈(mid), g = GOALS[mid]||{};
@@ -4666,7 +4691,8 @@ function 홈현황(mid){   /* 홈현황셋 */
   const 분 = Math.round(ws.reduce((a,w)=>a+(+w.dur||0),0)/60);
   return `<div class="hcard hst3"><span class="hh"><b>${+달.slice(5)}월 현황</b></span>
     <span class="h3">${[['h_dumb','개인운동',개인,'회','개인'],['h_user','PT 수업',수업,'회','수업'],['h_clock','운동시간',분.toLocaleString(),'분','시간']]
-      .map(x=>`<button data-act="hst:${x[4]}">${svg(x[0],17)}<small>${x[1]} ›</small><b>${x[2]}<i>${x[3]}</i></b></button>`).join('')}</span></div>`;
+      .map(x=>`<button data-act="hst:${x[4]}">${svg(x[0],17)}<small>${x[1]} ›</small><b>${x[2]}<i>${x[3]}</i></b></button>`).join('')}</span></div>`
+    + (()=>{ const wg = 운동목표(mid); return (wg.새 && S.who !== 'tr') ? `<div class="wgnote"><span>🔔 트레이너가 운동 목표를 <b>주 ${목표글(wg)}</b>${wg.옛 ? ' <small>(전에는 ' + esc(wg.옛) + ')</small>' : ''}로 정했어요</span><button data-act="wgseen">확인</button></div>` : ''; })();
 }
 /* 현황 칸을 누르면 — 개인운동 = 목표 + 지난 개인운동 / PT 수업 = 지난 수업(리포트 · 피드백) / 운동시간 = 부위별 + 날마다.
    지난 기록 줄마다 「이 루틴으로 시작」(again) 을 붙인다 (2026-10-09 대표 「지난 기록이 있는 곳이면 바로 그 루틴으로 운동기록 할 수 있게」) */
@@ -4696,10 +4722,10 @@ function sheetHomeStat(종류){
     return `<div class="h2">개인운동 <small>${m}월 ${a.개인}회</small></div>
       <div class="card">
         <div class="rowc" style="align-items:baseline"><div class="nm" style="font-size:24px;color:var(--gold)">${a.률}<small style="font-size:13px"> %</small></div>
-          <div class="sm">목표 출석률 · ${esc(a.기준)}</div></div>
+          <div class="sm">운동 달성률 · ${esc(a.기준)}</div></div>
         <i class="bar" style="display:block;height:6px;border-radius:9px;background:var(--dark-4);overflow:hidden;margin-top:8px">
           <b style="display:block;height:100%;width:${Math.min(100,a.률)}%;background:var(--gold)"></b></i>
-        ${a.목표있나 ? '' : `<button class="btn sub sm" style="margin-top:10px" data-act="goal:new">개인운동 목표 정하기</button>`}
+        <button class="btn sub sm" style="margin-top:10px" data-act="wgoal:${mid}">${a.목표있나 ? '운동 목표 수정' : '운동 목표 정하기'}</button>
       </div>
       <span class="lbl">지난 개인운동</span>
       <div class="pickbox">${목록(ws, 'orec', '아직 개인운동 기록이 없어요')}</div>
@@ -11691,6 +11717,13 @@ document.addEventListener('click', async ev=>{
       S.fpQty = Math.round((Number(rest[0])/amt)*1000)/1000;
       drawSheet(); return; }
     case 'fput': { if(S.fpMode==='g') readGram(); putFood(); return; }
+    case 'wgoal': S.wg = null; sheetWgoal(rest[0] || S.mid); return;
+    case 'wgst': { if(S.wg && (rest[0] === 's' || rest[0] === 'p')){ S.wg[rest[0]] = Math.max(0, Math.min(7, S.wg[rest[0]] + (+rest[1] || 0))); drawSheet(); } return; }
+    case 'wgsave': { const g = S.wg; if(!g) return; if(!(g.s + g.p)){ toast('일주일에 한 번은 넘게 정해 주세요'); return; }
+      const 옛 = 운동목표(g.mid), 내가 = S.who !== 'tr';
+      운동목표저장(g.mid, { s: g.s, p: g.p, by: 내가 ? 'me' : 'tr', at: TODAY, was: 목표글(옛), seenMe: 내가, seenTr: !내가 }).then(()=>{ S.wg = null; closeSheet(); render(); toast('운동 목표를 저장했어요'); }).catch(e=>{ console.error(e); toast('저장하지 못했어요'); });
+      return; }
+    case 'wgseen': 운동목표저장(S.mid, { seenMe: true }).then(render).catch(e=>console.error(e)); return;
     case 'fnewsave': {
       const g = k => { const el=document.querySelector('[data-k="nf:'+k+'"]'); return el? el.value.trim() : ''; };
       const name = g('name'); const kcal = nnum(g('kcal'));
