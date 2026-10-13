@@ -1059,7 +1059,9 @@ body .figbox2{background:radial-gradient(80% 50% at 50% 30%,rgba(240,211,160,.09
 .wc small{font-size:10.5px;color:var(--sub);font-weight:600;margin-left:2px}.wtb.c3 .wc{font-size:14.5px}.wtb.c3 .wc small{font-size:9.5px}
 .wck{width:40px;height:40px;border-radius:10px;border:1.5px solid #4a463d;color:#5d5a54;font-size:18px;font-weight:800;justify-self:center;padding:0}
 .wtr.ok{background:rgba(240,211,160,.07)}.wtr.ok .wc{background:none;border-color:transparent;color:var(--gold)}.wtr.ok .wck{background:var(--gold);border-color:var(--gold);color:#1a1814}.wtr.ok .s{color:var(--gold)}
-.wtr.on .wc{border-color:var(--teal);background:#1e2c30}.wtr.on .s{color:var(--teal)}.wtr.on:not(.ok) .wck{border-color:var(--teal);color:var(--teal)}.wtr.ok.on{outline:1.5px solid var(--teal);outline-offset:-1px}
+/* 세트 표의 칸은 **글자로만** (2026-10-13 대표 「무게가 표시되는 것과 무게 조절 두 번 다 같은 숫자판이 나와서 헷갈려 · 무게는 한 곳에서 표기 · 조절판만」) — 상자는 아래 조절판(.wadj) 하나. 줄을 누르면 그 세트가 선택된다 */
+.wtb .wc{background:none;border:0;height:34px}.wtr.on{outline:1.5px solid var(--teal);outline-offset:-1px;background:#16232a}.wtr.on .wc{color:var(--cream)}.wtr.on .s{color:var(--teal)}.wtr.on:not(.ok) .wck{border-color:var(--teal);color:var(--teal)}.wtr.ok.on{outline:1.5px solid var(--teal);outline-offset:-1px}
+.wsame{border:1px dashed var(--gold-2,#b9965f);background:rgba(240,211,160,.08);color:var(--gold);border-radius:999px;height:26px;padding:0 10px;font-size:12px;font-weight:700;white-space:nowrap;flex:none}
 .wadj{flex:none;border-radius:14px;border:1px solid #3f7281;background:linear-gradient(170deg,#1b2d33,#171a19 70%);padding:10px 10px 12px}
 .wadj .lab{display:flex;justify-content:space-between;gap:8px;font-size:12px;font-weight:700;color:var(--teal);margin-bottom:8px;padding:0 2px}.wadj .lab span+span{color:var(--sub);font-weight:500;white-space:nowrap}
 .wadj .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.wadj.w3 .two{grid-template-columns:1fr 1fr 1fr;gap:6px}
@@ -1071,7 +1073,9 @@ body .figbox2{background:radial-gradient(80% 50% at 50% 30%,rgba(240,211,160,.09
 .wadj.w3 .wstp .num input{font-size:17px}.wstp .num small{font-size:10.5px;color:var(--sub);font-weight:600;line-height:1.1}
 .wdone{flex:none;width:100%;height:52px;border-radius:14px;background:var(--teal);color:#10181a;font-size:16px;font-weight:800}.wdone.g{background:var(--gold)}
 .wend{flex:none;width:100%;height:46px;border-radius:14px;border:1.5px solid var(--gold-2,#b9965f);background:rgba(240,211,160,.08);color:var(--gold);font-size:14.5px;font-weight:800}
-.wdone2{display:grid;grid-template-columns:1fr 1.3fr;gap:9px;flex:none}
+/* 「운동중」 배지 — 원래 있던 작은 점(1.2초 깜빡임)만으로는 눈에 안 들어왔다 → 배지 둘레로 빛이 번졌다 사라진다 · 2.2초 (2026-10-13 대표 「활성 중인 표시가 인지되게」 · 「지금 보고 있는 탭」 표준과 같은 박자) */
+body .card.now2 .pill.t.nowp{animation:nowp 2.2s ease-in-out infinite}@keyframes nowp{0%,100%{box-shadow:0 0 0 0 rgba(169,216,230,.6)}50%{box-shadow:0 0 0 7px rgba(169,216,230,0)}}@media(prefers-reduced-motion:reduce){body .card.now2 .pill.t.nowp{animation:none}}
+.wdone2{display:grid;grid-template-columns:1fr 1.3fr;gap:9px;flex:none}      /* 왼쪽 = 이 종목 끝내기(좁게) · 오른쪽 = ＋ 세트 추가(넓게) */
 .wexf{display:flex;flex:none;border-top:1px dashed #3b3a35;margin:0 -2px}.wexf button{flex:1;padding:11px 4px;font-size:12.5px;font-weight:700;color:var(--gold)}.wexf button+button{border-left:1px dashed #3b3a35;color:var(--sub)}
 .wlock{display:flex;justify-content:space-between;align-items:center;flex:none;font-size:12px;color:var(--sub)}.wlock button{font-size:12.5px;font-weight:700;color:var(--cream);border:1px solid #57524a;border-radius:999px;padding:7px 14px}
 .wrs{display:flex;align-items:center;gap:10px;flex:none;padding:9px 11px;border-radius:12px;border:1px solid #34332d;background:#1a1917}
@@ -2884,7 +2888,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '395';
+const BUILD = '397';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -4231,7 +4235,7 @@ function bar(title, right, back, sub){
      「글래드짐」 제목은 로고와 겹쳐서 뺀다. 종 · 프로필은 **탭 첫 화면**(홈 · 분석 · 식단 · 커뮤니티 · 피드백 · 내 정보)에만 — 안쪽 화면은 제목과 뒤로가기가 주인이다.
      계정 전환은 「내 정보」 맨 아래로 옮겼다. */
   if(title === '글래드짐' && !bare) title = '';
-  const 직원 = !bare && !!직원줄 && !S.rpOnly && (S.who === 'tr' || !!S.self);
+  const 직원 = !bare && !!직원줄 && !S.rpOnly && (S.who === 'tr' || !!S.self) && (S.screen === 't_today' || S.screen === 'home');      /* 홈에서만 보인다 — 모든 화면 위에 떠 있어 잘못 누르기 쉬웠다 (2026-10-13 대표 「홈 버튼에만 있는 건 어떤지 · 누르면 바꿀 건지 안내창」) */
   const logo = bare ? '' : `<button class="logo${직원 && title ? ' sm' : ''}" data-act="${S.who==='tr' ? 'ttab:t_today' : 'tab:home'}" aria-label="홈으로">${직원 && title ? 'GG' : 'GLAD GYM'}</button>`;      /* 직원 화면은 전환 단추 자리를 내느라 로고를 줄인다 — 누르면 홈인 것은 그대로 */
   const 전환 = 직원 ? `<span class="modesw${S.self ? ' me' : ''}"><button class="${S.self ? '' : 'on'}" data-act="mode:tr">트레이너</button><button class="${S.self ? 'on' : ''}" data-act="mode:self">내 운동</button></span>` : '';
   /* 날짜 · 「최근 n회」 자리에 전환 단추가 온다 — 그 글은 제목 바로 아래 작은 글씨로 옮긴다 (2026-10-10 대표 「1번으로」) */
@@ -5722,7 +5726,7 @@ function vWorkout(){
         ? `<button class="ordbtn" data-act="ordmv:${i}:-1" ${i===0?'disabled':''}>▲</button>
            <button class="ordbtn" data-act="ordmv:${i}:1" ${i===w.items.length-1?'disabled':''}>▼</button>
            <button class="chip t" data-act="ordend" style="flex:none;padding:6px 10px">여기에 놓기</button>`
-        : `${on&&!it.locked?'<span class="pill t">운동중</span>':(it.locked?'<span class="pill q">완료</span>':'')}
+        : `${on&&!it.locked?'<span class="pill t nowp">운동중</span>':(it.locked?'<span class="pill q">완료</span>':'')}
            <button class="chip rm" data-act="wdel:${i}">제거</button>`}
       </div>${(on && !S.fold) ? 펼침() : ''}`;
     }).join('')}
@@ -5974,6 +5978,8 @@ function sheetCardio(){
     <button class="czbig" data-act="cstart">시작</button>
     <div class="czhint">시작을 누르면 시간이 흐릅니다<br>거리 · 속도 · 경사는 끝난 뒤에 입력합니다</div>`);
 }
+/* 조절판의 숫자 칸을 누르면 **든 숫자가 통째로 선택된다** — 바로 치면 바뀌게. 예전에는 표의 칸을 눌러(wsf) 그렇게 들어왔는데, 표의 칸이 글자가 되면서 조절판을 직접 누르게 됐다. 선택이 안 되면 「11」 뒤에 「12」가 붙어 1112 가 된다 (2026-10-13) */
+document.addEventListener('focusin', e => { const t = e.target; if(t && t.matches && t.matches('.wadj input')) setTimeout(() => { try{ t.select(); }catch(_){} }, 0); });
 function 세트표(cur, e, mid){
   const 유 = !!e.cardio, 경 = 유 && 경사최대(cur.ex), 단위 = 유 ? '구간' : '세트';
   const 칸들 = 유 ? [['reps','setreps','시간','분',1], ['spd','setspd','속도','km/h',0.5]].concat(경 ? [['kg','setkg','경사','도',1]] : [])
@@ -5985,15 +5991,15 @@ function 세트표(cur, e, mid){
   const sel = 잠 ? -1 : (S.wsel != null && S.wsel <= 끝) ? S.wsel : (열림 >= 0 ? 열림 : 끝);
   const 표 = `<div class="wtb c${칸들.length}"><div class="wtr hd"><span>${단위}</span><span>지난번</span>${칸들.map(c=>`<span>${c[2]}</span>`).join('')}<span>완료</span></div>
     ${cur.sets.map((x,i)=>`<div class="wtr ${x.done||잠?'ok':''} ${i===sel?'on':''}"${잠?'':` data-act="ws:${i}"`}><span class="s">${i+1}</span><span class="pv">${지난글(지난[i])}</span>
-      ${칸들.map(c=>`<button class="wc"${잠?'':` data-act="wsf:${i}:${c[1]}"`}>${값(x,c[0])}<small>${c[3]}</small></button>`).join('')}
+      ${칸들.map(c=>`<span class="wc">${값(x,c[0])}<small>${c[3]}</small></span>`).join('')}
       <button class="wck"${잠?'':` data-act="${!x.done && i===끝 ? 'rep' : 'wsd:'+i}"`} aria-label="${i+1}${단위} 완료">✓</button></div>`).join('')}</div>`;
   if(잠) return 표 + `<div class="wlock"><span>끝낸 종목이에요 · 잠겨 있어요</span><button data-act="redo">재기록</button></div>`;
-  const x = cur.sets[sel], p = 지난[sel], 할 = x.done ? 열림 : sel, c0 = 쉼설정(), 도는중 = !!(S.rest && S.rest.until);
+  const x = cur.sets[sel], p = 지난[sel] || 지난[지난.length - 1], 할 = x.done ? 열림 : sel, c0 = 쉼설정(), 도는중 = !!(S.rest && S.rest.until);
   return `${cur.rmPlan ? '' : `<div class="wrs ${c0.on?'on':''}"><button class="sw" data-act="wrest" aria-label="쉬는 시간 ${c0.on?'끄기':'켜기'}"><i></i></button>
       <span class="t"><b>세트 사이 휴식</b><small>${c0.on ? '세트 끝나면 시작' : '꺼짐'}</small></span>
       ${c0.on ? `<span class="pm2"><button data-act="wrestd:-15" aria-label="15초 줄이기">−</button><em>${mmss(c0.sec)}</em><button data-act="wrestd:15" aria-label="15초 늘리기">＋</button></span>` : ''}</div>`}
     ${표}
-    <div class="wadj ${칸들.length > 2 ? 'w3' : ''}"><div class="lab"><span>${sel+1}${단위} ${x.done ? '수정' : '조절'}</span><span>지난번 ${p ? (유 ? p.reps+'분' : kgfmt(p.kg)+'kg × '+p.reps+'회') : '없음'}</span></div>
+    <div class="wadj ${칸들.length > 2 ? 'w3' : ''}"><div class="lab"><span>${sel+1}${단위} ${x.done ? '수정' : '조절'}</span>${p ? `<button class="wsame" data-act="wsame:${sel}">지난번 ${유 ? p.reps+'분' : kgfmt(p.kg)+'kg × '+p.reps+'회'} 그대로</button>` : '<span>지난번 없음</span>'}</div>
       <div class="two">${칸들.map(c=>`<div><div class="nm">${c[2]}</div><div class="wstp">
         <button class="pm" data-act="d:${c[0]}:${sel}:-${c[4]}" data-rep="1" aria-label="${c[2]} 내리기">−</button>
         <span class="num"><input type="text" inputmode="decimal" data-k="${c[1]}" data-i="${sel}" value="${값(x,c[0])}" aria-label="${c[2]}"><small>${c[3]}</small></span>
@@ -6003,7 +6009,7 @@ function 세트표(cur, e, mid){
     ${열림 >= 0
       ? `<button class="wdone" data-act="${할 === 끝 ? 'rep' : 'wsd:'+할}">${할+1}${단위} 완료</button>
          <button class="wend" data-act="fin">이 종목 끝내기</button>`
-      : `<div class="wdone2"><button class="wdone" data-act="nextset">＋ ${끝+2}${단위} 추가</button><button class="wdone g" data-act="fin">이 종목 끝내기</button></div>`}
+      : `<div class="wdone2"><button class="wdone g" data-act="fin">이 종목 끝내기</button><button class="wdone" data-act="nextset">＋ ${끝+2}${단위} 추가</button></div>`}
 `;
 }
 
@@ -12106,7 +12112,9 @@ document.addEventListener('click', async ev=>{
       S.who='tr'; S.ttab='t_members'; S.tmid=id; S.subj=id; toast(name+' 회원을 만들었어요');
       go('t_member'); return;
     }
-    case 'mode': 직원전환(rest[0]); return;
+    case 'rtsv': { const el = document.querySelector('[data-k="rtnm"]'); if(S.rtrec) 수업루틴저장(S.rtrec, el ? el.value : '', rest[0] === '1'); return; }
+    case 'mode': { if(rest[0] === (S.self ? 'self' : 'tr')) return;
+      확인창(rest[0] === 'self' ? '내 운동으로 바꿀까요?<br>트레이너 화면에서 나가 내 운동 기록 화면으로 갑니다.' : '트레이너 화면으로 바꿀까요?<br>내 운동 화면에서 나가 트레이너 화면으로 갑니다.', rest[0] === 'self' ? '내 운동으로' : '트레이너로', () => 직원전환(rest[0]), true); return; }
     case 'as':
       S.self = false; if(직원줄) MEMBERS = MEMBERS.filter(m => m.id !== 직원줄.id);
       if(rest[0]==='tr'){ /* 앱을 다시 켰는데 남아 있는 운동이 내 것이면 「내 운동」 쪽에 넣어 둔다 — 트레이너 화면에서 수업처럼 보이면 안 된다 */
@@ -12657,12 +12665,13 @@ document.addEventListener('click', async ev=>{
     case 'pickvar': sheetPickVar(rest[0]); return;
     case 'add': { const [ex,va]=rest;
       if(!w) newLive('빈 운동', [], '개인운동');
-      const last=lastSet(ex,va);
+      const last=lastSet(ex,va), 하던것 = live().items[live().cur];
       live().items.push({ ex, va, rest:60, locked:false, sec:0, startAt: live().startAt ? Date.now() : null,
         sets:[ exOf(ex).cardio ? {kg:0, reps:last?last.reps:20, spd:(last&&last.spd)?last.spd:6.5, done:false}
                                : {kg:last?last.kg:20, reps:last?last.reps:10, done:false} ] });
       /* 이미 하는 중이면 자리를 옮기지 않는다 — 담자마자 새 종목으로 튀면 하던 걸 놓친다 */
-      if(!live().begun) live().cur = live().items.length-1;
+      /* ⛔ 다만 펼쳐져 있던 종목이 **이미 끝낸 것**이면 새 종목을 편다 — 다 마치고 하나 더 추가했는데 지난 종목이 펼쳐져 있었다 (2026-10-13 대표) */
+      if(!live().begun || !하던것 || 하던것.locked){ live().cur = live().items.length-1; S.fold = false; S.wsel = null; }
       save();
       S.just = VID(ex,va); clearTimeout(S.justT);
       S.justT = setTimeout(()=>{ S.just=null; render(); }, 2600);
@@ -12744,6 +12753,10 @@ document.addEventListener('click', async ev=>{
     case 'wrestd': { const c = 쉼설정(), n = Math.max(15, Math.min(600, c.sec + (+rest[0]))); try{ localStorage.setItem('gg_rest_sec', String(n)); }catch(e){} if(S.repeating){ const em = document.querySelector('#main .wrs .pm2 em'); if(em) em.textContent = mmss(n); } else render(); return; }
     case 'wrestadd': if(S.rest && S.rest.until){ S.rest.until += 15000; render(); } return;
     case 'wrestx': S.rest = null; render(); return;
+    case 'wsame': {      /* 조절판의 「지난번 … 그대로」 — 지난번 같은 세트(없으면 지난번 마지막 세트) 값을 그대로 채운다 (2026-10-13 대표 · 지금은 ＋ 를 여러 번 눌러 맞춰야 했다) */
+      const cur = w.items[w.cur], 지난 = (lastRuns(cur.ex, cur.va, w.mid || S.mid, 1)[0] || {}).sets || [], q = 지난[+rest[0]] || 지난[지난.length - 1], s = cur.sets[+rest[0]];
+      if(!q || !s) return; s.reps = q.reps; if(exOf(cur.ex).cardio){ if(q.spd != null) s.spd = q.spd; if(q.kg != null) s.kg = q.kg; } else s.kg = q.kg;
+      save(); drawSheet(); render(); toast('지난번 값으로 채웠어요'); return; }
     case 'd': { const [f,i,dv]=rest, s=w.items[w.cur].sets[+i];
       /* 유산소면 kg 칸이 「경사」다 — 기구가 올라가는 만큼만 */
       if(f==='kg'){ const 위 = 경사최대(w.items[w.cur].ex) || 9999;
@@ -13353,16 +13366,26 @@ async function finish(){
   go('summary');
   /* 루틴 없이(빈 루틴으로) 시작한 수업이면 — 오늘 실제로 한 것을 루틴으로 남길지 묻는다 (2026-10-11 대표) */
   if(S.who==='tr' && (rec.kind||'') === '수업' && !rec.rid && rec.items.length)
-    setTimeout(() => 확인창('이 운동을 루틴으로 저장할까요?<br>오늘 실제로 한 무게 · 횟수로 만들어요.', '루틴으로 저장', () => 수업루틴저장(rec), true), 800);
+    setTimeout(() => sheetRtSave(rec), 800);
 }
-function 수업루틴저장(rec){
-  const mid = rec.mid, id = 'r' + Date.now(), no = myRoutines(mid).length + 1, nm = dateTxt(rec.date) + ' 수업';
+/* 루틴으로 저장 창 — 이름 한 칸만 묻는다. 번호는 자동(다음 번호). 예전에는 저장하자마자 루틴 수정 페이지(번호 · 이름 · 목적 · 그룹 · 종목)로 넘어가서 다 채워야 하는 것처럼 보였다
+   (2026-10-13 대표 「번호나 이런 거 지정하지 않고 루틴 편하게 만들게 설정되지 않았었나」). 손보고 싶을 때만 「자세히 수정」 */
+function sheetRtSave(rec){ S.rtrec = rec;
+  openSheet(() => `<div class="h2">루틴으로 저장 <small>루틴 ${myRoutines(rec.mid).length + 1}</small></div>
+    <div class="note">오늘 한 종목 · 무게 · 횟수 그대로 저장합니다</div>
+    <div class="fld"><span class="fn">루틴 이름</span><input class="search" type="text" data-k="rtnm" maxlength="24" value="${esc(dateTxt(rec.date) + ' 수업')}"></div>
+    <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:9px"><button class="btn sub" data-act="rtsv:1">자세히 수정</button><button class="btn main" data-act="rtsv:0">저장</button></div>
+    <button class="btn ghost sm" data-act="close">저장하지 않음</button>`); }
+function 수업루틴저장(rec, 이름, 자세히){
+  const mid = rec.mid, id = 'r' + Date.now(), no = myRoutines(mid).length + 1, nm = (이름 || '').trim().slice(0, 24) || (dateTxt(rec.date) + ' 수업');
   const items = rec.items.map(it => { const z = it.sets[it.sets.length-1] || {}, 유 = exOf(it.ex).cardio;
     return { ex:it.ex, va:it.va, kg: 유 ? 0 : (z.kg || 0), reps: 유 ? (Math.round((it.sec||0)/60) || null) : (z.reps || null), sets: it.sets.length || 3, rest:60 }; });
   D.routines.push({ id, mid, no, n:nm, purpose:'', grp:'', items });
   sv(spost('routines',[{ id, member_id:mid, no, name:nm, purpose:'', grp:'' }]).then(() => spost('routine_items', items.map((it,i)=>({ routine_id:id, sort:i,
     variant_id:VID(it.ex,it.va), kg:it.kg, reps:it.reps, sets:it.sets, rest:it.rest })))), '루틴 만들기');
-  save(); S.tmid = mid; S.rcm = false; S.redit = id; toast('루틴으로 저장했어요 · 이름을 변경해 주세요'); go('t_redit');
+  save(); closeSheet(); S.rtrec = null;
+  if(자세히){ S.tmid = mid; S.rcm = false; S.redit = id; toast('루틴으로 저장했어요'); go('t_redit'); }
+  else toast('「루틴 ' + no + ' · ' + nm + '」으로 저장했어요');
 }
 
 function hideSplash(){
