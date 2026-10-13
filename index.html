@@ -2900,7 +2900,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '401';
+const BUILD = '402';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -3067,7 +3067,7 @@ async function boot(){
 
   EX = exs.map(e => ({ id:e.id, n:e.name, p:e.part, e:e.equip, cardio: e.cardio ? 1 : 0, owner:e.owner||'', media: Array.isArray(e.media) ? e.media : [],
     vars: vrs.filter(v => v.ex_id === e.id).map(v => ({ k:v.vkey, n:v.name||'', desc:v.descr||'', demo: v.demo?1:0, du: v.demo_url||'' })) }));
-  const 회원꼴 = m => ({ id:m.id, n:m.name, tr:m.trainer, reg:(m.reg_kind||'').trim(),
+  const 회원꼴 = m => ({ id:m.id, n:m.name, tr:m.trainer, p4:m.phone4||'', reg:(m.reg_kind||'').trim(),      /* p4 = 전화 뒷 4자리 — 회원 추가 때 「이미 있음」을 가린다 */
     /* 동의 칸 — 설계서\8단계_SQL_동의칸.sql (없으면 undefined 로 들어와 「미동의」로 본다) */
     aT:m.agree_terms_at||'', aP:m.agree_privacy_at||'', aS:m.agree_sensitive_at||'',
     aM:m.agree_marketing_at||'', aV:m.agree_version||'',
@@ -4508,24 +4508,47 @@ function vLogin(){
     <button class="btn sub" data-act="newmem">＋ 회원 새로 만들기</button>` : ''}` };
 }
 
-/* ── 회원 새로 만들기 ── */
+/* ── 회원 추가 ── 브로제이에서 검색해 추가한다 (2026-10-13 대표 「검색이 아니라 직접 입력해서 추가하게 되어 있는데 · 테스트 때 만든 방법인 것 같아 · 대시보드랑 달라」)
+   데스크 「회원 추가」 판과 같은 길: `POST /app/crm/search {q}` → `{ok, 사람:[{name, phone, 상태, 잔여, 담당}], 받은때}` → 「추가」 = members 에 { id, name, phone4, role, trainer } (+ 빈 상담일지 · 운동계획).
+   ⛔ 전체 번호는 서버가 준 것을 **화면에만** 쓴다 — 앱 표에는 뒷 4자리만.
+   서버는 중앙 몫(`앱회원.py`). 앱은 전화번호 로그인으로 받은 직원 토큰을 몸의 `token` 칸에 실어 보낸다(데스크는 `desk` 칸에 구글 증표 — 서버가 둘 다 받는다). 서버가 매번 서명 + 직원 명단(퇴사 아님)을 다시 본다.
+   「권한이 없어요」가 오면 토큰이 틀렸거나 퇴사 처리된 것 — 다시 로그인하라고 알린다.
+   브로제이에 닿지 않을 때만 수기 추가(이름 + 뒷 4자리 · id 가 `mh…` 로 시작 → 데스크에 「수기」 표시)가 열린다 — 데스크와 같다 */
+async function 앱crm(길, 몸){ const au = 로그인기억.읽() || {}; if(!au.token || au.mid) throw new Error('직원으로 로그인해야 검색할 수 있어요');
+  let r; try{ r = await fetch(GG_API + '/app/crm/' + 길, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(Object.assign({ token: au.token }, 몸 || {})) }); }
+  catch(e){ const x = new Error('서버에 닿지 못했어요'); x.막힘 = true; throw x; }
+  if(!r.ok){ const x = new Error('서버에 닿지 못했어요 (' + r.status + ')'); x.막힘 = r.status >= 500; throw x; }
+  const j = await r.json(); if(!j.ok){ const x = new Error(/권한이 없/.test(j.why || '') ? '「내 정보 → 로그아웃」 뒤 다시 로그인해 주세요' : (j.why || '검색하지 못했어요')); x.막힘 = !!j['막힘']; throw x; } return j; }
+const 추가번호 = p => { const n = 번호만(p); return n.length === 11 ? n.slice(0,3) + '-' + n.slice(3,7) + '-' + n.slice(7) : n.length === 10 ? n.slice(0,3) + '-' + n.slice(3,6) + '-' + n.slice(6) : n; };
+async function 회원검색(){ const g = S.ma || (S.ma = { q:'', 결과:null, 말:'', 중:false, 막힘:false }); const el = document.querySelector('[data-k="maq"]'); if(el) g.q = el.value.trim();
+  if(g.q.length < 2){ toast('두 글자 넘게 입력해 주세요'); return; }
+  g.중 = true; g.말 = ''; render();
+  try{ const j = await 앱crm('search', { q: g.q }); g.결과 = j['사람'] || []; g.막힘 = false; }catch(e){ g.결과 = null; g.말 = e.message || ''; g.막힘 = !!e.막힘; }
+  g.중 = false; render(); }
+function 회원넣기(이름, 뒤4, 담당, 수기){ 이름 = String(이름 || '').trim(); 뒤4 = 번호만(뒤4).slice(-4);
+  if(!이름 || 뒤4.length !== 4){ toast('이름과 전화번호 뒷 4자리를 입력해 주세요'); return; }
+  if(MEMBERS.some(m => m.n === 이름 && m.p4 === 뒤4)){ toast('이미 있는 회원이에요'); return; }
+  const id = (수기 ? 'mh' : 'm') + Date.now(), tr = 담당 || TRAINER, intake = { meals:{}, route:[], relief:[], cond:[], hist:[], time:[] }, plan = { goal:'', work:'', diet:'', purpose:[], now:{}, to:{}, vows:[], promises:[] };
+  MEMBERS.push({ id, n:이름, tr, p4:뒤4 }); D.intake[id] = intake; GOALS[id] = plan;
+  sv(spost('members', [{ id, name:이름, role:'member', trainer:tr, phone4:뒤4 }]).then(() => Promise.all([spost('intake', [{ member_id:id, data:intake }], { on:'member_id' }), spost('plans', [{ member_id:id, data:plan }], { on:'member_id' })])), '회원 추가');
+  S.ma = null; S.who = 'tr'; S.ttab = 't_members'; S.tmid = id; S.subj = id; toast(이름 + ' 회원을 추가했어요'); go('t_member'); }
 function vNewMem(){
-  return { top: bar('회원 만들기','', 'go:login'), body:`
-    <div class="fld"><span class="fn">이름 <span class="req">*</span></span>
-      <input class="search" type="text" data-k="nm:name" placeholder="예) 김O민"></div>
-    <div class="fld"><span class="fn">성별</span>
-      <div class="chips">${['여','남'].map(x=>`<button class="chip ${S.nm_sex===x?'on':''}" data-act="nmsex:${x}">${x}</button>`).join('')}</div></div>
-    <div class="grid2">
-      <div class="fld"><span class="fn">나이</span><input class="search" type="text" data-k="nm:age" placeholder="34"></div>
-      <div class="fld"><span class="fn">신장</span><input class="search" type="text" data-k="nm:height" placeholder="168cm"></div>
-    </div>
-    <div class="fld"><span class="fn">전화 뒷 4자리</span>
-      <input class="search" type="text" data-k="nm:phone4" placeholder="1234"></div>
-    <div class="fld"><span class="fn">담당 트레이너</span>
-      <input class="search" type="text" data-k="nm:tr" placeholder="${esc(TRAINER)}"></div>
-    <button class="btn main" data-act="nmsave">만들기</button>
-    <div class="cyfoot"><span>상담일지 · 운동계획 · 체형분석은 빈 채로 생겨요</span></div>` };
+  const g = S.ma || (S.ma = { q:'', 결과:null, 말:'', 중:false, 막힘:false }), 있 = x => MEMBERS.some(m => m.n === x.name && m.p4 === 번호만(x.phone).slice(-4));
+  const 줄 = (g.결과 || []).map((x, i) => `<div class="card rowc"><div><div class="nm">${esc(x.name)} <span class="pill q">${esc(x['상태'] || '')}</span></div>
+      <div class="sm">${esc([x['잔여'] || '', x['담당'] ? '담당 ' + x['담당'] : ''].filter(Boolean).join(' · '))}<br>${esc(추가번호(x.phone))}</div></div>
+      ${있(x) ? '<span class="pill q">이미 있음</span>' : `<button class="chip t" style="flex:none" data-act="maadd:${i}">추가</button>`}</div>`).join('');
+  return { top: bar('회원 추가', '', 'back'), body:`
+    <div class="note">브로제이에서 검색해 추가합니다 · PT 수강권이 있는 분만 나옵니다</div>
+    <div style="display:flex;gap:8px;flex:none"><input class="search" type="text" data-k="maq" placeholder="이름 또는 전화번호 뒷자리" value="${esc(g.q)}" style="flex:1;min-width:0"><button class="btn main" style="flex:none;width:auto;padding:0 18px" data-act="mafind" ${g.중 ? 'disabled' : ''}>검색</button></div>
+    ${g.중 ? '<div class="empty">검색 중이에요…</div>'
+      : g.말 ? `<div class="empty">브로제이에서 검색하지 못했습니다<small class="e2">${esc(g.말)}</small></div>`
+      : g.결과 == null ? '<div class="empty">아직 검색 전입니다<small class="e2">위 칸에 이름이나 전화번호 뒷자리를 입력해 주세요</small></div>'
+      : 줄 || '<div class="empty">검색 결과가 없습니다<small class="e2">PT 수강권이 없으면 나오지 않습니다 · 이름을 다시 확인해 주세요</small></div>'}
+    ${g.막힘 ? `<div class="hr"></div><span class="lbl">브로제이에 닿지 않을 때만 — 수기로 추가</span>
+      <div class="note">이름과 전화번호 뒷 4자리만 입력합니다 · 이렇게 추가한 회원은 대시보드에 「수기」로 표시됩니다</div>
+      <div style="display:flex;gap:8px;flex:none"><input class="search" type="text" data-k="mahn" placeholder="이름" style="flex:1.3;min-width:0"><input class="search" type="text" inputmode="numeric" maxlength="4" data-k="mahp" placeholder="뒷 4자리" style="flex:1;min-width:0"><button class="btn main" style="flex:none;width:auto;padding:0 18px" data-act="mahand">추가</button></div>` : ''}` };
 }
+document.addEventListener('keydown', e => { if(e.key === 'Enter' && e.target && e.target.dataset && e.target.dataset.k === 'maq'){ e.preventDefault(); 회원검색(); } });
 
 /* ── 홈 ── */
 const 목표종류 = {
@@ -11106,8 +11129,8 @@ function tTools(){
     <button class="card rowc" data-act="tfm2:diet"><div><div class="nm">식단 모아보기</div>
       <div class="sm">올라온 사진 ${(D.meals||[]).length}장 · 피드백 안 단 것 ${mealTodo().length}장</div></div><span class="rt">›</span></button>
     <div class="hr"></div>
-    <button class="card rowc" data-act="newmem"><div><div class="nm">＋ 회원 새로 만들기</div>
-      <div class="sm">상담일지부터 처음부터</div></div><span class="rt">›</span></button>
+    <button class="card rowc" data-act="newmem"><div><div class="nm">＋ 회원 추가</div>
+      <div class="sm">브로제이에서 검색해 추가</div></div><span class="rt">›</span></button>
     ${시험판 ? `<button class="card rowc" data-act="switch"><div><div class="nm">회원 화면으로 전환</div>
       <div class="sm">계정 선택 화면으로 (시험판에서만)</div></div><span class="rt">›</span></button>` : ''}` };
 }
@@ -11151,7 +11174,7 @@ function tMembers(){
             :(last?`${dateTxt(last.date)} · ${esc(last.kind||'')}`:'기록 없음')}</small></span>
           ${lv?'<span class="pill t">진행 중</span>'
             :(!last?'<span class="pill q">기록 없음</span>':(nofb?'<span class="pill">안 본 기록</span>':'<span class="pill q">봤음</span>'))}<i>›</i></button></div>`).join('')}</div>`; })()
-    + `<button class="btn sub" data-act="newmem" style="margin-top:4px;flex:none">＋ 회원 새로 만들기</button>` };
+    + `<button class="btn sub" data-act="newmem" style="margin-top:4px;flex:none">＋ 회원 추가</button>` };
 }
 function tMember(){
   const m=MEMBERS.find(x=>x.id===S.tmid), ws=D.workouts.filter(w=>w.mid===m.id&&w.done).slice().sort(byDateDesc);
@@ -12173,26 +12196,10 @@ document.addEventListener('click', async ev=>{
       Object.keys(D.today).forEach(m=>{ if(D.today[m].rid===rid) delete D.today[m]; });
       sv(sdel('routines','id=eq.'+rid), '루틴 삭제');
       toast('루틴을 삭제했어요'); go('t_routines'); return; }
-    case 'newmem': S.nm_sex='여'; go('newmem'); return;
-    case 'nmsex': S.nm_sex=rest[0]; render(); return;
-    case 'nmsave': {
-      const g=k=>{ const el=document.querySelector('input[data-k="nm:'+k+'"]'); return (el&&el.value||'').trim(); };
-      const name=g('name');
-      if(!name){ toast('이름을 입력해 주세요'); return; }
-      const id='m'+Date.now(), tr=g('tr')||TRAINER;
-      const intake={ age:g('age'), height:g('height'), sex:S.nm_sex||'', meals:{}, route:[], relief:[], cond:[], hist:[], time:[] };
-      const plan={ goal:'', work:'', diet:'', purpose:[], now:{}, to:{}, vows:[], promises:[] };
-      MEMBERS.push({id, n:name, tr});
-      D.intake[id]=intake; GOALS[id]=plan;
-      if(S.draft){ ['name','age','height','phone4','tr'].forEach(k=>delete S.draft['nm:'+k]); }
-      sv(spost('members',[{ id, name, role:'member', trainer:tr, phone4:g('phone4')||null }])
-        .then(()=>Promise.all([
-          spost('intake',[{ member_id:id, data:intake }], {on:'member_id'}),
-          spost('plans',[{ member_id:id, data:plan }], {on:'member_id'})
-        ])), '회원 만들기');
-      S.who='tr'; S.ttab='t_members'; S.tmid=id; S.subj=id; toast(name+' 회원을 만들었어요');
-      go('t_member'); return;
-    }
+    case 'newmem': S.ma = null; go('newmem'); return;
+    case 'mafind': 회원검색(); return;
+    case 'maadd': { const x = ((S.ma || {}).결과 || [])[+rest[0]]; if(x) 회원넣기(x.name, x.phone, x['담당'] || '', false); return; }
+    case 'mahand': { const v = k => { const el = document.querySelector('[data-k="' + k + '"]'); return el ? el.value : ''; }; 회원넣기(v('mahn'), v('mahp'), '', true); return; }
     case 'rtsv': { const el = document.querySelector('[data-k="rtnm"]'); if(S.rtrec) 수업루틴저장(S.rtrec, el ? el.value : '', rest[0] === '1'); return; }
     case 'mode': { if(rest[0] === (S.self ? 'self' : 'tr')) return;
       확인창(rest[0] === 'self' ? '내 운동으로 바꿀까요?<br>트레이너 화면에서 나가 내 운동 기록 화면으로 갑니다.' : '트레이너 화면으로 바꿀까요?<br>내 운동 화면에서 나가 트레이너 화면으로 갑니다.', rest[0] === 'self' ? '내 운동으로' : '트레이너로', () => 직원전환(rest[0]), true); return; }
