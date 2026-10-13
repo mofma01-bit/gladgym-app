@@ -2890,7 +2890,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '399';
+const BUILD = '400';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -4189,6 +4189,8 @@ function render(){
      · 필수 둘(이용약관·개인정보)에 동의하기 전에는 **동의 화면만** 보인다
      · 건강정보 화면(인바디·체형사진)은 **건강정보 동의가 있을 때만** 연다
        — 없으면 그 자리에서 동의 창을 띄운다. 앱 전체를 막지 않는다 (제16조③) */
+  /* ⛔ 들어온 사람이 없는데(S.who 없음) 안쪽 화면을 그리지 않는다 — 나간 뒤 「뒤로」를 누르면 예전 회원 화면 · 동의 화면이 떴다 (2026-10-13 대표 「인증번호 화면이 떴다가 갑자기 동의 화면으로 넘어가서 로그인 됐다가」) */
+  if(!S.who && !['login','boot','err','newmem'].includes(S.screen)){ S.screen = 'login'; S.stack = []; }
   const 로그인전 = (S.screen==='login'||S.screen==='boot'||S.screen==='err'||S.screen==='newmem');
   if(!로그인전 && S.mid && S.who!=='tr' && !S.self && !필수동의함(S.mid) && S.screen!=='agree'){   /* 직원의 「내 운동」은 회원 약관 관문을 거치지 않는다 — 수업 사이에 바로 바꿔야 한다 */
     S.screen = 'agree';
@@ -4468,11 +4470,11 @@ function vLogin(){
     <div class="h1">운동을 기록하고<br>트레이너에게 받습니다</div>
     <span class="lbl">전화번호로 시작하기 · 문자 인증은 처음 한 번만 합니다</span>
     ${폼}
-    <div class="hr"></div>
+    ${시험판 ? `<div class="hr"></div>
     <button class="card rowc teal" data-act="as:tr">
       <div><div class="nm t">${esc(TRAINER)} 트레이너로 들어가기</div>
       <div class="sm">회원 만들기 · 루틴 · 피드백</div></div><span class="rt">›</span></button>
-    ${시험판 ? `<div class="hr"></div>
+    <div class="hr"></div>
     <div class="note"><b>시험판</b> — 이 목록은 점검할 때만 보입니다. 실제 주소에서는 전화번호로만 들어옵니다.</div>
     <span class="lbl">회원으로 들어가기 · ${MEMBERS.length}명</span>
     <input class="search" type="text" data-filter="1" placeholder="이름으로 검색">
@@ -9063,7 +9065,7 @@ function vMe(){
       <button class="mrow2" data-act="go:terms"><span class="mi">${svg('note',19)}</span><span class="mt"><b>약관 및 동의</b>
         <small>${건강동의함(S.mid)?'건강정보 동의함':'건강정보 동의 안 함'} · 마케팅 ${agreeOf(S.mid).aM?'받음':'안 받음'}</small></span><i>›</i></button>
       <div class="mrow2"><span class="mi">${svg('h_clock',19)}</span><span class="mt"><b>화면 꺼짐 방지</b><small>운동 중에만 켭니다</small></span>${스위치(1)}</div>
-      <button class="mrow2" data-act="switch"><span class="mi">${svg('h_user',19)}</span><span class="mt"><b>계정 전환</b><small>다른 사람으로 들어가기</small></span><i>›</i></button>
+      <button class="mrow2" data-act="switch"><span class="mi">${svg('h_user',19)}</span><span class="mt"><b>로그아웃</b><small>다음에 들어올 때 문자 인증을 다시 합니다</small></span><i>›</i></button>
     </div>
 
     <span class="lbl">내 기록장</span>
@@ -11084,8 +11086,8 @@ function tTools(){
     <div class="hr"></div>
     <button class="card rowc" data-act="newmem"><div><div class="nm">＋ 회원 새로 만들기</div>
       <div class="sm">상담일지부터 처음부터</div></div><span class="rt">›</span></button>
-    <button class="card rowc" data-act="switch"><div><div class="nm">회원 화면으로 전환</div>
-      <div class="sm">계정 선택 화면으로</div></div><span class="rt">›</span></button>` };
+    ${시험판 ? `<button class="card rowc" data-act="switch"><div><div class="nm">회원 화면으로 전환</div>
+      <div class="sm">계정 선택 화면으로 (시험판에서만)</div></div><span class="rt">›</span></button>` : ''}` };
 }
 
 /* 회원 즐겨찾기 — 트레이너가 별을 켠 회원. 목록 맨 위로 올라오고 「★ 즐겨찾기」 칩으로 그 회원만 본다 (2026-10-07 대표 「회원 즐겨찾기 · 해당 페이지에 별표」)
@@ -11736,7 +11738,8 @@ const 지움확인 = {
   wsdel:['이 세트를 삭제할까요?', '삭제'], spdel:['이 종목을 제거할까요?', '제거'], clearpick:['추가한 종목을 전부 비울까요?', '전부 비우기'], pcdel:['이 댓글을 삭제할까요?', '삭제'],
   rsetdel:['이 세트를 제거할까요?', '제거'], psrm:['세트에서 이 종목을 제거할까요?', '제거'], mkclear:['표시를 모두 삭제할까요?', '모두 삭제'], rcartclr:['추가한 것을 전부 비울까요?', '비우기'],
   grpdel:['이 그룹을 삭제할까요?<br>안에 있던 루틴은 남습니다.', '삭제'], phdreq:['이 사진의 완전 삭제를 요청할까요?', '삭제 요청'], ootddel:['이 사진을 삭제할까요?<br>되돌릴 수 없습니다.', '삭제'],
-  exdel:['이 종목을 삭제할까요?', '삭제'] };
+  exdel:['이 종목을 삭제할까요?', '삭제'],
+  switch:['로그아웃할까요?<br>다음에 들어올 때 문자 인증을 다시 합니다.', '로그아웃'] };      /* 2026-10-13 — 나가면 기기 기억이 지워진다 */
 const 창에 = sel => !!document.querySelector('#sheetbox ' + sel + ', #main ' + sel);
 const 수정확인 = {
   saveintake: a => { const d = D.intake[a.split(':')[1]] || {}; return Object.keys(d).some(k => k !== 'meals' && d[k] && (!Array.isArray(d[k]) || d[k].length)) || Object.values(d.meals || {}).some(Boolean); },
@@ -11787,7 +11790,7 @@ document.addEventListener('click', async ev=>{
     case 'b3': { const b = document.getElementById(rest[0]); if(!b) return;
       b.dataset.a = String((((+b.dataset.a || 0) + Number(rest[1]) * 2) % 몸3N + 몸3N) % 몸3N); 몸3그리기(b.id); return; }
     case 'retry': S.screen='boot'; render(); start(); return;
-    case 'switch': 로그인기억.씀(null); S.lg = null; S.stack=[]; S.who=null; go('login'); return;      /* 나가면 기억도 지운다 — 다음에는 다시 문자 인증 */
+    case 'switch': 로그인기억.씀(null); S.lg = null; S.stack=[]; S.who=null; S.mid=null; S.self=false; S.tmid=null; go('login'); return;      /* 나가면 기억도 지운다 — 다음에는 다시 문자 인증 */
     case 'back': goBack(); return;
     case 'ttab': S.ttab=rest[0]; if(rest[0]==='t_community') S.cmode=''; goRoot(rest[0]);
       if(rest[0]==='t_community') 커뮤니티받기().then(()=>{ if(S.screen==='t_community') render(); });
