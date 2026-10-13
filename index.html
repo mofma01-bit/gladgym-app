@@ -2879,7 +2879,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '390';
+const BUILD = '391';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -4628,7 +4628,7 @@ function 계획기록(g, src, memo, 옛){
 const 기록곳 = { calc: '대시보드 · 칼로리 계산기', desk: '대시보드 · 정보 탭', app: '회원 앱 · 운동계획', back: '되돌림', old: '전부터 있던 계획' };
 function 식단계획보기(mid){
   const g = GOALS[mid] || {}, mp = g.mp;
-  if(!mp || !mp.meals) return `<div class="empty">아직 받은 식단 계획이 없어요<br><small style="font-weight:500;opacity:.8">트레이너가 상담에서 칼로리를 계산해 보내면 여기에 나옵니다</small></div>`;
+  if(!mp || !mp.meals) return `<div class="empty">아직 받은 식단 계획이 없습니다<br><small style="font-weight:500;opacity:.8">트레이너가 보내면 여기에 나옵니다</small></div>`;
   return `<div class="card gold mpk"><span class="lbl" style="margin:0">하루에 이만큼 드세요</span><div class="k">${(+mp.kcal||0).toLocaleString()}<i>kcal</i></div>
       <div class="mpm"><span style="--c:var(--gold)">탄수화물<b>${+mp.c||0}g</b></span><span style="--c:var(--teal)">단백질<b>${+mp.p||0}g</b></span><span style="--c:#b08968">지방<b>${+mp.f||0}g</b></span></div>
       <div class="mpf"><span><b>${esc(mp.by||'')}</b> 트레이너 · ${esc(dateTxt(mp.at)||'')}${mp.style ? ' · ' + esc(mp.style) : ''}</span>${(g.hist||[]).length ? `<button data-act="phist:${mid}">바뀐 기록 ›</button>` : ''}</div></div>
@@ -9197,15 +9197,12 @@ function 상담작성(d){
 }
 function 상담작성카드(d, tr){
   const a = 상담작성(d), 단계 = a.p >= 100 ? 2 : a.n <= 3 ? 0 : 1;
-  const 제목 = ['아직 상담 전이에요', '상담일지를 작성하는 중이에요', '상담일지를 모두 작성했어요'][단계];
-  const 말 = tr ? ['키 · 나이 같은 기본 값만 들어 있어요. 아래 「PT 상담일지 작성 · 수정」을 누르거나, 종이 상담지를 찍어 올리면 채워집니다. PC 에서는 대시보드 → 회원 → 정보 탭의 「수정」입니다.',
-                  '남은 항목은 ' + a.빈.slice(0, 4).join(' · ') + (a.빈.length > 4 ? ' 외 ' + (a.빈.length - 4) + '개' : '') + '입니다. 아래 「PT 상담일지 작성 · 수정」에서 이어서 입력하세요.',
-                  '운동 가능 시간 · 건강 상태 · 원하는 것이 모두 들어 있어요. 바뀐 것이 있으면 「작성 · 수정」에서 수정합니다.'][단계]
-                : ['첫 수업에서 트레이너와 함께 작성합니다. 작성하면 운동 가능 시간 · 건강 상태 · 원하는 것이 여기에 보이고, 운동계획과 칼로리 계산에 쓰입니다.',
-                   '트레이너와 상담한 내용이 채워지고 있어요. 남은 항목은 다음 수업에서 이어서 작성합니다.',
-                   '트레이너와 상담한 내용입니다. 바뀐 것이 있으면 트레이너에게 말씀해 주세요.'][단계];
+  /* 안내는 두 줄 — ① 없는 이유(간결하게) ② 어디서 무엇을 (2026-10-13 대표). 길게 풀어 쓰지 않는다 */
+  const 제목 = ['아직 작성 전입니다', '작성 중입니다 · 남은 항목 ' + a.빈.length + '개', '모두 작성했습니다'][단계];
+  const 말 = tr ? ['아래 「PT 상담일지 작성 · 수정」에서 입력해 주세요', '아래 「PT 상담일지 작성 · 수정」에서 이어서 입력해 주세요', '수정은 아래 「PT 상담일지 작성 · 수정」에서 해 주세요'][단계]
+                : ['첫 수업에서 트레이너와 함께 작성합니다', '남은 항목은 다음 수업에서 트레이너와 작성합니다', '수정할 것이 있으면 트레이너에게 말씀해 주세요'][단계];
   return `<div class="card ikprog${단계 === 2 ? ' ok' : ''}"><div class="rowc" style="align-items:baseline"><div class="nm">${제목}</div><div class="sm"><b>${a.p}%</b> · ${a.n} / ${a.모두}항목</div></div>
-    <i class="bar"><b style="width:${Math.max(3, a.p)}%"></b></i><div class="sm" style="margin-top:9px;line-height:1.6">${말}</div></div>`;
+    <i class="bar"><b style="width:${Math.max(3, a.p)}%"></b></i><div class="sm" style="margin-top:9px">${말}</div></div>`;
 }
 function vIntake(){
   const mid=subj(), d=D.intake[mid]||{}, tr=(S.who==='tr');
@@ -9930,9 +9927,9 @@ function vPlan(){
        :(mid===S.mid?`<div class="cyfoot"><span>목표 체중 · 칼로리는 트레이너와 함께 정해요</span></div>`:'')}
     ${목표막대(mid, g)}${이대로그림(g)}
     <span class="lbl">나의 운동 목적</span>
-    ${목적.length ? `<div class="chips">${목적.map(x=>`<span class="chip on">${esc(x)}</span>`).join('')}</div>` : `<div class="cyfoot"><span>아직 정하지 않았어요 · ${tr ? '위 「계획 수정 · 칼로리 계산」의 「운동 목적」에서 선택합니다' : '트레이너와 상담할 때 함께 정해요'}</span></div>`}
+    ${목적.length ? `<div class="chips">${목적.map(x=>`<span class="chip on">${esc(x)}</span>`).join('')}</div>` : `<div class="cyfoot"><span>아직 정하지 않았습니다<br>${tr ? '위 「계획 수정 · 칼로리 계산」에서 선택해 주세요' : '트레이너와 상담할 때 정합니다'}</span></div>`}
     <span class="lbl">목표${(g.now.date||g.to.date) ? ` <small style="font-weight:600;color:var(--sub)">${esc(g.now.date||'—')} → ${esc(g.to.date||'—')}${남!=null&&남>=0 ? ' · '+남+'일 남음' : ''}</small>` : ''}</span>
-    ${칸들 ? `<div class="sstat3 ib4 plg">${칸들}</div>` : `<div class="cyfoot"><span>아직 목표 몸무게가 없어요 · ${tr ? '위 「계획 수정 · 칼로리 계산」에서 정하거나, 대시보드 칼로리 계산기에서 보내면 들어옵니다' : '트레이너와 상담할 때 함께 정해요'}</span></div>`}
+    ${칸들 ? `<div class="sstat3 ib4 plg">${칸들}</div>` : `<div class="cyfoot"><span>아직 목표 몸무게가 없습니다<br>${tr ? '위 「계획 수정 · 칼로리 계산」에서 입력해 주세요' : '트레이너와 상담할 때 정합니다'}</span></div>`}
     <span class="lbl">맞춤 칼로리 · 얼마나 빠질까</span>
     ${(g.calc && (g.now.w||g.calc.bmr)) ? calcView(g) : '<div class="cyfoot"><span>몸무게와 활동량을 입력하면 계산해 드려요</span></div>'}
     ${(g.kcal||g.ratio||g.wk||g.mo) ? `<span class="lbl">직접 입력해 둔 값</span>
