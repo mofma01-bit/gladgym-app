@@ -2827,6 +2827,7 @@ const demoBox = (e, v, 접어둠) => {
 };
 
 let MEMBERS = [];
+let 직원들 = [];
 let 직원줄 = null;                          /* 직원 본인의 기록 자리 — members 표의 직원 줄 */
 function 직원전환(to){
   if(!직원줄){ toast('직원 기록 자리를 찾지 못했어요'); return; }
@@ -2889,7 +2890,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '398';
+const BUILD = '399';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -3067,8 +3068,9 @@ async function boot(){
        막는 기계 = _도구\회원칸점검.py */
     cmOff:m.cm_optout_at||'' });
   MEMBERS = mems.filter(m => m.role === 'member').map(회원꼴);
-  const t = mems.find(m => m.role === 'trainer'); if(t) TRAINER = t.name;
-  직원줄 = t ? Object.assign(회원꼴(t), { staff:true, tr:t.name }) : null; if(S.self && 직원줄) MEMBERS.push(직원줄);
+  직원들 = mems.filter(m => m.role === 'trainer').map(x => Object.assign(회원꼴(x), { staff:true, tr:x.name }));      /* 전화번호로 들어온 직원이 누구인지 이름(n)으로 찾는다 (2026-10-13) — 회원꼴은 이 함수 안에서만 쓸 수 있어 미리 꼴을 만들어 둔다 */
+  const t = (로그인기억.읽() || {}).who && 직원들.find(m => m.n === 로그인기억.읽().name) || 직원들[0]; if(t) TRAINER = t.n;
+  직원줄 = t || null; if(S.self && 직원줄) MEMBERS.push(직원줄);
 
   D.routines = rts.map(r => ({ id:r.id, mid:r.member_id, no:r.no, n:r.name, purpose:r.purpose||'', grp:r.grp||'',
     items: ritems.filter(i => i.routine_id === r.id).sort((a,b)=>a.sort-b.sort).map(i => {
@@ -3154,7 +3156,8 @@ async function boot(){
     if(rw){ S.who='me'; S.mid=rw.mid; S.rw=rw.id; S.screen='report'; S.rpOnly=true; }
     try{ history.replaceState(null, '', location.pathname); }catch(e){} }
   if(S.screen === 'boot'){ const au = 로그인기억.읽();      /* 한 번 인증한 기기 — 다시 묻지 않는다(확정 틀 3절). 명단에 없어졌으면 로그인 화면으로 */
-    if(au && au.mid && MEMBERS.some(m => m.id === au.mid)){ S.who = 'm'; S.mid = au.mid; S.tab = 'home'; S.screen = 'home'; setTimeout(인사, 0); }
+    if(au && au.who && au.who !== 'member' && !au.mid){ S.who = 'tr'; S.ttab = 't_today'; S.screen = 't_today'; }      /* 직원 — 트레이너 화면으로 */
+    else if(au && au.mid && MEMBERS.some(m => m.id === au.mid)){ S.who = 'm'; S.mid = au.mid; S.tab = 'home'; S.screen = 'home'; setTimeout(인사, 0); }
     else S.screen = 'login'; }
   if(!histOn) histInit();
 }
@@ -4436,10 +4439,17 @@ async function 로그인일(k){ const g = S.lg || (S.lg = { 단계:'번호', pho
   if(k === 'lgcheck'){ const c = 번호만(g.code); if(c.length !== 6){ g.말 = '인증번호 6자리를 입력해 주세요'; render(); return; }
     g.중 = true; g.말 = ''; render();
     try{ const r = await 인증부르기('check', { phone: 번, code: c });
+      /* ⛔ 직원 번호면 서버가 mid 없이 { ok, token, who(권한), name } 을 준다 — 이것을 「틀림」으로 읽어 대표 번호가 「번호가 달라요」로 떴다 (2026-10-13 대표 시험에서 드러남). 직원은 트레이너 화면으로 들인다 */
+      if(r && r.ok && !r.mid && r.who && r.who !== 'member'){ 로그인기억.씀({ token: r.token || '', who: r.who, name: r.name || '', at: Date.now() }); S.lg = null;
+        const t = 직원들.find(m => m.n === r.name); if(t){ TRAINER = t.n; 직원줄 = t; } else if(r.name) TRAINER = r.name;
+        S.self = false; if(직원줄) MEMBERS = MEMBERS.filter(m => m.id !== 직원줄.id); S.who = 'tr'; S.ttab = 't_today'; S.stack = []; go('t_today'); return; }
+      if(r && r.ok && !r.mid){ g.말 = '앱 회원 자리를 찾지 못했어요 — 담당 선생님께 말씀해 주세요'; g.code = ''; g.중 = false; render(); return; }
       if(r && r.ok && r.mid){ 로그인기억.씀({ token: r.token || '', mid: r.mid, name: r.name || '', at: Date.now() }); S.lg = null;
         if(!MEMBERS.some(m => m.id === r.mid)){ location.reload(); return; }      /* 방금 만들어진 회원 — 명단을 다시 받는다(다시 켜지면 기억한 것으로 바로 들어온다) */
         회원으로들어가기(r.mid); return; }
-      g.말 = (r && r.why) || '번호가 달라요 — 다시 입력해 주세요'; g.code = ''; }
+      g.말 = (r && r.why) || '번호가 달라요 — 다시 입력해 주세요'; g.code = '';
+      /* 틀릴 때마다 **경고 창**으로 몇 번 남았는지 알린다 — 화면 글만으로는 못 보고 막 누르다 5번이 찬다 (2026-10-13 대표). 서버 글 「…(n번 남았어요)」에서 숫자를 읽는다 */
+      { const 남 = /(\d+)번 남/.exec(g.말), 막 = r && r['막힘']; 알림창(막 ? esc(g.말) : 남 ? '인증번호가 맞지 않습니다<br><b>' + 남[1] + '번</b> 더 틀리면 잠깁니다' : esc(g.말)); } }
     catch(e){ g.말 = e.message || '서버에 닿지 못했어요'; }
     g.중 = false; render(); return; } }
 document.addEventListener('input', e => { const t = e.target, k = t && t.dataset && t.dataset.k; if(k === 'lgphone' || k === 'lgcode'){ (S.lg || (S.lg = { 단계:'번호', phone:'', code:'', 말:'', 중:false, 이름:'' }))[k === 'lgphone' ? 'phone' : 'code'] = t.value; } });
@@ -11737,6 +11747,10 @@ const 수정확인 = {
   cycsetok:  () => !(D.cycle && D.cycle[S.mid] && D.cycle[S.mid].새),
   exsave:    () => 창에('[data-act^="exdel"]'), pisave: () => 창에('[data-act^="pidel"]'), pssave: () => 창에('[data-act^="psdel"]'),
   fsave:     () => 창에('[data-act^="fdelgo:"]') };
+/* 알리기만 하는 창 — 단추 하나. 확인창과 같은 틀(#cfm)을 쓴다 */
+function 알림창(말){ let o = document.getElementById('cfm'); if(o) o.remove(); o = document.createElement('div'); o.id = 'cfm';
+  o.innerHTML = `<div class="bx soft"><p>${말}</p><div><button class="yes">확인</button></div></div>`; document.body.appendChild(o);
+  o.querySelector('.yes').addEventListener('click', () => o.remove()); o.addEventListener('click', e => { if(e.target === o) o.remove(); }); }
 function 확인창(말, 단추, 하면, 순한){
   let o = document.getElementById('cfm'); if(o) o.remove();
   o = document.createElement('div'); o.id = 'cfm';
