@@ -2463,6 +2463,7 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
 .dseg{margin-bottom:12px}.mpk .k{font-size:34px;font-weight:800;line-height:1.2}.mpk .k i{font-style:normal;font-size:14px;opacity:.7;margin-left:4px}.mpm{display:flex;gap:6px;margin-top:10px}.mpm span{flex:1;text-align:center;border-radius:11px;padding:8px 2px;font-size:13px;color:var(--sub);background:rgba(0,0,0,.25);border-top:3px solid var(--c)}.mpm b{display:block;font-size:16px;color:var(--cream)}
 .mpf{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--sub);margin-top:10px}.mpf span{flex:1}.mpf b{color:var(--cream);font-weight:600}.mpf button{border:0;background:none;color:var(--gold);font-size:13px;font-weight:700;text-decoration:underline}
 .mpc{margin-top:8px}.mpr{display:flex;align-items:center;gap:9px;padding:6px 0;font-size:14px}.mpr .fe{width:26px;text-align:center;font-size:19px}.mpr .fn2{flex:1}.mpr .fq{color:var(--sub);font-size:13px;white-space:nowrap}
+.phmb{margin-top:8px;border:0;background:none;color:var(--gold);font-size:13.5px;font-weight:700;text-decoration:underline;padding:4px 0}.phml{display:flex;gap:8px;padding:7px 0;border-top:1px solid rgba(255,255,255,.07);font-size:13.5px;line-height:1.5}.phml b{width:44px;flex:none;color:var(--sub);font-weight:600}.phml span{flex:1}.phml i{font-style:normal;color:var(--sub);white-space:nowrap}
 .phg{display:flex;gap:8px;margin-top:8px}.phg span{flex:1;border-radius:10px;background:rgba(0,0,0,.25);padding:8px 9px;min-width:0}.phg small{font-size:13px;color:var(--sub)}.phg span>small:first-child{display:block}.phg b{font-size:15px}
 .ikprog .bar{display:block;height:7px;border-radius:9px;background:var(--dark-4);overflow:hidden;margin-top:9px}.ikprog .bar b{display:block;height:100%;background:var(--gold);border-radius:9px}.ikprog.ok .bar b{background:var(--teal)}.ikprog .sm b{color:var(--gold);font-size:15px}
 </style>
@@ -2879,7 +2880,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '391';
+const BUILD = '393';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -4628,13 +4629,13 @@ function 계획기록(g, src, memo, 옛){
 const 기록곳 = { calc: '대시보드 · 칼로리 계산기', desk: '대시보드 · 정보 탭', app: '회원 앱 · 운동계획', back: '되돌림', old: '전부터 있던 계획' };
 function 식단계획보기(mid){
   const g = GOALS[mid] || {}, mp = g.mp;
-  if(!mp || !mp.meals) return `<div class="empty">아직 받은 식단 계획이 없습니다<br><small style="font-weight:500;opacity:.8">트레이너가 보내면 여기에 나옵니다</small></div>`;
+  if(!mp || !mp.meals) return `<div class="empty">아직 받은 식단 계획이 없습니다<br><small style="font-weight:500;opacity:.8">트레이너에게 작성을 요청해 주세요</small></div>`;
   return `<div class="card gold mpk"><span class="lbl" style="margin:0">하루에 이만큼 드세요</span><div class="k">${(+mp.kcal||0).toLocaleString()}<i>kcal</i></div>
       <div class="mpm"><span style="--c:var(--gold)">탄수화물<b>${+mp.c||0}g</b></span><span style="--c:var(--teal)">단백질<b>${+mp.p||0}g</b></span><span style="--c:#b08968">지방<b>${+mp.f||0}g</b></span></div>
       <div class="mpf"><span><b>${esc(mp.by||'')}</b> 트레이너 · ${esc(dateTxt(mp.at)||'')}${mp.style ? ' · ' + esc(mp.style) : ''}</span>${(g.hist||[]).length ? `<button data-act="phist:${mid}">바뀐 기록 ›</button>` : ''}</div></div>
     ${mp.meals.map(x => `<div class="card mpc"><div class="rowc"><div class="nm">${esc(x.n)}${x.t ? ` <small style="font-weight:500;opacity:.7">${esc(x.t)}</small>` : ''}</div><div class="sm" style="color:var(--gold);font-weight:700">${+x.k||0}kcal</div></div>
       ${(x.li||[]).map(y => `<div class="mpr"><span class="fe">${y[4] || 음식그림(y[0])}</span><span class="fn2">${esc(String(y[0]).replace(/ \(.*/, ''))}</span><span class="fq">${kgfmt(+y[2]||0)} × ${esc(y[1])}</span></div>`).join('')}</div>`).join('')}
-    <div class="cyfoot"><span>식단 계획은 트레이너와 함께 정해요 · 바꾸고 싶으면 트레이너에게 말씀해 주세요</span></div>`;
+    <div class="cyfoot"><span>내용이 다르면 트레이너에게 말씀해 주세요</span></div>`;
 }
 function sheetPlanHist(mid){
   openSheet(()=>{ const h = (GOALS[mid]||{}).hist || [], 때 = s => { const t = s ? new Date(s) : null; return t && !isNaN(t) ? (t.getMonth()+1) + '월 ' + t.getDate() + '일' : '날짜 모름'; };
@@ -4642,7 +4643,8 @@ function sheetPlanHist(mid){
       ${h.length ? h.map((x, i) => { const 전 = h[i+1], 차 = (a, b, 단) => 전 && a && b && a !== b ? ` <small style="color:${a < b ? 'var(--teal)' : 'var(--warn)'}">${a < b ? '▼' : '▲'} ${kgfmt(Math.abs(a - b))}${단}</small>` : '';
         return `<div class="card${i ? '' : ' gold'}"><div class="rowc"><div class="nm">${때(x.at)}${i ? '' : ' <small style="color:var(--gold)">지금 계획</small>'}</div><div class="sm">${esc([x.by, 기록곳[x.src] || ''].filter(Boolean).join(' · '))}</div></div>
           <div class="phg"><span><small>하루 칼로리</small><b>${x.kcal ? (+x.kcal).toLocaleString() : '–'}</b>${차(x.kcal, 전 && 전.kcal, '')}</span><span><small>목표 몸무게</small><b>${x.tw ? kgfmt(x.tw) + 'kg' : '–'}</b>${차(x.tw, 전 && 전.tw, 'kg')}</span><span><small>목표 날짜</small><b>${x.td ? esc(dateTxt(x.td)) : '–'}</b></span></div>
-          ${x.style || x.memo ? `<div class="sm" style="margin-top:6px">${esc([x.style ? x.style + ' 식단' : '', x.memo].filter(Boolean).join(' · '))}</div>` : ''}</div>`; }).join('') : '<div class="empty">아직 기록이 없어요</div>'}
+          ${x.style || x.memo ? `<div class="sm" style="margin-top:6px">${esc([x.style ? x.style + ' 식단' : '', x.memo].filter(Boolean).join(' · '))}</div>` : ''}
+          ${x.mp && x.mp.meals ? `<button class="phmb" data-act="phm:${i}">${(S.phm||{})[i] ? '식단 접기 ▴' : '식단 보기 ▾'}</button>${(S.phm||{})[i] ? x.mp.meals.map(m => `<div class="phml"><b>${esc(m.n)}</b><span>${(m.li||[]).map(y => esc(String(y[0]).replace(/ \(.*/, '')) + ' ' + kgfmt(+y[2]||0) + ' × ' + esc(y[1])).join(' · ')}</span><i>${+m.k||0}kcal</i></div>`).join('') : ''}` : ''}</div>`; }).join('') : '<div class="empty">아직 기록이 없어요</div>'}
       <button class="btn ghost sm" data-act="close">닫기</button>`; });
 }
 function sheetWgoal(mid){
@@ -9199,8 +9201,8 @@ function 상담작성카드(d, tr){
   const a = 상담작성(d), 단계 = a.p >= 100 ? 2 : a.n <= 3 ? 0 : 1;
   /* 안내는 두 줄 — ① 없는 이유(간결하게) ② 어디서 무엇을 (2026-10-13 대표). 길게 풀어 쓰지 않는다 */
   const 제목 = ['아직 작성 전입니다', '작성 중입니다 · 남은 항목 ' + a.빈.length + '개', '모두 작성했습니다'][단계];
-  const 말 = tr ? ['아래 「PT 상담일지 작성 · 수정」에서 입력해 주세요', '아래 「PT 상담일지 작성 · 수정」에서 이어서 입력해 주세요', '수정은 아래 「PT 상담일지 작성 · 수정」에서 해 주세요'][단계]
-                : ['첫 수업에서 트레이너와 함께 작성합니다', '남은 항목은 다음 수업에서 트레이너와 작성합니다', '수정할 것이 있으면 트레이너에게 말씀해 주세요'][단계];
+  const 말 = tr ? ['아래 「PT 상담일지 작성 · 수정」에서 입력해 주세요', '아래 「PT 상담일지 작성 · 수정」에서 이어서 입력해 주세요', '아래 「PT 상담일지 작성 · 수정」에서 변경할 수 있습니다'][단계]
+                : ['트레이너에게 작성을 요청해 주세요', '남은 항목은 트레이너에게 작성을 요청해 주세요', '내용이 다르면 트레이너에게 말씀해 주세요'][단계]      /* 회원은 못 쓰는 자리 — 비었을 때 「작성을 요청」 · 채워졌을 때 「다르면 말씀」(「수정」이라 하지 않는다 · 2026-10-13 대표) */;
   return `<div class="card ikprog${단계 === 2 ? ' ok' : ''}"><div class="rowc" style="align-items:baseline"><div class="nm">${제목}</div><div class="sm"><b>${a.p}%</b> · ${a.n} / ${a.모두}항목</div></div>
     <i class="bar"><b style="width:${Math.max(3, a.p)}%"></b></i><div class="sm" style="margin-top:9px">${말}</div></div>`;
 }
@@ -9927,9 +9929,9 @@ function vPlan(){
        :(mid===S.mid?`<div class="cyfoot"><span>목표 체중 · 칼로리는 트레이너와 함께 정해요</span></div>`:'')}
     ${목표막대(mid, g)}${이대로그림(g)}
     <span class="lbl">나의 운동 목적</span>
-    ${목적.length ? `<div class="chips">${목적.map(x=>`<span class="chip on">${esc(x)}</span>`).join('')}</div>` : `<div class="cyfoot"><span>아직 정하지 않았습니다<br>${tr ? '위 「계획 수정 · 칼로리 계산」에서 선택해 주세요' : '트레이너와 상담할 때 정합니다'}</span></div>`}
+    ${목적.length ? `<div class="chips">${목적.map(x=>`<span class="chip on">${esc(x)}</span>`).join('')}</div>` : `<div class="cyfoot"><span>아직 정하지 않았습니다<br>${tr ? '위 「계획 수정 · 칼로리 계산」에서 선택해 주세요' : '트레이너에게 작성을 요청해 주세요'}</span></div>`}
     <span class="lbl">목표${(g.now.date||g.to.date) ? ` <small style="font-weight:600;color:var(--sub)">${esc(g.now.date||'—')} → ${esc(g.to.date||'—')}${남!=null&&남>=0 ? ' · '+남+'일 남음' : ''}</small>` : ''}</span>
-    ${칸들 ? `<div class="sstat3 ib4 plg">${칸들}</div>` : `<div class="cyfoot"><span>아직 목표 몸무게가 없습니다<br>${tr ? '위 「계획 수정 · 칼로리 계산」에서 입력해 주세요' : '트레이너와 상담할 때 정합니다'}</span></div>`}
+    ${칸들 ? `<div class="sstat3 ib4 plg">${칸들}</div>` : `<div class="cyfoot"><span>아직 목표 몸무게가 없습니다<br>${tr ? '위 「계획 수정 · 칼로리 계산」에서 입력해 주세요' : '트레이너에게 작성을 요청해 주세요'}</span></div>`}
     <span class="lbl">맞춤 칼로리 · 얼마나 빠질까</span>
     ${(g.calc && (g.now.w||g.calc.bmr)) ? calcView(g) : '<div class="cyfoot"><span>몸무게와 활동량을 입력하면 계산해 드려요</span></div>'}
     ${(g.kcal||g.ratio||g.wk||g.mo) ? `<span class="lbl">직접 입력해 둔 값</span>
@@ -11773,7 +11775,8 @@ document.addEventListener('click', async ev=>{
       drawSheet(); return; }
     case 'fput': { if(S.fpMode==='g') readGram(); putFood(); return; }
     case 'dtab': S.dietTab = rest[0]; render(); return;
-    case 'phist': sheetPlanHist(rest[0] || S.mid); return;
+    case 'phist': S.phm = {}; sheetPlanHist(rest[0] || S.mid); return;
+    case 'phm': S.phm = S.phm || {}; S.phm[rest[0]] = !S.phm[rest[0]]; drawSheet(); return;
     case 'wgoal': S.wg = null; sheetWgoal(rest[0] || S.mid); return;
     case 'wgst': { if(S.wg && (rest[0] === 's' || rest[0] === 'p')){ S.wg[rest[0]] = Math.max(0, Math.min(7, S.wg[rest[0]] + (+rest[1] || 0))); drawSheet(); } return; }
     case 'wgsave': { const g = S.wg; if(!g) return; if(!(g.s + g.p)){ toast('일주일에 한 번은 넘게 정해 주세요'); return; }
