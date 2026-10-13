@@ -2456,6 +2456,11 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
 .wgst button{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--dark-3);color:var(--cream);font-size:21px}.wgst b{width:54px;text-align:center;font-size:24px}.wgst b small{font-size:13px;opacity:.7;font-weight:600}
 .wgsum{display:flex;justify-content:space-between;align-items:baseline;border-top:2px solid var(--line);padding:13px 2px 6px;font-size:15px;font-weight:800}.wgsum b{color:var(--gold);font-size:19px}
 .wgnote{display:flex;align-items:center;gap:10px;margin-top:8px;border-radius:14px;padding:11px 13px;background:rgba(232,182,90,.1);border:1px solid rgba(232,182,90,.45);font-size:13.5px;line-height:1.5}.wgnote span{flex:1}.wgnote small{opacity:.7;font-size:13px}.wgnote button{border:0;background:none;color:var(--gold);font-size:13.5px;font-weight:700;text-decoration:underline;flex:none}
+/* 내 식단 계획 · 바뀐 기록 (2026-10-13 · 389) */
+.dseg{margin-bottom:12px}.mpk .k{font-size:34px;font-weight:800;line-height:1.2}.mpk .k i{font-style:normal;font-size:14px;opacity:.7;margin-left:4px}.mpm{display:flex;gap:6px;margin-top:10px}.mpm span{flex:1;text-align:center;border-radius:11px;padding:8px 2px;font-size:13px;color:var(--sub);background:rgba(0,0,0,.25);border-top:3px solid var(--c)}.mpm b{display:block;font-size:16px;color:var(--cream)}
+.mpf{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--sub);margin-top:10px}.mpf span{flex:1}.mpf b{color:var(--cream);font-weight:600}.mpf button{border:0;background:none;color:var(--gold);font-size:13px;font-weight:700;text-decoration:underline}
+.mpc{margin-top:8px}.mpr{display:flex;align-items:center;gap:9px;padding:6px 0;font-size:14px}.mpr .fe{width:26px;text-align:center;font-size:19px}.mpr .fn2{flex:1}.mpr .fq{color:var(--sub);font-size:13px;white-space:nowrap}
+.phg{display:flex;gap:8px;margin-top:8px}.phg span{flex:1;border-radius:10px;background:rgba(0,0,0,.25);padding:8px 9px;min-width:0}.phg small{font-size:13px;color:var(--sub)}.phg span>small:first-child{display:block}.phg b{font-size:15px}
 </style>
 
 </head>
@@ -2870,7 +2875,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '388';
+const BUILD = '389';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -4607,6 +4612,34 @@ async function 운동목표저장(mid, 바꿈){      /* 서버의 최신 운동�
   const 합 = Object.assign({}, 서버 || g); if(g.my) 합.my = g.my;
   합.wgoal = Object.assign({}, 합.wgoal || {}, 바꿈); GOALS[mid] = 합;
   await sv(spost('plans', [{ member_id:mid, data:합, updated_at:new Date().toISOString() }], {on:'member_id'}), '운동 목표 저장');
+}
+/* ══ 내 식단 계획 · 계획이 바뀌어 온 기록 ══ 2026-10-13 대표 「앱 ↔ 대시보드 서로 수정한 걸 동기화 · 이전 계획을 볼 수 있는 자리」
+   plans.data.mp = 대시보드 칼로리 계산기가 보낸 식단 계획 / plans.data.hist = 운동계획이 저장될 때마다 한 줄(맨 앞이 지금 · 30개). 모양은 데스크 `계획기록` 과 같다 — ⛔ 한쪽을 고치면 같이 고친다 */
+function 계획기록(g, src, memo, 옛){
+  const 요 = x => { const r = (x && x.now) ? calcOf(JSON.parse(JSON.stringify(x))) : {}; return { kcal: r.kcal || nnum(x && x.kcal) || 0, w: nnum(x && x.now && x.now.w), tw: nnum(x && x.to && x.to.w), td: (x && x.to && x.to.date) || '', act: (x && x.calc && x.calc.act) || '', style: (x && x.mp && x.mp.style) || '' }; };
+  const 새 = Object.assign({ at: new Date().toISOString(), by: S.who === 'tr' ? TRAINER : ((MEMBERS.find(m => m.id === S.mid) || {}).n || ''), src: src, memo: memo || '' }, 요(g)), h = (g.hist || []).slice(), 같 = (a, b) => a && ['kcal', 'w', 'tw', 'td', 'act', 'style'].every(k => a[k] === b[k]);
+  if(!h.length && 옛){ const o = 요(옛); if(o.kcal || o.tw) h.push(Object.assign({ at: '', by: '', src: 'old', memo: '' }, o)); }
+  if(같(h[0], 새) && !memo) return g;
+  g.hist = [새].concat(h).slice(0, 30); return g; }
+const 기록곳 = { calc: '대시보드 · 칼로리 계산기', desk: '대시보드 · 정보 탭', app: '회원 앱 · 운동계획', back: '되돌림', old: '전부터 있던 계획' };
+function 식단계획보기(mid){
+  const g = GOALS[mid] || {}, mp = g.mp;
+  if(!mp || !mp.meals) return `<div class="empty">아직 받은 식단 계획이 없어요<br><small style="font-weight:500;opacity:.8">트레이너가 상담에서 칼로리를 계산해 보내면 여기에 나옵니다</small></div>`;
+  return `<div class="card gold mpk"><span class="lbl" style="margin:0">하루에 이만큼 드세요</span><div class="k">${(+mp.kcal||0).toLocaleString()}<i>kcal</i></div>
+      <div class="mpm"><span style="--c:var(--gold)">탄수화물<b>${+mp.c||0}g</b></span><span style="--c:var(--teal)">단백질<b>${+mp.p||0}g</b></span><span style="--c:#b08968">지방<b>${+mp.f||0}g</b></span></div>
+      <div class="mpf"><span><b>${esc(mp.by||'')}</b> 트레이너 · ${esc(dateTxt(mp.at)||'')}${mp.style ? ' · ' + esc(mp.style) : ''}</span>${(g.hist||[]).length ? `<button data-act="phist:${mid}">바뀐 기록 ›</button>` : ''}</div></div>
+    ${mp.meals.map(x => `<div class="card mpc"><div class="rowc"><div class="nm">${esc(x.n)}${x.t ? ` <small style="font-weight:500;opacity:.7">${esc(x.t)}</small>` : ''}</div><div class="sm" style="color:var(--gold);font-weight:700">${+x.k||0}kcal</div></div>
+      ${(x.li||[]).map(y => `<div class="mpr"><span class="fe">${y[4] || 음식그림(y[0])}</span><span class="fn2">${esc(String(y[0]).replace(/ \(.*/, ''))}</span><span class="fq">${kgfmt(+y[2]||0)} × ${esc(y[1])}</span></div>`).join('')}</div>`).join('')}
+    <div class="cyfoot"><span>식단 계획은 트레이너와 함께 정해요 · 바꾸고 싶으면 트레이너에게 말씀해 주세요</span></div>`;
+}
+function sheetPlanHist(mid){
+  openSheet(()=>{ const h = (GOALS[mid]||{}).hist || [], 때 = s => { const t = s ? new Date(s) : null; return t && !isNaN(t) ? (t.getMonth()+1) + '월 ' + t.getDate() + '일' : '날짜 모름'; };
+    return `<div class="h2">계획이 바뀌어 온 기록 <small>${h.length}건 · 맨 위가 지금</small></div>
+      ${h.length ? h.map((x, i) => { const 전 = h[i+1], 차 = (a, b, 단) => 전 && a && b && a !== b ? ` <small style="color:${a < b ? 'var(--teal)' : 'var(--warn)'}">${a < b ? '▼' : '▲'} ${kgfmt(Math.abs(a - b))}${단}</small>` : '';
+        return `<div class="card${i ? '' : ' gold'}"><div class="rowc"><div class="nm">${때(x.at)}${i ? '' : ' <small style="color:var(--gold)">지금 계획</small>'}</div><div class="sm">${esc([x.by, 기록곳[x.src] || ''].filter(Boolean).join(' · '))}</div></div>
+          <div class="phg"><span><small>하루 칼로리</small><b>${x.kcal ? (+x.kcal).toLocaleString() : '–'}</b>${차(x.kcal, 전 && 전.kcal, '')}</span><span><small>목표 몸무게</small><b>${x.tw ? kgfmt(x.tw) + 'kg' : '–'}</b>${차(x.tw, 전 && 전.tw, 'kg')}</span><span><small>목표 날짜</small><b>${x.td ? esc(dateTxt(x.td)) : '–'}</b></span></div>
+          ${x.style || x.memo ? `<div class="sm" style="margin-top:6px">${esc([x.style ? x.style + ' 식단' : '', x.memo].filter(Boolean).join(' · '))}</div>` : ''}</div>`; }).join('') : '<div class="empty">아직 기록이 없어요</div>'}
+      <button class="btn ghost sm" data-act="close">닫기</button>`; });
 }
 function sheetWgoal(mid){
   const g0 = 운동목표(mid); if(!S.wg || S.wg.mid !== mid) S.wg = { mid, s: g0.수, p: g0.개 };
@@ -7285,7 +7318,7 @@ function vDiet(){
   const day = S.dietDay || TODAY;
   const seqs = mealsSeq(mid, day);
   return { top: bar('식단', `<span class="sub">${esc((MEMBERS.find(m=>m.id===mid)||{}).n||'')}</span>`, tr?'tm:'+mid:null),
-    tabs: !tr, body:`
+    tabs: !tr, body: `<div class="seg dseg">${[['rec','오늘 기록'],['plan','내 식단 계획']].map(k=>`<button class="${(S.dietTab||'rec')===k[0]?'on':''}" data-act="dtab:${k[0]}">${k[1]}</button>`).join('')}</div>` + (S.dietTab === 'plan' ? 식단계획보기(mid) : `
     ${dietStrip(mid)}
     ${kcalCard(mid, day)}
     ${tr?'':`<div class="two">
@@ -7323,7 +7356,7 @@ function vDiet(){
     ${tr?'':식단올리기줄(mid, day)}
     ${!tr && 식단사진들(mid, day).length ? `<button class="dayfeed q" data-act="daycap:${day}"><span><b>${day===TODAY?'오늘':esc(dateTxt(day))} 식단 한 장으로 저장</b><small>갤러리 저장 · 공유용</small></span><em>만들기 ›</em></button>` : ''}
     ${(모 => 모 ? `<div class="hr"></div><span class="lbl">지금까지 모은 것</span>${모}` : '')(kcalSummary(mid))}
-    <div class="cyfoot" style="justify-content:center"><span>음식 정보 출처 · 식품영양성분 데이터베이스 (식품의약품안전처)</span></div>` };
+    <div class="cyfoot" style="justify-content:center"><span>음식 정보 출처 · 식품영양성분 데이터베이스 (식품의약품안전처)</span></div>`) };
 }
 
 const IC_DUMB = `<svg viewBox="0 0 28 20" width="26" height="19" aria-hidden="true" fill="none"
@@ -11717,11 +11750,14 @@ document.addEventListener('click', async ev=>{
       S.fpQty = Math.round((Number(rest[0])/amt)*1000)/1000;
       drawSheet(); return; }
     case 'fput': { if(S.fpMode==='g') readGram(); putFood(); return; }
+    case 'dtab': S.dietTab = rest[0]; render(); return;
+    case 'phist': sheetPlanHist(rest[0] || S.mid); return;
     case 'wgoal': S.wg = null; sheetWgoal(rest[0] || S.mid); return;
     case 'wgst': { if(S.wg && (rest[0] === 's' || rest[0] === 'p')){ S.wg[rest[0]] = Math.max(0, Math.min(7, S.wg[rest[0]] + (+rest[1] || 0))); drawSheet(); } return; }
     case 'wgsave': { const g = S.wg; if(!g) return; if(!(g.s + g.p)){ toast('일주일에 한 번은 넘게 정해 주세요'); return; }
       const 옛 = 운동목표(g.mid), 내가 = S.who !== 'tr';
-      운동목표저장(g.mid, { s: g.s, p: g.p, by: 내가 ? 'me' : 'tr', at: TODAY, was: 목표글(옛), seenMe: 내가, seenTr: !내가 }).then(()=>{ S.wg = null; closeSheet(); render(); toast('운동 목표를 저장했어요'); }).catch(e=>{ console.error(e); toast('저장하지 못했어요'); });
+      확인창('운동 목표를 주 ' + (g.s ? '수업 ' + g.s + ' · ' : '') + '개인 ' + g.p + '(으)로 저장할까요?', '저장', () =>      /* 설정 · 수정은 확인을 받는다 (2026-10-13 대표) */
+      운동목표저장(g.mid, { s: g.s, p: g.p, by: 내가 ? 'me' : 'tr', at: TODAY, was: 목표글(옛), seenMe: 내가, seenTr: !내가 }).then(()=>{ S.wg = null; closeSheet(); render(); toast('운동 목표를 저장했어요'); }).catch(e=>{ console.error(e); toast('저장하지 못했어요'); }), true);
       return; }
     case 'wgseen': 운동목표저장(S.mid, { seenMe: true }).then(render).catch(e=>console.error(e)); return;
     case 'fnewsave': {
@@ -11875,7 +11911,7 @@ document.addEventListener('click', async ev=>{
       g.calc[k] = (String(g.calc[k])===String(v)) ? '' : v;
       render(); return; }
     case 'saveplan': { if(S.who !== 'tr') return;
-      const mid=rest[0], g=GOALS[mid]||(GOALS[mid]={});
+      const mid=rest[0], g=GOALS[mid]||(GOALS[mid]={}), 옛계획 = JSON.parse(JSON.stringify(g));
       g.now=g.now||{}; g.to=g.to||{};
       const gv=k=>{ const el=document.querySelector('[data-k="'+k+'"]'); return el?el.value.trim():''; };
       ['goal','work','diet','kcal','ratio','wk','mo'].forEach(k=>{ g[k]=gv('pg:'+k); });
@@ -11897,6 +11933,7 @@ document.addEventListener('click', async ev=>{
       if(ikDirty) sv(spost('intake',[{ member_id:mid, data:ik, updated_at:new Date().toISOString() }], {on:'member_id'}), '상담일지 채우기');
       const rr = calcOf(g);
       g.kcal = String(rr.kcal||''); g.ratio = `${rr.rc} / ${rr.rp} / ${rr.rf}`;
+      try{ 계획기록(g, 'app', '', 옛계획); }catch(e){ console.error(e); }      /* 계획이 바뀌어 온 기록 — 저장할 때마다 한 줄 */
       g.wk = (Math.round(rr.wkKg*100)/100)+'kg'; g.mo = (Math.round(rr.moKg*100)/100)+'kg';
       g.vows = gv('pg:vows').split('\n').map(x=>x.trim()).filter(Boolean);
       g.promises = gv('pg:promises').split('\n').map(x=>x.trim()).filter(Boolean);
