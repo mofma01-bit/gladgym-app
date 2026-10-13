@@ -43,7 +43,10 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 #frame{width:100%;max-width:400px;height:min(860px,100vh);background:var(--dark);
   display:flex;flex-direction:column;overflow:hidden;position:relative;
   border:1px solid var(--line);border-radius:26px}
-@media (max-width:440px){ #frame{max-width:none;height:100vh;height:100dvh;border:none;border-radius:0} }
+@media (max-width:440px){ #frame{max-width:none;height:100vh;height:100dvh;border:none;border-radius:0}
+  /* ⛔ 폰에서는 바깥(body)이 절대 스크롤되면 안 된다 — body 가 100vh 라 설치한 앱에서 보이는 높이보다 길어, 화면 전체가 위아래로 밀리며 윗줄이나 아래 메뉴가 잘렸다 (2026-10-13 대표 · 구글로 설치한 앱).
+     틀(#frame)을 화면에 못박고(fixed) 안쪽 #main 만 스크롤한다 */
+  html,body{height:100%;overflow:hidden;overscroll-behavior:none}body{min-height:0!important;display:block!important}#frame{position:fixed;left:0;right:0;top:0;bottom:0;width:auto;height:auto!important} }
 @supports (padding: env(safe-area-inset-bottom)){
   /* ⛔ 앞에 #frame 을 붙여 둔다 — 이 줄이 아래 `#top{padding:13px 16px}` 보다 먼저 나와서, 같은 무게면 아래 것이 이겨 위쪽 여백이 사라졌다.
      홈 화면에 추가한 아이폰(노치)에서 윗줄이 시계 · 노치 밑으로 들어가 잘렸다 (2026-10-08 대표 「아이폰 미니에서 상단이 잘려」) */
@@ -2461,6 +2464,7 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
 .mpf{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--sub);margin-top:10px}.mpf span{flex:1}.mpf b{color:var(--cream);font-weight:600}.mpf button{border:0;background:none;color:var(--gold);font-size:13px;font-weight:700;text-decoration:underline}
 .mpc{margin-top:8px}.mpr{display:flex;align-items:center;gap:9px;padding:6px 0;font-size:14px}.mpr .fe{width:26px;text-align:center;font-size:19px}.mpr .fn2{flex:1}.mpr .fq{color:var(--sub);font-size:13px;white-space:nowrap}
 .phg{display:flex;gap:8px;margin-top:8px}.phg span{flex:1;border-radius:10px;background:rgba(0,0,0,.25);padding:8px 9px;min-width:0}.phg small{font-size:13px;color:var(--sub)}.phg span>small:first-child{display:block}.phg b{font-size:15px}
+.ikprog .bar{display:block;height:7px;border-radius:9px;background:var(--dark-4);overflow:hidden;margin-top:9px}.ikprog .bar b{display:block;height:100%;background:var(--gold);border-radius:9px}.ikprog.ok .bar b{background:var(--teal)}.ikprog .sm b{color:var(--gold);font-size:15px}
 </style>
 
 </head>
@@ -2875,7 +2879,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '389';
+const BUILD = '390';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -9182,6 +9186,27 @@ function fieldEditor(pre, d, f){
 /* ── 상담일지 ── */
 function subj(){ return S.subj || S.mid; }
 function subjName(){ const m=MEMBERS.find(x=>x.id===subj()); return m?m.n:''; }
+/* 상담일지가 얼마나 작성됐는지 — 2026-10-13 대표 「그냥 비어 있지 말고 한두 줄 설명 · n% 완성 혹은 어떤 상황인지 인지할 수 있도록」
+   항목 17개(묶어서 센다 · 병력은 「없음」 확인도 작성으로 본다). 회원에게는 「지금 어떤 단계인지」, 트레이너에게는 「어디서 입력하는지」를 적는다 */
+function 상담작성(d){
+  const 있 = v => Array.isArray(v) ? v.length > 0 : (v && typeof v === 'object' ? Object.values(v).some(x => String(x||'').trim()) : String(v == null ? '' : v).trim() !== '');
+  const 칸 = [['생년월일', ['birth']], ['키', ['height']], ['성별', ['sex']], ['직업', ['job']], ['직업환경', ['jobenv']], ['교대근무', ['shift']], ['알게 된 경로', ['route']], ['경험한 운동', ['exprs', 'expr']], ['스트레스 요인', ['stress']], ['스트레스 강도', ['stressLv']], ['해소 방법', ['relief']],
+    ['평소 활동량', ['act']], ['평균 수면', ['sleepH']], ['건강 상태 · 병력', ['cond', 'hist', 'histEtc', 'histNo']], ['운동 가능 시간', ['time', 'timeTxt']], ['식습관', ['meals']], ['원하는 것', ['goals', 'needs']]];
+  const 빈 = 칸.filter(c => !c[1].some(k => 있(d[k]))).map(c => c[0]), n = 칸.length - 빈.length;
+  return { n, 모두: 칸.length, p: Math.round(n / 칸.length * 100), 빈 };
+}
+function 상담작성카드(d, tr){
+  const a = 상담작성(d), 단계 = a.p >= 100 ? 2 : a.n <= 3 ? 0 : 1;
+  const 제목 = ['아직 상담 전이에요', '상담일지를 작성하는 중이에요', '상담일지를 모두 작성했어요'][단계];
+  const 말 = tr ? ['키 · 나이 같은 기본 값만 들어 있어요. 아래 「PT 상담일지 작성 · 수정」을 누르거나, 종이 상담지를 찍어 올리면 채워집니다. PC 에서는 대시보드 → 회원 → 정보 탭의 「수정」입니다.',
+                  '남은 항목은 ' + a.빈.slice(0, 4).join(' · ') + (a.빈.length > 4 ? ' 외 ' + (a.빈.length - 4) + '개' : '') + '입니다. 아래 「PT 상담일지 작성 · 수정」에서 이어서 입력하세요.',
+                  '운동 가능 시간 · 건강 상태 · 원하는 것이 모두 들어 있어요. 바뀐 것이 있으면 「작성 · 수정」에서 수정합니다.'][단계]
+                : ['첫 수업에서 트레이너와 함께 작성합니다. 작성하면 운동 가능 시간 · 건강 상태 · 원하는 것이 여기에 보이고, 운동계획과 칼로리 계산에 쓰입니다.',
+                   '트레이너와 상담한 내용이 채워지고 있어요. 남은 항목은 다음 수업에서 이어서 작성합니다.',
+                   '트레이너와 상담한 내용입니다. 바뀐 것이 있으면 트레이너에게 말씀해 주세요.'][단계];
+  return `<div class="card ikprog${단계 === 2 ? ' ok' : ''}"><div class="rowc" style="align-items:baseline"><div class="nm">${제목}</div><div class="sm"><b>${a.p}%</b> · ${a.n} / ${a.모두}항목</div></div>
+    <i class="bar"><b style="width:${Math.max(3, a.p)}%"></b></i><div class="sm" style="margin-top:9px;line-height:1.6">${말}</div></div>`;
+}
 function vIntake(){
   const mid=subj(), d=D.intake[mid]||{}, tr=(S.who==='tr');
   let 빈 = 0;
@@ -9189,7 +9214,7 @@ function vIntake(){
   const 묶음 = (제목, 쌍) => { const 찬 = 쌍.filter(p => { if(!p[1]) 빈++; return p[1]; }); if(!찬.length) return '';
     return `<span class="lbl">${제목}</span><div class="megrp ikg">${찬.map(p=>`<div class="mrow2"><span class="ikk">${esc(p[0])}</span><span class="ikv">${esc(p[1])}</span></div>`).join('')}</div>`; };
   const 나이 = ageFrom(d.birth), 식 = Object.entries(d.meals||{});
-  const 몸 = `
+  const 몸 = `${상담작성카드(d, tr)}
     <div class="sstat3">
       <div><span class="k">나이</span><span class="v">${나이 || '—'}<small>${나이 ? '세' : ''}</small></span></div>
       <div><span class="k">신장</span><span class="v">${esc(String(d.height||'—').replace(/cm/i,''))}<small>${d.height ? 'cm' : ''}</small></span></div>
@@ -9905,9 +9930,9 @@ function vPlan(){
        :(mid===S.mid?`<div class="cyfoot"><span>목표 체중 · 칼로리는 트레이너와 함께 정해요</span></div>`:'')}
     ${목표막대(mid, g)}${이대로그림(g)}
     <span class="lbl">나의 운동 목적</span>
-    ${목적.length ? `<div class="chips">${목적.map(x=>`<span class="chip on">${esc(x)}</span>`).join('')}</div>` : '<div class="cyfoot"><span>아직 정하지 않았어요</span></div>'}
+    ${목적.length ? `<div class="chips">${목적.map(x=>`<span class="chip on">${esc(x)}</span>`).join('')}</div>` : `<div class="cyfoot"><span>아직 정하지 않았어요 · ${tr ? '위 「계획 수정 · 칼로리 계산」의 「운동 목적」에서 선택합니다' : '트레이너와 상담할 때 함께 정해요'}</span></div>`}
     <span class="lbl">목표${(g.now.date||g.to.date) ? ` <small style="font-weight:600;color:var(--sub)">${esc(g.now.date||'—')} → ${esc(g.to.date||'—')}${남!=null&&남>=0 ? ' · '+남+'일 남음' : ''}</small>` : ''}</span>
-    ${칸들 ? `<div class="sstat3 ib4 plg">${칸들}</div>` : '<div class="cyfoot"><span>아직 정한 목표가 없어요</span></div>'}
+    ${칸들 ? `<div class="sstat3 ib4 plg">${칸들}</div>` : `<div class="cyfoot"><span>아직 목표 몸무게가 없어요 · ${tr ? '위 「계획 수정 · 칼로리 계산」에서 정하거나, 대시보드 칼로리 계산기에서 보내면 들어옵니다' : '트레이너와 상담할 때 함께 정해요'}</span></div>`}
     <span class="lbl">맞춤 칼로리 · 얼마나 빠질까</span>
     ${(g.calc && (g.now.w||g.calc.bmr)) ? calcView(g) : '<div class="cyfoot"><span>몸무게와 활동량을 입력하면 계산해 드려요</span></div>'}
     ${(g.kcal||g.ratio||g.wk||g.mo) ? `<span class="lbl">직접 입력해 둔 값</span>
