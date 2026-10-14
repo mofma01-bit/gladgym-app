@@ -2959,7 +2959,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '414';
+const BUILD = '416';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -12384,7 +12384,7 @@ document.addEventListener('click', async ev=>{
       toast('루틴을 삭제했어요'); go('t_routines'); return; }
     case 'newmem': S.ma = null; go('newmem'); return;
     case 'mafind': 회원검색(); return;
-    case 'maadd': { const x = ((S.ma || {}).결과 || [])[+rest[0]]; if(x) 회원넣기(x.name, x.phone, x['담당'] || '', false); return; }
+    case 'maadd': { const x = ((S.ma || {}).결과 || [])[+rest[0]]; if(x) 회원넣기(x.name, x.phone, (x['담당재직'] === false ? '' : (x['담당'] || '')) || (x['갈래'] === '체험수업' ? TRAINER : ''), false); return; }      /* 퇴사한 담당은 넣지 않는다 — 정본 `담당재직` · 체험 손님은 정본 담당(예약 · 수업)이 없으면 추가한 트레이너 (2026-10-14 대표) */
     case 'mahand': { const v = k => { const el = document.querySelector('[data-k="' + k + '"]'); return el ? el.value : ''; }; 회원넣기(v('mahn'), v('mahp'), '', true); return; }
     case 'rtsv': { const el = document.querySelector('[data-k="rtnm"]'); if(S.rtrec) 수업루틴저장(S.rtrec, el ? el.value : '', rest[0] === '1'); return; }
     case 'mode': { if(rest[0] === (S.self ? 'self' : 'tr')) return;
