@@ -2514,6 +2514,25 @@ body .wkhd:has(+ .cal2) .d::before{content:"";width:17px;height:17px;flex:none;b
 .texsub .btn{margin-top:6px}
 .tm.tmbtn{display:inline-flex;align-items:center;gap:6px;border:1px solid #57524a;border-radius:999px;padding:4px 10px 4px 12px;background:#22211e}.tm.tmbtn i{font-style:normal;font-size:11px;font-weight:700;color:var(--sub)}.tm.tmbtn:active{background:var(--dark-3)}
 .tm.off{opacity:.55}.chip.tmgo{flex:none;border-color:var(--gold-2);color:var(--gold);background:var(--gold-dim);font-weight:800;margin-left:6px}
+.btn.finx{background:#3b2320;border:1px solid #7a3d33;color:#ffd9d1}.btn.finx:active{background:#4a2a26}
+.finlock{border-radius:11px;border:1px solid #6b5a36;background:#2a2417;color:var(--gold);font-size:13px;padding:9px 12px}
+.wtop{display:flex;justify-content:flex-end;flex:none}.wrchip{border:1px solid var(--line);border-radius:999px;padding:4px 11px;font-size:12px;font-weight:700;color:#cfc7b8;background:#1d1c1a}.wrchip.on{border-color:var(--gold-2);color:var(--gold);background:var(--gold-dim)}.wdel2{font-size:12px;color:var(--warn);padding:2px 4px}
+.wtb.il .wtr{grid-template-columns:24px 52px 1fr 1fr 40px;gap:4px}.wtb.il .wtr.hd span{white-space:nowrap}
+.wc.wil{display:flex;align-items:center;justify-content:center;gap:3px}.wc.wil .pm{width:26px;height:32px;border-radius:8px;background:#26393f;color:var(--cream);font-size:16px;font-weight:800;flex:none;display:flex;align-items:center;justify-content:center}
+.wnum{min-width:40px;font-size:17px;font-weight:800;color:var(--cream);border-bottom:1.5px dashed #5d8994;padding:1px 2px;line-height:1.2}.wnum.on{color:var(--gold);border-bottom-color:var(--gold)}
+.pvgo{text-decoration:underline dotted;color:var(--gold-2)}
+#kpad{position:fixed;left:0;right:0;bottom:0;z-index:90;max-width:480px;margin:0 auto;background:#1b1a18;border-top:1px solid #3a3832;border-radius:18px 18px 0 0;padding:10px 12px calc(12px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:7px;box-shadow:0 -10px 30px rgba(0,0,0,.5)}
+#kpad .kpv{display:flex;align-items:baseline;gap:8px;padding:2px 4px}#kpad .kpv small{color:var(--sub);font-size:12px}#kpad .kpv b{font-size:26px;font-weight:800;color:var(--gold)}
+#kpad .kpq{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}#kpad .kpq button{border:1px solid var(--line);border-radius:10px;padding:8px 0;font-weight:700;color:#cfc7b8;font-size:13px}
+#kpad .kpg{display:grid;grid-template-columns:repeat(3,1fr) 1.1fr;gap:6px}#kpad .kpg button{border-radius:11px;background:#2a2926;padding:12px 0;font-size:19px;font-weight:700;color:var(--cream)}#kpad .kpg button:active{background:#3a3832}
+#kpad .kpg .ok{grid-row:span 2;background:linear-gradient(180deg,#f3dcae,#dfc089);color:#241a08;font-size:16px;font-weight:800}#kpad .kpg .fn{font-size:15px;color:var(--sub)}#kpad .kpg .sm{font-size:13px}#kpad .kpg button:disabled{background:none}
+body.kpon #main{padding-bottom:330px}
+.dragghost{position:fixed!important;z-index:95;pointer-events:none;opacity:.92;box-shadow:0 12px 30px rgba(0,0,0,.55);transform:scale(1.02);margin:0!important}
+.dragsrc{opacity:.3}.dropb{box-shadow:0 -3px 0 var(--gold)}.dropa{box-shadow:0 3px 0 var(--gold)}
+.wkst{flex:none;border-radius:16px;border:1px solid #4a4336;background:linear-gradient(135deg,#25211a,#1a1916);padding:12px 14px;display:flex;flex-direction:column;gap:9px}.wkst .h{display:flex;align-items:baseline}.wkst .h b{font-size:14px}.wkst .h span{margin-left:auto;font-size:11.5px;color:var(--sub)}
+.wkst .g{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.wkst .g div{border-radius:11px;background:#1d1c1a;border:1px solid #2c2b27;padding:7px 10px;font-size:11.5px;color:var(--sub)}.wkst .g b{display:block;font-size:19px;color:var(--cream);font-weight:800}.wkst .g b small{font-size:11px;color:var(--sub);font-weight:600;margin-left:1px}
+.wkst .wb{height:7px;border-radius:4px;background:#2a2926;overflow:hidden}.wkst .wb i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,#4fbf8f,#7fe0b0)}.wkst>small{font-size:11.5px;color:var(--sub);margin-top:-3px}
+.czgset small{display:block;font-size:11.5px;font-weight:500;color:#9fc9b4;margin-left:8px}
 .rby{font-size:11.5px;font-weight:700;color:var(--gold-2);white-space:nowrap}.rbynote{padding:8px 12px}
 .rhidlnk{flex:none;width:100%;text-align:center;font-size:13px;font-weight:600;color:var(--sub);padding:8px}.rhidc{opacity:.75}
 </style>
@@ -2931,7 +2950,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '410';
+const BUILD = '412';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -4189,7 +4208,7 @@ async function 파일올리기(path, blob, type){
    잠금은 D.live 에 담아 두므로 앱을 다시 켜도 풀리지 않는다.        */
 const 잠겼나 = () => { const w = live(); return !!(w && w.lock); };
 const 잠금이막는것 = { go:1, tab:1, back:1, switch:1, ttab:1, tfm2:1,
-                       askleave:1, askfin:1, askcancel:1, dofin:1, cancel:1 };
+                       askleave:1, askcancel:1, cancel:1 };      /* askfin · dofin 은 뺐다 — 잠겨 있어도 마칠 수 있다(종료하면서 잠금을 푼다 · 2026-10-14 대표 「잠겨 있어도 운동 종료는 될 수 있게」) */
 /* 자물쇠 그림 — 잠기면 고리가 내려온다 */
 const 자물쇠 = 잠김 => `<svg viewBox="0 0 24 24" width="21" height="21" fill="none"
   stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
@@ -4290,6 +4309,7 @@ function render(){
     if(!초안칸(t)) return;
     const d=S.draft&&S.draft[t.getAttribute('data-k')]; if(d !== undefined) t.value=d; });      /* 비운 것('')도 초안이다 — 안 그러면 옛 값이 되살아난다 */
   if(S.screen === 't_ex') 사전칠하기();      /* 초안(검색어)을 되살린 뒤에 가린다 */
+  if(자판 && S.screen !== 'workout') 자판그리기();
   S.dctx = dctx;
   $('#main').scrollTop = (v.keepScroll || sameView) ? keepAt : 0;
   const 새수 = [...$('#main').querySelectorAll('.cnt')].map(e=>e.getAttribute('data-cnt')).join(',');
@@ -5090,18 +5110,49 @@ function vRoutine(){
 }
 
 /* ── 운동 시작 ── */
+/* ══ 운동 시작 ══ 2026-10-14 대표 「유산소 하기는 위에 있는데 기록은 하단에 있고 · 이번 주 운동 현황은 상단에 어울릴 것 같아」→ 시안 `운동시작_정리안_1014.html` 권안
+   ① 맨 위 = 이번 주 운동 한 장(근력 n회 · 유산소 n분 · 운동한 날 n일 + 유산소 권장량 150분 막대) — 맨 아래 있던 「이번 주 유산소」를 올려 합쳤다.
+   ② 큰 카드 하나 = 그날 할 것: 트레이너 지정 → 없으면 내 루틴 → 루틴이 0개면 지난 기록(지난 기록도 없으면 내 루틴).
+   ③ 나머지 시작 길(내 루틴 · 지난 기록 · 자유 운동) 은 같은 크기 칸으로 · 유산소만 하기도 이 묶음 맨 아래 한 칸(떨어져 있던 것을 모음). */
+function 이번주운동(mid){
+  const d0 = new Date(); d0.setHours(0,0,0,0); d0.setDate(d0.getDate() - ((d0.getDay() + 6) % 7));
+  const 월 = d0.getFullYear() + '-' + String(d0.getMonth()+1).padStart(2,'0') + '-' + String(d0.getDate()).padStart(2,'0'), lw = live();
+  const ws = D.workouts.filter(w => w.mid === mid && w.date >= 월 && w.done && !(lw && lw.id === w.id));
+  const 근 = ws.filter(w => (w.items || []).some(it => !(exOf(it.ex) || {}).cardio && !isMemo(it.ex) && (it.sets || []).some(x => x.done !== false))).length;
+  const 날 = new Set(ws.filter(w => 세트있나(w)).map(w => w.date)).size;
+  return { 근, 날, 유: 주간유산소(mid) }; }
+function 이번주판(mid){ const o = 이번주운동(mid), 목 = 150, p = Math.min(100, o.유 / 목 * 100);      /* 150분 = WHO 주간 권장(중강도 유산소) */
+  return `<div class="wkst"><div class="h"><b>이번 주 운동</b><span>월 ~ 일</span></div>
+    <div class="g"><div>근력<b>${o.근}<small>회</small></b></div><div>유산소<b>${o.유}<small>분</small></b></div><div>운동한 날<b>${o.날}<small>일</small></b></div></div>
+    <div class="wb"><i style="width:${p}%"></i></div><small>${o.유 >= 목 ? '유산소 권장량 150분을 채웠습니다' : '유산소 권장량 150분 중 ' + o.유 + '분 · ' + (목 - o.유) + '분 남음'}</small></div>`; }
 function vStart(){
-  const t=D.today[S.mid], r=t?rOf(t.rid):null, ws=lastRealWorkouts();
+  const t=D.today[S.mid], r=t?rOf(t.rid):null, ws=lastRealWorkouts(), 루수 = myRoutines(S.mid).length;
+  const 큰 = r ? '지정' : 루수 ? '루틴' : ws[0] ? '지난' : '루틴';
+  const 루틴칸 = 크게 => `<button class="hero2 ${크게 ? 'tall' : 'half'} ${사진있나('routines')}" data-act="go:routines" style="${사진꾸밈('routines','#33304a','#131217')}">
+      ${크게 ? `<span class="art g5"></span><span class="tag2">${루수}개</span>` : ''}
+      <span class="tt">${크게 ? '내 루틴에서 선택' : '내 루틴'}</span>
+      <span class="dd">${크게 ? '미리 짜 둔 루틴 중에서 직접 선택합니다' : 루수 ? 루수 + '개 중에서 선택' : '0개 · 트레이너에게 요청'}</span></button>`;
+  const 지난칸 = 크게 => ws[0]
+      ? `<button class="hero2 ${크게 ? 'tall' : 'half'} ${사진있나('again')}" data-act="myrecs" style="${사진꾸밈('again','#3a2a20','#15110d')}">
+          ${크게 ? `<span class="tag2">${dateTxt(ws[0].date)}</span>` : ''}
+          <span class="tt">지난 기록으로</span>
+          <span class="dd">${크게 ? '' : dateTxt(ws[0].date) + ' · '}${ws[0].items.filter(i=>i.sets&&i.sets.length).map(i=>exName(i.ex,i.va)).slice(0,1).join('')}${ws[0].items.length>1?' 외':''}${크게 ? ' · 그대로 다시' : ''}</span></button>`
+      : `<button class="hero2 half dimc" data-act="noprev" style="--h1:#2b2a26;--h2:#141311">
+          <span class="tt">지난 기록으로</span>
+          <span class="dd">한 번 하고 나면 여기서 다시</span></button>`;
+  const 칸들 = [큰 !== '루틴' ? 루틴칸(false) : '', 큰 !== '지난' ? 지난칸(false) : '',
+    `<button class="hero2 half ${사진있나('pickex')}" data-act="empty" style="${사진꾸밈('pickex','#4a3b1c','#17130b')}">
+        <span class="tt">자유 운동</span>
+        <span class="dd">원하는 종목을 선택해 시작</span></button>`].filter(Boolean);
   return { top: bar('운동 시작', `<span class="sub">${dateTxt(TODAY)}</span>`, 'go:home'), body:`
-    ${r?`<button class="hero2 tall ${사진있나('assigned')}" data-act="rt:${r.id}"
+    ${이번주판(S.mid)}
+    ${큰 === '지정' ? `<button class="hero2 tall ${사진있나('assigned')}" data-act="rt:${r.id}"
         style="${사진꾸밈('assigned','#1f4048','#0e1517')}">
       <span class="art c2"></span>
       <span class="gl">${esc(t.by||'트레이너')}가 지정했어요</span>
       <span class="tag2">${r.items.length}종목 · ${estMin(r)}분</span>
       <span class="tt">트레이너 지정루틴 시작하기</span>
-      <span class="dd">${esc(t.kind)} · 루틴 ${r.no} · ${esc(r.n)}</span></button>`:''}
-
-    <button class="czgset" data-act="cardio" style="order:-1"><span class="ic"><svg viewBox="0 0 24 24">${유선.달리기}</svg></span><b>유산소만 하기</b><i>›</i></button>
+      <span class="dd">${esc(t.kind)} · 루틴 ${r.no} · ${esc(r.n)}</span></button>` : 큰 === '지난' ? 지난칸(true) : 루틴칸(true)}
     ${(()=>{ const rc=recosOf(S.mid).filter(x=>rOf(x.rid)); if(!rc.length) return '';
       return `<span class="lbl">다음 개인운동 추천</span>`
         + rc.map(x=>{ const r0=rOf(x.rid);
@@ -5111,35 +5162,9 @@ function vStart(){
             <span class="rt">›</span></button>`; }).join('')
         + `<div class="cyfoot"><span>트레이너 추천 루틴이에요</span></div>`;
     })()}
-
-    ${/* 큰 사진 카드는 맨 위 하나만. 지정 루틴이 없는 날은 「내 루틴」이 그 자리에 온다 (2026-10-06 융합) */''}
-    ${r ? '' : `<button class="hero2 tall ${사진있나('routines')}" data-act="go:routines"
-        style="order:-1;${사진꾸밈('routines','#33304a','#131217')}">
-      <span class="art g5"></span>
-      <span class="tag2">${myRoutines(S.mid).length}개</span>
-      <span class="tt">내 루틴에서 선택</span>
-      <span class="dd">미리 짜 둔 루틴 중에서 직접 선택합니다</span></button>`}
-    <span class="lbl">${r ? '다른 방법으로 시작' : '또는'}</span>
-    <div class="home2 st3">
-      ${r ? `<button class="hero2 half ${사진있나('routines')}" data-act="go:routines"
-          style="${사진꾸밈('routines','#33304a','#131217')}">
-        <span class="tt">내 루틴</span>
-        <span class="dd">${myRoutines(S.mid).length}개 중에서 선택</span></button>` : ''}
-      ${ws[0]
-        ? `<button class="hero2 half ${사진있나('again')}" data-act="myrecs"
-            style="${사진꾸밈('again','#3a2a20','#15110d')}">
-          <span class="tt">지난 기록으로</span>
-          <span class="dd">${dateTxt(ws[0].date)} · ${ws[0].items.filter(i=>i.sets&&i.sets.length)
-            .map(i=>exName(i.ex,i.va)).slice(0,1).join('')}${ws[0].items.length>1?' 외':''}</span></button>`
-        : `<button class="hero2 half dimc" data-act="noprev" style="--h1:#2b2a26;--h2:#141311">
-          <span class="tt">지난 기록으로</span>
-          <span class="dd">한 번 하고 나면 여기서 다시</span></button>`}
-      <button class="hero2 half ${r ? 'wide2' : ''} ${사진있나('pickex')}" data-act="empty"
-          style="${사진꾸밈('pickex','#4a3b1c','#17130b')}">
-        <span class="tt">자유 운동</span>
-        <span class="dd">원하는 종목을 선택해 시작</span></button>
-    </div>
-    ${주간판(S.mid)}` };
+    <span class="lbl">또는</span>
+    <div class="home2 st3">${칸들.map((h, i) => (칸들.length % 2 && i === 칸들.length - 1) ? h.replace('hero2 half', 'hero2 half wide2') : h).join('')}</div>
+    <button class="czgset" data-act="cardio"><span class="ic"><svg viewBox="0 0 24 24">${유선.달리기}</svg></span><b>유산소만 하기</b><small>런닝머신 · 사이클 · 천국의계단 · 야외</small><i>›</i></button>` };
 }
 
 /* ── 종목 고르기 ── 담기만 하고, 「운동 시작」을 눌러야 진행 화면으로 간다 */
@@ -5195,10 +5220,10 @@ function sheetStart(){
     if(추가중 && !보일것.length) return `<div class="h2">추가한 종목이 없어요</div>
       <button class="btn ghost sm" data-act="close">닫기</button>`;
     return `<div class="h2">${추가중 ? '이 종목을 추가할까요?' : '지금 순서대로 시작할까요?'}</div>
-    ${추가중 ? '' : `<p class="lbl plain" style="font-weight:500;color:var(--sub)">종목을 <b style="color:var(--teal)">길게 누르면</b> 순서를 변경할 수 있어요</p>`}
+    ${추가중 ? '' : `<p class="lbl plain" style="font-weight:500;color:var(--sub)">종목을 <b style="color:var(--teal)">길게 눌러 끌면</b> 순서를 변경할 수 있습니다</p>`}
     ${보일것.map((it,k)=>{ const i = 처음 + k; const mv=(S.sordIdx===i);
       return `<div class="card rowc ${mv?'teal':''}" style="padding:9px 9px 9px 13px"
-        ${추가중?'':`data-hold="sord:${i}"`}>
+        ${추가중?'':`data-drag="sord:${i}"`}>
         <div><div class="nm" style="font-size:14px">${i+1}. ${esc(exName(it.ex,it.va))}</div>
         <div class="sm">${esc(exOf(it.ex).p)}${isMemo(it.ex)?' · 메모':''}</div></div>
         ${mv?`<button class="ordbtn" data-act="sordmv:${i}:-1" ${i===0?'disabled':''}>▲</button>
@@ -5810,7 +5835,7 @@ function itemsFromRoutine(r){            /* 루틴의 빈칸은 그 회원의 �
 function 발판(w){
   const 잠 = !!(w && w.lock);
   return `<button class="btn sub ic ${잠?'dim':''}" data-act="go:pick"><b class="pl">＋</b>운동 추가</button>
-    <button class="btn gold ${잠?'dim':''}" data-act="askfin">운동 마치기</button>
+    <button class="btn finx" data-act="askfin">운동 마치기</button>
     <button class="lockb ${잠?'on':''}" aria-label="${잠?'화면 잠금 풀기':'화면 잠그기'}"
       data-act="${잠?'wlockhint':'wlock'}"${잠?' data-hold="wunlock"':''}>
       ${자물쇠(잠)}<i>${잠?'잠김':'잠금'}</i></button>`;
@@ -5884,18 +5909,18 @@ function vWorkout(){
     ${w.items.map((it,i)=>{
       const on = (i===w.cur), mv = (S.moveIdx===i);
       return `<div class="card rowc ${it.locked&&!on?'dim':''} ${on?'now2':''} ${S.just===VID(it.ex,it.va)?'just':''}"
-        style="padding:9px 9px 9px 13px" data-hold="ord:${i}">
+        style="padding:9px 9px 9px 13px" data-drag="ord:${i}">
       ${on ? `<span class="wkic">${svg('h_dumb',18)}</span>` : ''}
       <button data-act="jump:${i}" style="flex:1;min-width:0;text-align:left">
         <div class="nm" style="font-size:14px">${esc(exName(it.ex,it.va))}${isMemo(it.ex)?' <span class="pill q">메모</span>':''}</div>
         <div class="sm">${it.locked?`${mmss(it.sec)} · ${isMemo(it.ex)?'메모':it.sets.length+'세트'}`
-          :(on?(S.fold?접개(0):'하는 중 '+접개(1))
+          :(on?접개(S.fold?0:1)      /* 「하는 중」 글은 뺐다 — 카드가 밝게 떠 있어 지금 종목인 것이 보인다 (2026-10-14 대표 「하는 중 · 운동중 중복」) */
               :(isMemo(it.ex)?'메모':`${it.sets.length}세트 예정`))}</div></button>
       ${mv
         ? `<button class="ordbtn" data-act="ordmv:${i}:-1" ${i===0?'disabled':''}>▲</button>
            <button class="ordbtn" data-act="ordmv:${i}:1" ${i===w.items.length-1?'disabled':''}>▼</button>
            <button class="chip t" data-act="ordend" style="flex:none;padding:6px 10px">여기에 놓기</button>`
-        : `${on&&!it.locked?'<span class="pill t nowp">운동중</span>':(it.locked?'<span class="pill q">완료</span>':'')}
+        : `${it.locked?'<span class="pill q">완료</span>':''}
            <button class="chip rm" data-act="wdel:${i}">제거</button>`}
       </div>${(on && !S.fold) ? 펼침() : ''}`;
     }).join('')}
@@ -6106,7 +6131,7 @@ function 유산소판(cur, e, mid){
           : `<div><small>${종==='강도' ? '강도' : '속도'}</small><b>${x.spd||0}</b></div>${종==='속경' ? `<div><small>경사</small><b>${kgfmt(x.kg||0)}도</b></div><div><small>거리</small><b>${km}km</b></div>` : ''}`}
         ${x.feel ? `<div><small>느낌</small><b>${esc(x.feel)}</b></div>` : ''}</div></div>
       ${주간판(mid)}
-      <div class="wlock"><span>끝낸 종목이에요 · 잠겨 있어요</span><button data-act="redo">재기록</button></div>`; }
+      <div class="wlock"><span>끝낸 종목입니다</span><button data-act="redo">재기록</button></div>`; }
   if(c.ph === 'ready') return `<div class="czbox">${목표줄(c.goal)}
       <button class="czbig" data-act="cz:go">시작</button>
       <div class="czhint">시작을 누르면 시간이 흐릅니다<br>${종==='야외' ? '거리' : 종==='강도' ? '강도' : '거리 · 속도 · 경사'}는 끝난 뒤에 입력합니다</div></div>`;
@@ -6160,12 +6185,25 @@ function 세트표(cur, e, mid){
   const 지난글 = p => !p ? '—' : 유 ? `${p.reps}분` : `${kgfmt(p.kg)}×${p.reps}`;
   const 열림 = cur.sets.findIndex(x => !x.done), 끝 = cur.sets.length - 1, 잠 = !!cur.locked;
   const sel = 잠 ? -1 : (S.wsel != null && S.wsel <= 끝) ? S.wsel : (열림 >= 0 ? 열림 : 끝);
-  const 표 = `<div class="wtb c${칸들.length}"><div class="wtr hd"><span>${단위}</span><span>지난번</span>${칸들.map(c=>`<span>${c[2]}</span>`).join('')}<span>완료</span></div>
-    ${cur.sets.map((x,i)=>`<div class="wtr ${x.done||잠?'ok':''} ${i===sel?'on':''}"${잠?'':` data-act="ws:${i}"`}><span class="s">${i+1}</span><span class="pv">${지난글(지난[i])}</span>
-      ${칸들.map(c=>`<span class="wc">${값(x,c[0])}<small>${c[3]}</small></span>`).join('')}
+  const 줄안 = !유 && !잠;      /* 2026-10-14 대표 「무게 · 횟수 카운트가 두 개 표기 · 올리고 내리는 버튼만 붙이고 · 세트 1 이 있는데 아래 1세트가 또」 — 고른 줄 안에서 바로 올리고 내린다 */
+  const 칸글 = (x, c, i) => (줄안 && i === sel)
+    ? `<span class="wc wil"><button class="pm" data-act="d:${c[0]}:${i}:-${c[4]}" data-rep="1" aria-label="${c[2]} 내리기">−</button><button class="wnum${자판 && 자판.i === i && 자판.f === c[0] ? ' on' : ''}" data-act="kp:${c[0]}:${i}" aria-label="${c[2]} 입력">${값(x,c[0])}</button><button class="pm" data-act="d:${c[0]}:${i}:${c[4]}" data-rep="1" aria-label="${c[2]} 올리기">＋</button></span>`
+    : `<span class="wc">${값(x,c[0])}<small>${c[3]}</small></span>`;
+  const 표 = `<div class="wtb c${칸들.length}${줄안 ? ' il' : ''}"><div class="wtr hd"><span>${단위}</span><span>지난번</span>${칸들.map(c=>`<span>${c[2]}${줄안 ? ' ' + c[3] : ''}</span>`).join('')}<span>완료</span></div>
+    ${cur.sets.map((x,i)=>`<div class="wtr ${x.done||잠?'ok':''} ${i===sel?'on':''}"${잠?'':` data-act="ws:${i}"`}><span class="s">${i+1}</span>${줄안 && i === sel && 지난[i] ? `<button class="pv pvgo" data-act="wsame:${i}" aria-label="지난번 값 그대로">${지난글(지난[i])}</button>` : `<span class="pv">${지난글(지난[i])}</span>`}
+      ${칸들.map(c=>칸글(x, c, i)).join('')}
       <button class="wck"${잠?'':` data-act="${!x.done && i===끝 ? 'rep' : 'wsd:'+i}"`} aria-label="${i+1}${단위} 완료">✓</button></div>`).join('')}</div>`;
-  if(잠) return 표 + `<div class="wlock"><span>끝낸 종목이에요 · 잠겨 있어요</span><button data-act="redo">재기록</button></div>`;
+  if(잠) return 표 + `<div class="wlock"><span>끝낸 종목입니다</span><button data-act="redo">재기록</button></div>`;
   const x = cur.sets[sel], p = 지난[sel] || 지난[지난.length - 1], 할 = x.done ? 열림 : sel, c0 = 쉼설정(), 도는중 = !!(S.rest && S.rest.until);
+  if(줄안) return `${cur.rmPlan ? '' : `<div class="wtop"><button class="wrchip ${c0.on?'on':''}" data-act="wrestpick">${c0.on ? '휴식 ' + c0.sec + '초' : '휴식 끔'} ▾</button></div>`}
+    ${표}
+    ${cur.sets.length > 1 ? `<div class="wtop"><button class="wdel2" data-act="wsdel:${sel}">${sel+1}${단위} 삭제</button></div>` : ''}
+    ${도는중 ? `<div class="wrestbar"><b id="restleft2">${mmss(Math.max(0,(S.rest.until-Date.now())/1000))}</b><span>쉬는 중</span><button data-act="wrestadd">+15초</button><button data-act="wrestx">건너뛰기</button></div>` : ''}
+    ${열림 >= 0
+      ? `<button class="wdone" data-act="${할 === 끝 ? 'rep' : 'wsd:'+할}">${할+1}${단위} 완료</button>
+         <button class="wend" data-act="fin">이 종목 끝내기</button>`
+      : `<div class="wdone2"><button class="wdone g" data-act="fin">이 종목 끝내기</button><button class="wdone" data-act="nextset">＋ ${끝+2}${단위} 추가</button></div>`}
+`;      /* 「이 종목 끝내기」와 「＋ 세트 추가」는 예전처럼 따로 (2026-10-14 대표 「종료랑 세트 추가는 기존처럼 분리」) */
   return `${cur.rmPlan ? '' : `<div class="wrs ${c0.on?'on':''}"><button class="sw" data-act="wrest" aria-label="쉬는 시간 ${c0.on?'끄기':'켜기'}"><i></i></button>
       <span class="t"><b>세트 사이 휴식</b><small>${c0.on ? '세트 끝나면 시작' : '꺼짐'}</small></span>
       ${c0.on ? `<span class="pm2"><button data-act="wrestd:-15" aria-label="15초 줄이기">−</button><em>${mmss(c0.sec)}</em><button data-act="wrestd:15" aria-label="15초 늘리기">＋</button></span>` : ''}</div>`}
@@ -6200,7 +6238,7 @@ function sheetLeave(nextTab){
     <div class="h2">운동을 마치겠습니까?</div>
     <p class="lbl plain" style="line-height:1.8;font-weight:500;color:var(--sub)">
       기록하는 동안에는 다른 화면으로 갈 수 없어요.<br>마치면 오늘 기록이 저장됩니다.</p>
-    <button class="btn gold" data-act="askfin">오늘 운동 마치기</button>
+    <button class="btn finx" data-act="askfin">오늘 운동 마치기</button>
     <button class="btn ghost" data-act="close">계속 운동하기</button>
     <button class="dngr" data-act="askcancel">기록 삭제하고 나가기</button>`);
 }
@@ -6218,6 +6256,28 @@ function sheetRest(){
       ${r.until?`<button class="btn sub" data-act="rskip">건너뛰기</button>`:`<button class="btn gold" data-act="rgo">시작</button>`}
       <button class="btn ghost" data-act="close">닫기</button></div>`; });
 }
+/* 휴식 — 한 줄을 다 차지하던 스위치 대신 표 위 작은 칩 하나. 누르면 고른다 (2026-10-14 대표 「휴식 시간 버튼도 길게 되어 있는데 다른 방법」) */
+function sheetRestPick(){ const c = 쉼설정();
+  openSheet(() => `<div class="h2">세트 사이 휴식</div>
+    <div class="chips">${[0, 60, 90, 120, 180].map(n => `<button class="chip ${(n === 0 ? !c.on : c.on && c.sec === n) ? 'on' : ''}" data-act="wrestset:${n}">${n ? n + '초' : '끄기'}</button>`).join('')}</div>
+    <button class="btn ghost sm" data-act="close">닫기</button>`); }
+/* ══ 앱 숫자 자판 ══ 2026-10-14 대표 「기종마다 번호 자판이 다르게 뜨지 않게 우리가 만든 자판이 뜨게 · 지금 내 자판은 완료 버튼이 없고 이동이라 확정이 안 돼 불편」
+   운동 중 세트 표의 숫자를 누르면 폰 자판 대신 아래에서 올라온다. 처음 누른 숫자는 칸을 통째로 바꾸고, 그다음부터 이어 붙는다.
+   「완료」 = 넣고 닫기 · 「다음」 = 무게를 넣고 횟수로 · 빠른 단추(무게 ±2.5 · ±5 / 횟수 ±1 · ±5). 화면을 떠나면 닫힌다. */
+let 자판 = null;
+function 자판열기(f, i){ const w = live(), cur = w && w.items[w.cur], x = cur && cur.sets[i]; if(!x) return;
+  S.wsel = i; 자판 = { f, i, v: String(f === 'kg' ? kgfmt(x.kg) : x.reps), 새로: true }; render(); 자판그리기(); }
+function 자판그리기(){ let el = document.getElementById('kpad');
+  if(!자판 || S.screen !== 'workout'){ 자판 = null; if(el) el.remove(); document.body.classList.remove('kpon'); return; }
+  if(!el){ el = document.createElement('div'); el.id = 'kpad'; document.body.appendChild(el); } document.body.classList.add('kpon');
+  const 무 = 자판.f === 'kg', 빠 = 무 ? [-5, -2.5, 2.5, 5] : [-5, -1, 1, 5], 키 = (k, 글, 꼴) => `<button class="${꼴 || ''}" data-act="${k}">${글}</button>`;
+  el.innerHTML = `<div class="kpv"><small>${자판.i + 1}세트 ${무 ? '무게' : '횟수'}</small><b>${esc(자판.v === '' ? '0' : 자판.v)}</b><small>${무 ? 'kg' : '회'}</small></div>
+    <div class="kpq">${빠.map(n => 키('kpq:' + n, (n > 0 ? '＋' : '−') + Math.abs(n))).join('')}</div>
+    <div class="kpg">${키('kpk:1','1')}${키('kpk:2','2')}${키('kpk:3','3')}${키('kpbs','⌫','fn')}${키('kpk:4','4')}${키('kpk:5','5')}${키('kpk:6','6')}${키('kpok','완료','ok')}${키('kpk:7','7')}${키('kpk:8','8')}${키('kpk:9','9')}${무 ? 키('kpk:.','.','fn') : '<button class="fn" disabled></button>'}${키('kpk:0','0')}${무 ? 키('kpnx','다음 ›','fn sm') : 키('kpx','닫기','fn sm')}${무 ? 키('kpx','닫기','fn sm') : '<button class="fn" disabled></button>'}</div>`; }
+function 자판넣기(){ if(!자판) return; const w = live(), cur = w && w.items[w.cur], st = cur && cur.sets[자판.i]; if(!st) return;
+  const n = parseFloat(String(자판.v).replace(/[^0-9.]/g, '')); if(isNaN(n)) return;
+  if(자판.f === 'kg'){ const 위 = 경사최대(cur.ex) || 9999; st.kg = Math.min(위, Math.max(0, Math.round(n * 10) / 10)); } else st.reps = Math.max(1, Math.round(n));
+  save(); }
 function sheetFinish(){
   const w=live(); if(!w) return;
   const items=w.items, sets=items.reduce((a,it)=>a+it.sets.filter(x=>x.done).length,0);
@@ -6228,11 +6288,12 @@ function sheetFinish(){
       <div><span class="k">한 운동</span><span class="v">${items.filter(it=>it.locked||it.sets.some(x=>x.done)).length}<small>개</small></span></div>
       <div><span class="k">세트</span><span class="v">${sets}<small>개</small></span></div>
     </div>
+    ${w.lock ? `<div class="finlock">🔒 잠겨 있습니다 — 「운동 종료」를 누르면 잠금을 풀고 종료합니다</div>` : ''}
     ${left.length ? `<div class="agbody finleft"><b>아직 안 한 운동 ${left.length}개</b><br>${esc(left.map(it=>exOf(it.ex).n).join(' · '))}<br><span>종료하면 안 한 것으로 넘어갑니다</span></div>` : ''}
     <div style="display:flex;gap:9px">
-      <button class="btn sub" style="flex:1" data-act="close">더 할래요</button>
-      <button class="btn gold" style="flex:1" data-act="dofin">운동 종료</button></div>
-    <div class="cyfoot" style="justify-content:center"><span>종료한 뒤에도 「이어서 계속하기」로 되돌릴 수 있어요</span></div>`);
+      <button class="btn sub" style="flex:1" data-act="morego">더 할래요 ›</button>
+      <button class="btn finx" style="flex:1" data-act="dofin">운동 종료</button></div>
+    <div class="cyfoot" style="justify-content:center"><span>종료한 뒤에도 「이어서 계속하기」로 되돌릴 수 있습니다</span></div>`);
 }
 
 /* 지난 기록으로 시작 — 최근 기록 목록에서 골라 그날 종목 · 무게 그대로 (2026-10-08 대표 「홈화면에서 지난 기록 루틴으로 시작하기가 없음」). 고르면 `again:<id>` */
@@ -6306,6 +6367,9 @@ function 끝카드(w){
 }
 function vSummary(){
   const w=D.workouts.find(x=>x.id===S.wid); if(!w) return (S.who==='tr' ? tToday() : vHome());
+  /* 직원 「내 운동」 기록이면 회원 수업이 아니다 — 같이 찍기 · 수업 리포트 · 피드백 · 회원 화면으로 를 띄우지 않는다.
+     「회원 화면으로」가 직원 기록을 회원 명단에서 찾다가 「reading 'id'」 오류가 났다 (2026-10-14 대표 사진) */
+  const 수업 = S.who === 'tr' && !(직원줄 && w.mid === 직원줄.id) && MEMBERS.some(m => m.id === w.mid);
   const times=partTimes(w);
   return { top: bar('오늘 운동', `<span class="sub">${dateTxt(w.date)}</span>`, S.who==='tr'?'ttab:t_today':'tab:home'), body:`
     ${끝카드(w)}
@@ -6317,9 +6381,9 @@ function vSummary(){
             ((D.bph||[]).filter(x => x.kind==='ootd' && x.mid===w.mid && (x.memo===w.id || x.date===w.date)).slice(-1)[0])}
          <button class="btn ${ootd찍었나(w) ? 'sub' : 'gold'}" data-act="ootd:${w.id}">${svg('h_cam',19)} ${ootd찍었나(w) ? '오운완 다시 찍기' : '오운완 찍기'}</button>
          ${ootd찍었나(w) ? '' : `<div class="cyfoot" style="justify-content:center"><span>사진에 오늘 한 종목 · 세트 · 총 무게가 얹힌 한 장이 만들어집니다</span></div>`}
-         ${S.who==='tr' ? `<button class="btn sub" data-act="pair:${w.id}">${svg('h_hands',19)} 회원과 같이 찍기</button>` : ''}`
+         ${수업 ? `<button class="btn sub" data-act="pair:${w.id}">${svg('h_hands',19)} 회원과 같이 찍기</button>` : ''}`
       : `<div class="note">오운완은 <b>기록한 날에만</b> 찍을 수 있습니다</div>`}
-    ${S.who==='tr' ? `<button class="btn sub" data-act="rpt:${w.id}">오늘 수업 리포트 보기</button>` : ''}
+    ${수업 ? `<button class="btn sub" data-act="rpt:${w.id}">오늘 수업 리포트 보기</button>` : ''}
 
     <div class="grid2">${Object.entries(times).slice(0,4).map(([k,v])=>
       `<div class="tile"><span class="k">${esc(k)}</span><span class="v">${parseInt(durTxt(v))}<small> ${durTxt(v).slice(-1)}</small></span></div>`).join('')}</div>
@@ -6337,9 +6401,10 @@ function vSummary(){
     <div class="hr"></div>
     <button class="btn ghost" data-act="resume:${w.id}">이어서 계속하기</button>
     <div class="note">잘못 끝냈다면 여기서 이어서 할 수 있습니다</div>`,
-    foot: S.who==='tr'
+    foot: 수업
       ? `<button class="btn sub" data-act="tw:${w.id}">피드백 남기기</button>
          <button class="btn main" data-act="tm:${w.mid}">회원 화면으로</button>`
+      : S.who==='tr' ? `<button class="btn main" data-act="ttab:t_today">홈으로</button>`
       : `<button class="btn sub" data-act="tab:records">분석 보기</button>
          <button class="btn main" data-act="tab:home">홈으로</button>` };
 }
@@ -11256,6 +11321,7 @@ function tMembers(){
     + `<button class="btn sub" data-act="newmem" style="margin-top:4px;flex:none">＋ 회원 추가</button>` };
 }
 function tMember(){
+  if(!MEMBERS.find(x=>x.id===S.tmid)){ S.tmid = null; return tMembers(); }      /* 못 찾는 회원(직원 기록 · 지워진 회원)이면 회원 목록으로 — 오류 화면을 띄우지 않는다 (2026-10-14) */
   const m=MEMBERS.find(x=>x.id===S.tmid), ws=D.workouts.filter(w=>w.mid===m.id&&w.done).slice().sort(byDateDesc);
   const t=D.today[m.id], r=t?rOf(t.rid):null, g=GOALS[m.id]||{};
   const bench=ws.slice().reverse().map(w=>w.items.find(i=>i.ex==='bp')).filter(Boolean).map(it=>Math.max(...it.sets.map(s=>s.kg)));
@@ -11834,6 +11900,32 @@ document.addEventListener('pointercancel', ()=>{ figDrag = null; figMoved = fals
   for(const ev of ['pointerdown']) document.addEventListener(ev, 눌림, {passive:true});
   for(const ev of ['pointerup','pointercancel','pointerleave','scroll','touchmove'])
     document.addEventListener(ev, 끝, {passive:true});
+})();
+
+/* ══ 길게 눌러 끌어 옮기기 ══ 2026-10-14 대표 「옮길 때 버튼 말고 길게 눌러서 잔상처럼 위치 바꿔지는 것 · 윈도우도 클릭한 상태에서 아이콘 따라오는 모션 · 옮기면 바로 옮겨지는」
+   `data-drag="ord:i"`(운동 중 종목) · `"sord:i"`(시작 전 순서 창). 0.42초 누르면 그 줄이 손가락을 따라 떠다니고, 놓는 자리에 금색 선이 보인다. 놓으면 `ordto` · `sordto` 로 바로 옮긴다.
+   제거 단추 · 칩 위에서는 시작하지 않는다. 끄는 동안에는 화면이 같이 밀리지 않게 touchmove 를 막는다. 놓은 뒤 따라오는 눌림은 S.heldAt 으로 흘려보낸다. */
+(function(){
+  let 타 = null, 드 = null, 시 = null;
+  const 정리 = () => { clearTimeout(타); 타 = null; 시 = null; };
+  const 줄들 = 열 => [...document.querySelectorAll('[data-drag^="' + 열 + ':"]')];
+  document.addEventListener('pointerdown', e => { const el = e.target.closest('[data-drag]'); if(!el || e.target.closest('.chip,.ordbtn,.rm')) return;
+    시 = { el, x: e.clientX, y: e.clientY }; clearTimeout(타);
+    타 = setTimeout(() => { if(!시) return; const r = el.getBoundingClientRect(), [열, 번] = el.dataset.drag.split(':'), 떠 = el.cloneNode(true);
+      떠.className += ' dragghost'; 떠.removeAttribute('data-drag'); Object.assign(떠.style, { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px' }); document.body.appendChild(떠);
+      el.classList.add('dragsrc'); 드 = { el, 열, 번: +번, 떠, 틈: 시.y - r.top, 갈: +번 }; if(navigator.vibrate) navigator.vibrate(18); }, 420); }, { passive: true });
+  const 움직 = (x, y, e) => { if(!드){ if(시 && (Math.abs(y - 시.y) > 8 || Math.abs(x - 시.x) > 8)) 정리(); return; }
+    if(e && e.cancelable) e.preventDefault(); 드.떠.style.top = (y - 드.틈) + 'px';
+    const 다 = 줄들(드.열); 다.forEach(z => z.classList.remove('dropb', 'dropa'));
+    /* 갈 자리 = 끄는 줄을 뺀 나머지 중 손가락보다 위에 가운데가 있는 줄 수 — 끄는 줄 자신을 세면 아래로 놓을 때 한 칸 더 내려갔다(2026-10-14 점검이 잡음) */
+    const 남 = 다.filter((z, k) => k !== 드.번); let 갈 = 0; 남.forEach(z => { const r = z.getBoundingClientRect(); if(y > r.top + r.height / 2) 갈++; });
+    드.갈 = 갈; if(갈 !== 드.번){ if(갈 < 남.length) 남[갈].classList.add('dropb'); else 남[남.length - 1].classList.add('dropa'); } };
+  document.addEventListener('pointermove', e => 움직(e.clientX, e.clientY, null), { passive: true });
+  document.addEventListener('touchmove', e => { const t = e.touches[0]; if(t) 움직(t.clientX, t.clientY, e); }, { passive: false });
+  const 놓 = () => { 정리(); if(!드) return; const d0 = 드; 드 = null; d0.떠.remove(); d0.el.classList.remove('dragsrc'); 줄들(d0.열).forEach(z => z.classList.remove('dropb', 'dropa'));
+    S.heldAt = Date.now(); if(d0.갈 === d0.번) return;
+    const b = document.createElement('button'); b.setAttribute('data-act', d0.열 + 'to:' + d0.번 + ':' + d0.갈); b.setAttribute('data-syn', '1'); b.style.display = 'none'; document.body.appendChild(b); b.click(); b.remove(); };
+  document.addEventListener('pointerup', 놓, { passive: true }); document.addEventListener('pointercancel', 놓, { passive: true });
 })();
 
 /* 사진 위를 누르면 그 자리에 음식을 담는다 — 누른 곳의 좌표가 필요해서 따로 듣는다 */
@@ -12909,6 +13001,10 @@ document.addEventListener('click', async ev=>{
     /* 종목 순서 — 길게 누르면 옮기기 모드, ▲▼ 로 이동 */
     case 'ord': S.moveIdx=+rest[0]; render(); return;
     case 'ordend': S.moveIdx=null; render(); return;
+    case 'ordto': case 'sordto': { const i = +rest[0], j = +rest[1]; if(!w || i === j || i < 0 || j < 0 || i >= w.items.length || j >= w.items.length) return;
+      const cur = w.items[w.cur], [it] = w.items.splice(i, 1); w.items.splice(j, 0, it); w.cur = k === 'sordto' ? 0 : Math.max(0, w.items.indexOf(cur));
+      w.items.forEach((x, n) => { if(x._id) sv(spatch('workout_items', 'id=eq.' + x._id, { sort: n }), '순서 저장'); });
+      save(); if(navigator.vibrate) navigator.vibrate(10); if(k === 'sordto') drawSheet(); render(); return; }
     case 'ordmv': { const i=+rest[0], d=+rest[1], j=i+d;
       if(j<0 || j>=w.items.length) return;
       const cur=w.items[w.cur];
@@ -13138,7 +13234,18 @@ document.addEventListener('click', async ev=>{
       }
       sheetFinish(); return; }
     case 'askfin': if(w && w.items.some(it => it.cs && it.cs.ph === 'go' && !it.locked)){ toast('유산소를 먼저 종료해 주세요'); return; } sheetFinish(); return;
-    case 'dofin': closeSheet(); finish(); return;
+    case 'dofin': if(w && w.lock){ w.lock = false; save(); } closeSheet(); finish(); return;
+    case 'morego': closeSheet(); go('pick'); return;      /* 「더 할래요」 = 바로 종목 추가 (2026-10-14 대표) */
+    case 'wrestpick': sheetRestPick(); return;
+    case 'wrestset': { const n = +rest[0]; try{ localStorage.setItem('gg_rest_on', n ? '1' : '0'); if(n) localStorage.setItem('gg_rest_sec', String(n)); }catch(e){} if(!n) S.rest = null; closeSheet(); toast(n ? '휴식 ' + n + '초' : '휴식을 껐습니다'); render(); return; }
+    case 'kp': 자판열기(rest[0], +rest[1]); return;
+    case 'kpk': { if(!자판) return; const ch = rest.join(':'); if(ch === '.' && (자판.f !== 'kg' || (!자판.새로 && 자판.v.includes('.')))) return;
+      자판.v = (자판.새로 ? '' : 자판.v) + ch; if(자판.v.length > 6) 자판.v = 자판.v.slice(0, 6); 자판.새로 = false; 자판그리기(); return; }
+    case 'kpbs': if(자판){ 자판.v = 자판.새로 ? '' : 자판.v.slice(0, -1); 자판.새로 = false; 자판그리기(); } return;
+    case 'kpq': if(자판){ const n = (parseFloat(자판.v) || 0) + (+rest[0]); 자판.v = String(자판.f === 'kg' ? Math.max(0, Math.round(n * 10) / 10) : Math.max(1, Math.round(n))); 자판.새로 = false; 자판그리기(); } return;
+    case 'kpok': 자판넣기(); 자판 = null; 자판그리기(); render(); return;
+    case 'kpnx': { 자판넣기(); const i = 자판 ? 자판.i : 0; 자판 = null; 자판열기('reps', i); return; }
+    case 'kpx': 자판 = null; 자판그리기(); render(); return;
     case 'noprev': toast('아직 지난 기록이 없어요'); return;
     case 'ootd': ootdPick(rest[0]); return;
     case 'ootdview': sheetOotdView(rest[0]); return;
