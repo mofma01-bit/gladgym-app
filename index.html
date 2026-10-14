@@ -2512,6 +2512,8 @@ body .wkhd:has(+ .cal2) .d::before{content:"";width:17px;height:17px;flex:none;b
 .texsub>button:not(.btn) u{width:7px;height:7px;border-radius:50%;background:#4a4740;flex:none;text-decoration:none}.texsub>button:not(.btn) u.on{background:var(--gold-2)}
 .texsub>button:not(.btn) span{flex:1;min-width:0}.texsub>button:not(.btn) i{font-style:normal;color:#6f6a60}
 .texsub .btn{margin-top:6px}
+.tm.tmbtn{display:inline-flex;align-items:center;gap:6px;border:1px solid #57524a;border-radius:999px;padding:4px 10px 4px 12px;background:#22211e}.tm.tmbtn i{font-style:normal;font-size:11px;font-weight:700;color:var(--sub)}.tm.tmbtn:active{background:var(--dark-3)}
+.tm.off{opacity:.55}.chip.tmgo{flex:none;border-color:var(--gold-2);color:var(--gold);background:var(--gold-dim);font-weight:800;margin-left:6px}
 .rby{font-size:11.5px;font-weight:700;color:var(--gold-2);white-space:nowrap}.rbynote{padding:8px 12px}
 .rhidlnk{flex:none;width:100%;text-align:center;font-size:13px;font-weight:600;color:var(--sub);padding:8px}.rhidc{opacity:.75}
 </style>
@@ -2929,7 +2931,7 @@ const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type'
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '409';
+const BUILD = '410';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -4204,7 +4206,7 @@ setInterval(()=>{
       el.textContent = mmss(초); if(r) r.setAttribute('stroke-dashoffset', 둘 * (1 - 분));
       if(c.on && c.goal){ const 남 = c.goal*60 - 초; if(글) 글.textContent = 남 > 0 ? '목표 ' + c.goal + '분 · ' + Math.ceil(남/60) + '분 남음' : '목표 ' + c.goal + '분 달성';
         if(남 <= 0 && !c.hit){ c.hit = true; save(); toast('목표 ' + c.goal + '분 달성'); try{ navigator.vibrate && navigator.vibrate([200,100,200]); }catch(e){} } } } }
-  if(w && w.startAt && (S.screen==='workout'||S.screen==='t_live')){ const el=$('#tm'); if(el) el.textContent=mmss(끝났나(w) ? 저절로끝난길이(w) : (Date.now()-w.startAt)/1000); }
+  if(w && w.startAt && (S.screen==='workout'||S.screen==='t_live')){ const el=$('#tm'); if(el && !w.pausedAt) el.textContent=mmss(끝났나(w) ? 저절로끝난길이(w) : 흐른초(w)); }
   if(S.rest && S.rest.until){
     const left=(S.rest.until-Date.now())/1000;
     const 쉼창 = !!document.querySelector('#sheetbox .ring');
@@ -5724,11 +5726,24 @@ function vPrep3(){
 /* ── ★ 운동 중 ── */
 /* 트레이너가 기록하는 운동인가 — 그러면 시계는 「시간 재기 ▶」를 눌러야만 켜진다 */
 const 시계는손으로 = w => !!w && (w.kind === '수업' || w.by === '트레이너' || S.who === 'tr');
+/* ══ 운동 시간 일시정지 ══ 2026-10-14 대표 「운동 기록 중에 타이머 멈춤 기능이 없어 · 시간을 누르면 일시정지 · 계속 버튼을 추가해」
+   멈춘 때를 `w.pausedAt` 에 남긴다. 멈춘 동안 「지금」은 그 시각으로 본다(`시계지금`) — 화면 시계 · 종목 시간 · 마칠 때의 운동 시간이 모두 이것을 쓴다.
+   「계속」 = 멈춰 있던 만큼 시작 시각들을 뒤로 민다(전체 + 아직 안 잠근 종목). 멈춘 사이에 시작한 종목은 지금부터 잰다.
+   멈춘 채로 마쳐도 된다 — 멈춘 시각까지만 운동 시간으로 남는다. 저장해 둔 D.live 에 같이 실려 앱을 껐다 켜도 멈춘 채다. */
+const 시계지금 = w => (w && w.pausedAt) || Date.now();
+const 흐른초 = w => (w && w.startAt) ? Math.max(0, (시계지금(w) - w.startAt) / 1000) : 0;
+function 시계멈춤(w){ if(!w || !w.startAt) return;
+  if(!w.pausedAt){ w.pausedAt = Date.now(); save(); toast('시간을 멈췄습니다'); render(); return; }
+  const 이제 = Date.now(), 쉰 = 이제 - w.pausedAt;
+  w.startAt += 쉰; w.items.forEach(it => { if(!it.locked && it.startAt) it.startAt = it.startAt >= w.pausedAt ? 이제 : it.startAt + 쉰; });
+  w.pausedAt = null; save(); toast('시간을 다시 잽니다'); render(); }
 async function newLive(title, items, kind, rid, mid, by){
   const id='w'+Date.now();
   mid = mid || S.mid;
   const kd = kind || '개인운동';
-  const t0 = 시계는손으로({ kind:kd, by }) ? null : Date.now();   /* 수업·트레이너 기록은 시계를 자동으로 켜지 않는다 */
+  /* 수업·트레이너 기록은 시계를 자동으로 켜지 않는다.
+     ⛔ 종목 없이 시작한 것(빈 루틴)도 여기서 켜지 않는다 — 종목을 선택하는 동안 시간이 흘렀다 (2026-10-14 대표 「빈 루틴으로 시작할 때부터 타이머가 작동하는 것 같아 · 종목 다 담고 기록 시작부터 타이머 시작이야」). 「기록 시작」(startgo)이 켠다 */
+  const t0 = (시계는손으로({ kind:kd, by }) || !items.length) ? null : Date.now();
   D.live={ id, mid, title, kind:kd, rid:rid||null, date:TODAY, startAt:t0, born:Date.now(), items, cur:0,
            by:by||'회원', begun: items.length>0 };   /* 담기만 한 상태면 아직 시작 전 */
   if(!t0) items.forEach(it=>{ it.startAt = null; });
@@ -5817,7 +5832,9 @@ function 윗시계(w){
   /* 1RM 측정 모드 — 운동시간과 쉬는시간이 같이 돌면 뭘 봐야 할지 헷갈린다(2026-10-05 대표). 쉬는 시간만 */
   if(w.title === '1RM 측정') return `<span class="tmwrap">${쉼칩(w)}</span>`;
   return `<span class="tmwrap">
-    ${w.startAt ? `<span class="tm" id="tm">${mmss((Date.now()-w.startAt)/1000)}</span>`
+    ${w.startAt ? (w.pausedAt
+                    ? `<span class="tm off" id="tm">${mmss(흐른초(w))}</span><button class="chip tmgo" data-act="tmpause">계속 ▶</button>`
+                    : `<button class="tm tmbtn" data-act="tmpause" aria-label="운동 시간 일시정지"><span id="tm">${mmss(흐른초(w))}</span><i>일시정지</i></button>`)
                 : `<button class="chip t" data-act="timego">시간 재기 ▶</button>`}</span>`;   /* 쉬는 시간 칩은 뺐다 — 종목 카드 안 스위치와 겹친다 (2026-10-08 대표). 1RM 측정 모드에만 남는다 */
 }
 
@@ -11308,7 +11325,7 @@ function sheetTWAll(mid){
 function tLive(){
   const lv=liveOf(S.tmid); if(!lv) return tMembers();
   const m=MEMBERS.find(x=>x.id===lv.mid);
-  return { top: bar(m.n+' · 피드백 남기기', (lv.startAt ? `<span class="tm" id="tm">${mmss((Date.now()-lv.startAt)/1000)}</span>`
+  return { top: bar(m.n+' · 피드백 남기기', (lv.startAt ? `<span class="tm${lv.pausedAt ? ' off' : ''}" id="tm">${mmss(흐른초(lv))}</span>`
       : `<button class="chip t" data-act="timego">시간 재기 ▶</button>`), 'tm:'+m.id),
     keepScroll:true, body:
     lv.items.map((it,i)=>{ const sent=D.cm.filter(c=>c.mid===m.id&&c.ex===it.ex&&c.va===it.va&&c.at==='방금');
@@ -12859,7 +12876,7 @@ document.addEventListener('click', async ev=>{
       live().cur = live().items.length-1; save();
       if(S.draft) delete S.draft['memo:n'];
       toast(nm+' 추가했어요');
-      if(S.screen==='pick') render(); else go('workout');
+      if(S.screen==='pick') render(); else { const lw = live(); if(!lw.startAt && !시계는손으로(lw)){ lw.startAt = Date.now(); lw.items.forEach(it => { if(!it.startAt) it.startAt = lw.startAt; }); save(); } go('workout'); }      /* 빈 운동이 메모 종목으로 바로 시작될 때 — 「기록 시작」을 안 거치므로 여기서 시계를 켠다 (2026-10-14) */
       svNewItem(live().items.length-1).then(()=>{
         const sw=D.workouts.find(x=>x.id===live().id);
         if(sw) sw.items.push({ _id:live().items[live().items.length-1]._id, ex:'memo', va:nm, sec:0, locked:false, sets:[] });
@@ -13112,7 +13129,7 @@ document.addEventListener('click', async ev=>{
     case 'fin': { S.fold=false; S.wsel=null; const cur=w.items[w.cur];
       if(!cur.locked){
         cur.sets.forEach(s=>s.done=true); cur.locked=true;
-        cur.sec=(cur.sec||0)+(cur.startAt ? (Date.now()-cur.startAt)/1000 : 0);
+        cur.sec=(cur.sec||0)+(cur.startAt ? Math.max(0, (시계지금(w)-cur.startAt)/1000) : 0);
         const doneIdx=w.cur;
         const nxt=w.items.findIndex(it=>!it.locked);
         svItem(doneIdx);
@@ -13293,6 +13310,7 @@ document.addEventListener('click', async ev=>{
         내려받기(b, f.name); toast('공유를 못 열어 내려받았어요'); }catch(e){ console.error(e); toast('사진을 꾹 눌러 저장해 주세요'); } return; }
     case 'ootdsave': ootdSave(); return;
     case 'ootdpost': ootdSave(true); return;
+    case 'tmpause': 시계멈춤(live()); return;
     case 'timego': { const w=live(); if(!w) return;
       w.startAt = Date.now();
       const cur = w.items[w.cur]; if(cur && !cur.startAt) cur.startAt = Date.now();
@@ -13491,10 +13509,10 @@ async function finish(){
     D.live=null; save(); toast('기록할 세트가 없어요');
     if(S.who==='tr'){ S.tmid=w.mid; S.subj=w.mid; S.stack=[]; S.screen='t_today'; S.ttab='t_today'; go('t_member'); } else go('home');
     return; }
-  done.forEach(it=>{ if(!it.locked){ it.locked=true; it.sec=(it.sec||0)+(it.startAt ? (Date.now()-it.startAt)/1000 : 0); } });
+  done.forEach(it=>{ if(!it.locked){ it.locked=true; it.sec=(it.sec||0)+(it.startAt ? Math.max(0, (시계지금(w)-it.startAt)/1000) : 0); } });
   w.items.forEach(it=>{ it.sec = capSec(it.sec, CAP_EX); });
   /* 직접 누른 「마치기」는 누른 그 시각이 끝이다. 다만 8시간은 못 넘는다 */
-  const dur=capSec(w.startAt ? (Date.now()-w.startAt)/1000
+  const dur=capSec(w.startAt ? 흐른초(w)
     : w.items.reduce((a,it)=>a+(Number(it.sec)||0), 0), CAP_W);
   for(let i=0;i<w.items.length;i++) await svItem(i);
   await sv(spatch('workouts','id=eq.'+w.id, { done:true, dur, kind:w.kind }), '운동 저장');
