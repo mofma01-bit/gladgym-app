@@ -2955,11 +2955,27 @@ let GOALS = {};
 /* ═══ 서버 ═══ */
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
-const SB_H = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' };
+/* ══ 수파베이스 증표 (RLS 1단계 · 2026-10-14 대표 「RLS 시작해」) ══
+   로그인하면 중앙 서버가 `sb_token`(수파베이스가 믿는 증표 · 7일) 을 준다 — 회원은 mid, 직원은 who(trainer · boss · super) 가 실려 있다.
+   수파베이스를 부를 때마다 Authorization 에 이 증표를 싣는다. 없거나 1분 안에 끝나면 예전처럼 공개 열쇠(apikey 는 언제나 공개 열쇠).
+   ⛔ 정책(RLS)을 걸면 공개 열쇠로는 0줄이 온다 — 그래서 로그인한 뒤에는 다시 읽어 온다(아래 로그인일 · reload). */
+const 수파열쇠 = () => { const a = 로그인기억.읽(); return (a && a.sb && (a.sbexp || 0) * 1000 > Date.now() + 60000) ? a.sb : SB_KEY; };
+const SB_H = { apikey: SB_KEY, get Authorization(){ return 'Bearer ' + 수파열쇠(); }, 'Content-Type': 'application/json' };
+/* 이틀 안에 끝나는 증표는 켤 때 새로 받는다 — 우리 서버 토큰(1년)으로 `POST /app/otp/renew {token}` → `{ok, sb_token, sb_exp}`. 5초 안에 못 받으면 건너뛴다(앱은 그대로 뜬다) */
+async function 증표새로(){ const a = 로그인기억.읽(); if(!a || !a.token) return;
+  if(a.sb && (a.sbexp || 0) * 1000 > Date.now() + 2 * 86400000) return;
+  try{ const r = await Promise.race([인증부르기('renew', { token: a.token }), new Promise((_, 안) => setTimeout(() => 안(new Error('5초 넘음')), 5000))]);
+    if(r && r.ok && r.sb_token){ const b = 로그인기억.읽() || a; b.sb = r.sb_token; b.sbexp = r.sb_exp || 0; 로그인기억.씀(b); } }
+  catch(e){ console.warn('증표 새로 받기 건너뜀 —', e.message); } }
+/* 증표가 안 먹으면(401 — 망가졌거나 비밀이 바뀜) 앱이 통째로 멈추지 않게: 증표를 버리고 공개 열쇠로 한 번 더. 다음에 켤 때 새 증표를 받는다 */
+async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.headers.Authorization) || '');      /* 보낼 때 실은 것으로 판단 — 동시에 여럿이 401 을 받아도 모두 다시 한다 */
+  const r = await fetch(u, o); if(r.status !== 401 || !실은 || 실은 === 'Bearer ' + SB_KEY) return r;
+  const a = 로그인기억.읽(); if(a && a.sb){ a.sb = ''; a.sbexp = 0; 로그인기억.씀(a); console.warn('증표가 안 먹어 버림 — 공개 열쇠로 다시'); }
+  return fetch(u, Object.assign({}, o, { headers: Object.assign({}, o && o.headers, { Authorization: 'Bearer ' + SB_KEY }) })); }
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '416';
+const BUILD = '417';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2976,23 +2992,23 @@ async function checkBuild(){
 
 let netBad = 0;
 async function sget(q){
-  const r = await fetch(SB_URL + '/rest/v1/' + q, { headers: SB_H, cache: 'no-store' });
+  const r = await 수파fetch(SB_URL + '/rest/v1/' + q, { headers: SB_H, cache: 'no-store' });
   if(!r.ok) throw new Error(await r.text());
   return r.json();
 }
 async function spost(t, rows, opt){
   opt = opt || {};
   const h = Object.assign({}, SB_H, { Prefer: (opt.ret ? 'return=representation' : 'return=minimal') + (opt.on ? (opt.ignore ? ',resolution=ignore-duplicates' : ',resolution=merge-duplicates') : '') });      /* ignore = 이미 있으면 건드리지 않는다(데스크가 먼저 넣은 담당을 덮지 않게) */
-  const r = await fetch(SB_URL + '/rest/v1/' + t + (opt.on ? '?on_conflict=' + opt.on : ''), { method:'POST', headers:h, body: JSON.stringify(rows) });
+  const r = await 수파fetch(SB_URL + '/rest/v1/' + t + (opt.on ? '?on_conflict=' + opt.on : ''), { method:'POST', headers:h, body: JSON.stringify(rows) });
   if(!r.ok) throw new Error(await r.text());
   return opt.ret ? r.json() : null;
 }
 async function spatch(t, q, body){
-  const r = await fetch(SB_URL + '/rest/v1/' + t + '?' + q, { method:'PATCH', headers: Object.assign({}, SB_H, {Prefer:'return=minimal'}), body: JSON.stringify(body) });
+  const r = await 수파fetch(SB_URL + '/rest/v1/' + t + '?' + q, { method:'PATCH', headers: Object.assign({}, SB_H, {Prefer:'return=minimal'}), body: JSON.stringify(body) });
   if(!r.ok) throw new Error(await r.text());
 }
 async function sdel(t, q){
-  const r = await fetch(SB_URL + '/rest/v1/' + t + '?' + q, { method:'DELETE', headers: SB_H });
+  const r = await 수파fetch(SB_URL + '/rest/v1/' + t + '?' + q, { method:'DELETE', headers: SB_H });
   if(!r.ok) throw new Error(await r.text());
 }
 /* 서버에 쓰다 실패하면 조용히 넘어가지 않는다 */
@@ -3000,7 +3016,7 @@ async function sdel(t, q){
    ⛔ `앞` 으로 시작하는 경로만 지운다(그 종목 자기 폴더). 실패해도 화면은 멈추지 않는다 — 파일 한 개 남는 것뿐이다. */
 async function 파일지우기(paths, 앞){
   for(const p of (paths||[])){ if(!p || p.indexOf(앞) !== 0) continue;
-    try{ await fetch(SB_URL+'/storage/v1/object/media/'+p, { method:'DELETE', headers:{ apikey:SB_KEY, Authorization:'Bearer '+SB_KEY } }); delete SIGNED[p]; }
+    try{ await fetch(SB_URL+'/storage/v1/object/media/'+p, { method:'DELETE', headers:{ apikey:SB_KEY, Authorization:'Bearer '+수파열쇠() } }); delete SIGNED[p]; }
     catch(e){ console.warn('파일 못 지움', p, e); } }
 }
 function sv(promise, what){
@@ -3083,6 +3099,7 @@ function mapWorkouts(wks, witems, wsets){
 }
 
 async function boot(){
+  await 증표새로();      /* RLS — 내 증표로 읽어야 내 자료가 온다 */
   const [exs, vrs, mems, rts, ritems, asg, wks, witems, wsets, cms, mdesc, intk, plns, bdy, cyc, mls, mits, aks, bphs, blgs, brds, psts, pcms, plks, rms, bdgs] = await Promise.all([
     sget('exercises?select=*&order=sort'),
     sget('variants?select=*&order=sort'),
@@ -4208,7 +4225,7 @@ function 첨부고르기(종, K){
 }
 async function 파일올리기(path, blob, type){
   const r = await fetch(SB_URL+'/storage/v1/object/media/'+path, { method:'POST',
-    headers:{ apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':type }, body: blob });
+    headers:{ apikey:SB_KEY, Authorization:'Bearer '+수파열쇠(), 'Content-Type':type }, body: blob });
   if(!r.ok) throw new Error('파일을 못 올렸어요 (' + r.status + ')');
 }
 
@@ -4531,11 +4548,12 @@ async function 로그인일(k){ const g = S.lg || (S.lg = { 단계:'번호', pho
     g.중 = true; g.말 = ''; render();
     try{ const r = await 인증부르기('check', { phone: 번, code: c });
       /* ⛔ 직원 번호면 서버가 mid 없이 { ok, token, who(권한), name } 을 준다 — 이것을 「틀림」으로 읽어 대표 번호가 「번호가 달라요」로 떴다 (2026-10-13 대표 시험에서 드러남). 직원은 트레이너 화면으로 들인다 */
-      if(r && r.ok && !r.mid && r.who && r.who !== 'member'){ 로그인기억.씀({ token: r.token || '', who: r.who, name: r.name || '', at: Date.now() }); S.lg = null;
+      if(r && r.ok && !r.mid && r.who && r.who !== 'member'){ 로그인기억.씀({ token: r.token || '', who: r.who, name: r.name || '', at: Date.now(), sb: r.sb_token || '', sbexp: r.sb_exp || 0 }); S.lg = null;
+        if(r.sb_token){ location.reload(); return; }      /* RLS — 로그인 전에는 공개 열쇠로 읽었다. 내 증표로 다시 읽는다 */
         const t = 직원들.find(m => m.n === r.name); if(t){ TRAINER = t.n; 직원줄 = t; } else if(r.name) TRAINER = r.name;
         S.self = false; if(직원줄) MEMBERS = MEMBERS.filter(m => m.id !== 직원줄.id); S.who = 'tr'; S.ttab = 't_today'; S.stack = []; go('t_today'); return; }
       if(r && r.ok && !r.mid){ g.말 = '앱 회원 자리를 찾지 못했어요 — 담당 선생님께 말씀해 주세요'; g.code = ''; g.중 = false; render(); return; }
-      if(r && r.ok && r.mid){ 로그인기억.씀({ token: r.token || '', mid: r.mid, name: r.name || '', at: Date.now() }); S.lg = null;
+      if(r && r.ok && r.mid){ 로그인기억.씀({ token: r.token || '', mid: r.mid, name: r.name || '', at: Date.now(), sb: r.sb_token || '', sbexp: r.sb_exp || 0 }); S.lg = null;
         if(!MEMBERS.some(m => m.id === r.mid)){
           /* 전산에는 있는데 앱에 없던 회원 — 서버가 들여보냈다(새회원:true · mid = 'c' + 전산 key · 데스크 자동 추가와 같은 id). 자리는 앱이 만든다 — 서버는 수파베이스에 쓰지 않는다(업무 나눔).
              2026-10-14 대표(중앙 창에서) 「앱에 없는 전산 회원은 로그인 때 자동으로 들여야 해」. 이미 있으면(데스크가 먼저 넣음) 건드리지 않는다 — 담당을 덮지 않게 */
@@ -4544,6 +4562,7 @@ async function 로그인일(k){ const g = S.lg || (S.lg = { 단계:'번호', pho
                await Promise.all([spost('intake', [{ member_id:r.mid, data:intake }], { on:'member_id', ignore:true }), spost('plans', [{ member_id:r.mid, data:plan }], { on:'member_id', ignore:true })]); }
           catch(e){ console.error(e); location.reload(); return; }      /* 자리를 못 만들었으면 예전처럼 명단을 다시 받아 본다 */
           MEMBERS.push({ id:r.mid, n:r.name || '', tr:'', p4:뒤 }); if(!D.intake[r.mid]) D.intake[r.mid] = intake; if(!GOALS[r.mid]) GOALS[r.mid] = plan; }
+        if(r.sb_token){ location.reload(); return; }      /* RLS — 내 증표로 다시 읽는다(켜면 기억으로 바로 홈) */
         회원으로들어가기(r.mid); return; }
       g.말 = (r && r.why) || '번호가 달라요 — 다시 입력해 주세요'; g.code = '';
       /* 틀릴 때마다 **경고 창**으로 몇 번 남았는지 알린다 — 화면 글만으로는 못 보고 막 누르다 5번이 찬다 (2026-10-13 대표). 서버 글 「…(n번 남았어요)」에서 숫자를 읽는다 */
@@ -8350,7 +8369,7 @@ async function postSend(){
   if(!path){
     path = `posts/${S.mid}/${id}.jpg`;
     const r = await fetch(SB_URL+'/storage/v1/object/media/'+path, {
-      method:'POST', headers:{ apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'image/jpeg' }, body: n.blob });
+      method:'POST', headers:{ apikey:SB_KEY, Authorization:'Bearer '+수파열쇠(), 'Content-Type':'image/jpeg' }, body: n.blob });
     if(!r.ok){ toast('사진을 못 올렸어요'); console.error(await r.text()); return; }
   }
   const row = { id, member_id:S.mid, kind:n.kind||'사진', photo_id:n.photo_id||null, path, caption:n.cap||'', visibility:n.vis||'센터', taken_by:n.by||null };
@@ -8669,7 +8688,7 @@ async function ootd앱저장(){
     const id = 'od' + Date.now(), path = `ootd/${mid}/${id}.jpg`;
     const blob = await (await fetch(o.url)).blob();
     const r = await fetch(SB_URL+'/storage/v1/object/media/'+path, {
-      method:'POST', headers:{ apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'image/jpeg' }, body: blob });
+      method:'POST', headers:{ apikey:SB_KEY, Authorization:'Bearer '+수파열쇠(), 'Content-Type':'image/jpeg' }, body: blob });
     if(!r.ok){ console.error(await r.text()); o.저장중 = null; return null; }
     const 날 = (w && w.date) || TODAY;
     await sv(spost('body_photos',[{ id, member_id:mid, kind:'ootd', pose:'오운완', on_date:날, path, memo:o.wid||'' }]), '오운완 저장');
@@ -8752,7 +8771,7 @@ async function pairSave(){
   const path = `pair/${mid}/${id}.jpg`;
   closeSheet(); toast('올리는 중이에요');
   const r = await fetch(SB_URL+'/storage/v1/object/media/'+path, {
-    method:'POST', headers:{ apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'image/jpeg' }, body: S.pair.blob });
+    method:'POST', headers:{ apikey:SB_KEY, Authorization:'Bearer '+수파열쇠(), 'Content-Type':'image/jpeg' }, body: S.pair.blob });
   if(!r.ok){ toast('사진을 못 올렸어요'); console.error(await r.text()); return; }
   const 날 = (w && w.date) || TODAY, by = (S.who==='tr') ? (TRAINER || '트레이너') : '회원';
   await sv(spost('body_photos',[{ id, member_id:mid, kind:'pair', pose:'인증샷', on_date:날, path, memo:S.pair.wid||'', taken_by:by }]), '인증샷 저장');
@@ -9022,7 +9041,7 @@ async function uploadMeal(){
   const blob = await (await fetch(S.shot)).blob();
   closeSheet(); toast('올리는 중이에요');
   const r = await fetch(SB_URL+'/storage/v1/object/media/'+path, {
-    method:'POST', headers:{ apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'image/jpeg' }, body: blob });
+    method:'POST', headers:{ apikey:SB_KEY, Authorization:'Bearer '+수파열쇠(), 'Content-Type':'image/jpeg' }, body: blob });
   if(!r.ok){ toast('사진을 못 올렸어요'); console.error(await r.text()); return; }
   const seq = nextSeq(mid, day), at = hhmm();
   /* 고른 끼니(아침·점심·저녁·간식)를 그대로 담는다.
@@ -9195,7 +9214,7 @@ function profPick(){
       const blob = await new Promise(r => cv.toBlob(r, 'image/jpeg', 0.88));
       const path = `avatar/${S.mid}/${Date.now()}.jpg`;
       const r2 = await fetch(SB_URL+'/storage/v1/object/media/'+path, {
-        method:'POST', headers:{ apikey:SB_KEY, Authorization:'Bearer '+SB_KEY,
+        method:'POST', headers:{ apikey:SB_KEY, Authorization:'Bearer '+수파열쇠(),
           'Content-Type':'image/jpeg' }, body: blob });
       if(!r2.ok){ toast('사진을 못 올렸어요'); console.error(await r2.text()); return; }
       await profSave(S.mid, { avatar: path });
@@ -10995,7 +11014,7 @@ async function bpVidUpload(){
   const path = `body/${mid}/${id}.${V.ext}`;
   closeSheet(); toast('올리는 중이에요');
   const r = await fetch(SB_URL+'/storage/v1/object/media/'+path, {
-    method:'POST', headers:{ apikey:SB_KEY, Authorization:'Bearer '+SB_KEY,
+    method:'POST', headers:{ apikey:SB_KEY, Authorization:'Bearer '+수파열쇠(),
       'Content-Type': (V.ext === 'webm' ? 'video/webm' : 'video/mp4') }, body: V.blob });
   if(!r.ok){ toast('영상을 못 올렸어요'); console.error(await r.text()); return; }
   await sv(spost('body_photos',[{ id, member_id:mid, kind:'vid', pose:'영상', on_date:date, path, memo:'' }]), '영상 저장');
@@ -11044,7 +11063,7 @@ async function bpUpload(){
   const blob = await (await fetch(S.bpShot)).blob();
   closeSheet(); toast('올리는 중이에요');
   const r = await fetch(SB_URL+'/storage/v1/object/media/'+path, {
-    method:'POST', headers:{ apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'image/jpeg' }, body: blob });
+    method:'POST', headers:{ apikey:SB_KEY, Authorization:'Bearer '+수파열쇠(), 'Content-Type':'image/jpeg' }, body: blob });
   if(!r.ok){ toast('사진을 못 올렸어요'); console.error(await r.text()); return; }
   await sv(spost('body_photos',[{ id, member_id:mid, kind, pose, on_date:date, path, memo:'' }]), '사진 저장');
   D.bph = D.bph || [];
@@ -12150,7 +12169,7 @@ document.addEventListener('click', async ev=>{
       sv(sdel('meals','id=eq.'+id), '식단 삭제');
       { const g = 식단글(m.mid, m.date);      /* 그날 사진이 하나도 안 남으면 식단 글도 같이 내린다 — 빈 글이 피드에 남지 않게 */
         if(g && !식단사진들(m.mid, m.date).length){ D.posts = D.posts.filter(x=>x.id!==g.id); sv(sdel('posts','id=eq.'+g.id), '식단 글 내리기'); } }
-      if(m.path) fetch(SB_URL+'/storage/v1/object/media/'+m.path,{method:'DELETE',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}}).catch(()=>{});
+      if(m.path) fetch(SB_URL+'/storage/v1/object/media/'+m.path,{method:'DELETE',headers:{apikey:SB_KEY,Authorization:'Bearer '+수파열쇠()}}).catch(()=>{});
       closeSheet(); toast('삭제했어요'); render(); return; }
     case 'tstartask': S.tmid=rest[0]; sheetStartSession(rest[0]);
       try{ sessionStorage.setItem('cycpop_'+rest[0]+'_'+TODAY, '1'); }catch(e){}
@@ -12810,7 +12829,7 @@ document.addEventListener('click', async ev=>{
       D.bph = D.bph.filter(y=>y.id!==id);
       sv(sdel('body_photos','id=eq.'+id), '사진 삭제');
       fetch(SB_URL+'/storage/v1/object/media/'+x.path,
-        {method:'DELETE',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}}).catch(()=>{});
+        {method:'DELETE',headers:{apikey:SB_KEY,Authorization:'Bearer '+수파열쇠()}}).catch(()=>{});
       toast('삭제했어요'); render(); return; }
     case 'bmemo': { const mid=rest[0], b=(D.body&&D.body[mid])||{};
       openSheet(()=>`<div class="h2">체형 메모</div>
@@ -13265,7 +13284,7 @@ document.addEventListener('click', async ev=>{
       D.bph = D.bph.filter(y=>y.id!==x.id);
       sv(sdel('body_photos','id=eq.'+x.id), '오운완 삭제');
       fetch(SB_URL+'/storage/v1/object/media/'+x.path,
-        {method:'DELETE',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}}).catch(()=>{});
+        {method:'DELETE',headers:{apikey:SB_KEY,Authorization:'Bearer '+수파열쇠()}}).catch(()=>{});
       closeSheet(); toast('삭제했어요'); render(); return; }
     case 'profedit': sheetProfEdit(); return;
     case 'profpic': profPick(); return;
@@ -13400,7 +13419,7 @@ document.addEventListener('click', async ev=>{
       if(!confirm('이 글을 삭제할까요? 댓글도 같이 삭제됩니다.')) return;
       D.posts = D.posts.filter(x=>x.id!==p.id); D.pcm = (D.pcm||[]).filter(c=>c.pid!==p.id); D.plk = (D.plk||[]).filter(l=>l.pid!==p.id);
       sv(sdel('posts','id=eq.'+p.id), '글 삭제');
-      if(p.path && p.path.startsWith('posts/')) fetch(SB_URL+'/storage/v1/object/media/'+p.path, {method:'DELETE',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}}).catch(()=>{});
+      if(p.path && p.path.startsWith('posts/')) fetch(SB_URL+'/storage/v1/object/media/'+p.path, {method:'DELETE',headers:{apikey:SB_KEY,Authorization:'Bearer '+수파열쇠()}}).catch(()=>{});
       closeSheet(); toast('삭제했어요'); render(); return; }
     case 'pcsend': { const el=document.querySelector('[data-k="pcm"]'); const body=el?el.value.trim():''; if(!body){ toast('한마디를 입력해 주세요'); return; }
       const g=글쓴이(), id='pc'+Date.now(), ts=new Date().toISOString();
