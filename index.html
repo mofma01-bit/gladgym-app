@@ -2975,7 +2975,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '417';
+const BUILD = '418';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -2991,12 +2991,27 @@ async function checkBuild(){
 }
 
 let netBad = 0;
+/* 수파베이스 함수(32단계 SQL) 부르기 — 잠근 표에서 「필요한 한 줄만」 받는 길 */
+async function srpc(fn, body){
+  const r = await 수파fetch(SB_URL + '/rest/v1/rpc/' + fn, { method:'POST', headers: SB_H, body: JSON.stringify(body || {}) });
+  if(!r.ok) throw new Error(await r.text());
+  const t = await r.text(); return t ? JSON.parse(t) : null;
+}
+/* 리포트 링크(?rp=열쇠)로 로그인 없이 들어오면 그 회원의 리포트 자료만 묶어 받는다(report_bundle) — 그 사이 sget 은 묶음에서 답한다.
+   묶음에 없는 표는 빈 줄 · 종목 · 음식 사전은 그대로 서버에서 */
+let RP묶음 = null;
+/* 남의 닉네임 · 사진(public_profiles) 을 GOALS 의 빈 곳에만 얹는다 — 내 것 · 이미 있는 값은 안 덮는다 */
+function 프로필얹기(profs){ (profs || []).forEach(x => { if(!x || !x.member_id || (!x.nick && !x.avatar)) return; const g = GOALS[x.member_id] = GOALS[x.member_id] || {}, pf = g.prof = g.prof || {};
+  if(!pf.nick && x.nick) pf.nick = x.nick; if(!pf.avatar && x.avatar) pf.avatar = x.avatar; }); }
+const 사전표들 = ['exercises', 'variants', 'foods'];
 async function sget(q){
+  if(RP묶음){ const t = q.split('?')[0]; if(Array.isArray(RP묶음[t])) return RP묶음[t]; if(!사전표들.includes(t)) return []; }
   const r = await 수파fetch(SB_URL + '/rest/v1/' + q, { headers: SB_H, cache: 'no-store' });
   if(!r.ok) throw new Error(await r.text());
   return r.json();
 }
 async function spost(t, rows, opt){
+  if(RP묶음) return null;      /* 로그인 없이 연 리포트 한 장은 아무것도 쓰지 않는다 — 묶음에 없는 자료(배지 등)를 「없다」고 보고 다시 쓰려 했다(2026-10-14 실측 409) */
   opt = opt || {};
   const h = Object.assign({}, SB_H, { Prefer: (opt.ret ? 'return=representation' : 'return=minimal') + (opt.on ? (opt.ignore ? ',resolution=ignore-duplicates' : ',resolution=merge-duplicates') : '') });      /* ignore = 이미 있으면 건드리지 않는다(데스크가 먼저 넣은 담당을 덮지 않게) */
   const r = await 수파fetch(SB_URL + '/rest/v1/' + t + (opt.on ? '?on_conflict=' + opt.on : ''), { method:'POST', headers:h, body: JSON.stringify(rows) });
@@ -3004,10 +3019,12 @@ async function spost(t, rows, opt){
   return opt.ret ? r.json() : null;
 }
 async function spatch(t, q, body){
+  if(RP묶음) return;
   const r = await 수파fetch(SB_URL + '/rest/v1/' + t + '?' + q, { method:'PATCH', headers: Object.assign({}, SB_H, {Prefer:'return=minimal'}), body: JSON.stringify(body) });
   if(!r.ok) throw new Error(await r.text());
 }
 async function sdel(t, q){
+  if(RP묶음) return;
   const r = await 수파fetch(SB_URL + '/rest/v1/' + t + '?' + q, { method:'DELETE', headers: SB_H });
   if(!r.ok) throw new Error(await r.text());
 }
@@ -3100,6 +3117,8 @@ function mapWorkouts(wks, witems, wsets){
 
 async function boot(){
   await 증표새로();      /* RLS — 내 증표로 읽어야 내 자료가 온다 */
+  { const k = new URLSearchParams(location.search).get('rp');      /* 로그인 없이 리포트 링크로 — 그 한 장의 자료만 */
+    if(k && k.length >= 20 && 수파열쇠() === SB_KEY){ try{ const b = await srpc('report_bundle', { k }); if(b && b.wid) RP묶음 = b; }catch(e){ console.warn('리포트 묶음 못 받음 —', e.message); } } }
   const [exs, vrs, mems, rts, ritems, asg, wks, witems, wsets, cms, mdesc, intk, plns, bdy, cyc, mls, mits, aks, bphs, blgs, brds, psts, pcms, plks, rms, bdgs] = await Promise.all([
     sget('exercises?select=*&order=sort'),
     sget('variants?select=*&order=sort'),
@@ -3130,6 +3149,7 @@ async function boot(){
     sget('badges?select=*').catch(()=>[]),
   ]);
   D.badges = (bdgs||[]).map(b => ({ mid:b.member_id, key:b.key, at:b.earned_at||'' }));
+  D.profs = []; if(!RP묶음 && 수파열쇠() !== SB_KEY){ try{ D.profs = (await srpc('public_profiles', {})) || []; }catch(e){ D.profs = []; } }      /* 남의 닉네임 · 사진 — 아래 GOALS 를 채운 뒤 빈 곳에만 얹는다 */
   커뮤니티담기(psts, pcms, plks);
   try{ 세트담기(await sget('prep_sets?select=*&order=created_at').catch(()=>[])); }catch(e){ D.psets = []; }
   try{ 종목담기(await sget('prep_items?select=*&order=created_at').catch(()=>[])); }catch(e){ D.pitems = []; }
@@ -3185,6 +3205,7 @@ async function boot(){
   D.desc = {}; mdesc.forEach(m => { const [ex,va] = splitV(m.variant_id); D.desc[m.member_id+':'+ex+':'+va] = m.descr; });
   D.intake = {}; intk.forEach(r => D.intake[r.member_id] = r.data || {});
   GOALS = {}; plns.forEach(r => GOALS[r.member_id] = r.data || {});
+  프로필얹기(D.profs);
   D.body = {}; bdy.forEach(r => D.body[r.member_id] = { date:r.on_date, checks:r.checks||{}, photos:r.photos||{}, memo:r.memo||'' });
   D.bph = (bphs||[]).map(r => ({ id:r.id, mid:r.member_id, kind:r.kind||'body',
     pose:r.pose||'전면', date:r.on_date, path:r.path, memo:r.memo||'', marks:r.marks||null,
@@ -3234,7 +3255,10 @@ async function boot(){
   /* 알림톡 리포트 링크(?rp=운동id)로 들어왔으면 그 리포트를 바로 연다.
      읽고 나면 주소에서 지운다 — 안 지우면 새로고침할 때마다 리포트로 돌아온다 */
   if(new URLSearchParams(location.search).get('open') === 'agree'){ S.동의하러 = true; try{ history.replaceState(null, '', location.pathname); }catch(e){} }
-  const 리포트id = new URLSearchParams(location.search).get('rp');
+  /* 2026-10-14 RLS — 링크에는 운동 id 대신 **무작위 열쇠**(report_sends.rkey)가 실린다. 열쇠면 묶음의 wid, 로그인했으면 함수로 wid 를 찾는다. 옛 링크(운동 id)도 그대로 열린다 */
+  let 리포트id = new URLSearchParams(location.search).get('rp');
+  if(리포트id && RP묶음) 리포트id = RP묶음.wid;
+  else if(리포트id && 리포트id.length >= 20 && !D.workouts.some(x => x.id === 리포트id)){ try{ const b = await srpc('report_bundle', { k: 리포트id }); if(b && b.wid) 리포트id = b.wid; }catch(e){} }
   if(리포트id && S.screen === 'boot'){ const rw = D.workouts.find(x=>x.id===리포트id);
     /* ⛔ 링크로 들어온 사람은 **리포트 한 장만** 본다 (2026-09-29).
        회원 앱에 전화 인증이 아직 없어서, 링크가 새면 그 회원 앱이 통째로 열린다.
@@ -4295,7 +4319,8 @@ function render(){
   /* ⛔ 들어온 사람이 없는데(S.who 없음) 안쪽 화면을 그리지 않는다 — 나간 뒤 「뒤로」를 누르면 예전 회원 화면 · 동의 화면이 떴다 (2026-10-13 대표 「인증번호 화면이 떴다가 갑자기 동의 화면으로 넘어가서 로그인 됐다가」) */
   if(!S.who && !['login','boot','err','newmem'].includes(S.screen)){ S.screen = 'login'; S.stack = []; }
   const 로그인전 = (S.screen==='login'||S.screen==='boot'||S.screen==='err'||S.screen==='newmem');
-  if(!로그인전 && S.mid && S.who!=='tr' && !S.self && !필수동의함(S.mid) && S.screen!=='agree'){   /* 직원의 「내 운동」은 회원 약관 관문을 거치지 않는다 — 수업 사이에 바로 바꿔야 한다 */
+  if(!로그인전 && S.mid && S.who!=='tr' && !S.self && !S.rpOnly && !필수동의함(S.mid) && S.screen!=='agree'){   /* 직원의 「내 운동」은 회원 약관 관문을 거치지 않는다 — 수업 사이에 바로 바꿔야 한다
+     ⛔ 리포트 한 장(rpOnly · 로그인 없이 알림톡 링크)도 거치지 않는다 — 읽기만 하는 한 장이고, 로그인 없이는 동의를 저장할 수도 없다(RLS · 2026-10-14). 동의는 앱에 로그인할 때 받는다 */
     S.screen = 'agree';
     S.ag = S.ag || { aT:false, aP:false };
   }
@@ -5047,6 +5072,8 @@ function 닉네임먼저(){
 /* 욕설 · 비하 말 — 띄어쓰기 · 숫자 · 기호를 사이에 끼워 넣어도 걸리게 글자만 남겨서 본다 */
 const 나쁜말 = ['시발','씨발','씨팔','시팔','씨바','ㅅㅂ','ㅆㅂ','병신','븅신','ㅂㅅ','좆','좃','존나','졸라','ㅈㄴ','개새','새끼','새키','쉐끼','지랄','ㅈㄹ','미친놈','미친년','썅','쌍놈','쌍년','염병','엿먹','꺼져','닥쳐','등신','호구','찐따','느금','니애미','니미','애미','애비','창녀','걸레','보지','자지','섹스','성기','야동','한남','김치녀','개년','개놈','년놈','죽어','자살','fuck','shit','bitch','sex','porn','asshole'];
 const 욕인가 = 닉 => { const t = String(닉||'').toLowerCase().replace(/[^a-z가-힣ㄱ-ㅎㅏ-ㅣ]/g, ''); return 나쁜말.some(w => t.includes(w)); };
+/* 잠근 뒤에는 회원 폰에 남의 이름 · 닉네임이 없다 — 서버에 묻는다(nick_taken · 참/거짓만). 못 물으면 막지 않는다 */
+const 닉서버겹침 = async 닉 => { if(수파열쇠() === SB_KEY) return false; try{ return (await srpc('nick_taken', { n: 닉, me: S.mid || '' })) === true; }catch(e){ return false; } };
 const 닉검사 = 닉 => !닉 ? '닉네임을 입력해 주세요' : (닉.length < 2 ? '두 글자 이상으로 입력해 주세요'
   : 욕인가(닉) ? '쓸 수 없는 말이 들어 있어요'
   : (MEMBERS.some(m => m.id !== S.mid && (m.n === 닉 || 닉of(m.id) === 닉)) ? '이미 쓰고 있는 닉네임이에요 · 다른 닉네임을 입력해 주세요' : ''));
@@ -6443,7 +6470,9 @@ function vSummary(){
       : `<button class="btn sub" data-act="tab:records">분석 보기</button>
          <button class="btn main" data-act="tab:home">홈으로</button>` };
 }
-const 리포트링크 = wid => location.origin + location.pathname + '?rp=' + wid;
+const 리포트링크 = (wid, 열) => location.origin + location.pathname + '?rp=' + (열 || wid);
+/* 보낸 리포트의 무작위 열쇠(rkey) — 없으면(아직 안 보냄 · 32단계 전) 운동 id. 로그인한 회원이면 운동 id 로도 열린다 */
+async function 리포트열쇠(wid){ try{ return ((await sget('report_sends?select=rkey&id=eq.rs_' + encodeURIComponent(wid)))[0] || {}).rkey || ''; }catch(e){ return ''; } }
 
 /* ══ 리포트 언제 나가나 ══ 2026-09-29 대표
    「수업기록 완료하면 리포트 보내기가 자동으로 가는 것도 좋을 거 같아」
@@ -6510,8 +6539,10 @@ async function 끔동의화면(key){
   그리기('<div class="cmoffbox"><div class="ttl">확인하는 중…</div></div>');
 
   let m = null;
-  try{ m = (await sget('members?select=id,name,cm_optout_at&cm_optout_key=eq.'
-                       + encodeURIComponent(key) + '&limit=1'))[0] || null; }catch(e){}
+  /* 2026-10-14 RLS — 잠근 members 대신 함수로(열쇠가 맞는 한 줄만). 함수가 아직 없으면 예전처럼 표에서 */
+  try{ m = ((await srpc('optout_info', { k: key })) || [])[0] || null; }
+  catch(e){ try{ m = (await sget('members?select=id,name,cm_optout_at&cm_optout_key=eq.'
+                       + encodeURIComponent(key) + '&limit=1'))[0] || null; }catch(e2){} }
   if(!m){
     그리기('<div class="cmoffbox">'
       + '<div class="ttl">이미 처리되었거나 만료된 주소입니다</div>'
@@ -6540,7 +6571,8 @@ async function 끔동의화면(key){
     this.disabled = true; this.textContent = '처리 중…';
     try{
       /* 열쇠를 **조건으로 걸어** 고친다 — 그 사이 누가 이미 썼으면 아무것도 안 바뀐다 */
-      await spatch('members?cm_optout_key=eq.' + encodeURIComponent(key),
+      let 됨 = null; try{ 됨 = await srpc('optout_set', { k: key }); }catch(e){ 됨 = null; }
+      if(됨 === null) await spatch('members?cm_optout_key=eq.' + encodeURIComponent(key),
                    { cm_optout_at:new Date().toISOString(), cm_optout_by:'알림톡', cm_optout_key:null });
       그리기('<div class="cmoffbox ok"><div class="ttl">그만 받기로 했습니다</div>'
         + '<p>' + esc(m.name) + ' 회원님,<br>앞으로 피드백 안내를 보내지 않습니다.<br>'
@@ -6559,15 +6591,17 @@ async function 초상동의화면(key){
   그리기('<div class="cmoffbox"><div class="ttl">확인하는 중…</div></div>');
 
   let k = null;
-  try{ k = (await sget('media_kits?select=member_id,portrait&portrait_key=eq.'
-                       + encodeURIComponent(key) + '&limit=1'))[0] || null; }catch(e){}
+  let 함수 = true;      /* 2026-10-14 RLS — 함수로(열쇠가 맞는 한 줄 + 이름). 없으면 예전처럼 표에서 */
+  try{ k = ((await srpc('portrait_info', { k: key })) || [])[0] || null; }
+  catch(e){ 함수 = false; try{ k = (await sget('media_kits?select=member_id,portrait&portrait_key=eq.'
+                       + encodeURIComponent(key) + '&limit=1'))[0] || null; }catch(e2){} }
   if(!k){
     그리기('<div class="cmoffbox"><div class="ttl">이미 처리되었거나 만료된 주소입니다</div>'
       + '<p>이 링크는 <b>한 번만</b> 쓸 수 있어요.<br>다시 하시려면 담당 트레이너에게 말씀해 주세요.</p></div>');
     return; }
 
-  let 이름 = '';
-  try{ 이름 = ((await sget('members?select=name&id=eq.' + encodeURIComponent(k.member_id)))[0]||{}).name || ''; }catch(e){}
+  let 이름 = k.name || '';
+  if(!함수) try{ 이름 = ((await sget('members?select=name&id=eq.' + encodeURIComponent(k.member_id)))[0]||{}).name || ''; }catch(e){}
 
   const 고르기 = [
     ['노출',   '얼굴이 보여도 괜찮아요',   '사진·영상을 그대로 씁니다'],
@@ -6587,7 +6621,8 @@ async function 초상동의화면(key){
     const v = this.dataset.v;
     try{
       /* 열쇠를 **조건으로 걸어** 고친다 — 그 사이 누가 썼으면 아무것도 안 바뀐다 */
-      await spatch('media_kits?portrait_key=eq.' + encodeURIComponent(key),
+      if(함수) await srpc('portrait_set', { k: key, v });
+      else await spatch('media_kits?portrait_key=eq.' + encodeURIComponent(key),
         { portrait: v, portrait_at: new Date().toISOString(), portrait_by: '회원', portrait_key: null });
       그리기('<div class="cmoffbox ok"><div class="ttl">고맙습니다</div>'
         + '<p><b>' + esc(v) + '</b> 로 남겼습니다.<br>'
@@ -12518,7 +12553,7 @@ document.addEventListener('click', async ev=>{
       if(동의){ if(건강동의함(S.mid)) toast('이미 동의하셨어요'); else sheetSensitive('inbody'); return; }
       goRoot('home'); return; }
     case 'noop': return;
-    case 'rcopy': { const u = 리포트링크(rest[0]);
+    case 'rcopy': { const u = 리포트링크(rest[0], await 리포트열쇠(rest[0]));
       (navigator.clipboard ? navigator.clipboard.writeText(u) : Promise.reject())
         .then(()=>toast('링크를 복사했어요 — 카톡에 붙여 넣으세요'))
         .catch(()=>openSheet(()=>`<div class="h2">리포트 링크</div>
@@ -13291,12 +13326,14 @@ document.addEventListener('click', async ev=>{
     case 'nick0re': if(sheetRender && sheetRender.다시) sheetRender.다시(); return;
     case 'nick0ok': { const el = document.querySelector('[data-k="nick0"]'), 닉 = el ? el.value.trim().replace(/\s+/g,' ') : '', 말 = 닉검사(닉);
       if(말){ toast(말); return; }
+      if(await 닉서버겹침(닉)){ toast('이미 쓰고 있는 닉네임이에요 · 다른 닉네임을 입력해 주세요'); return; }
       await profSave(S.mid, { nick: 닉 }); closeSheet(); toast(닉 + '님, 반가워요'); render(); return; }
     case 'profok': {
       const el = document.querySelector('[data-k="pf:bio"]');
       const nk = document.querySelector('[data-k="pf:nick"]'), 닉 = nk ? nk.value.trim().replace(/\s+/g,' ') : (profOf(S.mid).nick||'');
       /* 남이 쓰는 닉네임·남의 이름과 같으면 받지 않는다 — 랭킹에서 누군지 헷갈린다 */
       { const 말 = 닉검사(닉); if(말){ toast(말); return; } }      /* 프로필에서는 바꿀 수만 있다 — 비울 수 없다 */
+      if(닉 !== (profOf(S.mid).nick || '') && await 닉서버겹침(닉)){ toast('이미 쓰고 있는 닉네임이에요 · 다른 닉네임을 입력해 주세요'); return; }
       profSave(S.mid, { bio: el ? el.value.trim() : '', nick: 닉 });   /* 저장은 뒤에서 마저 */
       closeSheet(); toast('저장했어요'); render(); return; }
     case 'ootdre': closeSheet(); ootdPick(rest[0]); return;
