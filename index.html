@@ -2852,7 +2852,8 @@ function 주소예약(p){
     try{ await 주소받기(묶); }catch(e){}
     if(묶.some(x => SIGNED[x])){ try{ render(); if(typeof sheetRender === 'function' && sheetRender) drawSheet(); }catch(e){} } }, 60);
 }
-const 사진주소 = p => { if(!p) return ''; if(!SIGNED[p]) 주소예약(p); return SIGNED[p] || (SB_URL + '/storage/v1/object/public/media/' + p); };
+const 사진주소 = p => { if(!p) return ''; if(S3키(p) && SIGNED[p] && (S3만료[p] || 0) < Date.now()){ delete SIGNED[p]; 주소시도[p] = 0; }      /* S3 주소는 하루짜리 — 지나면 다시 받는다 */
+  if(!SIGNED[p]) 주소예약(p); return SIGNED[p] || (S3키(p) ? '' : SB_URL + '/storage/v1/object/public/media/' + p); };
 const demoURL = p => (SIGNED[p] || (SB_URL + '/storage/v1/object/public/media/' + p + '?v=' + DEMOV));
 /* 접고 펴는 표시는 앱 어디서나 이 한 가지 모양으로 쓴다 (2026-09-04 통일).
    예전에는 「보기 ▾」·「자세히 ▾」·「▾ 눌러서 펼치기」가 제각각이었고,
@@ -2975,7 +2976,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '418';
+const BUILD = '419';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -3080,8 +3081,24 @@ let CMEDIA = [];                          /* comment_media — 피드백에 붙�
 let SIGNED = {};                          /* path → 잠깐 쓰는 주소 */
 const 서명유효 = 3600;                     /* 한 시간 */
 
+/* ══ S3 길목 ══ 2026-10-14 대표 「새로 올리는 영상은 S3 로 바로 · 옮기기는 내일 · 길목부터」 — 중앙 창구 /app/media/{upload|view|delete}
+   「media/」 로 시작하는 경로 = S3(CloudFront 서명 주소 · 하루짜리로 받아 23시간 쓰고 다시) · 그 밖 = 예전 수파베이스.
+   S3 로 올리는 것은 회원 개인 영상만(피드백 영상 · 체형 영상) — 공용 자료(종목 · 스트레칭)는 수파베이스(회원이 남의 S3 자료를 못 연다) */
+const S3키 = p => typeof p === 'string' && p.indexOf('media/') === 0;
+const S3만료 = {};
+async function S3부르기(길, 몸){ const a = 로그인기억.읽() || {}; if(!a.token) throw new Error('로그인이 필요해요');
+  const r = await fetch(GG_API + '/app/media/' + 길, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(Object.assign({ token: a.token }, 몸 || {})) });
+  if(!r.ok) throw new Error('서버에 닿지 못했어요 (' + r.status + ')'); const j = await r.json(); if(!j.ok) throw new Error(j.why || '안 되었어요'); return j; }
+async function S3주소받기(keys){ await Promise.all(keys.map(async k => { try{ const j = await S3부르기('view', { key: k, 분: 1440 }); if(j.url){ SIGNED[k] = j.url; S3만료[k] = Date.now() + 23 * 3600 * 1000; } }catch(e){ console.warn('S3 주소 못 받음', e.message); } })); }
+async function S3올리기(blob, 종류, 파일명, type, mid){
+  const j = await S3부르기('upload', Object.assign({ 종류, 파일명, content_type: type }, mid ? { mid } : {}));
+  const r = await fetch(j.url, { method:'PUT', headers:{ 'Content-Type': j.content_type || type }, body: blob });
+  if(!r.ok) throw new Error('영상을 못 올렸어요 (' + r.status + ')'); return j.key; }
+async function S3지우기(k){ try{ await S3부르기('delete', { key: k }); delete SIGNED[k]; }catch(e){ console.warn('S3 못 지움', k, e.message); } }
+const 저장소지우기 = p => { if(!p) return Promise.resolve(); return S3키(p) ? S3지우기(p) : fetch(SB_URL + '/storage/v1/object/media/' + p, { method:'DELETE', headers:{ apikey:SB_KEY, Authorization:'Bearer ' + 수파열쇠() } }).catch(() => {}); };
 async function 주소받기(paths){
-  const 새것 = [...new Set((paths||[]).filter(x => x && !SIGNED[x]))];
+  { const 지금 = Date.now(), s3 = [...new Set((paths||[]).filter(x => S3키(x) && (!SIGNED[x] || (S3만료[x] || 0) < 지금)))]; if(s3.length) await S3주소받기(s3); }
+  const 새것 = [...new Set((paths||[]).filter(x => x && !S3키(x) && !SIGNED[x]))];
   if(!새것.length) return;
   for(let i=0; i<새것.length; i+=100){
     const 묶 = 새것.slice(i, i+100);
@@ -4247,10 +4264,12 @@ function 첨부고르기(종, K){
   });
   inp.click();
 }
-async function 파일올리기(path, blob, type){
+async function 파일올리기(path, blob, type, 회원){
+  if(회원 && /^video\//.test(type || '')) return await S3올리기(blob, 'video', String(path).split('/').pop(), String(type).split(';')[0], 회원);      /* 회원 개인 영상 → S3 (2026-10-14) */
   const r = await fetch(SB_URL+'/storage/v1/object/media/'+path, { method:'POST',
     headers:{ apikey:SB_KEY, Authorization:'Bearer '+수파열쇠(), 'Content-Type':type }, body: blob });
   if(!r.ok) throw new Error('파일을 못 올렸어요 (' + r.status + ')');
+  return path;
 }
 
 /* ── 운동 중 잠금 ── 주머니에 넣거나 손이 미끄러져도 화면이 안 바뀌게 (2026-09-04).
@@ -11046,12 +11065,10 @@ async function bpVidUpload(){
   const date = (el && el.value) || S.bpNewDate || TODAY;
   const mid = S.bpMid;
   const id = 'bv' + Date.now();
-  const path = `body/${mid}/${id}.${V.ext}`;
   closeSheet(); toast('올리는 중이에요');
-  const r = await fetch(SB_URL+'/storage/v1/object/media/'+path, {
-    method:'POST', headers:{ apikey:SB_KEY, Authorization:'Bearer '+수파열쇠(),
-      'Content-Type': (V.ext === 'webm' ? 'video/webm' : 'video/mp4') }, body: V.blob });
-  if(!r.ok){ toast('영상을 못 올렸어요'); console.error(await r.text()); return; }
+  let path = '';      /* 회원 개인 영상 → S3 (2026-10-14) */
+  try{ path = await S3올리기(V.blob, 'video', id + '.' + V.ext, V.ext === 'webm' ? 'video/webm' : 'video/mp4', mid); }
+  catch(e){ toast('영상을 못 올렸어요 — ' + (e.message || '').slice(0, 40)); console.error(e); return; }
   await sv(spost('body_photos',[{ id, member_id:mid, kind:'vid', pose:'영상', on_date:date, path, memo:'' }]), '영상 저장');
   D.bph = D.bph || [];
   D.bph.push({ id, mid, kind:'vid', pose:'영상', date, path, memo:'' });
@@ -12204,7 +12221,7 @@ document.addEventListener('click', async ev=>{
       sv(sdel('meals','id=eq.'+id), '식단 삭제');
       { const g = 식단글(m.mid, m.date);      /* 그날 사진이 하나도 안 남으면 식단 글도 같이 내린다 — 빈 글이 피드에 남지 않게 */
         if(g && !식단사진들(m.mid, m.date).length){ D.posts = D.posts.filter(x=>x.id!==g.id); sv(sdel('posts','id=eq.'+g.id), '식단 글 내리기'); } }
-      if(m.path) fetch(SB_URL+'/storage/v1/object/media/'+m.path,{method:'DELETE',headers:{apikey:SB_KEY,Authorization:'Bearer '+수파열쇠()}}).catch(()=>{});
+      if(m.path) 저장소지우기(m.path);
       closeSheet(); toast('삭제했어요'); render(); return; }
     case 'tstartask': S.tmid=rest[0]; sheetStartSession(rest[0]);
       try{ sessionStorage.setItem('cycpop_'+rest[0]+'_'+TODAY, '1'); }catch(e){}
@@ -12747,8 +12764,8 @@ document.addEventListener('click', async ev=>{
           const 올린것 = [], 다 = 파일.length;
           for(let i=0;i<파일.length;i++){ const x=파일[i], path=`cm/${mid}/${cid}_${i}.${x.ext}`;
             toast('올리는 중 ' + (i+1) + '/' + 다);
-            await 파일올리기(path, x.blob, x.kind==='photo' ? 'image/jpeg' : (x.ext==='webm' ? 'video/webm' : 'video/mp4'));
-            올린것.push({ kind:x.kind, path }); }
+            const 들어간 = await 파일올리기(path, x.blob, x.kind==='photo' ? 'image/jpeg' : (x.ext==='webm' ? 'video/webm' : 'video/mp4'), mid);      /* 영상이면 S3 키 */
+            올린것.push({ kind:x.kind, path: 들어간 }); }
           await spost('comments',[{ id:cid, member_id:mid, variant_id:VID(ex,va), trainer:TRAINER,
             body:몸, pics:사진.length, vids:영상.length,
             workout_id: S.cmWid || null }]);      /* 수업에서 열었으면 그 수업 번호 */
@@ -12863,8 +12880,7 @@ document.addEventListener('click', async ev=>{
     case 'bpdelgo': { const id=rest[0], x=(D.bph||[]).find(y=>y.id===id); closeSheet(); if(!x) return;
       D.bph = D.bph.filter(y=>y.id!==id);
       sv(sdel('body_photos','id=eq.'+id), '사진 삭제');
-      fetch(SB_URL+'/storage/v1/object/media/'+x.path,
-        {method:'DELETE',headers:{apikey:SB_KEY,Authorization:'Bearer '+수파열쇠()}}).catch(()=>{});
+      저장소지우기(x.path);      /* S3 영상이면 S3 창구로 */
       toast('삭제했어요'); render(); return; }
     case 'bmemo': { const mid=rest[0], b=(D.body&&D.body[mid])||{};
       openSheet(()=>`<div class="h2">체형 메모</div>
@@ -13318,8 +13334,7 @@ document.addEventListener('click', async ev=>{
       const x = (D.bph||[]).find(y=>y.id===rest[0]); if(!x) return;
       D.bph = D.bph.filter(y=>y.id!==x.id);
       sv(sdel('body_photos','id=eq.'+x.id), '오운완 삭제');
-      fetch(SB_URL+'/storage/v1/object/media/'+x.path,
-        {method:'DELETE',headers:{apikey:SB_KEY,Authorization:'Bearer '+수파열쇠()}}).catch(()=>{});
+      저장소지우기(x.path);
       closeSheet(); toast('삭제했어요'); render(); return; }
     case 'profedit': sheetProfEdit(); return;
     case 'profpic': profPick(); return;
