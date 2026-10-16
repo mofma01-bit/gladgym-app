@@ -2976,7 +2976,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '419';
+const BUILD = '420';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -7328,11 +7328,18 @@ function 지금끼니(){
 const mealURL = path => 사진주소(path);
 
 /* 사진이 없거나 서버에서 지워졌으면 샐러드 그림으로 갈음합니다 */
+/* 그려진 사진 주소 → 저장소 경로 — 공개 주소 · 수파 서명 주소 · S3 서명 주소(받아 둔 것에서 거꾸로 찾음) 모두 (2026-10-16) */
+const 사진길 = src => { const m = String(src || '').match(/\/object\/(?:public|sign)\/media\/([^?#]+)/); if(m){ try{ return decodeURIComponent(m[1]); }catch(e){ return m[1]; } }
+  return src ? (Object.keys(SIGNED).find(k => SIGNED[k] === src) || '') : ''; };
 function picFail(img){
-  /* 주소를 아직 못 받은 사진이면 받아서 한 번 더 건다 — 바로 자리 그림으로 바꾸지 않는다 */
-  const m = (img.getAttribute('src')||'').match(/\/object\/public\/media\/([^?]+)/), 길 = m ? decodeURIComponent(m[1]) : '';
+  /* 주소를 아직 못 받은 사진이면 받아서 한 번 더 건다 — 바로 자리 그림으로 바꾸지 않는다
+     ⛔ 서명 주소도 한 번 더 — 방금 올린 사진은 서명 주소가 처음 한 번 실패할 수 있다. 예전엔 공개 주소만 다시 걸어서
+        서명 주소가 한 번 실패하면 바로 사진기 그림이 되고, 화면을 다시 들어가야 떴다 (2026-10-16 대표 「피드에 올라간 사진이 카메라 이모지로만 떠서 다시 들어가보니 잘 나와」)
+        → 잠깐 기다렸다 **새 서명**을 받아 다시 건다. 두 번째도 실패하면 그때 자리 그림 */
+  const src = img.getAttribute('src') || '', 길 = 사진길(src), 서명 = !!길 && !/\/object\/public\//.test(src);
   if(길 && !img.dataset.retry){ img.dataset.retry = '1';
-    주소받기([길]).then(() => { if(SIGNED[길]) img.src = SIGNED[길]; else picFail(img); }).catch(() => picFail(img)); return; }
+    if(서명){ delete SIGNED[길]; delete 주소시도[길]; }
+    setTimeout(() => 주소받기([길]).then(() => { if(SIGNED[길]) img.src = SIGNED[길]; else picFail(img); }).catch(() => picFail(img)), 서명 ? 900 : 0); return; }
   const sp = document.createElement('span');
   sp.className = 'nopic ' + (img.className||'');
   if(img.dataset && img.dataset.act) sp.dataset.act = img.dataset.act;
