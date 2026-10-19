@@ -2991,7 +2991,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '421';
+const BUILD = '422';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -5463,12 +5463,12 @@ function 세칸(e, v, cur, mid, tr, cms, nw, dsc){
     <button class="t1" data-act="trio:prev">
       <span class="k">직전기록</span>
       <span class="v">${esc(p.v)}${화?`<i class="${p.방향}">${화}</i>`:''}</span></button>
-    <button class="t2${(영상시범(v)||내시범)?'':' off'}" data-act="trio:demo">
+    <button class="t2${(영상시범(v)||내시범||dsc)?'':' off'}" data-act="trio:demo">
       <span class="k">${내시범 ? '트레이너 시범' : '기구 사용법'}</span>
-      <span class="v">${시범}</span></button>
+      <span class="v">${시범 === '준비중' && dsc ? '설명' : 시범}</span></button>
     <button class="t3" data-act="exd:${cur.ex}:${cur.va}${tr?':'+mid:''}">
-      <span class="k">${tr?'피드백 남기기':'설명 · 피드백'}</span>
-      <span class="v">${cms.length?`${cms.length}개`:(dsc?'설명 있음':'—')}</span>
+      <span class="k">${tr?'피드백 남기기':'피드백'}</span>
+      <span class="v">${cms.length?`${cms.length}개`:'—'}</span>
       ${(!tr&&nw)?'<b class="nw">NEW</b>':''}</button>
     ${rm가능 ? `<button class="t4" data-act="rm"><span class="k">1RM 재기</span><span class="v">${rmb ? kg표(rmb.kg)+'kg' : '—'}</span></button>` : ''}</div>`;
 }
@@ -5482,10 +5482,27 @@ function sheetPrev(){
       ${prevBox(z.e, z.cur, z.mid, true)}
       <button class="btn ghost sm" data-act="close">닫기</button>`; });
 }
+/* 기본 설명 칸 — 2026-10-19 대표 「피드백 보기를 누르면 기본 설명(공통)도 떠 · 트레이너 피드백만 보이게 · 기구 설명에 공통 설명이 들어가게」
+   그래서 「설명 · 피드백」 창 → 피드백만, 기본 설명은 「기구 사용법」 창 아래로 옮겼다. 트레이너는 여기서 이 회원용으로 수정한다 */
+function 설명칸(mid, exid, vk){
+  const K = exid + '|' + vk, dsc = descOf(mid, exid, vk), tr = (S.who === 'tr');
+  if(tr && S.editDesc === K) return `<span class="lbl">설명 수정</span>
+      <textarea class="tall" data-k="desc:${K}">${esc(dsc)}</textarea>
+      <div style="display:flex;gap:9px">
+        <button class="btn main sm" data-act="savedesc:${exid}:${vk}:${mid}">저장</button>
+        <button class="btn ghost sm" data-act="canceldesc">취소</button></div>`;
+  if(!dsc && !tr) return '';
+  return `<div class="desc" style="margin-top:10px"><div class="hd"><b>설명</b>
+      ${isEdited(mid, exid, vk) ? '<span class="pill q">이 회원용</span>' : '<span class="pill q">공통</span>'}
+      ${tr ? `<button class="chip t" style="margin-left:auto" data-act="editdesc:${exid}:${vk}">수정</button>` : ''}</div>
+      <div class="tx">${dsc ? esc(dsc) : '아직 설명이 없어요'}</div></div>`;
+}
 function sheetDemo(){
   openSheet(()=>{ const z=지금종목(); if(!z) return '<button class="btn ghost sm" data-act="close">닫기</button>';
+    const 영상있음 = 영상시범(z.v) || (z.e.media||[]).length;
     return `<div class="h2">${(!영상시범(z.v) && (z.e.media||[]).length) ? '트레이너 시범' : '기구 사용법'} <small>${esc(exName(z.cur.ex,z.cur.va))}</small></div>
-      ${demoBox(z.e, z.v)}
+      ${영상있음 || !descOf(z.mid, z.cur.ex, z.cur.va) ? demoBox(z.e, z.v) : ''}
+      ${설명칸(z.mid, z.cur.ex, z.cur.va)}
       <button class="btn ghost sm" data-act="close">닫기</button>`; });
 }
 
@@ -6217,18 +6234,9 @@ function sheetExDesc(exid, vk, mid){
       <div class="hr"></div>
       <span class="lbl">지난 피드백 ${cms.length?`${cms.length}개`:''}</span>
       ${피드백회차(cms, K, true)}
-      <div class="desc" style="margin-top:6px"><div class="hd"><b>기본 설명</b>
-        ${isEdited(mid,exid,vk)?'<span class="pill q">이 회원용</span>':'<span class="pill q">공통</span>'}
-        <button class="chip t" style="margin-left:auto" data-act="editdesc:${exid}:${vk}">수정</button></div>
-        <div class="tx">${dsc? esc(dsc) : '아직 설명이 없어요'}</div></div>
-      <button class="btn ghost sm" data-act="close">닫기</button>`;
-    const 피드백만 = !tr && S.screen === 'feedback';      /* 피드백 탭에서 열면 설명 · 시범 없이 피드백만 (2026-10-09 대표) */
-    return head + (피드백만 ? '' : `
-      <div class="desc"><div class="hd"><b>기본 설명</b>
-        ${isEdited(mid,exid,vk)?'<span class="pill q">이 회원용</span>':'<span class="pill q">공통</span>'}
-        ${tr?`<button class="chip t" style="margin-left:auto" data-act="editdesc:${exid}:${vk}">수정</button>`:''}</div>
-        <div class="tx">${dsc? esc(dsc) : '아직 설명이 없어요'}</div></div>
-      ${S.screen==='workout' ? '' : demoBox(exOf(exid), v)}`) + `
+      <button class="btn ghost sm" data-act="close">닫기</button>`;      /* 기본 설명은 「기구 사용법」 창으로 옮겼다 (2026-10-19) */
+    /* 피드백 창은 어디서 열든 트레이너 피드백만 — 기본 설명 · 시범은 「기구 사용법」 창 (2026-10-19 대표 · 10/09 은 피드백 탭에서만 뺐었다) */
+    return head + `
       <span class="lbl">피드백 ${cms.length?`${cms.length}개`:''}</span>
       ${cms.length ? 피드백회차(cms, K, tr)
         : 빔('chat','아직 받은 피드백이 없습니다', tr ? '아래에서 피드백을 남겨 주세요' : '아래 「피드백 요청하기」에서 요청해 주세요')}
@@ -7084,7 +7092,7 @@ function vRecord(){
     + items.map((it,i)=>`<div class="card">
         <div class="rowc" style="align-items:baseline">
           <div><div class="nm">${esc(exName(it.ex,it.va))}</div></div>
-          ${ed?'':`<button class="chip t" data-act="exd:${it.ex}:${it.va}${S.who==='tr'?':'+w.mid:''}">설명 · 피드백 ${cmOf(S.who==='tr'?w.mid:S.mid,it.ex,it.va).length}</button>`}
+          ${ed?'':`<button class="chip t" data-act="exd:${it.ex}:${it.va}${S.who==='tr'?':'+w.mid:''}">피드백 ${cmOf(S.who==='tr'?w.mid:S.mid,it.ex,it.va).length}</button>`}
         </div>
         ${ed
           ? it.sets.map((st,j)=>`<button class="setrow2 ed" data-act="rset:${i}:${j}">
@@ -13347,7 +13355,7 @@ document.addEventListener('click', async ev=>{
     case 'prevopen': S.prevOpen = !S.prevOpen; render(); return;
     case 'trio': { const z=지금종목(); if(!z) return;
       if(rest[0]==='prev') sheetPrev();
-      else if(!z.v.du && !(z.e.media||[]).length) toast('이 종목은 사용법이 아직 준비중이에요');      /* 트레이너가 만든 종목은 올린 사진·영상을 보여 준다 */
+      else if(!z.v.du && !(z.e.media||[]).length && !descOf(z.mid, z.cur.ex, z.cur.va) && S.who !== 'tr') toast('이 종목은 사용법이 아직 준비중이에요');      /* 트레이너가 만든 종목은 올린 사진·영상을 보여 준다 */
       else sheetDemo();
       return; }
     case 'usekg': {
