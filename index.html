@@ -1134,6 +1134,16 @@ body .card.now2 .pill.t.nowp{animation:nowp 2.2s ease-in-out infinite}@keyframes
 .rp2ib div{border-radius:16px;border:1px solid var(--line);background:#1a1917;padding:12px 10px}.rp2ib span{font-size:11px;color:var(--sub)}
 .rp2ib b{display:block;font-size:20px;font-weight:800;margin-top:2px}.rp2ib b small{font-size:11px;color:var(--sub);margin-left:1px}.rp2ib i{font-style:normal;font-size:11.5px;font-weight:800;color:var(--teal)}.rp2ib i.z{color:var(--sub);font-weight:600}
 .rp2fig{flex:none}.rp2fig .figpick{display:none}.rp2ck{flex:none}
+/* 2026-10-20 6번 — 오늘의 사진 · 오늘 세운 기록 */
+.rp2ph{flex:none;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.rp2ph button{position:relative;aspect-ratio:4/5;border-radius:14px;overflow:hidden;background:#1a1917;border:1px solid var(--line);padding:0}
+.rp2ph img{width:100%;height:100%;object-fit:cover;display:block}
+.rp2ph span{position:absolute;left:8px;bottom:8px;max-width:calc(100% - 16px);font-size:12px;font-weight:800;color:var(--cream);background:rgba(18,18,17,.72);border-radius:999px;padding:3px 9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rp2lk{flex:none;width:100%;display:flex;align-items:center;gap:10px;text-align:left;border-radius:14px;border:1px solid var(--line);background:#1a1917;padding:12px 14px;font-size:14px;font-weight:700;color:var(--cream)}
+.rp2lk small{display:block;font-size:12px;color:var(--sub);font-weight:500}.rp2lk i{margin-left:auto;font-style:normal;color:var(--teal);font-weight:800;white-space:nowrap}
+.rp2pr{flex:none;border-radius:16px;border:1px solid #5a4c33;background:linear-gradient(170deg,#241f17,#171615 75%);padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.rp2pr div{display:flex;align-items:baseline;gap:8px;min-width:0}.rp2pr b{font-size:15px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rp2pr .was{font-size:12px;color:var(--sub);white-space:nowrap}.rp2pr .k{margin-left:auto;font-size:17px;font-weight:900;color:var(--gold);white-space:nowrap}.rp2pr .k small{font-size:11px;color:var(--sub);margin-left:1px}
 .rp2mo{flex:none;border-radius:16px;border:1px solid var(--line);background:#1a1917;padding:13px 15px;display:flex;align-items:center;gap:14px}
 .rp2mo b{font-size:22px;font-weight:800;color:var(--gold);white-space:nowrap}.rp2mo b small{font-size:12px;color:var(--sub);margin-left:2px}.rp2mo span{font-size:12px;color:var(--sub);line-height:1.5}
 /* 2026-10-09 노션 목록 */
@@ -1315,7 +1325,13 @@ body .cm2 .tx{font-size:14px;line-height:1.6;color:var(--cream)}
 .tmsum>div{display:flex;flex-direction:column;gap:1px;padding:12px 12px 10px;border-radius:16px;border:1px solid #34332d;background:linear-gradient(180deg,#221f1a,#181816);box-shadow:inset 0 1px 0 rgba(240,211,160,.2)}
 .tmsum small{font-size:11.5px;color:var(--sub)}.tmsum b{font-size:24px;font-weight:800;color:var(--gold);line-height:1.15}.tmsum b i{font-style:normal;font-size:11.5px;color:var(--cream);margin-left:2px}
 .tmsum>div.t{border-color:#3f7281;background:linear-gradient(170deg,#1b2d33,#171a19 70%)}.tmsum>div.t b{color:var(--teal)}
-.mrow2 .mi.nm1{font-size:15px;font-weight:800}.mrow2 .mi.lv{color:var(--teal);border-color:rgba(169,216,230,.6);background:rgba(169,216,230,.08)}
+.mrow2 .mi.nm1{font-size:15px;font-weight:800}
+/* 2026-10-20 대표 「7번 A」 — 원 안 성 대신 갈래 · 채도 낮춘 셋(급하다로 안 읽히게) · 골드 · 빨강 안 씀 · 시안 회원갈래표시_1020 */
+.mrow2 .mi.gl{font-size:13px;font-weight:900;letter-spacing:-.02em}
+.mrow2 .mi.gl-pt{color:#7fc9d6;background:rgba(127,201,214,.14);border-color:rgba(127,201,214,.45)}
+.mrow2 .mi.gl-tg{color:#e9e1d1;background:rgba(233,225,209,.12);border-color:rgba(233,225,209,.42)}
+.mrow2 .mi.gl-ex{color:#b8a6e0;background:rgba(184,166,224,.14);border-color:rgba(184,166,224,.45)}
+.mrow2 .mi.gl-fc{color:#8f8a83;background:rgba(143,138,131,.08);border-color:rgba(143,138,131,.35)}.mrow2 .mi.lv{color:var(--teal);border-color:rgba(169,216,230,.6);background:rgba(169,216,230,.08)}
 .mrow2 .pill{flex:none}
 .hcard.gold2{background:radial-gradient(110% 130% at 0% 0%,rgba(240,211,160,.18),transparent 62%),linear-gradient(180deg,#241f17,#171614);border-color:#6b5a33}
 /* 운동 중 — 융합 (2026-10-06): 짜임·단추는 그대로, 겉모습만 */
@@ -2993,7 +3009,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '423';
+const BUILD = '425';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -3320,7 +3336,7 @@ const capSec = (n, cap) => Math.max(0, Math.min(Math.round(Number(n)||0), cap));
    (2026-09-17 대표: 「하나의 판단기준을 신설하는거지」)
    기준이 늘면 **이 함수에 한 줄만** 더한다. 다른 곳에 흩뿌리지 않는다.
      ① 날짜가 지났다
-     ② 아무것도 안 건드리고 3시간 (`w.touch`)
+     ② 운동 화면에서 아무것도 안 건드리고 3시간 (`w.touch` · 2026-10-20 부터 운동 화면 · 종목 추가 화면에서 누른 것만 센다)
      ③ 안정시 심박수가 20분 이상 이어졌다 — **워치가 붙으면 시행.** 지금은 심박수를 받는 데가 없다
    ⛔ 「끝났나」와 「얼마나 했나」는 다른 자다.
       끝났는지는 `w.touch`(손댄 시각)로, 얼마나 했는지는 `s.at`(세트 체크 시각)로 잰다.
@@ -4417,7 +4433,19 @@ setInterval(()=>{
 },250);
 
 /* ═══ 그리기 ═══ */
+/* ══ 회원 갈래 (7번 A · 2026-10-20) ══ 정본 = 중앙 /app/crm/states 의 「갈래」(PT회원 · 운동가이드 · 체험수업 · 일반FC) — 앱이 따로 판정하지 않는다.
+   트레이너 화면에서만 받는다(직원 증표) · 10분에 한 번 · 못 받으면 예전처럼 성 한 글자 */
+let 갈래표 = {}, 갈래때 = 0;
+const 갈래짧게 = { 'PT회원':['PT','pt'], '운동가이드':['TG','tg'], '체험수업':['체험','ex'], '일반FC':['FC','fc'] };
+function 갈래받기(){
+  if(S.who !== 'tr' || S.rpOnly || Date.now() - 갈래때 < 600000) return; 갈래때 = Date.now();
+  const 목록 = MEMBERS.filter(m => m.p4).map(m => ({ name:m.n, phone4:m.p4 })); if(!목록.length) return;
+  앱crm('states', { 목록 }).then(j => { 갈래표 = j['사람'] || {}; render(); }).catch(e => { 갈래때 = Date.now() - 480000; console.warn('갈래 못 받음', e); });      /* 실패하면 2분 뒤 다시 */
+}
+function 갈래원(mid){ const m = MEMBERS.find(x => x.id === mid) || {}, x = m.p4 ? 갈래표[m.n + '|' + m.p4] : null, g = x && 갈래짧게[x['갈래']];
+  return g ? `<span class="mi gl gl-${g[1]}" title="${esc(x['갈래'])}">${g[0]}</span>` : `<span class="mi nm1">${esc((m.n || '?').slice(0, 1))}</span>`; }
 function render(){
+  갈래받기();
   /* ⛔ 동의 한 장(?c= · ?pt=)은 body 를 통째로 갈아 끼운다 — 그 뒤 start() 가 render() 를 부르면 #main 이 없어
      「Cannot read properties of null (reading 'querySelectorAll')」 가 났다 (2026-10-02 전수 시험에서 잡음). 그릴 자리가 없으면 안 그린다. */
   if(!$('#main')) return;
@@ -6906,6 +6934,20 @@ function vReport(){
         : tr ? `<div class="cyfoot" style="justify-content:center"><span>새 사진 ${새사진.length}장은 회원에게 「앱에서 보기」로 안내돼요</span></div>`
         : `<button class="hline" data-act="sub:body">${svg('h_cam',18)}<b>새 사진 ${새사진.length}장 보기</b><small>인바디 · 비포애프터</small><i>›</i></button>`) : ''}`;
 
+  /* ══ 오늘 세운 기록 (6번 ② · 2026-10-20) ══ 종목별로 **지금까지 든 것 중 가장 무거운 무게**를 넘은 것만. 처음 하는 종목은 넣지 않는다(견줄 것이 없다) · 유산소 · 메모 뺌 */
+  const 세운 = w.items.filter(it => it.sets.length && !isMemo(it.ex) && !(exOf(it.ex)||{}).cardio).map(it => {
+    const 오늘 = Math.max(...it.sets.map(x => +x.kg || 0)); if(!(오늘 > 0)) return null;
+    const 전들 = workoutsOf(mid).filter(x => x.id !== w.id && (x.date < w.date || (x.date === w.date && x.id < w.id))).flatMap(x => x.items.filter(i => i.ex === it.ex && i.va === it.va).flatMap(i => i.sets.map(y => +y.kg || 0)));
+    const 전 = 전들.length ? Math.max(...전들) : 0; return 전 > 0 && 오늘 > 전 ? { it, 오늘, 전 } : null; }).filter(Boolean);
+  const 기록칸 = 세운.length ? `<div class="rp2sec">오늘 세운 기록 <small>지금까지 든 것 중 가장 무거움</small></div>
+    <div class="rp2pr">${세운.map(r => `<div><b>🏆 ${esc(exName(r.it.ex, r.it.va))}</b><span class="was">전 최고 ${kgfmt(r.전)}kg</span><span class="k">${kgfmt(r.오늘)}<small>kg</small></span></div>`).join('')}</div>` : '';
+  /* ══ 오늘의 사진 (6번 ① · 2026-10-20 대표 「인증사진이 있으면 뜨게」) ══ 그 수업에서 같이 찍은 사진(pair · memo = 수업 id · 옛 것은 날짜) + 그날 오운완.
+     회원이 숨긴 것은 회원 눈에 안 보임 · ⛔ 링크(로그인 없음)로 열면 사진을 싣지 않는다 — 몸 사진과 같은 규칙 → 「앱에서 보기」 */
+  const 오늘사진 = (D.bph||[]).filter(x => x.mid === mid && ((x.kind === 'pair' && (x.memo ? x.memo === w.id : x.date === w.date)) || (x.kind === 'ootd' && x.date === w.date)) && !(!tr && x.hid))
+    .sort((a, b) => (a.kind === 'pair' ? 0 : 1) - (b.kind === 'pair' ? 0 : 1));
+  const 사진칸 = !오늘사진.length ? '' : `<div class="rp2sec">오늘의 사진</div>` + (만보기
+    ? `<button class="rp2lk" data-act="rpapp:home">📷<span>${오늘사진.some(x => x.kind === 'pair') ? '트레이너와 찍은 사진' + (오늘사진.length > 1 ? ' · 오운완' : '') : '오운완'} ${오늘사진.length}장<small>사진은 앱에서만 열려요</small></span><i>앱에서 보기 ›</i></button>`
+    : `<div class="rp2ph">${오늘사진.slice(0, 4).map(x => `<button data-act="ootdview:${x.id}"><img src="${esc(phURL(x.path))}" alt="" loading="lazy" onerror="picFail(this)"><span>${x.kind === 'pair' ? (찍은 => esc(찍은 ? 찍은 + ' 트레이너와' : '트레이너와'))(x.by && x.by !== '회원' ? x.by : 담당) : '오운완'}</span></button>`).join('')}</div>`);
   /* 맨 위 안내 — 동의가 없어 리포트에 못 싣는 것이 있으면 무엇인지 알려 주고 앱의 동의 화면으로 보낸다 */
   const 동의안내 = (!tr && !건강동의함(mid)) ? `<div class="rp2ask"><b>인바디 · 체형분석</b>은 앱에서 동의해 주셔야<br>리포트에 표시됩니다
       <button data-act="rpapp:agree">앱에서 동의하기 ›</button></div>` : '';
@@ -6917,8 +6959,10 @@ function vReport(){
       <h1>${esc(이름)} 회원님,<br>${루틴이름 ? `오늘 <b>${esc(루틴이름)}</b>${/루틴$/.test(루틴이름.trim()) ? '을' : ' 루틴을'}<br>끝까지 해내셨어요` : '오늘 수업을<br>끝까지 해내셨어요'}</h1>
       <p>${esc(수업제목(w).replace(/ (수업|개인운동) 기록$/, ''))}${담당 ? ' · ' + esc(담당) + ' 트레이너와 함께' : ''}</p>
       <div class="rp2one">${종목수}종목 · ${세트수}세트${(w.dur||0) >= 60 ? ' · ' + Math.round(w.dur/60) + '분' : ''}${무게 ? ' · ' + (무게 >= 1000 ? (무게/1000).toFixed(1) + '톤' : Math.round(무게).toLocaleString() + 'kg') : ''}</div></div>
+    ${사진칸}
     ${루틴줄 ? `<div class="rp2sec">오늘 한 운동</div>
       <div class="rp2rt">${rt ? `<div class="rth"><i>루틴 ${esc(String(rt.no||''))}</i><b>${esc(rt.n)}</b></div>` : ''}${루틴줄}</div>` : ''}
+    ${기록칸}
     ${피드백들.length ? `<div class="rp2sec">트레이너 피드백 <small>${피드백들.length}개</small></div>${피드백들.map(코카드).join('')}` : ''}
     ${몸}
     <div class="rp2sec">${m}월 <small>오늘까지</small></div>
@@ -11362,8 +11406,8 @@ function tToday(){
       const 지정 = MEMBERS.filter(m => D.today[m.id]), 묶 = {}; todo.forEach(w => { (묶[w.mid] = 묶[w.mid] || []).push(w); });
       const 기다 = Object.keys(묶).map(id => ({ m: MEMBERS.find(x => x.id === id), ws: 묶[id] })).filter(x => x.m).slice(0, 5);
       return (지정.length ? `<span class="lbl">오늘 루틴을 지정한 회원 ${지정.length}명</span><div class="megrp">${지정.map(m => { const t = D.today[m.id], r = t && t.rid ? rOf(t.rid) : null;
-          return `<button class="mrow2" data-act="tgo:${m.id}"><span class="mi nm1">${esc(m.n.slice(0,1))}</span><span class="mt"><b>${esc(m.n)}</b><small>${esc([t && t.kind, r && r.n].filter(Boolean).join(' · ') || '루틴 지정됨')}</small></span><i>›</i></button>`; }).join('')}</div>` : '')
-        + (기다.length ? `<span class="lbl">피드백 기다리는 회원</span><div class="megrp">${기다.map(x => `<button class="mrow2" data-act="tw:${x.ws[0].id}"><span class="mi nm1">${esc(x.m.n.slice(0,1))}</span><span class="mt"><b>${esc(x.m.n)}</b><small>운동 ${x.ws.length}건 · 최근 ${dateTxt(x.ws[0].date)}</small></span><em class="go">쓰기 ›</em></button>`).join('')}</div>` : ''); })()}
+          return `<button class="mrow2" data-act="tgo:${m.id}">${갈래원(m.id)}<span class="mt"><b>${esc(m.n)}</b><small>${esc([t && t.kind, r && r.n].filter(Boolean).join(' · ') || '루틴 지정됨')}</small></span><i>›</i></button>`; }).join('')}</div>` : '')
+        + (기다.length ? `<span class="lbl">피드백 기다리는 회원</span><div class="megrp">${기다.map(x => `<button class="mrow2" data-act="tw:${x.ws[0].id}">${갈래원(x.m.id)}<span class="mt"><b>${esc(x.m.n)}</b><small>운동 ${x.ws.length}건 · 최근 ${dateTxt(x.ws[0].date)}</small></span><em class="go">쓰기 ›</em></button>`).join('')}</div>` : ''); })()}
 ` };
 }
 /* 오늘 화면 숫자 칸을 누르면 뜨는 내역 창 셋 */
@@ -11379,7 +11423,7 @@ function sheetTdTodo(){
   openSheet(()=>{ const todo = D.workouts.filter(w=>w.done && unseen(w)).sort((a,b)=> a.date < b.date ? -1 : a.date > b.date ? 1 : 0);      /* 오래된 것부터 */
     return `<div class="h2">피드백 안 단 기록 <small>${todo.length}건 · 오래된 것부터</small></div>
     <div class="pickbox"><div class="megrp">${todo.map(w=>{ const n = w.items.filter(it => it.sets.length && cmOf(w.mid, it.ex, it.va).length === 0).length;
-      return `<button class="mrow2" data-act="tw:${w.id}"><span class="mi nm1">${esc(nm(w.mid).slice(0,1))}</span>
+      return `<button class="mrow2" data-act="tw:${w.id}">${갈래원(w.mid)}
         <span class="mt"><b>${esc(nm(w.mid))} · ${dateTxt(w.date)}</b><small>${esc(w.kind||'')} · 피드백 없는 종목 ${n}개</small></span><em class="go">쓰기 ›</em></button>`; }).join('') || '<div class="empty">남길 피드백이 없습니다</div>'}</div></div>
     <button class="btn ghost sm" data-act="close">닫기</button>`; });
 }
@@ -11430,7 +11474,7 @@ function tFeed(){
   return { top: bar('피드백', `<span class="sub">${dateTxt(sel)}</span>`), body: head + `
     ${asks.length?`<span class="lbl">회원이 봐 달라고 한 것 · ${asks.length}건</span>
       <div class="megrp fbg g">${asks.map(a=>`<button class="mrow2" data-act="exd:${a.ex}:${a.va}:${a.mid}">
-        <span class="mi nm1">${esc(nm(a.mid).slice(0,1))}</span>
+        ${갈래원(a.mid)}
         <span class="mt"><b>${esc(nm(a.mid))} · ${esc(exName(a.ex,a.va))}</b><small>${esc(a.note||'따로 입력한 말은 없어요')} · ${esc(agoTxt(a.ts))}</small></span><em class="go">쓰기 ›</em></button>`).join('')}</div>`:''}
     <div class="wk">
       <div class="wkhd">
@@ -11444,14 +11488,14 @@ function tFeed(){
     ${list.length ? `<div class="megrp fbg">${list.map(w=>{
       const miss = noCmItems(w).length, 종 = w.items.filter(i=>i.sets.length);
       return `<button class="mrow2 ${unseen(w)?'pson':''}" data-act="tw:${w.id}">
-        <span class="mi nm1">${esc(nm(w.mid).slice(0,1))}</span>
+        ${갈래원(w.mid)}
         <span class="mt"><b>${esc(nm(w.mid))} 회원</b><small>${esc(w.kind||'')}${w.title?' · '+esc(w.title):''} · ${durTxt(w.dur)}</small>
           <small>${종.map(i=>esc(exName(i.ex,i.va))).slice(0,3).join(' · ')}${종.length>3?' 외':''}</small></span>
         <em class="go ${miss?'':'q'}">${miss?`피드백 ${miss}개 남음 ›`:'다 남겼어요'}</em></button>`; }).join('')}</div>`
      : '<div class="empty">이 날은 기록한 수업이 없습니다<small class="e2">다른 날을 선택해 주세요</small></div>'}
     ${todo.length?`<span class="lbl">아직 피드백 안 단 기록 · ${todo.length}건</span>
       <div class="megrp fbg">${todo.slice(0,4).map(w=>`<button class="mrow2" data-act="tw:${w.id}">
-        <span class="mi nm1">${esc(nm(w.mid).slice(0,1))}</span>
+        ${갈래원(w.mid)}
         <span class="mt"><b>${esc(nm(w.mid))} · ${dateTxt(w.date)}</b><small>${esc(w.kind||'')} · 피드백 없는 종목 ${noCmItems(w).length}개</small></span><em class="go">쓰기 ›</em></button>`).join('')}
         ${todo.length > 4 ? `<button class="mrow2 more" data-act="tdtodo"><span class="mt"><b>${todo.length}건 모두 보기</b></span><i>›</i></button>` : ''}</div>`:''}` };
 }
@@ -11518,7 +11562,7 @@ function tMembers(){
         <div class="megrp">${줄.length ? '' : `<div class="empty">${거름==='★' ? '아직 즐겨찾기한 회원이 없어요<br>회원 이름 옆 별을 눌러 보세요' : '해당하는 회원이 없어요'}</div>`}${줄.map(({m,last,lv,nofb,fav})=>`<div class="mrow2 favrow" data-nm="${esc(m.n)}">
           <button class="favbtn ${fav?'on':''}" data-act="tmfav:${m.id}" aria-label="${fav?'즐겨찾기 해제':'즐겨찾기'}">${별(fav)}</button>
           <button class="tmgo" data-act="tm:${m.id}">
-          <span class="mi nm1">${esc((m.n||'?').slice(0,1))}</span>
+          ${갈래원(m.id)}
           <span class="mt"><b>${esc(m.n)}</b><small>${lv?`지금 운동 중 · ${esc((it0=>it0?exName(it0.ex,it0.va):'')(lv.items[lv.cur]||lv.items[0]))}`
             :(last?`${dateTxt(last.date)} · ${esc(last.kind||'')}`:'기록 없음')}</small></span>
           ${lv?'<span class="pill t">진행 중</span>':(nofb?'<span class="nbdot" title="안 본 기록"></span>':'')}<i>›</i></button></div>`).join('')}</div>`; })()
@@ -12199,7 +12243,7 @@ document.addEventListener('click', async ev=>{
   /* 길게 눌러 끝낸 직후의 「따라오는 눌림」은 흘려보낸다 (풀자마자 다시 잠기지 않게) */
   if(!el.hasAttribute('data-syn') && S.heldAt && Date.now()-S.heldAt < 600){ S.heldAt=0; return; }
   const a=el.getAttribute('data-act'), [k,...rest]=a.split(':'), w=live();
-  손댐();                                    /* 뭐든 누르면 「끝났나」 시계가 다시 간다 */
+  if(['workout', 't_live', 'pick'].includes(S.screen)) 손댐();      /* 운동 화면에서 누른 것만 「손댐」 — 2026-10-20 대표 「종료 안 하면 무한으로 시간이 간다」 · 다른 화면을 쓰는 동안에도 3시간이 계속 새로 시작됐다 */
   /* 「운동 중으로 돌아가기」만은 잠겨도 열어 둔다 — 자물쇠가 거기 있기 때문이다.
      막아 두면 앱을 다시 켰을 때 홈에 갇힌다 (2026-09-04 확인). */
   if(잠금이막는것[k] && 잠겼나() && !(k==='go' && rest[0]==='workout')){
