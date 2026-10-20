@@ -3009,7 +3009,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '426';
+const BUILD = '427';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -6616,6 +6616,7 @@ function vSummary(){
          ${ootd찍었나(w) ? '' : `<div class="cyfoot" style="justify-content:center"><span>사진에 오늘 한 종목 · 세트 · 총 무게가 얹힌 한 장이 만들어집니다</span></div>`}
          ${수업 ? `<button class="btn sub" data-act="pair:${w.id}">${svg('h_hands',19)} 회원과 같이 찍기</button>` : ''}`
       : `<div class="note">오운완은 <b>기록한 날에만</b> 찍을 수 있습니다</div>`}
+    ${수업 && S.who === 'tr' ? 리포트발(w) : ''}
     ${수업 ? `<button class="btn sub" data-act="rpt:${w.id}">오늘 수업 리포트 보기</button>` : ''}
 
     <div class="grid2">${Object.entries(times).slice(0,4).map(([k,v])=>
@@ -6650,7 +6651,7 @@ async function 리포트열쇠(wid){ try{ return ((await sget('report_sends?sele
    「그러면 끝나고 30분 뒤니까 발송 전인지 발송 완료인지만 체킹되면 되겠다」
    수업을 마치면 **30분 뒤**로 예약한다. 그 사이에 트레이너가 피드백을 올리거나
    잘못 끝낸 것을 취소할 수 있다. 보내는 때가 아니면(00~05시) 그날 05시로 민다. */
-const 자동분 = 30;
+const 자동분 = 5;      /* 2026-10-20 대표 「30분 → 5분 · 그 사이 발송 취소」 (서버 확인 주기는 중앙 몫) */
 function 나갈시각(분){
   const t = new Date(Date.now() + (분 || 0) * 60000);
   if(t.getHours() < 5) t.setHours(5, 0, 0, 0);       /* 새벽이면 그날 05시 */
@@ -6681,7 +6682,7 @@ async function 리포트예약(w, 분){
 
 /* 이미 예약·발송된 수업인가 — 두 번 보내지 않으려고 본다 */
 async function 리포트상태(wid){
-  try{ return (await sget('report_sends?select=state,send_at,sent_at&id=eq.rs_' + encodeURIComponent(wid)))[0] || null; }
+  try{ return (await sget('report_sends?select=state,send_at,sent_at,fail_why&id=eq.rs_' + encodeURIComponent(wid)))[0] || null; }
   catch(e){ return null; }
 }
 /* ══ 리포트에 뜨는 피드백 ══ 2026-09-29 대표
@@ -6988,9 +6989,10 @@ function vReport(){
    ⛔ 「보내기」 단추를 없앴다. 수업을 마치면 **30분 뒤 저절로** 나가는데 단추가 같이 있으면
       「내가 눌러야 하나」 하고 헷갈린다. 상태만 보여 주고, **실패했을 때만** 다시 보내기를 낸다. */
 function 리포트발(w){
-  const 대상 = (w.kind || '') === '수업' && 운동요약(w);
-  if(!대상) return `<div class="note" style="margin:0">개인운동은 리포트를 보내지 않습니다.</div>`;
+  if((w.kind || '') !== '수업') return `<div class="note" style="margin:0">개인운동은 리포트를 보내지 않습니다.</div>`;
   const st = (S.rpSt && S.rpSt.wid === w.id) ? S.rpSt : null;
+  /* 발송 줄이 이미 있으면 종목 요약과 상관없이 그 상태를 보인다 (2026-10-20 — 취소 뒤 다시 그릴 때 요약이 잠깐 비어 「개인운동은…」이 떴다) */
+  if(!운동요약(w) && !(st && st.state)) return `<div class="note" style="margin:0">기록한 세트가 없어 리포트를 보내지 않습니다</div>`;
   if(!st){ 리포트상태받기(w.id); return `<div class="note" style="margin:0">발송 상태를 확인하는 중…</div>`; }
   if(st.읽는중) return `<div class="note" style="margin:0">발송 상태를 확인하는 중…</div>`;
 
@@ -7004,14 +7006,18 @@ function 리포트발(w){
         <b style="color:var(--warn)">못 보냈어요</b>${st.fail_why ? '<br>' + esc(오류말(st.fail_why)) : ''}</div>
       <button class="btn main" data-act="rsend2:${w.id}">다시 보내기</button>`;
 
-  if(st.state === '대기')
-    return `<div class="note" style="margin:0;border-color:var(--gold-2)">
-      <b style="color:var(--gold)">리포트는 자동 발송됩니다</b>
-      ${st.send_at ? '<br>' + esc(시각글(new Date(st.send_at))) + '에 나갑니다' : ''}
-      <br>그 전에 올린 피드백 · 사진도 함께 보입니다</div>`;
+  if(st.state === '대기'){ const 남 = st.send_at ? Math.ceil((new Date(st.send_at) - Date.now()) / 60000) : null;
+    return `<div class="note rpwait" style="margin:0 0 8px;border-color:var(--gold-2)">
+      <b style="color:var(--gold)">${st.send_at ? esc(시각글(new Date(st.send_at))) + '에 회원에게 나갑니다' : '리포트는 자동 발송됩니다'}</b>${남 != null && 남 > 0 ? ' <small>(' + 남 + '분 남음)</small>' : ''}
+      <br>잘못 마쳤으면 그 전에 취소해 주세요</div>
+      <button class="btn ghost" data-act="rcancel:${w.id}">발송 취소</button>`; }
+
+  if(st.state === '취소')      /* 2026-10-20 — 트레이너가 취소함. 서버는 「대기」만 보낸다 */
+    return `<div class="note" style="margin:0 0 8px">발송을 취소했어요<br>회원에게 보내려면 「보내기」를 눌러 주세요</div>
+      <button class="btn sub" data-act="rsend2:${w.id}">보내기</button>`;
 
   /* 예약 줄이 아직 없다 — 수업을 마치는 순간 저절로 잡힌다 */
-  return `<div class="note" style="margin:0">수업을 마치면 <b>30분 뒤 자동으로</b> 나갑니다.</div>`;
+  return `<div class="note" style="margin:0">수업을 마치면 <b>${자동분}분 뒤 자동으로</b> 나갑니다</div>`;
 }
 
 function anaMid(){ return (S.who==='tr') ? (S.tmid || S.subj || S.mid) : S.mid; }
@@ -12817,14 +12823,23 @@ document.addEventListener('click', async ev=>{
           <button class="btn main" data-act="rsend2:${w.id}">보내기</button>
           <button class="btn ghost" data-act="close">닫기</button></div>`);
       return; }
+    case 'rcancel': { const wid = rest[0];
+      확인창('리포트 발송을 취소할까요?<br>회원에게 알림톡이 가지 않습니다.', '발송 취소', async () => {
+        try{ await spatch('report_sends', 'id=eq.rs_' + encodeURIComponent(wid) + '&state=eq.' + encodeURIComponent('대기'), { state:'취소' }); }catch(e){ console.error(e); toast('취소하지 못했어요\n' + 오류말(e)); return; }
+        S.rpSt = null; const r = await 리포트상태(wid); S.rpSt = Object.assign({ wid }, r || { 없음: true });
+        toast(r && r.state === '취소' ? '발송을 취소했어요' : r && r.state === '보냄' ? '이미 보냈어요\n취소할 수 없어요' : '발송 상태를 다시 확인해 주세요'); render(); });
+      return; }
     case 'rsend2': { const w = D.workouts.find(x=>x.id===rest[0]); if(!w) return;
       closeSheet();
       S.rpSt = null;                       /* 다시 읽어 상태가 바뀌게 */
       /* 손으로 누른 것은 **바로** 나간다 (자동만 30분 뒤).
          실패했던 건 「대기」로 돌아가고 시도 횟수도 0 이 된다 — 그래야 다시 나간다 */
       let at = null;
-      await sv(리포트예약(w, 0).then(v => { at = v; }), '리포트 보내기');
-      toast(at ? (시각글(at) + ' 발송 예정입니다') : '보낼 목록에 넣었습니다');
+      /* 발송 줄이 이미 있으면(실패 · 취소) 그 줄을 「대기」로 되돌린다 — 요약을 다시 만들지 않는다 (2026-10-20 · 요약이 비면 아무것도 안 됐다) */
+      const 옛 = await 리포트상태(w.id);
+      if(옛){ at = 나갈시각(0); await sv(spatch('report_sends', 'id=eq.rs_' + encodeURIComponent(w.id), { state:'대기', send_at:at.toISOString(), tried:0, fail_why:null }), '리포트 보내기'); }
+      else await sv(리포트예약(w, 0).then(v => { at = v; }), '리포트 보내기');
+      toast(at ? (시각글(at) + ' 발송 예정입니다') : '보낼 목록에 넣었습니다'); render();
       return; }
     /* 피드백 회차 — 좌우 넘김 · 가운데 목록 · 목록에서 고르기 (2026-09-29) */
     /* ⚠ 종목 열쇠(K)는 `ch05|a` 처럼 **막대(|)** 로 잇는다 — 쌍점(:)이 아니다.
@@ -13912,14 +13927,14 @@ async function finish(){
   }
   /* ══ 수업을 마치면 리포트를 30분 뒤로 예약한다 ══ 2026-09-29 대표
      ⛔ 안전장치 셋 — ① 「수업」만 (개인운동은 안 보낸다)  ② 기록된 세트가 있어야
-        ③ **30분 뒤** — 그 사이 피드백을 올리거나 잘못 끝낸 것을 취소할 수 있다
+        ③ **5분 뒤**(2026-10-20 · 전엔 30분) — 그 사이 잘못 끝낸 것을 「발송 취소」(마친 화면 · 리포트 화면) · 피드백은 뒤에 올려도 열 때 보인다
      이미 예약·발송된 수업이면 건드리지 않는다 (두 번 보내기 막기). */
   if((rec.kind || '') === '수업' && 운동요약(rec)){
     try{
       const 있 = await 리포트상태(rec.id);
       if(!있){
-        const at = await 리포트예약(rec, 자동분);
-        if(at) toast('수업 기록을 ' + 시각글(at) + ' 에 보냅니다');
+        const at = await 리포트예약(rec, 자동분); S.rpSt = null;
+        if(at) toast('리포트를 ' + 시각글(at) + '에 보냅니다\n잘못 마쳤으면 아래에서 취소해 주세요');
       }
     }catch(e){ console.warn('리포트 예약 실패', e); }   /* 예약이 안 돼도 운동 마치기는 그대로 끝난다 */
   }
