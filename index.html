@@ -3033,7 +3033,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '428';
+const BUILD = '429';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -9084,8 +9084,8 @@ function sheetPair(){
     <div class="pfrow"><input class="search" id="pftitle" maxlength="30" value="${esc(P.제목)}" aria-label="제목"><button class="pfbtn" data-act="pfroll">다른 문구</button></div>
     ${g ? `<div class="pfrow"><input class="search" id="pftx" maxlength="24" value="${esc(g.t)}" placeholder="글자를 입력해 주세요"></div>
       <div class="pftool">${[['#fdfaf6', '흰색'], ['#1a1814', '검정'], ['#e9cf9b', '골드']].map(c => `<button class="c${g.c === c[0] ? ' on' : ''}" style="background:${c[0]}" data-act="pfcol:${c[0].slice(1)}" aria-label="${c[1]}"></button>`).join('')}
-        <button class="z${g.z === 'm' ? ' on' : ''}" data-act="pfsz:m">보통</button><button class="z${g.z === 'l' ? ' on' : ''}" data-act="pfsz:l">크게</button><button class="del" data-act="pfdel">글자 삭제</button></div>`
-      : `<div class="pfrow"><button class="pfbtn" style="flex:1" data-act="pfadd">＋ 글자 넣기</button></div>`}
+        <button class="z${g.z === 'm' ? ' on' : ''}" data-act="pfsz:m">보통</button><button class="z${g.z === 'l' ? ' on' : ''}" data-act="pfsz:l">크게</button><button class="del" data-act="pfdel" aria-label="이 글자 없애기">✕ 이 글자 없애기</button></div>`
+      : `<div class="pfrow"><button class="pfbtn" style="flex:1" data-act="pfadd">＋ 글자 추가</button></div>`}
     <button class="btn main" data-act="pairsave">저장</button>
     <button class="btn ghost sm" data-act="pairre:${S.pair.wid}">다시 찍기</button>
     <button class="btn ghost sm" data-act="close">닫기</button>`; });
