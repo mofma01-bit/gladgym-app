@@ -3009,7 +3009,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '425';
+const BUILD = '426';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -3321,7 +3321,7 @@ async function boot(){
     try{ history.replaceState(null, '', location.pathname); }catch(e){} }
   if(S.screen === 'boot'){ const au = 로그인기억.읽();      /* 한 번 인증한 기기 — 다시 묻지 않는다(확정 틀 3절). 명단에 없어졌으면 로그인 화면으로 */
     if(au && au.who && au.who !== 'member' && !au.mid){ S.who = 'tr'; S.ttab = 't_today'; S.screen = 't_today'; }      /* 직원 — 트레이너 화면으로 */
-    else if(au && au.mid && MEMBERS.some(m => m.id === au.mid)){ S.who = 'm'; S.mid = au.mid; S.tab = 'home'; S.screen = 'home'; setTimeout(인사, 0); }
+    else if(au && au.mid && MEMBERS.some(m => m.id === au.mid)){ S.who = 'm'; S.mid = au.mid; S.tab = 'home'; S.screen = 'home'; setTimeout(인사, 0); setTimeout(갈곳열기, 0); }
     else S.screen = 'login'; }
   if(!histOn) histInit();
 }
@@ -4713,8 +4713,16 @@ const 로그인기억 = { 읽: () => { try{ return JSON.parse(localStorage.getIt
 async function 인증부르기(길, 몸){ const r = await fetch(GG_API + '/app/otp/' + 길, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(몸) });
   if(!r.ok) throw new Error('서버에 닿지 못했어요 (' + r.status + ')'); return await r.json(); }
 const 번호만 = v => String(v || '').replace(/[^0-9]/g, '');
+/* ══ 알림톡 버튼으로 들어온 곳 (?go=) ══ 2026-10-20 — UM_4515 식단 「앱에서 식단 보기」 = ?go=diet · UM_4516 보관 안내 = ?go=media (주소는 검수에 박혀 못 바꾼다)
+   켤 때 주소에서 읽어 이 창에 기억 → 회원으로 들어간 바로 뒤 그 화면 (로그인 전이면 로그인 끝난 뒤). 직원 · 리포트 한 장에는 안 쓴다 */
+try{ const g = new URLSearchParams(location.search).get('go'); if(g === 'diet' || g === 'media'){ sessionStorage.setItem('gg_go', g); history.replaceState(null, '', location.pathname); } }catch(e){}
+function 갈곳열기(){ let g = ''; try{ g = sessionStorage.getItem('gg_go') || ''; sessionStorage.removeItem('gg_go'); }catch(e){}
+  if(S.who !== 'm' || S.rpOnly || !g) return false;
+  if(g === 'diet'){ S.tab = 'diet'; S.stack = []; S.screen = 'diet'; S.dietTab = 'plan'; render(); return true; }
+  if(g === 'media'){ S.tab = 'me'; S.stack = ['me']; S.screen = 'me'; S.subj = S.mid; S.bodyPart = 'in'; go('body'); return true; }
+  return false; }
 function 회원으로들어가기(mid){ S.self = false; if(직원줄) MEMBERS = MEMBERS.filter(m => m.id !== 직원줄.id); S.who = 'm'; S.mid = mid; S.tab = 'home'; S.screen = 'home'; S.stack = []; 인사();
-  if(D.live && D.live.mid === mid && D.live.lock) go('workout'); else go('home'); }
+  if(D.live && D.live.mid === mid && D.live.lock) go('workout'); else if(!갈곳열기()) go('home'); }
 async function 로그인일(k){ const g = S.lg || (S.lg = { 단계:'번호', phone:'', code:'', 말:'', 중:false, 이름:'' }); if(g.중) return;
   if(k === 'lgback'){ g.단계 = '번호'; g.말 = ''; g.code = ''; render(); return; }
   const 번 = 번호만(g.phone);
