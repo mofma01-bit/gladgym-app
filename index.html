@@ -2423,6 +2423,8 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
   border:1px solid var(--line);border-radius:11px;padding:11px 17px;font-size:13.5px;font-weight:700;
   white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .22s;z-index:30}
 #toast.on{opacity:1}
+#toast small{display:block;margin-top:3px;font-size:13px;font-weight:500;color:var(--sub)}   /* 2026-10-20 두 줄 알림 — 둘째 줄 = 다음에 할 것 */
+.blall small,.blrow span small,.rmhint small{display:block;margin-top:1px;font-weight:500;color:var(--sub)}   /* 2026-10-20 줄표 대신 둘째 줄 */
 /* ── 로딩 그림 (설계서\시험페이지\로딩_모음.html 과 같은 것 · 금색 하나 · 그림 파일 없음) ── */
 @keyframes glspin{to{transform:rotate(360deg)}}@keyframes gllift{0%,100%{transform:translateY(9px)}50%{transform:translateY(-9px)}}@keyframes glbn{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
 .gload{display:flex;justify-content:center;margin:0 0 14px;color:#e9cf9b}.gload svg{width:56px;height:56px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;overflow:visible}.gload .bar{animation:gllift 1.4s ease-in-out infinite}
@@ -2703,7 +2705,7 @@ function 운동파일고르기(종){
       if(종==='pic'){ for(const f of fs){ const u = await shrinkPhoto(f), blob = await (await fetch(u)).blob(); d.files.push({ kind:'photo', blob, ext:'jpg', url:URL.createObjectURL(blob) }); } }
       else { const r = await 영상줄이기(fs[0], null, true); d.files.push({ kind:'video', blob:r.blob, ext:r.ext, url:URL.createObjectURL(r.blob) }); }
       sheetExNew();
-    }catch(e){ console.error(e); toast(e.message || '파일을 읽지 못했어요'); } });
+    }catch(e){ console.error(e); toast('파일을 읽지 못했어요\n' + 오류말(e)); } });
   inp.click();
 }
 function exKey(e){
@@ -2963,7 +2965,7 @@ const QA = [
   {q:'러닝머신 먼저 해야 될까 근력운동 먼저 해야 될까?',
    a:'오늘 근력운동을 어느 정도 무겁게 할 거라면, 유산소를 먼저 과하게 할 경우 근력운동 집중력이 떨어질 수 있어요.\n가볍게 10분 정도 하거나 스트레칭 후 근력운동에 집중하고, 마무리로 유산소를 추천합니다.'},
   {q:'매일 운동해야 효과 있나요?',
-   a:'목적에 따라 다르지만 주 3회 이상 유산소·근력운동을 30분 이상 하는 것을 권장합니다.\n\n추천 — 일주일에 근력운동 2회, 유산소 2회 · 나에게 맞는 하루 식사 칼로리 지키기'},
+   a:'목적에 따라 다르지만 주 3회 이상 유산소·근력운동을 30분 이상 하는 것을 권장합니다.\n\n추천은 일주일에 근력운동 2회, 유산소 2회, 그리고 나에게 맞는 하루 식사 칼로리를 지키는 것입니다.'},
 ];
 
 let GOALS = {};
@@ -2991,7 +2993,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '422';
+const BUILD = '423';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -3052,11 +3054,14 @@ async function 파일지우기(paths, 앞){
     try{ await fetch(SB_URL+'/storage/v1/object/media/'+p, { method:'DELETE', headers:{ apikey:SB_KEY, Authorization:'Bearer '+수파열쇠() } }); delete SIGNED[p]; }
     catch(e){ console.warn('파일 못 지움', p, e); } }
 }
+/* 2026-10-20 오류를 쉬운 말로 — 영어 원문(Failed to fetch 등)은 화면에 안 내고 콘솔에만. 짧은 우리말 오류는 그대로 */
+function 오류말(e){ const m = String((e && e.message) || e || ''); if(/fetch|network|load failed|timeout|연결/i.test(m)) return '인터넷 연결을 확인해 주세요'; return /[가-힣]/.test(m) && m.length <= 40 && !/[{}<>_]|SQL|sql/.test(m) ? m : '잠시 뒤 다시 눌러 주세요'; }
+const 을를 = w => { const c = String(w).charCodeAt(String(w).length - 1); return w + (c >= 0xAC00 && c <= 0xD7A3 && (c - 0xAC00) % 28 ? '을' : '를'); };
 function sv(promise, what){
   return Promise.resolve(promise).catch(e => {
     netBad++;
     console.error(what, e);
-    toast('서버에 저장 못 했어요 — ' + what);
+    toast('반영하지 못했어요\n「' + 을를(what) + '」 다시 해 주세요');
   });
 }
 
@@ -3482,8 +3487,8 @@ async function saveAgree(mid, 값){
     /* ⛔ 조용히 죽지 않는다. 칸이 없으면(PGRST204) SQL 을 안 돌린 것이다 */
     console.error('동의 저장 실패', e);
     const 칸없음 = /PGRST204|column/i.test(String(e && e.message || e));
-    toast(칸없음 ? '동의 칸이 아직 서버에 없어요 — 8단계_SQL_동의칸.sql 을 돌려 주세요'
-                 : '동의를 저장하지 못했어요 — 잠시 뒤 다시 시도해 주세요');
+    toast(칸없음 ? '동의를 저장하지 못했어요\n잠시 뒤 다시 눌러 주세요'
+                 : '동의를 저장하지 못했어요\n잠시 뒤 다시 눌러 주세요');
     throw e;
   }
 }
@@ -3519,8 +3524,8 @@ async function 건강동의끄기(){
     await saveAgree(mid, { aS:'' });
     if(D.body) D.body[mid] = [];
     D.bph = (D.bph || []).filter(x=>x.mid!==mid);
-    closeSheet(); toast('취소했어요 · 건강정보를 삭제했어요'); render();
-  }catch(e){ console.error(e); toast('삭제하는 중 문제가 생겼어요 — 다시 시도해 주세요'); }
+    closeSheet(); toast('동의를 취소했어요\n건강정보를 삭제했어요'); render();
+  }catch(e){ console.error(e); toast('삭제하지 못했어요\n잠시 뒤 다시 눌러 주세요'); }
 }
 
 /* ══ 알림함 ══ 표를 새로 만들지 않는다 — 이미 있는 자료를 모아 보여준다 */
@@ -3564,7 +3569,7 @@ function setShort(id,s){ if(isMemo(id)) return '메모';
   return exOf(id).cardio ? `${s.reps}분`+(s.kg?` ${kgfmt(s.kg)}°`:'') : `${kgfmt(s.kg)}×${s.reps}`; }
 
 let toastT=null;
-function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.toggle('busy', /중이에요|올리는 중|저장 중/.test(m)); t.classList.add('on'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('on'),1700); }
+function toast(m){ const t=$('#toast'), 줄 = String(m).split('\n'); t.innerHTML = esc(줄[0]) + (줄[1] ? '<small>' + esc(줄.slice(1).join(' ')) + '</small>' : ''); t.classList.toggle('busy', /중이에요|올리는 중|저장 중/.test(m)); t.classList.add('on'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('on'),1700); }
 function go(sc, patch){
   if(S.screen && S.screen!==sc && S.screen!=='boot' && S.screen!=='err'){
     S.stack = S.stack || [];
@@ -3969,15 +3974,15 @@ function 균형말(ps, W){
   const 묶 = x => 부위.filter(k => 키(k) === x), 많 = 묶('과사용'), 알 = 묶('적정'), 부 = 묶('부족').concat(묶('거의')), 안 = 묶('없음');
   const 한 = 부위.length - 안.length;
   const 전체 = 한 === 0 ? '아직 근력 운동 기록이 없어요'
-    : 한 <= 2 ? `<b>${부위.filter(k => 키(k) !== '없음').join(' · ')}</b>에 몰려 있어요 — 다른 부위도 골고루 해 보세요`
+    : 한 <= 2 ? `<b>${부위.filter(k => 키(k) !== '없음').join(' · ')}</b>에 몰려 있어요<small>다른 부위도 골고루 해 보세요</small>`
     : (!부.length && !안.length) ? '모든 부위를 골고루 잘하고 있어요!'
-    : 안.length ? `${한}개 부위를 했어요 — 빠진 부위를 채우면 더 좋아요` : '골고루 하고 있어요 — 부족한 부위만 조금 더!';
+    : 안.length ? `${한}개 부위를 했어요<small>빠진 부위를 채우면 더 좋아요</small>` : '골고루 하고 있어요<small>부족한 부위만 조금 더!</small>';
   const 줄 = (색, 제목, 글) => `<div class="blrow"><i style="background:${색}"></i><span><b>${제목}</b>${글}</span></div>`;
   return `<div class="blsay"><div class="blall">${전체}</div>
-    ${많.length ? 줄('#ef5350', 많.join(' · '), ' — 충분해요. 세트를 다른 부위에 나눠 보세요') : ''}
-    ${알.length ? 줄('#e2a63a', 알.join(' · '), ' — 딱 좋아요. 지금처럼!') : ''}
-    ${부.length ? 줄('#4da3e0', 부.map(k => `${k} ${Math.round(주(k)*10)/10}`).join(' · '), ' — 주 10세트까지 늘려 보세요!') : ''}
-    ${안.length ? 줄('#6b675f', 안.join(' · '), ' — 아직 안 했어요. 이번 주에 한 번 넣어 보세요!') : ''}
+    ${많.length ? 줄('#ef5350', 많.join(' · '), ' 충분해요<small>세트를 다른 부위에 나눠 보세요</small>') : ''}
+    ${알.length ? 줄('#e2a63a', 알.join(' · '), ' 딱 좋아요<small>지금처럼 하면 됩니다</small>') : ''}
+    ${부.length ? 줄('#4da3e0', 부.map(k => `${k} ${Math.round(주(k)*10)/10}`).join(' · '), ' 부족해요<small>주 10세트까지 늘려 보세요</small>') : ''}
+    ${안.length ? 줄('#6b675f', 안.join(' · '), ' 아직 안 했어요<small>이번 주에 한 번 넣어 보세요</small>') : ''}
     <div class="blfoot">숫자는 한 주 평균 세트 · 주 10~20세트가 알맞아요</div></div>`;
 }
 
@@ -4363,7 +4368,7 @@ function 첨부고르기(종, K){
         A.files.push({ kind:'video', blob:r.blob, ext:r.ext, url: URL.createObjectURL(r.blob) });
       }
       drawSheet();
-    }catch(e){ console.error(e); toast(e.message || '파일을 읽지 못했어요'); }
+    }catch(e){ console.error(e); toast('파일을 읽지 못했어요\n' + 오류말(e)); }
   });
   inp.click();
 }
@@ -4688,7 +4693,7 @@ async function 로그인일(k){ const g = S.lg || (S.lg = { 단계:'번호', pho
   if(k === 'lgsend'){ if(g.단계 === '코드' && Date.now() - (g.t || 0) < 60000) return;      /* 다시 받기는 60초 뒤부터 — 서버도 그렇게 막는다 */
     if(!/^01\d{8,9}$/.test(번)){ g.말 = '전화번호를 다시 확인해 주세요'; render(); return; }
     g.중 = true; g.말 = ''; render();
-    try{ const r = await 인증부르기('send', { phone: 번 }); if(r && r.ok){ g.단계 = '코드'; g.이름 = r['이름'] || ''; g.code = ''; g.말 = ''; g.t = Date.now(); } else g.말 = (r && r.why) || '문자를 못 보냈어요 — 다시 눌러 주세요'; }
+    try{ const r = await 인증부르기('send', { phone: 번 }); if(r && r.ok){ g.단계 = '코드'; g.이름 = r['이름'] || ''; g.code = ''; g.말 = ''; g.t = Date.now(); } else g.말 = (r && r.why) || '문자를 보내지 못했어요\n다시 눌러 주세요'; }
     catch(e){ g.말 = e.message || '서버에 닿지 못했어요'; }
     g.중 = false; render(); const el = document.querySelector('[data-k="lgcode"]'); if(el) el.focus(); return; }
   if(k === 'lgcheck'){ const c = 번호만(g.code); if(c.length !== 6){ g.말 = '인증번호 6자리를 입력해 주세요'; render(); return; }
@@ -4699,7 +4704,7 @@ async function 로그인일(k){ const g = S.lg || (S.lg = { 단계:'번호', pho
         if(r.sb_token){ location.reload(); return; }      /* RLS — 로그인 전에는 공개 열쇠로 읽었다. 내 증표로 다시 읽는다 */
         const t = 직원들.find(m => m.n === r.name); if(t){ TRAINER = t.n; 직원줄 = t; } else if(r.name) TRAINER = r.name;
         S.self = false; if(직원줄) MEMBERS = MEMBERS.filter(m => m.id !== 직원줄.id); S.who = 'tr'; S.ttab = 't_today'; S.stack = []; go('t_today'); return; }
-      if(r && r.ok && !r.mid){ g.말 = '앱 회원 자리를 찾지 못했어요 — 담당 선생님께 말씀해 주세요'; g.code = ''; g.중 = false; render(); return; }
+      if(r && r.ok && !r.mid){ g.말 = '회원 정보를 찾지 못했어요\n담당 트레이너에게 말씀해 주세요'; g.code = ''; g.중 = false; render(); return; }
       if(r && r.ok && r.mid){ 로그인기억.씀({ token: r.token || '', mid: r.mid, name: r.name || '', at: Date.now(), sb: r.sb_token || '', sbexp: r.sb_exp || 0 }); S.lg = null;
         if(!MEMBERS.some(m => m.id === r.mid)){
           /* 전산에는 있는데 앱에 없던 회원 — 서버가 들여보냈다(새회원:true · mid = 'c' + 전산 key · 데스크 자동 추가와 같은 id). 자리는 앱이 만든다 — 서버는 수파베이스에 쓰지 않는다(업무 나눔).
@@ -4711,7 +4716,7 @@ async function 로그인일(k){ const g = S.lg || (S.lg = { 단계:'번호', pho
           MEMBERS.push({ id:r.mid, n:r.name || '', tr:'', p4:뒤 }); if(!D.intake[r.mid]) D.intake[r.mid] = intake; if(!GOALS[r.mid]) GOALS[r.mid] = plan; }
         if(r.sb_token){ location.reload(); return; }      /* RLS — 내 증표로 다시 읽는다(켜면 기억으로 바로 홈) */
         회원으로들어가기(r.mid); return; }
-      g.말 = (r && r.why) || '번호가 달라요 — 다시 입력해 주세요'; g.code = '';
+      g.말 = (r && r.why) || '인증번호가 달라요\n다시 입력해 주세요'; g.code = '';
       /* 틀릴 때마다 **경고 창**으로 몇 번 남았는지 알린다 — 화면 글만으로는 못 보고 막 누르다 5번이 찬다 (2026-10-13 대표). 서버 글 「…(n번 남았어요)」에서 숫자를 읽는다 */
       { const 남 = /(\d+)번 남/.exec(g.말), 막 = r && r['막힘']; 알림창(막 ? esc(g.말) : 남 ? '인증번호가 맞지 않습니다<br><b>' + 남[1] + '번</b> 더 틀리면 잠깁니다' : esc(g.말)); } }
     catch(e){ g.말 = e.message || '서버에 닿지 못했어요'; }
@@ -4796,7 +4801,7 @@ function vNewMem(){
       : g.말 ? `<div class="empty">전산에서 검색하지 못했습니다<small class="e2">${esc(g.말)}</small></div>`
       : g.결과 == null ? '<div class="empty">아직 검색 전입니다<small class="e2">위 칸에 이름이나 전화번호 뒷자리를 입력해 주세요</small></div>'
       : 줄 || '<div class="empty">검색 결과가 없습니다<small class="e2">이름이나 전화번호 뒷자리를 다시 확인해 주세요</small></div>'}
-    ${g.막힘 ? `<div class="hr"></div><span class="lbl">전산에 연결되지 않을 때만 — 수기로 추가</span>
+    ${g.막힘 ? `<div class="hr"></div><span class="lbl">수기로 추가 (전산에 연결되지 않을 때만)</span>
       <div class="note">이름과 전화번호 뒷 4자리만 입력합니다 · 대시보드에 「수기」로 표시됩니다</div>
       <div style="display:flex;gap:8px;flex:none"><input class="search" type="text" data-k="mahn" placeholder="이름" style="flex:1.3;min-width:0"><input class="search" type="text" inputmode="numeric" maxlength="4" data-k="mahp" placeholder="뒷 4자리" style="flex:1;min-width:0"><button class="btn main" style="flex:none;width:auto;padding:0 18px" data-act="mahand">추가</button></div>` : ''}` };
 }
@@ -4857,7 +4862,7 @@ function 뱃지주기(mid){
     if(r && r.p >= 1 && !g.badges.some(b => b.k === r.키)){ const b = { k:r.키, 이름:r.뱃지, at:TODAY }; g.badges.push(b); 새것.push(b); } });
   if(!새것.length) return;
   목표뱃지저장(mid);
-  setTimeout(() => toast('🏅 배지를 받았어요 — ' + 새것.map(b=>b.이름).join(', ')), 300);
+  setTimeout(() => toast('🏅 배지를 받았어요\n' + 새것.map(b=>b.이름).join(', ')), 300);
 }
 /* 체중 · 체지방률 · 근육량 목표 — 운동계획(now · to)과 **같은 값**이다. 「내 목표」 맨 위 줄로 보인다. 회원은 보기만 · 트레이너가 정한다 (2026-10-11 대표 — 10-08 「회원도 고친다」를 바꿈) */
 function 몸목표들(mid){
@@ -5198,7 +5203,7 @@ const 욕인가 = 닉 => { const t = String(닉||'').toLowerCase().replace(/[^a-
 const 닉서버겹침 = async 닉 => { if(수파열쇠() === SB_KEY) return false; try{ return (await srpc('nick_taken', { n: 닉, me: S.mid || '' })) === true; }catch(e){ return false; } };
 const 닉검사 = 닉 => !닉 ? '닉네임을 입력해 주세요' : (닉.length < 2 ? '두 글자 이상으로 입력해 주세요'
   : 욕인가(닉) ? '쓸 수 없는 말이 들어 있어요'
-  : (MEMBERS.some(m => m.id !== S.mid && (m.n === 닉 || 닉of(m.id) === 닉)) ? '이미 쓰고 있는 닉네임이에요 · 다른 닉네임을 입력해 주세요' : ''));
+  : (MEMBERS.some(m => m.id !== S.mid && (m.n === 닉 || 닉of(m.id) === 닉)) ? '이미 쓰고 있는 닉네임이에요\n다른 닉네임을 입력해 주세요' : ''));
 /* 추천 닉네임 — 꾸밈말 + 운동 낱말. 남이 쓰는 것과 겹치면 다시 뽑고, 그래도 겹치면 숫자를 붙인다 */
 function 닉추천(){
   const 앞 = ['꾸준한','새벽','든든한','씩씩한','묵직한','가뿐한','성실한','불타는','단단한','유쾌한','조용한','날쌘','끈질긴','산뜻한','당찬'];
@@ -5245,7 +5250,7 @@ function vHome(){
     <button class="hero2 half wide shot" data-act="go:prep"
         style="--h1:#22424b;--h2:#101719;--img:url(img/card-both.jpg)">
       <span class="tt">준비운동</span>
-      <span class="dd">스트레칭 · 셀프 마사지 — 굳은 곳을 먼저 풀고 시작합니다</span></button>
+      <span class="dd">굳은 곳을 먼저 풀고 시작합니다</span></button>
     ${workoutsOf(S.mid).some(w=>세트있나(w)) ? `<button class="hline" data-act="myrecs">${svg('h_clock',18)}<b>지난 기록으로 시작</b><small>그날 종목 · 무게 그대로</small></button>` : ''}
     ${(w => w ? `<button class="hline" data-act="ootd:${w.id}">${svg('h_cam',18)}<b>오늘 오운완 찍기</b><small>오늘만 찍을 수 있어요</small><i>›</i></button>`
       : (t => t ? `<button class="hline" data-act="orec:${t.id}">${svg('h_cam',18)}<b>${오늘오운완(S.mid) ? '오운완 다시 보기' : '오늘 운동기록 보기'}</b><small>${오늘오운완(S.mid) && !(D.posts||[]).some(p=>p.photo_id===오늘오운완(S.mid).id) ? '피드에 올릴 수 있어요' : '오늘 운동기록'}</small><i>›</i></button>` : '')(오늘끝낸운동(S.mid)))(오운완남음(S.mid))}
@@ -5366,7 +5371,7 @@ function vPick(){
   const 처음 = 추가중 ? Math.min(S.addFrom||0, w.items.length) : 0;
   const 담은 = w ? w.items.length - 처음 : 0;
   return { top: bar('종목 선택','', (w&&w.begun)?'go:workout':'go:start'), body:`
-    <input class="search" type="text" data-k="exq" placeholder="검색 — 스쿼트 · 레그컬 · bp · 코어 · 맨몸">
+    <input class="search" type="text" data-k="exq" placeholder="종목 검색 · 예) 스쿼트, bp, 코어">
     <div class="pkparts">${PARTS.map(x=>`<button class="chip ${x===S.pickPart?'on':''}" data-act="part:${x}">${x}</button>`).join('')}</div>
     <div class="pkmini" id="pickhint">
       <button class="${(S.pickOpen || S.pickEq!=='전체')?'on':''}" data-act="partopen">기구 · ${esc(S.pickEq)} ${S.pickOpen?'▴':'▾'}</button>
@@ -5376,7 +5381,7 @@ function vPick(){
     ${S.pickOpen?`<div class="chips pkeq">${EQS().map(x=>`<button class="chip ${x===S.pickEq?'on t':''}" data-act="peq:${x}">${x}</button>`).join('')}</div>`:''}
     <div class="megrp pkg">
     <button class="mrow2" data-exrow="1rm 원알엠 일알엠 원rm 1알엠 1rm측정 측정 최대중량 맥스 max onerepmax" data-part="__1rm" data-eq="" style="display:none" data-act="rmaddpick">
-      <span class="mt"><b style="color:var(--gold)">1RM 측정 종목 추가</b><small>스쿼트 · 벤치 · 데드 등 — 추가하면 바로 측정 계획을 엽니다</small></span><em class="pkadd">＋</em></button>
+      <span class="mt"><b style="color:var(--gold)">1RM 측정 종목 추가</b><small>추가하면 바로 측정 계획이 열립니다</small></span><em class="pkadd">＋</em></button>
     ${EX.filter(고를수있나).map(e=>{ const vs=vars(e.id), n=cmOf(S.mid,e.id).length, last=lastSet(e.id), 담 = w ? w.items.slice(처음).filter(it=>it.ex===e.id).length : 0;
       return `<button class="mrow2 ${담?'pson':''}" data-exrow="${esc(exKey(e))}" data-part="${esc(e.p)}"
         data-eq="${esc(e.e||'')}"
@@ -5619,7 +5624,7 @@ ST.concat(MS).forEach(x=>{ 사전[x.i]=x; if(x.v) 사전v[x.v]=x; });
    그냥 돌리기만 하면 어떤 주에는 핵심 부위가 통째로 빠진다. */
 const PREPSET = [
  { k:'office', n:'직장인을 위한 전신 풀기', art:'g5', h1:'#2c3a4a', h2:'#111417',
-   sm:'하루 종일 앉아 있어 굳은 곳 — 목·가슴·등·고관절',
+   sm:'오래 앉아 굳은 목 · 가슴 · 등 · 고관절',
    m:[ ['m01','m02','m03','m20'],
        ['m04','m08','m05','m06'],
        ['m09','m10','m19','m18','m12'] ],
@@ -5826,7 +5831,7 @@ function 세트파일고르기(종){
       if(종==='pic'){ for(const f of fs){ const u = await shrinkPhoto(f), blob = await (await fetch(u)).blob(); d.files.push({ kind:'photo', blob, ext:'jpg', url:URL.createObjectURL(blob) }); } }
       else { const r = await 영상줄이기(fs[0], null, true); d.files.push({ kind:'video', blob:r.blob, ext:r.ext, url:URL.createObjectURL(r.blob) }); }
       sheetPsetOwn();
-    }catch(e){ console.error(e); toast(e.message || '파일을 읽지 못했어요'); } });
+    }catch(e){ console.error(e); toast('파일을 읽지 못했어요\n' + 오류말(e)); } });
   inp.click();
 }
 /* 받을 회원 고르기 */
@@ -6092,8 +6097,8 @@ function vWorkout(){
         ${cur.rmPlan.map((p,i)=>`<div class="rmrow ${i<n?'ok':(i===n?'now':'')}"><b>${i<n?'✓':i+1}</b><span>${p.단계}<small>${Math.round(p.pct*100)}%</small></span><em>${kg표(p.kg)}kg × ${p.reps}회</em><i>쉬기 ${p.쉼}</i></div>`).join('')}
         ${n < cur.rmPlan.length ? `<div class="rmhint">세트를 끝내면 그 단계 쉬는 시간이 자동으로 돌아갑니다</div>`
           : (cur.rmDone ? `<div class="rmhint"><b style="color:var(--gold)">✓ 1RM 실측 ${kg표(cur.rmDone)}kg 남겼어요</b></div>`
-          : `<div class="rmhint">본 시도 끝 — 방금 무게를 성공했으면 남기고, 더 들 수 있으면 올려서 한 번 더</div>
-             <div style="display:flex;gap:7px"><button class="btn main sm" style="flex:1" data-act="rmok">성공 — 실측으로 남기기</button>
+          : `<div class="rmhint">본 시도를 마쳤어요<small>성공했으면 남기고, 더 들 수 있으면 올려서 한 번 더</small></div>
+             <div style="display:flex;gap:7px"><button class="btn main sm" style="flex:1" data-act="rmok">성공 · 실측으로 남기기</button>
                <button class="btn sub sm" style="flex:1" data-act="rmmore">＋${RM종목[cur.ex]==='상체'?'2.5':'5'}% 한 번 더</button></div>`)}</div>`; })() : ''}
     ${세칸(e, v, cur, wmid, tr, cms, nw, dsc)}
     ${isMemo(cur.ex) ? (cur.locked ? '' : `<button class="btn main fin" data-act="fin">${esc(e.n)} 완료</button>`) : e.cardio ? 유산소판(cur, e, wmid) : 세트표(cur, e, wmid)}
@@ -6106,7 +6111,7 @@ function vWorkout(){
     ${tr ? 주기줄(wmid, 'tsub:cycle:'+wmid, true) : ''}
     ${tr?`<button class="hline" data-act="tlive:${wmid}">${svg('h_chat',18)}<b>${esc((MEMBERS.find(m=>m.id===wmid)||{}).n||'')} 회원 수업 기록 중</b>
       <small>종목별 피드백 남기기</small><i>›</i></button>`:''}
-    <span class="lbl">오늘 한 운동${S.moveIdx!=null?' — <b style="color:var(--teal)">순서 변경 중</b>':''}</span>
+    <span class="lbl">오늘 한 운동${S.moveIdx!=null?' <b style="color:var(--teal)">· 순서 변경 중</b>':''}</span>
     ${w.items.map((it,i)=>{
       const on = (i===w.cur), mv = (S.moveIdx===i);
       return `<div class="card rowc ${it.locked&&!on?'dim':''} ${on?'now2':''} ${S.just===VID(it.ex,it.va)?'just':''}"
@@ -6229,7 +6234,7 @@ function sheetExDesc(exid, vk, mid){
         <button data-act="att:pic:${K}"><span class="ic">📷</span>사진 첨부</button>
         <button data-act="att:vid:${K}"><span class="ic">🎬</span>영상 첨부</button></div>
       ${붙인것(K)}
-      <textarea data-k="cm:${K}" placeholder="피드백을 입력하세요 — 길이 제한 없어요"></textarea>
+      <textarea data-k="cm:${K}" placeholder="피드백을 입력해 주세요"></textarea>
       <button class="btn main sm" data-act="sendcm:${exid}:${vk}:${mid}">${S.보내는중?'보내는 중…':'보내기'}</button>
       <div class="hr"></div>
       <span class="lbl">지난 피드백 ${cms.length?`${cms.length}개`:''}</span>
@@ -6255,7 +6260,7 @@ function sheetExDesc(exid, vk, mid){
         ${askOf(mid, exid, vk).length?`<div class="note" style="border-color:var(--gold-2)">
           <b style="color:var(--gold)">회원이 이 종목 피드백을 요청했습니다</b>
           <div>${esc(askOf(mid, exid, vk)[0].note||'따로 입력한 말은 없습니다.')}</div></div>`:''}
-        <span class="lbl">피드백 남기기 — 길이 제한 없어요</span>
+        <span class="lbl">피드백 남기기</span>
         <textarea data-k="cm:${K}" placeholder="지금 본 것을 입력하세요"></textarea>
         ${붙인것(K)}
         <div class="chips">
@@ -6345,7 +6350,7 @@ function 유산소판(cur, e, mid){
       <span class="lbl">느낌</span>
       <div class="czfeel">${['가볍게','보통','힘들게'].map(x => `<button class="${c.feel===x ? 'on' : ''}" data-act="cz:feel:${x}">${x}</button>`).join('')}</div>
       <button class="czbig" data-act="cz:save">기록 저장</button>
-      <button class="czback" data-act="cz:resume">아직 안 끝났어요 — 이어서 재기</button></div>`;
+      <button class="czback" data-act="cz:resume">이어서 재기</button></div>`;
 }
 function 유산소몇(){ return ['tm','cyc','cd07','cd23'].map(exOf).filter(Boolean).concat(EX.filter(x => x.cardio && /^야외/.test(x.n))); }
 /* 종목 앞 그림 (2026-10-11) — 부위 그림은 대표가 뽑은 선 그림 · 유산소 선은 Tabler Icons (MIT License · Copyright (c) 2020-2024 Paweł Kuna) */
@@ -6480,7 +6485,7 @@ function sheetFinish(){
       <div><span class="k">한 운동</span><span class="v">${items.filter(it=>it.locked||it.sets.some(x=>x.done)).length}<small>개</small></span></div>
       <div><span class="k">세트</span><span class="v">${sets}<small>개</small></span></div>
     </div>
-    ${w.lock ? `<div class="finlock">🔒 잠겨 있습니다 — 「운동 종료」를 누르면 잠금을 풀고 종료합니다</div>` : ''}
+    ${w.lock ? `<div class="finlock">🔒 잠겨 있습니다<br><small>「운동 종료」를 누르면 잠금을 풀고 종료합니다</small></div>` : ''}
     ${left.length ? `<div class="agbody finleft"><b>아직 안 한 운동 ${left.length}개</b><br>${esc(left.map(it=>exOf(it.ex).n).join(' · '))}<br><span>종료하면 안 한 것으로 넘어갑니다</span></div>` : ''}
     <div style="display:flex;gap:9px">
       <button class="btn sub" style="flex:1" data-act="morego">더 할래요 ›</button>
@@ -6580,7 +6585,7 @@ function vSummary(){
     <div class="grid2">${Object.entries(times).slice(0,4).map(([k,v])=>
       `<div class="tile"><span class="k">${esc(k)}</span><span class="v">${parseInt(durTxt(v))}<small> ${durTxt(v).slice(-1)}</small></span></div>`).join('')}</div>
     ${S.who==='tr' && 피드백0개(w.mid) ? `<div class="note" style="border-color:var(--gold-2)">
-      <b style="color:var(--gold)">피드백 0개</b> — 수업 ${수업횟수(w.mid)}번 동안 남긴 피드백이 없습니다<br>
+      <b style="color:var(--gold)">피드백 0개</b><br>수업 ${수업횟수(w.mid)}번 동안 남긴 피드백이 없습니다<br>
       아래 종목 옆 <b>💬</b> 를 눌러 주세요</div>` : ''}
     <span class="lbl">오늘은 여기까지</span>
     ${w.items.map(it=>{ const n = S.who==='tr' ? cmOf(w.mid,it.ex,it.va).length : 0;
@@ -6709,7 +6714,7 @@ async function 끔동의화면(key){
         + '되돌리고 싶으시면 담당 트레이너에게 말씀해 주세요.</p></div>');
     }catch(e){
       this.disabled = false; this.textContent = '동의합니다';
-      그리기(판.innerHTML + '<div class="cmoffbox warn">잠시 뒤 다시 눌러 주세요 — ' + esc(e.message) + '</div>');
+      그리기(판.innerHTML + '<div class="cmoffbox warn">저장하지 못했어요<br>' + esc(오류말(e)) + '</div>');
     }
   };
 }
@@ -6761,7 +6766,7 @@ async function 초상동의화면(key){
         + '<br>변경하고 싶으시면 담당 트레이너에게 말씀해 주세요.</p></div>');
     }catch(e){
       판.querySelectorAll('.ptbtn').forEach(x => x.disabled = false);
-      그리기(판.innerHTML + '<div class="cmoffbox warn">잠시 뒤 다시 눌러 주세요 — ' + esc(e.message) + '</div>');
+      그리기(판.innerHTML + '<div class="cmoffbox warn">저장하지 못했어요<br>' + esc(오류말(e)) + '</div>');
     }
   });
 }
@@ -6838,7 +6843,7 @@ function vReport(){
           ${붙 ? `<span class="at">${esc(붙)}</span>` : ''}
           ${cs.length > 1 ? `<span class="at">＋${cs.length-1}</span>` : ''}</button>`
         : 첫없음 ? `<button class="rpcm none" data-act="rpcm:${it.ex}:${it.va}">
-          <span class="ic">✎</span><span class="tx"><b>첫 피드백 없음</b> — 이 종목은 아직 하나도 없어요</span>
+          <span class="ic">✎</span><span class="tx"><b>아직 피드백이 없어요</b></span>
           <span class="at">남기기 ›</span></button>` : '');
     }).join('');
 
@@ -6881,7 +6886,7 @@ function vReport(){
     return `<div class="rp2row"><span class="n">${esc(exName(it.ex,it.va))}<small>${e.cardio ? (it.sets.length > 1 ? it.sets.length + '구간' : (유덧글(e, it.sets[0]).replace(/^ · /, '') || '유산소')) : it.sets.length + '세트 · ' + (+최고.reps||0) + '회'}</small></span>
         <span class="v">${kgfmt(오늘)}<small>${단위}</small></span>
         ${d!=null && d>0 ? `<span class="d up">▲ ${kgfmt(d)}</span>` : '<span></span>'}</div>`
-      + (첫없음 ? `<button class="rpcm none" data-act="rpcm:${it.ex}:${it.va}"><span class="ic">✎</span><span class="tx"><b>첫 피드백 없음</b> — 이 종목은 아직 하나도 없어요</span><span class="at">남기기 ›</span></button>` : '');
+      + (첫없음 ? `<button class="rpcm none" data-act="rpcm:${it.ex}:${it.va}"><span class="ic">✎</span><span class="tx"><b>아직 피드백이 없어요</b></span><span class="at">남기기 ›</span></button>` : '');
   }).join('');
   /* 몸의 변화 — **지난 수업 뒤로 새로 올라온 것이 있을 때만**, 건강정보 동의한 회원에게만 */
   const 앞수업 = workoutsOf(mid).filter(x => x.kind==='수업' && x.id!==w.id && x.date < w.date && 세트있나(x)).map(x=>x.date).sort().pop() || '';
@@ -6898,7 +6903,7 @@ function vReport(){
     ${체크한.length ? `<div class="rp2fig">${bodyFig(새회차.checks)}</div>
       <div class="megrp rp2ck">${체크한.map(t=>`<div class="mrow2"><span class="ikk">${esc(t.g)}</span><span class="ikv">${esc(t.t)} · ${esc((새회차.checks[t.k]==='a') ? t.a : t.b)}</span></div>`).join('')}</div>` : ''}
     ${새사진.length ? (만보기 ? `<div class="cyfoot" style="justify-content:center"><span>새 사진 ${새사진.length}장은 앱에서 볼 수 있어요</span></div>`
-        : tr ? `<div class="cyfoot" style="justify-content:center"><span>새 사진 ${새사진.length}장 — 회원에게는 「앱에서 보기」로 안내돼요</span></div>`
+        : tr ? `<div class="cyfoot" style="justify-content:center"><span>새 사진 ${새사진.length}장은 회원에게 「앱에서 보기」로 안내돼요</span></div>`
         : `<button class="hline" data-act="sub:body">${svg('h_cam',18)}<b>새 사진 ${새사진.length}장 보기</b><small>인바디 · 비포애프터</small><i>›</i></button>`) : ''}`;
 
   /* 맨 위 안내 — 동의가 없어 리포트에 못 싣는 것이 있으면 무엇인지 알려 주고 앱의 동의 화면으로 보낸다 */
@@ -6944,13 +6949,13 @@ function 리포트발(w){
 
   if(st.state === '실패')
     return `<div class="note" style="margin:0 0 8px;border-color:var(--warn)">
-        <b style="color:var(--warn)">못 보냈어요</b>${st.fail_why ? ' — ' + esc(st.fail_why) : ''}</div>
+        <b style="color:var(--warn)">못 보냈어요</b>${st.fail_why ? '<br>' + esc(오류말(st.fail_why)) : ''}</div>
       <button class="btn main" data-act="rsend2:${w.id}">다시 보내기</button>`;
 
   if(st.state === '대기')
     return `<div class="note" style="margin:0;border-color:var(--gold-2)">
       <b style="color:var(--gold)">리포트는 자동 발송됩니다</b>
-      ${st.send_at ? '<br>' + esc(시각글(new Date(st.send_at))) + ' 에 나갑니다' : ''}
+      ${st.send_at ? '<br>' + esc(시각글(new Date(st.send_at))) + '에 나갑니다' : ''}
       <br>그 전에 올린 피드백 · 사진도 함께 보입니다</div>`;
 
   /* 예약 줄이 아직 없다 — 수업을 마치는 순간 저절로 잡힌다 */
@@ -8394,7 +8399,7 @@ function 커뮤니티입구(){
       <span class="cgt"><b>${이름}</b><small>${설명}</small>${알림 ? `<em>${알림}</em>` : ''}</span><i>›</i></button>`;
   return { top: bar('커뮤니티'), tabs:1, body:`
     ${칸('피드','gold','h_cam','오운완 · 식단 피드','회원들의 오운완 · 식단 · 인증샷', 피드.length ? `글 ${피드.length}개 · 최근 ${esc(이름of(피드[0].mid))} · ${언제(피드[0].ts)}` : '아직 글이 없어요')}
-    ${칸('랭킹','dark','h_crown','글래드 랭킹','오운완 인증 · 운동 기록 · 총 무게 · 3대', 내것 ? (랭킹샘플 ? '샘플 화면 — 미리 보기' : i>=0 ? `이번 달 오운완 Lv.${레벨of('오운완', R.오운완[i].v)} · ${i+1}위` : '이번 달 순위에 올라 보세요') : (랭킹샘플 ? '샘플 화면 — 미리 보기' : R.오운완[0] ? `이번 달 오운완 1위 ${esc(이름of(R.오운완[0].mid))}` : ''))}
+    ${칸('랭킹','dark','h_crown','글래드 랭킹','오운완 인증 · 운동 기록 · 총 무게 · 3대', 내것 ? (랭킹샘플 ? '미리 보기 화면' : i>=0 ? `이번 달 오운완 Lv.${레벨of('오운완', R.오운완[i].v)} · ${i+1}위` : '이번 달 순위에 올라 보세요') : (랭킹샘플 ? '미리 보기 화면' : R.오운완[0] ? `이번 달 오운완 1위 ${esc(이름of(R.오운완[0].mid))}` : ''))}
     ${칸('파트너','teal','h_hands','운동 파트너 찾기','같이 운동할 사람 모집', 모집.length ? `모집 중 ${모집.length}건` : '모집 중인 글이 없어요')}
     <div class="note">${내것 ? '같은 센터 회원끼리만 보는 공간이에요.' : '회원들이 올린 글과 순위를 봅니다. 문제 글은 ⋯ 에서 삭제할 수 있습니다.'}</div>` };
 }
@@ -8604,7 +8609,7 @@ function rm추정확인(w, cur, set){
   const est = Math.round(rm추정식(kg, reps)*2)/2;
   const b = rm최고(w.mid, cur.ex); if(b && est <= Number(b.kg)) return;
   rm기록(w.mid, cur.ex, cur.va, est, reps, '추정', w.id, '자동');
-  toast(`🏆 ${exName(cur.ex,cur.va)} 1RM 추정 ${est}kg${b ? ' — 신기록!' : ''}`);
+  toast((b ? `🏆 신기록!\n${exName(cur.ex,cur.va)} 1RM 추정 ${est}kg` : `🏆 ${exName(cur.ex,cur.va)} 1RM 추정 ${est}kg`));
 }
 /* 1RM 을 재는 종목 — 바벨 큰 운동만 (대표 「일반적으로 1RM 을 측정하는 종목만」) */
 const RM종목 = { sq:'하체', fsq:'하체', dl:'하체', bk01:'하체', bk02:'하체', bp:'상체', ibp:'상체', ohp:'상체' };
@@ -8649,7 +8654,7 @@ function sheetRMStart(mid, 추가){
 
 function sheetRM(){
   const z = 지금종목(); if(!z) return;
-  if(!rm종목인가(z.cur.ex)){ toast('1RM 은 스쿼트·벤치·데드리프트·오버헤드 프레스 같은 바벨 종목에서만 잽니다'); return; }
+  if(!rm종목인가(z.cur.ex)){ toast('1RM 은 바벨 종목에서만 잽니다\n스쿼트 · 벤치 · 데드리프트 · 오버헤드 프레스'); return; }
   const b = rm최고(z.mid, z.cur.ex);
   const 모드 = S.rmMode || '루틴';
   S.rmGoal = S.rmGoal || (b ? Number(b.kg) : 0);
@@ -8734,7 +8739,7 @@ async function 배지확인(){
     for(const b of 새){
       const at = new Date().toISOString(); (D.badges=D.badges||[]).push({ mid, key:b.key, at });
       await sv(spost('badges',[{ member_id:mid, key:b.key, earned_at:at }]), '배지');
-      toast(`🏅 배지 획득 — ${b.아이콘} ${b.이름}`);
+      toast(`🏅 배지를 받았어요\n${b.아이콘} ${b.이름}`);
     }
     if(새.length && (S.screen==='profile' || S.screen==='home')) render();
   }catch(e){ console.warn('배지', e); }
@@ -8950,7 +8955,7 @@ async function pairSave(){
   D.bph = D.bph || [];
   D.bph.push({ id, mid, kind:'pair', pose:'인증샷', date:날, path, memo:S.pair.wid||'', by, hid:'', dreq:'' });
   try{ URL.revokeObjectURL(S.pair.url); }catch(e){}
-  S.pair = null; toast('남겼어요 — 회원 프로필에서도 보입니다'); render();
+  S.pair = null; toast('남겼어요\n회원 프로필에서도 보입니다'); render();
 }
 /* 프로필 격자에 올릴 사진 — 오운완 + 인증샷. 회원은 숨긴 것을 못 보고, 트레이너는 다 본다 */
 const 사진모음 = (mid, 회원눈) => (D.bph||[]).filter(x => x.mid===mid && (x.kind==='ootd' || x.kind==='pair') && !(회원눈 && x.hid))
@@ -9048,7 +9053,7 @@ function sheetFoodPick(mealId){
       <span class="k2">${Math.round(f.kcal)}<span style="font-size:11px;font-weight:600;color:#8f8a83"> kcal</span></span></button>`;
     return `
       <div class="h2">음식 추가 <small>${mealId==='new'?'새 식사':'이 식사에'}</small></div>
-      <input class="search" type="text" data-k="fq" value="${esc(S.fpQ)}" placeholder="음식 이름으로 검색 — 예) 닭가슴살">
+      <input class="search" type="text" data-k="fq" value="${esc(S.fpQ)}" placeholder="음식 이름 · 예) 닭가슴살">
       <div style="display:flex;gap:9px">
         <button class="btn main sm" data-act="fsearch">검색</button>
         <button class="btn sub sm" data-act="fnew">직접 입력</button>
@@ -9465,13 +9470,13 @@ function vMe(){
     </div>
 
     <span class="lbl">내 기록장</span>
-    <div class="megrp">${[['note','PT 상담일지', D.intake[S.mid] && Object.keys(D.intake[S.mid]).length ? '눌러서 보기 · 수정' : '아직 없어요 — 눌러서 작성', 'sub:intake'],
+    <div class="megrp">${[['note','PT 상담일지', D.intake[S.mid] && Object.keys(D.intake[S.mid]).length ? '눌러서 보기 · 수정' : '아직 작성 전입니다', 'sub:intake'],
        ['plan','운동계획','목표 · 맞춤 칼로리 · 다짐','sub:plan'],
        ['chart','인바디 · 비포애프터','인바디 기록 · 몸 사진 · 영상','sub:body'],
        ['h_user','체형분석 기록','트레이너가 본 체형 · 체크리스트','posture'],
        ...(여성인가(S.mid) ? [['moon','생리주기', (cycOf(S.mid)&&cycOf(S.mid).on)
           ? `${cycToday(cycOf(S.mid)).ph==='월경기' ? '' : '현재 '}${esc(주기말(cycToday(cycOf(S.mid)).ph))} · ${cycToday(cycOf(S.mid)).day}일차`
-          : '켜면 시기에 맞춰 운동을 조절합니다 — 선택이에요', 'sub:cycle']] : []),
+          : '켜면 시기에 맞춰 운동을 조절합니다', 'sub:cycle']] : []),
        ['chat','자주 묻는 질문','식사 · 유산소 · 빈도','sub:qa']]
       .map(x=>`<button class="mrow2" data-act="${x[3]}"><span class="mi">${svg(x[0],19)}</span>
         <span class="mt"><b>${x[1]}</b><small>${x[2]}</small></span><i>›</i></button>`).join('')}</div>
@@ -9549,10 +9554,10 @@ const 다음말 = t => t.ph === '월경기' ? `다음은 ${t.left}일 뒤` : `�
 const 주기색 = { '월경기':'#c8605a', '난포기':'#5aa97a', '배란기':'#d9a441', '황체기':'#7f74c7' };
 /* 단계마다 권장 — 트레이너가 루틴을 고를 때 바로 쓰는 말 */
 const 주기권장 = {
-  '월경기': '강도를 낮추고 가볍게 — 무게는 평소의 70~80%, 복부 압박이 큰 동작·거꾸로 매달리는 동작은 피하고 스트레칭·유산소 위주로',
-  '난포기': '힘이 붙는 때 — 증량·새 종목·1RM 측정에 좋아요. 고강도 근력 운동을 계획하세요',
-  '배란기': '힘은 가장 좋지만 인대가 느슨한 때 — 점프·방향 전환은 조심, 하체는 자세 먼저',
-  '황체기': '붓고 무겁게 느끼는 때 — 무게보다 횟수·템포로, 쉬는 시간을 조금 늘리고 수분을 챙기세요',
+  '월경기': '강도를 낮추고 가볍게\n무게는 평소의 70~80%로, 복부 압박이 큰 동작과 거꾸로 매달리는 동작은 피하고 스트레칭 · 유산소 위주로',
+  '난포기': '힘이 붙는 때\n증량 · 새 종목 · 1RM 측정에 좋아요. 고강도 근력 운동을 계획해 보세요',
+  '배란기': '힘은 가장 좋지만 인대가 느슨한 때\n점프 · 방향 전환은 조심하고, 하체는 자세 먼저',
+  '황체기': '붓고 무겁게 느끼는 때\n무게보다 횟수 · 템포로, 쉬는 시간을 조금 늘리고 수분을 챙기세요',
 };
 function 주기줄(mid, act, 짧게){
   const c = cycOf(mid), t = cycToday(c); if(!t || !여성인가(mid)) return '';
@@ -9560,7 +9565,7 @@ function 주기줄(mid, act, 짧게){
     <span class="ch">${t.ph==='월경기' ? `<b>그날</b> ${t.day}일차` : `현재 <b>${esc(t.ph)}</b> · ${t.day}일차`}</span><span class="c1">${다음말(t)} ›</span></button>`;
   return `<button class="cycline" data-act="${act}" style="--cc:${주기색[t.ph]||'var(--gold)'}">
     <span class="ch">${t.ph==='월경기' ? '<b>그날</b>이에요' : `현재 <b>${esc(t.ph)}</b>입니다`} <small>${t.day}일차 · ${다음말(t)} ›</small></span>
-    <span class="cw">${esc(주기권장[t.ph]||t.why)}</span></button>`;
+    <span class="cw">${esc(주기권장[t.ph]||t.why).replace('\n', '<br>')}</span></button>`;
 }
 const 여성인가 = mid => (((D.intake||{})[mid]||{}).sex || '') === '여';
 /* 트레이너가 회원을 고를 때 — 주기를 켠 여성 회원이면 하루 한 번 팝업으로 */
@@ -9591,12 +9596,12 @@ const CYC_TIP = {
   '월경기':['가벼운 유산소와 스트레칭 위주로','무게는 평소의 60~70%로 낮춰서','아프면 그날은 쉬어도 괜찮아요'],
   '난포기':['증량하기 제일 좋은 때예요','고중량·복합운동을 이 시기에 몰아 주세요','새 기록 노려볼 만합니다'],
   '배란기':['힘은 가장 잘 나는 때예요','다만 인대가 느슨해져 삐끗하기 쉬워요','무릎 · 발목 동작은 자세 먼저'],
-  '황체기':['무게보다 횟수로 채우는 편이 편해요','붓기 때문에 몸무게가 늘어 보일 수 있어요 — 괜찮아요','수분·염분만 조금 신경 써 주세요'],
+  '황체기':['무게보다 횟수로 채우는 편이 편해요','붓기 때문에 몸무게가 늘어 보일 수 있어요. 괜찮아요','수분·염분만 조금 신경 써 주세요'],
 };
 
 /* ── 상담일지 · 운동계획 편집 서식 ── */
 const INTAKE_FIELDS = [
-  {k:'birth',    n:'생년월일 — 1992-03-15',  t:'text'},
+  {k:'birth',    n:'생년월일 (예: 1992-03-15)',  t:'text'},
   {k:'height',   n:'신장',        t:'text'},
   {k:'sex',      n:'성별',        t:'one',  o:['여','남']},
   {k:'job',      n:'직업',        t:'text'},
@@ -9609,14 +9614,14 @@ const INTAKE_FIELDS = [
   {k:'stressLv', n:'스트레스 강도', t:'one', o:['1~3','4~6','7~10']},
   {k:'relief',   n:'해소 방법',   t:'many', o:['음식섭취','운동','쇼핑','인간관계','수면','스마트폰','기타']},
   {k:'act',      n:'평소 활동량', t:'one',  o:['앉아서 일해요','가볍게 움직여요','자주 움직여요','많이 움직여요','아주 많이 움직여요']},   /* 종이 v4 · 운동계획 칼로리 계산의 활동량으로 넘어간다 */
-  {k:'sleepH',   n:'하루 평균 수면 — 예) 6시간 30분', t:'text'},
+  {k:'sleepH',   n:'하루 평균 수면 (예: 6시간 30분)', t:'text'},
   {k:'cond',     n:'현재 겪는 것',t:'many', o:['과민성 대장 증후군','당뇨','고혈압','갑상선질환','불면증']},
   {k:'hist',     n:'과거 병력·질환', t:'many', o:['최근 수술','천식','무릎부상','목디스크','골절','고혈압','폐질환','허리디스크','무월경','저혈압','갑상선기능','관절염','허리부상','다낭성난소증후군','당뇨']},
   {k:'histEtc',  n:'그 밖의 병력', t:'text'},
   {k:'time',     n:'운동 가능 요일', t:'many', o:['월','화','수','목','금','토','일']},
   {k:'timeTxt',  n:'시간대',      t:'text'},
   {k:'goals',    n:'회원님이 원하는 것', t:'many', o:['다이어트','근력 향상','체형 교정','통증 개선','체력 향상','바디프로필','기타']},
-  {k:'needs',    n:'메모 — 구체적인 내용 (예: 3개월에 7kg 감량)', t:'area'},
+  {k:'needs',    n:'메모 (예: 3개월에 7kg 감량)', t:'area'},
   {k:'notes',    n:'특이사항 (트레이너만 봅니다)', t:'area'},
 ];
 const MEAL_KEYS = ['아침','점심','저녁','간식','영양제','음주','취침'];   /* 취침은 식습관이 아니라 「운동 · 생활」 칸에서 입력한다 — 저장 자리는 예전 그대로 meals.취침 */
@@ -9727,11 +9732,11 @@ function 직원로그인창(다음){
   o.querySelector('#stgo').addEventListener('click', async () => { const em = o.querySelector('#stem').value.trim(), pw = o.querySelector('#stpw').value; if(!em || !pw){ 글('이메일과 비밀번호를 입력해 주세요'); return; }
     글('확인하는 중…'); try{ 담(await 보냄('token?grant_type=password', { email:em, password:pw })); }catch(e){ 글(/invalid/i.test(e.message) ? '이메일이나 비밀번호가 달라요' : e.message); } });
   const 구글 = async () => { const box = document.getElementById('stgsi'); if(!box) return;
-    if(!(window.google && google.accounts && google.accounts.id) || !(window.crypto && crypto.subtle)){ box.innerHTML = '<span>구글 단추를 불러오지 못했어요 — 이메일로 들어와 주세요</span>'; return; }
+    if(!(window.google && google.accounts && google.accounts.id) || !(window.crypto && crypto.subtle)){ box.innerHTML = '<span>구글 단추를 불러오지 못했어요<br>이메일로 들어와 주세요</span>'; return; }
     const nonce = crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2) + Date.now();
     const hex = [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(nonce)))].map(x => x.toString(16).padStart(2,'0')).join('');
     google.accounts.id.initialize({ client_id:G_CLIENT, nonce:hex, ux_mode:'popup', auto_select:false, itp_support:true,
-      callback: async res => { 글('확인하는 중…'); try{ 담(await 보냄('token?grant_type=id_token', { provider:'google', id_token:res.credential, nonce })); }catch(e){ 글('구글로 못 들어왔어요 — ' + e.message); } } });
+      callback: async res => { 글('확인하는 중…'); try{ 담(await 보냄('token?grant_type=id_token', { provider:'google', id_token:res.credential, nonce })); }catch(e){ 글('구글로 들어오지 못했어요. ' + 오류말(e)); } } });
     box.innerHTML = ''; google.accounts.id.renderButton(box, { theme:'filled_black', size:'large', width:280, text:'signin_with', locale:'ko', shape:'pill' }); };
   if(window.google && google.accounts) 구글();
   else { const sc = document.createElement('script'); sc.src = 'https://accounts.google.com/gsi/client'; sc.async = true; sc.onload = 구글; sc.onerror = 구글; document.head.appendChild(sc); }
@@ -9760,7 +9765,7 @@ function 상담지고르기(mid, 찍기){
             <button class="btn sub" data-act="scanalb:${mid}">앨범에서 다시 선택</button>
             <button class="btn ghost" data-act="scanforce">그래도 이 사진으로 읽기</button>`); return; }
         await 상담지보냄(mid, b64);
-      }catch(e){ console.error(e); toast('상담지를 읽지 못했어요 — ' + e.message); } };
+      }catch(e){ console.error(e); toast('상담지를 읽지 못했어요\n' + 오류말(e)); } };
     img.onerror = () => toast('사진을 열지 못했어요');
     img.src = URL.createObjectURL(f); });
   inp.click();
@@ -9799,10 +9804,10 @@ function 사진흠(cv, img){
   return 흠;
 }
 async function 상담지보냄(mid, b64){
-  toast('상담지를 읽는 중이에요 — 10초쯤 걸려요');
+  toast('상담지를 읽는 중이에요\n10초쯤 걸려요');
   try{ const d = await 상담지읽기(b64); 상담지채움(mid, d); }
-  catch(e){ console.error(e); if(/로그인/.test(e.message)){ try{ localStorage.removeItem(DESK_KEY); }catch(e2){} toast('직원 확인이 안 됐어요 — 다시 로그인해 주세요'); 직원로그인창(() => 상담지보냄(mid, b64)); }
-    else toast('상담지를 읽지 못했어요 — ' + e.message); }
+  catch(e){ console.error(e); if(/로그인/.test(e.message)){ try{ localStorage.removeItem(DESK_KEY); }catch(e2){} toast('직원 확인이 안 됐어요\n다시 로그인해 주세요'); 직원로그인창(() => 상담지보냄(mid, b64)); }
+    else toast('상담지를 읽지 못했어요\n' + 오류말(e)); }
 }
 async function 상담지읽기(b64){
   const t = await 직원토큰(); if(!t) throw new Error('직원 로그인이 필요해요');
@@ -9830,7 +9835,7 @@ function 상담지채움(mid, r){
   S.scanQ = { mid, n, 다름, 모름: (r.모름 || []).map(k => k === 'meals' ? '식습관' : ((INTAKE_FIELDS.find(f => f.k === k) || {}).n || '').replace(/ —.*| \(.*/, '')).filter(Boolean),
     다른 : 이름 && m.n && 이름 !== String(m.n).replace(/\s/g, '') ? 읽.name : '',
     숫자: [['신장', 읽.height ? 읽.height + 'cm' : ''], ['생년월일', 읽.birth || ''], ['취침', (읽.meals || {})['취침'] || '']].filter(p => p[1]) };
-  render(); toast(n + '칸을 채웠어요 — 확인하고 저장해 주세요');
+  render(); toast(n + '칸을 채웠어요\n확인하고 저장해 주세요');
 }
 function vIntakeEdit(){
   const mid=subj(), d=D.intake[mid]||(D.intake[mid]={});
@@ -9840,11 +9845,11 @@ function vIntakeEdit(){
   const q = S.scanQ && S.scanQ.mid === mid ? S.scanQ : null;
   return { top: bar('PT 상담일지 작성', `<span class="sub">${esc(subjName())}</span>`, 'sub2:intake:'+mid), body:
       (q ? `<div class="scnb"><b>종이에서 읽은 ${q.n}칸을 채웠어요</b>확인하고 맨 아래 「저장」을 눌러야 들어갑니다.
-        ${(q.다름||[]).length ? `<span class="df"><b>이미 있던 값과 종이가 달라요 — ${q.다름.length}칸</b>${q.다름.map((x, i) => `<i><u>${esc(x.이름)}</u> ${esc(x.옛)} → 종이 <em>${esc(x.새)}</em> <button data-act="scanuse:${i}">종이 값으로</button></i>`).join('')}
+        ${(q.다름||[]).length ? `<span class="df"><b>이미 있던 값과 종이가 다른 칸 ${q.다름.length}개</b>${q.다름.map((x, i) => `<i><u>${esc(x.이름)}</u> ${esc(x.옛)} → 종이 <em>${esc(x.새)}</em> <button data-act="scanuse:${i}">종이 값으로</button></i>`).join('')}
           ${q.다름.length > 1 ? `<button class="all" data-act="scanuse:all">전부 종이 값으로</button>` : ''}</span>` : ''}
-        ${q.n < 6 && !(q.다름||[]).length ? `<span class="w">읽은 칸이 적어요 — 사진이 잘 안 나왔을 수 있어요</span><button class="rs" data-act="scanpaper:${mid}">다시 찍기</button>` : ''}
+        ${q.n < 6 && !(q.다름||[]).length ? `<span class="w">읽은 칸이 적어요<br>사진이 잘 안 나왔을 수 있어요</span><button class="rs" data-act="scanpaper:${mid}">다시 찍기</button>` : ''}
         ${(q.숫자||[]).length ? `<span class="num"><b>숫자는 종이와 꼭 맞춰 보세요</b>${q.숫자.map(p => `<i>${esc(p[0])} <em>${esc(p[1])}</em></i>`).join('')}</span>` : ''}
-        ${q.모름.length ? `<span class="w">글씨 확인: ${esc(q.모름.join(' · '))}</span>` : ''}${q.다른 ? `<span class="w">종이의 이름이 「${esc(q.다른)}」예요 — 다른 분의 상담지가 아닌지 확인해 주세요</span>` : ''}</div>` : '') +
+        ${q.모름.length ? `<span class="w">글씨 확인: ${esc(q.모름.join(' · '))}</span>` : ''}${q.다른 ? `<span class="w">종이의 이름이 「${esc(q.다른)}」예요<br>다른 분의 상담지가 아닌지 확인해 주세요</span>` : ''}</div>` : '') +
       상자('기본', `<div class="grid2">${F('birth')}${F('height')}</div>${F('sex')}${F('job')}${F('jobenv')}${F('shift')}`)
     + 상자('글래드짐을 알게 된 경로', F('route'))
     + 상자('운동 · 생활', F('exprs') + F('expr') + F('stress') + F('stressLv') + F('relief') + F('act')
@@ -10015,13 +10020,13 @@ function calcOf(g){
   const water = w ? Math.round(w*33/10)*10 : 0;           /* 물 ml */
   const wkPct = w ? (week/FAT_KCAL)/w*100 : 0;            /* 주당 감량 % */
   const warn = [];
-  if(kcal && kcal < floor) warn.push(`하루 ${floor}kcal 아래입니다 — 안전 가이드보다 낮게 잡으셨습니다`);
-  else if(kcal && bmr && kcal < bmr) warn.push('권장 칼로리가 기초대사량보다 낮습니다 — 오래 끌면 근육이 빠집니다');
-  if(wkPct > wkMax) warn.push(`너무 빨리 빠지는 계획이에요 — 한 주에 몸무게의 ${Math.round(wkPct*10)/10}%씩 (권하는 한도 ${wkMax}%)`);
+  if(kcal && kcal < floor) warn.push(`하루 ${floor}kcal 아래입니다. 안전 가이드보다 낮게 잡으셨습니다`);
+  else if(kcal && bmr && kcal < bmr) warn.push('권장 칼로리가 기초대사량보다 낮습니다. 오래 끌면 근육이 빠집니다');
+  if(wkPct > wkMax) warn.push(`너무 빨리 빠지는 계획이에요. 한 주에 몸무게의 ${Math.round(wkPct*10)/10}%씩 (권하는 한도 ${wkMax}%)`);
   if(dayNeed && dayNeed > total - floor)
     warn.push(`이 날짜에 맞추려면 하루 ${dayNeed.toLocaleString()}kcal 를 줄여야 하는데, 최소 섭취 ${floor.toLocaleString()}kcal 를 지키면 ${Math.max(0,total-floor).toLocaleString()}kcal 까지가 한계입니다`);
-  if(perKg && perKg < 1.0) warn.push(`단백질이 체중 1kg당 ${perKg}g입니다 — 근육을 지키려면 1.2g 이상을 권합니다`);
-  if(day <= 0 && kcal && gw && w > gw) warn.push('지금 설정으로는 살이 빠지지 않습니다 — 섭취를 낮추거나 활동량을 올려 보세요');
+  if(perKg && perKg < 1.0) warn.push(`단백질이 체중 1kg당 ${perKg}g입니다. 근육을 지키려면 1.2g 이상을 권합니다`);
+  if(day <= 0 && kcal && gw && w > gw) warn.push('지금 설정으로는 살이 빠지지 않습니다. 섭취를 낮추거나 활동량을 올려 보세요');
   const tough = !!(warn.length && safeDate && daysTo && safeDays > daysTo);
   return { w, gw, fp, bmr, auto, how, k, actC, keep: total, total, kcal, kcalAuto, day, week, month,
     wkKg: week/FAT_KCAL, moKg: month/FAT_KCAL, rc, rp, rf, kk, gg, need, days,
@@ -10103,7 +10108,7 @@ function calcHTML(g, ed){
         <span class="kl">하루 이만큼 드세요${r.kcalAuto?(r.dayNeed?' · 목표 날짜 기준':''):' · 직접 정함'}</span>
         <span class="kb">${r.kcal?수(r.kcal,1):'—'}<small>kcal</small></span>
         <span class="ks">${r.total && r.day>0
-          ? `유지 ${r.total.toLocaleString()} 에서 <b>${r.day}kcal</b> 줄인 값 — ${esc(foodTxt(r.day))}`
+          ? `유지 ${r.total.toLocaleString()} 에서 <b>${r.day}kcal</b> 줄인 값 · ${esc(foodTxt(r.day))}`
           : (r.total ? `유지 칼로리 ${r.total.toLocaleString()}kcal 과 같습니다` : '몸무게와 활동량을 입력해 주세요')}</span>
       </div>
       <div class="ksub">
@@ -10148,7 +10153,7 @@ function calcHTML(g, ed){
           <div class="fld"><span class="fn">단백 %</span><input class="search" type="text" inputmode="numeric" data-k="pc:rp" value="${esc(c.rp||'')}" placeholder="25"></div>
           <div class="fld"><span class="fn">지방 %</span><input class="search" type="text" inputmode="numeric" data-k="pc:rf" value="${esc(c.rf||'')}" placeholder="25"></div>
         </div>`}`:''}
-    ${r.perKg?`<div class="crow"><span class="ck">단백질 — 체중 1kg당</span>
+    ${r.perKg?`<div class="crow"><span class="ck">단백질 (체중 1kg당)</span>
       <span class="cv">${r.perKg}<span class="cs"> g/kg</span></span></div>`:''}
     ${r.bmi?`<div class="crow"><span class="ck">체질량지수 BMI</span>
       <span class="cv">${r.bmi}${r.bmiTo?`<span class="cs"> → 목표 ${r.bmiTo}</span>`:''}</span></div>`:''}
@@ -10309,7 +10314,7 @@ function vPlanEdit(){
         <div class="fld"><span class="fn">운동 목적</span>
           <div class="chips">${['다이어트','근육증가','교정운동','건강','그 밖에'].map(x=>
             `<button class="chip ${(g.purpose||[]).includes(x)?'on':''}" data-act="pickn:pg:purpose:${x}">${x}</button>`).join('')}</div></div>
-        <div class="fld"><span class="fn">내가 지킬 약속 — 줄바꿈으로 여러 개</span>
+        <div class="fld"><span class="fn">내가 지킬 약속 (한 줄에 하나씩)</span>
           <textarea data-k="pg:vows">${esc((g.vows||[]).join('\n'))}</textarea></div>
         <div class="fld"><span class="fn">회원님, 이건 꼭 약속해요</span>
           <textarea data-k="pg:promises">${esc((g.promises||[]).join('\n'))}</textarea></div>
@@ -10343,7 +10348,7 @@ function sheetKcalEx(mid){
       + `<div class="cyfoot" style="justify-content:center"><span>밥 대신 드실 때 이 양을 넘지 않으면 같은 칼로리입니다</span></div>`;
     if(탭 === '지') 몸 = `<div class="kxhero"><small>하루에 드셔도 되는 지방</small><b>${지목}<i>g</i></b><p>기름으로 치면 큰 숟가락 <em>${양말(지목 / 숟지, '숟갈')}</em>만큼입니다</p></div>
       <span class="lbl">이 음식에는 기름 몇 숟갈만큼의 지방이 들어 있을까요</span>` + 예시음식.지.map(x => 줄(x[0], esc(x[1]) + ` <u>${esc(x[2])}</u>`, '', `<div class="eq">= 기름 <em>${양말(x[3] / 숟지, '숟갈')}</em> 만큼</div><div class="dots">${양그림('🥄', x[3] / 숟지)}</div>`, `<div class="n"><small>지방</small><b>${Math.round(x[3])}g</b></div>`)).join('')
-      + `<div class="cyfoot" style="justify-content:center"><span>지방은 1g 에 9kcal — 탄수화물 · 단백질(4kcal)의 두 배가 넘습니다</span></div>`;
+      + `<div class="cyfoot" style="justify-content:center"><span>지방은 1g 에 9kcal 로 탄수화물 · 단백질(4kcal)의 두 배가 넘습니다</span></div>`;
     return `<div class="h2">얼마나 먹는 걸까요</div>
       <div class="kxtabs">${[['칼','칼로리'],['단','단백질'],['탄','탄수화물'],['지','지방']].map(t => `<button class="${탭===t[0]?'on':''}" data-act="kext:${t[0]}">${t[1]}</button>`).join('')}</div>${몸}
       <div class="cyfoot" style="justify-content:center"><span>음식의 크기 · 조리법에 따라 조금씩 다릅니다</span></div>
@@ -10855,7 +10860,7 @@ function roundPane(mid){
   return `
     <span class="lbl">체형 회차 · ${rs.length}번</span>
     ${rs.length>1 ? `<div class="gbox">${lineChart2(cnt,'개',0)}
-        <div class="sm" style="text-align:center;color:#75706a;margin-top:-6px">표시된 항목 수 — 내려갈수록 좋아진 것입니다</div></div>
+        <div class="sm" style="text-align:center;color:#75706a;margin-top:-6px">표시된 항목 수 · 내려갈수록 좋아진 것입니다</div></div>
       ${sig}`
       : `<div class="note">회차가 ${rs.length}번뿐입니다 · <b>체형 재검사</b>를 한 번 더 하면 ${rs.length?'첫 검사와 비교해 드립니다':'그때부터 회차가 쌓입니다'}</div>`}
     ${tr?`<button class="btn sub sm" data-act="bnew:${mid}">＋ 체형 재검사 시작</button>`:''}`;
@@ -10885,7 +10890,7 @@ function markTxt(pts){
   const seg = [];
   const put = (i,j,n) => { if(pts[i] && pts[j]){ const a = angV(pts[i], pts[j]); if(a!=null) seg.push(`${n} <b>${a}°</b>`); } };
   put(0,1,'목(귀–어깨)'); put(1,2,'몸통(어깨–골반)'); put(2,4,'다리(골반–복사뼈)');
-  return seg.length ? `<div class="note">수직선에서 벗어난 각도 — ${seg.join(' · ')}
+  return seg.length ? `<div class="note">수직선에서 벗어난 각도 · ${seg.join(' · ')}
     <br><b>귀–어깨가 수직에 가까울수록</b> 목 부담이 적습니다</div>` : '';
 }
 function markTap(ev, el){
@@ -11079,7 +11084,7 @@ function 영상줄이기(file, 알림, 소리){
     v.onloadedmetadata = () => {
       const dur = v.duration || 0;
       if(dur > 영상최대초 + 2){ 치우기();
-        rej(new Error(영상최대초 + '초까지만 올라갑니다 — 지금 ' + Math.round(dur) + '초예요')); return; }
+        rej(new Error(영상최대초 + '초까지 올릴 수 있어요 (지금 ' + Math.round(dur) + '초)')); return; }
       let w = v.videoWidth, h = v.videoHeight;
       const sc = Math.min(1, 720 / Math.max(w, h));
       w = Math.max(2, Math.round(w * sc / 2) * 2);
@@ -11106,7 +11111,7 @@ function 영상줄이기(file, 알림, 소리){
         치우기();
         if(file.size <= 영상최대MB * 1048576)
           return res({ blob:file, ext:(String(file.type).indexOf('webm') >= 0 ? 'webm' : 'mp4'), 원본:true });
-        return rej(new Error('이 브라우저가 영상을 줄이지 못해요 — 더 짧게 찍어 주세요'));
+        return rej(new Error('더 짧게 찍어 주세요'));
       }
       const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
       const cx = cv.getContext('2d');
@@ -11162,7 +11167,7 @@ function bpVid(){
                   mb:Math.round(r.blob.size / 1048576 * 10) / 10 };
       S.bpNewDate = TODAY;
       sheetBpVid();
-    }catch(e){ console.error(e); toast(e.message || '영상을 읽지 못했어요'); }
+    }catch(e){ console.error(e); toast('영상을 읽지 못했어요\n' + 오류말(e)); }
   });
   inp.click();
 }
@@ -11186,7 +11191,7 @@ async function bpVidUpload(){
   closeSheet(); toast('올리는 중이에요');
   let path = '';      /* 회원 개인 영상 → S3 (2026-10-14) */
   try{ path = await S3올리기(V.blob, 'video', id + '.' + V.ext, V.ext === 'webm' ? 'video/webm' : 'video/mp4', mid); }
-  catch(e){ toast('영상을 못 올렸어요 — ' + (e.message || '').slice(0, 40)); console.error(e); return; }
+  catch(e){ toast('영상을 올리지 못했어요\n' + 오류말(e)); console.error(e); return; }
   await sv(spost('body_photos',[{ id, member_id:mid, kind:'vid', pose:'영상', on_date:date, path, memo:'' }]), '영상 저장');
   D.bph = D.bph || [];
   D.bph.push({ id, mid, kind:'vid', pose:'영상', date, path, memo:'' });
@@ -11553,13 +11558,13 @@ function tMember(){
 
     <span class="lbl">회원 자료</span>
     <div class="megrp">${(()=>{ const 모 = 사진모음(m.id, false), 요 = 모.filter(x=>x.dreq).length;
-      return [['note','PT 상담일지', D.intake[m.id] && Object.keys(D.intake[m.id]).length ? '작성됨 — 눌러서 보기 · 수정' : '아직 없음 — 눌러서 작성', (D.intake[m.id] && Object.keys(D.intake[m.id]).length ? 'tsub:intake:' : 'editintake:')+m.id, ''],
+      return [['note','PT 상담일지', D.intake[m.id] && Object.keys(D.intake[m.id]).length ? '눌러서 보기 · 수정' : '아직 작성 전입니다', (D.intake[m.id] && Object.keys(D.intake[m.id]).length ? 'tsub:intake:' : 'editintake:')+m.id, ''],
         ['plan','운동계획', (g.now&&g.now.w)?`${g.now.w}kg → ${(g.to&&g.to.w)||'?'}kg`:'아직 없음', 'tsub:plan:'+m.id, ''],
         ['bowl','식단', mealsOf(m.id).length?`${mealsOf(m.id).length}장 · 최근 ${dateTxt(mealsOf(m.id)[0].date)}`:'아직 없음', 'tsub:diet:'+m.id, ''],
-        ['h_cam','오운완 · 인증샷', 모.length ? `${모.length}장` : '아직 없음 — 수업 마친 화면에서 「같이 찍기」', 'tprof:'+m.id, 요 ? `삭제 요청 ${요}` : ''],
-        ['h_roll','스트레칭 세트', (n => n ? `${n}개 지정함` : '아직 지정 안 함 — 눌러서 지정')(내세트().filter(x=>x.mids.includes(m.id)).length), 'psets:'+m.id, ''],
+        ['h_cam','오운완 · 인증샷', 모.length ? `${모.length}장` : '수업 마친 화면에서 「같이 찍기」', 'tprof:'+m.id, 요 ? `삭제 요청 ${요}` : ''],
+        ['h_roll','스트레칭 세트', (n => n ? `${n}개 지정함` : '아직 지정 전입니다')(내세트().filter(x=>x.mids.includes(m.id)).length), 'psets:'+m.id, ''],
         ['chart','인바디 · 비포애프터', `사진 ${((D.bph||[]).filter(x=>x.mid===m.id && x.kind!=='ootd' && x.kind!=='pair')).length}장`, 'tsub:body:'+m.id, ''],
-        ['h_user','체형분석 기록', `${Object.keys(checksOf(m.id)).length}개 표시 · ${roundsOf(m.id).length}회차 — 눌러서 입력 · 수정`, 'tposture:'+m.id, '']]
+        ['h_user','체형분석 기록', `${Object.keys(checksOf(m.id)).length}개 표시 · ${roundsOf(m.id).length}회차`, 'tposture:'+m.id, '']]
         .map(x=>`<button class="mrow2" data-act="${x[3]}"><span class="mi">${svg(x[0],19)}</span>
           <span class="mt"><b>${x[1]}</b><small>${x[2]}</small></span>${x[4]?`<em class="nb w">${x[4]}</em>`:''}<i>›</i></button>`).join(''); })()}</div>
     ${(()=>{ if(!여성인가(m.id)) return '';
@@ -11692,11 +11697,11 @@ function sheetRAdd(){
         <div style="display:flex;gap:8px;margin-top:9px">
           <button class="btn main sm" data-act="raddask">추가</button>
           <button class="btn ghost sm" data-act="rcartclr">비우기</button></div></div>`:''}
-      ${공통루틴().length?`<span class="lbl">공통 루틴 — 이 회원의 지난 기록으로 채워서 추가</span>
+      ${공통루틴().length?`<span class="lbl">공통 루틴 · 이 회원의 지난 기록으로 채워요</span>
         ${공통루틴().map(r=>row(r,'공통')).join('')}`:''}
-      ${mine.length?`<span class="lbl">이 회원 루틴 — 같은 것을 하나 더</span>
+      ${mine.length?`<span class="lbl">이 회원 루틴 · 같은 것을 하나 더</span>
         ${mine.map(r=>row(r,'')).join('')}`:''}
-      ${others.map(o=>`<span class="lbl">${esc(o.m.n)} 회원 루틴 — 가져오기</span>
+      ${others.map(o=>`<span class="lbl">${esc(o.m.n)} 회원 루틴 가져오기</span>
         ${o.rs.map(r=>row(r, o.m.n)).join('')}`).join('')}
       <button class="btn ghost sm" data-act="close">닫기</button>
       <div class="cyfoot"><span>＋ 로 선택한 뒤 「추가하기」를 눌러 주세요</span></div>`;
@@ -11752,13 +11757,13 @@ function tRedit(){
     return `<label class="rin"><input type="text" inputmode="${mode||'numeric'}" enterkeyhint="next" autocomplete="off" data-k="ri:${r.id}:${i}:${f}" data-ri="${r.id}:${i}:${f}"
       value="${빈값(v) ? '' : (f==='kg' ? kgfmt(v) : v)}" placeholder="–"><small>${단}</small></label>`; };
   return { top: bar(공 ? `공통 루틴 · ${r.n}` : `루틴 ${r.no} · ${r.n}`, '', 'go:t_routines'), body:`
-    ${공 ? '' : `<div class="fld"><span class="fn">루틴 번호 — 목록에 「루틴 ○」로 나옵니다</span>
+    ${공 ? '' : `<div class="fld"><span class="fn">루틴 번호 (목록에 「루틴 ○」로 나옵니다)</span>
       <input class="search" type="text" inputmode="numeric" data-k="rno:${r.id}" value="${r.no}"></div>`}
     <div class="fld"><span class="fn">루틴 이름</span>
       <input class="search" type="text" data-k="rn:${r.id}" value="${esc(r.n)}"></div>
     <div class="fld"><span class="fn">운동 방향 · 목적</span>
       <input class="search" type="text" data-k="rp:${r.id}" value="${esc(r.purpose||'')}"></div>
-    ${공 ? '' : `<div class="fld"><span class="fn">그룹 — 목록 위 칩으로 나뉩니다</span>
+    ${공 ? '' : `<div class="fld"><span class="fn">그룹 (목록 위 칩으로 나뉩니다)</span>
       <div class="chips">
         <button class="chip ${!(r.grp||'').trim()?'on':''}" data-act="rsetgrp:${r.id}:">없음</button>
         ${grpsOf(r.mid).map(g=>`<button class="chip ${(r.grp||'').trim()===g?'on':''}" data-act="rsetgrp:${r.id}:${g}">${esc(g)}</button>`).join('')}
@@ -11946,7 +11951,7 @@ function tEx(){
       <span class="mt"><b>${esc(e.n)}</b><small>${esc([e.e, e.media.length ? ((e.media.some(z=>z.kind==='video') ? '영상 ' : '사진 ') + e.media.length) : '사진·영상 없음'].filter(Boolean).join(' · '))}</small></span><i>›</i></button>`).join('')}</div>` : ''}
     <div class="megrp texlist">` + 다.map(e => { const vs = vars(e.id), 열 = S.exopen === e.id, 대 = 내요청(e.id);
       return `<div data-texrow="${esc(e.n)}" data-texpart="${esc(e.p)}"><button class="mrow2" data-act="texo:${e.id}"><span class="mt"><b>${esc(e.n)}</b><small>${esc(e.e)} · 하는 법 ${vs.length}가지${대 ? ' · 요청 대기 ' + 대 : ''}</small></span><i class="${열 ? 'up' : ''}">${열 ? '⌃' : '⌄'}</i></button>
-        ${열 ? `<div class="texsub">${vs.map(v => `<button data-act="exd:${e.id}:${v.k}"><u class="${v.desc ? 'on' : ''}"></u><span>${esc(벌이름(e.id, v))}${v.desc ? '' : ' — 설명 없음'}${영상시범(v) ? ' · 영상 ▶' : ''}</span><i>›</i></button>`).join('')}
+        ${열 ? `<div class="texsub">${vs.map(v => `<button data-act="exd:${e.id}:${v.k}"><u class="${v.desc ? 'on' : ''}"></u><span>${esc(벌이름(e.id, v))}${v.desc ? '' : ' · 설명 없음'}${영상시범(v) ? ' · 영상 ▶' : ''}</span><i>›</i></button>`).join('')}
           <button class="btn ghost sm" data-act="xr:${e.id}">보완 요청</button></div>` : ''}</div>`; }).join('') + `</div>
     <div class="empty texnone" style="display:none">검색 결과가 없습니다<small class="e2">종목 이름을 다시 확인해 주세요</small></div>
     <button class="hline gold" data-act="exnew">${svg('h_dumb',18)}<b>＋ 종목 만들기</b><small>사전에 없는 운동</small></button>` };
@@ -12198,7 +12203,7 @@ document.addEventListener('click', async ev=>{
   /* 「운동 중으로 돌아가기」만은 잠겨도 열어 둔다 — 자물쇠가 거기 있기 때문이다.
      막아 두면 앱을 다시 켰을 때 홈에 갇힌다 (2026-09-04 확인). */
   if(잠금이막는것[k] && 잠겼나() && !(k==='go' && rest[0]==='workout')){
-    toast('잠겨 있어요 — 자물쇠를 길게 누르면 풀립니다'); return; }
+    toast('잠겨 있어요\n자물쇠를 길게 누르면 풀립니다'); return; }
   /* ⛔ 알림톡 링크로 들어온 사람은 리포트 밖으로 못 나간다 (2026-09-29).
      본인 것만 보이게 하는 진짜 문은 전화 인증이다 — 그건 아직 없다. */
   /* 리포트 안에서 쓰는 것만 열어 둔다 — 피드백 팝업(rpcm)과 사진 넘겨보기(csl·csk·vmute).
@@ -12370,7 +12375,7 @@ document.addEventListener('click', async ev=>{
       const 넣 = x => { const 칸 = (k, v) => { S.draft = S.draft || {}; S.draft[k] = v; const el = document.querySelector('[data-k="' + k + '"]'); if(el) el.value = v; };
         if(x.t === 'one' || x.t === 'many') d[x.k] = x.v; else if(x.t === 'meal') 칸('ikm:' + x.k, x.v); else 칸('ik:' + x.k, x.v); };
       if(rest[0] === 'all'){ q.다름.forEach(넣); q.n += q.다름.length; q.다름 = []; } else { const x = q.다름[+rest[0]]; if(x){ 넣(x); q.다름.splice(+rest[0], 1); q.n++; } }
-      render(); toast('종이 값으로 변경했어요 — 저장을 눌러야 반영됩니다'); return; }
+      render(); toast('종이 값으로 변경했어요\n「저장」을 눌러야 반영됩니다'); return; }
     case 'scanforce': { const h = S.scanHold; S.scanHold = null; closeSheet(); if(h) await 상담지보냄(h.mid, h.b64); return; }
     case 'scancam': case 'scanalb': { const mid = rest[0]; closeSheet(); 상담지고르기(mid, k === 'scancam'); return; }
     case 'editintake': if(S.who !== 'tr') return;   /* 상담일지 · 운동계획은 트레이너만 수정한다 (2026-10-11 대표) */ S.scanQ = null; S.subj=rest[0]; go('intake_edit'); return;
@@ -12520,10 +12525,10 @@ document.addEventListener('click', async ev=>{
       await sv(spost('exercises', [{ id:d.id, name:d.n, part:d.p, equip:d.e, cardio:!!cardio, sort:9000, owner:TRAINER, media }], {on:'id'}), '종목 저장');
       await sv(spost('variants', [{ id:VID(d.id,'a'), ex_id:d.id, vkey:'a', name:'', descr:d.d, demo:false, sort:0 }], {on:'id'}), '종목 설명 저장');
       await 파일지우기(뺀, 'exmedia/'+d.id+'/');
-      S.exn = null; S.pickPart = d.p; closeSheet(); toast(d.새 ? '만들었어요 — 목록 맨 위에 있어요' : '수정했어요'); render(); return; }
+      S.exn = null; S.pickPart = d.p; closeSheet(); toast(d.새 ? '만들었어요\n목록 맨 위에 있어요' : '수정했어요'); render(); return; }
     case 'exdel': { const d = S.exn; if(!d) return;
       const 쓰는 = D.routines.some(r => (r.items||[]).some(it => it.ex === d.id)) || D.workouts.some(w => (w.items||[]).some(it => it.ex === d.id));
-      if(쓰는){ toast('루틴이나 기록에 추가된 종목은 삭제할 수 없어요 — 루틴에서 먼저 제거해 주세요'); return; }
+      if(쓰는){ toast('루틴에 들어간 종목은 삭제할 수 없어요\n루틴에서 먼저 제거해 주세요'); return; }
       if(!confirm('이 종목을 삭제할까요?')) return;
       const 옛파일 = ((EX.find(e => e.id === d.id)||{}).media||[]).map(m=>m.path);
       EX = EX.filter(e => e.id !== d.id);
@@ -12539,7 +12544,7 @@ document.addEventListener('click', async ev=>{
       S.just = VID(ex,va);
       clearTimeout(S.justT);
       S.justT = setTimeout(()=>{ S.just=null; if(S.screen==='t_pickex') render(); }, 2600);
-      toast(exName(ex,va)+' 추가했어요 · ' + r.items.length + '개');
+      toast(exName(ex,va)+' 추가했어요\n루틴 종목 ' + r.items.length + '개');
       render(); return; }
     case 'ritem': sheetRitem(rest[0], +rest[1]); return;
     case 'rd2': { const [rid,i,f,dv]=rest, r=rOf(rid); if(!r) return;
@@ -12576,13 +12581,13 @@ document.addEventListener('click', async ev=>{
       D.routines.push(Object.assign({ id, mid, no, n:src.n, purpose:src.purpose||'', grp:'', items }, 루틴덧꼴()));
       sv(spost('routines',[Object.assign({ id, member_id:mid, no, name:src.n, purpose:src.purpose||'', grp:'' }, 루틴덧())]).then(() => items.length ? spost('routine_items', items.map((it,i)=>({ routine_id:id, sort:i,
         variant_id:VID(it.ex,it.va), kg:it.kg, reps:it.reps, sets:it.sets, rest:it.rest }))) : null), '루틴 추가');
-      save(); S.rcm = false; S.redit = id; toast('추가했어요 · 숫자를 확인해 주세요'); go('t_redit'); return; }
+      save(); S.rcm = false; S.redit = id; toast('추가했어요\n숫자를 확인해 주세요'); go('t_redit'); return; }
     case 'rtocommon': { const src = rOf(rest[0]); if(!src) return;
       const id = 'r' + Date.now(), no = 공통루틴().length + 1, items = src.items.map(it => Object.assign({}, it, exOf(it.ex).cardio ? {} : { kg:null, reps:null }));
       D.routines.push({ id, mid:null, no, n:src.n, purpose:src.purpose||'', grp:'', items });
       sv(spost('routines',[{ id, member_id:null, no, name:src.n, purpose:src.purpose||'', grp:'' }]).then(() => items.length ? spost('routine_items', items.map((it,i)=>({ routine_id:id, sort:i,
         variant_id:VID(it.ex,it.va), kg:it.kg, reps:it.reps, sets:it.sets, rest:it.rest }))) : null), '공통 루틴 만들기');
-      save(); toast('공통 루틴으로 복사했어요 · 무게 · 횟수는 비웠어요'); render(); return; }
+      save(); toast('공통 루틴으로 복사했어요\n무게 · 횟수는 비워 두었어요'); render(); return; }
     case 'rdel': sheetRDel(rest[0]); return;
     case 'rdelgo': { const rid=rest[0]; closeSheet();
       D.routines = D.routines.filter(x=>x.id!==rid);
@@ -12708,7 +12713,7 @@ document.addEventListener('click', async ev=>{
     case 'noop': return;
     case 'rcopy': { const u = 리포트링크(rest[0], await 리포트열쇠(rest[0]));
       (navigator.clipboard ? navigator.clipboard.writeText(u) : Promise.reject())
-        .then(()=>toast('링크를 복사했어요 — 카톡에 붙여 넣으세요'))
+        .then(()=>toast('링크를 복사했어요\n카톡에 붙여 넣어 주세요'))
         .catch(()=>openSheet(()=>`<div class="h2">리포트 링크</div>
           <input class="search" type="text" readonly value="${esc(u)}" onfocus="this.select()">
           <button class="btn ghost sm" data-act="close">닫기</button>`));
@@ -12742,10 +12747,10 @@ document.addEventListener('click', async ev=>{
       if(이미 && 이미.state === '보냄'){
         openSheet(()=>`<div class="h2">이미 보냈어요</div>
           <p class="lbl" style="line-height:1.8">${esc(m.n||'')} 회원님께 <b>${esc(dateTxt(w.date))}</b> 수업 기록이
-          이미 나갔습니다.<br>같은 수업은 한 번만 보냅니다 — 두 번 가면 회원님이 놀라세요.</p>
+          이미 나갔습니다.<br>같은 수업은 한 번만 보냅니다. 두 번 가면 회원님이 놀라세요.</p>
           <button class="btn ghost sm" data-act="close">닫기</button>`);
         return; }
-      if(이미 && 이미.state === '대기'){ toast('이미 보낼 목록에 있어요 — 곧 나갑니다'); return; }
+      if(이미 && 이미.state === '대기'){ toast('이미 보낼 목록에 있어요\n곧 나갑니다'); return; }
       const 예정 = 나갈시각(0);
       const 언제 = 시각글(예정) + ' 발송 예정';
       openSheet(()=>`<div class="h2">수업 기록을 보낼까요</div>
@@ -12822,7 +12827,7 @@ document.addEventListener('click', async ev=>{
       go('home'); return; }
     case 'aghealth': { const 함 = rest[0] === '1';
       if(함){ try{ await saveAgree(S.mid, { aS:new Date().toISOString(), askAt:'', askKind:'' }); }catch(e){} }
-      S.agStep = null; go('home'); toast(함 ? '동의해 주셔서 고맙습니다' : '미동의로 시작합니다 — 나중에 내 정보에서 동의하실 수 있어요'); return; }
+      S.agStep = null; go('home'); toast(함 ? '동의해 주셔서 고맙습니다' : '동의하지 않고 시작합니다\n「내 정보」에서 언제든 동의할 수 있어요'); return; }
     /* 건강정보 켜기 — 동의 창에서 누르거나, 알림의 「확인하고 동의」에서 온다 */
     case 'agsens': {
       const 지금 = new Date().toISOString();
@@ -12916,8 +12921,8 @@ document.addEventListener('click', async ev=>{
             open.forEach(a => a.done = true);
             sv(spatch('asks','id=in.('+open.map(a=>a.id).join(',')+')', { done_at: new Date().toISOString() }), '요청 처리');
           }
-          toast('보냈어요 · 회원 화면에 바로 떠요');
-        }catch(e){ console.error('피드백 보내기', e); toast('못 보냈어요 — ' + (e.message||'').slice(0,60)); }
+          toast('보냈어요\n회원 화면에 바로 나옵니다');
+        }catch(e){ console.error('피드백 보내기', e); toast('보내지 못했어요\n' + 오류말(e)); }
         finally{ S.보내는중 = false; drawSheet(); }
       })();
       return; }
@@ -12935,7 +12940,7 @@ document.addEventListener('click', async ev=>{
       D.asks=D.asks||[]; D.asks.unshift({ id, mid:S.mid, ex, va, wid:last, note, ts:new Date().toISOString(), done:false });
       if(S.draft) delete S.draft['ask:'+K];
       sv(spost('asks',[{ id, member_id:S.mid, variant_id:VID(ex,va), workout_id:last, note }]), '피드백 요청');
-      toast('요청했어요 · 트레이너에게 바로 떠요');
+      toast('요청했어요\n트레이너 화면에 바로 나옵니다');
       if(rest[2]==='x'){ closeSheet(); render(); } else drawSheet();
       return; }
     case 'unask': {
@@ -13009,7 +13014,7 @@ document.addEventListener('click', async ev=>{
     case 'bpview': sheetBpView(rest[0]); return;
     case 'bpdel': { const x=(D.bph||[]).find(y=>y.id===rest[0]); if(!x) return;
       openSheet(()=>`<div class="h2">이 ${x.kind==='vid'?'영상':'사진'}을 삭제할까요?</div>
-        <div class="note">${esc(dateTxt(x.date))} · ${x.kind==='ai'?'AI 체형분석':esc(x.pose)} — 되돌릴 수 없습니다.</div>
+        <div class="note">${esc(dateTxt(x.date))} · ${x.kind==='ai'?'AI 체형분석':esc(x.pose)}<br>삭제하면 되돌릴 수 없습니다.</div>
         <button class="btn main" data-act="bpdelgo:${x.id}" style="background:var(--warn);color:#241310">삭제</button>
         <button class="btn ghost sm" data-act="close">닫기</button>`);
       return; }
@@ -13067,7 +13072,7 @@ document.addEventListener('click', async ev=>{
         {on:'member_id,on_date'}), '회차 만들기');
       sv(spost('body_checks',[{ member_id:mid, on_date:TODAY, checks:r.checks,
         photos:b.photos||{}, memo:b.memo||'', updated_at:new Date().toISOString() }], {on:'member_id'}), '체형분석 저장');
-      toast('새 회차를 열었어요 — 풀린 것을 눌러서 끄세요'); render(); return; }
+      toast('새 회차를 열었어요\n좋아진 항목을 눌러서 꺼 주세요'); render(); return; }
     case 'bpmark': closeSheet(); sheetBpMark(rest[0]); return;
     case 'mkundo': { if(S.bpMark) S.bpMark.pts.pop(); drawSheet(); return; }
     case 'mkclear': { if(S.bpMark) S.bpMark.pts = []; drawSheet(); return; }
@@ -13081,7 +13086,7 @@ document.addEventListener('click', async ev=>{
       const 옛 = D.cycle[mid];
       if(!(옛 && 옛.last)){ S.cyset = { mid, last:TODAY, len:28, period:5, 새:true }; sheetCycSet(); return; }      /* 처음이면 세 가지를 묻는다 */
       D.cycle[mid] = Object.assign({}, 옛, { on:true });
-      svCycle(mid); toast('주기를 다시 켰어요 — 입력해 둔 날짜 그대로예요'); render(); return; }
+      svCycle(mid); toast('주기를 다시 켰어요\n입력해 둔 날짜 그대로예요'); render(); return; }
     case 'cycset': { const c = cycOf(rest[0]); if(!c) return; S.cyset = { mid:rest[0], last:c.last, len:c.len, period:c.period }; sheetCycSet(); return; }
     case 'cycd': { const d = S.cyset; if(!d) return; const el = document.querySelector('[data-k="cyclast"]'); if(el && el.value) d.last = el.value;
       const k = rest[0], [lo, hi] = 주기범위[k]; d[k] = Math.min(hi, Math.max(lo, d[k] + Number(rest[1]))); drawSheet(); return; }
@@ -13092,7 +13097,7 @@ document.addEventListener('click', async ev=>{
     case 'cycoff': sheet끄기확인('생리주기를 끌까요?', '끄면 내 화면과 트레이너 화면에서 주기가 안 보입니다.<br>입력해 둔 시작일 · 주기는 남아 있어서, 다시 켜면 그대로 이어집니다.', '끄기', 'cycoffok:' + rest[0]); return;
     case 'cycoffok': { const mid=rest[0];
       if(D.cycle&&D.cycle[mid]) D.cycle[mid].on=false;
-      closeSheet(); svCycle(mid); toast('껐어요 — 트레이너에게도 안 보여요'); render(); return; }
+      closeSheet(); svCycle(mid); toast('주기를 껐어요\n트레이너 화면에도 안 보여요'); render(); return; }
     case 'cycstart': { 주기시작(rest[0], TODAY); return; }
     case 'cyccal':   { sheetCycCal(rest[0]); return; }
     /* ⛔ `openSheet()` 를 빈 채로 부르면 **시트가 꺼진다** (sheetRender 가 지워진다).
@@ -13134,7 +13139,7 @@ document.addEventListener('click', async ev=>{
     case 'again': { closeSheet(); const src=D.workouts.find(x=>x.id===rest[0]);
       if(!src){ toast('그 기록을 찾지 못했어요'); return; }
       /* ⛔ 하던 운동이 있으면 새로 만들지 않는다 — newLive 가 D.live 를 통째로 덮는다 */
-      if(liveOf(S.mid)){ toast('하던 운동이 있어요 — 마치고 시작해 주세요'); go('workout'); return; }
+      if(liveOf(S.mid)){ toast('하던 운동이 있어요\n마치고 시작해 주세요'); go('workout'); return; }
       /* 세트가 남아 있는 종목만 가져온다 — 빈 종목이 섞이면 여기서 터진다 */
       const 것들 = (src.items||[]).filter(it=>it.sets&&it.sets.length).map(it=>{
         const f = it.sets[0];
@@ -13271,7 +13276,7 @@ document.addEventListener('click', async ev=>{
         const 방금 = cur.rmPlan[cur.sets.length-1];
         if(방금){ cur.rest = 방금.쉼초; S.rest = { sec:방금.쉼초, until: nx ? Date.now()+방금.쉼초*1000 : null }; }   /* 휴식 타이머를 그 단계 시간으로 바로 돌린다 */
         if(nx){ cur.sets.push({ kg:nx.kg, reps:nx.reps, done:false }); save(); toast('쉬기 '+방금.쉼+' 시작 → 다음 '+nx.단계+' '+nx.kg+'kg × '+nx.reps+'회'); }
-        else toast('본 시도 끝 — 성공했으면 「실측으로 남기기」'); }
+        else toast('본 시도를 마쳤어요\n성공했으면 「실측으로 남기기」를 눌러 주세요'); }
       render(); return; }
     case 'nextset': { const cur=w.items[w.cur], last=cur.sets[cur.sets.length-1];
       if(!last || !last.done) return toast('이번 세트를 먼저 완료해 주세요');
@@ -13347,7 +13352,7 @@ document.addEventListener('click', async ev=>{
       S.pse = null; toast('삭제했어요'); sheetPsets(S.psMid); render(); return; }
     case 'psasg': { const x = 내세트().find(z=>z.id===rest[0]); if(!x) return; const mid = rest[1], i = x.mids.indexOf(mid);
       if(i >= 0) x.mids.splice(i,1); else x.mids.push(mid);
-      drawSheet(); await 세트저장(x); toast(i >= 0 ? '지정을 풀었어요' : '지정했어요 — 회원 「준비운동」 맨 위에 떠요'); return; }
+      drawSheet(); await 세트저장(x); toast(i >= 0 ? '지정을 풀었어요' : '지정했어요\n회원 「준비운동」 맨 위에 나옵니다'); return; }
     case 'pt': S.prepTab = rest[0]; render(); return;
     case 'ps': S.prepSet = rest[0]; S.prepRid = null; S.prepPset = null; go('prep3'); return;
     case 'pr': S.prepRid = rest[0]; S.prepPset = null; go('prep3'); return;
@@ -13368,7 +13373,7 @@ document.addEventListener('click', async ev=>{
       save(); toast('그 무게로 맞췄어요'); render(); return; }
     case 'rest': sheetRest(); return;
     case 'wlock': { const lw=live(); if(!lw) return; lw.lock=true; save();
-      toast('잠갔어요 — 풀 때는 자물쇠를 길게 누르세요'); render(); return; }
+      toast('잠갔어요\n풀 때는 자물쇠를 길게 눌러 주세요'); render(); return; }
     case 'wunlock': { const lw=live(); if(!lw) return; lw.lock=false; save();
       toast('잠금을 풀었어요'); render(); return; }
     case 'wlockhint': toast('자물쇠를 길게 누르면 풀립니다'); return;
@@ -13435,7 +13440,7 @@ document.addEventListener('click', async ev=>{
         cur.sets = [{ kg: 종==='속경' ? c.inc : 0, reps: Math.max(1, Math.round(c.acc/60)), spd: 속, dist: 거 == null ? undefined : 거, feel: c.feel, src:'직접', done:true }];
         cur.locked = true; cur.sec = c.acc; S.fold = false; S.wsel = null;
         const 끝난 = w.cur, nxt = w.items.findIndex(it => !it.locked); svItem(끝난);
-        if(nxt >= 0){ w.cur = nxt; w.items[nxt].startAt = w.startAt ? Date.now() : null; save(); toast('기록했어요 · 다음 종목'); render(); return; }
+        if(nxt >= 0){ w.cur = nxt; w.items[nxt].startAt = w.startAt ? Date.now() : null; save(); toast('기록했어요\n다음 종목으로 넘어갑니다'); render(); return; }
         save(); render(); toast('기록했어요'); return; }
       save(); render(); return; }
     case 'fin': { S.fold=false; S.wsel=null; const cur=w.items[w.cur];
@@ -13445,7 +13450,7 @@ document.addEventListener('click', async ev=>{
         const doneIdx=w.cur;
         const nxt=w.items.findIndex(it=>!it.locked);
         svItem(doneIdx);
-        if(nxt>=0){ w.cur=nxt; w.items[nxt].startAt = w.startAt ? Date.now() : null; save(); toast('잠갔어요 · 다음 종목'); render(); return; }
+        if(nxt>=0){ w.cur=nxt; w.items[nxt].startAt = w.startAt ? Date.now() : null; save(); toast('잠갔어요\n다음 종목으로 넘어갑니다'); render(); return; }
         save(); render();
       }
       sheetFinish(); return; }
@@ -13477,14 +13482,14 @@ document.addEventListener('click', async ev=>{
     case 'nick0re': if(sheetRender && sheetRender.다시) sheetRender.다시(); return;
     case 'nick0ok': { const el = document.querySelector('[data-k="nick0"]'), 닉 = el ? el.value.trim().replace(/\s+/g,' ') : '', 말 = 닉검사(닉);
       if(말){ toast(말); return; }
-      if(await 닉서버겹침(닉)){ toast('이미 쓰고 있는 닉네임이에요 · 다른 닉네임을 입력해 주세요'); return; }
+      if(await 닉서버겹침(닉)){ toast('이미 쓰고 있는 닉네임이에요\n다른 닉네임을 입력해 주세요'); return; }
       await profSave(S.mid, { nick: 닉 }); closeSheet(); toast(닉 + '님, 반가워요'); render(); return; }
     case 'profok': {
       const el = document.querySelector('[data-k="pf:bio"]');
       const nk = document.querySelector('[data-k="pf:nick"]'), 닉 = nk ? nk.value.trim().replace(/\s+/g,' ') : (profOf(S.mid).nick||'');
       /* 남이 쓰는 닉네임·남의 이름과 같으면 받지 않는다 — 랭킹에서 누군지 헷갈린다 */
       { const 말 = 닉검사(닉); if(말){ toast(말); return; } }      /* 프로필에서는 바꿀 수만 있다 — 비울 수 없다 */
-      if(닉 !== (profOf(S.mid).nick || '') && await 닉서버겹침(닉)){ toast('이미 쓰고 있는 닉네임이에요 · 다른 닉네임을 입력해 주세요'); return; }
+      if(닉 !== (profOf(S.mid).nick || '') && await 닉서버겹침(닉)){ toast('이미 쓰고 있는 닉네임이에요\n다른 닉네임을 입력해 주세요'); return; }
       profSave(S.mid, { bio: el ? el.value.trim() : '', nick: 닉 });   /* 저장은 뒤에서 마저 */
       closeSheet(); toast('저장했어요'); render(); return; }
     case 'ootdre': closeSheet(); ootdPick(rest[0]); return;
@@ -13536,11 +13541,11 @@ document.addEventListener('click', async ev=>{
       if(!(S.rmGoal>0)){ toast('목표 1RM 을 입력해 주세요'); return; } sheetRM(); return; }
     case 'rmplan': { const z=지금종목(); if(!z || !(S.rmGoal>0)) return;
       const 계획 = rm계획(S.rmGoal, z.cur.ex).filter(p=>!p.선택);
-      if(z.cur.sets.some(x=>x.done)){ toast('이미 끝낸 세트가 있어요 — 새 종목으로 추가해 재 주세요'); return; }
+      if(z.cur.sets.some(x=>x.done)){ toast('이미 끝낸 세트가 있어요\n새 종목으로 추가해서 재 주세요'); return; }
       z.cur.sets = [{ kg:계획[0].kg, reps:계획[0].reps, done:false }];     /* 첫 세트만 — 완료할 때마다 다음 단계가 자동으로 온다 */
       z.cur.rest = 계획[0].쉼초;
       z.cur.rmPlan = 계획; z.cur.rmGoal = S.rmGoal; save(); closeSheet();
-      toast('워밍업 '+계획[0].kg+'kg × '+계획[0].reps+'회부터 — 완료하면 다음 단계가 자동으로 깔려요'); render(); return; }
+      toast('워밍업 '+계획[0].kg+'kg × '+계획[0].reps+'회부터 시작해요\n완료하면 다음 단계가 자동으로 나옵니다'); render(); return; }
     case 'rmsave': { const z=지금종목(); if(!z) return; const el=document.querySelector('[data-k="rmkg"]'); const kg=el?Number(el.value):0;
       if(!(kg>0)){ toast('무게를 입력해 주세요'); return; }
       rm기록(z.mid, z.cur.ex, z.cur.va, kg, 1, '실측', z.w.id, S.who==='tr' ? (TRAINER||'트레이너') : '회원');
@@ -13654,11 +13659,11 @@ document.addEventListener('click', async ev=>{
       if(exOf(it.ex).cardio){ st.reps = nnum(g('reps')); st.spd = g('spd')===''? undefined : nnum(g('spd'));
         if(경사최대(it.ex)) st.kg = Math.min(경사최대(it.ex), nnum(g('kg'))); }
       else { st.kg = nnum(g('kg')); st.reps = nnum(g('reps')); }
-      closeSheet(); toast('변경했어요 · 아직 저장 전이에요'); render(); return; }
+      closeSheet(); toast('변경했어요\n「저장」을 눌러야 반영됩니다'); render(); return; }
     case 'rsetdel': {
       const [i,j] = rest.map(Number);
       S.recEdit.items[i].sets.splice(j,1);
-      closeSheet(); toast('제거했어요 · 아직 저장 전이에요'); render(); return; }
+      closeSheet(); toast('제거했어요\n「저장」을 눌러야 반영됩니다'); render(); return; }
     case 'raddset': {
       const i = Number(rest[0]), it = S.recEdit.items[i];
       const last = it.sets[it.sets.length-1] || { kg:0, reps:10 };
@@ -13691,7 +13696,7 @@ document.addEventListener('click', async ev=>{
       save(); toast('이어서 하실 수 있어요'); go('workout'); return; }
     case 'unfsave': { const w=live(); if(!w) { closeSheet(); return; } const dur = 접기(w, '끝내지 못한 운동 저장');
       { const i = D.workouts.findIndex(x => x.id === w.id); if(i < 0) D.workouts.unshift(w); else if(D.workouts[i] !== w) D.workouts[i] = w; }   /* 목록의 사본이 따로 있으면 접은 것으로 바꿔 끼운다 — 안 그러면 시간이 비었다 */
-      D.live = null; S.미완 = null; save(); closeSheet(); toast('기록으로 저장했어요 — ' + durTxt(dur)); 미완나가기(); return; }
+      D.live = null; S.미완 = null; save(); closeSheet(); toast('기록으로 저장했어요\n운동 시간 ' + durTxt(dur)); 미완나가기(); return; }
     case 'unfgo': { const w=live(); if(w){ w.touch = Date.now(); save(); } S.미완 = null; closeSheet(); if(w) go('workout'); return; }
     case 'unfdel': openSheet(()=>`<div class="h2" style="text-align:center;line-height:1.5;padding:6px 0 4px">이 운동 기록을<br>삭제하시겠습니까?</div>
         <div style="display:flex;gap:9px"><button class="btn main" style="flex:1" data-act="unfback">돌아가기</button>
@@ -13761,8 +13766,8 @@ document.addEventListener('click', async ev=>{
       });
       save();
       if(cart.length===1 && 마지막){        /* 하나만 가져왔으면 바로 이름 짓는 화면으로 */
-        S.redit=마지막; toast('가져왔어요 · 이름을 변경해 주세요'); go('t_redit'); return; }
-      toast(`루틴 ${cart.length}개를 가져왔어요 · 이름을 변경해 주세요`); go('t_routines'); return; }
+        S.redit=마지막; toast('가져왔어요\n이름을 변경해 주세요'); go('t_redit'); return; }
+      toast(`루틴 ${cart.length}개를 가져왔어요\n이름을 변경해 주세요`); go('t_routines'); return; }
     case 'rgrp': S.rgrp = rest.join(':'); render(); return;
     case 'rmpick': sheetRmPick(); return;
     case 'grpman': sheetGrpMan(); return;
@@ -13775,7 +13780,7 @@ document.addEventListener('click', async ev=>{
       if(el) el.value='';
       S.rgrp = g;                       /* 만든 그룹으로 바로 들어간다 */
       closeSheet();
-      toast(`「${g}」 그룹을 만들었어요 · 여기에 루틴을 추가하세요`);
+      toast(`「${g}」 그룹을 만들었어요\n여기에 루틴을 추가해 주세요`);
       render(); return; }
     case 'grpren': S.grpRen = rest.join(':'); drawSheet(); return;
     case 'grprencancel': S.grpRen = null; drawSheet(); return;
@@ -13793,7 +13798,7 @@ document.addEventListener('click', async ev=>{
       const g = rest.join(':');
       myRoutines(S.tmid||'m1').filter(r=>(r.grp||'').trim()===g).forEach(r=>setGrp(r.id, ''));
       if(S.rgrp===g) S.rgrp='전체';
-      toast('그룹을 없앴어요 · 루틴은 그대로 있어요'); drawSheet(); render(); return; }
+      toast('그룹을 없앴어요\n루틴은 그대로 있어요'); drawSheet(); render(); return; }
     case 'rsetgrp': { const rid=rest[0], g=rest.slice(1).join(':');
       setGrp(rid, g); toast(g?`「${g}」 그룹으로`:'그룹에서 제거했어요'); render(); return; }
     case 'assign': sheetAssign(rest[0], rest[1]); return;
