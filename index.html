@@ -2439,6 +2439,30 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
   border:1px solid var(--line);border-radius:11px;padding:11px 17px;font-size:13.5px;font-weight:700;
   white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .22s;z-index:30}
 #toast.on{opacity:1}
+/* ══ 같이 찍은 사진 A안 (2026-10-20 대표 「A안 · kg · 제목 수정 · 뒤 문구 랜덤」) ══ 미리보기는 cqw(그림 폭 기준) — 저장은 캔버스로 같은 자리 */
+.pf{position:relative;width:100%;aspect-ratio:4/5;border-radius:12px;overflow:hidden;container-type:inline-size;background:#1b1a18 center/cover no-repeat;user-select:none;touch-action:none}
+.pf .sh{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.28) 0,rgba(0,0,0,0) 22%,rgba(0,0,0,0) 48%,rgba(0,0,0,.72) 100%)}
+.pf .tp{position:absolute;left:6.7%;right:6.7%;top:5.5%;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.pf .lg{font-family:Archivo,sans-serif;font-size:2.95cqw;letter-spacing:.34em;font-weight:700;color:#fff}
+.pf .dt{font-family:Archivo,sans-serif;font-size:2.95cqw;letter-spacing:.18em;font-weight:600;color:rgba(253,250,246,.82);white-space:nowrap}
+.pf .bt{position:absolute;left:6.7%;right:6.7%;bottom:6%}
+.pf .k{font-size:3.05cqw;font-weight:800;letter-spacing:.14em;color:#e9cf9b}
+.pf .h{font-size:6.95cqw;font-weight:900;letter-spacing:-.02em;margin-top:1.4cqw;line-height:1.15;color:#fff}
+.pf .ex{font-size:3.2cqw;color:rgba(253,250,246,.72);margin-top:1.7cqw}
+.pf .k,.pf .h,.pf .ex{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pf .st{display:grid;grid-template-columns:repeat(3,1fr);margin-top:3.9cqw;border-top:1px solid rgba(253,250,246,.22);padding-top:3cqw}
+.pf .st div{min-width:0;padding-left:2.8cqw;border-left:1px solid rgba(253,250,246,.22)}.pf .st div:first-child{padding-left:0;border-left:0}
+.pf .st b{display:block;font-family:Archivo,sans-serif;font-size:6.6cqw;font-weight:700;line-height:1;color:#fff;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pf .st small{display:block;font-size:2.8cqw;letter-spacing:.12em;color:rgba(253,250,246,.66);margin-top:1.1cqw;font-weight:700}
+.pf .tx{position:absolute;padding:.4cqw 1.4cqw;border-radius:1.6cqw;font-weight:900;white-space:nowrap;cursor:move;line-height:1.25;text-shadow:0 1px 6px rgba(0,0,0,.45);touch-action:none}
+.pf .tx.m{font-size:6.1cqw}.pf .tx.l{font-size:8.9cqw}
+.pf .tx.sel{outline:1.5px dashed rgba(233,207,155,.9);outline-offset:2px}
+.pfrow{display:flex;gap:8px;align-items:center;margin-top:10px}.pfrow input{flex:1;min-width:0}
+.pfrow .pfbtn{flex:none;height:44px;padding:0 12px;border-radius:12px;border:1px solid var(--line);font-size:13.5px;font-weight:700;color:var(--cream)}
+.pftool{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.pftool .c{width:30px;height:30px;border-radius:50%;border:2px solid transparent;box-shadow:0 0 0 1px #4a4842}.pftool .c.on{border-color:var(--gold)}
+.pftool .z{height:30px;padding:0 10px;border-radius:9px;border:1px solid var(--line);font-size:13px;font-weight:800}.pftool .z.on{border-color:var(--gold-2);color:var(--gold)}
+.pftool .del{margin-left:auto;height:30px;padding:0 10px;border-radius:9px;border:1px solid var(--line);font-size:13px;color:var(--sub)}
 #toast small{display:block;margin-top:3px;font-size:13px;font-weight:500;color:var(--sub)}   /* 2026-10-20 두 줄 알림 — 둘째 줄 = 다음에 할 것 */
 .blall small,.blrow span small,.rmhint small{display:block;margin-top:1px;font-weight:500;color:var(--sub)}   /* 2026-10-20 줄표 대신 둘째 줄 */
 /* ── 로딩 그림 (설계서\시험페이지\로딩_모음.html 과 같은 것 · 금색 하나 · 그림 파일 없음) ── */
@@ -3009,7 +3033,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '427';
+const BUILD = '428';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -8990,13 +9014,81 @@ function pairPick(wid){
   });
   inp.click();
 }
+/* ══ 같이 찍은 사진 A안 ══ 2026-10-20 대표 「틀 없는 사진 · A안 · kg · 「n번째 수업 기록, ○○」 수정 · 뒤 문구 랜덤 · 글자 넣기」
+   글은 그 수업 기록에서 자동 : 날짜 · 요일 · 트레이너 · n번째 수업 · 종목(앞 3개 + 외 n) · 종목 수 · 세트 · 총 kg. 원본은 따로 남긴다 */
+const 같이문구 = ['끝까지 해냈어요', '오늘도 한 단계 위로', '땀은 거짓말 안 해요', '함께라서 가능했어요', '어제보다 한 걸음 더', '오늘 운동 완료', '꾸준함이 답이에요', '잘 버텼어요'];
+const 요일영 = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+function 같이자료(wid){
+  const w = D.workouts.find(z => z.id === wid) || D.live || {}, mid = w.mid || S.tmid || S.mid, m = MEMBERS.find(x => x.id === mid) || {};
+  const its = (w.items || []).filter(it => (it.sets || []).length && !isMemo(it.ex)), 날 = w.date || TODAY, d = new Date(날 + 'T00:00:00');
+  const n = workoutsOf(mid).filter(x => x.kind === '수업' && 세트있나(x) && (x.date < 날 || (x.date === 날 && x.id <= w.id))).length || 1;
+  const 종 = its.map(it => exName(it.ex, it.va));
+  return { n, 트: (S.who === 'tr' ? TRAINER : m.tr) || '', 날글: 날.slice(0, 4) + '. ' + 날.slice(5, 7) + '. ' + 날.slice(8, 10), 요: 요일영[d.getDay()],
+    종: 종.slice(0, 3).join(' · ') + (종.length > 3 ? ' 외 ' + (종.length - 3) : ''), 수: its.length, 세: its.reduce((a, it) => a + it.sets.length, 0), kg: Math.round(totalKg(w)) }; }
+const 같이제목 = n => n + '번째 수업 기록, ' + 같이문구[Math.floor(Math.random() * 같이문구.length)];
+function 같이판(){ const P = S.pair, a = P.자료;
+  return `<div class="pf" id="pf" style="background-image:url('${P.url}')"><div class="sh"></div>
+    <div class="tp"><span class="lg">GLAD GYM</span><span class="dt">${esc(a.날글)} · ${a.요}</span></div>
+    <div class="bt"><div class="k">WITH ${esc(a.트 || 'GLAD')} TRAINER</div><div class="h" id="pfh">${esc(P.제목)}</div><div class="ex">${esc(a.종)}</div>
+      <div class="st"><div><b>${a.수}</b><small>종목</small></div><div><b>${a.세}</b><small>세트</small></div><div><b>${a.kg.toLocaleString()}</b><small>kg</small></div></div></div>
+    ${P.글.map((g, i) => `<div class="tx ${g.z}${i === P.고른 ? ' sel' : ''}" data-i="${i}" style="left:${g.x * 100}%;top:${g.y * 100}%;color:${g.c}">${esc(g.t)}</div>`).join('')}</div>`; }
+function 같이붙이기(){ const pf = $('#pf'), P = S.pair; if(!pf || !P || pf.dataset.on) return; pf.dataset.on = '1';
+  let 끌 = null;
+  /* ⚠ 누르는 순간 다시 그리면 끌던 글자가 새 것으로 바뀌어 안 옮겨진다 — 다시 그리기는 손을 뗀 뒤에 (2026-10-20) */
+  pf.addEventListener('pointerdown', e => { const t = e.target.closest('.tx');
+    if(!t){ if(P.고른 != null){ P.고른 = null; drawSheet(); } return; }
+    const i = +t.dataset.i, 바뀜 = P.고른 !== i; P.고른 = i; pf.querySelectorAll('.tx').forEach(el => el.classList.toggle('sel', el === t));
+    const r = pf.getBoundingClientRect(), g = P.글[i]; 끌 = { i, 바뀜, dx: e.clientX - r.left - g.x * r.width, dy: e.clientY - r.top - g.y * r.height }; try{ pf.setPointerCapture(e.pointerId); }catch(x){} });
+  pf.addEventListener('pointermove', e => { if(!끌) return; const r = pf.getBoundingClientRect(), g = P.글[끌.i];
+    g.x = Math.max(0, Math.min(.9, (e.clientX - r.left - 끌.dx) / r.width)); g.y = Math.max(0, Math.min(.93, (e.clientY - r.top - 끌.dy) / r.height));
+    const el = $('#pf .tx[data-i="' + 끌.i + '"]'); if(el){ el.style.left = g.x * 100 + '%'; el.style.top = g.y * 100 + '%'; } });
+  pf.addEventListener('pointerup', () => { const 다시 = 끌 && 끌.바뀜; 끌 = null; if(다시) drawSheet(); });
+  const 맞춤 = () => { const t = $('#pfh'); if(!t) return; let 크 = 6.95; t.style.fontSize = 크 + 'cqw'; while(크 > 5 && t.scrollWidth > t.clientWidth + 1){ 크 -= .3; t.style.fontSize = 크 + 'cqw'; } };      /* 저장본과 같이 — 길면 줄여서 다 넣는다 */
+  맞춤();
+  const h = $('#pftitle'); if(h) h.addEventListener('input', () => { P.제목 = h.value; const t = $('#pfh'); if(t) t.textContent = h.value; 맞춤(); });
+  const tx = $('#pftx'); if(tx) tx.addEventListener('input', () => { if(P.고른 == null) return; P.글[P.고른].t = tx.value; const el = $('#pf .tx[data-i="' + P.고른 + '"]'); if(el) el.textContent = tx.value; }); }
+/* 저장할 한 장 — 미리보기와 같은 자리 · 같은 크기(1080 = 미리보기 폭의 3배 기준) */
+async function 같이굽기(){ const P = S.pair, a = P.자료, W = OOTD_W, H = OOTD_H;
+  const img = await new Promise((ok, no) => { const i = new Image(); i.onload = () => ok(i); i.onerror = no; i.src = P.url; });
+  try{ await document.fonts.ready; }catch(e){}
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const x = cv.getContext('2d');
+  const 비 = Math.max(W / img.naturalWidth, H / img.naturalHeight); x.drawImage(img, (W - img.naturalWidth * 비) / 2, (H - img.naturalHeight * 비) / 2, img.naturalWidth * 비, img.naturalHeight * 비);
+  const gr = x.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, 'rgba(0,0,0,.28)'); gr.addColorStop(.22, 'rgba(0,0,0,0)'); gr.addColorStop(.48, 'rgba(0,0,0,0)'); gr.addColorStop(1, 'rgba(0,0,0,.72)'); x.fillStyle = gr; x.fillRect(0, 0, W, H);
+  const 한 = '"Noto Sans KR","Malgun Gothic",sans-serif', 글 = (크, 굵, 꼴, 색, 자) => { x.font = 굵 + ' ' + 크 + 'px ' + 꼴; x.fillStyle = 색; try{ x.letterSpacing = (자 || 0) + 'px'; }catch(e){} };
+  const 줄임 = (t, 폭) => { t = String(t || ''); if(x.measureText(t).width <= 폭) return t; while(t.length && x.measureText(t + '…').width > 폭) t = t.slice(0, -1); return t + '…'; };
+  const L = 72, R = W - 72, 폭 = R - L; x.textBaseline = 'alphabetic';
+  x.shadowColor = 'rgba(0,0,0,.35)'; x.shadowBlur = 6; x.shadowOffsetY = 1;
+  x.textAlign = 'left'; 글(32, 700, OOTD_A, '#fff', 11); x.fillText('GLAD GYM', L, 108);
+  x.textAlign = 'right'; 글(32, 600, OOTD_A, 'rgba(253,250,246,.82)', 6); x.fillText(a.날글 + ' · ' + a.요, R + 6, 108);
+  x.textAlign = 'left';
+  const 바닥 = H - 81, 라벨 = 바닥 - 6, 숫자 = 라벨 - 42, 선 = 숫자 - 102, 종목 = 선 - 44, 제목 = 종목 - 56, 라벨위 = 제목 - 82;
+  글(33, 800, 한, '#e9cf9b', 4.6); x.fillText(줄임('WITH ' + (a.트 || 'GLAD') + ' TRAINER', 폭), L, 라벨위);
+  { let 크 = 75; 글(크, 900, 한, '#fff', -1.5); while(크 > 54 && x.measureText(P.제목).width > 폭){ 크 -= 3; 글(크, 900, 한, '#fff', -1.5); }      /* 길면 줄여서 다 넣고(54까지) 그래도 넘치면 … */
+    x.fillText(줄임(P.제목, 폭), L, 제목); }
+  글(34.5, 500, 한, 'rgba(253,250,246,.72)', 0); x.fillText(줄임(a.종, 폭), L, 종목);
+  x.shadowColor = 'transparent'; x.fillStyle = 'rgba(253,250,246,.22)'; x.fillRect(L, 선, 폭, 2);
+  const 칸 = 폭 / 3;
+  [[a.수, '종목'], [a.세, '세트'], [a.kg.toLocaleString(), 'kg']].forEach((v, i) => { const cx = L + 칸 * i + (i ? 30 : 0);
+    if(i){ x.fillStyle = 'rgba(253,250,246,.22)'; x.fillRect(L + 칸 * i, 선 + 30, 2, 바닥 - 선 - 30); }
+    x.shadowColor = 'rgba(0,0,0,.35)'; 글(72, 700, OOTD_A, '#fff', 0); x.fillText(줄임(String(v[0]), 칸 - 36), cx, 숫자);
+    글(30, 700, 한, 'rgba(253,250,246,.66)', 3.6); x.fillText(v[1], cx, 라벨); });
+  P.글.forEach(g => { if(!g.t) return; 글(g.z === 'l' ? 96 : 66, 900, 한, g.c, 0); x.shadowColor = 'rgba(0,0,0,.45)'; x.shadowBlur = 18; x.fillText(g.t, g.x * W + 15, g.y * H + (g.z === 'l' ? 96 : 66) * 1.02); });
+  try{ x.letterSpacing = '0px'; }catch(e){}
+  return await new Promise(r => cv.toBlob(r, 'image/jpeg', 0.9)); }
 function sheetPair(){
-  openSheet(()=>`
+  const P = S.pair; if(!P.자료){ P.자료 = 같이자료(P.wid); P.제목 = 같이제목(P.자료.n); P.글 = []; P.고른 = null; }
+  setTimeout(같이붙이기, 0);
+  openSheet(()=>{ const g = P.고른 != null ? P.글[P.고른] : null; setTimeout(같이붙이기, 0); return `
     <div class="h2">같이 찍은 사진 <small>저장하면 양쪽에 남습니다</small></div>
-    <img class="shot ootdimg" src="${S.pair.url}" alt="">
+    ${같이판()}
+    <div class="pfrow"><input class="search" id="pftitle" maxlength="30" value="${esc(P.제목)}" aria-label="제목"><button class="pfbtn" data-act="pfroll">다른 문구</button></div>
+    ${g ? `<div class="pfrow"><input class="search" id="pftx" maxlength="24" value="${esc(g.t)}" placeholder="글자를 입력해 주세요"></div>
+      <div class="pftool">${[['#fdfaf6', '흰색'], ['#1a1814', '검정'], ['#e9cf9b', '골드']].map(c => `<button class="c${g.c === c[0] ? ' on' : ''}" style="background:${c[0]}" data-act="pfcol:${c[0].slice(1)}" aria-label="${c[1]}"></button>`).join('')}
+        <button class="z${g.z === 'm' ? ' on' : ''}" data-act="pfsz:m">보통</button><button class="z${g.z === 'l' ? ' on' : ''}" data-act="pfsz:l">크게</button><button class="del" data-act="pfdel">글자 삭제</button></div>`
+      : `<div class="pfrow"><button class="pfbtn" style="flex:1" data-act="pfadd">＋ 글자 넣기</button></div>`}
     <button class="btn main" data-act="pairsave">저장</button>
     <button class="btn ghost sm" data-act="pairre:${S.pair.wid}">다시 찍기</button>
-    <button class="btn ghost sm" data-act="close">닫기</button>`);
+    <button class="btn ghost sm" data-act="close">닫기</button>`; });
 }
 async function pairSave(){
   if(!S.pair) return;
@@ -9004,9 +9096,11 @@ async function pairSave(){
   const mid = w ? w.mid : (S.tmid || S.mid);
   const id = 'pr' + Date.now();
   const path = `pair/${mid}/${id}.jpg`;
+  let 꾸민 = null; try{ 꾸민 = await 같이굽기(); }catch(e){ console.error('같이 찍은 사진 꾸미기', e); }
   closeSheet(); toast('올리는 중이에요');
-  const r = await fetch(SB_URL+'/storage/v1/object/media/'+path, {
-    method:'POST', headers:{ apikey:SB_KEY, Authorization:'Bearer '+수파열쇠(), 'Content-Type':'image/jpeg' }, body: S.pair.blob });
+  const 올림 = (경로, 몸) => fetch(SB_URL+'/storage/v1/object/media/'+경로, { method:'POST', headers:{ apikey:SB_KEY, Authorization:'Bearer '+수파열쇠(), 'Content-Type':'image/jpeg' }, body: 몸 });
+  if(꾸민){ const r0 = await 올림(path.replace(/\.jpg$/, '.orig.jpg'), S.pair.blob); if(!r0.ok) console.warn('원본 못 올림', await r0.text()); }      /* 원본은 따로 (2026-10-02 「원본을 남긴다」) */
+  const r = await 올림(path, 꾸민 || S.pair.blob);
   if(!r.ok){ toast('사진을 못 올렸어요'); console.error(await r.text()); return; }
   const 날 = (w && w.date) || TODAY, by = (S.who==='tr') ? (TRAINER || '트레이너') : '회원';
   await sv(spost('body_photos',[{ id, member_id:mid, kind:'pair', pose:'인증샷', on_date:날, path, memo:S.pair.wid||'', taken_by:by }]), '인증샷 저장');
@@ -13690,6 +13784,11 @@ document.addEventListener('click', async ev=>{
     case 'pair': pairPick(rest[0]); return;
     case 'pairre': closeSheet(); pairPick(rest[0]); return;
     case 'pairsave': pairSave(); return;
+    case 'pfroll': { const P = S.pair; if(!P) return; const 옛 = P.제목; let n = 0; do{ P.제목 = 같이제목(P.자료.n); }while(P.제목 === 옛 && ++n < 5); drawSheet(); return; }
+    case 'pfadd': { const P = S.pair; if(!P) return; P.글.push({ t:'오늘도 해냈다', x:.08, y:.16, z:'m', c:'#fdfaf6' }); P.고른 = P.글.length - 1; drawSheet(); setTimeout(() => { const t = $('#pftx'); if(t){ t.focus(); t.select(); } }, 30); return; }
+    case 'pfcol': { const P = S.pair; if(!P || P.고른 == null) return; P.글[P.고른].c = '#' + rest[0]; drawSheet(); return; }
+    case 'pfsz': { const P = S.pair; if(!P || P.고른 == null) return; P.글[P.고른].z = rest[0]; drawSheet(); return; }
+    case 'pfdel': { const P = S.pair; if(!P || P.고른 == null) return; P.글.splice(P.고른, 1); P.고른 = null; drawSheet(); return; }
     case 'tprof': S.tmid=rest[0]; S.subj=rest[0]; go('profile'); return;
     case 'phhide': sheet끄기확인('이 사진을 내 화면에서 숨길까요?', '내 프로필 · 사진 모음에서 안 보이게 됩니다. 트레이너 화면에는 남아 있고, 다시 보이게 할 수 있어요.', '숨기기', 'phhideok:' + rest[0]); return;
     case 'phhideok': await 사진표시(rest[0], 'hid', new Date().toISOString()); toast('내 화면에서 숨겼어요'); closeSheet(); render(); return;
