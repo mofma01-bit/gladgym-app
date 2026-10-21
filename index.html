@@ -942,6 +942,39 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
   background-image:linear-gradient(100deg,#cfa868 0%,#cfa868 34%,#fff 50%,#cfa868 66%,#cfa868 100%);
   background-size:260% 100%;animation:newShine 2.4s linear infinite}
 @keyframes newShine{0%{background-position:130% 0}60%,100%{background-position:-30% 0}}
+/* ══ 피드백 탭 칸 (2026-10-21) — 기준 = 앱 톤앤매너(골드는 「지금」 · 색 대신 밝기) · 시안 설계서\시험페이지\피드백탭_시안_1021 ══ */
+.fsec{border-radius:18px;border:1px solid #34332d;background:linear-gradient(180deg,#1f1e1b,#171615);overflow:hidden;margin-top:12px;flex:none;width:100%}
+.fsec{padding:0!important}.fsec>.fh{display:flex;align-items:center;gap:10px;width:100%;margin:0!important;border-radius:0!important;box-shadow:none!important;min-height:0;padding:14px 15px 13px;text-align:left;background:rgba(255,255,255,.028);color:inherit;font:inherit}
+.fsec>.fh .ft{display:flex;flex-direction:column;min-width:0;flex:1}
+.fsec>.fh b{font-size:16px;font-weight:800;letter-spacing:-.02em;color:#fdfaf6}
+.fsec>.fh small{font-size:13px;color:#a39c8e;font-weight:500;margin-top:1px}
+.fsec>.fh .fc{font-variant-numeric:tabular-nums;font-size:13.5px;font-weight:800;min-width:26px;height:24px;border-radius:12px;padding:0 9px;display:flex;align-items:center;justify-content:center;background:#2a2925;color:#d6cfc3;flex:none}
+.fsec>.fh i{font-style:normal;color:#8f8a83;font-size:15px;transition:transform .18s;width:16px;text-align:center;flex:none}
+.fsec.shut>.fh i{transform:rotate(-90deg)}.fsec.shut>.fb{display:none}.fsec:not(.shut)>.fh{border-bottom:1px solid #2c2b27}
+.fsec .fb .mrow2{border-top:1px solid #2c2b27}.fsec .fb .mrow2:first-child{border-top:0}
+.fsec .mt small{font-size:13px!important}
+.fsec .fe{padding:14px 15px;font-size:13px;color:#8f8a83}
+.fsec .pd{width:9px;height:9px;border-radius:50%;background:var(--lc);position:relative;flex:none;margin-right:2px}
+.fsec .pd::after{content:'';position:absolute;inset:-5px;border-radius:50%;border:2px solid var(--lc);animation:fsping 1.4s ease-out infinite}
+.fsec.now,.fsec.new{--lc:#f0d3a0;--lg:rgba(230,196,135,.35);--lb1:#2a2318;--lb2:#3a2f1c;--lt:var(--gold)}
+.fsec.ask{--lc:#a9d8e6;--lg:rgba(169,216,230,.32);--lb1:#18262a;--lb2:#223940;--lt:var(--teal)}
+.fsec.miss{--lc:#f0a868;--lg:rgba(240,168,104,.32);--lb1:#2a1f17;--lb2:#3b2a1c;--lt:#f0a868}
+.fsec.live{border-color:color-mix(in srgb,var(--lc) 50%,transparent);animation:fsglow 2.6s ease-in-out infinite}
+.fsec.live>.fh{background:linear-gradient(90deg,var(--lb1),var(--lb2),var(--lb1));background-size:200% 100%;animation:fsbg 3.2s linear infinite}
+.fsec.live>.fh b{color:var(--lt)}.fsec.live>.fh .fc{background:var(--lc);color:#1a140c}
+.fsec.zero>.fh b{color:#a39c8e}.fsec.zero>.fh .fc{color:#8f8a83}
+@keyframes fsbg{to{background-position:-200% 0}}
+@keyframes fsglow{0%,100%{box-shadow:0 0 0 0 transparent}50%{box-shadow:0 0 16px 2px var(--lg)}}
+@keyframes fsping{0%{transform:scale(.6);opacity:1}100%{transform:scale(1.9);opacity:0}}
+.av2{position:relative;width:36px;height:36px;flex:none}
+.av2 img{width:36px;height:36px;border-radius:50%;object-fit:cover;display:block;border:1.2px solid rgba(253,250,246,.18)}
+.av2 .gb{position:absolute;right:-6px;bottom:-4px;font-style:normal;font-size:10.5px;font-weight:900;letter-spacing:-.03em;padding:1px 5px;border-radius:7px;background:#121211;border:1.2px solid}
+.av2 .gb.pt{color:#7fc9d6;border-color:rgba(127,201,214,.6)}.av2 .gb.tg{color:#e9e1d1;border-color:rgba(233,225,209,.55)}.av2 .gb.ex{color:#b8a6e0;border-color:rgba(184,166,224,.6)}.av2 .gb.fc{color:#8f8a83;border-color:rgba(143,138,131,.5)}
+.stp{flex:none;font-size:12.5px;font-weight:800;padding:3px 10px;border-radius:999px}
+.stp.ok{color:#a9d8e6;background:rgba(169,216,230,.1)}.stp.no{color:#241a10;background:var(--gold)}.stp.ns{color:#8f8a83;background:#2a2925}
+.mrow2 em.go.q{color:#8f8a83}
+.mrow2 .mt b .nw{font-size:11.5px;font-weight:900;color:#241a10;background:var(--gold);border-radius:20px;padding:1px 7px;margin-left:4px;vertical-align:1px}
+
 @media (prefers-reduced-motion:reduce){.hero .tag.new em{animation:none;color:var(--gold);background:none}}
 .hero2.half.wide{min-height:104px;background-position:center 38%}
 .cgate{display:flex;align-items:center;gap:14px;width:100%;flex:none;text-align:left;min-height:112px;padding:18px 16px;border-radius:20px;border:1px solid #5a4c33;
@@ -3060,7 +3093,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '439';
+const BUILD = '440';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -4623,9 +4656,16 @@ function unseen(w){
 function noCmItems(w){ return w.items.filter(it => it.sets.length && cmOf(w.mid, it.ex, it.va).length === 0); }
 function askOf(mid, ex, va){ return (D.asks||[]).filter(a => a.mid===mid && a.ex===ex && a.va===va && !a.done); }
 function openAsks(){ return (D.asks||[]).filter(a => !a.done); }
-function todoCount(){ return D.workouts.filter(w=>w.done && unseen(w)).length; }
-function mealTodo(){ return (D.meals||[]).filter(m=>!m.note); }
-function trTodo(){ return todoCount() + mealTodo().length + openAsks().length; }
+/* 숫자는 이번 주만 (2026-10-21 대표 「매번 피드백 자료를 올리는 게 아닌데 매번 불이 들어오고 숫자가 쌓이게 될 거야 · 데스크에서 확인 · 앱은 주간 데이터 위주」) — 주 = 주간 달력과 같은 일~토 */
+const 이번주에 = d => weekOf(TODAY).indexOf(d) >= 0;
+function todoCount(){ return D.workouts.filter(w=>w.done && unseen(w) && 이번주에(w.date)).length; }
+function mealTodo(){ return (D.meals||[]).filter(m=>!m.note && 이번주에(m.date)); }
+/* 새로 올라온 식단 — 이 기기에서 아직 안 연 이번 주 식단 (회원 식단을 열면 그 회원 것은 「봄」) */
+const 식단본 = (() => { try{ return new Set(JSON.parse(localStorage.getItem('gg_mseen') || '[]')); }catch(e){ return new Set(); } })();
+function 식단봄(mid){ (D.meals||[]).filter(x => x.mid === mid).forEach(x => 식단본.add(x.id)); try{ localStorage.setItem('gg_mseen', JSON.stringify([...식단본].slice(-3000))); }catch(e){} }
+function 새식단(){ return (D.meals||[]).filter(m => 이번주에(m.date) && !식단본.has(m.id)); }
+function 식단할일(){ return new Set(새식단().map(x => x.id).concat(mealTodo().map(x => x.id))).size; }
+function trTodo(){ return todoCount() + 식단할일() + openAsks().length + 오늘기록전().length; }
 function tabBarTr(){
   const n = trTodo();
   const t=(id,ic,nm,bd)=>`<button data-act="ttab:${id}" class="${S.ttab===id?'on':''}">
@@ -11571,7 +11611,7 @@ function vQa(){
 /* 오늘 */
 function tToday(){
   const live = MEMBERS.map(m=>({m, w:liveOf(m.id)})).filter(x=>x.w);
-  const todo = D.workouts.filter(w=>w.done && unseen(w)).sort(byDateDesc);
+  const todo = D.workouts.filter(w=>w.done && unseen(w) && 이번주에(w.date)).sort(byDateDesc);      /* 이번 주만 (2026-10-21) */
   return { top: bar('오늘', `<span class="sub">${TODAY.slice(5).replace('-','월 ')}일</span>`), body:`
     ${/* 2026-10-06 융합 — 큰 카드는 「오늘 수업 기록하기」 하나 · 숫자 셋(실제 수) · 나머지 둘은 반쪽 카드 */''}
     <button class="hero photo" data-act="pickmem">
@@ -11611,7 +11651,7 @@ function sheetTdLive(){
 }
 function sheetTdTodo(){
   const nm = id => (MEMBERS.find(x=>x.id===id)||{}).n || '?';
-  openSheet(()=>{ const todo = D.workouts.filter(w=>w.done && unseen(w)).sort((a,b)=> a.date < b.date ? -1 : a.date > b.date ? 1 : 0);      /* 오래된 것부터 */
+  openSheet(()=>{ const todo = D.workouts.filter(w=>w.done && unseen(w) && 이번주에(w.date)).sort((a,b)=> a.date < b.date ? -1 : a.date > b.date ? 1 : 0);      /* 오래된 것부터 */
     return `<div class="h2">피드백 안 단 기록 <small>${todo.length}건 · 오래된 것부터</small></div>
     <div class="pickbox"><div class="megrp">${todo.map(w=>{ const n = w.items.filter(it => it.sets.length && cmOf(w.mid, it.ex, it.va).length === 0).length;
       return `<button class="mrow2" data-act="tw:${w.id}">${갈래원(w.mid)}
@@ -11631,42 +11671,60 @@ function sheetTdMeal(){
 }
 
 /* 피드백 — 피드백 쓸 곳 모아보기 */
+/* ══ 피드백 탭 ══ 2026-10-21 대표 (노션 10/20 밤 · 시안 확정) — 칸마다 접기(기억) · 할 일 있으면 칸 색 불 · 없으면 무채색 · 누락은 이번 주만 */
+const 칸접힘 = (() => { try{ return JSON.parse(localStorage.getItem('gg_fsec') || '{}'); }catch(e){ return {}; } })();
+function 접칸(k, 꼴, 제목, 부제, n, 속, 불){
+  const 접 = 칸접힘[k] === true, 산 = (불 === undefined ? n : 불) > 0;
+  return `<div class="fsec ${꼴}${꼴 === 'day' ? '' : 산 ? ' live' : ' zero'}${접 ? ' shut' : ''}" data-k="${k}"><button class="fh" data-act="fsec:${k}">${산 && 꼴 !== 'day' ? '<span class="pd"></span>' : ''}<span class="ft"><b>${제목}</b>${부제 ? `<small>${부제}</small>` : ''}</span><span class="fc">${n}</span><i>⌄</i></button><div class="fb">${속}</div></div>`; }
+/* 프로필 원 — 회원이 넣은 사진 + PT · TG · 체험 딱지 · 사진이 없으면 갈래 원 */
+function 얼굴갈래(mid){
+  const a = profOf(mid).avatar, m = MEMBERS.find(x => x.id === mid) || {}, x = m.p4 ? 갈래표[m.n + '|' + m.p4] : null, g = x && 갈래짧게[x['갈래']];
+  if(!a) return 갈래원(mid);
+  return `<span class="av2"><img src="${esc(phURL(a))}" alt="" onerror="picFail(this)">${g ? `<em class="gb ${g[1]}">${g[0]}</em>` : ''}</span>`; }
+/* 오늘 예약 수업 — 데스크와 같은 서버 자료(/app/crm/booking 「오늘예약」 · 트레이너 토큰은 본인 것만) · 10분마다 · 무료 그룹수업은 뺀다 */
+const 예약 = { 줄:null, 중:false, 때:0, 말:'' };
+async function 예약받기(){ if(예약.중 || (예약.줄 && Date.now() - 예약.때 < 10 * 60 * 1000)) return; 예약.중 = true;
+  try{ const j = await 앱crm('booking', {}); const 나 = j['나'], 다 = j['오늘예약'] || {}; 예약.줄 = [].concat(...Object.entries(다).filter(([t]) => !나 || t === 나).map(([, v]) => v || [])); 예약.말 = ''; }
+  catch(e){ 예약.줄 = 예약.줄 || []; 예약.말 = e.message || ''; }
+  예약.중 = false; 예약.때 = Date.now(); if(S.screen === 't_feed') render(); }
+function 오늘예약줄(){ return (예약.줄 || []).filter(x => x && x['상태'] !== '취소' && x['종목'] !== '그룹').map(x => ({ x, m: MEMBERS.find(m => m.n === String(x.name || '').trim() && (!x.phone4 || m.p4 === x.phone4)) }))
+  .sort((a, b) => String(a.x['시각'] || '').localeCompare(String(b.x['시각'] || ''))); }
+const 오늘기록함 = m => !!m && D.workouts.some(w => w.mid === m.id && w.date === TODAY && w.done && w.items.some(i => i.sets.length));
+function 오늘기록전(){ return 오늘예약줄().filter(o => o.x['상태'] !== '노쇼' && !오늘기록함(o.m)); }
 function tFeed(){
   const nm = id => (MEMBERS.find(x=>x.id===id)||{}).n || '?';
   const mode = S.tfeed || 'ex';
+  setTimeout(예약받기, 0);
+  const 운동수 = 오늘기록전().length + openAsks().length + todoCount(), 식수 = 식단할일();
   const head = `<div class="seg">
-    <button class="${mode==='ex'?'on':''}" data-act="tfm:ex">운동${(todoCount()+openAsks().length)?' '+(todoCount()+openAsks().length):''}</button>
-    <button class="${mode==='diet'?'on':''}" data-act="tfm:diet">식단${mealTodo().length?' '+mealTodo().length:''}</button></div>`;
+    <button class="${mode==='ex'?'on':''}" data-act="tfm:ex">운동${운동수?' '+운동수:''}</button>
+    <button class="${mode==='diet'?'on':''}" data-act="tfm:diet">식단${식수?' '+식수:''}</button></div>`;
 
-  /* ── 식단 — 회원별로 묶어서 ── */
+  /* ── 식단 — 새로 올라온 식단(위) · 피드백을 남겨 주세요(이번 주) ── */
   if(mode==='diet'){
+    const 새 = 새식단(), 안단 = mealTodo(), 묶 = 목 => { const g = {}; 목.forEach(x => (g[x.mid] = g[x.mid] || []).push(x)); return Object.entries(g).map(([mid, xs]) => ({ mid, xs: xs.slice().sort((a,b)=> a.date<b.date?1:a.date>b.date?-1:(a.at||'')<(b.at||'')?1:-1) })).sort((a,b)=> a.xs[0].date<b.xs[0].date?1:-1); };
     const since = addDays(TODAY, -13);
-    const rows = MEMBERS.map(m=>{
-      const ms = (D.meals||[]).filter(x=>x.mid===m.id).slice().sort((a,b)=> a.date<b.date?1:a.date>b.date?-1:0);
-      return { m, ms, nw: ms.filter(x=>!x.note && x.date>=since).length, last: ms[0] };
-    }).filter(r=>r.ms.length).sort((a,b)=> b.nw-a.nw || (a.last.date<b.last.date?1:-1));
-    return { top: bar('피드백', `<span class="sub">식단</span>`), body: head + `
-      <span class="lbl">최근 올린 회원</span>
-      ${rows.length ? rows.map(r=>`<button class="card rowc ${r.nw?'gold':''}" data-act="tmeals:${r.m.id}">
-          <div><div class="nm ${r.nw?'g':''}">${esc(r.m.n)} 회원${r.nw?` <span class="pill">new ${r.nw}</span>`:''}</div>
-          <div class="sm">최근 ${dateTxt(r.last.date)} · ${esc(r.last.slot)}${r.last.memo?' · '+esc(r.last.memo.slice(0,14)):''}
-            <br>모두 ${r.ms.length}장${r.nw?` · 최근 2주에 피드백 안 단 것 ${r.nw}장`:' · 최근 것은 다 보셨어요'}</div></div>
-          <span class="rt">›</span></button>`).join('')
-        : '<div class="empty">아직 올라온 식단이 없습니다<small class="e2">회원이 식단을 기록하면 여기에 나옵니다</small></div>'}` };
+    const 올린 = MEMBERS.map(m => { const ms = (D.meals||[]).filter(x=>x.mid===m.id).slice().sort((a,b)=> a.date<b.date?1:a.date>b.date?-1:0); return { m, ms, 새: ms.filter(x => 새.indexOf(x) >= 0).length }; })
+      .filter(r => r.ms.length && r.ms[0].date >= since).sort((a,b)=> b.새 - a.새 || (a.ms[0].date<b.ms[0].date?1:-1));
+    const 끼 = x => `${dateTxt(x.date)} ${esc(x.slot||'')}`.trim();
+    return { top: bar('피드백', `<span class="sub">식단</span>`), body: head
+      + 접칸('mnew', 'new', '새로 올라온 식단', 새.length ? `아직 안 본 식단 ${새.length}장 · 회원 ${묶(새).length}명` : '최근 2주 안에 올린 회원', 새.length,
+          올린.length ? 올린.map(r => `<button class="mrow2" data-act="tmeals:${r.m.id}">${얼굴갈래(r.m.id)}<span class="mt"><b>${esc(r.m.n)} 회원${r.새 ? ` <span class="nw">new ${r.새}</span>` : ''}</b><small>${r.새 ? r.ms.filter(x => 새.indexOf(x) >= 0).slice(0, 2).map(끼).join(' · ') : '최근 ' + 끼(r.ms[0]) + ' · 다 보셨어요'}</small></span><em class="go${r.새 ? '' : ' q'}">${r.새 ? '보기 ›' : '›'}</em></button>`).join('')
+            : '<div class="fe">최근 2주 안에 올라온 식단이 없습니다</div>')
+      + 접칸('mmiss', 'miss', '피드백을 남겨 주세요 (주간)', '이번 주만 · 지난 건 데스크에서', 안단.length,
+          안단.length ? 묶(안단).map(g => `<button class="mrow2" data-act="tmeals:${g.mid}">${얼굴갈래(g.mid)}<span class="mt"><b>${esc(nm(g.mid))} 회원</b><small>이번 주 ${g.xs.length}장 · 최근 ${끼(g.xs[0])}</small></span><em class="go">쓰기 ›</em></button>`).join('')
+            : '<div class="fe">이번 주 식단은 피드백을 다 남겼어요</div>') };
   }
 
-  /* ── 운동 — 날짜별로 그날 수업한 회원 ── */
+  /* ── 운동 — 주간 달력(맨 위 그대로) · 오늘 예약 · 피드백 요청 · 남겨 주세요(이번 주) · 고른 날 수업 기록 ── */
   const sel = S.tfDay || TODAY, wkd = weekOf(sel);
   const dayWs = d => D.workouts.filter(w=>w.done && w.date===d && w.items.some(i=>i.sets.length))
     .slice().sort((a,b)=> a.mid<b.mid?-1:1);
   const list = dayWs(sel);
-  const todo = D.workouts.filter(w=>w.done && unseen(w) && w.items.some(i=>i.sets.length)).sort(byDateDesc);
-  const asks = openAsks();
+  const todo = D.workouts.filter(w=>w.done && unseen(w) && w.items.some(i=>i.sets.length) && 이번주에(w.date)).sort(byDateDesc);
+  const asks = openAsks(), 예 = 오늘예약줄(), 전 = 오늘기록전();
+  const 종류 = x => ({ PT:'PT', 서비스:'서비스', 가이드:'운동가이드', 체험:'체험', 기타:'수업' }[x['종목']] || x['종목'] || '수업');
   return { top: bar('피드백', `<span class="sub">${dateTxt(sel)}</span>`), body: head + `
-    ${asks.length?`<span class="lbl">회원이 봐 달라고 한 것 · ${asks.length}건</span>
-      <div class="megrp fbg g">${asks.map(a=>`<button class="mrow2" data-act="exd:${a.ex}:${a.va}:${a.mid}">
-        ${갈래원(a.mid)}
-        <span class="mt"><b>${esc(nm(a.mid))} · ${esc(exName(a.ex,a.va))}</b><small>${esc(a.note||'따로 입력한 말은 없어요')} · ${esc(agoTxt(a.ts))}</small></span><em class="go">쓰기 ›</em></button>`).join('')}</div>`:''}
     <div class="wk">
       <div class="wkhd">
         <button data-act="tfmove:-1">‹</button>
@@ -11674,21 +11732,21 @@ function tFeed(){
         <button data-act="tfmove:1" ${sel>=TODAY?'style="opacity:.3"':''}>›</button>
       </div>
       ${주간줄(wkd, sel, 'tfd', d => { const n = dayWs(d).length; return { has: n > 0, n }; })}
-    </div>
-    <span class="lbl">${dateTxt(sel)} 수업 ${list.length?`· ${list.length}명`:''}</span>
-    ${list.length ? `<div class="megrp fbg">${list.map(w=>{
-      const miss = noCmItems(w).length, 종 = w.items.filter(i=>i.sets.length);
-      return `<button class="mrow2 ${unseen(w)?'pson':''}" data-act="tw:${w.id}">
-        ${갈래원(w.mid)}
-        <span class="mt"><b>${esc(nm(w.mid))} 회원</b><small>${esc(w.kind||'')}${w.title?' · '+esc(w.title):''} · ${durTxt(w.dur)}</small>
-          <small>${종.map(i=>esc(exName(i.ex,i.va))).slice(0,3).join(' · ')}${종.length>3?' 외':''}</small></span>
-        <em class="go ${miss?'':'q'}">${miss?`피드백 ${miss}개 남음 ›`:'다 남겼어요'}</em></button>`; }).join('')}</div>`
-     : '<div class="empty">이 날은 기록한 수업이 없습니다<small class="e2">다른 날을 선택해 주세요</small></div>'}
-    ${todo.length?`<span class="lbl">아직 피드백 안 단 기록 · ${todo.length}건</span>
-      <div class="megrp fbg">${todo.slice(0,4).map(w=>`<button class="mrow2" data-act="tw:${w.id}">
-        ${갈래원(w.mid)}
-        <span class="mt"><b>${esc(nm(w.mid))} · ${dateTxt(w.date)}</b><small>${esc(w.kind||'')} · 피드백 없는 종목 ${noCmItems(w).length}개</small></span><em class="go">쓰기 ›</em></button>`).join('')}
-        ${todo.length > 4 ? `<button class="mrow2 more" data-act="tdtodo"><span class="mt"><b>${todo.length}건 모두 보기</b></span><i>›</i></button>` : ''}</div>`:''}` };
+    </div>`
+    + 접칸('today', 'now', '오늘 예약 수업', `${dateTxt(TODAY)} · 내 수업`, 예.length,
+        예.length ? 예.map(o => { const 됨 = 오늘기록함(o.m), 노 = o.x['상태'] === '노쇼';
+          return `<button class="mrow2" ${o.m ? `data-act="tm:${o.m.id}"` : ''}>${o.m ? 얼굴갈래(o.m.id) : `<span class="mi nm1">${esc(String(o.x.name || '?').slice(0, 1))}</span>`}<span class="mt"><b>${esc(o.x.name || '')} 회원</b><small>${esc(o.x['시각'] || '')} · ${종류(o.x)}${o.m ? '' : ' · 앱 미가입'}</small></span><span class="stp ${노 ? 'ns' : 됨 ? 'ok' : 'no'}">${노 ? '노쇼' : 됨 ? '기록함' : '기록 전'}</span></button>`; }).join('')
+          : `<div class="fe">${예약.줄 === null ? '불러오는 중이에요' : 예약.말 ? '오늘 예약을 불러오지 못했어요 · 잠시 뒤 다시 열어 주세요' : '오늘 예약된 수업이 없습니다'}</div>`, 전.length)
+    + 접칸('ask', 'ask', '회원 피드백 요청', '회원이 봐 달라고 한 것', asks.length,
+        asks.length ? asks.map(a=>`<button class="mrow2" data-act="exd:${a.ex}:${a.va}:${a.mid}">${얼굴갈래(a.mid)}<span class="mt"><b>${esc(nm(a.mid))} · ${esc(exName(a.ex,a.va))}</b><small>${esc(a.note||'따로 입력한 말은 없어요')} · ${esc(agoTxt(a.ts))}</small></span><em class="go">쓰기 ›</em></button>`).join('')
+          : '<div class="fe">회원이 봐 달라고 한 것이 없습니다</div>')
+    + 접칸('miss', 'miss', '피드백을 남겨 주세요 (주간)', '이번 주만 · 지난 건 데스크에서', todo.length,
+        todo.length ? todo.map(w=>`<button class="mrow2" data-act="tw:${w.id}">${얼굴갈래(w.mid)}<span class="mt"><b>${esc(nm(w.mid))} · ${dateTxt(w.date)}</b><small>${esc(w.kind||'')} · 피드백 없는 종목 ${noCmItems(w).length}개</small></span><em class="go">쓰기 ›</em></button>`).join('')
+          : '<div class="fe">이번 주 수업은 피드백을 다 남겼어요</div>')
+    + 접칸('day', 'day', `${dateTxt(sel)} 수업 기록`, '위 달력에서 선택한 날 · 다른 주도 ‹ › 로', list.length,
+        list.length ? list.map(w=>{ const miss = noCmItems(w).length, 종 = w.items.filter(i=>i.sets.length);
+          return `<button class="mrow2 ${unseen(w)?'pson':''}" data-act="tw:${w.id}">${얼굴갈래(w.mid)}<span class="mt"><b>${esc(nm(w.mid))} 회원</b><small>${esc(w.kind||'')}${w.title?' · '+esc(w.title):''} · ${durTxt(w.dur)}</small><small>${종.map(i=>esc(exName(i.ex,i.va))).slice(0,3).join(' · ')}${종.length>3?' 외':''}</small></span><em class="go ${miss?'':'q'}">${miss?`피드백 ${miss}개 남음 ›`:'다 남겼어요'}</em></button>`; }).join('')
+          : '<div class="fe">이 날은 기록한 수업이 없습니다 · 다른 날을 선택해 주세요</div>') };
 }
 
 /* 회원 한 명의 식단 모아보기 */
@@ -12462,6 +12520,7 @@ document.addEventListener('click', async ev=>{
       if(rest[0]==='t_community') 커뮤니티받기().then(()=>{ if(S.screen==='t_community') render(); });
       return;
     case 'tfm': S.tfeed=rest[0]; render(); return;
+    case 'fsec': { const 지금 = document.querySelector('.fsec[data-k="' + rest[0] + '"]'); 칸접힘[rest[0]] = !(지금 && 지금.classList.contains('shut')); try{ localStorage.setItem('gg_fsec', JSON.stringify(칸접힘)); }catch(e){} if(지금) 지금.classList.toggle('shut', 칸접힘[rest[0]]); return; }      /* 칸 접기 (2026-10-21) */
     case 'tfm2': S.tfeed=rest[0]; S.ttab='t_feed'; go('t_feed'); return;
     case 'pickmem': sheetPickMember(); return;
     case 'pickasg': sheetPickAssign(); return;
@@ -12863,7 +12922,7 @@ document.addEventListener('click', async ev=>{
       d.setDate(d.getDate() + Number(rest[0]));
       const n = ymd(d); if(n > TODAY) return;
       S.dietDay = n; render(); return; }
-    case 'tmeals': S.tmid = rest[0]; go('t_meals'); return;
+    case 'tmeals': S.tmid = rest[0]; 식단봄(rest[0]); go('t_meals'); return;
     case 'tana': S.tmid = rest[0]; S.subj = rest[0]; S.anaP = S.anaP||'1달'; go('records'); return;
     case 'tfd': S.tfDay = rest[0]; closeSheet(); render(); return;
     case 'tfcal': S.tfMon = (S.tfDay||TODAY).slice(0,7); sheetTfCal(); return;
