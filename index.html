@@ -3093,7 +3093,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '440';
+const BUILD = '441';
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -7940,7 +7940,7 @@ async function sheetDayCap(mid, day){
 async function 식단캡쳐내보내기(blob, day, 공유){
   const file = new File([blob], '글래드짐_식단_' + day + '.jpg', { type:'image/jpeg' });
   if((공유 || 아이폰()) && navigator.canShare && navigator.canShare({ files:[file] })){
-    try{ await navigator.share({ files:[file] }); return; }catch(e){ if(e.name === 'AbortError') return; } }
+    try{ await navigator.share({ files:[file], title:공유제목(file) }); return; }catch(e){ if(e.name === 'AbortError') return; } }
   내려받기(blob, file.name); toast(공유 ? '공유를 못 열어 내려받았어요' : '갤러리에 저장했어요');
 }
 function carMove(el){
@@ -8766,7 +8766,7 @@ async function postShareSave(id, 공유){
     const blob = 첫 ? await 식단캡쳐(날.mid, 날.day) : await 사진받기(p.path);      /* 저장소가 잠겨 있어 주소를 받아서 가져온다 — 공개 주소로 받으면 깨진 파일이 저장된다 (2026-10-08 대표 「피드에 올리면 다운로드가 안 되는 것 같다」) */
     const file = new File([blob], '글래드짐_'+(p.ts||'').slice(0,10)+'.jpg', { type:'image/jpeg' });
     if((공유 || 아이폰()) && navigator.canShare && navigator.canShare({ files:[file] })){
-      try{ await navigator.share({ files:[file], text:p.cap||'' }); return; }catch(e){ if(e.name==='AbortError') return; }
+      try{ await navigator.share({ files:[file], title:공유제목(file), text:p.cap||'' }); return; }catch(e){ if(e.name==='AbortError') return; }
     }
     내려받기(blob, file.name); toast(공유 ? '공유를 못 열어 내려받았어요' : '갤러리에 저장했어요');
   }catch(e){ console.error(e); toast('사진을 꾹 눌러 저장해 주세요'); }
@@ -9009,6 +9009,8 @@ function ootd파일(blob, 날짜){
 }
 /* 그 기록이 언제 것인가 */
 const ootd날 = wid => ((D.workouts||[]).find(z=>z.id===wid)||{}).date || TODAY;
+/* 공유 시트 제목 — 파일 이름에서(「글래드짐_오운완_2026-10-22.jpg」 → 「글래드짐 오운완 2026-10-22」) · 없으면 시트 머리에 사이트 주소가 나온다 */
+const 공유제목 = f => String((f && f.name) || '글래드짐').replace(/\.[a-z0-9]+$/i, '').split('_').join(' ');
 function 내려받기(blob, 이름){
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob); a.download = 이름;
@@ -9023,7 +9025,7 @@ async function ootdDL(url, 날짜){
     const file = ootd파일(blob, 날짜);
     if(아이폰() && navigator.canShare && navigator.canShare({ files:[file] })){
       toast('「이미지 저장」을 선택해 주세요');
-      try{ await navigator.share({ files:[file] }); return; }
+      try{ await navigator.share({ files:[file], title:공유제목(file) }); return; }
       catch(e){ if(e.name==='AbortError') return; }
     }
     내려받기(blob, file.name);
@@ -9037,7 +9039,7 @@ async function ootdShare(){
   const blob = await (await fetch(S.ootd.url)).blob();
   const file = ootd파일(blob, ootd날(S.ootd.wid));
   if(navigator.canShare && navigator.canShare({ files:[file] })){
-    try{ await navigator.share({ files:[file] }); return; }catch(e){ if(e.name==='AbortError') return; }
+    try{ await navigator.share({ files:[file], title:공유제목(file) }); return; }catch(e){ if(e.name==='AbortError') return; }
   }
   내려받기(blob, file.name);
   toast('공유를 못 열어 내려받았어요');
@@ -12478,6 +12480,13 @@ const 수정확인 = {
 function 알림창(말){ let o = document.getElementById('cfm'); if(o) o.remove(); o = document.createElement('div'); o.id = 'cfm';
   o.innerHTML = `<div class="bx soft"><p>${말}</p><div><button class="yes">확인</button></div></div>`; document.body.appendChild(o);
   o.querySelector('.yes').addEventListener('click', () => o.remove()); o.addEventListener('click', e => { if(e.target === o) o.remove(); }); }
+/* 기다리는 확인 창 — 브라우저 confirm 대신 (2026-10-22 대표 「앱 데스크 알림창에 깃허브 주소 안 나오게」) · 취소 · 바깥 = false */
+function 물어(말, 단추){
+  const 바꾼 = typeof window.confirm === 'function' && !/\[native code\]/.test(Function.prototype.toString.call(window.confirm));
+  if(바꾼) return Promise.resolve(!!window.confirm(말));
+  return new Promise(끝 => { let 됨 = false; 확인창(esc(말).split(String.fromCharCode(10)).join('<br>'), 단추 || '확인', () => { 됨 = true; 끝(true); });
+    const o = document.getElementById('cfm'); if(o){ const 안됨 = () => setTimeout(() => { if(!됨 && !document.body.contains(o)) 끝(false); }, 0); o.querySelector('.no').addEventListener('click', 안됨); o.addEventListener('click', e => { if(e.target === o) 안됨(); }); } });
+}
 function 확인창(말, 단추, 하면, 순한){
   let o = document.getElementById('cfm'); if(o) o.remove();
   o = document.createElement('div'); o.id = 'cfm';
@@ -12829,7 +12838,7 @@ document.addEventListener('click', async ev=>{
     case 'exdel': { const d = S.exn; if(!d) return;
       const 쓰는 = D.routines.some(r => (r.items||[]).some(it => it.ex === d.id)) || D.workouts.some(w => (w.items||[]).some(it => it.ex === d.id));
       if(쓰는){ toast('루틴에 들어간 종목은 삭제할 수 없어요\n루틴에서 먼저 제거해 주세요'); return; }
-      if(!confirm('이 종목을 삭제할까요?')) return;
+      /* 지움확인(exdel)이 이미 물었다 — 두 번 묻지 않는다 (2026-10-22) */
       const 옛파일 = ((EX.find(e => e.id === d.id)||{}).media||[]).map(m=>m.path);
       EX = EX.filter(e => e.id !== d.id);
       await sv(sdel('variants','ex_id=eq.'+d.id), '종목 설명 삭제'); await sv(sdel('exercises','id=eq.'+d.id), '종목 삭제');
@@ -13621,7 +13630,8 @@ document.addEventListener('click', async ev=>{
     case 'piback': S.pso = null; if(S.pse){ S.pslk = 'y'; sheetPsetLib(); } else sheetPitems(); return;
     case 'pomrm': { const d = S.pso; if(d){ d.media.splice(+rest[0],1); drawSheet(); } return; }
     case 'pidel': { const d = S.pso; if(!d) return; const 쓰는 = 내세트().filter(x=>x.items.some(z=>z.k==='my' && z.i===d.id)).length;
-      if(!confirm(쓰는 ? `이 종목을 삭제할까요? 세트 ${쓰는}개에서도 제거됩니다.` : '이 종목을 삭제할까요?')) return;
+      if(!await 물어(쓰는 ? `이 종목을 삭제할까요?
+세트 ${쓰는}개에서도 빠져요` : '이 종목을 삭제할까요?', '삭제')) return;
       const 옛파일 = (((D.pitems||[]).find(z=>z.id===d.id)||{}).media||[]).map(m=>m.path);
       D.pitems = (D.pitems||[]).filter(z=>z.id!==d.id); await sv(sdel('prep_items','id=eq.'+d.id), '종목 삭제');
       await 파일지우기(옛파일, 'prep/items/'+d.id+'/');
@@ -13656,7 +13666,7 @@ document.addEventListener('click', async ev=>{
       const x = { id:p.id, tr:TRAINER, n:p.n, memo:p.memo, items:p.items, mids:p.mids };
       D.psets = (D.psets||[]).filter(z=>z.id!==x.id).concat([x]); await 세트저장(x);
       S.pse = null; toast('세트를 저장했어요'); sheetPsets(S.psMid); render(); return; }
-    case 'psdel': { const p = S.pse; if(!p) return; if(!confirm('이 세트를 삭제할까요? 받은 회원 화면에서도 사라집니다.')) return;
+    case 'psdel': { const p = S.pse; if(!p) return; if(!await 물어('이 세트를 삭제할까요?' + String.fromCharCode(10) + '받은 회원 화면에서도 사라져요', '삭제')) return;
       D.psets = (D.psets||[]).filter(z=>z.id!==p.id); await sv(sdel('prep_sets','id=eq.'+p.id), '세트 삭제');
       S.pse = null; toast('삭제했어요'); sheetPsets(S.psMid); render(); return; }
     case 'psasg': { const x = 내세트().find(z=>z.id===rest[0]); if(!x) return; const mid = rest[1], i = x.mids.indexOf(mid);
@@ -13922,7 +13932,7 @@ document.addEventListener('click', async ev=>{
       p.hid = p.hid ? '' : new Date().toISOString(); p.vis = p.hid ? '나만' : '센터';
       sv(spatch('posts','id=eq.'+p.id, { hidden_at:p.hid||null, visibility:p.vis }), '글 내리기'); closeSheet(); render(); return; }
     case 'pdel': { const p=(D.posts||[]).find(x=>x.id===rest[0]); if(!p) return;
-      if(!confirm('이 글을 삭제할까요? 댓글도 같이 삭제됩니다.')) return;
+      if(!await 물어('이 글을 삭제할까요?' + String.fromCharCode(10) + '댓글도 같이 삭제돼요', '삭제')) return;
       D.posts = D.posts.filter(x=>x.id!==p.id); D.pcm = (D.pcm||[]).filter(c=>c.pid!==p.id); D.plk = (D.plk||[]).filter(l=>l.pid!==p.id);
       sv(sdel('posts','id=eq.'+p.id), '글 삭제');
       if(p.path && p.path.startsWith('posts/')) fetch(SB_URL+'/storage/v1/object/media/'+p.path, {method:'DELETE',headers:{apikey:SB_KEY,Authorization:'Bearer '+수파열쇠()}}).catch(()=>{});
@@ -13953,7 +13963,7 @@ document.addEventListener('click', async ev=>{
       try{ const b = await 사진받기(x.path); ootdDL(URL.createObjectURL(b), x.date); }catch(e){ console.error(e); toast('사진을 꾹 눌러 저장해 주세요'); } return; }
     case 'ootdshare2': { const x=(D.bph||[]).find(y=>y.id===rest[0]); if(!x) return;
       try{ const b = await 사진받기(x.path), f = ootd파일(b, x.date);
-        if(navigator.canShare && navigator.canShare({ files:[f] })){ try{ await navigator.share({ files:[f] }); return; }catch(e){ if(e.name==='AbortError') return; } }
+        if(navigator.canShare && navigator.canShare({ files:[f] })){ try{ await navigator.share({ files:[f], title:공유제목(f) }); return; }catch(e){ if(e.name==='AbortError') return; } }
         내려받기(b, f.name); toast('공유를 못 열어 내려받았어요'); }catch(e){ console.error(e); toast('사진을 꾹 눌러 저장해 주세요'); } return; }
     case 'ootdsave': ootdSave(); return;
     case 'ootdpost': ootdSave(true); return;
