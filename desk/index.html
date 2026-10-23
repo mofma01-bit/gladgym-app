@@ -2309,7 +2309,7 @@ body{word-break:keep-all}
 
 <script>
 "use strict";
-const BUILD = '376';
+const BUILD = '377';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -7838,6 +7838,11 @@ async function 예상저장(){
   catch(e){ toast('저장하지 못했어요 — ' + (e.message || '').slice(0, 60)); }
 }
 document.addEventListener('change', ev => { const f = ev.target && ev.target.dataset && ev.target.dataset.asf; if(!f) return; 배정.거[f] = ev.target.value; 배정.페 = 0; render(); });
+/* ══ 한글 검색칸 ══ 2026-10-23 대표 「양인수」를 치면 「ㅇㅣㄴㅅㅜ」로 흩어짐(중앙 캡처) — 검색칸이 한글 조합 중에도 글자마다 화면을 다시 그려 조합이 끊겼다.
+   조합 중(isComposing)에는 검색 손잡이로 안 보내고, 조합이 끝나면(compositionend) 한 번 보낸다 · 검색칸 전부 */
+const 검색칸들 = ['asq', 'rsq', 'rtq', 'rlgq', 'pzmq', 'pzgq', 'bpsq', 'q', 'pq'];
+document.addEventListener('input', ev => { if(ev.isComposing && ev.target && 검색칸들.indexOf(ev.target.id) >= 0) ev.stopImmediatePropagation(); }, true);
+document.addEventListener('compositionend', ev => { const t = ev.target; if(t && 검색칸들.indexOf(t.id) >= 0) setTimeout(() => t.dispatchEvent(new Event('input', { bubbles:true })), 0); }, true);
 document.addEventListener('input', ev => { if(!ev.target || ev.target.id !== 'asq') return; 배정.거.q = ev.target.value; 배정.페 = 0; const p = ev.target.selectionStart; render(); const n = document.getElementById('asq'); if(n){ n.focus(); n.setSelectionRange(p, p); } });
 document.addEventListener('input', ev => { const f = ev.target && ev.target.closest && ev.target.closest('#popbox .ck-fr'); if(!f || !예상입력) return; 예상읽기(); const t = document.getElementById('ckftot'); if(t) t.textContent = 예상만원(예상합(예상입력.줄)); });
 
