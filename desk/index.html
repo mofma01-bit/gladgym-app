@@ -1899,6 +1899,14 @@ body{word-break:keep-all}
 .as-tab.on{color:var(--gold);border-bottom-color:var(--gold)}.as-tab b{font-size:13px;margin-left:5px;color:var(--cream)}
 .as-q{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
 .rsbtns{display:flex;gap:6px;flex:none}
+.mvstrip.four{grid-auto-flow:row;grid-template-columns:repeat(4,minmax(0,1fr))}.mvstrip.four.pn{grid-template-columns:repeat(2,minmax(0,1fr))}.mvstrip.four.pn .mvc,.mvstrip.four.pn .mvc:nth-child(n+4){grid-column:auto}
+.pn ~ .mvbig,.mvbig.pn{grid-template-columns:repeat(2,minmax(0,1fr))}
+.mvbig{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:10px 0 6px}
+.mvbig button{display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-height:64px;padding:12px 14px;border-radius:14px;background:#2a2620;border:1px solid #5a5246;color:var(--cream);font:inherit;cursor:pointer;text-align:left}
+.mvbig button b{font-size:16px;font-weight:900}.mvbig button small{font-size:13px;color:var(--sub)}.mvbig em{font-style:normal;font-size:12.5px;color:#1b1813;background:#f2e3c6;border-radius:999px;padding:0 7px;margin-left:4px}
+.mvbig button:first-child{background:#3a3123;border-color:#8a7a5c}
+.mvsmall{display:flex;gap:6px;margin:0 0 10px}.mvsmall button{height:34px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--dark-3);color:var(--cream);font:inherit;font-size:13.5px;font-weight:700;cursor:pointer}
+.mvdone{display:flex;align-items:center;gap:10px;background:#2a2318;border:1px solid #8a7a5c;border-radius:12px;padding:10px 14px;margin:0 0 10px;font-weight:800}.mvdone .btn{margin-left:auto}.mvdone .x{background:none;border:0;color:var(--sub);font-size:16px;cursor:pointer}
 #apprec{position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.62);display:flex;align-items:center;justify-content:center}
 #apprec .ar-box{width:min(480px,96vw);height:94vh;background:#0f0f0e;border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
 #apprec .ar-h{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line);font-size:15px}
@@ -2331,7 +2339,7 @@ body{word-break:keep-all}
 
 <script>
 "use strict";
-const BUILD = '383';
+const BUILD = '384';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -4508,7 +4516,6 @@ function 회원판그리기(){
     + TABS.map(t => '<button class="'+(S.tab===t[0]?'on':'')+'" data-mtab="'+t[0]+'">'+t[1]+'</button>').join('')
     + '</div><div class="mpane">' + 회원탭내용() + '</div>',
     '<div class="tx-fbtns"><span class="tx-stat"></span>'
-    + '<button class="btn sub" data-act="wnew">＋ 오늘 운동 기록</button>'
     + '<button class="btn gold" data-act="mfull">⤢ 크게 보기</button></div>');
 }
 async function 회원판열기(mid, tab){
@@ -5811,19 +5818,35 @@ function 달성셈(mid){
 }
 /* 요약 줄 — 다섯 칸이 같은 꼴(이름 · 큰 값 · 작은 한 줄). 색은 봐야 할 때만. 어느 탭에서나 떠 있다.
    판 = 옆 판(회원판)에서 부를 때 — 탭 손잡이가 data-mtab 이다. ⛔ 회원 화면은 전체 페이지와 옆 판 **두 곳**에서 그린다 */
+/* 다음 예약 — 이번 주 예약률 자료(예약있음)에서 그 회원 줄 (2026-10-24 C-4) */
+const 다음예약of = m => { const d = 예약률 && 예약률.답; if(!d || !m) return ''; const 있 = d['예약있음'] || {};
+  for(const t in 있) for(const x of (있[t] || [])) if(String(x.name || '').trim() === String(m.name || '').trim() && x.phone4 === m.phone4) return x['다음'] || '';
+  return ''; };
+let 기록끝 = null;      /* 데스크 창에서 앱 기록을 마치면 {mid, wid} — 회원 화면 맨 위 「기록 완료 · 리포트 보기」 */
 function 회원요약줄(판){
   const m = memOf(S.mid); if(!m || !m.id) return '';
   const ws = 마친운동(m.id).slice().sort((a, b) => String(a.on_date) < String(b.on_date) ? 1 : -1), 갭 = ws[0] ? daysAgo(ws[0].on_date) : null, 받음 = M.ok === m.id, a = 받음 ? 달성셈(m.id) : null;
   const 안봄 = D.c.filter(c => c.member_id === m.id && !c.read_at).length, x = 잔여of(m), 유 = x ? (+x['정규'] || 0) : 0, 서 = x ? (+x['서비스'] || 0) : 0, 가 = x ? (+x['가이드'] || 0) : 0, 추 = x ? (+x['가이드추가'] || 0) : 0, 확 = x ? (+x['가이드확인'] || 0) : 0;
   const 탭 = t => 'data-' + (판 ? 'mtab' : 'tab') + '="' + t + '"', 깃 = !x ? (PTST_막힘 ? '못 받는 중' : '전산에 없음') : [추 ? '추가 ' + 추 : '', 확 ? '미확인 ' + 확 : ''].filter(Boolean).join(' · ');
   const 칸 = (손, 빛, 이름, 값, 작은, 깃발) => '<button class="mvc ' + 빛 + (깃발 ? ' flag' : '') + '" ' + 손 + '><span class="hd"><small>' + 이름 + '</small><em>' + (깃발 ? 깃발 + ' ' : '') + '›</em></span><b' + (/\d/.test(값) ? '' : ' class="tx"') + '>' + 값 + '</b><i>' + (작은 || '&nbsp;') + '</i></button>';
-  return '<div class="mvstrip' + (판 ? ' pn' : '') + '">'
+  /* C-4 (2026-10-23 대표 시안 2) — 위 고정 4칸: 마지막 운동 · 이번 주 · 다음 예약 · 남은 회차/만료일 (달성률은 「현황」 탭 · 피드백 요청 수는 「피드백」 단추에) */
+  const 끝 = x && (x['끝날'] || x['만료'] || ''), 다 = 다음예약of(m), 요청수 = (D.asks || []).filter(q => q.member_id === m.id && !q.done_at).length;
+  const 마지막수업 = ws.find(w => w.kind === '수업') || ws[0], 끝남 = 기록끝 && 기록끝.mid === m.id ? 기록끝 : null;
+  return (끝남 ? '<div class="mvdone">✓ 오늘 수업 기록 완료'
+      + '<button class="btn gold sm" data-act="tx:mrpt" data-k="' + esc(끝남.wid || '') + '">리포트 보기 ›</button>'
+      + '<button class="x" data-act="tx:mdonex" aria-label="닫기">✕</button></div>' : '')
+    + '<div class="mvstrip four' + (판 ? ' pn' : '') + '">'
     + 칸(탭('record'), 갭 == null ? 'z' : 갭 >= 7 ? 'bad' : 갭 >= 4 ? 'warn' : 'ok', '마지막 운동', 갭 == null ? '아직 없음' : 갭 === 0 ? '오늘' : 갭 + '<u>일 전</u>')
     + 칸(탭('record'), a && !(a.이번.수업 + a.이번.개인) ? 'z' : '', '이번 주', a ? (a.이번.수업 + a.이번.개인) + '<u>번</u>' : '…', a ? '수업 ' + a.이번.수업 + ' · 개인 ' + a.이번.개인 : '')
-    + 칸('data-act="mvpt"', (유 + 서 + 가) ? '' : 'z', '남은 수업', (유 + 서 + 가) + '<u>회</u>', '유료 ' + 유 + ' · 서비스 ' + 서 + ' · 가이드 ' + 가, 깃)
-    + 칸(탭('stat'), !a || !a.한 ? 'z' : a.률 >= 80 ? 'ok' : a.률 >= 50 ? 'warn' : 'bad', '이번 달 운동 달성률', a ? a.률 + '<u>%</u>' : '…', a ? '수업 ' + a.수업 + ' · 개인 ' + a.개인 + ' · 총 ' + a.한 + ' / ' + a.목 + '번' : '', a && a.g.새 ? '회원이 목표를 수정함' : '')
-    + (요청수 => 칸(탭('comment'), 요청수 ? 'bad' : 'z', '피드백 요청', 요청수 ? 요청수 + '<u>건</u>' : '없음'))((D.asks || []).filter(q => q.member_id === m.id && !q.done_at).length)      /* 「회원이 안 본 피드백」 → 「피드백 요청」 (2026-10-18 대표 「회원이 안 본 건 곳곳에 남아 있어」) */
-    + '</div>';
+    + 칸('data-act="mvpt"', 다 ? '' : 'z', '다음 예약', 다 ? 예약날(다) : '없음', 다 ? '' : '이번 주 예약 없음')
+    + 칸('data-act="mvpt"', (유 + 서 + 가) ? '' : 'z', '남은 수업', (유 + 서 + 가) + '<u>회</u>', (끝 ? '만료 ' + esc(String(끝).slice(0, 10)) + ' · ' : '') + '유료 ' + 유 + ' · 서비스 ' + 서 + ' · 가이드 ' + 가, 깃)
+    + '</div>'
+    + '<div class="mvbig">'
+    + '<button data-act="wnew"><b>✍ 수업 기록하기</b><small>앱과 같은 기록 화면</small></button>'
+    + '<button data-act="rnew"><b>📋 루틴 만들기</b><small>이 회원 루틴</small></button>'
+    + '<button ' + 탭('comment') + '><b>💬 피드백' + (요청수 ? ' <em>요청 ' + 요청수 + '</em>' : '') + '</b><small>대화 · 요청</small></button>'
+    + '<button data-act="tx:mrpt" data-k="' + esc((마지막수업 && 마지막수업.id) || '') + '"><b>📄 리포트 보기</b><small>' + (마지막수업 ? '최근 ' + esc(String(마지막수업.on_date || '').slice(5).replace('-', '/')) : '아직 없음') + '</small></button>'
+    + '</div><div class="mvsmall"><button ' + 탭('info') + '>상담일지</button><button ' + 탭('body') + '>인바디</button></div>';
 }
 /* 남은 수업 — 요약 줄 칸을 누르면 뜨는 사이드. 표 두 개(남은 횟수 · 수업 흐름). PT 회원이 아니어도 보이고 없으면 0 (2026-10-12 대표 「PT 아니어도 보이게 해 · 없으면 0으로 뜨는 거니까」 — 9/22 「PT회원 아니면 회차 표기 안 함」을 바꿈).
    가이드는 확정 낱말 「등록시 제공분 · 수업 중간 추가분 · 확인 필요」 그대로. 날수 판정은 서버가 한다 */
@@ -7704,16 +7727,16 @@ function 매확팝업(강제){
 /* ══ 수업 기록 = 앱 기록 화면 그대로 ══ 2026-10-23 확정 C-2 「데스크도 앱 기록 화면 그대로」 — 데스크용을 따로 만들지 않고 가운데 큰 창에 앱을 띄운다(고칠 때 한 번만)
    앱은 이 탭의 데스크 계정(sessionStorage)으로 메모리 로그인 · 마치면 앱이 알려 주고(postMessage gg:'deskrec') 데스크는 그 회원을 다시 받는다 */
 const 앱기록길 = () => /github\.io$/.test(location.hostname) ? '../index.html' : location.port === '8792' ? 'http://localhost:8791/' : '../웹앱/index.html';
-function 앱기록창(mid){
+function 앱기록창(mid, 리포트){
   const m = (D.m || []).find(x => x.id === mid) || {}; 앱기록닫기();
   const el = document.createElement('div'); el.id = 'apprec';
-  el.innerHTML = '<div class="ar-box"><div class="ar-h"><b>' + esc(m.name || '') + ' · 수업 기록</b><small>앱과 같은 화면이에요</small><button class="btn ghost sm" data-act="tx:arclose">✕ 닫기</button></div>'
-    + '<iframe title="수업 기록" src="' + 앱기록길() + '?desk=1&m=' + encodeURIComponent(mid) + '"></iframe></div>';
+  el.innerHTML = '<div class="ar-box"><div class="ar-h"><b>' + esc(m.name || '') + (리포트 ? ' · 리포트' : ' · 수업 기록') + '</b><small>앱과 같은 화면이에요</small><button class="btn ghost sm" data-act="tx:arclose">✕ 닫기</button></div>'
+    + '<iframe title="수업 기록" src="' + 앱기록길() + '?desk=1&m=' + encodeURIComponent(mid) + (리포트 ? '&r=' + encodeURIComponent(리포트) : '') + '"></iframe></div>';
   document.body.appendChild(el); }
 function 앱기록닫기(){ const el = document.getElementById('apprec'); if(el) el.remove(); }
 window.addEventListener('message', e => { const d = e.data || {}; if(d.gg !== 'deskrec') return;
   if(e.origin !== location.origin && !/^http:\/\/localhost:\d+$/.test(e.origin)) return;
-  if(d.mid) loadMember(d.mid); toast('기록했어요'); });
+  if(d.mid){ 기록끝 = { mid: d.mid, wid: d.wid || '' }; loadMember(d.mid); } toast('기록했어요'); });
 const 상품묶음 = ps => { const 셈 = new Map(); (ps || []).forEach(p => { const n = String((p && p['이름']) || '').trim(); if(n) 셈.set(n, (셈.get(n) || 0) + 1); });
   return [...셈].map(([n, c]) => c > 1 ? n + ' × ' + c : n).join(' + '); };
 function 매확판(){
@@ -12238,6 +12261,8 @@ async function txAct(a, el){
     const q = $('#rsq'); if(q){ q.focus(); q.setSelectionRange(q.value.length, q.value.length); }
     return; }
   if(a==='arclose'){ 앱기록닫기(); if(S.mid) loadMember(S.mid); return; }
+  if(a==='mrpt'){ if(!k) return toast('아직 리포트가 없어요'); 앱기록창(S.mid, k); return; }      /* 리포트 보기 = 앱 리포트 화면 그대로 (C-4) */
+  if(a==='mdonex'){ 기록끝 = null; render(); return; }
   if(a==='rsdel'){      /* 리포트 발송 실패 삭제 — 묻고 휴지통으로(되살리기 됨) · 2026-10-23 대표 「테스트 안 보내도 되는데 삭제가 없어 불편」 */
     const id = el.dataset.i, r = RS.find(x => x.id === id); if(!r) return;
     if(!await 묻기((r.member_name || '') + ' · ' + (r.lesson_date || '') + ' 리포트를 정말 삭제하시겠습니까?' + String.fromCharCode(10) + '보내지 않고 목록에서 뺍니다 · 휴지통에서 되살릴 수 있어요')) return;
@@ -13358,7 +13383,7 @@ const 사진칸 = ['전면','후면','좌측','우측'];
 const 영상칸 = ['정적 평가','오버헤드 스쿼트','한발 스쿼트'];
 
 /* ── 그리기 ── */
-const TABS = [['stat','현황'],['routine','루틴'],['record','운동 기록'],['comment','피드백'],
+const TABS = [['routine','루틴'],['record','지난 기록'],['comment','피드백'],['stat','현황'],      /* C-4 앱과 같은 차례 — 루틴 → 지난 기록 → 피드백 (2026-10-24) */
               ['meal','식단'],['body','체형'],['info','정보']];
 /* ══ 화면 길 ‹ › ══ 2026-10-23 대표 「상단에 뒤로가기 앞으로가기 버튼 항상 · 홈에서 상담으로 넘어갔는데 뒤로가기 누르면 홈으로」
    화면(S.view)이 바뀔 때마다 적는다 · ‹ = 앞 화면 · › = 다시 앞으로 · 잠금을 풀면 새로 읽으므로 처음부터(홈) */
@@ -13432,7 +13457,6 @@ function render0(){
     top.innerHTML = '<button class="back" data-act="toList"><span class="ar">‹</span>뒤로</button><h1>' + esc(m.name) + '</h1>'
       + '<span class="cnt">' + esc(m.trainer||'담당 없음') + '</span>';
     top.innerHTML += '<div class="sp">'
-      + '<button class="btn sub sm" data-act="wnew">＋ 오늘 운동 기록</button>'
       + '<button class="btn gold sm" data-act="aspick">루틴 지정 · 예약</button></div>';
     line.innerHTML = 회원요약줄() + '<div class="tabs">' + TABS.map(t =>
       '<button class="' + (S.tab===t[0]?'on':'') + '" data-tab="' + t[0] + '">' + t[1] + '</button>').join('')
