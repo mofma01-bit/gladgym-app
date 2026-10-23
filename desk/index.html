@@ -1827,9 +1827,9 @@ body{word-break:keep-all}
 .nav.navbig b{font-size:15px;font-weight:900;color:var(--cream)}.nav.navbig small{font-size:13px;color:var(--sub);font-weight:600}.nav.navbig .bdg{position:absolute;right:10px;top:10px}
 .nav.navbig.on{border-color:var(--cream)}
 .navgh{font-size:13px;color:var(--sub);font-weight:700;padding:10px 12px 4px}
-.lsbig{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:4px 0 18px}@media (max-width:1100px){.lsbig{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.lsb{text-align:left;background:var(--dark-2);border:1px solid var(--line);border-radius:16px;padding:18px 16px;color:var(--cream);font:inherit;cursor:pointer}.lsb:hover{border-color:#8f8676}
-.lsb b{display:block;font-size:17px;font-weight:900}.lsb small{display:block;font-size:13px;color:var(--sub);margin-top:4px}
+.lsbig{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin:6px 0 22px}@media (max-width:1100px){.lsbig{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.lsb{text-align:left;background:linear-gradient(180deg,#2c2822,#201d19);border:1.5px solid #5a5246;border-radius:20px;padding:30px 24px;min-height:150px;color:var(--cream);font:inherit;cursor:pointer;display:flex;flex-direction:column;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,.35)}.lsb:hover{border-color:var(--cream);transform:translateY(-1px)}      /* 2026-10-23 대표 「너무 작아 · 더 크게 눈에 확」 */
+.lsb b{display:block;font-size:24px;font-weight:900;letter-spacing:-.4px}.lsb small{display:block;font-size:15px;color:var(--sub);margin-top:8px}
 .vnav{display:inline-flex;gap:4px;margin-right:12px;flex:none}.vnav button{width:32px;height:32px;border:1px solid var(--line);border-radius:9px;background:transparent;color:var(--cream);font-size:18px;line-height:1;cursor:pointer}.vnav button:disabled{opacity:.3;cursor:default}
 .aq-box{display:flex;justify-content:center;margin:14px 0 12px}.aq-box svg{border-radius:10px}
 .aq-url{display:flex;gap:8px;align-items:center;background:#141412;border:1px solid var(--line);border-radius:10px;padding:6px 6px 6px 12px;margin-bottom:10px}.aq-url span{flex:1;min-width:0;font-size:13px;color:#cfc7b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -2309,7 +2309,7 @@ body{word-break:keep-all}
 
 <script>
 "use strict";
-const BUILD = '375';
+const BUILD = '376';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -2520,7 +2520,7 @@ const 회원보임 = () => 할수('members') && 회원범위() !== 'x';
 const 홈블록허용 = { booking: 회원보임, today: () => 할수('today') && 회원보임(), leave: () => false };      /* 「이번 주 연월차」 카드는 뺐다 → 머리 오른쪽 위 · 현황판 (2026-10-23 대표) */
 const 현황허용 = { 부름: () => 할수('tasks'), 실패: () => 할수('reports'), 밀림: () => 할수('cmall') && 회원보임(), 업무: () => 할수('tasks'), 요청: () => 할수('cmall') && 회원보임(),
   누락: 회원보임, 오늘없음: 회원보임, 운동: () => 할수('today') && 회원보임(), 상담: () => 할수('leads'), 담당: 회원보임, 빈담당: 회원보임 };
-const 수업판칸 = [['today', '✍ 수업 기록하기', '오늘 예약에서 회원을 눌러요'], ['cmall', '💬 피드백', '남겨 주세요 · 요청'], ['rtmake', '📋 루틴 · 스트레칭 만들기', '회원에게 추가'], ['reports', '📄 리포트 내역', '보낸 수업 리포트']];      /* 2026-10-23 대표 「수업 기록 한곳에」 */
+const 수업판칸 = [['today', '✍ 수업 기록하기', '오늘 예약에서 회원을 눌러요'], ['cmall', '💬 피드백', '남겨 주세요 · 요청'], ['rtmake', '📋 루틴 · 스트레칭', '만들기 · 회원에게 추가'], ['reports', '📄 리포트 내역', '보낸 수업 리포트']];      /* 2026-10-23 대표 「수업 기록 한곳에」 */
 function 메뉴가림(){ { const b = document.querySelector('.nav[data-v="lesson"]'); if(b) b.style.display = 수업판칸.some(([v]) => 할수(v)) ? '' : 'none'; }
   document.querySelectorAll('.nav[data-v]').forEach(b => { const v = b.dataset.v; if(!권한메뉴.has(v)) return;
   b.style.display = (v === 'members' ? 회원범위() !== 'x' && 할수(v) : 할수(v)) ? '' : 'none'; }); }
@@ -12183,7 +12183,7 @@ async function txAct(a, el){
   if(a==='pedit'){ 매출.고침 = 매출.고침 === k ? '' : k; 매출다시(); return; }
   if(a==='plog'){ await 매출기록열기(k); return; }
   if(a==='ptab'){ 매출.탭 = k; 매출판(); return; }
-  if(a==='tgpick'){ 매출.선생 = !k || 매출.선생 === k ? '' : k; 매출판(); return; }      /* 팀 막대 · 이름표 — 다시 누르면 전체 */
+  if(a==='tgpick'){ 매출.선생 = !k || 매출.선생 === k ? '' : k; if(매출.선생) 매출.탭 = '확정'; 매출판(); return; }      /* 팀 막대 · 이름표 — 누르면 그 선생님 「확정」 매출로 바로 (2026-10-23 대표) · 다시 누르면 전체 */      /* 팀 막대 · 이름표 — 다시 누르면 전체 */
   if(a==='pmon'){ 매출.달 = k; 매출판(); return; }      /* 매출 목록 달 바꾸기 (2026-10-21) */
   if(a==='bpopen'){ popClose(); 비품팝업(true); return; }
   if(a==='bplater'){ try{ localStorage.setItem('gg_bipum_seen', TODAY); }catch(e){} popClose(); return; }
