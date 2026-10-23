@@ -139,6 +139,10 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 #main.lite .card .sm{color:#7b6c5d}
 #main.lite .lbl{color:#7b6c5d}
 /* ══ 플래너 기록 화면 (2026-10-23) ══ */
+.plgrp{margin:12px 0 4px}.plgh{display:flex;align-items:baseline;gap:8px;margin:0 2px 8px}.plgh b{font-size:16px}.plgh span{font-size:13px;color:var(--sub)}
+.plsheet{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:12px}.plsheet .plbody.sm canvas{max-width:170px}
+.plsheet .pl-hd .k{margin-left:0}.pl-rp{margin-left:auto;font-size:13px;font-weight:800;color:var(--gold);border:1px solid #5a4a30;border-radius:999px;padding:3px 10px}
+.pl-vm{margin-top:8px;font-size:13.5px;background:var(--dark-2,#1a1815);border-radius:10px;padding:8px 10px}.pl-vm span{font-size:13px;color:var(--sub);font-weight:700}.pl-vm p{margin:3px 0 0;white-space:pre-wrap}
 .pl-hd{display:flex;align-items:center;gap:8px;margin:2px 0 8px}.pl-hd b{font-size:16px}.pl-hd .k{margin-left:auto;font-size:13px;color:var(--sub);border:1px solid var(--line);border-radius:999px;padding:2px 10px}
 .plbody{display:flex;justify-content:center;margin:0 0 8px}.plbody canvas{width:100%;max-width:240px;height:auto;display:block}
 .pl-tools{display:flex;gap:8px;align-items:center;margin:0 0 8px;min-height:30px}.pl-tools .sp{flex:1}
@@ -3120,7 +3124,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '449';
+const BUILD = '450';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -7396,13 +7400,13 @@ function vRecords(){
       <span class="ic3">${IC_BODY}</span>체형분석</button>
     <button class="lg ${at==='log'?'on':''}" data-act="anat:log">
       <span class="ic3">${IC_CAL}</span>지난기록</button></div>`;
-  const topbar = bar('분석', `<span class="sub">${S.who==='tr'?esc((MEMBERS.find(x=>x.id===mid)||{}).n||'')+' · ':''}${at==='body'?'인바디 · 비포애프터':at==='pose'?'체형분석 기록':esc(per)}</span>`,
+  const topbar = bar('분석', `<span class="sub">${S.who==='tr'?esc((MEMBERS.find(x=>x.id===mid)||{}).n||'')+' · ':''}${at==='body'?'인바디 · 비포애프터':at==='pose'?'체형분석 기록':at==='log'?'지난 기록':esc(per)}</span>`,
       S.who==='tr' ? 'tm:'+mid : null);
   const tabn = S.who==='tr' ? 0 : 1;
 
   if(at === 'body') return { top: topbar, tabs: tabn, body: head + bodyPane(mid, 'in') };
   if(at === 'pose') return { top: topbar, tabs: tabn, body: head + bodyPane(mid, 'pose') };
-  if(at === 'log')  return { top: topbar, tabs: tabn, body: head + daysPane(mid) };
+  if(at === 'log')  return { top: topbar, tabs: tabn, body: head + 지난기록판(mid) };
 
   return { top: topbar, tabs: tabn, body: head + `
     <div class="seg">${Object.keys(ANA_P).map(k=>
@@ -7459,6 +7463,39 @@ function vRecords(){
     <div class="cyfoot"><span>기간의 처음과 마지막 최고 무게를 비교합니다</span></div>` };
 }
 
+/* ── 지난 기록 = 플래너 한 장씩 · 주별 / 월별 묶음 (C-2 · 2026-10-23 대표 시안 2 확정 「달력 아님」) ──
+   한 장 = 날짜 · 수업/개인운동 · 해부 그림(기록 화면과 같은 형광펜 색) · 무게/반복수 표 · 유산소 · 메모(종목 메모 · 트레이너 메모) · 「리포트」 */
+function 플래너장(w){
+  const 색 = 플래너색(w), 줄들 = w.items.map((it, i) => ({ it, i, e: exOf(it.ex) || {} })).filter(o => o.it.sets.length || isMemo(o.it.ex));
+  const 근 = 줄들.filter(o => !o.e.cardio), 유 = 줄들.filter(o => o.e.cardio);
+  const 칸 = (x, f, 첫) => `<span class="plc${첫 ? ' r1' : ''}">${!x ? '' : f === 'kg' ? (x.kg ? kgfmt(x.kg) : (x.reps ? '–' : '')) : (x.reps || '')}</span>`;
+  const 이름 = o => `<span class="pln"><span class="hl" style="background:${색[o.i] || '#b9b1a2'}">${esc(isMemo(o.it.ex) ? exName(o.it.ex, o.it.va) : ((exOf(o.it.ex) || {}).n || exName(o.it.ex, o.it.va)))}</span>${줄아래(o.it)}</span>`;
+  const 행 = o => { if(isMemo(o.it.ex)) return `<div class="plr">${이름(o)}<span class="plm">메모 종목</span></div>`;
+    const n = Math.max(4, o.it.sets.length);
+    return `<div class="plr">${이름(o)}<div class="plcs${n > 4 ? ' wide' : ''}"><div class="plg" style="--n:${n}">${[...Array(n)].map((_, j) => 칸(o.it.sets[j], 'kg', false)).join('')}${[...Array(n)].map((_, j) => 칸(o.it.sets[j], 'reps', j === 0)).join('')}</div></div></div>`; };
+  const 유행 = o => { const x = o.it.sets[0] || {}; return `<div class="plr plca"><span class="pln"><span class="hl" style="background:#b9b1a2">${esc(exName(o.it.ex, o.it.va))}</span></span><span>${x.reps ? x.reps + '분' : '—'}</span><span>${x.spd ? x.spd + 'km/h' : '—'}</span></div>`; };
+  const 메모 = (D.cm || []).filter(c => c.wid === w.id && c.ex === 'memo').map(c => c.tx).filter(Boolean);
+  const 몸id = 'plv_' + w.id, 칠 = 플래너칠(w);
+  if(근.length) setTimeout(() => 플래너몸그리기(몸id), 0);
+  return `<div class="plsheet"><div class="pl-hd"><b>${dateTxt(w.date)}</b><span class="k">${w.kind === '수업' ? '수업' : '개인운동'}</span><button class="pl-rp" data-act="rpt:${w.id}">리포트 ›</button></div>
+    ${근.length ? `<div class="plbody sm" id="${몸id}" data-sex="${esc((D.intake[w.mid] || {}).sex || '')}" data-p='${esc(JSON.stringify(칠))}'><canvas></canvas></div>` : ''}
+    ${근.length ? `<div class="pltb"><div class="plr plh"><span class="pln">운동 명칭</span><div class="plcs"><div class="plg" style="--n:4"><span class="plhh" style="grid-column:span 4">무게(kg)</span><span class="plhh r1" style="grid-column:span 4">반복수</span></div></div></div>${근.map(행).join('')}</div>` : ''}
+    ${유.length ? `<div class="pltb plcard"><div class="plr plca plh"><span class="pln">유산소</span><span>시간</span><span>속도</span></div>${유.map(유행).join('')}</div>` : ''}
+    ${메모.length ? `<div class="pl-vm"><span>트레이너 메모</span>${메모.map(t => `<p>${esc(t)}</p>`).join('')}</div>` : ''}</div>`;
+}
+const 주첫날 = d => addDays(d, -((new Date(d + 'T12:00:00').getDay() + 6) % 7));      /* 월요일 */
+function 지난기록판(mid){
+  const by = S.logBy || '주', ws = D.workouts.filter(w => w.mid === mid && w.done && 세트있나(w)).slice().sort((a, b) => String(b.date).localeCompare(String(a.date)));
+  const 키 = w => by === '월' ? w.date.slice(0, 7) : 주첫날(w.date), 묶 = [];
+  ws.forEach(w => { const k = 키(w), g = 묶[묶.length - 1]; if(g && g.k === k) g.ws.push(w); else 묶.push({ k, ws: [w] }); });
+  const n = S.logN || 4, 보 = 묶.slice(0, n);
+  const 머 = g => by === '월' ? `${+g.k.slice(0, 4) !== +TODAY.slice(0, 4) ? g.k.slice(0, 4) + '년 ' : ''}${+g.k.slice(5, 7)}월`
+    : (k => `${+k.slice(5, 7)}/${+k.slice(8)} ~ ${+addDays(k, 6).slice(5, 7)}/${+addDays(k, 6).slice(8)}`)(g.k);
+  return `<div class="seg">${['주', '월'].map(k => `<button class="${by === k ? 'on' : ''}" data-act="logby:${k}">${k}별</button>`).join('')}</div>
+    ${보.length ? 보.map(g => `<div class="plgrp"><div class="plgh"><b>${머(g)}</b><span>${g.ws.length}번</span></div>${g.ws.map(플래너장).join('')}</div>`).join('')
+      + (묶.length > n ? `<button class="btn ghost sm" data-act="logmore">이전 기록 더 보기</button>` : '')
+      : 빔('chart', '아직 운동 기록이 없습니다', '운동을 마치면 여기에 한 장씩 쌓여요')}`;
+}
 /* ── 지난 운동기록 — 날짜로 보기 ──
    분석 탭 셋째 칸과 이 화면이 같은 판을 쓴다.                       */
 function daysPane(mid){
@@ -13509,6 +13546,8 @@ document.addEventListener('click', async ev=>{
     case 'posture': S.subj=S.mid; S.bodyPart='pose'; go('body'); return;
     case 'tposture': S.subj=rest[0]; S.tmid=rest[0]; S.bodyPart='pose'; go('body'); return;
     case 'anat': S.anaT = rest[0]; render(); return;
+    case 'logby': S.logBy = rest[0]; S.logN = 4; render(); return;      /* 지난 기록 주별 / 월별 (C-2) */
+    case 'logmore': S.logN = (S.logN || 4) + 4; render(); return;
     case 'figa': S.figA = Number(rest[0]) * Math.PI/180; S.figSel = null; drawFig(); return;
     case 'figk': { if(figMoved) return;
       const k = rest[0];
