@@ -2718,6 +2718,16 @@ body.kpon #main{padding-bottom:330px}
 .pz-note{margin-top:8px;border:1.5px dashed #8a7f6c;border-radius:8px;padding:6px 8px;white-space:pre-wrap}.pz-note small{display:block;color:#6b6253;font-size:13px}
 @media (max-width:640px){.pz-r{grid-template-columns:1fr}.pz-g2{grid-template-columns:1fr}.pz-hd{margin-left:0}.pz-days{grid-template-columns:repeat(7,1fr)}}
 .pz.n .pz-r{grid-template-columns:1fr;gap:3px}.pz.n .pz-g2{grid-template-columns:1fr}.pz.n .pz-hd{margin-left:0}.pz.n .pz-days{display:grid;grid-template-columns:repeat(7,1fr);width:100%}.pz.n .pz-x{margin:4px 0 0}
+
+/* 피드백 대화방 (C-3) */
+.fbroom{display:flex;flex-direction:column;gap:8px;padding:4px 0 12px}.fbroom.sm{max-height:52vh;overflow-y:auto}
+.fbday{align-self:center;font-size:12.5px;color:var(--sub);background:#1f1d1a;border-radius:999px;padding:2px 12px;margin:6px 0 2px}
+.fbrow{display:flex;gap:8px;align-items:flex-start}.fbrow .av{flex:none;width:30px;height:30px;border-radius:50%;background:#2a2620;color:var(--gold);font-weight:800;display:flex;align-items:center;justify-content:center;font-size:13px}
+.fbb{display:flex;flex-direction:column;gap:4px;text-align:left;max-width:82%;background:#24211c;border:1px solid #3a352c;border-radius:4px 14px 14px 14px;padding:8px 11px;color:var(--cream)}
+.fbb.me{align-self:flex-end;background:#3a3123;border-color:#5a4a30;border-radius:14px 4px 14px 14px}.fbb.new{border-color:var(--gold)}
+.fbb .tx{font-size:14.5px;line-height:1.45;white-space:pre-wrap}.fbb small{font-size:12px;color:var(--sub)}
+.fbtag{align-self:flex-start;font-size:12px;font-weight:800;color:#e8c08f;background:#2e2a22;border-radius:6px;padding:1px 7px}
+.fbchips{flex-wrap:nowrap;overflow-x:auto}
 </style>
 
 </head>
@@ -3150,7 +3160,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '451';
+const BUILD = '452';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -3530,7 +3540,7 @@ async function boot(){
   if(데스크끼움){ document.body.classList.add('deskin');
     const mid = 데스크끼움.mid;
     if(S.who === 'tr' && mid && MEMBERS.some(m => m.id === mid)){ S.tmid = mid; S.subj = mid; S.screen = 't_member';
-      setTimeout(() => { if(liveOf(mid) && adoptLive(mid)) go('workout'); else { S.tmid = mid; sheetStartSession(mid); } }, 0); }
+      setTimeout(() => { if(liveOf(mid) && adoptLive(mid)) go('workout'); else { S.tmid = mid; 수업시작창(mid); } }, 0); }
     else if(S.who === 'tr' && mid) setTimeout(() => toast('이 회원을 앱에서 열 수 없어요\n담당 범위를 확인해 주세요'), 0); }
   if(!histOn) histInit();
 }
@@ -7808,28 +7818,55 @@ function cmCard(c, 날짜보이기){
     </span></button>`;
 }
 
+/* ── 피드백 = 회원마다 대화방 하나 (C-3 · 2026-10-23 대표 시안 2 확정 「카톡처럼」) ──
+   왼쪽 = 트레이너 피드백 · 오른쪽 = 회원 피드백 요청 · 말풍선마다 「종목 · 날짜」 이름표 · 누르면 그 날 기록 · 위 칩으로 종목 거르기
+   저장은 지금처럼 종목별(comments · asks) — 쓰기는 종목 화면에서 */
+const 피드백날 = c => { if(c.wid){ const w = D.workouts.find(x => x.id === c.wid); if(w) return w.date; } return String(c.ts || '').slice(0, 10) || TODAY; };
+function 대화줄들(mid){
+  const 트 = (D.cm || []).filter(c => c.mid === mid).map(c => ({ k:'t', c, ts:c.ts || '', ex:c.ex, va:c.va }));
+  const 회 = (D.asks || []).filter(a => a.mid === mid).map(a => ({ k:'m', a, ts:a.ts || '', ex:a.ex, va:a.va }));
+  return 트.concat(회).sort((x, y) => String(x.ts).localeCompare(String(y.ts)));
+}
+function 말풍선(o){
+  const 날 = o.k === 't' ? 피드백날(o.c) : (o.a.wid && (D.workouts.find(w => w.id === o.a.wid) || {}).date) || String(o.ts).slice(0, 10);
+  const w = (o.k === 't' && o.c.wid) ? o.c.wid : ((D.workouts.find(x => x.mid === (o.k === 't' ? o.c.mid : o.a.mid) && x.date === 날 && x.done && x.items.some(i => i.ex === o.ex)) || {}).id || '');
+  const 표 = `<span class="fbtag">${esc(o.ex === 'memo' ? '수업 메모' : exName(o.ex, o.va))} · ${+날.slice(5, 7)}/${+날.slice(8, 10)}</span>`;
+  const 갈 = w ? 'rec:' + w : 'exd:' + o.ex + ':' + o.va;
+  if(o.k === 'm') return `<button class="fbb me" data-act="${갈}">${표}<span class="tx">${esc(o.a.note || '이 종목 봐 주세요')}</span><small>피드백 요청 · ${시분(o.ts)}</small></button>`;
+  const c = o.c, 이름 = (c.tr || '').trim();
+  return `<div class="fbrow"><span class="av">${esc(이름 ? 이름.slice(0, 1) : '트')}</span><button class="fbb${c.read ? '' : ' new'}" data-act="${갈}">${표}<span class="tx">${esc(c.tx)}</span>${(c.pics || c.vids) ? `<span class="cmore">${c.vids ? '영상' : '사진'} 있음 · 눌러서 보기 ›</span>` : ''}<small>${esc(이름)} 트레이너 · ${시분(o.ts)}</small></button></div>`;
+}
+const 시분 = t => { const d = new Date(t); return isNaN(d) ? '' : String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
+function 대화방(mid, 줄들){
+  let 앞날 = '';
+  return 줄들.map(o => { const d = String(o.ts).slice(0, 10), 머 = d && d !== 앞날 ? `<div class="fbday">${dateTxt(d)}</div>` : ''; 앞날 = d || 앞날; return 머 + 말풍선(o); }).join('');
+}
 function vFeedback(){
+  if(S.fbMode === 'ask') return vFeedbackOld();
+  const tr = S.who === 'tr', mid = tr ? subj() : S.mid;
+  const cms = D.cm.filter(c => c.mid === mid);
+  if(!tr){ cms.forEach(c => c.read = true); save(); }
+  const 모두 = 대화줄들(mid), 종목들 = [...new Map(모두.map(o => [o.ex + ':' + o.va, o])).values()];
+  const 거름 = S.fbEx && 종목들.some(o => o.ex + ':' + o.va === S.fbEx) ? S.fbEx : '';
+  const 줄들 = 거름 ? 모두.filter(o => o.ex + ':' + o.va === 거름) : 모두;
+  setTimeout(() => { const m = document.getElementById('main'); if(m && !S.fbKeep) m.scrollTop = m.scrollHeight; S.fbKeep = false; }, 0);      /* 카톡처럼 — 최근 말이 아래 */
+  return { top: bar('피드백', `<span class="sub">${tr ? esc(subjName()) + ' · ' : ''}${cms.length}개</span>`, tr ? 'tm:' + mid : null), tabs: tr ? 0 : 1,
+    foot: tr ? '' : `<button class="btn blue go" data-act="askpick">피드백 요청하기</button>`, body:
+      (종목들.length > 1 ? `<div class="chips fbchips"><button class="chip ${거름 ? '' : 'on'}" data-act="fbex:">전체</button>${종목들.map(o => `<button class="chip ${거름 === o.ex + ':' + o.va ? 'on' : ''}" data-act="fbex:${esc(o.ex + ':' + o.va)}">${esc(o.ex === 'memo' ? '수업 메모' : exName(o.ex, o.va))}</button>`).join('')}</div>` : '')
+      + (줄들.length ? `<div class="fbroom">${대화방(mid, 줄들)}</div>`
+        : 빔('chat', '아직 나눈 피드백이 없습니다', tr ? '종목을 눌러 피드백을 남기면 여기에 쌓여요' : '운동을 기록하거나 「피드백 요청하기」를 눌러 주세요')) };
+}
+/* 옛 갈래(최근 수업 · 종목별 · 요청) — 요청 화면(askpick)만 쓴다 */
+function vFeedbackOld(){
   const cms=D.cm.filter(c=>c.mid===S.mid);
-  const nw=cms.filter(c=>!c.read).length;
-  cms.forEach(c=>c.read=true); save();
   const mode = S.fbMode || 'recent';
-  /* 갈래 탭 = 분석과 같은 금테 한 줄 · 그 아래 요약 한 줄 (2026-10-06 융합). 숫자는 실제 피드백 수 */
-  const 트 = [...new Set(cms.map(c=>(c.tr||'').trim()).filter(Boolean))];
-  const head = `<div class="anatab fbtab">
-    <button class="${mode==='recent'?'on':''}" data-act="fbm:recent">최근</button>
-    <button class="${mode==='day'?'on':''}" data-act="fbm:day">최근 수업</button>
-    <button class="${mode==='part'?'on':''}" data-act="fbm:part">종목별</button></div>
-    <div class="fbsum"><span class="mi">${svg('h_chat',20)}</span>
-      <span class="ft"><b>${nw ? `새 피드백 ${nw}개` : (cms.length ? '새 피드백은 없어요' : '아직 받은 피드백이 없어요')}</b>
-        <small>지금까지 ${cms.length}개${트.length ? ' · ' + esc(트.join(', ')) + ' 트레이너' : ''}</small></span>
-      ${nw ? `<em>NEW</em>` : ''}</div>`;
-
+  const head = '';
   if(mode==='ask'){
     const sel = S.fbDay || TODAY;
     const ws = wsOnDay(S.mid, sel);
     const rows = [];
     ws.forEach(w => w.items.filter(i=>i.sets.length).forEach(it => rows.push({ w, it })));
-    return { top: bar('피드백 요청', `<span class="sub">${dateTxt(sel)}</span>`), tabs:1, body:
+    return { top: bar('피드백 요청', `<span class="sub">${dateTxt(sel)}</span>`, 'fbm:'), tabs:1, body:
       (rows.length ? `<span class="lbl">${dateTxt(sel)} · 봐 달라고 할 종목을 누르세요</span>`
         + rows.map(({w,it})=>{ const on = askOf(S.mid,it.ex,it.va).length, n = cmOf(S.mid,it.ex,it.va).length;
           return `<button class="card rowc ${on?'gold':''}" data-act="${on?`unask:${askOf(S.mid,it.ex,it.va)[0].id}`:`askfor:${it.ex}:${it.va}`}">
@@ -7840,55 +7877,7 @@ function vFeedback(){
       foot:`<button class="btn blue go" data-act="askpick">다른 날 선택</button>` };
   }
 
-  if(mode==='day'){
-    const sel = S.fbDay || TODAY;
-    const list = cmOnDay(S.mid, sel).slice().sort((a,b)=> a.ts < b.ts ? 1 : -1);
-    const ws = D.workouts.filter(w => w.mid===S.mid && w.date===sel && w.done);
-    return { top: bar('피드백', `<span class="sub">${dateTxt(sel)}</span>`), tabs:1,
-      foot:`<button class="btn blue go" data-act="askpick">피드백 요청하기</button>`, body: head +
-      fbStrip(S.mid) + `
-      ${ws.length ? `<span class="lbl">그날 한 운동</span>
-        ${ws.map(w=>`<button class="card rowc" data-act="rec:${w.id}">
-          <div><div class="nm">${esc(w.kind||'운동')}${w.title?` · ${esc(w.title)}`:''}</div>
-          <div class="sm">${w.items.filter(i=>i.sets.length).map(i=>esc(exName(i.ex,i.va))).join(' · ')||'세트 없음'}</div></div>
-          <span class="rt">${durTxt(w.dur)} ›</span></button>`).join('')}`
-        : '<div class="empty">이 날은 운동 기록이 없습니다<small class="e2">다른 날을 선택해 주세요</small></div>'}
-      <span class="lbl">그날 받은 피드백 ${list.length?`· ${list.length}개`:''}</span>
-      ${list.length ? list.map(c=>cmCard(c, 0)).join('')
-      : 빔('chat','이 날은 받은 피드백이 없습니다','다른 날을 선택해 주세요')}
-      <div class="note">가운데 날짜를 누르면 달력이 열립니다 · ● 피드백이 온 날</div>` };
-  }
-
-  if(mode==='recent'){
-    return { top: bar('피드백', `<span class="sub">${cms.length}개</span>`), tabs:1,
-      foot:`<button class="btn blue go" data-act="askpick">피드백 요청하기</button>`, body: head +
-      (cms.length? cms.map(c=>cmCard(c, 1)).join('')
-      : 빔('chat','아직 받은 피드백이 없습니다','운동을 기록하거나 「피드백 요청하기」를 눌러 주세요')) };
-  }
-
-  /* 종목별 — 부위 → 종목(하는 법) */
-  const part = S.fbPart || '가슴';
-  const rows=[];
-  EX.filter(e=>e.p===part).forEach(e=>{
-    vars(e.id).forEach(v=>{
-      const list=cmOf(S.mid,e.id,v.k);
-      rows.push({ex:e.id, va:v.k, n:list.length, at:list.length?list[0].at:'', pv:list.length?list[0].tx.split('\n')[0]:''});
-    });
-  });
-  rows.sort((a,b)=>b.n-a.n);
-  const has=rows.filter(r=>r.n>0), none=rows.filter(r=>!r.n);
-  return { top: bar('피드백', `<span class="sub">${esc(part)}</span>`), tabs:1,
-    foot:`<button class="btn blue go" data-act="askpick">피드백 요청하기</button>`, body: head + `
-    <div class="chips">${PARTS.map(p=>`<button class="chip ${p===part?'on':''}" data-act="fbp:${p}">${p}</button>`).join('')}</div>
-    ${has.length? has.map(r=>`<button class="card rowc" data-act="exd:${r.ex}:${r.va}">
-        <div><div class="nm">${esc(exName(r.ex,r.va))}</div>
-        <div class="sm">피드백 ${r.n}개 · 최근 ${esc(r.at)}<br>${esc(r.pv.slice(0,26))}…</div></div>
-        <span class="pill">${r.n}</span></button>`).join('')
-      : `<div class="empty">${esc(part)}에는 아직 피드백이 없습니다<small class="e2">다른 부위를 선택해 주세요</small></div>`}
-    ${none.length?`<div class="hr"></div><span class="lbl">아직 피드백 없음</span>
-      ${none.map(r=>`<button class="card rowc dim" data-act="exd:${r.ex}:${r.va}">
-        <div><div class="nm">${esc(exName(r.ex,r.va))}</div><div class="sm">설명만 있어요</div></div>
-        <span class="rt">›</span></button>`).join('')}`:''}` };
+  return vFeedback();
 }
 
 /* ── 식단 ── */
@@ -12185,6 +12174,7 @@ function tMember(){
       return 주기줄(m.id, 'tsub:cycle:'+m.id); })()}
     <div class="hr"></div><span class="lbl">운동 기록 <small>최근 ${Math.min(ws.length,5)}회${ws.length>5?` · 전체 ${ws.length}회`:''}</small></span>
     ${ws.slice(0,5).map(기록줄).join('') || '<div class="empty">아직 운동 기록이 없습니다<small class="e2">수업을 기록하면 여기에 나옵니다</small></div>'}
+    ${(n => `<button class="card rowc" data-act="tfbchat:${m.id}"><div><div class="nm">피드백 대화</div><div class="sm">${n ? n + '개 · 카톡처럼 날짜 순서로' : '아직 나눈 피드백이 없어요'}</div></div><span class="rt">›</span></button>`)(대화줄들(m.id).length)}
     ${ws.length>5 ? `<button class="card rowc teal" data-act="twall:${m.id}"><div><div class="nm t">지난 운동 기록 모두 보기</div>
       <div class="sm">전체 ${ws.length}회 · 수업 / 개인운동으로 선택해 보기</div></div><span class="rt">›</span></button>` : ''}` };
 }
@@ -12464,6 +12454,18 @@ function sheetPickAssign(){
     <div class="note">지정하면 회원 홈에 <b>오늘 할 루틴</b>으로 뜹니다</div>`);
 }
 
+/* 수업 시작 — 지난 수업 뒤 나눈 피드백이 있으면 먼저 보여 준다 (C-3 · 대표 「인바디 알림처럼 · 최근 나눈 피드백이 있습니다」) · 「수업 시작 ›」 = 원래 시작 창 */
+function 최근대화(mid){
+  const 지난 = D.workouts.filter(w => w.mid === mid && w.done && w.kind === '수업' && w.date < TODAY).map(w => w.date).sort().pop() || '';
+  return 대화줄들(mid).filter(o => String(o.ts).slice(0, 10) >= 지난 && o.ex !== 'memo');
+}
+function 수업시작창(mid){
+  const 줄들 = 최근대화(mid);
+  if(!줄들.length) return sheetStartSession(mid);
+  openSheet(() => `<div class="h2">최근 나눈 피드백이 있습니다 <small>지난 수업 뒤 ${줄들.length}개</small></div>
+    <div class="fbroom sm">${대화방(mid, 줄들.slice(-6))}</div>
+    <button class="btn blue go" data-act="tstartgo:${mid}">수업 시작 ›</button>`);
+}
 function sheetStartSession(mid){
   const m = MEMBERS.find(x=>x.id===mid) || {n:''};
   const rs = myRoutines(mid), t = D.today[mid];
@@ -12977,7 +12979,8 @@ document.addEventListener('click', async ev=>{
         if(g && !식단사진들(m.mid, m.date).length){ D.posts = D.posts.filter(x=>x.id!==g.id); sv(sdel('posts','id=eq.'+g.id), '식단 글 내리기'); } }
       if(m.path) 저장소지우기(m.path);
       closeSheet(); toast('삭제했어요'); render(); return; }
-    case 'tstartask': S.tmid=rest[0]; sheetStartSession(rest[0]);
+    case 'tstartgo': closeSheet(); S.tmid=rest[0]; sheetStartSession(rest[0]); return;
+    case 'tstartask': S.tmid=rest[0]; 수업시작창(rest[0]);
       try{ sessionStorage.setItem('cycpop_'+rest[0]+'_'+TODAY, '1'); }catch(e){}
       return;
     case 'tstart': {
@@ -13315,6 +13318,8 @@ document.addEventListener('click', async ev=>{
 
     case 'rt': S.rid=rest[0]; go('routine'); return;
     case 'rec': S.wid=rest[0]; go('record'); return;
+    case 'fbex': S.fbEx = rest.join(':'); S.fbKeep = true; render(); return;      /* 피드백 대화방 종목 거르기 (C-3) */
+    case 'tfbchat': S.tmid = rest[0]; S.subj = rest[0]; S.fbMode = ''; S.fbEx = ''; go('feedback'); return;
     case 'fendview': S.wid=rest[0]; go('summary'); return;
     case 'days': S.day = TODAY; go('days'); return;
     case 'dayat': S.day = rest[0]; go('days'); return;
