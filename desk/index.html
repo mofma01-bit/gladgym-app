@@ -1732,6 +1732,15 @@ body{word-break:keep-all}
 .bp-pbox .c{display:flex;justify-content:flex-end;align-items:center;gap:6px;margin-top:8px}.bp-pbox .c .bp-done{margin-right:auto}
 .bp-pbox .bp-done{font-weight:800;color:var(--teal);font-size:13.5px}.bp-pbox.snz{opacity:.72}.bp-pbox.ps-locked .c{margin-top:6px}
 .cl-its{display:flex;flex-direction:column;gap:4px;margin:8px 0 4px}.cl-it{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:9px;background:var(--dark-3);border:1px solid var(--line);font-size:14px}
+.cl-qs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}.cl-qs button{border:1px solid var(--line);background:var(--dark-3);border-radius:999px;padding:6px 12px;font-size:13.5px;font-weight:700;color:var(--cream)}
+.cl-qs button.on{background:#f2e3c6;color:#1b1813;border-color:#f2e3c6}
+.cl-offt{margin-left:auto;font-size:13px;color:var(--sub)}.cl-offt b{color:#e8c08f}.cl-offed{display:grid;gap:6px;font-size:13px}.cl-cov{display:grid;gap:4px}
+.cl-zh{flex-wrap:wrap;gap:6px}.cl-zh>.cl-tm{margin-left:0}.cl-kd{font-style:normal;font-size:13px;color:var(--sub);border:1px solid var(--line);border-radius:6px;padding:0 6px}
+.cl-mv{display:inline-flex;align-items:center;gap:5px;margin-left:auto;border:1px solid #5a4a30;background:#2a2318;border-radius:999px;padding:2px 8px}.cl-mv i,.cl-chg i{font-style:normal;color:#e8c08f;font-weight:800}
+.cl-same{margin-left:auto;font-size:13px;color:var(--sub)}.cl-zd{font-size:13px;color:var(--sub);margin:2px 0 4px}
+.cl-chg{background:#1f1b14;border:1px solid #5a4a30;border-radius:12px;padding:10px 12px;margin-bottom:8px}.cl-chg .t{font-size:13.5px;color:#e8c08f;font-weight:800;margin-bottom:6px}
+.cl-chg .r{display:flex;align-items:center;gap:6px;font-size:14px;padding:3px 0;flex-wrap:wrap}.cl-chg .z{color:var(--sub);font-size:13px}
+.cl-grp{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:800;margin:16px 0 8px}.cl-grp small{font-weight:500;color:#a39c8e;font-size:13px}
 .cl-tm{font-style:normal;display:inline-block;background:#2e4656;color:#dcefff;border-radius:6px;padding:1px 7px;font-size:13px;font-weight:800;margin-left:4px;white-space:nowrap}
 .cl-dy{font-style:normal;color:#e8c08f;font-weight:700;margin-right:6px}
 .cl-it .t{font-weight:700}.cl-it .d{font-size:13px;color:var(--sub);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.cl-it .bp-act{margin-left:auto}.bp-q{width:100%;margin:2px 0 6px}.pop.tx-side .tgrp.bp-hide{display:none!important}.bp-jl{margin-top:6px;font-size:13px;color:#e8c08f}
@@ -2317,7 +2326,7 @@ body{word-break:keep-all}
 
 <script>
 "use strict";
-const BUILD = '381';
+const BUILD = '382';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -7148,7 +7157,7 @@ function 분기배정(q){
 /* 그날 담당 — 구역(세트)째 한 사람에게 (2026-10-22 대표 「세트로 돌리자 · FC · 대표 · 지점장 · 영림은 고정 · off 가 생기면 분배」)
    담당이 쉬면 그 구역 전부를 같은 성별 · 출근 · 그날 적게 맡은 사람에게 · 같으면 이번 달 대신 덜 맡은 사람 · 그래도 같으면 날마다 다른 사람 */
 function 청소배정(d, 월){
-  const 사람 = 청소사람(), 찾 = id => 사람.find(p => p.id === id), 수 = {}, 결과 = {}, 더 = (p, n) => { 수[p.id] = (수[p.id] || 0) + n; };
+  const 사람 = 청소사람(), 찾 = id => 사람.find(p => p.id === id), 수 = {}, 결과 = {}, 더 = (p, n) => { 수[p.id] = (수[p.id] || 0) + n; };      /* 월 = 이번 달 넘겨받은 청소 수(개수) */
   const 섞 = p => { let h = 7; for(const c of d + p.id) h = (h * 31 + c.charCodeAt(0)) % 9973; return h; };      /* 같은 수면 날마다 다른 사람이 먼저 */
   if(!월){ 월 = {}; for(let t = d.slice(0, 8) + '01'; t < d; t = 날더함(t, 1)) (청소배정(t, 월).대신들 || []).forEach(id => { 월[id] = (월[id] || 0) + 1; }); }      /* 이번 달 1일 ~ 어제 대신 맡은 횟수 */
   const 고름 = 후보 => 후보.slice().sort((a, b) => ((수[a.id] || 0) - (수[b.id] || 0)) || ((월[a.id] || 0) - (월[b.id] || 0)) || (섞(a) - 섞(b)))[0] || null;
@@ -7160,9 +7169,25 @@ function 청소배정(d, 월){
     쓸.forEach(z => { const p = 고름(당들.filter(s => !z.sex || s.sex === z.sex)) || 고름(당들); 줌(z, p, { 당직: true, 왜: p ? '' : '당직자 없음' }); if(p) 더(p, 구목[z.id].length); });
     return { 목, 결과, 당직: true, 대신들: [] }; }
   const 배 = 분기배정(분기of(d)), 출근 = 사람.filter(p => !청소쉼(p, d)), 대신들 = [];
-  쓸.forEach(z => { const 원 = 찾(배[z.id]); if(원 && !청소쉼(원, d)){ 줌(z, 원, { 대신: false }); 더(원, 구목[z.id].length); } });
-  쓸.forEach(z => { if(결과[구목[z.id][0].id]) return; const 원 = 찾(배[z.id]) || null, p = 원 ? 고름(출근.filter(s => !z.sex || s.sex === z.sex)) : null;
-    줌(z, p, { 대신: !!p, 원, 왜: p ? '' : !원 ? '담당 없음' : z.sex ? z.sex + '자 선생님 중 출근자 없음' : '출근자 없음' }); if(p){ 더(p, 구목[z.id].length); 대신들.push(p.id); } });
+  /* 담당이 쉬는 날 「대신 안 함」 구역은 그날 통째로 뺀다 — 홈 · 누락 · 기록에도 안 나온다 (2026-10-23 대표 「대표 화장실 청소는 배분 안 해도」 · 결정함 k2) */
+  const 쉼뺌 = new Set(쓸.filter(z => z.off_mode === '건너뜀' && 찾(배[z.id]) && 청소쉼(찾(배[z.id]), d)).map(z => z.id));
+  for(let i = 목.length - 1; i >= 0; i--) if(쉼뺌.has(구역of[목[i].id].id)) 목.splice(i, 1);
+  const 쓸2 = 쓸.filter(z => !쉼뺌.has(z.id));
+  쓸2.forEach(z => { const 원 = 찾(배[z.id]); if(원 && !청소쉼(원, d)){ 줌(z, 원, { 대신: false }); 더(원, 구목[z.id].length); } });
+  /* 담당이 쉬는 날 — 구역째 한 사람이 아니라 청소 하나씩 골고루 (2026-10-23 23:18 대표 「한 사람에게 넘어가는 게 아니라 골고루 · 1개씩 분배 ·
+     항목이 적어서 한 사람이 안 받으면 다음 차례 때 우선 · 연속으로 2~3일 쉬면 순차적으로 돌게」 · 22:21 세트 규칙을 바꿈)
+     받는 차례 = 오늘 넘겨받은 수가 적은 사람 → 이번 달 넘겨받은 수가 적은 사람(못 받았으면 다음에 먼저 · 며칠 쉬면 돌아가며) → 오늘 맡은 청소가 적은 사람 → 날마다 다른 사람
+     후보 = 먼저 받을 사람(cover · 구역 성별 상관없이) 중 출근자 → 없으면 같은 성별 출근자 (2026-10-23 대표 「영림 여자 탈의실은 대표 혹은 조민철 먼저 · 다 없으면 다른 선생님」) */
+  const 받음 = {}, 차례 = 후보 => 후보.slice().sort((a, b) => ((받음[a.id] || 0) - (받음[b.id] || 0)) || ((월[a.id] || 0) - (월[b.id] || 0)) || ((수[a.id] || 0) - (수[b.id] || 0)) || (섞(a) - 섞(b)))[0] || null;
+  쓸2.forEach(z => { if(결과[구목[z.id][0].id]) return; const 원 = 찾(배[z.id]) || null;
+    if(!원){ 줌(z, null, { 대신: false, 원, 왜: '담당 없음' }); return; }
+    /* 먼저 받을 사람을 정한 구역은 그 사람들이 다 없으면 다른 선생님(성별 상관없이 · FC 빼고 — 저녁에만 나옴) (2026-10-23 23:22 대표 「영림쌤 청소도 분배는 되게 · FC 는 저녁에만 나오니까 · 우선순위 분배」) */
+    /* 23:24 대표 「먼저 받는 사람 양인수 → off 면 조민철 → off 면 또 누군가가 받는다」 — 먼저 받을 사람은 고른 차례대로 첫 출근자 한 사람이 그 구역을 받는다 */
+    const 먼저 = (z.cover || []).map(찾).filter(s => s && !청소쉼(s, d)),
+      후보 = 먼저.length ? [먼저[0]] : (z.cover || []).length ? 출근.filter(s => 등급of(s) !== 'FC') : 출근.filter(s => !z.sex || s.sex === z.sex);
+    구목[z.id].forEach(x => { const p = 차례(후보);
+      결과[x.id] = { p, 구역: z, 대신: !!p, 원, 왜: p ? '' : z.sex ? z.sex + '자 선생님 중 출근자 없음' : '출근자 없음' };
+      if(p){ 받음[p.id] = (받음[p.id] || 0) + 1; 더(p, 1); 대신들.push(p.id); } }); });
   return { 목, 결과, 대신들 };
 }
 const 청소체크of = (id, d) => 청소.기록.find(r => r.clean_id === id && r.day === d);
@@ -7249,43 +7274,48 @@ function 청소기록판(){
 /* ── 관리 — 구역 · 분기 배정 · 할 일 · 대청소 메모 · 선생님 성별 (청소 담당 관리 권한) ── */
 const 구역종류글 = { 고정:'고정', 순환:'순환', 당직:'주말당직' };
 function 청소관리판(){
-  const 고칠 = 할수('clean');      /* 보기는 모두 · 수정 단추는 청소 관리 권한만 (2026-10-22 22:22 대표 「수정은 대표랑 지점장만」) */
-  const 이름 = id => { const p = (W.staff || []).find(s => s.id === id); return p ? 보임이름(p.name) : '(퇴사)'; };
-  const q = 분기of(TODAY), 배 = 분기배정(q), 다음 = 분기배정(다음분기(q)), 구 = 구역들(), 평 = 구.filter(z => z.kind !== '당직'), 당 = 구.filter(z => z.kind === '당직');
+  const 고칠0 = 할수('clean');      /* 보기는 모두 · 수정 단추는 청소 관리 권한만 (2026-10-22 22:22 대표 「수정은 대표랑 지점장만」) */
+  /* 2026-10-23 밤 대표 「직원별로 한눈에 · 다음 분기 순환 미리 보는 칩」 + 22:24 「순환이 먼저 · 양인혁 → 000 표기」 → 합친 안(시안 버전 3) */
+  const q = 분기of(TODAY), 미리 = 청소.보기 === '다음', 고칠 = 고칠0 && !미리, 지금배 = 분기배정(q), 배 = 미리 ? 분기배정(다음분기(q)) : 지금배;
+  const 구 = 구역들(), 당 = 구.filter(z => z.kind === '당직'), 순환 = 구.filter(z => z.kind === '순환'), 고정 = 구.filter(z => z.kind === '고정');
   const 할일들 = z => ((청소.순서 && 청소.순서.zid === z.id ? 청소.순서.items : z.items) || []).map(할일of).filter(x => x && x.active !== false);
   const 순 = 청소.순서;
   const 청소줄 = (x, zid) => 순 && 순.zid === zid ? '<div class="cl-it"><span class="t">' + 청소글(x) + '</span><span class="bp-act"><button class="btn ghost sm" data-act="tx:clmv" data-k="-1" data-v2="' + esc(x.id) + '" title="위로">▲</button><button class="btn ghost sm" data-act="tx:clmv" data-k="1" data-v2="' + esc(x.id) + '" title="아래로">▼</button></span></div>'
     : '<div class="cl-it"><span class="t">' + 청소글(x) + '</span><span class="d">' + ((x.days || []).length ? '<em class="cl-dy">' + esc(x.days.join(' · ')) + '</em>' : '') + esc(x.how || '') + '</span>'
-    + (청소체크of(x.id, TODAY) ? '<span class="cl-tk">✓ 오늘</span>' : '')
+    + (!미리 && 청소체크of(x.id, TODAY) ? '<span class="cl-tk">✓ 오늘</span>' : '')
     + (고칠 ? '<span class="bp-act"><button class="btn ghost sm" data-act="tx:clmove" data-v2="' + esc(x.id) + '">옮기기</button><button class="btn ghost sm" data-act="tx:cledit" data-v2="' + esc(x.id) + '">수정</button><button class="btn ghost sm" data-act="tx:cloff" data-v2="' + esc(x.id) + '">삭제</button></span>' : '') + '</div>';
-  const 구줄 = z => '<div class="bp-row2"><div class="a"><b>' + 시간칠(z.name) + '</b>' + (z.sex ? '<em class="bp-st">' + esc(z.sex) + '</em>' : '')
-    + (z.kind !== '당직' ? '<span style="margin-left:auto">' + (배[z.id] ? 이름딱지(배[z.id]) : '<span class="sub3">담당 없음</span>') + '</span>' : '') + '</div>'
-    + (z.kind === '순환' && 다음[z.id] && 다음[z.id] !== 배[z.id] ? '<div class="b"><span>다음 분기 ' + esc(이름(다음[z.id])) + '</span></div>' : '')
+  const 딱 = id => id ? 이름딱지(id) : '<span class="sub3">담당 없음</span>';
+  const 구줄 = z => { const 옮김 = 미리 && z.kind === '순환' && (지금배[z.id] || null) !== (배[z.id] || null);
+    return '<div class="bp-row2"><div class="a cl-zh">' + (z.kind !== '당직' ? 딱(배[z.id]) : '') + (z.slot ? 청소시각(z.slot) : '') + '<b>' + 시간칠(z.name) + '</b>' + (z.sex ? '<em class="bp-st">' + esc(z.sex) + '</em>' : '') + (z.kind !== '당직' ? '<em class="cl-kd">' + 구역종류글[z.kind] + '</em>' : '')
+    + (!미리 && z.kind !== '당직' ? (z.off_mode === '건너뜀' ? '<span class="cl-offt">쉬면 <b>건너뜀</b></span>' : (z.cover || []).length ? '<span class="cl-offt">쉬면 <b>' + esc(z.cover.map(id => { const p = (W.staff || []).find(s => s.id === id); return p ? 보임이름(p.name) : ''; }).filter(Boolean).join(' → ')) + '</b> → 다른 선생님</span>' : '') : '')
+    + (옮김 ? '<span class="cl-mv">' + 딱(지금배[z.id]) + '<i>→</i>' + 딱(배[z.id]) + '</span>' : 미리 && z.kind !== '당직' ? '<span class="cl-same">그대로</span>' : '') + '</div>'
+    + (z.memo ? '<div class="cl-zd">' + esc(z.memo) + '</div>' : '')
     + '<div class="cl-its">' + (할일들(z).length ? 할일들(z).map(x => 청소줄(x, z.id)).join('') : '<div class="sub3">아직 청소가 없어요</div>') + '</div>'
     + (고칠 && 순 && 순.zid === z.id ? '<div class="c"><small>▲▼ 로 차례를 바꾸고 저장해요</small><span class="bp-act"><button class="btn ghost sm" data-act="tx:clordx">취소</button><button class="btn gold sm" data-act="tx:clordok">순서 저장</button></span></div>'
     : 고칠 ? '<div class="c"><small></small><span class="bp-act">' + (할일들(z).length > 1 ? '<button class="btn ghost sm" data-act="tx:clord" data-v2="' + esc(z.id) + '">순서</button>' : '') + '<button class="btn sub sm" data-act="tx:cladd" data-v2="' + esc(z.id) + '">＋ 청소 추가</button>' + (z.kind !== '당직' ? '<button class="btn sub sm" data-act="tx:clwho" data-v2="' + esc(z.id) + '">담당 수정</button>' : '')
-    + '<button class="btn ghost sm" data-act="tx:clzone" data-v2="' + esc(z.id) + '">구역 수정</button></span></div>' : '') + '</div>';
+    + '<button class="btn ghost sm" data-act="tx:clzone" data-v2="' + esc(z.id) + '">구역 수정</button></span></div>' : '') + '</div>'; };
   const 쓰임 = new Set(); 구.forEach(z => (z.items || []).forEach(id => 쓰임.add(id)));
   const 켜 = (청소.목 || []).filter(x => x.active !== false), 꺼 = (청소.목 || []).filter(x => x.active === false), 없는 = 켜.filter(x => !쓰임.has(x.id));
-  const 고정 = 평.filter(z => z.kind === '고정'), 순환 = 평.filter(z => z.kind !== '고정');
   const 없줄 = x => '<div class="bp-row2"><div class="a"><b>' + 청소글(x) + '</b><span style="margin-left:auto"><button class="btn sub sm" data-act="tx:clmove" data-v2="' + esc(x.id) + '">구역에 넣기</button><button class="btn ghost sm" data-act="tx:cloff" data-v2="' + esc(x.id) + '">삭제</button></span></div></div>';
   const 대들 = 대청소날(+TODAY.slice(0, 4)).concat(대청소날(+TODAY.slice(0, 4) + 1)).filter(d => d >= TODAY).slice(0, 4);
-  const 머 = (제목, 설명, 단추) => '<div class="lbl" style="display:flex;align-items:center;gap:8px">' + 제목 + ' <small style="font-weight:500;color:#a39c8e">' + 설명 + '</small>' + (고칠 && 단추 || '') + '</div>';
-  const 빈 = (b, 안내) => '<div class="empty why"><b>' + b + ' 없습니다</b>' + (고칠 ? 안내 : '대표 · 지점장이 「관리」에서 정해요') + '</div>';
-  const 선생 = 청소사람().map(p => ({ p, 맡: 평.filter(z => 배[z.id] === p.id) }));
-  const 선줄 = r => '<div class="bp-row2"><div class="a">' + 이름딱지(r.p.id) + '<span class="sub3">' + (r.맡.length ? r.맡.map(z => 구역종류글[z.kind] + ' · ' + 시간칠(z.name) + ' · ' + 할일들(z).length + '개').join(' / ') : '맡은 구역 없음') + '</span></div></div>';
-  판열기('청소 담당',
-    머('선생님별', 분기글(q) + ' · 쉬는 날은 구역째 같은 성별 출근자에게') + (선생.length ? 선생.map(선줄).join('') : 빈('맡은 구역이 아직', '구역마다 「담당 수정」에서 정해요'))
+  /* 칸 머리 — .lbl 이 아니라 .cl-grp (판 자동 칩이 또 생기지 않게 · 칩은 분기 둘만) */
+  const 머 = (제목, 설명, 단추) => '<div class="cl-grp">' + 제목 + ' <small>' + 설명 + '</small>' + (고칠 && 단추 || '') + '</div>';
+  const 빈 = (b, 안내) => '<div class="empty why"><b>' + b + ' 없습니다</b>' + (고칠0 ? 안내 : '대표 · 지점장이 「관리」에서 정해요') + '</div>';
+  const 칩 = '<div class="cl-qs"><button class="' + (미리 ? '' : 'on') + '" data-act="tx:clq" data-k="">이번 분기 · ' + 분기글(q) + '</button><button class="' + (미리 ? 'on' : '') + '" data-act="tx:clq" data-k="다음">다음 분기 미리보기 · ' + 분기글(다음분기(q)) + '</button></div>';
+  const 바뀜 = 미리 ? 순환.filter(z => (지금배[z.id] || null) !== (배[z.id] || null)) : [];
+  const 달라짐 = 미리 ? '<div class="cl-chg"><div class="t">이번 분기와 달라지는 것 · 순환 ' + 바뀜.length + '곳</div>' + (바뀜.length ? 바뀜.map(z => '<div class="r">' + 딱(지금배[z.id]) + '<i>→</i>' + 딱(배[z.id]) + '<span class="z">' + (z.slot ? esc(z.slot) + ' ' : '') + 시간칠(z.name) + '</span></div>').join('') : '<div class="sub3">달라지는 것이 없어요</div>') + '</div>'
+    + '<div class="sub3" style="margin:-2px 0 10px">미리보기는 보기만 해요' + (고칠0 ? ' · 바꾸려면 「이번 분기」에서 「담당 수정」' : '') + '</div>' : '';
+  판열기('청소 담당', 칩 + 달라짐
+    + 머('순환 구역 ' + 순환.length, '분기마다 한 칸씩 돌아요', '<button class="btn sub sm" style="margin-left:auto" data-act="tx:clzone" data-k="순환" data-v2="">＋ 구역 추가</button>')
+    + (순환.length ? 순환.map(구줄).join('') : 빈('순환 구역이', '「＋ 구역 추가」로 만들어 주세요'))
     + 머('고정 구역 ' + 고정.length, '정한 선생님이 계속 해요', '<button class="btn sub sm" style="margin-left:auto" data-act="tx:clzone" data-k="고정" data-v2="">＋ 구역 추가</button>')
     + (고정.length ? 고정.map(구줄).join('') : 빈('고정 구역이', '「＋ 구역 추가」로 만들어 주세요'))
-    + 머('순환 구역 · ' + 분기글(q), '분기마다 한 칸씩 돌아요' + (고칠 ? ' · 담당 수정으로 바로 바꿔요' : ''), '<button class="btn sub sm" style="margin-left:auto" data-act="tx:clzone" data-k="순환" data-v2="">＋ 구역 추가</button>')
-    + (순환.length ? 순환.map(구줄).join('') : 빈('순환 구역이', '「＋ 구역 추가」로 만들어 주세요'))
     + 머('주말당직 ' + 당.length, '토 · 일 · 당직이 잡힌 공휴일 · 명절에 그날 당직자에게') + (당.length ? 당.map(구줄).join('') : 빈('주말당직 구역이', '「＋ 구역 추가」에서 종류를 「주말당직」으로 골라요'))
+    + (미리 ? '' : 머('대청소', '3 · 6 · 9 · 12월 셋째 금요일 14시 · 다 같이') + 대들.map(d => '<div class="bp-row2"><div class="a"><b>' + 청소짧은날(d) + ' <em class="cl-tm">14시</em></b>' + (고칠 ? '<span style="margin-left:auto"><button class="btn sub sm" data-act="tx:clbig" data-v2="' + d + '">메모 ' + (대메모(d) ? '수정' : '쓰기') + '</button></span>' : '') + '</div>'
+      + (대메모(d) ? '<div class="b"><span style="white-space:pre-wrap">' + esc(대메모(d)) + '</span></div>' : '') + '</div>').join(''))
     + (고칠 && 없는.length ? 머('구역 없는 청소 ' + 없는.length, '구역에 넣어야 담당에게 나와요') + 없는.map(없줄).join('') : '')
-    + 머('대청소', '3 · 6 · 9 · 12월 셋째 금요일 14시 · 다 같이') + 대들.map(d => '<div class="bp-row2"><div class="a"><b>' + 청소짧은날(d) + ' 14시</b>' + (고칠 ? '<span style="margin-left:auto"><button class="btn sub sm" data-act="tx:clbig" data-v2="' + d + '">메모 ' + (대메모(d) ? '수정' : '쓰기') + '</button></span>' : '') + '</div>'
-      + (대메모(d) ? '<div class="b"><span style="white-space:pre-wrap">' + esc(대메모(d)) + '</span></div>' : '') + '</div>').join('')
-    + (할수('staff') ? 머('선생님 성별', '성별이 있는 구역 · 자동 분배에 써요') + 청소사람().map(p => '<div class="bp-row2"><div class="a">' + 이름딱지(p.id) + '<span class="sub3">' + (p.sex ? esc(p.sex) : '성별 미입력') + '</span><span style="margin-left:auto"><button class="btn sub sm" data-act="tx:clstaff" data-v2="' + esc(p.id) + '">수정</button></span></div></div>').join('') : '')
-    + (고칠 && 꺼.length ? 머('삭제한 청소 ' + 꺼.length, '') + 꺼.map(x => '<div class="bp-row2 dim"><div class="a"><b>' + 청소글(x) + '</b><span style="margin-left:auto"><button class="btn ghost sm" data-act="tx:clon" data-v2="' + esc(x.id) + '">복원</button></span></div></div>').join('') : ''));
+    + (고칠 && 꺼.length ? 머('삭제한 청소 ' + 꺼.length, '') + 꺼.map(x => '<div class="bp-row2 dim"><div class="a"><b>' + 청소글(x) + '</b><span style="margin-left:auto"><button class="btn ghost sm" data-act="tx:clon" data-v2="' + esc(x.id) + '">복원</button></span></div></div>').join('') : '')
+    + (!미리 && 할수('staff') ? 머('선생님 성별', '성별이 있는 구역 · 자동 분배에 써요') + 청소사람().map(p => '<div class="bp-row2"><div class="a">' + 이름딱지(p.id) + '<span class="sub3">' + (p.sex ? esc(p.sex) : '성별 미입력') + '</span><span style="margin-left:auto"><button class="btn sub sm" data-act="tx:clstaff" data-v2="' + esc(p.id) + '">수정</button></span></div></div>').join('') : ''));
 }
 function 청소판다시(){ if(판머리 === '청소 담당') 청소관리판(); else if(판머리 === '청소 기록') 청소기록판(); else if(판머리 === '청소 누락') 청소누락판(); }
 const 청소편 = { days: [], items: [], kind: '순환', id: '', el: null };
@@ -7356,9 +7386,16 @@ async function 청소옮김(id, zid){
 function 구역창(el, id, 초안){
   const 원 = (청소.구역 || []).find(z => z.id === id), z = 초안 || 원 || { name:'', kind:'순환', sex:null, items:[] };      /* 「＋ 구역 추가」는 고정 / 순환 칸에서 그 종류로 (2026-10-22) */
   if(!초안) 청소편.items = (z.items || []).slice(); 청소편.kind = z.kind || '순환'; 청소편.id = id || ''; 청소편.el = el;
+  청소편.off = z.off_mode || ''; 청소편.cover = (z.cover || []).slice();
   const 켜 = (청소.목 || []).filter(x => x.active !== false);
   쪽지열기(el, '<div class="tx-ph"><b>' + (id ? '구역 수정' : '구역 추가') + '</b><button data-act="popclose">✕</button></div><div class="cl-ed">'
     + '<label>이름<input class="inp" id="clzn" value="' + esc(z.name || '') + '" placeholder="A구역"></label>'
+    + ((청소.구역 || []).some(y => 'slot' in y) ? '<label>시간 <span class="sub3">비우면 아무 때 · 이름 앞 파란 딱지</span><input class="inp" id="clzs" value="' + esc(z.slot || '') + '" placeholder="15~16시"></label>' : '')
+    + ((청소.구역 || []).some(y => 'off_mode' in y) && z.kind !== '당직' ? '<div class="cl-offed"><span class="sub3">담당이 쉬는 날</span><span class="cl-days">'
+      + '<button data-act="tx:clzom" data-v2="" class="' + (청소편.off !== '건너뜀' ? 'on' : '') + '">다른 선생님이 대신</button><button data-act="tx:clzom" data-v2="건너뜀" class="' + (청소편.off === '건너뜀' ? 'on' : '') + '">대신 안 함 · 그날 건너뜀</button></span>'
+      + '<div class="cl-cov"' + (청소편.off === '건너뜀' ? ' style="display:none"' : '') + '><span class="sub3">먼저 받을 사람 · 누른 차례대로 · 다 쉬면 다른 선생님(FC 빼고)</span><span class="cl-days">'
+      + 청소사람().map(p => { const i = 청소편.cover.indexOf(p.id); return '<button data-act="tx:clzcov" data-v2="' + esc(p.id) + '" data-n="' + esc(보임이름(p.name)) + '" class="' + (i >= 0 ? 'on' : '') + '">' + (i >= 0 ? (i + 1) + ' ' : '') + esc(보임이름(p.name)) + '</button>'; }).join('') + '</span></div></div>' : '')
+    + ((청소.구역 || []).some(y => 'memo' in y) ? '<label>설명 <span class="sub3">구역 이름 아래 작게 보여요</span><input class="inp" id="clzd" value="' + esc(z.memo || '') + '" placeholder="쉬는 날은 출근한 여자 선생님에게"></label>' : '')
     + '<label>종류<span class="cl-days">' + ['순환', '고정', '당직'].map(k => '<button data-act="tx:clzk" data-v2="' + k + '" class="' + (청소편.kind === k ? 'on' : '') + '" style="min-width:76px">' + 구역종류글[k] + '</button>').join('') + '</span></label>'
     + '<label>성별 <span class="sub3">탈의실처럼 성별이 있는 구역</span><select class="inp" id="clzx"><option value="">아무나</option><option value="남"' + (z.sex === '남' ? ' selected' : '') + '>남자 선생님만</option><option value="여"' + (z.sex === '여' ? ' selected' : '') + '>여자 선생님만</option></select></label>'
     + '<div style="display:flex;gap:6px">' + (id ? '<button class="btn ghost sm" data-act="tx:clzoff" data-v2="' + esc(id) + '">구역 삭제</button>' : '') + '<button class="btn gold sm" style="flex:1" data-act="tx:clzsave" data-v2="' + esc(id || '') + '">저장</button></div></div>', 340);
@@ -7366,6 +7403,9 @@ function 구역창(el, id, 초안){
 async function 구역저장(id){
   const 이름 = (($('#clzn') || {}).value || '').trim(); if(!이름) return toast('구역 이름을 입력해 주세요');
   const 몸 = { name: 이름, kind: 청소편.kind, sex: (($('#clzx') || {}).value || '') || null, items: 청소편.items.slice() };
+  if($('#clzd')) 몸.memo = ($('#clzd').value || '').trim() || null;
+  if($('#txpop .cl-offed')){ 몸.off_mode = 청소편.off || null; 몸.cover = 청소편.off === '건너뜀' || !청소편.cover.length ? null : 청소편.cover.slice(); }      /* 담당이 쉬는 날 (결정함 k2) */
+  if($('#clzs')) 몸.slot = ($('#clzs').value || '').trim() || null;      /* 구역 시간 (57단계 · 22:48 대표 「이름과 시간, 설명도 다 수정」) */      /* 57단계 SQL(구역 설명) 뒤에만 칸이 있다 */
   if(!await 묻기((id ? '「' + 이름 + '」 구역을 이대로 수정할까요?' : '「' + 이름 + '」 ' + 구역종류글[몸.kind] + ' 구역을 추가할까요?'))) return;
   쪽지닫기();
   try{ if(id) await usend('tr_clean_zone?id=eq.' + encodeURIComponent(id), 'PATCH', Object.assign({ updated_at: new Date().toISOString() }, 몸));
@@ -12310,6 +12350,7 @@ async function txAct(a, el){
   if(a==='cllog'){ 청소기록판(); return; }
   if(a==='clset'){ 청소관리판(); return; }
   if(a==='cledit'){ if(!할수('clean')) return; 청소수정창(el, v2, k); return; }
+  if(a==='clq'){ 청소.보기 = k || ''; 청소.순서 = null; 청소관리판(); return; }      /* 이번 분기 / 다음 분기 미리보기 (2026-10-23 밤) */
   if(a==='clwho'){ if(!할수('clean')) return; 담당창(el, v2); return; }      /* 청소 v2 — 구역 · 분기 담당 · 대청소 (2026-10-21) */
   if(a==='clwhook'){ if(!할수('clean')) return; await 담당저장(k, v2); return; }
   if(a==='clzone'){ if(!할수('clean')) return; if(!v2 && k){ 청소편.items = []; 구역창(el, '', { name:'', kind:k, sex:null, items:[] }); } else 구역창(el, v2); return; }
@@ -12320,6 +12361,9 @@ async function txAct(a, el){
   if(a==='clordok'){ if(!할수('clean')) return; await 청소순서저장(); return; }
   if(a==='clmove'){ if(!할수('clean')) return; 청소옮김창(el, v2); return; }
   if(a==='clmoveok'){ if(!할수('clean')) return; await 청소옮김(k, v2); return; }
+  if(a==='clzom'){ 청소편.off = v2 || ''; document.querySelectorAll('#txpop [data-act="tx:clzom"]').forEach(b => b.classList.toggle('on', (b.dataset.v2 || '') === 청소편.off)); const c = document.querySelector('#txpop .cl-cov'); if(c) c.style.display = 청소편.off === '건너뜀' ? 'none' : ''; return; }
+  if(a==='clzcov'){ const i = 청소편.cover.indexOf(v2); if(i >= 0) 청소편.cover.splice(i, 1); else 청소편.cover.push(v2);      /* 누른 차례 = 받는 차례(1 → 2) */
+    document.querySelectorAll('#txpop [data-act="tx:clzcov"]').forEach(b => { const j = 청소편.cover.indexOf(b.dataset.v2); b.classList.toggle('on', j >= 0); b.textContent = (j >= 0 ? (j + 1) + ' ' : '') + (b.dataset.n || ''); }); return; }
   if(a==='clzk'){ 청소편.kind = v2; document.querySelectorAll('#txpop [data-act="tx:clzk"]').forEach(b => b.classList.toggle('on', b.dataset.v2 === v2)); return; }
   if(a==='clzsave'){ if(!할수('clean')) return; await 구역저장(v2); return; }
   if(a==='clzoff'){ if(!할수('clean')) return; await 구역끄기(v2); return; }
