@@ -3093,7 +3093,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '443';
+const BUILD = '444';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -4968,7 +4968,8 @@ function vLogin(){
    「권한이 없어요」가 오면 토큰이 틀렸거나 퇴사 처리된 것 — 다시 로그인하라고 알린다.
    브로제이에 닿지 않을 때만 수기 추가(이름 + 뒷 4자리 · id 가 `mh…` 로 시작 → 데스크에 「수기」 표시)가 열린다 — 데스크와 같다 */
 async function 앱crm(길, 몸){ const au = 로그인기억.읽() || {}; if(!au.token || au.mid) throw new Error('직원으로 로그인해야 검색할 수 있어요');
-  let r; try{ r = await fetch(GG_API + '/app/crm/' + 길, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(Object.assign({ token: au.token }, 몸 || {})) }); }
+  /* 앱은 늘 트레이너 본인 범위 — 대신 = 로그인한 직원 이름(서버가 자기 이름이면 등급과 상관없이 트레이너 범위로 답한다) · 2026-10-23 대표 「앱은 관리자로 볼 필요가 없으니 조민철 트레이너로만」 */
+  let r; try{ r = await fetch(GG_API + '/app/crm/' + 길, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(Object.assign({ token: au.token }, 몸 || {}, au.name ? { 대신: au.name } : {})) }); }
   catch(e){ const x = new Error('서버에 닿지 못했어요'); x.막힘 = true; throw x; }
   if(!r.ok){ const x = new Error('서버에 닿지 못했어요 (' + r.status + ')'); x.막힘 = r.status >= 500; throw x; }
   const j = await r.json(); if(!j.ok){ const x = new Error(/권한이 없/.test(j.why || '') ? '「내 정보 → 로그아웃」 뒤 다시 로그인해 주세요' : (j.why || '검색하지 못했어요')); x.막힘 = !!j['막힘']; throw x; } return j; }
@@ -6170,7 +6171,10 @@ function 시계멈춤(w){ if(!w || !w.startAt) return;
 async function newLive(title, items, kind, rid, mid, by){
   const id='w'+Date.now();
   mid = mid || S.mid;
-  const kd = kind || '개인운동';
+  /* 직원(트레이너 · 대표)이 로그인해서 만든 기록은 무조건 「수업」 — 회원 화면 경로(빈 운동 · 루틴 · 지난 운동 · 종목 담기)로 들어와도 (2026-10-23 대표 「트레이너가 로그인해서 기록하는데 개인운동 기록을 왜 물어 무조건 수업이지」 · 김O은 기록이 개인운동이라 리포트가 안 나갔다) */
+  const 직원기록 = 직원화면();
+  if(직원기록){ by = '트레이너'; if(title === '빈 운동') title = '수업'; }
+  const kd = 직원기록 ? '수업' : (kind || '개인운동');
   /* 수업·트레이너 기록은 시계를 자동으로 켜지 않는다.
      ⛔ 종목 없이 시작한 것(빈 루틴)도 여기서 켜지 않는다 — 종목을 선택하는 동안 시간이 흘렀다 (2026-10-14 대표 「빈 루틴으로 시작할 때부터 타이머가 작동하는 것 같아 · 종목 다 담고 기록 시작부터 타이머 시작이야」). 「기록 시작」(startgo)이 켠다 */
   const t0 = (시계는손으로({ kind:kd, by }) || !items.length) ? null : Date.now();
@@ -11751,7 +11755,7 @@ function 얼굴갈래(mid){
 /* 오늘 예약 수업 — 데스크와 같은 서버 자료(/app/crm/booking 「오늘예약」 · 트레이너 토큰은 본인 것만) · 10분마다 · 무료 그룹수업은 뺀다 */
 const 예약 = { 줄:null, 중:false, 때:0, 말:'' };
 async function 예약받기(){ if(예약.중 || (예약.줄 && Date.now() - 예약.때 < 10 * 60 * 1000)) return; 예약.중 = true;
-  try{ const j = await 앱crm('booking', {}); const 나 = j['나'], 다 = j['오늘예약'] || {}; 예약.줄 = [].concat(...Object.entries(다).filter(([t]) => !나 || t === 나).map(([, v]) => v || [])); 예약.말 = ''; }
+  try{ const j = await 앱crm('booking', {}); const 나 = j['나'] || TRAINER, 다 = j['오늘예약'] || {}; 예약.줄 = [].concat(...Object.entries(다).filter(([t]) => t === 나).map(([, v]) => v || []));      /* 관리자 권한(대표 · 지점장)은 서버가 전체를 준다(「나」 없음) — 앱은 로그인한 선생님 것만 (2026-10-23 대표 「조민철은 전체 회원이 보임 · 모두 본인 수업만」) */ 예약.말 = ''; }
   catch(e){ 예약.줄 = 예약.줄 || []; 예약.말 = e.message || ''; }
   예약.중 = false; 예약.때 = Date.now(); if(S.screen === 't_feed') render(); }
 function 오늘예약줄(){ return (예약.줄 || []).filter(x => x && x['상태'] !== '취소' && x['종목'] !== '그룹').map(x => ({ x, m: MEMBERS.find(m => m.n === String(x.name || '').trim() && (!x.phone4 || m.p4 === x.phone4)) }))
