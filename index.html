@@ -3093,7 +3093,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '442';
+const BUILD = '443';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -3426,6 +3426,7 @@ async function boot(){
       ts:a.created_at, done:!!a.done_at }; });
   loadLive();
   if(D.live && !D.workouts.some(w => w.id === D.live.id)) D.live = null;   // 서버에서 지워진 것
+  if(D.live && 직원화면() && !D.live.born && !D.live.mine){ D.live = null; save(); }      /* 예전에 이어받은 남의 기록 — 이 폰에서만 내려놓는다 · 서버 기록은 그대로 (2026-10-23) */
   S.mid = S.mid || (MEMBERS[0] && MEMBERS[0].id);
   S.tmid = S.tmid || S.mid;
   /* ══ 피드백 안내 그만 받기 동의 (?cmoff=열쇠) ══ 2026-09-30 대표
@@ -3840,8 +3841,10 @@ function myWorkouts(){ return D.workouts.filter(w=>w.mid===S.mid && w.done).slic
    이걸 걸러 내지 않아 「지난 운동 그대로」가 빈 배열을 받고 터졌다 (2026-09-04). */
 const 세트있나 = w => !!(w.items && w.items.some(i => i.sets && i.sets.length));
 function lastRealWorkouts(){ return myWorkouts().filter(세트있나); }
+const 직원화면 = () => !!(직원줄 || S.who === 'tr' || S.self);      /* 트레이너 · 대표 폰 — 남의 안 끝난 기록을 「기록 중」으로 보지 않는다 (2026-10-23) */
 function liveOf(mid){
   if(D.live && D.live.mid===mid) return D.live;
+  if(직원화면()) return null;      /* 김O정 「기록 중」 사고 — 회원이 자기 폰으로 하던 운동 · 다른 선생님 내 운동이 떠서 눌렀다가 남의 기록을 이어받았다 */
   /* 오늘 것만 「기록 중」으로 본다 — 지난날 끝내지 않은 기록이 계속 떠 있지 않게 */
   const w = D.workouts.find(x=>!x.done && x.mid===mid && x.date===TODAY);
   if(!w || !w.items || !w.items.length) return null;
@@ -6172,7 +6175,7 @@ async function newLive(title, items, kind, rid, mid, by){
      ⛔ 종목 없이 시작한 것(빈 루틴)도 여기서 켜지 않는다 — 종목을 선택하는 동안 시간이 흘렀다 (2026-10-14 대표 「빈 루틴으로 시작할 때부터 타이머가 작동하는 것 같아 · 종목 다 담고 기록 시작부터 타이머 시작이야」). 「기록 시작」(startgo)이 켠다 */
   const t0 = (시계는손으로({ kind:kd, by }) || !items.length) ? null : Date.now();
   D.live={ id, mid, title, kind:kd, rid:rid||null, date:TODAY, startAt:t0, born:Date.now(), items, cur:0,
-           by:by||'회원', begun: items.length>0 };   /* 담기만 한 상태면 아직 시작 전 */
+           by:by||'회원', begun: items.length>0, mine:true };   /* 담기만 한 상태면 아직 시작 전 */
   if(!t0) items.forEach(it=>{ it.startAt = null; });
   save(); go(items.length ? 'workout' : 'pick');
   await sv(spost('workouts',[{ id, member_id:mid, on_date:TODAY, kind:D.live.kind,
@@ -6185,6 +6188,7 @@ async function newLive(title, items, kind, rid, mid, by){
 /* 다른 기기에서 시작한 운동을 이 기기에서 이어받는다 */
 function adoptLive(mid){
   if(D.live && D.live.mid===mid) return true;
+  if(직원화면()) return false;      /* 남의 기록은 이어받지 않는다 (2026-10-23) */
   const w = D.workouts.find(x=>!x.done && x.mid===mid && x.date===TODAY);
   if(!w || !w.items || !w.items.length) return false;
   const i = w.items.findIndex(it=>!it.locked);
@@ -6269,6 +6273,9 @@ function 윗시계(w){
 
 function vWorkout(){
   const w=live(); if(!w) return (S.who==='tr' ? tToday() : vHome());
+  (w.items || (w.items = [])).forEach(it => { if(!Array.isArray(it.sets)) it.sets = []; });
+  if(!(w.cur >= 0 && w.cur < w.items.length)) w.cur = Math.max(0, w.items.findIndex(it => !it.locked));
+  { const c0 = w.items[w.cur]; if(c0 && !c0.sets.length) c0.sets.push({ kg:0, reps:10, done:false }); }      /* 지금 종목이 세트 0개 → 세트[-1].done 로 멈췄다 (2026-10-23 reading 'done') */
   if(!w.items.length) return {
     top: bar('운동 중', 윗시계(w), 'go:home'),
     body:`<div class="empty">아직 종목이 없습니다<small class="e2">아래 「＋ 운동 추가」를 눌러 주세요</small></div>
@@ -14073,7 +14080,7 @@ document.addEventListener('click', async ev=>{
       D.workouts.splice(i,1);
       /* 시계를 안 켜고 끝낸 수업이면 이어서 할 때도 꺼 둔다 */
       const 꺼둠 = 시계는손으로(rec) && !Number(rec.dur);
-      D.live={ id:rec.id, mid:rec.mid, title:rec.title||'이어서 하는 운동', kind:rec.kind, rid:rec.rid, date:rec.date,
+      D.live={ id:rec.id, mid:rec.mid, title:rec.title||'이어서 하는 운동', kind:rec.kind, rid:rec.rid, date:rec.date, mine:true,
         startAt: 꺼둠 ? null : Date.now() - rec.dur*1000, cur: Math.max(0, rec.items.length-1),
         items: rec.items.map(it=>({ _id:it._id, ex:it.ex, va:it.va, rest:60, locked:true, sec:it.sec, startAt:Date.now(),
           sets: it.sets.map(x=>({kg:x.kg, reps:x.reps, spd:x.spd, done:true})) })) };
