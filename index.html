@@ -3120,7 +3120,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '448';
+const BUILD = '449';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -5632,7 +5632,7 @@ function vPick(){
       return `<button class="mrow2 ${담?'pson':''}" data-exrow="${esc(exKey(e))}" data-part="${esc(e.p)}"
         data-eq="${esc(e.e||'')}"
         style="${(e.p===S.pickPart && (S.pickEq==='전체'||e.e===S.pickEq))?'':'display:none'}"
-        data-act="add:${e.id}:${지난그립(e.id)}">
+        data-act="add:${e.id}:${(vars(e.id)[0] || {}).k || 'a'}">
         <span class="mt"><b>${esc(e.n)}</b>
           <small>${esc(e.e)}${last?` · 지난번 ${setTxt(e.id,last)}`:''}${n?` · 피드백 ${n}`:''}${vs.length>1?` · <u>하는 법 ${vs.length}가지</u>`:''}</small></span>
         <em class="pkadd">${담 ? '✓' + (담>1 ? 담 : '') : '＋'}</em></button>`; }).join('')}
@@ -6469,15 +6469,10 @@ function 플래너화면(w){
     <button class="dngr" data-act="askcancel">기록 삭제하고 나가기</button>`,
     foot: 발판(w) };
 }
-/* ── 그립 · 수업 메모 ── 2026-10-23 대표 그립 시안 확정 「그립 선택은 하도록 · 넓게 · 좁게는 메모에 알아서 기입 · 입력은 간단하게」 */
-const 그립들 = ex => { const vs = vars(ex) || []; return vs.length >= 2 ? vs : []; };
-function 지난그립(ex){ const vs = vars(ex) || [], mid = (live() && live().mid) || S.tmid || S.mid;
-  for(const w of workoutsOf(mid)){ const it = w.items.find(i => i.ex === ex); if(it && vs.some(v => v.k === it.va)) return it.va; }
-  return (vs[0] || {}).k || 'a'; }
-/* 기본 그립은 아무것도 안 붙인다 — 칩도 이름도 (2026-10-23 22:57~59 대표 「바벨 컬에 언더까지 붙여서 말하지 않아」 · 중앙 전달) · 이름이 따로 있는 그립(리버스 컬 · 해머 컬 · 친업)은 별도 종목 */
-const 기본그립밖 = it => isMemo(it.ex) ? null : 그립들(it.ex).find(x => x.k === it.va && !기본벌인가(it.ex, x.k) && x.n) || null;
-const 줄아래 = it => { const v = 기본그립밖(it), m = String(it.memo || '').trim();
-  return (v || m) ? `<small>${v ? esc(v.n) : ''}${m ? `<i>${v ? ' · ' : ''}${esc(m.length > 18 ? m.slice(0, 18) + '…' : m)}</i>` : ''}</small>` : ''; };
+/* ── 수업 메모 ── 2026-10-23 23:01~03 대표 「그립도 언더 · 오버는 그냥 메모 · 칩으로 하지 말고 · 지저분하게 입력할 게 많아지게 하지 말고」
+   종목 = 큰 틀 하나(무게가 이어지게) · 그립 · 폭 · 높이 · 몸 방향은 트레이너가 메모에 · 따로 부르는 이름(리버스 컬 · 해머 컬 · 친업)은 별도 종목(중앙 서버 정리 · 변형은 종목마다 하나) */
+const 줄아래 = it => { const m = String(it.memo || '').trim();
+  return m ? `<small><i>${esc(m.length > 18 ? m.slice(0, 18) + '…' : m)}</i></small>` : ''; };
 /* 칸을 누르면 — 숫자판(그 종목 · 그 세트 · 무게/횟수). 빈 칸은 바로 다음 세트만(건너뛰지 않게) */
 function 플래너자판(i, j, f){ const w = live(), it = w && w.items[i]; if(!it) return;
   j = Math.min(j, it.sets.length); const x = it.sets[j];
@@ -6492,10 +6487,9 @@ function 플래너정리(w){ if(!플래너인가(w)) return;
 /* 종목 이름을 누르면 — 설명 · 피드백(큰 단추 둘) · 직전 기록 · 세트 추가 · 빼기 */
 function sheetPlName(i){ const w = live(), it = w && w.items[i]; if(!it) return; w.cur = i; save();
   const tr = S.who === 'tr', wmid = w.mid || S.mid, cms = cmOf(wmid, it.ex, it.va), nw = cms.filter(c => !c.read).length;
-  openSheet(() => { const gs = isMemo(it.ex) ? [] : 그립들(it.ex), 지 = isMemo(it.ex) ? null : lastRuns(it.ex, it.va, wmid, 1)[0];
+  openSheet(() => { const 지 = isMemo(it.ex) ? null : lastRuns(it.ex, it.va, wmid, 1)[0];
     return `<div class="h2">${esc(isMemo(it.ex) ? exName(it.ex, it.va) : (exOf(it.ex) || {}).n || '')}</div>
-    ${(gx => gx.length ? `<span class="lbl">그립 <small style="font-weight:600">비워 두면 기본 · 다시 누르면 풀림</small></span><div class="chips pl-grip">${gx.map(v => `<button class="chip ${v.k === it.va ? 'on' : ''}" data-act="plgrip:${i}:${v.k === it.va ? gs[0].k : v.k}">${esc(v.n)}</button>`).join('')}</div>` : '')(gs.filter(v => !기본벌인가(it.ex, v.k) && v.n))}
-    ${isMemo(it.ex) ? '' : `<span class="lbl">수업 메모 <small style="font-weight:600">이 날 이 종목에만</small></span><textarea class="pl-imemo" data-k="imemo:${i}" maxlength="300" placeholder="언더그립 · 넓게 · 기구 등지고 · 주의할 점">${esc(it.memo || '')}</textarea>`}
+    ${isMemo(it.ex) ? '' : `<span class="lbl">수업 메모 <small style="font-weight:600">이 날 이 종목에만</small></span><textarea class="pl-imemo" data-k="imemo:${i}" maxlength="300" placeholder="안 써도 돼요 · 언더그립 · 넓게 · 기구 등지고">${esc(it.memo || '')}</textarea>`}
     ${지 ? `<div class="pl-prev">지난번 ${esc(dateTxt(지.date))} · ${지.sets.map(x => (x.kg ? kgfmt(x.kg) + '×' : '') + x.reps).join(' · ')}${지.memo ? '<br>메모 · ' + esc(지.memo) : ''}</div>` : ''}
     <div class="pl-big"><button data-act="trio:demo"><b>설명</b><small>기구 사용법 · 자세</small></button>
       <button data-act="exd:${it.ex}:${it.va}${tr ? ':' + wmid : ''}"><b>${tr ? '피드백 남기기' : '피드백 보기'}</b><small>${cms.length ? cms.length + '개' + (!tr && nw ? ' · 새 ' + nw : '') : '아직 없음'}</small></button></div>
@@ -14037,10 +14031,6 @@ document.addEventListener('click', async ev=>{
     case 'plnm': 자판 = null; 자판그리기(); sheetPlName(+rest[0]); return;
     case 'plfocus': 자판 = null; 자판그리기(); S.wfocus = +rest[0]; S.fold = false; S.wsel = null; render(); return;
     case 'wfback': S.wfocus = null; render(); return;
-    case 'plgrip': { const it = w && w.items[+rest[0]], vk = rest[1]; if(!it || it.va === vk) return;
-      const 그대로 = JSON.stringify(바탕(it.sets)) === JSON.stringify(it.base || []);      /* 아직 손대지 않았으면 그 그립 지난 기록으로 다시 채운다 */
-      it.va = vk; if(그대로){ const 지들 = 지난세트들(w.mid || S.mid, it.ex, vk) || []; it.sets = 지들; it.base = 바탕(지들); }
-      save(); drawSheet(); render(); return; }
     case 'plsadd': { const it = w && w.items[+rest[0]]; if(!it) return; const 앞 = it.sets[it.sets.length - 1];
       it.sets.push({ kg: 앞 ? 앞.kg : 0, reps: 앞 ? 앞.reps : 0, done: !!(앞 && 앞.reps > 0) }); save(); closeSheet(); render(); toast((it.sets.length) + '세트 칸을 늘렸어요'); return; }
     case 'plnew': 확인창('채워진 무게 · 횟수를 비우고<br>새로 기록할까요?<br><small>종목은 그대로 남아요</small>', '새로 기록', () => {
