@@ -1732,6 +1732,8 @@ body{word-break:keep-all}
 .bp-pbox .c{display:flex;justify-content:flex-end;align-items:center;gap:6px;margin-top:8px}.bp-pbox .c .bp-done{margin-right:auto}
 .bp-pbox .bp-done{font-weight:800;color:var(--teal);font-size:13.5px}.bp-pbox.snz{opacity:.72}.bp-pbox.ps-locked .c{margin-top:6px}
 .cl-its{display:flex;flex-direction:column;gap:4px;margin:8px 0 4px}.cl-it{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:9px;background:var(--dark-3);border:1px solid var(--line);font-size:14px}
+.cl-tm{font-style:normal;display:inline-block;background:#2e4656;color:#dcefff;border-radius:6px;padding:1px 7px;font-size:13px;font-weight:800;margin-left:4px;white-space:nowrap}
+.cl-dy{font-style:normal;color:#e8c08f;font-weight:700;margin-right:6px}
 .cl-it .t{font-weight:700}.cl-it .d{font-size:13px;color:var(--sub);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.cl-it .bp-act{margin-left:auto}.bp-q{width:100%;margin:2px 0 6px}.pop.tx-side .tgrp.bp-hide{display:none!important}.bp-jl{margin-top:6px;font-size:13px;color:#e8c08f}
 #gcfm{position:fixed;inset:0;z-index:10050;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:22px}
 #gcfm .gc-box{width:100%;max-width:400px;border-radius:18px;background:var(--dark-2);border:1px solid var(--line);padding:22px 20px 16px;color:var(--cream);box-shadow:0 18px 50px rgba(0,0,0,.5)}
@@ -2309,7 +2311,7 @@ body{word-break:keep-all}
 
 <script>
 "use strict";
-const BUILD = '377';
+const BUILD = '378';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -7156,7 +7158,10 @@ function 청소배정(d, 월){
   return { 목, 결과, 대신들 };
 }
 const 청소체크of = (id, d) => 청소.기록.find(r => r.clean_id === id && r.day === d);
-const 청소글 = x => esc(x.title || '') + (x.slot ? ' <small>' + esc(x.slot) + '</small>' : '');
+/* 시각은 바탕색 딱지로 — 할 일 시각 · 구역 이름 안의 「15~16시」 (2026-10-23 밤 대표 「시간이 있는 것은 시간에 바탕색 · 눈에 잘 띄게」) */
+const 청소시각 = t => t ? '<em class="cl-tm">' + esc(t) + '</em>' : '';
+const 시간칠 = t => esc(t || '').replace(/(\d{1,2}(?:\s*~\s*\d{1,2})?시)/g, '<em class="cl-tm">$1</em>');
+const 청소글 = x => esc(x.title || '') + (x.slot ? ' ' + 청소시각(x.slot) : '');
 function 청소누락(){
   if(!청소.목 || 청소.없음) return [];
   const d = 날더함(TODAY, -1), { 목, 결과 } = 청소배정(d), 다봄 = 할수('cleanlog');
@@ -7191,7 +7196,7 @@ function 청소카드(){
   const 대 = 다음대청소(TODAY), 대띠 = 대 && 주안(TODAY, 대) ? '<div class="cl-big"><b>' + (대 === TODAY ? '오늘 14시 대청소' : '이번 주 ' + 청소짧은날(대) + ' 14시 대청소') + '</b>' + (대메모(대) ? '<span>' + esc(대메모(대).split(String.fromCharCode(10))[0].slice(0, 40)) + '</span>' : '') + '</div>' : '';
   const 줄 = x => { const 됨 = !!청소체크of(x.id, TODAY), b = 배.결과[x.id];
     return '<button class="cl-row' + (됨 ? ' on' : '') + '" data-act="tx:clck" data-v2="' + esc(x.id) + '"><span class="bx">' + (됨 ? '✓' : '') + '</span><span class="cl-t"><b>' + esc(x.title || '') + '</b>' + (x.how ? '<span class="cl-how">' + esc(x.how) + '</span>' : '') + '</span>'
-      + (x.slot ? '<small>' + esc(x.slot) + '</small>' : '') + (b.대신 && b.원 ? '<em>' + esc(보임이름(b.원.name)) + ' 대신</em>' : '') + '</button>'; };      /* 구역 이름은 뺐다 — 시각이 두 번 · 낮 청소가 마감처럼 보임 (2026-10-23 대표) · 설명(하는 방법)은 이름 아래 작게 */
+      + 청소시각(x.slot) + (b.대신 && b.원 ? '<em>' + esc(보임이름(b.원.name)) + ' 대신</em>' : '') + '</button>'; };      /* 구역 이름은 뺐다 — 시각이 두 번 · 낮 청소가 마감처럼 보임 (2026-10-23 대표) · 설명(하는 방법)은 이름 아래 작게 */
   return '<div class="tx-home one"><div class="sec"><div class="lbl">오늘 내 청소' + (내.length ? ' <span class="tx-tag' + (한 < 내.length ? ' gold' : '') + '">' + 한 + ' / ' + 내.length + '</span>' : '') + 링크 + '</div>' + 대띠
     + (내.length ? '<div class="cl-hl">' + 내.map(줄).join('') + '</div>'
       : '<div class="empty why">' + (배.휴무 ? '<b>오늘은 정기휴무입니다</b>' : 배.당직 ? '<b>오늘은 당직 청소만 있습니다</b>' : '<b>오늘 맡은 청소가 없습니다</b>') + (할수('clean') ? '구역 · 담당은 「관리」에서 정해요' : '구역 · 담당은 청소 관리자가 정해요') + '</div>') + '</div></div>';
@@ -7242,10 +7247,10 @@ function 청소관리판(){
   const 할일들 = z => ((청소.순서 && 청소.순서.zid === z.id ? 청소.순서.items : z.items) || []).map(할일of).filter(x => x && x.active !== false);
   const 순 = 청소.순서;
   const 청소줄 = (x, zid) => 순 && 순.zid === zid ? '<div class="cl-it"><span class="t">' + 청소글(x) + '</span><span class="bp-act"><button class="btn ghost sm" data-act="tx:clmv" data-k="-1" data-v2="' + esc(x.id) + '" title="위로">▲</button><button class="btn ghost sm" data-act="tx:clmv" data-k="1" data-v2="' + esc(x.id) + '" title="아래로">▼</button></span></div>'
-    : '<div class="cl-it"><span class="t">' + 청소글(x) + '</span><span class="d">' + ((x.days || []).length ? esc(x.days.join(' · ')) : '매일') + (x.how ? ' · ' + esc(x.how) : '') + '</span>'
+    : '<div class="cl-it"><span class="t">' + 청소글(x) + '</span><span class="d">' + ((x.days || []).length ? '<em class="cl-dy">' + esc(x.days.join(' · ')) + '</em>' : '') + esc(x.how || '') + '</span>'
     + (청소체크of(x.id, TODAY) ? '<span class="cl-tk">✓ 오늘</span>' : '')
     + (고칠 ? '<span class="bp-act"><button class="btn ghost sm" data-act="tx:clmove" data-v2="' + esc(x.id) + '">옮기기</button><button class="btn ghost sm" data-act="tx:cledit" data-v2="' + esc(x.id) + '">수정</button><button class="btn ghost sm" data-act="tx:cloff" data-v2="' + esc(x.id) + '">삭제</button></span>' : '') + '</div>';
-  const 구줄 = z => '<div class="bp-row2"><div class="a"><b>' + esc(z.name || '') + '</b>' + (z.sex ? '<em class="bp-st">' + esc(z.sex) + '</em>' : '')
+  const 구줄 = z => '<div class="bp-row2"><div class="a"><b>' + 시간칠(z.name) + '</b>' + (z.sex ? '<em class="bp-st">' + esc(z.sex) + '</em>' : '')
     + (z.kind !== '당직' ? '<span style="margin-left:auto">' + (배[z.id] ? 이름딱지(배[z.id]) : '<span class="sub3">담당 없음</span>') + '</span>' : '') + '</div>'
     + (z.kind === '순환' && 다음[z.id] && 다음[z.id] !== 배[z.id] ? '<div class="b"><span>다음 분기 ' + esc(이름(다음[z.id])) + '</span></div>' : '')
     + '<div class="cl-its">' + (할일들(z).length ? 할일들(z).map(x => 청소줄(x, z.id)).join('') : '<div class="sub3">아직 청소가 없어요</div>') + '</div>'
@@ -7260,7 +7265,7 @@ function 청소관리판(){
   const 머 = (제목, 설명, 단추) => '<div class="lbl" style="display:flex;align-items:center;gap:8px">' + 제목 + ' <small style="font-weight:500;color:#a39c8e">' + 설명 + '</small>' + (고칠 && 단추 || '') + '</div>';
   const 빈 = (b, 안내) => '<div class="empty why"><b>' + b + ' 없습니다</b>' + (고칠 ? 안내 : '대표 · 지점장이 「관리」에서 정해요') + '</div>';
   const 선생 = 청소사람().map(p => ({ p, 맡: 평.filter(z => 배[z.id] === p.id) }));
-  const 선줄 = r => '<div class="bp-row2"><div class="a">' + 이름딱지(r.p.id) + '<span class="sub3">' + (r.맡.length ? r.맡.map(z => 구역종류글[z.kind] + ' · ' + esc(z.name || '') + ' · ' + 할일들(z).length + '개').join(' / ') : '맡은 구역 없음') + '</span></div></div>';
+  const 선줄 = r => '<div class="bp-row2"><div class="a">' + 이름딱지(r.p.id) + '<span class="sub3">' + (r.맡.length ? r.맡.map(z => 구역종류글[z.kind] + ' · ' + 시간칠(z.name) + ' · ' + 할일들(z).length + '개').join(' / ') : '맡은 구역 없음') + '</span></div></div>';
   판열기('청소 담당',
     머('선생님별', 분기글(q) + ' · 쉬는 날은 구역째 같은 성별 출근자에게') + (선생.length ? 선생.map(선줄).join('') : 빈('맡은 구역이 아직', '구역마다 「담당 수정」에서 정해요'))
     + 머('고정 구역 ' + 고정.length, '정한 선생님이 계속 해요', '<button class="btn sub sm" style="margin-left:auto" data-act="tx:clzone" data-k="고정" data-v2="">＋ 구역 추가</button>')
