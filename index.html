@@ -2736,6 +2736,15 @@ body.kpon #main{padding-bottom:330px}
 .rtimg{width:100%;aspect-ratio:4/3;object-fit:contain;background:#fff;border-radius:10px}
 .rtph{width:100%;aspect-ratio:4/3;border-radius:10px;background:#1f1d1a;border:1px dashed #3a352c;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}.rtph small{font-size:12px;color:var(--sub)}
 .rtd{font-size:14.5px;line-height:1.5;white-space:pre-wrap;margin-bottom:4px}.rtpl{margin-bottom:10px}
+
+/* 유산소 넣어주기 */
+.ctips{display:grid;gap:6px;margin:8px 0}.ctip{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13.5px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:7px 10px}
+.ctok{color:var(--teal);font-weight:800;margin-left:auto}.ctno{color:var(--sub);font-weight:700;margin-left:auto}.ctx{background:none;border:0;color:var(--sub);font-size:15px;cursor:pointer}
+.ctc{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:10px 0}.ctc .lb{font-weight:800;font-size:14.5px}
+.ctn{display:flex;align-items:center;gap:10px}.ctn button{width:48px;height:48px;border-radius:14px;border:1px solid var(--line);background:#24211c;color:var(--cream);font-size:24px;font-weight:900}
+.ctn b{min-width:86px;text-align:center;font-size:24px;font-variant-numeric:tabular-nums}.ctn b small{font-size:13px;color:var(--sub);margin-left:2px}
+.ctcard{background:#231e16;border:1px solid #8a7a5c;border-radius:16px;padding:14px;margin-bottom:12px}.ctcard .k{font-size:13px;color:var(--gold);font-weight:800}.ctcard .v{font-size:19px;font-weight:900;margin:2px 0}.ctcard .s{font-size:13.5px;color:var(--sub);margin-bottom:8px}
+.ctlast{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:0 0 10px}.ctlast b{font-size:13.5px}
 </style>
 
 </head>
@@ -3168,7 +3177,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '454';
+const BUILD = '455';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -3428,6 +3437,7 @@ async function boot(){
   try{ 세트담기(await sget('prep_sets?select=*&order=created_at').catch(()=>[])); }catch(e){ D.psets = []; }
   try{ 종목담기(await sget('prep_items?select=*&order=created_at').catch(()=>[])); }catch(e){ D.pitems = []; }
   try{ D.favs = (await sget('trainer_favs?select=trainer,member_id').catch(()=>[])) || []; }catch(e){ D.favs = []; }
+  try{ D.ctips = await sget('cardio_tips?select=*&order=created_at.desc&limit=600'); }catch(e){ D.ctips = null; }      /* 유산소 넣어주기 (59단계) — 표가 없으면 null = 기능 숨김 */
   /* 트레이너가 올린 스트레칭·운동 종목 사진/영상도 주소를 미리 받아 둔다 — 버킷을 잠가도 보이게 (2026-10-07) */
   try{ await 주소받기([].concat((D.pitems||[]).flatMap(x => x.media.map(m => m.path)),
       (D.psets||[]).flatMap(x => x.items.flatMap(i => (i.media||[]).map(m => m.path))),
@@ -5530,6 +5540,7 @@ function vHome(){
       `<button class="notibell" data-act="go:noti" aria-label="알림${알림수?' '+알림수+'개':''}">
         ${svg('종',20)}${알림수?`<b>${알림수>9?'9+':알림수}</b>`:''}</button>`), tabs:1, body:`
     ${주기줄(S.mid, 'sub:cycle', true)}
+    ${lw ? '' : 팁카드(S.mid)}
     <button class="hero photo" data-act="${hero.act}">
       ${hero.새 ? `<span class="tag new"><b>NEW</b><em>${hero.새}</em></span>` : `<span class="tag">${hero.tag}</span>`}
       <div class="ht">${hero.ht}</div>
@@ -6504,6 +6515,27 @@ async function 플래너몸그리기(id){
       e[i] = c[0]; e[i + 1] = c[1]; e[i + 2] = c[2]; e[i + 3] = 205; }
     const ov = document.createElement('canvas'); ov.width = W; ov.height = H; ov.getContext('2d').putImageData(덮, 0, 0); x.drawImage(ov, k * W, 0); });
 }
+/* ══ 유산소 넣어주기 ══ 2026-10-24 대표 시안 확정 — 트레이너가 수업 기록에 넣으면 회원 홈에 「유산소가 들어왔어요」(그날 밤까지) → 바로 시작 → 마치면 그 수업 기록에 「✓ 유산소 n분」
+   강도: 런닝머신 · 마이마운틴 = 속도 + 경사(최대 20 · 50) / 사이클 · 천국의계단 = 속도(레벨) · 시간 · 강도는 − 숫자 + 카운터 */
+const 유넣기기구 = () => [...new Set(['tm', 'cyc', 'cd07'].map(exOf).concat([EX.find(x => x.cardio && /마이마운틴/.test(x.n))]).filter(e => e && e.cardio))];      /* 센터 기구 넷 — 런닝머신 · 사이클 · 천국의계단 · 마이마운틴 */
+const 팁of = wid => (D.ctips || []).filter(t => t.workout_id === wid);
+const 팁강도 = t => { const e = exOf(t.ex_id) || {}, 속 = 경사최대(t.ex_id) || /천국/.test(e.n || '') ? '속도' : '레벨';
+  return [t.speed != null && t.speed !== '' ? 속 + ' ' + kgfmt(+t.speed) : '', +t.incline ? '경사 ' + kgfmt(+t.incline) : ''].filter(Boolean).join(' · '); };
+const 팁글 = t => `${esc((exOf(t.ex_id) || {}).n || '유산소')} ${t.minutes}분${팁강도(t) ? ' · ' + esc(팁강도(t)) : ''}`;
+const 팁결과 = t => t.done_at ? `<span class="ctok">✓ 유산소 ${t.done_min || t.minutes}분 함</span>` : (t.on_date < TODAY ? '<span class="ctno">— 안 함</span>' : '<span class="ctno">아직 안 함</span>');
+function 팁줄들(wid){ const ts = 팁of(wid); if(!ts.length) return '';
+  return `<div class="ctips">${ts.map(t => `<div class="ctip"><span class="hl" style="background:#b9b1a2">유산소 넣어줌</span><span>${팁글(t)}</span>${팁결과(t)}${S.who === 'tr' && !t.done_at && t.on_date === TODAY ? `<button class="ctx" data-act="ctipdel:${t.id}" aria-label="빼기">✕</button>` : ''}</div>`).join('')}</div>`; }
+function sheetCtip(){ const w = live(); if(!w) return;
+  const 다 = 유넣기기구(); if(!S.ct || !다.some(e => e.id === S.ct.ex)) S.ct = { ex: (다[0] || {}).id, min: 20, spd: null, inc: 0 };
+  openSheet(() => { const c = S.ct, e = exOf(c.ex) || {}, 경 = 경사최대(c.ex), 속이름 = 경 || /천국/.test(e.n || '') ? '속도' : '레벨';      /* 그릴 때마다 지금 기구로 다시 센다 */
+    if(c.spd == null) c.spd = 경 ? 5.5 : 6;
+    const 셈 = (k, 이름, 값, 단위) => `<div class="ctc"><span class="lb">${이름}</span><div class="ctn"><button data-act="ctd:${k}:-1" aria-label="${이름} 줄이기">−</button><b>${값}<small>${단위}</small></b><button data-act="ctd:${k}:1" aria-label="${이름} 늘리기">＋</button></div></div>`;
+    return `<div class="h2">유산소 넣기 <small>회원 앱에 오늘 밤까지 떠요</small></div>
+    <span class="lbl">종류</span><div class="chips">${다.map(x => `<button class="chip ${x.id === c.ex ? 'on' : ''}" data-act="ctex:${x.id}">${esc(유이름(x))}</button>`).join('')}</div>
+    ${셈('min', '시간', c.min, '분')}${셈('spd', 속이름, kgfmt(c.spd), 경 ? 'km/h' : '')}${경 ? 셈('inc', '경사', kgfmt(c.inc), '') : ''}
+    <button class="btn blue go" data-act="ctsave">넣기</button><button class="btn ghost sm" data-act="close">닫기</button>`; }); }
+function 팁카드(mid){ const ts = (D.ctips || []).filter(t => t.member_id === mid && t.on_date === TODAY && !t.done_at); if(!ts.length) return '';
+  return ts.map(t => `<div class="ctcard"><div class="k">유산소가 들어왔어요${t.by ? ' · ' + esc(t.by) + ' 트레이너' : ''}</div><div class="v">${esc((exOf(t.ex_id) || {}).n || '유산소')} ${t.minutes}분</div>${팁강도(t) ? `<div class="s">${esc(팁강도(t))}</div>` : ''}<button class="btn blue go" data-act="ctipgo:${t.id}">바로 시작</button></div>`).join(''); }
 function 플래너화면(w){
   const wmid = w.mid || S.mid, tr = S.who === 'tr', 수업 = w.kind === '수업', 색 = 플래너색(w);
   const 줄들 = w.items.map((it, i) => ({ it, i, e: exOf(it.ex) || {} }));
@@ -6534,6 +6566,7 @@ function 플래너화면(w){
     <button class="pl-add" data-act="go:pick">＋ 종목 추가</button>
     <div class="pltb plcard"><div class="plr plca plh"><span class="pln">유산소</span><span>시간</span><span>속도</span></div>
       ${유.map(유행).join('') || '<div class="pl-empty">유산소는 「＋ 종목 추가」 → 유산소에서</div>'}</div>
+    ${수업 && tr && D.ctips ? 팁줄들(w.id) + `<button class="pl-add" data-act="ctipnew">＋ 유산소 넣기 <small>회원이 오늘 할 것</small></button>` : ''}
     ${수업 && tr ? `<span class="lbl">트레이너 메모</span><textarea class="pl-memo" data-k="wmemo" placeholder="오늘 컨디션 · 다음 수업에 할 것">${esc(w.trmemo || '')}</textarea>` : ''}
     <button class="dngr" data-act="askcancel">기록 삭제하고 나가기</button>`,
     foot: 발판(w) };
@@ -7546,6 +7579,7 @@ function 플래너장(w){
     ${근.length ? `<div class="plbody sm" id="${몸id}" data-sex="${esc((D.intake[w.mid] || {}).sex || '')}" data-p='${esc(JSON.stringify(칠))}'><canvas></canvas></div>` : ''}
     ${근.length ? `<div class="pltb"><div class="plr plh"><span class="pln">운동 명칭</span><div class="plcs"><div class="plg" style="--n:4"><span class="plhh" style="grid-column:span 4">무게(kg)</span><span class="plhh r1" style="grid-column:span 4">반복수</span></div></div></div>${근.map(행).join('')}</div>` : ''}
     ${유.length ? `<div class="pltb plcard"><div class="plr plca plh"><span class="pln">유산소</span><span>시간</span><span>속도</span></div>${유.map(유행).join('')}</div>` : ''}
+    ${팁줄들(w.id)}
     ${메모.length ? `<div class="pl-vm"><span>트레이너 메모</span>${메모.map(t => `<p>${esc(t)}</p>`).join('')}</div>` : ''}</div>`;
 }
 const 주첫날 = d => addDays(d, -((new Date(d + 'T12:00:00').getDay() + 6) % 7));      /* 월요일 */
@@ -12500,6 +12534,7 @@ function sheetStartSession(mid){
   const rs = myRoutines(mid), t = D.today[mid];
   openSheet(()=>`
     <div class="h2">${esc(m.n)} 회원 <small>무엇으로 시작할까요</small></div>
+    ${(() => { const 지난 = D.workouts.filter(w => w.mid === mid && w.done && w.kind === '수업').sort(byDateDesc)[0]; return 지난 && 팁of(지난.id).length ? `<div class="ctlast"><b>지난 수업(${dateTxt(지난.date)}) 유산소</b>${팁줄들(지난.id)}</div>` : ''; })()}
     ${주기줄(mid, 'tsub:cycle:'+mid)}
     ${t && rOf(t.rid) ? `<button class="sspick" data-act="tstart:${mid}:${t.rid}:${t.kind}">
       <span class="sst"><small>${지정이름(t.kind)}</small><b>루틴 ${rOf(t.rid).no} · ${esc(rOf(t.rid).n)}</b>
@@ -14103,6 +14138,23 @@ document.addEventListener('click', async ev=>{
     case 'rgo': S.rest.until=Date.now()+S.rest.sec*1000; drawSheet(); return;
     case 'rskip': S.rest=null; closeSheet(); return;
     case 'cardio': S.cpick = null; S.cgoal = 0; sheetCardio(); return;
+    case 'ctipnew': S.ct = null; sheetCtip(); return;      /* 유산소 넣어주기 (2026-10-24) */
+    case 'ctex': S.ct.ex = rest[0]; S.ct.spd = null; S.ct.inc = 0; drawSheet(); return;
+    case 'ctd': { const c = S.ct, k = rest[0], d = +rest[1], 경 = 경사최대(c.ex);
+      if(k === 'min') c.min = Math.max(5, Math.min(120, c.min + d * 5));
+      else if(k === 'spd') c.spd = Math.max(1, Math.min(경 ? 20 : 25, Math.round((c.spd + d * (경 ? 0.5 : 1)) * 10) / 10));
+      else if(k === 'inc') c.inc = Math.max(0, Math.min(경, c.inc + d));
+      drawSheet(); return; }
+    case 'ctsave': { const w = live(), c = S.ct; if(!w || !c) return;
+      const 줄 = { id: 'ct' + Date.now(), member_id: w.mid, workout_id: w.id, ex_id: c.ex, minutes: c.min, speed: c.spd, incline: 경사최대(c.ex) ? c.inc : null, on_date: TODAY, by: TRAINER };
+      try{ await spost('cardio_tips', [줄]); (D.ctips = D.ctips || []).unshift(줄); closeSheet(); toast('유산소를 넣었어요\n회원 앱에 오늘 밤까지 떠요'); render(); }
+      catch(e){ toast('넣지 못했어요 — ' + String(e.message || '').slice(0, 50)); } return; }
+    case 'ctipdel': { const t = (D.ctips || []).find(x => x.id === rest[0]); if(!t) return; if(!await 묻기('넣은 유산소를 뺄까요?')) return;
+      try{ await sdel('cardio_tips', 'id=eq.' + encodeURIComponent(t.id)); D.ctips = D.ctips.filter(x => x !== t); render(); }catch(e){ toast('빼지 못했어요'); } return; }
+    case 'ctipgo': { const t = (D.ctips || []).find(x => x.id === rest[0]), e = t && exOf(t.ex_id); if(!e) return; if(live()){ toast('진행 중인 운동이 있어요'); return; }
+      const v = (e.vars||[])[0], it = { ex:e.id, va:(v&&v.k)||'a', rest:0, locked:false, sec:0, startAt:Date.now(), sets:[], ctip:t.id };
+      const c = 유처음(it, e, S.mid); c.goal = t.minutes; c.ph = 'go'; c.on = Date.now(); if(t.speed != null) c.spd = +t.speed; if(t.incline != null) c.inc = +t.incline;      /* 넣어 준 값 그대로 */
+      S.subj = S.mid; await newLive(유이름(e), [it], '개인운동', null, S.mid); return; }
     case 'cpick': S.cpick = rest[0]; drawSheet(); return;
     case 'ctab': S.ctab = rest[0]; drawSheet(); return;      /* 유산소 — 직접 / 샘플 프로그램 (2026-10-20) */
     case 'cprog': { const p = 유샘플.find(x => x.id === rest[0]), e = p && 유샘플기구(p); if(!e) return; S.cprog = p.id; S.cpick = e.id; S.cgoal = 유샘플분(p); drawSheet(); return; }
@@ -14591,6 +14643,11 @@ async function finish(){
     }catch(e){ console.warn('리포트 예약 실패', e); }   /* 예약이 안 돼도 운동 마치기는 그대로 끝난다 */
   }
 
+  /* 유산소 넣어주기 — 넣어 준 줄로 시작한 유산소를 마치면 그 줄에 「했다」 · 한 분 (2026-10-24 대표 「지난 수업 때 유산소를 마무리했구나」) */
+  for(const it of w.items){ const t = it.ctip && (D.ctips || []).find(x => x.id === it.ctip); if(!t || t.done_at) continue;
+    const 분 = Math.max(1, Math.round((Number(it.sec) || 0) / 60) || (it.sets.find(x => x.done) || {}).reps || 0);
+    const 몸 = { done_at: new Date().toISOString(), done_min: 분, done_wid: rec.id };
+    try{ await spatch('cardio_tips', 'id=eq.' + encodeURIComponent(t.id), 몸); Object.assign(t, 몸); }catch(e){ console.warn('유산소 넣어주기 저장 실패', e); } }
   D.live=null; save(); S.wid=rec.id;
   if(S.who==='tr'){ S.tmid=rec.mid; S.subj=rec.mid; }
   go('summary'); 데스크알림({ wid: rec.id, mid: rec.mid });
