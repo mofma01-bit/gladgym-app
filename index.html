@@ -163,6 +163,8 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .pl-big{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0 12px}.pl-big button{border:1px solid var(--line);background:var(--dark-2);border-radius:14px;padding:18px 12px;color:var(--cream);font:inherit;text-align:left}
 .pl-big b{display:block;font-size:17px;font-weight:900}.pl-big small{display:block;font-size:13px;color:var(--sub);margin-top:4px}
 .pl-small{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.pln{flex-direction:column;justify-content:center;align-items:flex-start}.pln small{font-size:13px;color:var(--teal);font-weight:700;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}.pln small i{font-style:normal;color:var(--sub);font-weight:600}
+.pl-imemo{width:100%;min-height:52px}.pl-prev{font-size:13px;color:var(--sub);margin:8px 0 10px;line-height:1.5}
 #main.lite .note{background:#fff;border-color:#e6ddcf;color:#7b6c5d}
 #main.lite .note b{color:#8a5a2b}
 #main.lite .hr{background:#e6ddcf}
@@ -3118,7 +3120,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '445';
+const BUILD = '446';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -3323,7 +3325,7 @@ function mapWorkouts(wks, witems, wsets){
     dur:Number(w.dur||0), done:!!w.done,
     items: witems.filter(i => i.workout_id === w.id).sort((a,b)=>a.sort-b.sort).map(i => {
       const [ex,va] = splitV(i.variant_id);
-      return { _id:i.id, ex, va, sec:Number(i.sec||0), locked:!!i.locked,
+      return { _id:i.id, ex, va, sec:Number(i.sec||0), locked:!!i.locked, memo: i.memo || '',      /* 수업 메모 (55단계 · 2026-10-23) */
         sets: (유산소칸있나 = 유산소칸있나 || wsets.some(x => 'dist' in x), wsets).filter(x => x.item_id === i.id).sort((a,b)=>a.sort-b.sort)
           .map(x => ({ kg:Number(x.kg||0), reps:Number(x.reps||0), spd: x.spd==null ? undefined : Number(x.spd), dist: x.dist==null ? undefined : Number(x.dist), feel: x.feel||undefined, hr: x.hr==null ? undefined : Number(x.hr), src: x.src||undefined, done: !!x.done })) };
     })
@@ -4375,7 +4377,7 @@ function lastRuns(ex, va, mid, n){
     const it=w.items.find(i=>i.ex===ex && (va===undefined||i.va===va));
     if(it && it.sets.length){
       const ss=it.sets.filter(x=>x.done);
-      if(ss.length) out.push({ date:w.date, kind:w.kind||'', sets:ss });
+      if(ss.length) out.push({ date:w.date, kind:w.kind||'', sets:ss, memo: it.memo || '', va: it.va });
     }
     if(out.length >= (n||3)) break;
   }
@@ -4449,7 +4451,8 @@ function tRpick(){
 /* 글자를 칠 때는 화면 전체를 다시 그리지 않는다(한글 조합이 끊긴다) — 바뀐 칸만 */
 function RN부분(){ const st = document.getElementById('rnst'), go = document.getElementById('rngo'); if(st) st.innerHTML = RN상태글(); if(go) go.classList.toggle('ready', RN됨());
   const 이름 = S.rn && S.rn.name.trim(), b = document.querySelector('#rns1 .rn-n'); if(b){ b.className = 'rn-n' + (이름 ? ' ok' : ''); b.textContent = 이름 ? '✓' : '1'; } }
-document.addEventListener('input', ev => { const t0 = ev.target; if(t0 && t0.dataset && t0.dataset.k === 'wmemo'){ const z = live(); if(z){ z.trmemo = t0.value; save(); } return; } });      /* 플래너 트레이너 메모 (2026-10-23) */
+document.addEventListener('input', ev => { const t0 = ev.target; if(t0 && t0.dataset && t0.dataset.k === 'wmemo'){ const z = live(); if(z){ z.trmemo = t0.value; save(); } return; }
+  if(t0 && t0.dataset && /^imemo:/.test(t0.dataset.k || '')){ const z = live(), it = z && z.items[+t0.dataset.k.split(':')[1]]; if(it){ it.memo = t0.value; save(); const b = document.querySelector('.pln[data-act="plnm:' + t0.dataset.k.split(':')[1] + '"]'); if(b){ const o = b.querySelector('small'); if(o) o.remove(); b.insertAdjacentHTML('beforeend', 줄아래(it)); } } } });      /* 수업 메모 (2026-10-23) */      /* 플래너 트레이너 메모 (2026-10-23) */
 document.addEventListener('input', ev => { if(!S.rn) return; const t = ev.target;
   if(t.id === 'rnnm'){ S.rn.name = t.value; RN부분(); return; }
   if(t.id === 'rnq'){ S.rn.q = t.value; const l = document.getElementById('rnlist'); if(l) l.innerHTML = RN목록(); document.querySelectorAll('.pkparts .chip').forEach(c => c.classList.toggle('on', !t.value.trim() && c.dataset.act === 'rnpart:' + S.rn.part)); return; }
@@ -5613,7 +5616,7 @@ function vPick(){
       return `<button class="mrow2 ${담?'pson':''}" data-exrow="${esc(exKey(e))}" data-part="${esc(e.p)}"
         data-eq="${esc(e.e||'')}"
         style="${(e.p===S.pickPart && (S.pickEq==='전체'||e.e===S.pickEq))?'':'display:none'}"
-        data-act="add:${e.id}:${vs[0].k}">
+        data-act="add:${e.id}:${지난그립(e.id)}">
         <span class="mt"><b>${esc(e.n)}</b>
           <small>${esc(e.e)}${last?` · 지난번 ${setTxt(e.id,last)}`:''}${n?` · 피드백 ${n}`:''}${vs.length>1?` · <u>하는 법 ${vs.length}가지</u>`:''}</small></span>
         <em class="pkadd">${담 ? '✓' + (담>1 ? 담 : '') : '＋'}</em></button>`; }).join('')}
@@ -6246,7 +6249,7 @@ async function svItem(i){
   if(!it._id) await svNewItem(i);
   if(!it._id) return;
   await sv(spatch('workout_items','id=eq.'+it._id,
-    { sec:Math.round(it.sec||0), locked:!!it.locked, sort:i }), '종목 저장');
+    Object.assign({ sec:Math.round(it.sec||0), locked:!!it.locked, sort:i }, it.memo != null ? { memo: String(it.memo || '').slice(0, 300) || null } : {})), '종목 저장');      /* 수업 메모 = workout_items.memo (2026-10-23) */
   await sv(sdel('workout_sets','item_id=eq.'+it._id), '세트 정리');
   const rows = it.sets.filter(x=>x.done).map((x,k)=>Object.assign({ item_id:it._id, sort:k,
     kg:x.kg, reps:x.reps, spd: x.spd==null ? null : x.spd, done:true }, 유산소칸있나 && x.dist != null ? { dist:x.dist } : {}, 유산소칸있나 && x.feel ? { feel:x.feel, src:x.src||'직접' } : {}));
@@ -6423,7 +6426,7 @@ function 플래너화면(w){
   const 칸 = (o, j, f, 첫) => { const x = o.it.sets[j], 값 = !x ? '' : f === 'kg' ? (x.kg ? kgfmt(x.kg) : (x.reps ? '–' : '')) : (x.reps || '');
     const 바뀜 = !!(x && o.it.base && o.it.base[j] && o.it.base[j][f] !== x[f]), 지금 = !!(자판 && 자판.it === o.i && 자판.i === j && 자판.f === f);
     return `<button class="plc${첫 ? ' r1' : ''}${지금 ? ' now' : ''}${바뀜 ? ' ch' : ''}" data-act="plk:${o.i}:${j}:${f}" aria-label="${esc(exName(o.it.ex, o.it.va))} ${j + 1}세트 ${f === 'kg' ? '무게' : '횟수'}">${값}</button>`; };
-  const 이름 = o => `<button class="pln" data-act="plnm:${o.i}"><span class="hl" style="background:${색[o.i] || '#b9b1a2'}">${esc(exName(o.it.ex, o.it.va))}</span></button>`;
+  const 이름 = o => `<button class="pln" data-act="plnm:${o.i}"><span class="hl" style="background:${색[o.i] || '#b9b1a2'}">${esc(isMemo(o.it.ex) ? exName(o.it.ex, o.it.va) : ((exOf(o.it.ex) || {}).n || exName(o.it.ex, o.it.va)))}</span>${줄아래(o.it)}</button>`;
   const 행 = o => {
     if(isMemo(o.it.ex)) return `<div class="plr">${이름(o)}<button class="plm" data-act="${tr ? 'exd:memo:' + esc(o.it.va) + ':' + wmid : 'plfocus:' + o.i}">${tr ? '메모 · 눌러서 피드백으로 남기기 ›' : '메모 종목 ›'}${o.it.part ? ' <small>' + esc(o.it.part) + '</small>' : ''}</button></div>`;
     const n = Math.max(4, o.it.sets.length), 칸들 = [...Array(n)].map((_, j) => 칸(o, j, 'kg', false)).join('') + [...Array(n)].map((_, j) => 칸(o, j, 'reps', j === 0)).join('');
@@ -6450,6 +6453,13 @@ function 플래너화면(w){
     <button class="dngr" data-act="askcancel">기록 삭제하고 나가기</button>`,
     foot: 발판(w) };
 }
+/* ── 그립 · 수업 메모 ── 2026-10-23 대표 그립 시안 확정 「그립 선택은 하도록 · 넓게 · 좁게는 메모에 알아서 기입 · 입력은 간단하게」 */
+const 그립들 = ex => { const vs = vars(ex) || []; return vs.length >= 2 ? vs : []; };
+function 지난그립(ex){ const vs = vars(ex) || [], mid = (live() && live().mid) || S.tmid || S.mid;
+  for(const w of workoutsOf(mid)){ const it = w.items.find(i => i.ex === ex); if(it && vs.some(v => v.k === it.va)) return it.va; }
+  return (vs[0] || {}).k || 'a'; }
+const 줄아래 = it => { const v = isMemo(it.ex) ? null : 그립들(it.ex).find(x => x.k === it.va), m = String(it.memo || '').trim();
+  return (v || m) ? `<small>${v ? esc(v.n || '기본') : ''}${m ? `<i>${v ? ' · ' : ''}${esc(m.length > 18 ? m.slice(0, 18) + '…' : m)}</i>` : ''}</small>` : ''; };
 /* 칸을 누르면 — 숫자판(그 종목 · 그 세트 · 무게/횟수). 빈 칸은 바로 다음 세트만(건너뛰지 않게) */
 function 플래너자판(i, j, f){ const w = live(), it = w && w.items[i]; if(!it) return;
   j = Math.min(j, it.sets.length); const x = it.sets[j];
@@ -6464,13 +6474,17 @@ function 플래너정리(w){ if(!플래너인가(w)) return;
 /* 종목 이름을 누르면 — 설명 · 피드백(큰 단추 둘) · 직전 기록 · 세트 추가 · 빼기 */
 function sheetPlName(i){ const w = live(), it = w && w.items[i]; if(!it) return; w.cur = i; save();
   const tr = S.who === 'tr', wmid = w.mid || S.mid, cms = cmOf(wmid, it.ex, it.va), nw = cms.filter(c => !c.read).length;
-  openSheet(() => `<div class="h2">${esc(exName(it.ex, it.va))}</div>
+  openSheet(() => { const gs = isMemo(it.ex) ? [] : 그립들(it.ex), 지 = isMemo(it.ex) ? null : lastRuns(it.ex, it.va, wmid, 1)[0];
+    return `<div class="h2">${esc(isMemo(it.ex) ? exName(it.ex, it.va) : (exOf(it.ex) || {}).n || '')}</div>
+    ${gs.length ? `<span class="lbl">그립</span><div class="chips pl-grip">${gs.map(v => `<button class="chip ${v.k === it.va ? 'on' : ''}" data-act="plgrip:${i}:${v.k}">${esc(v.n || '기본')}</button>`).join('')}</div>` : ''}
+    ${isMemo(it.ex) ? '' : `<span class="lbl">수업 메모 <small style="font-weight:600">이 날 이 종목에만</small></span><textarea class="pl-imemo" data-k="imemo:${i}" maxlength="300" placeholder="넓게 · 좁게 · 기구 등지고 · 주의할 점">${esc(it.memo || '')}</textarea>`}
+    ${지 ? `<div class="pl-prev">지난번 ${esc(dateTxt(지.date))} · ${지.sets.map(x => (x.kg ? kgfmt(x.kg) + '×' : '') + x.reps).join(' · ')}${지.memo ? '<br>메모 · ' + esc(지.memo) : ''}</div>` : ''}
     <div class="pl-big"><button data-act="trio:demo"><b>설명</b><small>기구 사용법 · 자세</small></button>
       <button data-act="exd:${it.ex}:${it.va}${tr ? ':' + wmid : ''}"><b>${tr ? '피드백 남기기' : '피드백 보기'}</b><small>${cms.length ? cms.length + '개' + (!tr && nw ? ' · 새 ' + nw : '') : '아직 없음'}</small></button></div>
     <div class="pl-small"><button class="btn ghost sm" data-act="trio:prev">직전 기록</button>
       ${isMemo(it.ex) ? '' : `<button class="btn ghost sm" data-act="plsadd:${i}">＋ 세트 추가</button>`}
       <button class="btn ghost sm" data-act="wdel:${i}">종목 제거</button></div>
-    <button class="btn ghost sm" data-act="close">닫기</button>`); }
+    <button class="btn ghost sm" data-act="close">닫기</button>`; }); }
 /* ── 설명 + 피드백 ── */
 /* ══ 피드백 회차 넘겨보기 ══ 2026-09-29 대표
    한 번에 하나만 보인다. 좌우 화살표로 넘기고, **가운데를 누르면 회차 목록**이 펼쳐진다.
@@ -14005,6 +14019,10 @@ document.addEventListener('click', async ev=>{
     case 'plnm': 자판 = null; 자판그리기(); sheetPlName(+rest[0]); return;
     case 'plfocus': 자판 = null; 자판그리기(); S.wfocus = +rest[0]; S.fold = false; S.wsel = null; render(); return;
     case 'wfback': S.wfocus = null; render(); return;
+    case 'plgrip': { const it = w && w.items[+rest[0]], vk = rest[1]; if(!it || it.va === vk) return;
+      const 그대로 = JSON.stringify(바탕(it.sets)) === JSON.stringify(it.base || []);      /* 아직 손대지 않았으면 그 그립 지난 기록으로 다시 채운다 */
+      it.va = vk; if(그대로){ const 지들 = 지난세트들(w.mid || S.mid, it.ex, vk) || []; it.sets = 지들; it.base = 바탕(지들); }
+      save(); drawSheet(); render(); return; }
     case 'plsadd': { const it = w && w.items[+rest[0]]; if(!it) return; const 앞 = it.sets[it.sets.length - 1];
       it.sets.push({ kg: 앞 ? 앞.kg : 0, reps: 앞 ? 앞.reps : 0, done: !!(앞 && 앞.reps > 0) }); save(); closeSheet(); render(); toast((it.sets.length) + '세트 칸을 늘렸어요'); return; }
     case 'plnew': 확인창('채워진 무게 · 횟수를 비우고<br>새로 기록할까요?<br><small>종목은 그대로 남아요</small>', '새로 기록', () => {
@@ -14416,7 +14434,7 @@ async function finish(){
   for(let i=0;i<w.items.length;i++) await svItem(i);
   await sv(spatch('workouts','id=eq.'+w.id, { done:true, dur, kind:w.kind }), '운동 저장');
   const rec={ id:w.id, mid:w.mid, date:w.date||TODAY, kind:w.kind, rid:w.rid, title:w.title, dur, done:true,
-    items: w.items.filter(it=>it.sets.some(s=>s.done)).map(it=>({ _id:it._id, ex:it.ex, va:it.va, locked:true,
+    items: w.items.filter(it=>it.sets.some(s=>s.done)).map(it=>({ _id:it._id, ex:it.ex, va:it.va, locked:true, memo: it.memo || '',
       sec:Math.round(it.sec), sets: it.sets.filter(s=>s.done).map(s=>({kg:s.kg, reps:s.reps, spd:s.spd})) })) };
   const i0=D.workouts.findIndex(x=>x.id===w.id);
   if(i0>=0) D.workouts[i0]=rec; else D.workouts.unshift(rec);
