@@ -2269,7 +2269,7 @@ body{word-break:keep-all}
 
 <script>
 "use strict";
-const BUILD = '369';
+const BUILD = '370';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -7931,15 +7931,15 @@ function 새로만든것(){ const 때 = id => { const n = +String(id || '').repl
     .sort((a, b) => b.때 - a.때); }
 function 종목배지(){ const bx = $('#xrbdg'); if(!bx) return; const nx = (D.ex && D.xr) ? 종목알림수() : 0; if(nx){ bx.textContent = nx; bx.style.display = ''; } else bx.style.display = 'none'; }
 function 종목알림수(){ if(!종목급()) return 0; const 본 = 종목본때(); return (D.xr || []).filter(r => r.status === '대기').length + 새로만든것().filter(x => x.때 > 본).length; }
-const 요청하는법 = r => { const v = (D.va || []).find(z => z.ex_id === r.ex_id && z.vkey === r.vkey); return r.vkey ? ((v && v.name) || '기본') : ('새 하는 법' + (r.new_name ? ' 「' + r.new_name + '」' : '')); };
-const 요청종목 = r => ((D.ex || []).find(z => z.id === r.ex_id) || {}).name || '(삭제된 종목)';
+const 요청하는법 = r => { if(r.kind === '새 종목') return '새 종목'; const v = (D.va || []).find(z => z.ex_id === r.ex_id && z.vkey === r.vkey); return r.vkey ? ((v && v.name) || '기본') : ('새 하는 법' + (r.new_name ? ' 「' + r.new_name + '」' : '')); };
+const 요청종목 = r => r.kind === '새 종목' ? (r.new_name || '(이름 없음)') : ((D.ex || []).find(z => z.id === r.ex_id) || {}).name || '(삭제된 종목)';      /* 새 종목 = 앱에서 바로 추가한 종목 (2026-10-23 B-2) */
 const 짧은날 = t => { const x = new Date(t); return isNaN(x) ? '' : (x.getMonth() + 1) + '/' + x.getDate(); };
 function vExReq(){
   if(XR없음) return '<div class="note" style="border-color:var(--warn)"><b style="color:var(--warn)">종목 요청을 아직 준비 중이에요</b>'
     + '<div style="margin-top:6px;line-height:1.6">관리자에게 알려 주세요.</div></div>';
   if(S.xrSeen == null){ S.xrSeen = 종목본때(); try{ localStorage.setItem('gg_ex_seen', String(Date.now())); }catch(e){} }      /* 들어올 때의 값으로 「새」를 가리고, 본 때를 지금으로 옮긴다 */
   const 급 = 종목급(), 대기 = (D.xr || []).filter(r => r.status === '대기'), 끝 = (D.xr || []).filter(r => r.status !== '대기').slice(0, 20), 새 = 새로만든것(), 본 = S.xrSeen;
-  const 줄 = (r, 끝난) => '<tr data-xr="' + esc(r.id) + '"><td class="nw"><span class="tag ' + (r.kind === '덧붙이기' ? 'teal' : 'gold') + '">' + esc(r.kind === '덧붙이기' ? '덧붙이기' : '수정 요청') + '</span></td>'
+  const 줄 = (r, 끝난) => '<tr data-xr="' + esc(r.id) + '"><td class="nw"><span class="tag ' + (r.kind === '덧붙이기' || r.kind === '새 종목' ? 'teal' : 'gold') + '">' + esc(r.kind === '덧붙이기' ? '덧붙이기' : r.kind === '새 종목' ? '새 종목' : '수정 요청') + '</span></td>'
     + '<td><b>' + esc(요청종목(r)) + '</b><div class="sub3">' + esc([요청하는법(r), r.part].filter(Boolean).join(' · ')) + '</div></td>'
     + '<td style="white-space:pre-wrap;line-height:1.55">' + esc(r.body || '') + '</td>'
     + '<td class="nw"><span class="sub3">' + esc((r.by || '') + ' · ' + 짧은날(r.created_at || +String(r.id).replace(/\D/g, ''))) + '</span></td>'
@@ -7971,7 +7971,16 @@ async function 종목요청손잡이(a, act){
   if(a !== 'xrok' && a !== 'xrno' && a !== 'xrsave') return false;
   if(!종목급()){ toast('관리자 등급만 처리할 수 있습니다'); return true; }
   const 끝냄 = async (r, 상태) => { const 채 = { status:상태, done_by:나이름(), done_at:new Date().toISOString() }; await ssend('ex_requests?id=eq.' + encodeURIComponent(r.id), 'PATCH', 채); Object.assign(r, 채); };
-  if(a === 'xrok'){ XRW = (D.xr || []).find(r => r.id === act.dataset.v2) || null; if(XRW) 창(true); return true; }
+  if(a === 'xrok'){ const r0 = (D.xr || []).find(r => r.id === act.dataset.v2) || null;
+    if(r0 && r0.kind === '새 종목'){      /* 앱에서 바로 추가한 종목 → 종목 사전에 새 종목 (2026-10-23 B-2) */
+      if((D.ex || []).some(z => (z.name || '').trim() === (r0.new_name || '').trim())){ if(!await 묻기('같은 이름의 종목이 이미 있어요.' + String.fromCharCode(10, 10) + '요청만 끝낼까요?')) return true; try{ await 끝냄(r0, '반영'); toast('요청을 끝냈어요'); }catch(e){ toast('저장하지 못했습니다 — ' + (e.message || '').slice(0, 60)); } render(); return true; }
+      if(!await 묻기('종목 사전에 새 종목으로 넣을까요?' + String.fromCharCode(10, 10) + (r0.new_name || '') + ' · ' + (r0.part || '기타') + String.fromCharCode(10) + '모든 트레이너 · 회원 앱에서 검색돼요')) return true;
+      try{ const id = 'x' + Date.now(), 종 = { id, name:(r0.new_name || '').trim(), part:r0.part || '기타', equip:'', cardio:false, sort:9000, media:[] }, 벌 = { id:id + ':a', ex_id:id, vkey:'a', name:'', descr:'', demo:false, sort:0 };
+        await ssend('exercises?on_conflict=id', 'POST', [종], 'resolution=merge-duplicates'); await ssend('variants?on_conflict=id', 'POST', [벌], 'resolution=merge-duplicates');
+        (D.ex || (D.ex = [])).push(종); (D.va || (D.va = [])).push(벌); await 끝냄(r0, '반영'); toast('종목 사전에 넣었어요 — 설명은 「종목 사전」에서'); }
+      catch(e){ toast('저장하지 못했습니다 — ' + (e.message || '').slice(0, 60)); }
+      render(); return true; }
+    XRW = r0; if(XRW) 창(true); return true; }
   if(a === 'xrno'){ const r = (D.xr || []).find(z => z.id === act.dataset.v2); if(!r) return true;
     if(!await 묻기('이 요청을 반려할까요?' + String.fromCharCode(10, 10) + 요청종목(r) + ' · ' + (r.by || ''))) return true;
     try{ await 끝냄(r, '반려'); toast('반려했습니다'); }catch(e){ toast('저장하지 못했습니다 — ' + (e.message || '').slice(0, 60)); } render(); return true; }
