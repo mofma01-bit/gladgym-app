@@ -3160,7 +3160,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '452';
+const BUILD = '453';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -3309,7 +3309,7 @@ let S = { who:null, mid:null, screen:'boot', tab:'home', pickPart:'가슴', pick
 const 데스크끼움 = (() => { try{ const q = new URLSearchParams(location.search); if(q.get('desk') !== '1' || window.parent === window) return null;
   const 목 = JSON.parse(sessionStorage.getItem('gg_desk_accs') || '[]') || [], on = sessionStorage.getItem('gg_desk_on') || '', a = 목.find(x => x && x.name === on) || null;
   if(!a || !a.token) return null;
-  return { mid: q.get('m') || '', au: { token: a.token, who: a.who || 'trainer', name: a.name || '', sb: a.access_token || '', sbexp: Math.floor((+a.exp || 0) / 1000) } }; }catch(e){ return null; } })();
+  return { mid: q.get('m') || '', r: q.get('r') || '', au: { token: a.token, who: a.who || 'trainer', name: a.name || '', sb: a.access_token || '', sbexp: Math.floor((+a.exp || 0) / 1000) } }; }catch(e){ return null; } })();
 if(데스크끼움) document.documentElement.classList.add('deskin');      /* 폰 테두리 · 아래 탭 · 여는 그림 없이 창을 꽉 채운다 */
 const 데스크알림 = 몸 => { try{ if(데스크끼움) window.parent.postMessage(Object.assign({ gg: 'deskrec' }, 몸), '*'); }catch(e){} };
 const LIVEKEY = 데스크끼움 ? 'gladgym_live_desk' : 'gladgym_live_v1';
@@ -3539,7 +3539,8 @@ async function boot(){
     else S.screen = 'login'; }
   if(데스크끼움){ document.body.classList.add('deskin');
     const mid = 데스크끼움.mid;
-    if(S.who === 'tr' && mid && MEMBERS.some(m => m.id === mid)){ S.tmid = mid; S.subj = mid; S.screen = 't_member';
+    if(S.who === 'tr' && mid && 데스크끼움.r && D.workouts.some(w => w.id === 데스크끼움.r)){ S.tmid = mid; S.subj = mid; S.rw = 데스크끼움.r; S.screen = 'report'; }      /* 데스크 「리포트 보기」 (C-4) */
+    else if(S.who === 'tr' && mid && MEMBERS.some(m => m.id === mid)){ S.tmid = mid; S.subj = mid; S.screen = 't_member';
       setTimeout(() => { if(liveOf(mid) && adoptLive(mid)) go('workout'); else { S.tmid = mid; 수업시작창(mid); } }, 0); }
     else if(S.who === 'tr' && mid) setTimeout(() => toast('이 회원을 앱에서 열 수 없어요\n담당 범위를 확인해 주세요'), 0); }
   if(!histOn) histInit();
