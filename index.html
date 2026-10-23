@@ -3177,7 +3177,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '455';
+const BUILD = '456';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -6524,16 +6524,16 @@ const 팁강도 = t => { const e = exOf(t.ex_id) || {}, 속 = 경사최대(t.ex_
 const 팁글 = t => `${esc((exOf(t.ex_id) || {}).n || '유산소')} ${t.minutes}분${팁강도(t) ? ' · ' + esc(팁강도(t)) : ''}`;
 const 팁결과 = t => t.done_at ? `<span class="ctok">✓ 유산소 ${t.done_min || t.minutes}분 함</span>` : (t.on_date < TODAY ? '<span class="ctno">— 안 함</span>' : '<span class="ctno">아직 안 함</span>');
 function 팁줄들(wid){ const ts = 팁of(wid); if(!ts.length) return '';
-  return `<div class="ctips">${ts.map(t => `<div class="ctip"><span class="hl" style="background:#b9b1a2">유산소 넣어줌</span><span>${팁글(t)}</span>${팁결과(t)}${S.who === 'tr' && !t.done_at && t.on_date === TODAY ? `<button class="ctx" data-act="ctipdel:${t.id}" aria-label="빼기">✕</button>` : ''}</div>`).join('')}</div>`; }
+  return `<div class="ctips">${ts.map(t => `<div class="ctip"><span class="hl" style="background:#b9b1a2">추가한 유산소</span><span>${팁글(t)}</span>${팁결과(t)}${S.who === 'tr' && !t.done_at && t.on_date === TODAY ? `<button class="ctx" data-act="ctipdel:${t.id}" aria-label="삭제">✕</button>` : ''}</div>`).join('')}</div>`; }
 function sheetCtip(){ const w = live(); if(!w) return;
   const 다 = 유넣기기구(); if(!S.ct || !다.some(e => e.id === S.ct.ex)) S.ct = { ex: (다[0] || {}).id, min: 20, spd: null, inc: 0 };
   openSheet(() => { const c = S.ct, e = exOf(c.ex) || {}, 경 = 경사최대(c.ex), 속이름 = 경 || /천국/.test(e.n || '') ? '속도' : '레벨';      /* 그릴 때마다 지금 기구로 다시 센다 */
     if(c.spd == null) c.spd = 경 ? 5.5 : 6;
     const 셈 = (k, 이름, 값, 단위) => `<div class="ctc"><span class="lb">${이름}</span><div class="ctn"><button data-act="ctd:${k}:-1" aria-label="${이름} 줄이기">−</button><b>${값}<small>${단위}</small></b><button data-act="ctd:${k}:1" aria-label="${이름} 늘리기">＋</button></div></div>`;
-    return `<div class="h2">유산소 넣기 <small>회원 앱에 오늘 밤까지 떠요</small></div>
+    return `<div class="h2">유산소 추가 <small>회원 앱에 오늘 밤까지 떠요</small></div>
     <span class="lbl">종류</span><div class="chips">${다.map(x => `<button class="chip ${x.id === c.ex ? 'on' : ''}" data-act="ctex:${x.id}">${esc(유이름(x))}</button>`).join('')}</div>
     ${셈('min', '시간', c.min, '분')}${셈('spd', 속이름, kgfmt(c.spd), 경 ? 'km/h' : '')}${경 ? 셈('inc', '경사', kgfmt(c.inc), '') : ''}
-    <button class="btn blue go" data-act="ctsave">넣기</button><button class="btn ghost sm" data-act="close">닫기</button>`; }); }
+    <button class="btn blue go" data-act="ctsave">추가</button><button class="btn ghost sm" data-act="close">닫기</button>`; }); }
 function 팁카드(mid){ const ts = (D.ctips || []).filter(t => t.member_id === mid && t.on_date === TODAY && !t.done_at); if(!ts.length) return '';
   return ts.map(t => `<div class="ctcard"><div class="k">유산소가 들어왔어요${t.by ? ' · ' + esc(t.by) + ' 트레이너' : ''}</div><div class="v">${esc((exOf(t.ex_id) || {}).n || '유산소')} ${t.minutes}분</div>${팁강도(t) ? `<div class="s">${esc(팁강도(t))}</div>` : ''}<button class="btn blue go" data-act="ctipgo:${t.id}">바로 시작</button></div>`).join(''); }
 function 플래너화면(w){
@@ -6566,7 +6566,7 @@ function 플래너화면(w){
     <button class="pl-add" data-act="go:pick">＋ 종목 추가</button>
     <div class="pltb plcard"><div class="plr plca plh"><span class="pln">유산소</span><span>시간</span><span>속도</span></div>
       ${유.map(유행).join('') || '<div class="pl-empty">유산소는 「＋ 종목 추가」 → 유산소에서</div>'}</div>
-    ${수업 && tr && D.ctips ? 팁줄들(w.id) + `<button class="pl-add" data-act="ctipnew">＋ 유산소 넣기 <small>회원이 오늘 할 것</small></button>` : ''}
+    ${수업 && tr && D.ctips ? 팁줄들(w.id) + `<button class="pl-add" data-act="ctipnew">＋ 유산소 추가 <small>회원이 오늘 할 것</small></button>` : ''}
     ${수업 && tr ? `<span class="lbl">트레이너 메모</span><textarea class="pl-memo" data-k="wmemo" placeholder="오늘 컨디션 · 다음 수업에 할 것">${esc(w.trmemo || '')}</textarea>` : ''}
     <button class="dngr" data-act="askcancel">기록 삭제하고 나가기</button>`,
     foot: 발판(w) };
@@ -14147,10 +14147,10 @@ document.addEventListener('click', async ev=>{
       drawSheet(); return; }
     case 'ctsave': { const w = live(), c = S.ct; if(!w || !c) return;
       const 줄 = { id: 'ct' + Date.now(), member_id: w.mid, workout_id: w.id, ex_id: c.ex, minutes: c.min, speed: c.spd, incline: 경사최대(c.ex) ? c.inc : null, on_date: TODAY, by: TRAINER };
-      try{ await spost('cardio_tips', [줄]); (D.ctips = D.ctips || []).unshift(줄); closeSheet(); toast('유산소를 넣었어요\n회원 앱에 오늘 밤까지 떠요'); render(); }
-      catch(e){ toast('넣지 못했어요 — ' + String(e.message || '').slice(0, 50)); } return; }
-    case 'ctipdel': { const t = (D.ctips || []).find(x => x.id === rest[0]); if(!t) return; if(!await 묻기('넣은 유산소를 뺄까요?')) return;
-      try{ await sdel('cardio_tips', 'id=eq.' + encodeURIComponent(t.id)); D.ctips = D.ctips.filter(x => x !== t); render(); }catch(e){ toast('빼지 못했어요'); } return; }
+      try{ await spost('cardio_tips', [줄]); (D.ctips = D.ctips || []).unshift(줄); closeSheet(); toast('유산소를 추가했어요\n회원 앱에 오늘 밤까지 떠요'); render(); }
+      catch(e){ toast('추가하지 못했어요\n' + 오류말(e)); } return; }
+    case 'ctipdel': { const t = (D.ctips || []).find(x => x.id === rest[0]); if(!t) return; if(!await 묻기('추가한 유산소를 삭제할까요?')) return;
+      try{ await sdel('cardio_tips', 'id=eq.' + encodeURIComponent(t.id)); D.ctips = D.ctips.filter(x => x !== t); render(); }catch(e){ toast('삭제하지 못했어요'); } return; }
     case 'ctipgo': { const t = (D.ctips || []).find(x => x.id === rest[0]), e = t && exOf(t.ex_id); if(!e) return; if(live()){ toast('진행 중인 운동이 있어요'); return; }
       const v = (e.vars||[])[0], it = { ex:e.id, va:(v&&v.k)||'a', rest:0, locked:false, sec:0, startAt:Date.now(), sets:[], ctip:t.id };
       const c = 유처음(it, e, S.mid); c.goal = t.minutes; c.ph = 'go'; c.on = Date.now(); if(t.speed != null) c.spd = +t.speed; if(t.incline != null) c.inc = +t.incline;      /* 넣어 준 값 그대로 */
