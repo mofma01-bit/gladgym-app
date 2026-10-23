@@ -3093,7 +3093,60 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '441';
+const BUILD = '442';
+/* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
+   카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
+const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const 큰안내패드 = () => /ipad/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+function 홈추가안내글(이름){      /* 아이폰 · 아이패드 사파리 — 「홈 화면에 추가」 3단계(큰 글씨) */
+  const 패드 = 큰안내패드();
+  return '<div class="ga-big"><div class="ga-t">홈 화면에 「' + 이름 + '」 추가하기</div>'
+    + '<ol><li><b>' + (패드 ? '화면 오른쪽 위' : '화면 맨 아래 가운데') + '</b>의<br><span class="ga-ic">공유 <i>⬆</i></span> 버튼을 누르세요</li>'
+    + '<li>메뉴를 위로 올려<br><span class="ga-ic">홈 화면에 추가 <i>⊞</i></span> 를 누르세요</li>'
+    + '<li>오른쪽 위 <span class="ga-ic">추가</span> 를 누르면 끝!</li></ol>'
+    + '<div class="ga-s">다음부터는 홈 화면의 「' + 이름 + '」 아이콘으로 여세요</div></div>';
+}
+/* 크롬(PC · 안드로이드) 설치 신호 — 로그인 화면에도 「앱 설치하기」 (2026-10-23 대표 「설치 방법은 사파리만 있는 건가」 · 로그인 화면이 바로가기 띠를 덮고 있었다) */
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); window.__설치신호 = e; if(typeof 로그인설치칸 === 'function') 로그인설치칸(); });
+window.addEventListener('appinstalled', () => { window.__설치신호 = null; if(typeof 로그인설치칸 === 'function') 로그인설치칸(true); });
+function 앱설치누름(){ const p = window.__설치신호; if(!p) return; window.__설치신호 = null;
+  try{ p.prompt(); Promise.resolve(p.userChoice).then(c => { if(typeof 로그인설치칸 === 'function') 로그인설치칸(c && c.outcome === 'accepted'); }).catch(() => {}); }catch(e){} }
+(function(){
+  const ua = navigator.userAgent || '', 안드 = /android/i.test(ua), 카톡 = /KAKAOTALK/i.test(ua), 라인 = /\bLine\//i.test(ua);
+  const 앱안 = 카톡 || 라인 || /Instagram|FBAN|FBAV|NAVER\(inapp|DaumApps|everytimeApp|\bwv\)/i.test(ua);
+  const st = document.createElement('style');
+  st.textContent = '.ga-big{background:#1c1a17;border:1px solid #5a4a2c;border-radius:18px;padding:22px 20px;color:#f2ead9;text-align:left;line-height:1.5}'
+    + '.ga-t{font-size:21px;font-weight:900;color:#f0cf94;margin-bottom:14px;letter-spacing:-.3px}'
+    + '.ga-big ol{margin:0;padding:0;list-style:none;counter-reset:g;display:grid;gap:14px}'
+    + '.ga-big li{counter-increment:g;position:relative;padding-left:44px;font-size:18px;font-weight:700}'
+    + '.ga-big li::before{content:counter(g);position:absolute;left:0;top:0;width:32px;height:32px;border-radius:10px;background:#f0cf94;color:#1a160e;font-weight:900;display:flex;align-items:center;justify-content:center;font-size:17px}'
+    + '.ga-ic{display:inline-flex;align-items:center;gap:6px;background:#2c2924;border:1px solid #57503f;border-radius:9px;padding:2px 10px;font-weight:900;color:#fff}.ga-ic i{font-style:normal;color:#a9d8e6}'
+    + '.ga-s{margin-top:16px;font-size:15px;color:#cfc7b8}'
+    + '#gainapp{position:fixed;inset:0;z-index:99999;background:#131312;display:flex;align-items:center;justify-content:center;padding:24px;font-family:inherit}'
+    + '#gainapp .box{max-width:420px;width:100%;text-align:center}#gainapp h2{font-size:24px;font-weight:900;color:#f0cf94;margin:0 0 10px}#gainapp p{font-size:17px;color:#e6dfd2;line-height:1.6;margin:0 0 18px}'
+    + '#gainapp .go{display:block;width:100%;height:56px;border:0;border-radius:14px;background:#f0cf94;color:#1a160e;font-size:19px;font-weight:900;font-family:inherit;margin-bottom:12px}'
+    + '#gainapp .ga-big{text-align:left}'
+    + '.ga-inst{display:block;width:100%;height:54px;margin-top:22px;border-radius:14px;border:1.5px solid #c9a35c;background:transparent;color:#f0cf94;font-size:18px;font-weight:900;font-family:inherit;cursor:pointer}.ga-inst:hover{background:#2a2418}'
+    + '.ga-s2{margin-top:8px;font-size:14px;color:#a39c8e;text-align:center}.ga-done{margin-top:22px;font-size:16px;font-weight:800;color:#a9d8e6;text-align:center}';
+  document.head.appendChild(st);
+  if(!앱안) return;
+  const 주소 = location.href.replace(/[?&]openExternalBrowser=1/, '');
+  const 바깥 = () => {
+    if(카톡){ location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(주소); return true; }
+    if(라인){ location.href = 주소 + (주소.indexOf('?') >= 0 ? '&' : '?') + 'openExternalBrowser=1'; return true; }
+    if(안드){ location.href = 'intent://' + 주소.replace(/^https?:\/\//, '') + '#Intent;scheme=https;package=com.android.chrome;end'; return true; }
+    return false; };
+  const 갈곳 = 안드 ? '크롬' : '사파리';
+  const 판 = document.createElement('div'); 판.id = 'gainapp';
+  판.innerHTML = '<div class="box"><h2>' + 갈곳 + '에서 열어 주세요</h2>'
+    + ((카톡 || 라인 || 안드) ? '<p>지금은 앱 안의 화면이라 설치가 안 돼요.<br>' + 갈곳 + (안드 ? '이' : '가') + ' 저절로 열려요 — 안 열리면 아래 단추를 눌러 주세요</p><button class="go" type="button">' + 갈곳 + (안드 ? '으로' : '로') + ' 열기</button>'
+      : '<p>지금은 앱 안의 화면이라 설치가 안 돼요.<br>오른쪽 위나 아래의 <b>⋯</b> 를 누르고<br><b>「Safari로 열기」</b> 를 눌러 주세요</p>')
+    + '</div>';
+  document.body.appendChild(판);
+  const b = 판.querySelector('.go'); if(b) b.onclick = 바깥;
+  setTimeout(바깥, 300);
+})();
+
 /* 홈 아이콘으로 들어와도 옛 화면에 머물지 않게 — 새 판이 있으면 한 번만 다시 받는다 */
 async function checkBuild(){
   try{
@@ -4871,6 +4924,11 @@ function 로그인칸그림(){ const g = S.lg; if(!g) return; const c = 번호�
   const b = document.querySelector('#main .lgcta'); if(b && !g.중) b.disabled = g.단계 === '번호' ? !/^01\d{8,9}$/.test(p) : c.length !== 6;
   const r = document.querySelector('#main .lgre'); if(r){ const 남 = Math.max(0, 60 - Math.floor((Date.now() - (g.t || 0)) / 1000)); r.innerHTML = 남 ? '다시 받기 0:' + String(남).padStart(2, '0') : '<b>다시 받기</b>'; r.disabled = !!남; } }
 setInterval(() => { if(S.screen === 'login' && S.lg && S.lg.단계 === '코드') 로그인칸그림(); }, 1000);
+function 로그인설치칸(됨){      /* 크롬 설치 단추 — 신호가 있고 아직 안 깔렸을 때만 (2026-10-23) */
+  const el = document.getElementById('lginst2'); if(!el) return;
+  if(됨 === true){ el.innerHTML = '<div class="ga-done">설치됐어요 · 홈 화면 · 바탕화면 「글래드짐」 아이콘으로 여세요</div>'; return; }
+  const 깔림 = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  el.innerHTML = window.__설치신호 && !깔림 && !(S.lg && S.lg.단계 === '코드') ? '<button class="ga-inst" type="button" onclick="앱설치누름()">＋ 이 기기에 앱 설치하기</button><div class="ga-s2">한 번 설치하면 아이콘으로 바로 열려요</div>' : ''; }
 function vLogin(){
   const g = S.lg || (S.lg = { 단계:'번호', phone:'', code:'', 말:'', 중:false, 이름:'', t:0 }), 번 = 번호만(g.phone), 말 = `<div class="lgerr">${esc(g.말 || '')}</div>`;
   const 폼 = g.단계 === '번호'
@@ -4879,11 +4937,11 @@ function vLogin(){
     : `<div class="lglab">인증번호 6자리</div><div class="lgotp">${[0,1,2,3,4,5].map(() => '<i></i>').join('')}<input type="text" inputmode="numeric" autocomplete="one-time-code" data-k="lgcode" maxlength="6" value="${esc(g.code)}" aria-label="인증번호 6자리"></div>${말}
        <button class="lgcta" data-act="lgcheck" ${g.중 ? 'disabled' : ''}>${g.중 ? '확인 중이에요…' : '확인'}</button>
        <div class="lgrow"><button class="lgre" data-act="lgsend"></button><button data-act="lgback">번호 수정</button></div>`;
-  setTimeout(로그인칸그림, 0);
+  setTimeout(로그인칸그림, 0); setTimeout(로그인설치칸, 0);
   return { top: '', body:`
     <div class="lgx"><div class="lgtop"><svg class="lgsym" viewBox="-6 -6 295 295" aria-hidden="true"><path d="M236 4H140A91 91 0 0 0 49 95A91 91 0 0 0 140 186"/><path d="M236 95H49V280H142"/><path d="M142 95V280"/><path d="M142 95A92.5 92.5 0 0 1 142 280"/><path d="M49 280L142 187"/></svg>
       <div class="lgwm">GLAD GYM</div><small>${g.단계 === '코드' ? esc(번호가림(번)) : ''}</small></div>
-      <div class="lgmid">${폼}</div></div>
+      <div class="lgmid">${폼}<div id="lginst2"></div>${g.단계 === '번호' && 큰안내아이폰() && !(matchMedia('(display-mode: standalone)').matches || navigator.standalone === true) ? '<div style="margin:26px 0 8px">' + 홈추가안내글('글래드짐') + '</div>' : ''}</div></div>
     ${시험판 ? `<div class="hr"></div>
     <button class="card rowc teal" data-act="as:tr">
       <div><div class="nm t">${esc(TRAINER)} 트레이너로 들어가기</div>
@@ -14344,7 +14402,7 @@ let 설치신호 = null;
 const 설치됨 = () => window.matchMedia('(display-mode: standalone)').matches
               || window.navigator.standalone === true;
 /* ⚠ 회원앱엔 이미 `아이폰` 이 있다 — 겹치면 스크립트가 통째로 죽는다 (2026-09-30 브라우저에서 잡음) */
-const 아이폰사파리 = () => /iphone|ipad|ipod/i.test(navigator.userAgent);
+const 아이폰사파리 = () => 큰안내아이폰();
 window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); 설치신호 = e; 바로가기띠(); });
 window.addEventListener('appinstalled', () => { 설치신호 = null; 바로가기띠(); });
 
@@ -14356,8 +14414,7 @@ function 바로가기띠(){
   el.innerHTML = 설치신호
     ? '<span class="t">바로가기를 만들어 두세요<small>다음부터 주소를 찾지 않고 바로 열립니다</small></span>'
       + '<button id="pwago">＋ 바로가기 만들기</button><button class="x" id="pwax">✕</button>'
-    : '<span class="t">홈 화면에 추가하세요<small>아래 <b>공유</b> ⬆ → <b>홈 화면에 추가</b> 를 누르시면 됩니다</small></span>'
-      + '<button class="x" id="pwax">✕</button>';
+    : '<div style="flex:1;min-width:0">' + 홈추가안내글('글래드짐') + '</div><button class="x" id="pwax" style="align-self:flex-start">✕</button>';      /* 큰 글씨 3단계 (2026-10-23 대표) */
   el.classList.add('on');
   const go = document.getElementById('pwago');
   if(go) go.onclick = async () => {
