@@ -2692,6 +2692,32 @@ body.kpon #main{padding-bottom:330px}
 .qacard p{margin:9px 0 0;font-size:13.5px;line-height:1.65;color:#cfc7b8;white-space:pre-wrap}
 .rby{font-size:11.5px;font-weight:700;color:var(--gold-2);white-space:nowrap}.rbynote{padding:8px 12px}
 .rhidlnk{flex:none;width:100%;text-align:center;font-size:13px;font-weight:600;color:var(--sub);padding:8px}.rhidc{opacity:.75}
+
+/* 종이 상담지 (데스크와 같은 그림 · 2026-10-24 대표 「종이로」) */
+/* 상담지 = 종이 그대로 (2026-10-23) */
+.pz{background:#fbfaf7;color:#1d1a16;border-radius:12px;padding:16px 16px 18px;font-size:14px;line-height:1.45}
+.pz-h{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:10px}.pz-h>b{font-size:20px;font-weight:900;letter-spacing:-.4px}.pz-h>small{color:#6b6253;font-size:13px}
+.pz-hd{margin-left:auto;display:flex;align-items:center;gap:6px;font-weight:800}
+.pz-s{border:1.5px solid #2a241b;border-radius:12px;padding:10px 12px;margin-bottom:8px;background:#fff}
+.pz-t{display:flex;align-items:center;gap:8px;margin-bottom:6px}.pz-t b{white-space:nowrap;background:#1d1a16;color:#fff;border-radius:7px;padding:2px 10px;font-size:14px;font-weight:900}.pz-t small{font-size:13px;color:#6b6253}
+.pz-r{display:grid;grid-template-columns:104px minmax(0,1fr);gap:8px;align-items:center;padding:3px 0}
+.pz-k{font-weight:800;font-size:14px}
+.pz-v{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;min-width:0}
+.pz-col{flex-direction:column;align-items:flex-start}
+.pz-c{display:inline-flex;align-items:center;gap:5px;font-size:14px;color:#3a342b}
+.pz-c i{width:18px;height:18px;border:1.5px solid #2a241b;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-style:normal;font-size:13px;font-weight:900;flex:none}
+.pz-c.on{color:#1d1a16;font-weight:800}.pz-c.on i{background:#1d1a16;color:#fff}
+.pz-b{display:inline-block;min-width:90px;min-height:28px;border:1.5px solid #2a241b;border-radius:7px;padding:3px 8px;font-weight:700;background:#fff}
+.pz-b.w{display:block;width:100%}.pz-b small{color:#6b6253;font-weight:600}
+.pz-x{display:inline-flex;align-items:center;gap:6px;font-weight:800;margin-left:6px;white-space:nowrap}
+.pz-days{display:inline-grid;grid-template-columns:repeat(7,38px);border:1.5px solid #2a241b;border-radius:8px;overflow:hidden}
+.pz-days span{display:flex;flex-direction:column;align-items:center;gap:2px;padding:3px 0;font-weight:800;border-left:1px solid #2a241b}.pz-days span:first-child{border-left:0}
+.pz-days i{width:18px;height:18px;border:1.5px solid #2a241b;border-radius:4px;font-style:normal;font-size:13px;display:flex;align-items:center;justify-content:center}.pz-days span.on i{background:#1d1a16;color:#fff}
+.pz-g2{display:grid;grid-template-columns:1fr 1fr;gap:4px 14px}.pz-last{gap:8px}.pz-last .pz-s{margin-bottom:0}
+.pz-memo{min-height:70px;border:1.5px solid #2a241b;border-radius:8px;padding:6px 8px;white-space:pre-wrap;font-weight:600}
+.pz-note{margin-top:8px;border:1.5px dashed #8a7f6c;border-radius:8px;padding:6px 8px;white-space:pre-wrap}.pz-note small{display:block;color:#6b6253;font-size:13px}
+@media (max-width:640px){.pz-r{grid-template-columns:1fr}.pz-g2{grid-template-columns:1fr}.pz-hd{margin-left:0}.pz-days{grid-template-columns:repeat(7,1fr)}}
+.pz.n .pz-r{grid-template-columns:1fr;gap:3px}.pz.n .pz-g2{grid-template-columns:1fr}.pz.n .pz-hd{margin-left:0}.pz.n .pz-days{display:grid;grid-template-columns:repeat(7,1fr);width:100%}.pz.n .pz-x{margin:4px 0 0}
 </style>
 
 </head>
@@ -3124,7 +3150,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '450';
+const BUILD = '451';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -10210,6 +10236,45 @@ function 상담작성카드(d, tr){
   return `<div class="card ikprog${단계 === 2 ? ' ok' : ''}"><div class="rowc" style="align-items:baseline"><div class="nm">${제목}</div><div class="sm"><b>${a.p}%</b> · ${a.n} / ${a.모두}항목</div></div>
     <i class="bar"><b style="width:${Math.max(3, a.p)}%"></b></i><div class="sm" style="margin-top:9px">${말}</div></div>`;
 }
+/* ══ 상담지 = 종이 그대로 ══ 2026-10-23 대표 「앱이나 데스크에서 상담 내용 보는 방식도 종이 상담지 방식과 동일하게 · 양식이 통일되어야지 다르니까 어렵다」
+   종이 GG-INTAKE-A4 v4(설계서\상담지\PT상담지_A4_v4.png) 와 같은 칸 · 같은 순서 · 같은 낱말 — 고른 것은 ✓ · 안 고른 것도 종이처럼 보인다 */
+const 종이칸 = {
+  sex: [['여', '여'], ['남', '남']],
+  jobenv: [['좌식', '좌식 (앉아서)'], ['활동적', '활동적 (서서 · 움직임)'], ['복합적', '복합적']],
+  shift: [['아니오', '아니오'], ['예', '예']],
+  route: ['네이버블로그', '네이버지도', '인스타그램', '전단지', '외부간판', '지인소개', '기타'].map(x => [x, x]),
+  exprs: ['헬스', 'PT', '필라테스', '요가', '수영', '러닝', '골프'].map(x => [x, x]),
+  stressLv: [['1~3', '1~3 (약함)'], ['4~6', '4~6 (보통)'], ['7~10', '7~10 (심함)']],
+  relief: ['음식섭취', '운동', '쇼핑', '인간관계', '수면', '스마트폰', '기타'].map(x => [x, x]),
+  act: ['앉아서 일해요', '가볍게 움직여요', '자주 움직여요', '많이 움직여요', '아주 많이 움직여요'].map(x => [x, x]),
+  cond: ['과민성 대장 증후군', '당뇨', '고혈압', '갑상선질환', '불면증'].map(x => [x, x]),
+  hist: ['최근 수술', '골절', '무릎부상', '허리부상', '관절염', '목디스크', '허리디스크', '고혈압', '저혈압', '당뇨', '다낭성난소증후군', '무월경', '갑상선기능', '폐질환', '천식'].map(x => [x, x]),
+  goals: [['다이어트', '다이어트 (체중 감량)'], ['근력 향상', '근력 향상 · 근육량'], ['체형 교정', '체형 교정 · 자세'], ['통증 개선', '통증 개선 · 재활'], ['체력 향상', '체력 · 건강 관리'], ['바디프로필', '바디프로필 · 대회'], ['기타', '기타']],
+};
+function 상담지종이(ik, m, 트, 좁){
+  ik = ik || {}; m = m || {}; const 식 = (ik.meals && typeof ik.meals === 'object') ? ik.meals : {};
+  const 배열 = v => Array.isArray(v) ? v : (v ? String(v).split(/\s*[,·]\s*/).filter(Boolean) : []);
+  const 체 = (켬, 글) => '<span class="pz-c' + (켬 ? ' on' : '') + '"><i>' + (켬 ? '✓' : '') + '</i>' + esc(글) + '</span>';
+  const 여럿 = k => { const a = 배열(ik[k]); return 종이칸[k].map(([v, t]) => 체(a.indexOf(v) >= 0, t)).join('') + a.filter(v => !종이칸[k].some(([x]) => x === v)).map(v => 체(true, v)).join(''); };
+  const 하나 = k => 종이칸[k].map(([v, t]) => 체(String(ik[k] || '') === v, t)).join('') + (ik[k] && !종이칸[k].some(([x]) => x === ik[k]) ? 체(true, ik[k]) : '');
+  const 칸 = (값, 꼬리, 넓) => '<span class="pz-b' + (넓 ? ' w' : '') + '">' + (값 ? esc(String(값)) + (꼬리 ? ' <small>' + 꼬리 + '</small>' : '') : '') + '</span>';
+  const 줄 = (이름, 속) => '<div class="pz-r"><span class="pz-k">' + 이름 + '</span><div class="pz-v">' + 속 + '</div></div>';
+  const 판 = (꼬리표, 말, 속) => '<section class="pz-s"><div class="pz-t"><b>' + 꼬리표 + '</b>' + (말 ? '<small>' + 말 + '</small>' : '') + '</div>' + 속 + '</section>';
+  const 요일 = 배열(ik.time);
+  return '<div class="pz' + (좁 ? ' n' : '') + '">'
+    + '<div class="pz-h"><b>GLAD GYM PT 상담지</b><small>구산역촌점</small><span class="pz-hd"><span>담당</span>' + 칸(m.trainer || '') + '</span></div>'
+    + 판('기본', '', 줄('이름', 칸(m.name || '', '', 1)) + 줄('성별', 하나('sex')) + 줄('전화번호', 칸(m.phone || '', '', 1)) + 줄('생년월일', 칸(ik.birth || '', '', 1))
+        + 줄('신장', 칸(String(ik.height || '').replace(/cm/i, ''), 'cm')) + 줄('직업', 칸(ik.job || '', '', 1)) + 줄('직업환경', 하나('jobenv')) + 줄('교대근무', 하나('shift')))
+    + 판('글래드짐을 알게 된 경로', '여러 개 표시해도 됩니다', '<div class="pz-v">' + 여럿('route') + '</div>')
+    + 판('운동 · 생활', '', 줄('경험한 운동', 여럿('exprs') + '<span class="pz-x">그 밖 ' + 칸(ik.expr || '') + '</span>') + 줄('스트레스 요인', 칸(ik.stress || '', '', 1)) + 줄('스트레스 강도', 하나('stressLv'))
+        + 줄('해소 방법', 여럿('relief')) + 줄('평소 활동량', 하나('act')) + 줄('취침 시간', 칸(식['취침'] || '') + '<span class="pz-x">하루 평균 수면 ' + 칸(ik.sleepH || '') + '</span>'))
+    + 판('건강', '', 줄('현재 겪는 것', 여럿('cond')) + 줄('과거 병력', 여럿('hist')) + 줄('그 밖의 병력', 칸(ik.histEtc || '', '', 1)))
+    + 판('운동 가능 시간', '', '<div class="pz-v"><span class="pz-days">' + ['월', '화', '수', '목', '금', '토', '일'].map(d => '<span class="' + (요일.indexOf(d) >= 0 ? 'on' : '') + '">' + d + '<i>' + (요일.indexOf(d) >= 0 ? '✓' : '') + '</i></span>').join('') + '</span><span class="pz-x">시간대 ' + 칸(ik.timeTxt || '', '', 1) + '</span></div>')
+    + 판('나의 식습관', '보통 무엇을 언제 드시는지 · 음주는 일주일에 몇 번, 얼마나', '<div class="pz-g2">' + ['아침', '점심', '저녁', '간식', '영양제', '음주'].map(k => 줄(k, 칸(식[k] || '', '', 1))).join('') + '</div>')
+    + '<div class="pz-g2 pz-last">' + 판('회원님이 원하는 것', '여러 개 표시해도 됩니다', '<div class="pz-v pz-col">' + 여럿('goals') + '</div>')
+      + 판('메모', '구체적인 내용', '<div class="pz-memo">' + esc(ik.needs || '') + '</div>' + (트 && ik.notes ? '<div class="pz-note"><small>특이사항 · 트레이너만 봅니다</small>' + esc(ik.notes) + '</div>' : '')) + '</div>'
+    + '</div>';
+}
 function vIntake(){
   const mid=subj(), d=D.intake[mid]||{}, tr=(S.who==='tr');
   let 빈 = 0;
@@ -10218,24 +10283,10 @@ function vIntake(){
     return `<span class="lbl">${제목}</span><div class="megrp ikg">${찬.map(p=>`<div class="mrow2"><span class="ikk">${esc(p[0])}</span><span class="ikv">${esc(p[1])}</span></div>`).join('')}</div>`; };
   const 나이 = ageFrom(d.birth), 식 = Object.entries(d.meals||{});
   const 몸 = `${상담작성카드(d, tr)}
-    <div class="sstat3">
-      <div><span class="k">나이</span><span class="v">${나이 || '—'}<small>${나이 ? '세' : ''}</small></span></div>
-      <div><span class="k">신장</span><span class="v">${esc(String(d.height||'—').replace(/cm/i,''))}<small>${d.height ? 'cm' : ''}</small></span></div>
-      <div class="t"><span class="k">성별</span><span class="v cyv" style="font-size:22px;padding-top:2px">${esc(d.sex||'—')}</span></div>
-    </div>
     ${tr ?`<button class="hline gold" data-act="editintake:${mid}">${svg('h_note',18)}<b>PT 상담일지 작성 · 수정</b><small>눌러서 입력</small></button>`:''}
     ${tr ? `<button class="hline" data-act="scanpaper:${mid}">${svg('h_note',18)}<b>종이 상담지 올리기</b><small>찍거나 앨범에서 · 읽어서 채워요</small></button>` : ''}
-    ${묶음('기본', [['생년월일', d.birth ? (birthYmd(d.birth)||d.birth) : ''], ['직업', d.job], ['직업환경', d.jobenv], ['교대근무', d.shift]])}
-    ${(d.route||[]).length ? `<span class="lbl">글래드짐을 알게 된 경로</span><div class="chips">${d.route.map(x=>`<span class="chip on">${esc(x)}</span>`).join('')}</div>` : (빈++, '')}
-    ${묶음('운동 · 생활', [['경험한 운동', [(d.exprs||[]).join(', '), d.expr].filter(Boolean).join(' · ')], ['스트레스 요인', d.stress], ['스트레스 강도', d.stressLv], ['해소 방법', (d.relief||[]).join(', ')], ['평소 활동량', d.act], ['취침 시간', (d.meals||{})['취침']], ['하루 평균 수면', d.sleepH]])}
-    ${묶음('건강 상태', [['현재 겪는 것', (d.cond||[]).join(', ')], ['과거 병력·질환', (d.hist||[]).join(', ')], ['그 밖의 병력', d.histEtc]])}
-    ${((d.time||[]).length || d.timeTxt) ? `<span class="lbl">운동 가능 시간</span>
-      <div class="ikdays">${['월','화','수','목','금','토','일'].map(x=>`<span class="${(d.time||[]).includes(x)?'on':''}">${x}</span>`).join('')}</div>
-      ${d.timeTxt ? `<div class="cyfoot"><span>${esc(d.timeTxt)}</span></div>` : ''}` : (빈++, '')}
-    ${묶음('나의 식습관', MEAL_KEYS.filter(k => k !== '취침').map(k => [k, (d.meals||{})[k]]).concat(식.filter(p => !MEAL_KEYS.includes(p[0]))))}
-    ${((d.goals||[]).length || d.needs) ? `<span class="lbl">회원님이 원하는 것</span>${(d.goals||[]).length ? `<div class="chips">${d.goals.map(x=>`<span class="chip on">${esc(x)}</span>`).join('')}</div>` : ''}${d.needs ? `<div class="megrp ikg"><div class="mrow2"><span class="ikv">${esc(d.needs)}</span></div></div>` : ''}` : (빈++, '')}
-    ${tr && d.notes ? `<span class="lbl">특이사항 · 트레이너만 봅니다</span><div class="megrp ikg t"><div class="mrow2"><span class="ikv">${esc(d.notes)}</span></div></div>` : ''}`;
-  return { top: bar('PT 상담일지', `<span class="sub">${esc(subjName())}</span>`, tr?'tm:'+mid:'tab:me'), body: 몸 + (빈 && 상담작성(d).n > 3 && 상담작성(d).빈.length      /* 「아직 작성 전」(3항목 이하)일 땐 위 카드와 겹친다 · 숫자는 카드와 같은 셈으로 (2026-10-20) */
+    ${상담지종이(d, { name: subjName(), trainer: (MEMBERS.find(m => m.id === mid) || {}).tr || '' }, tr, true)}      ${''/* 종이 상담지 그대로 — 데스크와 같은 그림 (2026-10-24 00:47 대표 「종이로」 · 결정함 c1) */}`;
+  return { top: bar('PT 상담일지', `<span class="sub">${esc(subjName())}</span>`, tr?'tm:'+mid:'tab:me'), body: 몸 + (상담작성(d).n > 3 && 상담작성(d).빈.length      /* 「아직 작성 전」(3항목 이하)일 땐 위 카드와 겹친다 · 숫자는 카드와 같은 셈으로 (2026-10-20) */
     ? (tr ? `<button class="hline" data-act="editintake:${mid}">${svg('h_note',18)}<b>입력 안 한 항목 ${상담작성(d).빈.length}개</b><small>눌러서 채우기</small></button>`
           : '')
     : '') };
