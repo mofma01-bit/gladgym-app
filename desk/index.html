@@ -1223,6 +1223,11 @@ body.resizing{cursor:col-resize;user-select:none}
 .tx-vsr span{flex:1;min-width:0}.tx-vsr small{display:block;font-size:13px;color:#8f887e}.tx-vsr em{font-style:normal;font-size:13px;color:#9a938a;white-space:nowrap}.tx-vsr.off{opacity:.55}
 .tx-vsr.tog.on em{color:var(--gold);font-weight:800}.tx-vsl{border-top:1px solid var(--line);margin:6px 0}.tx-vsn{font-size:13px;color:#a9d8e6;padding:8px 10px 2px}
 .tx-vfix{font-style:normal;font-size:12px;margin-left:4px}.tx-fixnote{font-size:13px;color:#a9d8e6;font-weight:700;padding:0 4px}
+#txmask{position:fixed;inset:0;z-index:94;background:rgba(6,6,5,.66)}
+.tx-pop.tx-mid{left:50%;top:50%;transform:translate(-50%,-50%);max-height:88vh;padding:16px 18px;border-radius:16px}
+.tx-mid .tx-ph b{font-size:17px}.tx-mid .cl-ed{gap:14px}.tx-mid .cl-ed label,.tx-mid .cl-ed .cl-lb{display:grid;gap:6px;font-size:14px;color:#c9c1b2;font-weight:700}
+.tx-mid .inp{height:42px;font-size:15px}.tx-mid .cl-days{gap:6px}.tx-mid .cl-days button{min-width:44px;height:40px;padding:0 12px;font-size:14px;border-radius:10px}
+.tx-mid .btn.gold{height:46px;font-size:15px}.tx-mid .cl-ed small{font-weight:500;color:#8f887e;font-size:13px}
 .tx-pop{position:fixed;z-index:95;background:var(--dark-2);border:1px solid var(--line);border-radius:12px;
   padding:6px;box-shadow:0 14px 34px rgba(0,0,0,.55);max-height:360px;overflow-y:auto;overflow-x:hidden;
   overscroll-behavior:contain}
@@ -1734,7 +1739,7 @@ body{word-break:keep-all}
 .cl-its{display:flex;flex-direction:column;gap:4px;margin:8px 0 4px}.cl-it{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:9px;background:var(--dark-3);border:1px solid var(--line);font-size:14px}
 .cl-qs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}.cl-qs button{border:1px solid var(--line);background:var(--dark-3);border-radius:999px;padding:6px 12px;font-size:13.5px;font-weight:700;color:var(--cream)}
 .cl-qs button.on{background:#f2e3c6;color:#1b1813;border-color:#f2e3c6}
-.cl-offt{margin-left:auto;font-size:13px;color:var(--sub)}.cl-offt b{color:#e8c08f}.cl-offed{display:grid;gap:6px;font-size:13px}.cl-cov{display:grid;gap:4px}
+.cl-offt{font-size:13px;color:var(--sub);white-space:nowrap;flex:none}.cl-offt b{color:#e8c08f}.cl-offed{display:grid;gap:6px;font-size:13px}.cl-cov{display:grid;gap:4px}
 .cl-zh{flex-wrap:wrap;gap:6px}.cl-zh>.cl-tm{margin-left:0}.cl-kd{font-style:normal;font-size:13px;color:var(--sub);border:1px solid var(--line);border-radius:6px;padding:0 6px}
 .cl-mv{display:inline-flex;align-items:center;gap:5px;margin-left:auto;border:1px solid #5a4a30;background:#2a2318;border-radius:999px;padding:2px 8px}.cl-mv i,.cl-chg i{font-style:normal;color:#e8c08f;font-weight:800}
 .cl-same{margin-left:auto;font-size:13px;color:var(--sub)}.cl-zd{font-size:13px;color:var(--sub);margin:2px 0 4px}
@@ -2326,7 +2331,7 @@ body{word-break:keep-all}
 
 <script>
 "use strict";
-const BUILD = '382';
+const BUILD = '383';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -7169,10 +7174,7 @@ function 청소배정(d, 월){
     쓸.forEach(z => { const p = 고름(당들.filter(s => !z.sex || s.sex === z.sex)) || 고름(당들); 줌(z, p, { 당직: true, 왜: p ? '' : '당직자 없음' }); if(p) 더(p, 구목[z.id].length); });
     return { 목, 결과, 당직: true, 대신들: [] }; }
   const 배 = 분기배정(분기of(d)), 출근 = 사람.filter(p => !청소쉼(p, d)), 대신들 = [];
-  /* 담당이 쉬는 날 「대신 안 함」 구역은 그날 통째로 뺀다 — 홈 · 누락 · 기록에도 안 나온다 (2026-10-23 대표 「대표 화장실 청소는 배분 안 해도」 · 결정함 k2) */
-  const 쉼뺌 = new Set(쓸.filter(z => z.off_mode === '건너뜀' && 찾(배[z.id]) && 청소쉼(찾(배[z.id]), d)).map(z => z.id));
-  for(let i = 목.length - 1; i >= 0; i--) if(쉼뺌.has(구역of[목[i].id].id)) 목.splice(i, 1);
-  const 쓸2 = 쓸.filter(z => !쉼뺌.has(z.id));
+  const 쓸2 = 쓸, 뺄 = new Set();      /* 담당이 쉬는 날 「건너뜀」 청소는 그날 뺀다 — 홈 · 누락 · 기록에도 안 나온다 (23:36 대표 「구역 전체가 아니라 청소 항목마다」) */
   쓸2.forEach(z => { const 원 = 찾(배[z.id]); if(원 && !청소쉼(원, d)){ 줌(z, 원, { 대신: false }); 더(원, 구목[z.id].length); } });
   /* 담당이 쉬는 날 — 구역째 한 사람이 아니라 청소 하나씩 골고루 (2026-10-23 23:18 대표 「한 사람에게 넘어가는 게 아니라 골고루 · 1개씩 분배 ·
      항목이 적어서 한 사람이 안 받으면 다음 차례 때 우선 · 연속으로 2~3일 쉬면 순차적으로 돌게」 · 22:21 세트 규칙을 바꿈)
@@ -7182,12 +7184,14 @@ function 청소배정(d, 월){
   쓸2.forEach(z => { if(결과[구목[z.id][0].id]) return; const 원 = 찾(배[z.id]) || null;
     if(!원){ 줌(z, null, { 대신: false, 원, 왜: '담당 없음' }); return; }
     /* 먼저 받을 사람을 정한 구역은 그 사람들이 다 없으면 다른 선생님(성별 상관없이 · FC 빼고 — 저녁에만 나옴) (2026-10-23 23:22 대표 「영림쌤 청소도 분배는 되게 · FC 는 저녁에만 나오니까 · 우선순위 분배」) */
-    /* 23:24 대표 「먼저 받는 사람 양인수 → off 면 조민철 → off 면 또 누군가가 받는다」 — 먼저 받을 사람은 고른 차례대로 첫 출근자 한 사람이 그 구역을 받는다 */
-    const 먼저 = (z.cover || []).map(찾).filter(s => s && !청소쉼(s, d)),
-      후보 = 먼저.length ? [먼저[0]] : (z.cover || []).length ? 출근.filter(s => 등급of(s) !== 'FC') : 출근.filter(s => !z.sex || s.sex === z.sex);
-    구목[z.id].forEach(x => { const p = 차례(후보);
+    /* 23:24 대표 「먼저 받는 사람 양인수 → off 면 조민철 → off 면 또 누군가가 받는다」 · 23:36 「청소 항목마다」 — 그 청소의 먼저 받을 사람 중 차례대로 첫 출근자 · 다 쉬면 다른 선생님(FC 빼고) */
+    구목[z.id].forEach(x => { if(x.off_mode === '건너뜀'){ 뺄.add(x.id); return; }
+      const cv = x.cover || [], 먼저 = cv.map(찾).filter(s => s && !청소쉼(s, d)),
+        후보 = 먼저.length ? [먼저[0]] : cv.length ? 출근.filter(s => 등급of(s) !== 'FC') : 출근.filter(s => !z.sex || s.sex === z.sex);
+      const p = 차례(후보);
       결과[x.id] = { p, 구역: z, 대신: !!p, 원, 왜: p ? '' : z.sex ? z.sex + '자 선생님 중 출근자 없음' : '출근자 없음' };
       if(p){ 받음[p.id] = (받음[p.id] || 0) + 1; 더(p, 1); 대신들.push(p.id); } }); });
+  for(let i = 목.length - 1; i >= 0; i--) if(뺄.has(목[i].id)) 목.splice(i, 1);
   return { 목, 결과, 대신들 };
 }
 const 청소체크of = (id, d) => 청소.기록.find(r => r.clean_id === id && r.day === d);
@@ -7282,12 +7286,13 @@ function 청소관리판(){
   const 순 = 청소.순서;
   const 청소줄 = (x, zid) => 순 && 순.zid === zid ? '<div class="cl-it"><span class="t">' + 청소글(x) + '</span><span class="bp-act"><button class="btn ghost sm" data-act="tx:clmv" data-k="-1" data-v2="' + esc(x.id) + '" title="위로">▲</button><button class="btn ghost sm" data-act="tx:clmv" data-k="1" data-v2="' + esc(x.id) + '" title="아래로">▼</button></span></div>'
     : '<div class="cl-it"><span class="t">' + 청소글(x) + '</span><span class="d">' + ((x.days || []).length ? '<em class="cl-dy">' + esc(x.days.join(' · ')) + '</em>' : '') + esc(x.how || '') + '</span>'
+    + (x.off_mode === '건너뜀' ? '<span class="cl-offt">쉬면 <b>건너뜀</b></span>' : (x.cover || []).length ? '<span class="cl-offt">쉬면 <b>' + esc(x.cover.map(id => { const p = (W.staff || []).find(s => s.id === id); return p ? 보임이름(p.name) : ''; }).filter(Boolean).join(' → ')) + '</b></span>' : '')      /* 담당이 쉬는 날 — 항목마다 */
     + (!미리 && 청소체크of(x.id, TODAY) ? '<span class="cl-tk">✓ 오늘</span>' : '')
     + (고칠 ? '<span class="bp-act"><button class="btn ghost sm" data-act="tx:clmove" data-v2="' + esc(x.id) + '">옮기기</button><button class="btn ghost sm" data-act="tx:cledit" data-v2="' + esc(x.id) + '">수정</button><button class="btn ghost sm" data-act="tx:cloff" data-v2="' + esc(x.id) + '">삭제</button></span>' : '') + '</div>';
   const 딱 = id => id ? 이름딱지(id) : '<span class="sub3">담당 없음</span>';
   const 구줄 = z => { const 옮김 = 미리 && z.kind === '순환' && (지금배[z.id] || null) !== (배[z.id] || null);
     return '<div class="bp-row2"><div class="a cl-zh">' + (z.kind !== '당직' ? 딱(배[z.id]) : '') + (z.slot ? 청소시각(z.slot) : '') + '<b>' + 시간칠(z.name) + '</b>' + (z.sex ? '<em class="bp-st">' + esc(z.sex) + '</em>' : '') + (z.kind !== '당직' ? '<em class="cl-kd">' + 구역종류글[z.kind] + '</em>' : '')
-    + (!미리 && z.kind !== '당직' ? (z.off_mode === '건너뜀' ? '<span class="cl-offt">쉬면 <b>건너뜀</b></span>' : (z.cover || []).length ? '<span class="cl-offt">쉬면 <b>' + esc(z.cover.map(id => { const p = (W.staff || []).find(s => s.id === id); return p ? 보임이름(p.name) : ''; }).filter(Boolean).join(' → ')) + '</b> → 다른 선생님</span>' : '') : '')
+
     + (옮김 ? '<span class="cl-mv">' + 딱(지금배[z.id]) + '<i>→</i>' + 딱(배[z.id]) + '</span>' : 미리 && z.kind !== '당직' ? '<span class="cl-same">그대로</span>' : '') + '</div>'
     + (z.memo ? '<div class="cl-zd">' + esc(z.memo) + '</div>' : '')
     + '<div class="cl-its">' + (할일들(z).length ? 할일들(z).map(x => 청소줄(x, z.id)).join('') : '<div class="sub3">아직 청소가 없어요</div>') + '</div>'
@@ -7322,18 +7327,27 @@ const 청소편 = { days: [], items: [], kind: '순환', id: '', el: null };
 /* 할 일 — 이름 · 시각 · 요일 · 하는 방법 (누가 하는지는 구역이 정한다) */
 function 청소수정창(el, id, 구역){
   const x = 할일of(id) || { title:'', slot:'', days:[], how:'' }; 청소편.days = (x.days || []).slice(); 청소편.zone = 구역 || '';
-  const z = 구역 && (청소.구역 || []).find(y => y.id === 구역);
-  쪽지열기(el, '<div class="tx-ph"><b>' + (id ? '청소 수정' : (z ? esc(z.name || '') + ' · ' : '') + '청소 추가') + '</b><button data-act="popclose">✕</button></div><div class="cl-ed">'
+  청소편.off = x.off_mode || ''; 청소편.cover = (x.cover || []).slice();
+  const z = 구역 && (청소.구역 || []).find(y => y.id === 구역), 쉬는칸 = (청소.목 || []).some(y => 'off_mode' in y);      /* 58단계 SQL 뒤에만 */
+  가운데창('<div class="tx-ph"><b>' + (id ? '청소 수정' : (z ? esc(z.name || '') + ' · ' : '') + '청소 추가') + '</b><button data-act="popclose">✕</button></div><div class="cl-ed">'
     + '<label>청소<input class="inp" id="clt" value="' + esc(x.title || '') + '" placeholder="여자 탈의실 정리"></label>'
-    + '<label>시각<input class="inp" id="cls" value="' + esc(x.slot || '') + '" placeholder="14시 · 마감 · 비우면 아무 때"></label>'
-    + '<label>요일 <span class="sub3">안 고르면 매일</span><span class="cl-days">' + ['월', '화', '수', '목', '금', '토', '일'].map(d => '<button data-act="tx:clday" data-v2="' + d + '" class="' + (청소편.days.indexOf(d) >= 0 ? 'on' : '') + '">' + d + '</button>').join('') + '</span></label>'
-    + '<label>설명 <span class="sub3">홈 체크 줄 아래에 작게 보여요</span><input class="inp" id="clh" value="' + esc(x.how || '') + '" placeholder="포대 정리 · 비품 보충"></label>'
-    + '<button class="btn gold sm" data-act="tx:clsave" data-v2="' + esc(id || '') + '">저장</button></div>', 300);
+    + '<label>시각<input class="inp" id="cls" value="' + esc(x.slot || '') + '" placeholder="14시 · 마감"></label>'
+    + '<div class="cl-lb">요일 <small>비우면 매일</small><span class="cl-days">' + ['월', '화', '수', '목', '금', '토', '일'].map(d => '<button data-act="tx:clday" data-v2="' + d + '" class="' + (청소편.days.indexOf(d) >= 0 ? 'on' : '') + '">' + d + '</button>').join('') + '</span></div>'
+    + '<label>설명<input class="inp" id="clh" value="' + esc(x.how || '') + '" placeholder="포대 정리 · 비품 보충"></label>'
+    + (쉬는칸 ? 청소쉬는칸() : '')
+    + '<button class="btn gold sm" data-act="tx:clsave" data-v2="' + esc(id || '') + '">저장</button></div>', 440);
+}
+/* 담당이 쉬는 날 — 청소 항목마다 (2026-10-23 23:36 대표 「구역 전체가 아니라 청소 항목마다」) · 대신(먼저 받을 사람 차례 → 다른 선생님) / 건너뜀 */
+function 청소쉬는칸(){
+  return '<div class="cl-lb">담당이 쉬는 날<span class="cl-days"><button data-act="tx:clzom" data-v2="" class="' + (청소편.off !== '건너뜀' ? 'on' : '') + '">다른 선생님이 대신</button><button data-act="tx:clzom" data-v2="건너뜀" class="' + (청소편.off === '건너뜀' ? 'on' : '') + '">건너뜀</button></span></div>'
+    + '<div class="cl-lb cl-cov"' + (청소편.off === '건너뜀' ? ' style="display:none"' : '') + '>먼저 받을 사람 <small>누른 차례대로</small><span class="cl-days">'
+    + 청소사람().map(p => { const i = 청소편.cover.indexOf(p.id); return '<button data-act="tx:clzcov" data-v2="' + esc(p.id) + '" data-n="' + esc(보임이름(p.name)) + '" class="' + (i >= 0 ? 'on' : '') + '">' + (i >= 0 ? (i + 1) + ' ' : '') + esc(보임이름(p.name)) + '</button>'; }).join('') + '</span></div>';
 }
 async function 청소저장(id){
   const v = k => (($('#' + k) || {}).value || '').trim(), 제목 = v('clt');
   if(!제목) return toast('청소를 입력해 주세요');
   const 몸 = { title: 제목, slot: v('cls'), days: 청소편.days.slice(), how: v('clh') };
+  if($('#txpop .cl-cov')){ 몸.off_mode = 청소편.off || null; 몸.cover = 청소편.off === '건너뜀' || !청소편.cover.length ? null : 청소편.cover.slice(); }      /* 담당이 쉬는 날 (항목마다 · 58단계) */
   const 구역 = !id && 청소편.zone ? (청소.구역 || []).find(y => y.id === 청소편.zone) : null;
   if(!await 묻기(id ? '「' + 제목 + '」을 이대로 수정할까요?' : 구역 ? '「' + (구역.name || '') + '」에 「' + 제목 + '」을 추가할까요?' : '「' + 제목 + '」을 추가할까요?')) return;
   쪽지닫기();
@@ -7386,25 +7400,19 @@ async function 청소옮김(id, zid){
 function 구역창(el, id, 초안){
   const 원 = (청소.구역 || []).find(z => z.id === id), z = 초안 || 원 || { name:'', kind:'순환', sex:null, items:[] };      /* 「＋ 구역 추가」는 고정 / 순환 칸에서 그 종류로 (2026-10-22) */
   if(!초안) 청소편.items = (z.items || []).slice(); 청소편.kind = z.kind || '순환'; 청소편.id = id || ''; 청소편.el = el;
-  청소편.off = z.off_mode || ''; 청소편.cover = (z.cover || []).slice();
   const 켜 = (청소.목 || []).filter(x => x.active !== false);
-  쪽지열기(el, '<div class="tx-ph"><b>' + (id ? '구역 수정' : '구역 추가') + '</b><button data-act="popclose">✕</button></div><div class="cl-ed">'
+  가운데창('<div class="tx-ph"><b>' + (id ? '구역 수정' : '구역 추가') + '</b><button data-act="popclose">✕</button></div><div class="cl-ed">'
     + '<label>이름<input class="inp" id="clzn" value="' + esc(z.name || '') + '" placeholder="A구역"></label>'
-    + ((청소.구역 || []).some(y => 'slot' in y) ? '<label>시간 <span class="sub3">비우면 아무 때 · 이름 앞 파란 딱지</span><input class="inp" id="clzs" value="' + esc(z.slot || '') + '" placeholder="15~16시"></label>' : '')
-    + ((청소.구역 || []).some(y => 'off_mode' in y) && z.kind !== '당직' ? '<div class="cl-offed"><span class="sub3">담당이 쉬는 날</span><span class="cl-days">'
-      + '<button data-act="tx:clzom" data-v2="" class="' + (청소편.off !== '건너뜀' ? 'on' : '') + '">다른 선생님이 대신</button><button data-act="tx:clzom" data-v2="건너뜀" class="' + (청소편.off === '건너뜀' ? 'on' : '') + '">대신 안 함 · 그날 건너뜀</button></span>'
-      + '<div class="cl-cov"' + (청소편.off === '건너뜀' ? ' style="display:none"' : '') + '><span class="sub3">먼저 받을 사람 · 누른 차례대로 · 다 쉬면 다른 선생님(FC 빼고)</span><span class="cl-days">'
-      + 청소사람().map(p => { const i = 청소편.cover.indexOf(p.id); return '<button data-act="tx:clzcov" data-v2="' + esc(p.id) + '" data-n="' + esc(보임이름(p.name)) + '" class="' + (i >= 0 ? 'on' : '') + '">' + (i >= 0 ? (i + 1) + ' ' : '') + esc(보임이름(p.name)) + '</button>'; }).join('') + '</span></div></div>' : '')
-    + ((청소.구역 || []).some(y => 'memo' in y) ? '<label>설명 <span class="sub3">구역 이름 아래 작게 보여요</span><input class="inp" id="clzd" value="' + esc(z.memo || '') + '" placeholder="쉬는 날은 출근한 여자 선생님에게"></label>' : '')
-    + '<label>종류<span class="cl-days">' + ['순환', '고정', '당직'].map(k => '<button data-act="tx:clzk" data-v2="' + k + '" class="' + (청소편.kind === k ? 'on' : '') + '" style="min-width:76px">' + 구역종류글[k] + '</button>').join('') + '</span></label>'
-    + '<label>성별 <span class="sub3">탈의실처럼 성별이 있는 구역</span><select class="inp" id="clzx"><option value="">아무나</option><option value="남"' + (z.sex === '남' ? ' selected' : '') + '>남자 선생님만</option><option value="여"' + (z.sex === '여' ? ' selected' : '') + '>여자 선생님만</option></select></label>'
-    + '<div style="display:flex;gap:6px">' + (id ? '<button class="btn ghost sm" data-act="tx:clzoff" data-v2="' + esc(id) + '">구역 삭제</button>' : '') + '<button class="btn gold sm" style="flex:1" data-act="tx:clzsave" data-v2="' + esc(id || '') + '">저장</button></div></div>', 340);
+    + ((청소.구역 || []).some(y => 'slot' in y) ? '<label>시간<input class="inp" id="clzs" value="' + esc(z.slot || '') + '" placeholder="15~16시"></label>' : '')
+    + ((청소.구역 || []).some(y => 'memo' in y) ? '<label>설명<input class="inp" id="clzd" value="' + esc(z.memo || '') + '" placeholder="한 줄 안내"></label>' : '')
+    + '<div class="cl-lb">종류<span class="cl-days">' + ['순환', '고정', '당직'].map(k => '<button data-act="tx:clzk" data-v2="' + k + '" class="' + (청소편.kind === k ? 'on' : '') + '" style="min-width:76px">' + 구역종류글[k] + '</button>').join('') + '</span></div>'
+    + '<label>성별<select class="inp" id="clzx"><option value="">아무나</option><option value="남"' + (z.sex === '남' ? ' selected' : '') + '>남자 선생님만</option><option value="여"' + (z.sex === '여' ? ' selected' : '') + '>여자 선생님만</option></select></label>'
+    + '<div style="display:flex;gap:6px">' + (id ? '<button class="btn ghost sm" data-act="tx:clzoff" data-v2="' + esc(id) + '">구역 삭제</button>' : '') + '<button class="btn gold sm" style="flex:1" data-act="tx:clzsave" data-v2="' + esc(id || '') + '">저장</button></div></div>', 440);
 }
 async function 구역저장(id){
   const 이름 = (($('#clzn') || {}).value || '').trim(); if(!이름) return toast('구역 이름을 입력해 주세요');
   const 몸 = { name: 이름, kind: 청소편.kind, sex: (($('#clzx') || {}).value || '') || null, items: 청소편.items.slice() };
   if($('#clzd')) 몸.memo = ($('#clzd').value || '').trim() || null;
-  if($('#txpop .cl-offed')){ 몸.off_mode = 청소편.off || null; 몸.cover = 청소편.off === '건너뜀' || !청소편.cover.length ? null : 청소편.cover.slice(); }      /* 담당이 쉬는 날 (결정함 k2) */
   if($('#clzs')) 몸.slot = ($('#clzs').value || '').trim() || null;      /* 구역 시간 (57단계 · 22:48 대표 「이름과 시간, 설명도 다 수정」) */      /* 57단계 SQL(구역 설명) 뒤에만 칸이 있다 */
   if(!await 묻기((id ? '「' + 이름 + '」 구역을 이대로 수정할까요?' : '「' + 이름 + '」 ' + 구역종류글[몸.kind] + ' 구역을 추가할까요?'))) return;
   쪽지닫기();
@@ -9994,6 +10002,7 @@ let 쪽지끝 = null;
 function 쪽지닫기(){
   const f = 쪽지끝; 쪽지끝 = null;
   const d = $('#txpop'); if(d) d.remove();
+  const m = $('#txmask'); if(m) m.remove();
   if(f) f();
 }
 /* ⛔ 자리는 「속을 채운 뒤에」 다시 잡아야 한다 —
@@ -10021,6 +10030,15 @@ function 쪽지열기(el, html, w){
   document.body.appendChild(d);
   d.자리 = () => 쪽지자리(d, el);
   d.자리();
+  return d;
+}
+/* 가운데 창 — 뒤를 어둡게 깔아 그 창에만 집중 (2026-10-23 23:36 대표 「가운데 팝업 · 다른 페이지는 어둡게 깔아서 집중」) · 바깥(어두운 곳)을 누르면 닫힘 */
+function 가운데창(html, w){
+  쪽지닫기();
+  const m = document.createElement('div'); m.id = 'txmask'; document.body.appendChild(m);
+  const d = document.createElement('div'); d.className = 'tx-pop tx-mid'; d.id = 'txpop';
+  d.style.width = 'min(' + (w || 420) + 'px, 94vw)'; d.innerHTML = html;
+  document.body.appendChild(d); d.자리 = () => {};
   return d;
 }
 function 쪽지입력(el, 값, 종류, 확정){
