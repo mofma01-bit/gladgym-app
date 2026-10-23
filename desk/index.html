@@ -1882,6 +1882,7 @@ body{word-break:keep-all}
 .as-tab{background:none;border:0;color:var(--sub);font:inherit;font-size:15px;font-weight:800;padding:9px 14px;cursor:pointer;border-bottom:2px solid transparent}
 .as-tab.on{color:var(--gold);border-bottom-color:var(--gold)}.as-tab b{font-size:13px;margin-left:5px;color:var(--cream)}
 .as-q{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
+.rsbtns{display:flex;gap:6px;flex:none}
 .as-stop{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 10px;font-size:14px}.as-stop:empty{display:none}
 .as-send{display:flex;align-items:center;gap:10px;margin-top:10px}
 .as-qc{background:var(--dark-2);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;min-height:260px}
@@ -2307,7 +2308,7 @@ body{word-break:keep-all}
 
 <script>
 "use strict";
-const BUILD = '372';
+const BUILD = '373';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -7487,7 +7488,7 @@ const 매확CRM결과 = o => { const c = o['crm'] || (o['메모'] && o['메모']
 /* 신규 · 재등록 작은 칸 — 신규만 살짝 밝게 */
 const 매확등록칸 = v => v === '신규' || v === '재등록' ? '<span class="sc-reg' + (v === '신규' ? ' new' : '') + '">' + v + '</span>' : '';
 function 매확상품줄(o){
-  const 등 = o['등록'] || {}, ps = o['상품'] || [], 이름 = ps.map(p => p['이름'] || '').filter(Boolean).join(' + ') || (o['미수수납'] ? '미수금 수납' : '');
+  const 등 = o['등록'] || {}, ps = o['상품'] || [], 이름 = 상품묶음(ps) || (o['미수수납'] ? '미수금 수납' : '');
   const 등글 = (o['갈래'] || []).indexOf('PT') >= 0 && 등.PT ? 등.PT : 등.FC && ps.some(p => /회원권/.test(p['이름'] || '')) ? 등.FC : '';
   return '<div class="sc-r2"><b>' + esc(이름) + '</b>' + 매확등록칸(등글) + ' · ' + 매확때(o['때']) + ' · ' + esc(o['판매자'] || '—') + '</div>'; }
 /* ── TG메모 양식 ── 열쇠 = 결제 'p'+id · 따로 발급 't'+주문 */
@@ -7637,6 +7638,9 @@ function 매확팝업(강제){
     + '<div class="ps-foot">' + (lk.length ? '<button class="btn ghost" data-act="tx:scstep" data-k="락커">이전</button>' : '') + '<button class="btn ghost" data-act="tx:sclater">나중에</button><button class="btn main" data-act="tx:sclist">확인할 매출 보기</button></div></div>');
 }
 /* 목록 판 */
+/* 한 결제에 같은 상품이 여러 줄이면 「PT 30회 × 2」 — 이어 붙이면 「PT 30회 + … + PT 30회」로 두 번 보였다 (2026-10-23 대표 「이거 왜 이래?」) */
+const 상품묶음 = ps => { const 셈 = new Map(); (ps || []).forEach(p => { const n = String((p && p['이름']) || '').trim(); if(n) 셈.set(n, (셈.get(n) || 0) + 1); });
+  return [...셈].map(([n, c]) => c > 1 ? n + ' × ' + c : n).join(' + '); };
 function 매확판(){
   if(!매확.답){ 판열기('확인할 매출', '<div class="empty why"><b>' + (매확.없음 ? '확인할 매출을 불러오지 못했습니다' : '불러오는 중이에요') + '</b>' + (매확.없음 ? '잠시 뒤 다시 열어 주세요' : '') + '</div>'); if(!매확.중) 매확받기(); return; }
   const 칩에 = o => 매확.chip === '전체' || (o['갈래'] || []).indexOf(매확.chip) >= 0, 결 = 매확결제().filter(칩에), TG = 매확.chip === 'PT' ? [] : 매확TG만();
@@ -8305,7 +8309,7 @@ function vReports(){
       + '<div class="t2" style="margin-top:2px;opacity:.75">요청 ' + 때(r.queued_at) + ' · ' + 꼬리
         + (r.tried > 1 ? ' · ' + r.tried + '번 시도' : '') + '</div></div>'
       + (발송실패(r)
-          ? '<button class="btn sub sm" data-act="tx:rsretry" data-i="' + esc(r.id) + '">다시 보내기</button>'
+          ? '<span class="rsbtns"><button class="btn ghost sm" data-act="tx:rsdel" data-i="' + esc(r.id) + '">삭제</button><button class="btn sub sm" data-act="tx:rsretry" data-i="' + esc(r.id) + '">다시 보내기</button></span>'
           : '')
       + '</div>';
   };
@@ -11301,7 +11305,7 @@ function 현황판그리기(){
       + '<div class="t2">' + esc(r.lesson_date || '') + ' · ' + esc(r.summary || '') + '</div>'
       + '<div class="t2" style="color:var(--warn);margin-top:3px">' + esc(r.fail_why || '왜인지 안 적혔어요')
         + (r.tried ? ' · ' + r.tried + '번 해 봄' : '') + '</div></div>'
-      + '<button class="btn gold sm" data-act="tx:rsretry" data-i="' + esc(r.id) + '">다시 보내기</button></div>').join('');
+      + '<span class="rsbtns"><button class="btn ghost sm" data-act="tx:rsdel" data-i="' + esc(r.id) + '">삭제</button><button class="btn gold sm" data-act="tx:rsretry" data-i="' + esc(r.id) + '">다시 보내기</button></span></div>').join('');
 
   /* 연월차 승인 대기 — ⛔ 앞서는 승인 단추가 없어 줄을 열고 「속성」까지 들어가야 했다 */
   else if(k === '연월차') 속 = 목.map(r =>
@@ -12100,6 +12104,13 @@ async function txAct(a, el){
        게다가 여기 없는 `act` 를 봐서, 눌러도 아무 일도 안 나고 오류도 안 났다 (2026-09-29에 살림) */
   if(a==='rsteach'){ RS선생 = el.dataset.i || ''; render();
     const q = $('#rsq'); if(q){ q.focus(); q.setSelectionRange(q.value.length, q.value.length); }
+    return; }
+  if(a==='rsdel'){      /* 리포트 발송 실패 삭제 — 묻고 휴지통으로(되살리기 됨) · 2026-10-23 대표 「테스트 안 보내도 되는데 삭제가 없어 불편」 */
+    const id = el.dataset.i, r = RS.find(x => x.id === id); if(!r) return;
+    if(!await 묻기((r.member_name || '') + ' · ' + (r.lesson_date || '') + ' 리포트를 정말 삭제하시겠습니까?' + String.fromCharCode(10) + '보내지 않고 목록에서 뺍니다 · 휴지통에서 되살릴 수 있어요')) return;
+    try{ await 휴지통으로('report_sends', r, '수업 리포트 · ' + (r.member_name || '') + ' ' + (r.lesson_date || ''), ssend);
+      await 발송기록읽기(); toast('삭제했어요 · 휴지통에 있어요'); if(현황판) 현황판그리기(); render(); }
+    catch(e){ toast('삭제하지 못했어요 — ' + String(e.message || '').slice(0, 60)); }
     return; }
   if(a==='rsretry'){
     const id = el.dataset.i, r = RS.find(x=>x.id===id);
