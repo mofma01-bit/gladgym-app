@@ -2308,7 +2308,7 @@ body{word-break:keep-all}
 
 <script>
 "use strict";
-const BUILD = '373';
+const BUILD = '374';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -11631,11 +11631,17 @@ async function 배정출석열기(id){
 /* ── 가이드 신청 · 교체 요청 · 배정 정지 ── 2026-10-23 결정함 h1 · h3 · 56단계 */
 const 배정때 = t => { const d = new Date(t); return isNaN(d) ? '' : (d.getMonth() + 1) + '/' + d.getDate() + ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
 const 내가담당 = x => !!(ME && (x.trainers || []).includes(ME.name));
+const 목록 = v => Array.isArray(v) ? v.filter(Boolean).join(' · ') : (v ? String(v) : '');
+const 건강봄 = x => 할수('assignall') || 내가담당(x);      /* 건강은 민감정보 — 양식 동의 「담당 트레이너만 봅니다」 (2026-10-23 중앙 전달) */
 function 배정신청칸(x){
   const 설 = x.apply_survey || {}, 줄 = (이름, 값) => 값 ? '<div class="as-kv"><span>' + 이름 + '</span><b>' + 값 + '</b></div>' : '';
   const 신청 = x.apply_at ? '<div class="lbl" style="margin:14px 0 6px">신청 · ' + esc(배정때(x.apply_at)) + '</div><div class="as-kvs">'
       + 줄('희망 시간', esc((x.apply_times || []).join(' · '))) + 줄('운동 목적', esc((x.apply_goals || []).join(' · '))) + 줄('요청사항', esc(x.apply_req || ''))
-      + 줄('운동 경험', esc(설.exp || '')) + 줄('PT 경험', esc(설.pt || '')) + '</div>' : '';
+      + 줄('원하는 트레이너', esc(설.trainer || '')) + 줄('운동 기간', esc(설.exp || '')) + 줄('PT 경험', esc(설.pt || ''))
+      + 줄('PT 좋았던 점', esc(목록(설.pt_good))) + 줄('PT 아쉬웠던 점', esc(목록(설.pt_bad))) + 줄('받고 싶은 것', esc(목록(설.want))) + 줄('운동 성향', esc(목록(설.style)))
+      + 줄('해 본 운동', esc(목록(설.sports))) + 줄('알게 된 경로', esc(목록(설.route))) + 줄('운동 횟수', esc(설.days || '')) + 줄('연락 방법', esc(설.contact || ''))
+      + (건강봄(x) ? 줄('건강 · 불편한 곳', esc(목록(설.health)) + (설.health_ok ? ' <span class="sub3">동의 ' + esc(배정때(설.health_ok)) + '</span>' : '')) : (목록(설.health) ? 줄('건강 · 불편한 곳', '<span class="sub3">담당 트레이너 · 관리자만 봅니다</span>') : ''))
+      + '</div>' : '';
   const 보냄 = '<div class="as-send"><span class="sub3">' + (x.apply_sent_at ? '신청 링크 ' + esc(배정때(x.apply_sent_at)) + ' 보냄 · ' + (+x.apply_sent_n || 1) + '번' : '신청 링크를 아직 안 보냈어요') + '</span>'
       + (x.phone ? '<button class="as-btn g" data-act="tx:asresend" data-k="' + esc(x.id) + '">' + (x.apply_sent_at ? '다시 보내기' : '보내기') + '</button>' : '') + '</div>';
   const 교 = x.swap_at ? '<div class="note" style="margin-top:10px">담당 교체 요청 · ' + esc(x.swap_by || '') + ' · ' + esc(x.swap_why || '') + ' · ' + esc(배정때(x.swap_at)) + '</div>'
@@ -11685,7 +11691,9 @@ function 배정판(id){
 }
 function 배정담당판(id){
   const x = (배정.줄 || []).find(r => String(r.id) === String(id)); if(!x) return;
-  판열기(esc(x.name) + ' · 담당 정하기', '<div class="ck-act">담당 선생님을 골라 주세요<small>고르면 배정완료로 바뀌고 오늘이 배정한 날이 됩니다</small></div><div style="height:10px"></div>'
+  const 원함 = String(((x.apply_survey || {}).trainer) || '').trim();      /* 신청 양식 「원하는 트레이너」 — 배정할 때 참고 (2026-10-23 대표 21:13) */
+  판열기(esc(x.name) + ' · 담당 정하기', '<div class="ck-act">담당 선생님을 골라 주세요<small>고르면 배정완료로 바뀌고 오늘이 배정한 날이 됩니다</small></div>'
+    + (원함 ? '<div class="note" style="margin-top:8px">회원이 원하는 트레이너 · <b>' + esc(원함) + '</b></div>' : '') + '<div style="height:10px"></div>'
     + 배정고를선생().map(t => [t, 정지중().some(p => String(p.name || '').trim() === t)]).sort((a, b) => a[1] - b[1]).map(([t, 정]) => '<button class="card click rowc' + ((x.trainers || []).includes(t) ? ' gold' : '') + (정 ? ' dim' : '') + '" data-act="tx:asassign" data-k="' + esc(x.id) + '|' + esc(t) + '"><div><div class="t1">' + esc(t) + (정 ? ' <span class="as-tag">배정 정지</span>' : '') + '</div></div><span class="rt">›</span></button>').join(''));
 }
 function 배정추가판(){
