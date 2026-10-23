@@ -1885,6 +1885,11 @@ body{word-break:keep-all}
 .as-tab.on{color:var(--gold);border-bottom-color:var(--gold)}.as-tab b{font-size:13px;margin-left:5px;color:var(--cream)}
 .as-q{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
 .rsbtns{display:flex;gap:6px;flex:none}
+#apprec{position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.62);display:flex;align-items:center;justify-content:center}
+#apprec .ar-box{width:min(480px,96vw);height:94vh;background:#0f0f0e;border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+#apprec .ar-h{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line);font-size:15px}
+#apprec .ar-h small{color:var(--sub);font-size:13px}#apprec .ar-h button{margin-left:auto}
+#apprec iframe{flex:1;border:0;width:100%;background:#0f0f0e}
 .as-wait{font-size:13px;font-weight:700;color:var(--teal)}
 .as-stop{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 10px;font-size:14px}.as-stop:empty{display:none}
 .as-send{display:flex;align-items:center;gap:10px;margin-top:10px}
@@ -2311,7 +2316,7 @@ body{word-break:keep-all}
 
 <script>
 "use strict";
-const BUILD = '379';
+const BUILD = '380';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -7647,6 +7652,19 @@ function 매확팝업(강제){
 }
 /* 목록 판 */
 /* 한 결제에 같은 상품이 여러 줄이면 「PT 30회 × 2」 — 이어 붙이면 「PT 30회 + … + PT 30회」로 두 번 보였다 (2026-10-23 대표 「이거 왜 이래?」) */
+/* ══ 수업 기록 = 앱 기록 화면 그대로 ══ 2026-10-23 확정 C-2 「데스크도 앱 기록 화면 그대로」 — 데스크용을 따로 만들지 않고 가운데 큰 창에 앱을 띄운다(고칠 때 한 번만)
+   앱은 이 탭의 데스크 계정(sessionStorage)으로 메모리 로그인 · 마치면 앱이 알려 주고(postMessage gg:'deskrec') 데스크는 그 회원을 다시 받는다 */
+const 앱기록길 = () => /github\.io$/.test(location.hostname) ? '../index.html' : location.port === '8792' ? 'http://localhost:8791/' : '../웹앱/index.html';
+function 앱기록창(mid){
+  const m = (D.m || []).find(x => x.id === mid) || {}; 앱기록닫기();
+  const el = document.createElement('div'); el.id = 'apprec';
+  el.innerHTML = '<div class="ar-box"><div class="ar-h"><b>' + esc(m.name || '') + ' · 수업 기록</b><small>앱과 같은 화면이에요</small><button class="btn ghost sm" data-act="tx:arclose">✕ 닫기</button></div>'
+    + '<iframe title="수업 기록" src="' + 앱기록길() + '?desk=1&m=' + encodeURIComponent(mid) + '"></iframe></div>';
+  document.body.appendChild(el); }
+function 앱기록닫기(){ const el = document.getElementById('apprec'); if(el) el.remove(); }
+window.addEventListener('message', e => { const d = e.data || {}; if(d.gg !== 'deskrec') return;
+  if(e.origin !== location.origin && !/^http:\/\/localhost:\d+$/.test(e.origin)) return;
+  if(d.mid) loadMember(d.mid); toast('기록했어요'); });
 const 상품묶음 = ps => { const 셈 = new Map(); (ps || []).forEach(p => { const n = String((p && p['이름']) || '').trim(); if(n) 셈.set(n, (셈.get(n) || 0) + 1); });
   return [...셈].map(([n, c]) => c > 1 ? n + ' × ' + c : n).join(' + '); };
 function 매확판(){
@@ -12126,6 +12144,7 @@ async function txAct(a, el){
   if(a==='rsteach'){ RS선생 = el.dataset.i || ''; render();
     const q = $('#rsq'); if(q){ q.focus(); q.setSelectionRange(q.value.length, q.value.length); }
     return; }
+  if(a==='arclose'){ 앱기록닫기(); if(S.mid) loadMember(S.mid); return; }
   if(a==='rsdel'){      /* 리포트 발송 실패 삭제 — 묻고 휴지통으로(되살리기 됨) · 2026-10-23 대표 「테스트 안 보내도 되는데 삭제가 없어 불편」 */
     const id = el.dataset.i, r = RS.find(x => x.id === id); if(!r) return;
     if(!await 묻기((r.member_name || '') + ' · ' + (r.lesson_date || '') + ' 리포트를 정말 삭제하시겠습니까?' + String.fromCharCode(10) + '보내지 않고 목록에서 뺍니다 · 휴지통에서 되살릴 수 있어요')) return;
@@ -14337,6 +14356,7 @@ document.addEventListener('click', async function(ev){
   /* 달력 넘기기 */
   if(act.dataset.cal!==undefined){ }
   /* 오늘 운동 만들기 */
+  if(a==='wnew' && S.mid && AUTH && AUTH.token && (!S.wnewDate || S.wnewDate === TODAY)){ 앱기록창(S.mid); return; }      /* 오늘 기록 = 앱 기록 화면 그대로 (2026-10-23 확정 C-2) · 옛 길 로그인(서버 증표 없음)이면 옛 창 */
   if(a==='wnew'){
     const rs = D.r.filter(x=>x.member_id===S.mid).sort((a2,b)=>a2.no-b.no);
     popOpen('<h2>' + (S.wnewDate ? (+S.wnewDate.slice(5, 7)) + '/' + (+S.wnewDate.slice(8, 10)) + ' 수업 기록 만들기' : '오늘 운동 기록 만들기') + '</h2>'
