@@ -3120,7 +3120,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '446';
+const BUILD = '447';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -3263,7 +3263,16 @@ let D = { routines:[], desc:{}, addvars:{}, today:{}, workouts:[], cm:[], live:n
 let S = { who:null, mid:null, screen:'boot', tab:'home', pickPart:'가슴', pickEq:'전체', tmid:null,
           prepKind:'sm', prepSet:'office', prepTab:'common', prepRid:null, dayOpen:null };
 
-const LIVEKEY = 'gladgym_live_v1';
+/* ══ 데스크 안 수업 기록 ══ 2026-10-23 확정 C-2 「데스크도 앱 기록 화면 그대로」 — 데스크가 가운데 창에 이 앱을 ?desk=1&m=회원 으로 띄운다
+   로그인 = 데스크가 이 탭에 들고 있는 계정(sessionStorage gg_desk_accs · gg_desk_on · 같은 주소라 읽힌다)을 메모리로만 · 기기 기억(localStorage)엔 안 남긴다(공용 PC)
+   진행 중 기록도 따로 둔다(gladgym_live_desk) — 같은 PC 에서 앱을 열어도 섞이지 않게 · 마치면 데스크에 알린다(postMessage gg:'deskrec') */
+const 데스크끼움 = (() => { try{ const q = new URLSearchParams(location.search); if(q.get('desk') !== '1' || window.parent === window) return null;
+  const 목 = JSON.parse(sessionStorage.getItem('gg_desk_accs') || '[]') || [], on = sessionStorage.getItem('gg_desk_on') || '', a = 목.find(x => x && x.name === on) || null;
+  if(!a || !a.token) return null;
+  return { mid: q.get('m') || '', au: { token: a.token, who: a.who || 'trainer', name: a.name || '', sb: a.access_token || '', sbexp: Math.floor((+a.exp || 0) / 1000) } }; }catch(e){ return null; } })();
+if(데스크끼움) document.documentElement.classList.add('deskin');      /* 폰 테두리 · 아래 탭 · 여는 그림 없이 창을 꽉 채운다 */
+const 데스크알림 = 몸 => { try{ if(데스크끼움) window.parent.postMessage(Object.assign({ gg: 'deskrec' }, 몸), '*'); }catch(e){} };
+const LIVEKEY = 데스크끼움 ? 'gladgym_live_desk' : 'gladgym_live_v1';
 function save(){ try{ localStorage.setItem(LIVEKEY, JSON.stringify(D.live)); }catch(e){} }
 function loadLive(){ try{ const r=localStorage.getItem(LIVEKEY); if(r) D.live=JSON.parse(r); }catch(e){} }
 
@@ -3488,6 +3497,11 @@ async function boot(){
     if(au && au.who && au.who !== 'member' && !au.mid){ S.who = 'tr'; S.ttab = 't_today'; S.screen = 't_today'; }      /* 직원 — 트레이너 화면으로 */
     else if(au && au.mid && MEMBERS.some(m => m.id === au.mid)){ S.who = 'm'; S.mid = au.mid; S.tab = 'home'; S.screen = 'home'; setTimeout(인사, 0); setTimeout(갈곳열기, 0); }
     else S.screen = 'login'; }
+  if(데스크끼움){ document.body.classList.add('deskin');
+    const mid = 데스크끼움.mid;
+    if(S.who === 'tr' && mid && MEMBERS.some(m => m.id === mid)){ S.tmid = mid; S.subj = mid; S.screen = 't_member';
+      setTimeout(() => { if(liveOf(mid) && adoptLive(mid)) go('workout'); else { S.tmid = mid; sheetStartSession(mid); } }, 0); }
+    else if(S.who === 'tr' && mid) setTimeout(() => toast('이 회원을 앱에서 열 수 없어요\n담당 범위를 확인해 주세요'), 0); }
   if(!histOn) histInit();
 }
 
@@ -4723,6 +4737,8 @@ function bar(title, right, back, sub){
   return (canBack?`<button class="back${첫화면 ? ' ic' : ''}" data-act="${esc(act)}" aria-label="뒤로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>${첫화면 ? '' : '뒤로'}</button>`:'') + logo      /* 종 · 내 사진이 있는 탭 첫 화면은 좁은 폰(360)에서 넘쳐서 화살표만 (2026-10-20) */
     + `<span class="ttl${직원 ? ' one' : ''}">${esc(title)}${sub?`<small>${sub.indexOf('&') >= 0 ? sub : esc(sub)}</small>`:''}</span>` + 전환 + (right||'');
 }
+/* 데스크 창 안 — 아래 탭 숨김 (나가기는 데스크 창 ✕) */
+(() => { const st = document.createElement('style'); st.textContent = '.deskin #tabs{display:none!important}.deskin #frame{max-width:none;width:100%;height:100vh;border:none;border-radius:0}'; document.head.appendChild(st); })();
 function tabBar(){
   const u=unreadOf(S.mid);
   const t=(id,ic,nm,bd)=>`<button data-act="tab:${id}" class="${S.tab===id?'on':''}">
@@ -4894,7 +4910,7 @@ function vErr(){ return { top: bar('글래드짐'), body:`
    ⚠ 이 로그인은 화면의 문이다. 자료를 사람별로 잠그는 것(RLS)은 다음 단계 */
 /* GG_API(인증 서버 주소)는 아래 데스크 로그인 자리에 이미 있다 — 같은 것을 쓴다 */
 let 시험판 = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) || location.protocol === 'file:';
-const 로그인기억 = { 읽: () => { try{ return JSON.parse(localStorage.getItem('gg_auth') || 'null'); }catch(e){ return null; } }, 씀: v => { try{ v ? localStorage.setItem('gg_auth', JSON.stringify(v)) : localStorage.removeItem('gg_auth'); }catch(e){} } };
+const 로그인기억 = { 읽: () => { if(데스크끼움) return 데스크끼움.au; try{ return JSON.parse(localStorage.getItem('gg_auth') || 'null'); }catch(e){ return null; } }, 씀: v => { if(데스크끼움){ if(v) 데스크끼움.au = v; return; } try{ v ? localStorage.setItem('gg_auth', JSON.stringify(v)) : localStorage.removeItem('gg_auth'); }catch(e){} } };
 async function 인증부르기(길, 몸){ const r = await fetch(GG_API + '/app/otp/' + 길, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(몸) });
   if(!r.ok) throw new Error('서버에 닿지 못했어요 (' + r.status + ')'); return await r.json(); }
 const 번호만 = v => String(v || '').replace(/[^0-9]/g, '');
@@ -14460,7 +14476,7 @@ async function finish(){
 
   D.live=null; save(); S.wid=rec.id;
   if(S.who==='tr'){ S.tmid=rec.mid; S.subj=rec.mid; }
-  go('summary');
+  go('summary'); 데스크알림({ wid: rec.id, mid: rec.mid });
   /* 루틴 없이(빈 루틴으로) 시작한 수업이면 — 오늘 실제로 한 것을 루틴으로 남길지 묻는다 (2026-10-11 대표) */
   if(S.who==='tr' && (rec.kind||'') === '수업' && !rec.rid && rec.items.length)
     setTimeout(() => sheetRtSave(rec), 800);
@@ -14519,6 +14535,7 @@ async function start(){
   /* 그날 처음 열 때만 길게(문구까지). 같은 날 다시 열면 짧게 — 하루에도 몇 번씩 여는 앱이다 */
   let 처음 = true; try{ 처음 = localStorage.getItem('gg_splash_day') !== ymd(new Date()); localStorage.setItem('gg_splash_day', ymd(new Date())); }catch(e){}
   const sp0 = document.getElementById('splash');
+  if(sp0 && 데스크끼움) sp0.remove();      /* 데스크 창 안 — 여는 그림 없이 바로 */
   if(sp0 && !처음){ sp0.classList.add('quick'); const c = document.getElementById('spcopy'); if(c) c.remove(); }
   try{
     const t0=Date.now();
