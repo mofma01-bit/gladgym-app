@@ -2728,6 +2728,14 @@ body.kpon #main{padding-bottom:330px}
 .fbb .tx{font-size:14.5px;line-height:1.45;white-space:pre-wrap}.fbb small{font-size:12px;color:var(--sub)}
 .fbtag{align-self:flex-start;font-size:12px;font-weight:800;color:#e8c08f;background:#2e2a22;border-radius:6px;padding:1px 7px}
 .fbchips{flex-wrap:nowrap;overflow-x:auto}
+
+/* 루틴표 (C-5) */
+.rtgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:4px 0 12px}
+.rtc{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px 8px 10px;color:var(--cream)}
+.rtc b{font-size:14px;line-height:1.3}.rtc small{font-size:12.5px;color:var(--sub)}
+.rtimg{width:100%;aspect-ratio:4/3;object-fit:contain;background:#fff;border-radius:10px}
+.rtph{width:100%;aspect-ratio:4/3;border-radius:10px;background:#1f1d1a;border:1px dashed #3a352c;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}.rtph small{font-size:12px;color:var(--sub)}
+.rtd{font-size:14.5px;line-height:1.5;white-space:pre-wrap;margin-bottom:4px}.rtpl{margin-bottom:10px}
 </style>
 
 </head>
@@ -3160,7 +3168,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '453';
+const BUILD = '454';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -5571,15 +5579,35 @@ function vRoutines(){
             <div class="sm">${r.items.length}종목 · 예상 ${estMin(r)}분</div></div><button class="chip t" style="flex:none" data-act="rshow:${r.id}">다시 보이기</button></div>`).join('')
         : `<button class="rhidlnk" data-act="rhidden">숨긴 루틴 ${숨긴루틴(S.mid).length}개 보기 ›</button>`) : '') };
 }
+/* ══ 루틴표 (C-5 · 2026-10-23 대표 시안 2 확정) ══ 종목 = 이름 + 그림 카드 · 누르면 아래 판(자세 설명 → 최근 피드백 → 지난 기록 표)
+   그림은 구매 뒤(대표 「아직은 그림 넣지 마」) — 웹앱/img/ex/<종목 id>.png 를 넣고 img/ex/목록.json 에 id 를 적으면 저절로 뜬다 · 그 전엔 부위 그림 + 「그림 준비 중」 */
+let 그림있음 = new Set();
+try{ fetch('img/ex/목록.json?v=' + BUILD).then(r => r.ok ? r.json() : []).then(a => { 그림있음 = new Set(Array.isArray(a) ? a : []); if(그림있음.size && typeof render === 'function') render(); }).catch(() => {}); }catch(e){}
+const 종목그림 = e => !e ? '' : 그림있음.has(e.id) ? `<img class="rtimg" src="img/ex/${encodeURIComponent(e.id)}.png" alt="${esc(e.n || '')}">` : `<span class="rtph">${부위그림(e)}<small>그림 준비 중</small></span>`;
+function 지난기록표(ex, va, mid){
+  const rs = lastRuns(ex, va, mid, 3); if(!rs.length) return '<div class="sm" style="color:var(--sub)">아직 기록이 없어요</div>';
+  const n = Math.max(4, ...rs.map(r => r.sets.length)), 칸 = (x, f) => `<span class="plc">${!x ? '' : f === 'kg' ? (x.kg ? kgfmt(x.kg) : (x.reps ? '–' : '')) : (x.reps || '')}</span>`;
+  return `<div class="pltb rtpl"><div class="plr plh"><span class="pln">날짜</span><div class="plcs"><div class="plg" style="--n:${n}"><span class="plhh" style="grid-column:span ${n}">무게(kg)</span><span class="plhh r1" style="grid-column:span ${n}">반복수</span></div></div></div>`
+    + rs.map(r => `<div class="plr"><span class="pln"><b>${+r.date.slice(5, 7)}/${+r.date.slice(8, 10)}</b>${r.memo ? `<small><i>${esc(r.memo.slice(0, 14))}</i></small>` : ''}</span><div class="plcs"><div class="plg" style="--n:${n}">${[...Array(n)].map((_, j) => 칸(r.sets[j], 'kg')).join('')}${[...Array(n)].map((_, j) => 칸(r.sets[j], 'reps')).join('')}</div></div></div>`).join('') + '</div>';
+}
+function sheetRtEx(rid, i){
+  const r = rOf(rid), it = r && r.items[i]; if(!it) return; const e = exOf(it.ex) || {}, mid = S.who === 'tr' ? subj() : S.mid;
+  const 설명 = descOf(mid, it.ex, it.va) || (varOf(it.ex, it.va) || {}).desc || '', 피 = cmOf(mid, it.ex, it.va)[0];
+  openSheet(() => `<div class="h2">${esc(exName(it.ex, it.va))} <small>${esc(e.p || '')}</small></div>
+    <span class="lbl">자세 설명</span><div class="rtd">${설명 ? esc(설명) : '<span style="color:var(--sub)">설명이 아직 없어요</span>'}</div>
+    <span class="lbl">최근 피드백</span>${피 ? `<div class="fbroom sm" style="max-height:none">${말풍선({ k:'t', c:피, ts:피.ts || '', ex:피.ex, va:피.va })}</div>` : '<div class="rtd" style="color:var(--sub)">아직 받은 피드백이 없어요</div>'}
+    <span class="lbl">지난 기록</span>${지난기록표(it.ex, it.va, mid)}
+    <button class="btn ghost sm" data-act="exd:${it.ex}:${it.va}">설명 · 영상 크게 보기 ›</button>
+    <button class="btn ghost sm" data-act="close">닫기</button>`);
+}
 function vRoutine(){
   const r=rOf(S.rid); if(!r) return vRoutines();
   return { top: bar(`루틴 ${r.no} · ${r.n}`, `<span class="sub">${r.items.length}종목</span>`, 'go:routines'), body:
     (r.by ? `<div class="note rbynote"><span class="rby">${esc(r.by)}T</span>${r.at ? ' · ' + dateTxt(String(r.at).slice(0,10)) + ' 추가' : ''}</div>` : '')
     + (r.purpose ? `<div class="note">${esc(r.purpose)}</div>` : '')
-    + r.items.map((it,i)=>{ const e=exOf(it.ex);
-      return `<button class="card rowc" data-act="exd:${it.ex}:${it.va}">${부위그림(e)}<div><div class="nm">${i+1}. ${esc(exName(it.ex,it.va))}</div>
-        <div class="sm">${루틴줄(it, e)}
-        ${descOf(S.mid,it.ex,it.va)?' · 설명 보기 ›':''}</div></div></button>`; }).join('')
+    + `<div class="rtgrid">${r.items.map((it,i)=>{ const e=exOf(it.ex);
+      return `<button class="rtc" data-act="rtex:${r.id}:${i}">${종목그림(e)}<b>${i+1}. ${esc(exName(it.ex,it.va))}</b><small>${루틴줄(it, e)}</small></button>`; }).join('')}</div>`
+    + `<button class="btn ghost sm" data-act="go:routines">전체 루틴표 ›</button>`
     + (루틴칸 && !숨김도보나() && r.mid === S.mid && !r.hid && !오늘루틴인가(r) ? `<button class="btn ghost sm" data-act="rhide:${r.id}">이 루틴 숨기기</button>` : ''),
     foot:`<button class="btn main" data-act="startr:${r.id}">이 루틴으로 시작</button>` };
 }
@@ -13319,6 +13347,7 @@ document.addEventListener('click', async ev=>{
 
     case 'rt': S.rid=rest[0]; go('routine'); return;
     case 'rec': S.wid=rest[0]; go('record'); return;
+    case 'rtex': sheetRtEx(rest[0], +rest[1]); return;      /* 루틴표 카드 → 아래 판 (C-5) */
     case 'fbex': S.fbEx = rest.join(':'); S.fbKeep = true; render(); return;      /* 피드백 대화방 종목 거르기 (C-3) */
     case 'tfbchat': S.tmid = rest[0]; S.subj = rest[0]; S.fbMode = ''; S.fbEx = ''; go('feedback'); return;
     case 'fendview': S.wid=rest[0]; go('summary'); return;
