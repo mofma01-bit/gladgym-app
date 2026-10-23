@@ -2311,7 +2311,7 @@ body{word-break:keep-all}
 
 <script>
 "use strict";
-const BUILD = '378';
+const BUILD = '379';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -6758,13 +6758,15 @@ function 매출판(){
     + '<b>' + (+지.slice(0, 4) !== +이.slice(0, 4) ? 지.slice(0, 4) + '년 ' : '') + (+지.slice(5, 7)) + '월 매출</b>'
     + (i달 < 달들.length - 1 ? '<button class="btn ghost sm" data-act="tx:pmon" data-k="' + 달들[i달 + 1] + '">' + (+달들[i달 + 1].slice(5, 7)) + '월 ›</button>' : '<span></span>') + '</div>'
     + (남달.length ? '<div class="pm-left">' + 남달.map(m => { const n = 남.filter(g => 묶음달(g) === m).length; return '<button class="btn ghost sm" data-act="tx:pmon" data-k="' + m + '">' + (+m.slice(5, 7)) + '월에 남은 미확인 · 확인 대기 ' + n + '건 ›</button>'; }).join('') + '</div>' : '');
-  const 묶 = { 미확인: gs.filter(g => 묶음상태(g) === '미확인'), 확인대기: gs.filter(g => 묶음상태(g) === '선택됨'), 확정: gs.filter(g => 묶음상태(g) === '확정'), 삭제됨: gs.filter(g => 묶음상태(g) === '삭제됨') };
+  const 내것 = g => !매출.선생 || g.줄.some(x => (x.trainer || '') === 매출.선생);      /* 팀 막대에서 고른 선생님 매출만 (2026-10-23 대표) — 탭 숫자도 같은 범위로 센다 (22:00 「확정하라고 해 놓고 리스트 안 떠」) */
+  const 온 = { 미확인: gs.filter(g => 묶음상태(g) === '미확인'), 확인대기: gs.filter(g => 묶음상태(g) === '선택됨'), 확정: gs.filter(g => 묶음상태(g) === '확정'), 삭제됨: gs.filter(g => 묶음상태(g) === '삭제됨') };
+  const 묶 = {}; Object.keys(온).forEach(k => { 묶[k] = 온[k].filter(내것); });
   const 탭 = [['미확인', '선택 필요'], ['확인대기', '확정 필요'], ['확정', '확정'], ['삭제됨', '삭제됨']].filter(([k]) => k !== '삭제됨' || 묶.삭제됨.length);
-  const 볼 = (묶[매출.탭] || 묶.미확인).filter(g => !매출.선생 || g.줄.some(x => (x.trainer || '') === 매출.선생));      /* 팀 막대에서 고른 선생님 매출만 (2026-10-23 대표) */
+  const 볼 = 묶[매출.탭] || 묶.미확인, 딴 = (온[매출.탭] || 온.미확인).length - 볼.length;
   판열기('PT 매출', 팀게이지() + 달칸 + '<div class="nmtabs">' + 탭.map(([k, l]) => '<button class="nmtab' + (매출.탭 === k ? ' on' : '') + '" data-act="tx:ptab" data-k="' + k + '">' + l + '<b>' + 묶[k].length + '</b></button>').join('') + '</div>'
     + (매출.탭 === '확정' && 지 === 이 ? 팀순위() : '')      /* 순위는 이번 달 것이라 다른 달을 볼 땐 뺀다 */
     + (볼.length ? '<div class="lbl" style="margin:14px 0 6px">' + (+지.slice(5, 7)) + '월 · ' + 볼.length + '건</div>' + 볼.map(g => 매출줄(g)).join('')
-      : '<div class="empty why"><b>' + ({ 미확인:'담당을 고를 매출이 없습니다', 확인대기:'관리자 확인을 기다리는 매출이 없습니다', 확정:'확정된 매출이 없습니다', 삭제됨:'삭제된 매출이 없습니다' }[매출.탭] || '') + '</b>새 PT 결제가 생기면 여기와 팝업에 뜹니다</div>'));
+      : '<div class="empty why"><b>' + ({ 미확인:'담당을 고를 매출이 없습니다', 확인대기:'관리자 확인을 기다리는 매출이 없습니다', 확정:'확정된 매출이 없습니다', 삭제됨:'삭제된 매출이 없습니다' }[매출.탭] || '') + '</b>' + (매출.선생 && 딴 > 0 ? esc(매출.선생) + ' 선생님 것만 보는 중 · 다른 선생님 것 ' + 딴 + '건<div style="margin-top:8px"><button class="btn sub sm" data-act="tx:tgpick" data-k="">전체 보기</button></div>' : '새 PT 결제가 생기면 여기와 팝업에 뜹니다') + '</div>'));
 }
 /* ══ 팀 매출 · 순위 ══ (흰 선 「오늘까지 목표」는 19:46 대표 지시로 뺌) 2026-10-16 대표 낙서3 「팀 목표 매출 그래프 · 단순하게 · 이번 달 목표 / 달성률 및 액수 · 총 얼마 누구 건인지 한눈에」「확정은 트레이너별로 · 모두 열람 · 게임처럼 1등부터 좌→우 · 팀 목표 게이지」 → 시안 A안(`설계서\시험페이지\팀매출_순위_1016.html`) 고름
    팀 합 = 이번 달 확정(센터 매출 포함) · 개인 순위 = 담당 있는 확정만 · 팀 목표 = 800만 × PT 선생님 수(대표가 금액을 정하면 바꾼다) */
