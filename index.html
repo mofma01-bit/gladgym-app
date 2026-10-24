@@ -3177,7 +3177,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '456';
+const BUILD = '457';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -4797,7 +4797,9 @@ function bar(title, right, back, sub){
     + `<span class="ttl${직원 ? ' one' : ''}">${esc(title)}${sub?`<small>${sub.indexOf('&') >= 0 ? sub : esc(sub)}</small>`:''}</span>` + 전환 + (right||'');
 }
 /* 데스크 창 안 — 아래 탭 숨김 (나가기는 데스크 창 ✕) */
-(() => { const st = document.createElement('style'); st.textContent = '.deskin #tabs{display:none!important}.deskin #frame{max-width:none;width:100%;height:100vh;border:none;border-radius:0}'; document.head.appendChild(st); })();
+(() => { const st = document.createElement('style'); st.textContent = '.deskin #tabs{display:none!important}.deskin #frame{max-width:none;width:100%;height:100vh;border:none;border-radius:0}'      /* 데스크 안 넓은 화면 — 글씨 1.2배 · 본문은 가운데 넓게 · 아래 창은 가운데 대화창 (2026-10-24 대표 「PC 와 모바일 사이즈가 다르듯 크게」) */
+    + '@media (min-width:760px){.deskin #frame{zoom:1.2}.deskin #top,.deskin #main,.deskin #foot{width:100%;max-width:900px;margin-left:auto;margin-right:auto;box-sizing:border-box}'
+    + '.deskin #sheet{align-items:center;justify-content:center}.deskin #sheetbox{width:min(640px,92%);max-width:640px;border-radius:20px;border:1px solid var(--line)}}'; document.head.appendChild(st); })();
 function tabBar(){
   const u=unreadOf(S.mid);
   const t=(id,ic,nm,bd)=>`<button data-act="tab:${id}" class="${S.tab===id?'on':''}">
