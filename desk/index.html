@@ -2359,7 +2359,7 @@ body{word-break:keep-all}
 
 <script>
 "use strict";
-const BUILD = '389';
+const BUILD = '390';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -11720,8 +11720,10 @@ function v배정(){
   if(배정.탭 === '할일'){
     const 물걸 = 배정.물 ? 물.filter(x => x.ask === 배정.물) : 물;
     h += '<div class="as-q">'
-      + (PT확.length ? '<div class="as-qc hot"><div class="qh"><b>PT 회원 자동 배정 · 확인</b><span>' + PT확.length + '</span></div><div class="qd">PT 담당 선생님으로 자동 배정됐어요. 맞으면 확인을 눌러 주세요</div>'
-        + 줄(PT확, x => '<button class="as-btn g" data-act="tx:asptok" data-k="' + esc(x.id) + '">확인</button><button class="as-btn" data-act="tx:agpick" data-k="' + esc(x.id) + '">담당 바꾸기</button>') + '</div>' : '')
+      + (PT확.length ? '<div class="as-qc hot"><div class="qh"><b>PT 회원 자동 배정 · 확인</b><span>' + PT확.length + '</span></div><div class="qd">PT 선생님으로 자동 배정했거나 담당이 PT 선생님과 달라요. 보고 확인해 주세요</div>'
+        + 줄(PT확, x => 배정PT다름(x)
+          ? '<button class="as-btn g" data-act="tx:asassign" data-k="' + esc(x.id + '|' + x.pt_trainer) + '">' + esc(x.pt_trainer) + (c => (c - 0xAC00) % 28 === 0 || (c - 0xAC00) % 28 === 8 ? '로' : '으로')(String(x.pt_trainer).slice(-1).charCodeAt(0)) + ' 바꾸기</button><button class="as-btn" data-act="tx:asptok" data-k="' + esc(x.id) + '">그대로 두기</button>'
+          : '<button class="as-btn g" data-act="tx:asptok" data-k="' + esc(x.id) + '">확인</button><button class="as-btn" data-act="tx:agpick" data-k="' + esc(x.id) + '">담당 바꾸기</button>') + '</div>' : '')
       + (신.length ? '<div class="as-qc hot"><div class="qh"><b>신청 들어옴</b><span>' + 신.length + '</span></div><div class="qd">희망 시간 · 설문을 남겼어요. 담당을 정해 주세요</div>' + 줄(신.slice().sort((a, b) => String(a.apply_at).localeCompare(String(b.apply_at))), x => 할수('assignset') && 배정쓰기(x) ? '<button class="as-btn" data-act="tx:agpick" data-k="' + esc(x.id) + '">담당 정하기</button>' : '<span class="as-tag">' + esc((x.apply_times || []).join(' · ').slice(0, 14)) + '</span>') + '</div>' : '')
       + (교.length ? '<div class="as-qc hot"><div class="qh"><b>교체 요청</b><span>' + 교.length + '</span></div><div class="qd">담당 선생님이 바꿔 달라고 했어요</div>' + 줄(교, x => '<button class="as-btn" data-act="tx:agpick" data-k="' + esc(x.id) + '">새 담당</button>') + '</div>' : '')
       + (할수('assignall') ? '<div class="as-qc hot"><div class="qh"><b>미배정</b><span>' + 미배.length + '</span></div><div class="qd">담당이 없어요. 담당을 정해 주세요</div>' + (미배.length ? 줄(미배, x => 배정쓰기(x) ? (배정PT중(x) && x.pt_trainer ? '<button class="as-btn g" data-act="tx:asassign" data-k="' + esc(x.id + '|' + x.pt_trainer) + '">' + esc(x.pt_trainer) + ' 확인</button>' : '') + '<button class="as-btn" data-act="tx:agpick" data-k="' + esc(x.id) + '">담당 정하기</button>' : '<span class="as-tag">노션에서</span>') : '<div class="sub3">미배정이 없습니다</div>') + '</div>' : '')
@@ -11753,7 +11755,9 @@ function v배정(){
 }
 const 배정PT중 = x => x && x.pt_state === 'PT중';      /* 중앙이 매시 채움(60단계) — 사람이 고르지 않는다 */
 const 배정관리자 = () => !!(ME && (ME.super === true || ['대표자', '최고관리자', '중간관리자'].includes(등급of(ME))));
-const 배정PT확인대기 = x => 배정PT중(x) && (x.trainers || []).length && !x.pt_ok && 'pt_ok' in x;      /* 중앙이 자동 배정한 줄 · 관리자가 아직 확인 안 함 (16:46 대표 「관리자 확인만 · 매출 확정처럼」) */
+const 배정PT자동 = x => String(x.assign_note || '').includes('PT 진행 중(');      /* 중앙 자동 배정 줄 표시 — 「자동 10/24 · PT 진행 중(장승훈)」 */
+const 배정PT다름 = x => !!x.pt_trainer && !(x.trainers || []).includes(x.pt_trainer);      /* 담당이 PT 선생님과 다름 (퇴사 담당 · 빈 담당) */
+const 배정PT확인대기 = x => 배정PT중(x) && 'pt_ok' in x && !x.pt_ok && (배정PT자동(x) || 배정PT다름(x));      /* 관리자 확인 — 자동 배정했거나 담당이 PT 선생님과 다른 줄만 (16:46 대표 「관리자 확인만」 · 16:5x 중앙 제안: 직원이 이미 PT 선생님으로 배정한 줄은 뺌) */
 const 배정상태단추 = x => 배정PT중(x) ? '<span class="as-tag ptm">PT 회원</span>' + (x.pt_note ? ' <span class="sub3">' + esc(x.pt_note) + '</span>' : '') : !배정쓰기(x) ? '<span class="as-tag" title="노션에서 수정해 주세요">' + esc(x.progress) + ' · 노션</span>' : '<span class="as-st">' + [['진행중', 'p'], ['재연락 필요', 'r'], ['종료', 'e']].map(([k, c]) => '<button class="' + c + (x.progress === k ? ' on' : '') + '" data-act="tx:asst" data-k="' + esc(x.id) + '|' + k + '">' + k + '</button>').join('') + '</span>';
 async function 배정고침(id, 몸, 말){
   const x = (배정.줄 || []).find(r => String(r.id) === String(id)); if(!x) return false;
@@ -12489,7 +12493,7 @@ async function txAct(a, el){
   if(a==='agpick'){ 배정담당판(k); return; }
   if(a==='asresend'){ await 배정링크보내기(k); return; }
   if(a==='asptok'){ const x = (배정.줄 || []).find(r => String(r.id) === String(k)); if(!x) return;      /* PT 회원 자동 배정 확인 → pt_ok = 누가 · 때 (16:46 대표) */
-    await 배정고침(k, { pt_ok: ((ME && ME.name) || '') + ' ' + new Date().toISOString().slice(0, 16).replace('T', ' ') }, (x.trainers || []).join(' · ') + ' 자동 배정 확인'); return; }
+    await 배정고침(k, { pt_ok: ((ME && ME.name) || '') + ' ' + new Date().toISOString().slice(0, 16).replace('T', ' ') }, 배정PT다름(x) ? '담당 ' + ((x.trainers || []).join(' · ') || '없음') + ' 그대로 두기' : (x.trainers || []).join(' · ') + ' 자동 배정 확인'); return; }
   if(a==='astrsend'){ await 체험설문보내기(k); return; }
   if(a==='astradd'){ 체험추가판(); return; }
   if(a==='astraddgo'){ await 체험추가(); return; }
