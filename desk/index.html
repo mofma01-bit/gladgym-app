@@ -1926,7 +1926,7 @@ body{word-break:keep-all}
 .mvsmall{display:flex;gap:6px;margin:0 0 10px}.mvsmall button{height:34px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--dark-3);color:var(--cream);font:inherit;font-size:13.5px;font-weight:700;cursor:pointer}
 .mvdone{display:flex;align-items:center;gap:10px;background:#2a2318;border:1px solid #8a7a5c;border-radius:12px;padding:10px 14px;margin:0 0 10px;font-weight:800}.mvdone .btn{margin-left:auto}.mvdone .x{background:none;border:0;color:var(--sub);font-size:16px;cursor:pointer}
 #apprec{position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.62);display:flex;align-items:center;justify-content:center}
-#apprec .ar-box{width:min(480px,96vw);height:94vh;background:#0f0f0e;border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+#apprec .ar-box{width:min(1180px,96vw);height:94vh;background:#0f0f0e;border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
 #apprec .ar-h{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line);font-size:15px}
 #apprec .ar-h small{color:var(--sub);font-size:13px}#apprec .ar-h button{margin-left:auto}
 #apprec iframe{flex:1;border:0;width:100%;background:#0f0f0e}
@@ -2357,7 +2357,7 @@ body{word-break:keep-all}
 
 <script>
 "use strict";
-const BUILD = '386';
+const BUILD = '387';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
