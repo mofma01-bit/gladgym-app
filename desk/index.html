@@ -2359,7 +2359,7 @@ body{word-break:keep-all}
 
 <script>
 "use strict";
-const BUILD = '391';
+const BUILD = '392';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -8592,6 +8592,20 @@ function 이번주쉼글(){
   return '<span class="tlv">' + (당.length ? '<span><i>당직</i>' + 당.map(쉼한칸).join(' · ') + '</span>' : '') + (쉼.length ? '<span><i>OFF</i>' + 쉼.map(쉼한칸).join(' · ') + '</span>' : '') + '</span>';
 }
 const 다음주쉼 = () => 쉼날들(7, 13).filter(o => o.r.kind !== '당직');
+/* ══ 락커 현황 ══ 중앙 창구 locker_status(매시 crm_fetch 뒤 · 스크립트/락커TM.py --현황) — 데스크는 읽기만 · 10분에 한 번 */
+const 락커 = { r:null, 중:false, 때:0 };
+async function 락커받기(){ if(락커.중 || Date.now() - 락커.때 < 600000) return; 락커.중 = true;
+  try{ 락커.r = await crm('locker_status', {}); }catch(e){ 락커.r = null; }
+  락커.중 = false; 락커.때 = Date.now(); if(S.view === 'home') render(); }
+const 락커줄 = k => (락커.r && Array.isArray(락커.r[k])) ? 락커.r[k] : [];
+function 락커판(k){
+  const L = 락커줄(k), 짧 = d => d ? String(d).slice(5).replace('-', '/') : '-';
+  판열기(k === 'TM' ? '락커 TM' : '락커 만료자', '<div class="ck-act">' + (k === 'TM' ? '폐기 안내 뒤 15일이 지나도 회수 안 된 락커예요<small>전화해 회수 · 연장을 안내해 주세요 · 전산 ' + esc((락커.r || {})['자료'] || '') + ' 기준</small>' : '기간이 끝났는데 아직 회수 안 된 락커예요<small>폐기 안내 앞 · 뒤 모두 · 전산 ' + esc((락커.r || {})['자료'] || '') + ' 기준</small>') + '</div>'
+    + (L.length ? L.map(o => '<div class="bp-row2"><div class="a"><b>' + (o['번호'] != null && o['번호'] !== '' ? esc(String(o['번호'])) + '번 · ' : '') + esc(o['이름'] || '') + '</b>'
+        + (o['전화'] ? '<a class="sub3" style="margin-left:8px;color:var(--gold)" href="tel:' + esc(o['전화']) + '">' + esc(o['전화']) + '</a>' : '')
+        + '<span class="sub3" style="margin-left:auto">끝 ' + 짧(o['끝']) + (o['안내일'] ? ' · 안내 ' + 짧(o['안내일']) : '') + (o['지난날'] != null && o['지난날'] !== '' ? ' · 안내 뒤 ' + esc(String(o['지난날'])) + '일' : '') + '</span></div></div>').join('')
+      : '<div class="empty why"><b>' + (k === 'TM' ? '전화할 락커가 없어요' : '만료된 락커가 없어요') + '</b>매시 전산을 받은 뒤 다시 세요</div>'));
+}
 function 다음주쉼판(){
   const L = 다음주쉼();
   판열기('다음 주 연차', '<div class="ck-act">다음 주에 쉬는 선생님이에요<small>승인된 연차 · 반차 · OFF 만 · 당직은 빼요</small></div>'
@@ -11340,6 +11354,9 @@ const 현황칸 = [
      (2026-09-29 대표 「같은 직장에서 일하니까 급한건 아니야」) */
   /* 다음 주 연차 — 월요일 쉬는 사람을 미리 알게 (2026-10-23 대표 「다음 주 월요일인 경우 확인이 늦으니까 현황판에」) · 모두 */
   { k:'다음주연차', 이름:'다음 주 연차', 색:'teal', 셈: () => 다음주쉼().length, 직접: () => 다음주쉼판() },
+  /* 락커 — 중앙 locker_status 그대로 (2026-10-25 대표 「현황판에는 락커만료자 · 락커TM」) · 셈 = 명단 길이 */
+  { k:'락커만료', 이름:'락커 만료자', 색:'warn', 셈: () => 락커줄('만료').length, 직접: () => 락커판('만료'), 보임: () => !!락커.r },
+  { k:'락커TM', 이름:'락커 TM', 색:'warn', 셈: () => 락커줄('TM').length, 직접: () => 락커판('TM'), 보임: () => !!락커.r },
   { k:'연월차', 이름:'연월차 승인 대기', 색:'', 보임: () => 할수('leaveok') },
   { k:'가입',   이름:'가입 승인 대기',   색:'gold', 보임: () => 할수('perm'),      /* 2026-10-19 — 새 로그인 가입 승인(pwpending) · 옛 이메일 가입 수(가입대기수)가 아니다 */
     셈: () => (권한.대기 || []).length, 직접: () => 권한손잡이('permopen', { dataset:{} }) },
@@ -11366,7 +11383,8 @@ const 현황셈하기 = k => {
 
 function 숫자줄(){
   setTimeout(오늘수업받기, 0);
-  if(청소오래됨() && !청소.중) setTimeout(청소받기, 0);      /* 현황판 「청소 누락」 (2026-10-21) */      /* 10분 지났으면 오늘 수업 다시 (안에서 거른다) */
+  if(청소오래됨() && !청소.중) setTimeout(청소받기, 0);      /* 현황판 「청소 누락」 (2026-10-21) */
+  setTimeout(락커받기, 0);      /* 현황판 「락커 만료자 · 락커 TM」 (2026-10-25 · 안에서 10분 거름) */      /* 10분 지났으면 오늘 수업 다시 (안에서 거른다) */
   /* ⭐ 두 단 — **할 일이 있는 것이 윗줄**, 0 인 것은 아랫줄로 내린다
        (2026-09-30 대표 「죽어있는건 아래줄 · 살아있는건 윗줄로」).
      아침마다 보는 화면이라 **눈이 윗줄에서 멈춰야** 한다. */
