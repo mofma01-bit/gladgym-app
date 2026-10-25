@@ -1899,6 +1899,7 @@ body{word-break:keep-all}
 .as-tab.on{color:var(--gold);border-bottom-color:var(--gold)}.as-tab b{font-size:13px;margin-left:5px;color:var(--cream)}
 .as-q{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
 .rsbtns{display:flex;gap:6px;flex:none}
+.l1row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.tx-tr summary{cursor:pointer}
 .sc-pt{margin:4px 0 2px;font-size:13.5px;font-weight:800;color:#bfe0d8;background:#1f2a27;border:1px solid #3c5a53;border-radius:8px;padding:4px 10px;display:inline-block}
 .as-tag.ptm{background:#1f2a27;color:#bfe0d8;border:1px solid #3c5a53}
 .kt-list{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;overflow:hidden;max-height:72vh;overflow-y:auto}
@@ -2359,7 +2360,7 @@ body{word-break:keep-all}
 
 <script>
 "use strict";
-const BUILD = '393';
+const BUILD = '394';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -8561,6 +8562,7 @@ const 날짜한글 = d => { if(!d) return ''; const x = new Date(d); if(isNaN(x)
   return (x.getMonth()+1)+'/'+x.getDate()+'('+WDN[x.getDay()]+')'; };
 const 시각한글 = d => { if(!d) return ''; const x = new Date(d); if(isNaN(x)) return d;
   const h = x.getHours(), m = x.getMinutes();
+  if(!h && !m) return (x.getMonth()+1)+'/'+x.getDate()+'('+WDN[x.getDay()]+')';      /* 0시 = 날짜만 넣은 것 — 날짜만 (2026-10-25 중앙 · 노션 예약날짜를 옮긴 줄) */
   return (x.getMonth()+1)+'/'+x.getDate()+'('+WDN[x.getDay()]+') '+(h<12?'오전 ':'오후 ')+((h%12)||12)+':'+String(m).padStart(2,'0'); };
 const 오늘인가 = d => d && String(d).slice(0,10)===TODAY;
 const 이달인가 = d => d && String(d).slice(0,7)===TODAY.slice(0,7);
@@ -8656,16 +8658,19 @@ const 표정의 = {
   },
   leads: {
     table:'tr_leads', 제목:'상담', 사람열:'counselors', 제목열:'name',
+    /* 칸 이름 · 고르는 값 = 노션 상담예약 그대로 (2026-10-25 대표 「노션 상담 속성과 데스크 상담 속성을 맞춰」 · 중앙 목록)
+       ⛔ 등록여부 x · 리마크 2차 · 1차 발송상태는 자동 발송(1차 안내 · 2차 설문톡 14:10)이 읽는 값 — 이름 · 값을 바꾸지 않는다
+       리마크1차 · 2차 · 3차 · 1차 발송상태 · 발송여부 · 누락DB 는 늘린 칸(tr_cols · extra) */
     열:[
       {k:'name',       이름:'이름',     타입:'text', 필수:true},
-      {k:'phone',      이름:'전화',     타입:'text', 힌트:'010-0000-0000'},
-      {k:'at',         이름:'예약 일시', 타입:'datetime'},
-      {k:'channels',   이름:'상담유형', 타입:'multi', 옵션:['방문','전화','문자','카카오톡','네이버예약','네이버톡','인스타','당근','소개','전단지','스마트콜','카카오맵','무료 체험권','재등록 리마케팅','양도','일일입장','각종 바우처','락커회수']},
-      {k:'segment',    이름:'회원구분', 타입:'select', 옵션:['신규','재등록','컴백','기존회원']},
+      {k:'phone',      이름:'전화번호', 타입:'text', 힌트:'010-0000-0000'},
+      {k:'at',         이름:'예약날짜', 타입:'datetime'},
+      {k:'channels',   이름:'상담유형', 타입:'multi', 옵션:['양도예약','방문','스마트콜','네이버톡','네이버예약','소개','전단지','전화','문자','인스타','카카오톡','카카오맵','카카오비즈니스','당근','무료 체험권','재등록 리마케팅','락커회수','운닥','각종 바우처','양도','일일입장','네이버톡톡']},
+      {k:'segment',    이름:'회원구분', 타입:'select', 옵션:['신규','재등록','컴백','기존회원','만료회원']},
       {k:'counselors', 이름:'상담자',   타입:'people'},
       {k:'content',    이름:'상담내용', 타입:'long'},
       {k:'result',     이름:'상담결과', 타입:'long'},
-      {k:'reg',        이름:'등록여부', 타입:'select', 옵션:['o','x','미방문','무료체험','PT체험3회','일일입장','양도','일일권']},
+      {k:'reg',        이름:'등록여부', 타입:'select', 옵션:['집계제외','미방문','o','x','재등록','무료체험','PT체험3회','일일입장','양도','일일권','환불']},
       {k:'note',       이름:'특이사항', 타입:'text'},
       {k:'done',       이름:'완료',     타입:'check'},
     ],
@@ -8901,7 +8906,7 @@ async function loadWork(){
     uget('tr_views?select=*&order=sort').catch(()=>[]),
     uget('tr_meta?select=*').catch(()=>[]),
   ]);
-  W.staff = g[0]; W.tasks = g[1]; W.leads = g[2]; W.leave = g[3]; W.cm = g[4] || [];
+  W.staff = g[0]; W.tasks = g[1]; W.leads = (g[2] || []).filter(r => !(r.extra || {}).archived); W.leave = g[3]; W.cm = g[4] || [];      /* 숨긴 상담(extra.archived)은 목록 · 집계 · 검색에서 뺀다 (2026-10-25 · 노션 휴지통과 같은 뜻) */
   try{ const pp = await uget('desk_perm?select=perm&id=eq.main'); 권한값 = (pp && pp[0] && pp[0].perm) || {}; }catch(e){ 권한값 = {}; }      /* 42단계 SQL 전이면 기본값 */
   if(진짜ME){ ['tasks', 'leads', 'leave'].forEach(k => { W[k] = W[k].filter(보기보임); }); 보기끼움(); }      /* 선생님 계정으로 보기 — 서버 can_see 와 같은 규칙 */
   try{ await 사진채우기(); }catch(e){}
@@ -10351,7 +10356,9 @@ async function txView(key, id){
     + 속성줄들(key, r, 편집)
     + (본문키 ? '<div class="tx-sec" id="txbwrap">'+블록들(bs, 편집, urlmap)+'</div>' : '')
     + 긴열.slice(1).map(c => '<div class="tx-sec"><div class="lbl">'+c.이름+'</div><div class="tx-body">'+링크살리기((c.늘림 ? (r.extra||{})[c.k.slice(6)] : r[c.k])||'')+'</div></div>').join('')
+    + (key === 'leads' ? 상담1차칸(r, 편집) : '')
     + ((r.files||[]).length ? '<div class="tx-sec"><div class="lbl">파일과 미디어</div>'+첨부칸(key, r, 편집, urls)+'</div>' : '')
+    + (key === 'leads' && (r.extra || {}).transcript ? '<details class="tx-sec tx-tr"><summary class="lbl">통화 원문</summary><div class="tx-body">' + esc(String(r.extra.transcript)).replace(/\n/g, '<br>') + '</div></details>' : '')
     + '<div class="tx-sec"><div class="lbl">댓글 '+(댓글수(key,id)||'')+'</div>'+댓글칸(key, id)+'</div>'
     + '<div class="tx-meta">만든 사람 '+esc(사람(r.created_by).name)+' · '+시각한글(r.created_at)+(r.updated_at&&r.updated_at!==r.created_at?' · 고침 '+시각한글(r.updated_at):'')+'</div>'
     + '</div>',
@@ -10890,7 +10897,7 @@ function txSheet(key, id, 초기){
     + 메타 + '</div>',
     '<div class="tx-fbtns"><span class="tx-stat" id="txstat">'+(편집 ? '' : '읽기 전용')+'</span>'
     + (편집 && id ? '<button class="btn sub" data-act="tx:back">‹ 돌아가기</button>' : '')
-    + (편집 && id ? '<button class="btn ghost del" data-act="tx:pgdel">페이지 삭제</button>' : '')
+    + (편집 && id ? '<button class="btn ghost del" data-act="tx:pgdel">' + (key === 'leads' ? '숨기기' : '페이지 삭제') + '</button>' : '')
     + '</div>');
 }
 /* ── 자동 저장 ── 노션처럼 저장 버튼이 없다. 글자를 치면 0.9초 뒤, 칩·날짜·체크는 바로 */
@@ -10949,8 +10956,26 @@ async function txSave(){
     if(S.view==='home' || 표정의[S.view]) render();      /* 뒤의 목록만 새로 그린다. 팝업은 그대로 */
   }catch(e){ 상태('저장 못 함 — '+e.message, true); }
 }
+/* ══ 1차 안내 보내기 ══ 노션 버튼(메이크 4687601) 대신 — 창구 lead_remarket1(UK_1257 승인본 · 카톡 안 되면 문자 · 성공하면 extra.s1 = 완료) (2026-10-25 중앙) */
+function 상담1차칸(r, 편집){ const ex = r.extra || {}, 끝 = ex.s1 === '완료';
+  return '<div class="tx-sec"><div class="lbl">1차 안내</div><div class="l1row"><span class="tx-tag' + (끝 ? ' teal' : '') + '">' + esc(ex.s1 || '안 보냄') + '</span>'
+    + (ex.s1_at ? '<span class="sub3">' + esc(시각한글(ex.s1_at)) + (ex.s1_by ? ' · ' + esc(ex.s1_by) : '') + '</span>' : '')
+    + (편집 && !끝 && r.phone ? '<button class="btn gold sm" data-act="tx:lr1" data-id="' + esc(r.id) + '">1차 안내 보내기</button>' : '')
+    + (편집 && !끝 && !r.phone ? '<span class="sub3">전화번호가 없어 보낼 수 없습니다</span>' : '') + '</div></div>'; }
+async function 상담1차보내기(id){
+  const r = W.leads.find(x => x.id === id); if(!r) return;
+  if(!await 묻기((r.name || '') + '님께 1차 안내를 보낼까요?\n카카오톡으로 보내고 안 되면 문자로 보냅니다')) return;
+  try{ await crm('lead_remarket1', { id });
+    const n = await uget('tr_leads?select=*&id=eq.' + encodeURIComponent(id)); if(n && n[0]) Object.assign(r, n[0]);
+    else r.extra = Object.assign({}, r.extra || {}, { s1: '완료', s1_at: new Date().toISOString() });
+    toast('1차 안내를 보냈어요'); txView('leads', id); render(); }
+  catch(e){ toast(e.message || '보내지 못했어요'); } }
 async function txDel(){
   const { key, id } = 시트, T = 표정의[key];
+  if(key === 'leads'){ const r = W.leads.find(x => x.id === id); if(!r || !await 묻기('이 상담을 숨길까요?\n목록 · 집계에서 빠지고 노션 백업에서는 휴지통으로 옮겨집니다')) return;      /* 상담은 지우지 않고 숨긴다 (2026-10-25 중앙 · 데스크 → 노션 백업이 휴지통으로) */
+    try{ const ex = Object.assign({}, r.extra || {}, { archived: true, archived_why: '데스크에서 숨김', archived_by: (ME && ME.name) || '', archived_at: new Date().toISOString() });
+      await usend(T.table + '?id=eq.' + id, 'PATCH', { extra: ex }); W.leads = W.leads.filter(x => x.id !== id); popClose(); toast('숨겼어요'); render(); }
+    catch(e){ toast(e.message || '숨기지 못했어요'); } return; }
   if(!id || !await 묻기('이 페이지를 휴지통으로 보낼까요?\n60일 동안 휴지통에 있다가 사라집니다')) return;
   const r = W[key].find(x=>x.id===id);
   try{ await 휴지통으로(T.table, r, (r && r[T.제목열]) || T.제목);
@@ -12874,6 +12899,7 @@ async function txAct(a, el){
   /* 페이지 삭제 — ⛔ 회원 화면의 `del` 은 **종목 하나 빼기**다. `tx:` 하나로 갈리면
      종목 하나 빼려다 페이지가 통째로 지워진다. 그래서 이름을 갈랐다 (2026-09-29) */
   if(a==='pgdel'){ await txDel(); return; }
+  if(a==='lr1'){ await 상담1차보내기(el.dataset.id); return; }
   if(a==='me'){ txMe(); return; }
   if(a==='goal'){
     const 앞 = (ME.goal||{}), 이번 = 이번분기();
