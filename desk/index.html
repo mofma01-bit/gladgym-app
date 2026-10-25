@@ -1964,7 +1964,11 @@ button.as-more{display:block;width:100%;background:none;border:0;color:var(--sub
 .as-more.btn-l{background:none;border:0;color:var(--gold);font:inherit;font-size:13px;font-weight:700;text-align:left;cursor:pointer}
 .as-askc{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px}.as-askc .chip{padding:3px 9px;font-size:13px}
 .as-tag{font-size:12.5px;font-weight:800;border-radius:6px;padding:1px 7px;background:var(--dark-4);color:var(--sub);white-space:nowrap}
-.as-tag.ok{background:#3a352c;color:#f2ead9}.as-tag.wait{background:#24302c;color:#8fd1c4;border:1px solid #3c5a53}
+.as-tag.ok{background:#3a352c;color:#f2ead9}
+.tx-th .tx-td{position:relative}.tx-cr{position:absolute;top:0;right:-3px;width:7px;height:100%;cursor:col-resize;z-index:2}.tx-cr:hover{background:rgba(240,207,148,.45)}
+.tx-tr.tx-newr{animation:txnew 3.5s ease-out 1}@keyframes txnew{0%{box-shadow:inset 0 0 0 2px #f0cf94;background:#2e2718}100%{box-shadow:inset 0 0 0 0 transparent}}
+.tx-lockn{font-size:12.5px;color:var(--sub);align-self:center;margin-left:6px}.tx-ti{display:inline-block;width:18px;color:var(--sub);font-style:normal}
+.tx-tag.ret{background:#2a2723;color:#b9b1a2;border:1px dashed #5a5246}.tx-tag.ret button{margin-left:4px;color:var(--sub)}.as-tag.wait{background:#24302c;color:#8fd1c4;border:1px solid #3c5a53}
 .as-log{display:flex;flex-direction:column;gap:4px;font-size:13.5px}.l1row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .cl-grp{border:1px solid var(--line);border-radius:12px;padding:8px 10px;margin-bottom:10px}.cl-gh{display:flex;align-items:center;gap:8px;margin-bottom:6px}.cl-gh b{font-size:15px}.cl-gh .as-btn{margin-left:auto}.as-row .ptwhy{white-space:normal;line-height:1.4}.as-tag.fail{background:#3a2a17;color:#f0b46a;border:1px solid #6b4a24}.as-row .as-tag{margin-left:6px}
 .as-dots{display:inline-flex;gap:3px}.as-dots i{width:16px;height:6px;border-radius:3px;background:var(--dark-4);display:inline-block}.as-dots i.y{background:var(--teal)}
@@ -2377,7 +2381,7 @@ button.as-more{display:block;width:100%;background:none;border:0;color:var(--sub
 
 <script>
 "use strict";
-const BUILD = '399';
+const BUILD = '400';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -8750,7 +8754,7 @@ const 표정의 = {
       {이름:'네이버 예약', 값:{channels:['네이버예약'], segment:'신규', vis:'all'}},
     ],
     기본vis:'all',
-    정렬: (a,b) => (a.done-b.done) || ((b.at||b.created_at||'') > (a.at||a.created_at||'') ? 1 : -1),
+    정렬: (a,b) => ((b.created_at||'') > (a.created_at||'') ? 1 : (b.created_at||'') < (a.created_at||'') ? -1 : 0),      /* 생성일 최신이 위 (2026-10-26 대표 「생성일이 더 뒤인데 시험 페이지 아래로」 · 노션과 같게) */
     행: r => ({ 제목: r.name + (r.segment ? ' · '+r.segment : ''),
       칩: (r.at ? '<span class="tx-tag '+(오늘인가(r.at)?'gold':'')+'">'+시각한글(r.at)+'</span>' : '')
         + (r.channels||[]).map(c=>'<span class="tx-tag">'+esc(c)+'</span>').join('')
@@ -9090,6 +9094,7 @@ function txList(key){
         + (바꿀수있나(key) ? ' data-vtab="'+i+'" title="끌어서 순서를 변경할 수 있어요"' : '')+'>'
         + esc(x.이름) + (x.필터고정 ? '<i class="tx-vfix" title="필터 고정">🔒</i>' : '') + '<b>' + W[key].filter(r => 보기맞나(x, r, key)).length + '</b></button>').join('')
     + (할수('table') ? '<button class="tx-vplus" data-act="tx:views" data-k="'+key+'" title="새 보기 추가">＋</button>' : '')
+    + (잠겼나(key) ? '<span class="tx-lockn" title="칸 · 보기 순서 잠금 — 보기 설정에서 풀어요">🔒 순서 잠금</span>' : '')
     + '</div><div class="sp2">'
     + '<span class="tx-pchips"><button class="tx-pchip '+(!st.사람?'on':'')+'" data-act="tx:who" data-k="'+key+'" data-v2="">모두</button>'
     + W.staff.filter(p=>p.active!==false).map(p => '<button class="tx-pchip '+(st.사람===p.id?'on':'')+'" data-act="tx:who" data-k="'+key+'" data-v2="'+p.id+'">'+이름딱지(p.id)+'</button>').join('')
@@ -9317,10 +9322,38 @@ function 표칸값(key, c, r){
   }
   return 속성값보기(c, r);
 }
+/* 새 줄 — 표 맨 위에 넣고 잠깐 금테 + 이름 칸 바로 입력 (노션처럼) */
+const 새줄 = {};
+async function 새줄만들기(k, 덧){
+  const T2 = 표정의[k], 몸 = Object.assign({ vis: T2.기본vis || 'owners', viewers: [] }, 덧 || {});
+  T2.열.forEach(c => { if(c.기본 !== undefined && 몸[c.k] === undefined) 몸[c.k] = c.기본; });
+  if(T2.사람열 && ME && 몸[T2.사람열] === undefined) 몸[T2.사람열] = (T2.열.find(c => c.k === T2.사람열) || {}).타입 === 'person' ? ME.id : [ME.id];
+  몸[T2.제목열] = 몸[T2.제목열] || '';
+  if(k === 'leave' && !몸.day) 몸.day = TODAY;
+  try{ const o = await usend(T2.table, 'POST', 몸, 'return=representation');
+    if(o && o[0]){ W[k].unshift(o[0]); 새줄[k] = o[0].id; if(S.view !== k) 가기(k); render();
+      const td = 칸찾기(o[0].id, T2.제목열);
+      if(td){ 칸고르기(k, o[0].id, T2.제목열); td.scrollIntoView({ block:'nearest' }); 칸안편집(k, o[0].id, T2.제목열, td); }
+      else txView(k, o[0].id); } }      /* 표가 아닌 모양(목록)이면 페이지를 연다 */
+  catch(e){ toast('못 만들었어요 — '+e.message); } }
+/* 칸 넓이 — 머리 오른쪽 끝을 끌어서 (노션처럼 · 2026-10-26 대표 「속성 사이 간격 조절이 안 됨」) · 보기마다 · 이 기기에 기억 */
+const 칸넓이키 = key => 'gg_colw:' + key + ':' + ((표상태[key] || {}).보기 || '');
+const 칸넓이 = key => { try{ return JSON.parse(localStorage.getItem(칸넓이키(key)) || '{}') || {}; }catch(e){ return {}; } };
+document.addEventListener('pointerdown', e => { const h = e.target.closest && e.target.closest('.tx-cr'); if(!h) return;
+  e.preventDefault(); e.stopPropagation();
+  const key = h.dataset.crk, k = h.dataset.cr, th = h.parentElement, tb = th.closest('.tx-table'); if(!tb) return;
+  const 시작 = e.clientX, w0 = th.getBoundingClientRect().width, 칸 = [...tb.querySelectorAll('.tx-th > .tx-td')].indexOf(th);
+  const 줄 = tb.style.gridTemplateColumns.split(/ (?![^(]*\))/);      /* minmax(…) 안의 띄어쓰기는 자르지 않는다 */
+  document.body.classList.add('resizing');
+  const 움 = ev => { const w = Math.max(70, Math.round(w0 + ev.clientX - 시작)); 줄[칸] = w + 'px'; tb.style.gridTemplateColumns = 줄.join(' '); h.dataset.w = w; };
+  const 끝 = () => { document.removeEventListener('pointermove', 움); document.removeEventListener('pointerup', 끝); document.body.classList.remove('resizing');
+    if(h.dataset.w){ const m = 칸넓이(key); m[k] = +h.dataset.w; try{ localStorage.setItem(칸넓이키(key), JSON.stringify(m)); }catch(err){} } };
+  document.addEventListener('pointermove', 움); document.addEventListener('pointerup', 끝); }, true);
 function txTable(key, rows){
   const cs = 표칸들(key), 제 = 표정의[key].제목열;
   const 편집 = r => 고칠수있나(key, r);
-  const 폭 = '34px ' + cs.map(c => 'minmax(' + (칸너비[c.타입] || 140) + 'px, max-content)').join(' ');
+  const 넓 = 칸넓이(key);
+  const 폭 = '34px ' + cs.map(c => 넓[c.k] ? 넓[c.k] + 'px' : 'minmax(' + (칸너비[c.타입] || 140) + 'px, max-content)').join(' ');      /* 끌어서 정한 넓이 (2026-10-26) */
   const 고름 = 고른행.key === key ? 고른행.ids : [];
   const 모두 = rows.length > 0 && 고름.length === rows.length;
   const 머리 = '<div class="tx-tr tx-th">'
@@ -9329,11 +9362,11 @@ function txTable(key, rows){
         + (바꿀수있나(key) && !(얼렸나(key) && c.k === 표정의[key].제목열)
            ? ' data-hc="'+esc(c.k)+'" data-hi="'+i+'" data-hk="'+key+'"' : '')
         + (할수('table') && !c.시스템 ? ' data-act="tx:pmenu" data-k="'+key+'" data-v2="'+esc(c.k)+'"' : '')
-        + '><i>'+(타입아이콘[c.타입]||'≡')+'</i>'+esc(c.이름)+'</span>').join('')
+        + '><i>'+(타입아이콘[c.타입]||'≡')+'</i>'+esc(c.이름)+'<b class="tx-cr" data-cr="'+esc(c.k)+'" data-crk="'+key+'" title="끌어서 넓이 바꾸기"></b></span>').join('')
     + '</div>';
   const 줄 = r => {
     const 골랐나 = 고름.indexOf(r.id) >= 0, 고침 = 편집(r);
-    return '<div class="tx-tr'+(골랐나?' pk':'')+'">'
+    return '<div class="tx-tr'+(골랐나?' pk':'')+(새줄[key] === r.id ? ' tx-newr' : '')+'">'
       + '<span class="tx-td tx-tck"><span class="tx-pick '+(골랐나?'on':'')+'" data-act="tx:pick" data-k="'+key+'" data-id="'+r.id+'">'+(골랐나?'✓':'')+'</span></span>'
       + cs.map(c => {
           const 잠 = !!c.시스템 || !관리칸됨(c);
@@ -9505,6 +9538,34 @@ async function 범위채우기(어디){
   범위칠하기();
   toast(몇 + '항목을 채웠습니다');
 }
+/* 단축키 — Ctrl+Z 되돌리기 · Ctrl+Y(Ctrl+Shift+Z) 다시 · Ctrl+C 칸 복사 · Ctrl+V 칸 붙여넣기 · Delete 칸 비우기 (2026-10-26 대표 「한글 · 엑셀에서 통용되는」) */
+async function 칸되돌리기(앞){ const 목 = 앞 ? 다시함 : 되돌림, 저 = 앞 ? 되돌림 : 다시함, x = 목.pop(); if(!x) return toast(앞 ? '다시 할 것이 없어요' : '되돌릴 것이 없어요');
+  되돌리는중 = true; try{ await 속성저장하기(x.key, x.id, x.k, 앞 ? x.새 : x.옛); 저.push(x); toast(앞 ? '다시 했어요' : '되돌렸어요'); render(); } finally{ 되돌리는중 = false; } }
+document.addEventListener('keydown', function(e){
+  if(!(e.ctrlKey || e.metaKey) || 칸편집) return;
+  const t = e.target; if(t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;      /* 글칸 안에서는 브라우저 것 */
+  if(!['tasks', 'leads', 'leave'].includes(S.view)) return;
+  const 키 = String(e.key || '').toLowerCase();
+  if(키 === 'z' && !e.shiftKey){ e.preventDefault(); 칸되돌리기(false); return; }
+  if(키 === 'y' || (키 === 'z' && e.shiftKey)){ e.preventDefault(); 칸되돌리기(true); return; }
+  if(키 === 'c' && 고른칸){ const r = W[고른칸.key].find(x => x.id === 고른칸.id), c = 열들(고른칸.key).find(z => z.k === 고른칸.k); if(!r || !c) return;
+    const v = 값읽기(r, 고른칸.k), 글 = Array.isArray(v) ? v.map(x => c.타입 === 'people' ? 사람(x).name : x).join(', ') : c.타입 === 'person' ? 사람(v).name : (v == null ? '' : String(v));
+    e.preventDefault(); try{ navigator.clipboard.writeText(글); toast('복사했어요'); }catch(err){} }
+});
+document.addEventListener('paste', async function(e){
+  if(!고른칸 || 칸편집) return; const t = e.target; if(t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+  if($('#txpop') || $('#pop').classList.contains('on')) return;
+  const { key, id, k } = 고른칸, c = 열들(key).find(z => z.k === k), r = W[key].find(x => x.id === id); if(!c || !r || c.시스템 || !고칠수있나(key, r)) return;
+  const 글 = ((e.clipboardData && e.clipboardData.getData('text')) || '').trim(); e.preventDefault();
+  let v = 글;
+  if(c.타입 === 'number') v = 글 === '' ? null : +글.replace(/[^0-9.\-]/g, '');
+  else if(c.타입 === 'check') v = /^(1|o|y|true|✓|예)$/i.test(글);
+  else if(c.타입 === 'select'){ if(글 && (c.옵션 || []).indexOf(글) < 0) return toast('「' + 글 + '」은 고르는 값에 없어요'); v = 글 || null; }
+  else if(c.타입 === 'multi') v = 글.split(/\s*,\s*/).filter(x => (c.옵션 || []).indexOf(x) >= 0);
+  else if(c.타입 === 'people'){ v = 글.split(/\s*,\s*/).map(n => (W.staff || []).find(p => p.name === n)).filter(Boolean).map(p => p.id); }
+  else if(c.타입 === 'person'){ const p = (W.staff || []).find(x => x.name === 글); if(!p) return; v = p.id; }
+  await 속성저장하기(key, id, k, v); toast('붙여 넣었어요');
+});
 document.addEventListener('keydown', function(e){
   if(!고른칸 || 칸편집) return;
   if($('#txpop') || $('#pop').classList.contains('on')) return;   /* 쪽지·판이 열렸으면 그쪽 몫 */
@@ -9521,6 +9582,8 @@ document.addEventListener('keydown', function(e){
     const td = 칸찾기(id, k); if(!td) return;
     if(!칸안편집(key, id, k, td)) td.click(); return; }
   if(e.key === 'Escape'){ 범위지우기(); 칸고름지우기(); return; }
+  if(e.key === 'Delete' || e.key === 'Backspace'){ const c = 열들(key).find(z => z.k === k), r = W[key].find(x => x.id === id);      /* 칸 비우기 — Ctrl+Z 로 되돌림 */
+    if(c && r && !c.시스템 && !c.필수 && 고칠수있나(key, r)){ e.preventDefault(); 속성저장하기(key, id, k, c.타입 === 'check' ? false : (c.타입 === 'multi' || c.타입 === 'people') ? [] : null); } return; }
   /* 글자를 치면 바로 수정 상태로 (엑셀·노션처럼) */
   if(e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey){
     const c = 열들(key).find(z => z.k === k);
@@ -9613,8 +9676,9 @@ function txFilterBar(key, v, 순){
   const 조건 = (st.규칙||[]).map((q,i) => '<span class="tx-fchip">'+규칙말(q, key)
       + '<button data-act="tx:fdrop" data-k="'+key+'" data-i="'+i+'" title="제거">✕</button></span>').join('');
   const 순말 = 순 && 순.k ? ((열들(key).find(z=>z.k===순.k)||{}).이름 || 순.k) + (순.dir==='desc'?' 내림차순':' 오름차순') : '';
-  if(!(st.규칙||[]).length && !바뀜.length && !st.그룹 && !(순 && 순.k)) return '';      /* 아무 조건도 없으면 줄을 안 그린다 (노션) */
   const 고 = 고정막힘(key);
+  if(!(st.규칙||[]).length && !바뀜.length && !st.그룹 && !(순 && 순.k))      /* 조건이 없어도 표 바로 위에 「＋ 필터 · ⇅ 정렬」 (2026-10-26 대표 「필터 · 순서를 다 데이터 안에」) */
+    return '<div class="tx-fbar">' + (고 ? '<span class="tx-fixnote">🔒 필터 고정</span>' : '<button class="tx-fadd" data-act="tx:fnew" data-k="'+key+'">＋ 필터</button><button class="tx-fadd" data-act="tx:sortmenu" data-k="'+key+'">⇅ 정렬</button>') + '</div>';
   return '<div class="tx-fbar">'
     + (고 ? '<span class="tx-fixnote">🔒 필터 고정</span>' : '<button class="tx-fadd" data-act="tx:fnew" data-k="'+key+'">＋ 필터</button>')
     + ((st.규칙||[]).length > 1
@@ -9639,8 +9703,11 @@ function txFilterBar(key, v, 순){
 /* 조건 만들기 — ① 속성 ② 비교 ③ 값 */
 let 새규칙 = null;
 /* 필터 · 정렬 · 그룹 · 항목 고르기 — 옆 판이 아니라 도구줄 단추 바로 아래 작은 창 (2026-10-20 대표 · 노션) */
+let 누른단추 = null;
 function 작은판(key, 머리, 속, 발){
-  const el = document.querySelector('.tx-tools [data-act="tx:vset"][data-k="'+key+'"]');
+  const 안 = 누른단추 && document.body.contains(누른단추) && 누른단추.closest('#txpop');      /* 창 안에서 다음 단계로 — 같은 자리 */
+  const el = (!안 && 누른단추 && document.body.contains(누른단추) && 누른단추.closest('.tx-fbar, .tx-tools, .tx-bar')) ? (작은판.앵커 = 누른단추)
+    : (안 && 작은판.앵커 && document.body.contains(작은판.앵커)) ? 작은판.앵커 : document.querySelector('.tx-tools [data-act="tx:vset"][data-k="'+key+'"]');
   if(!el) return 판열기(머리, 속, 발);
   if($('#pop').classList.contains('tx-side')) popClose();
   쪽지열기(el, '<div class="tx-ph"><b>'+머리+'</b><button data-act="popclose" title="닫기">✕</button></div><div class="tx-pbody">'+속+'</div>'+(발||''), 320);
@@ -9667,7 +9734,7 @@ function 조건판(key){
   const cs = 열들(key).filter(c => c.타입 !== 'long');
   작은판(key, '필터 추가',
     '<div class="tx-menu">'
-    + cs.map(c => '<button data-act="tx:fpick" data-k="'+key+'" data-v2="'+esc(c.k)+'">'+esc(c.이름)
+    + cs.map(c => '<button data-act="tx:fpick" data-k="'+key+'" data-v2="'+esc(c.k)+'"><i class="tx-ti">'+(타입아이콘[c.타입]||'≡')+'</i>'+esc(c.이름)
         + '<small style="margin-left:auto;color:#6f6a63">'+타입이름(c.타입)+'</small></button>').join('')
     + '</div><button class="btn ghost" data-act="popclose">취소</button>');
 }
@@ -10032,7 +10099,8 @@ const 기본팔레트 = [['연분홍', '#FBBFC8'], ['산호', '#DE948F'], ['살�
   ['하늘', '#2DA9C3'], ['연하늘', '#8CC8DF'], ['파랑', '#65B4E9'], ['청보라', '#7597DC'], ['남보라', '#A8A2E1'], ['라일락', '#C9B5D6'], ['연라일락', '#F1BAFE'], ['자주', '#B784B5'], ['분홍', '#F5A0C5']];
 const 속성팔레트 = () => { const p = 명단받은 && 명단받은.색 && 명단받은.색['속성팔레트']; return Array.isArray(p) && p.length ? p.map(x => [x['이름'], x['색']]) : 기본팔레트; };
 const 칸색표 = (key, k) => ((표설정(key).colors || {})[k]) || {};
-const 옵색 = (c, o) => (c && c.색표 && c.색표[o]) || '';
+const 자동색 = ['#c49a7e', '#e0975a', '#e3c25b', '#5fb39d', '#6ea8d6', '#a48ad6', '#d98ad6', '#8fd1c4', '#b9b1a2', '#d6a5a5'];      /* 빨강 · 신호등 없이 */
+const 옵색 = (c, o) => (c && c.색표 && c.색표[o]) || ((c && (c.타입 === 'select' || c.타입 === 'multi') && (c.옵션 || []).indexOf(o) >= 0) ? 자동색[(c.옵션 || []).indexOf(o) % 자동색.length] : '');      /* 값마다 색 (2026-10-26 대표 「등록여부 · 상담유형처럼 선택 속성들 색상」) */
 const 옵칩 = (c, o, 글) => { const 색 = 옵색(c, o); return '<span class="tx-tag' + (색 ? ' oc" style="--oc:' + esc(색) : '') + '">' + 글 + '</span>'; };
 const 색선형 = v => { v /= 255; return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
 function 오클랩(hex){ const h = String(hex || '').replace('#', ''), r = 색선형(parseInt(h.slice(0, 2), 16)), g = 색선형(parseInt(h.slice(2, 4), 16)), b = 색선형(parseInt(h.slice(4, 6), 16));
@@ -10098,14 +10166,17 @@ async function 옵색저장(빼기){
 }
 const 칸색없음 = c => !!(c && c.색표 && c.색표['__없음']);
 const 사람칩 = (c, id) => 칸색없음(c) ? '<span class="tx-nm" title="' + esc(사람(id).name || '') + '">' + esc(보임이름(사람(id).name) || '?') + '</span>' : 이름딱지(id);
+/* 업무 담당 — 노션에서 옮긴 퇴사자 이름(extra.n_owner · 64 · 65단계) · 대표가 ✕ 로 지우면 사라짐 (2026-10-25 대표 d2) */
+const 퇴사담당칩 = (c, r) => { const L = c && c.k === 'owners' && r && r.extra && Array.isArray(r.extra.n_owner) ? r.extra.n_owner : [];
+  return L.map(n => '<span class="tx-tag ret">(퇴사) ' + esc(n) + (할수('table') ? '<button data-act="tx:retdel" data-id="' + esc(r.id) + '" data-v2="' + esc(n) + '" title="지우기">✕</button>' : '') + '</span>').join(''); };
 function 속성값보기(c, r){
   const v = c.늘림 ? (r.extra||{})[c.k.slice(6)] : r[c.k];
   if(c.타입 === 'check') return '<span class="tx-cb '+(v?'on':'')+'">'+(v?'✓':'')+'</span>';
-  if(값없나(v)) return '<span class="tx-pmut">비어 있음</span>';
+  if(값없나(v)) return 퇴사담당칩(c, r) || '<span class="tx-pmut">비어 있음</span>';
   if(c.타입 === 'select')   return 옵칩(c, v, esc((c.표시||{})[v]||v));
   if(c.타입 === 'multi')    return (v||[]).map(o => 옵칩(c, o, esc(o))).join('');
   if(c.타입 === 'person')   return 사람칩(c, v);
-  if(c.타입 === 'people')   return (v||[]).map(p => 사람칩(c, p)).join('');
+  if(c.타입 === 'people')   return (v||[]).map(p => 사람칩(c, p)).join('') + 퇴사담당칩(c, r);
   if(c.타입 === 'date')     return esc(날짜한글(v));
   if(c.타입 === 'datetime') return esc(시각한글(v));
   if(c.타입 === 'url' || c.타입 === 'phone' || c.타입 === 'email')
@@ -10217,8 +10288,10 @@ function 속성저장(key, id, k, v){
   저장줄 = 저장줄.then(() => 속성저장하기(key, id, k, v)).catch(() => {});
   return 저장줄;
 }
+const 되돌림 = [], 다시함 = []; let 되돌리는중 = false;
 async function 속성저장하기(key, id, k, v){
   const r = W[key].find(x => x.id === id); if(!r) return;
+  if(!되돌리는중){ const 옛 = 값읽기(r, k); if(JSON.stringify(옛) !== JSON.stringify(v)){ 되돌림.push({ key, id, k, 옛, 새: v }); if(되돌림.length > 50) 되돌림.shift(); 다시함.length = 0; } }      /* Ctrl+Z (2026-10-26 대표 「윈도우에서 통용되는 단축키」) */
   if(!시트 || 시트.key !== key || 시트.id !== id) 시트 = { key, id, 값: Object.assign({}, r) };
   늘림열(key).forEach(c => { if(시트.값[c.k] === undefined) 시트.값[c.k] = (r.extra||{})[c.k.slice(6)]; });
   시트.값[k] = v;
@@ -11200,6 +11273,7 @@ document.addEventListener('mouseup', async function(){
 function txNewMenu(key){
   const T = 표정의[key];
   popOpen('<h2>새 '+T.제목+'</h2><div class="tx-menu">'
+    + '<button data-act="tx:rownew" data-k="'+key+'">빈 페이지<small>아무것도 채우지 않고</small></button>'      /* 2026-10-26 대표 「빈 페이지도 추가」 */
     + T.템플릿.filter(t=>관리칸됨(t)).map((t,i)=>'<button data-act="tx:tpl" data-k="'+key+'" data-i="'+i+'">'+esc(t.이름)
         + (t.값.title?'<small>'+esc(t.값.title)+'</small>':'')+'</button>').join('')
     + '</div><button class="btn ghost" data-act="popclose">닫기</button>');
@@ -12683,7 +12757,7 @@ async function txAct(a, el){
   if(a==='qopen'){ 표상태[k].검색열림 = true; render(); const q = $('#txq'); if(q) q.focus(); return; }
   if(a==='vfix'){ if(!할수('table')) return toast('표 관리 권한이 있는 분만 고정할 수 있어요'); const v = 지금보기(k); if(!v) return;
     if(!v.필터고정 && 내변경(k).some(x => ['필터', '정렬', '그룹'].includes(x))) await 모두에게저장(k);      /* 지금 보이는 필터로 고정 */
-    if(!await 덮어쓰기(k, v.k, { fixed: !v.필터고정 })) return; 보기얹기(k); 쪽지닫기(); render(); toast(!v.필터고정 ? '이 보기의 필터를 고정했어요\n모든 직원 화면이 같아요' : '고정을 풀었어요'); return; }
+    if(!await 덮어쓰기(k, v.k, { fixed: !v.필터고정 })) return; 보기얹기(k); render(); 보기설정창(k);      /* 창을 닫지 않고 켜짐 / 꺼짐이 바로 바뀐다 */ toast(!v.필터고정 ? '이 보기의 필터를 고정했어요\n모든 직원 화면이 같아요' : '고정을 풀었어요'); return; }
   if(a==='bname'){ if(!할수('table')) return; const c = 기본열(k).find(z => z.k === v2); if(!c) return;
     const nm = await 입력받기('속성 이름 (화면 이름만 바뀌어요 · 비우면 원래 이름)', c.이름); if(nm == null) return;
     const m = 표설정(k), 별 = Object.assign({}, m.names || {}); if(nm.trim() && nm.trim() !== (c.원이름 || c.이름)) 별[v2] = nm.trim(); else delete 별[v2];
@@ -12728,22 +12802,7 @@ async function txAct(a, el){
     catch(e){ toast(e.message); }
     return; }
   if(a==='new'){ txNewMenu(k); return; }
-  if(a==='rownew'){                       /* 표 맨 아래에서 바로 한 줄 만든다 (노션과 같다) */
-    const T2 = 표정의[k], 몸 = { vis: T2.기본vis || 'owners', viewers: [] };
-    T2.열.forEach(c => { if(c.기본 !== undefined) 몸[c.k] = c.기본; });
-    if(T2.사람열 && ME) 몸[T2.사람열] = (T2.열.find(c => c.k === T2.사람열) || {}).타입 === 'person' ? ME.id : [ME.id];
-    몸[T2.제목열] = 몸[T2.제목열] || '';
-    if(k === 'leave') 몸.day = TODAY;
-    if(k === 'leads') 몸.name = '';
-    try{
-      const o = await usend(T2.table, 'POST', 몸, 'return=representation');
-      if(o && o[0]){ W[k].unshift(o[0]); render();
-        const td = 칸찾기(o[0].id, T2.제목열);
-        if(td){ 칸고르기(k, o[0].id, T2.제목열);
-          td.scrollIntoView({ block:'nearest' });
-          칸안편집(k, o[0].id, T2.제목열, td); } }
-    }catch(e){ toast('못 만들었어요 — '+e.message); }
-    return; }
+  if(a==='rownew'){ popClose(); await 새줄만들기(k, {}); return; }
   /* ── 필터 · 정렬 ── */
   if(a==='fnew'){ 새규칙 = { k:null, cmp:null, v:null }; 조건판(k); return; }
   if(a==='fpick'){ 새규칙 = { k:v2, cmp:null, v:null };
@@ -12762,11 +12821,11 @@ async function txAct(a, el){
   if(a==='fop'){ 표상태[k].op = 표상태[k].op === 'or' ? 'and' : 'or'; render(); return; }
   if(a==='lock'){ if(!할수('table')) return;
     const m = 표설정(k);
-    try{ const o = await usend('tr_meta?tbl=eq.'+표정의[k].table, 'PATCH',
-        { locked: !m.locked, updated_at: new Date().toISOString() }, 'return=representation');
+    try{ const o = m.tbl ? await usend('tr_meta?tbl=eq.'+표정의[k].table, 'PATCH', { locked: !m.locked, updated_at: new Date().toISOString() }, 'return=representation')
+                         : await usend('tr_meta', 'POST', { tbl: 표정의[k].table, locked: true }, 'return=representation');      /* 표 설정 줄이 없으면 만든다 — 없으면 바뀌는 줄이 0이라 「변화 없음」이었다 (2026-10-26 대표) */
       if(o && o[0]){ const i = W.meta.findIndex(x=>x.tbl===표정의[k].table);
         if(i>=0) W.meta[i] = o[0]; else W.meta.push(o[0]); }
-      render(); toast(!m.locked ? '잠갔어요' : '풀었어요. 끌어서 옮길 수 있어요');
+      render(); if(document.getElementById('txpop')) 보기설정창(k); toast(!m.locked ? '잠갔어요 · 칸 · 보기 순서를 끌어서 못 바꿔요' : '풀었어요. 끌어서 옮길 수 있어요');
     }catch(e){ toast('변경하지 못했어요 — '+e.message); }
     return; }
   if(a==='vpush'){ await 모두에게저장(k); return; }
@@ -12925,11 +12984,18 @@ async function txAct(a, el){
       W.cols = W.cols.filter(x => x.id !== c.id); 속성다시(k); render(); toast('삭제했어요'); }
     catch(e){ toast('삭제하지 못했어요 — '+e.message); }
     return; }
+  if(a==='tpl' && k !== 'leave'){ const t = 표정의[k].템플릿[+el.dataset.i]; popClose();      /* 만들면 표 맨 위 새 줄 · 이름 칸 바로 입력 — 옆 판은 「열기」를 눌러야 (2026-10-26 대표 「사이드 페이지에 뜨는 게 아니라 열기를 눌러야 · 새로 생긴 행을 인식할 수 있게」) */
+    await 새줄만들기(k, Object.assign({ template:t.이름 }, t.값)); return; }
   if(a==='tpl'){ const t = 표정의[k].템플릿[+el.dataset.i];
     txSheet(k, null, Object.assign({template:t.이름}, t.값));     /* 기본값을 채우고 */
     if(k!=='leave'){ await txSave(); if(시트 && 시트.id) txSheet(k, 시트.id); }   /* 바로 페이지를 만든다 (연월차는 날짜 고르면) */
     return; }
   if(a==='open'){ txView(k, id); return; }
+  if(a==='retdel'){ const r = (W.tasks || []).find(x => x.id === el.dataset.id); if(!r) return; const n = v2;
+    if(!await 묻기('담당에서 「(퇴사) ' + n + '」을 지울까요?')) return;
+    try{ const ex = Object.assign({}, r.extra || {}, { n_owner: (r.extra.n_owner || []).filter(x => x !== n) });
+      const o = await usend('tr_tasks?id=eq.' + r.id, 'PATCH', { extra: ex }, 'return=representation'); Object.assign(r, (o && o[0]) || { extra: ex }); toast('지웠어요'); render(); }
+    catch(e){ toast('지우지 못했어요 — ' + e.message); } return; }
   if(a==='back'){ txView(시트.key, 시트.id); return; }
   if(a==='wide'){ 넓게 = !넓게; $('#pop').classList.toggle('tx-wide', 넓게);
     const b = document.querySelector('[data-act="tx:wide"]'); if(b) b.textContent = 넓게?'⤡':'⤢'; return; }
@@ -14315,7 +14381,7 @@ document.addEventListener('click', async function(ev){
      앞서는 이쪽에 없어서, 바깥 손잡이에서 v2 를 쓰면 `v2 is not defined` 로 조용히 죽었다.
      두 손잡이가 같은 이름을 쓰면 어느 쪽에 적든 돈다. */
   const a = act.dataset.act, id = +act.dataset.i, v2 = act.dataset.v2;
-  if(a.indexOf('tx:')===0){ ev.preventDefault();
+  if(a.indexOf('tx:')===0){ ev.preventDefault(); 누른단추 = act;      /* 작은 창을 누른 단추 아래에 (2026-10-26 대표 「필터를 왼쪽에서 눌렀는데 우측에서 뜸」) */
     판누름 = { a: a.slice(3), ds: Object.assign({}, act.dataset), 안: !!act.closest('#popbox, #txpop') && $('#pop').classList.contains('tx-side') };      /* 판 뒤로가기 — 어느 단추가 판을 열었나 */
     try{ await txAct(a.slice(3), act); } finally { 판누름 = null; } return; }
   if((a.indexOf('pz')===0 || /^pi(list|new|close|edit|mrm|save|del)$/.test(a)) && await 세트손잡이(a, act)) return;      /* 스트레칭 세트 (2026-10-07) */
