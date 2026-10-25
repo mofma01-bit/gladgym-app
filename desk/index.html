@@ -2359,7 +2359,7 @@ body{word-break:keep-all}
 
 <script>
 "use strict";
-const BUILD = '392';
+const BUILD = '393';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -8604,7 +8604,7 @@ function 락커판(k){
     + (L.length ? L.map(o => '<div class="bp-row2"><div class="a"><b>' + (o['번호'] != null && o['번호'] !== '' ? esc(String(o['번호'])) + '번 · ' : '') + esc(o['이름'] || '') + '</b>'
         + (o['전화'] ? '<a class="sub3" style="margin-left:8px;color:var(--gold)" href="tel:' + esc(o['전화']) + '">' + esc(o['전화']) + '</a>' : '')
         + '<span class="sub3" style="margin-left:auto">끝 ' + 짧(o['끝']) + (o['안내일'] ? ' · 안내 ' + 짧(o['안내일']) : '') + (o['지난날'] != null && o['지난날'] !== '' ? ' · 안내 뒤 ' + esc(String(o['지난날'])) + '일' : '') + '</span></div></div>').join('')
-      : '<div class="empty why"><b>' + (k === 'TM' ? '전화할 락커가 없어요' : '만료된 락커가 없어요') + '</b>매시 전산을 받은 뒤 다시 세요</div>'));
+      : '<div class="empty why"><b>' + (k === 'TM' ? '전화할 락커가 없습니다' : '만료된 락커가 없습니다') + '</b>' + (k === 'TM' ? '폐기 안내 뒤 15일이 지나도 회수 안 되면 여기에 뜹니다' : '기간이 끝나고 회수 안 된 락커가 여기에 뜹니다') + '</div>'));
 }
 function 다음주쉼판(){
   const L = 다음주쉼();
