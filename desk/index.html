@@ -1949,7 +1949,7 @@ body{word-break:keep-all}
 .as-more.btn-l{background:none;border:0;color:var(--gold);font:inherit;font-size:13px;font-weight:700;text-align:left;cursor:pointer}
 .as-askc{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px}.as-askc .chip{padding:3px 9px;font-size:13px}
 .as-tag{font-size:12.5px;font-weight:800;border-radius:6px;padding:1px 7px;background:var(--dark-4);color:var(--sub);white-space:nowrap}
-.as-tag.ok{background:#3a352c;color:#f2ead9}.as-tag.fail{background:#3a2a17;color:#f0b46a;border:1px solid #6b4a24}.as-row .as-tag{margin-left:6px}
+.as-tag.ok{background:#3a352c;color:#f2ead9}.as-row .ptwhy{white-space:normal;line-height:1.4}.as-tag.fail{background:#3a2a17;color:#f0b46a;border:1px solid #6b4a24}.as-row .as-tag{margin-left:6px}
 .as-dots{display:inline-flex;gap:3px}.as-dots i{width:16px;height:6px;border-radius:3px;background:var(--dark-4);display:inline-block}.as-dots i.y{background:var(--teal)}
 .as-st{display:inline-flex;gap:4px;flex-wrap:wrap}
 .as-st button{font:inherit;font-size:13px;border-radius:7px;padding:2px 8px;border:1px solid #3a3833;background:none;color:var(--sub);cursor:pointer}
@@ -2360,7 +2360,7 @@ body{word-break:keep-all}
 
 <script>
 "use strict";
-const BUILD = '395';
+const BUILD = '396';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -8613,7 +8613,7 @@ function 못감판(){
         ? '<div class="bp-row2"><div class="a"><b>' + esc(이름(o.x.member_id)) + '</b><span class="as-tag">식단 알림톡</span><span class="sub3" style="margin-left:auto">' + esc(String(o.x.created_at || '').slice(5, 10).replace('-', '/')) + '</span></div>'
           + '<div class="sub3" style="margin:4px 0">' + esc(o.x.error || '이유를 받지 못했어요') + '</div><button class="btn sub sm" data-act="tx:dietre" data-k="' + esc(o.x.id) + '">다시 보내기</button></div>'
         : '<div class="bp-row2"><div class="a"><b>' + esc(o.x.name || '') + '</b><span class="as-tag">가이드 설문</span>' + (o.x.phone ? '<a class="sub3" style="margin-left:8px;color:var(--gold)" href="tel:' + esc(o.x.phone) + '">' + esc(o.x.phone) + '</a>' : '') + '<span class="sub3" style="margin-left:auto">' + esc(배정담당(o.x) || '담당 없음') + '</span></div>'
-          + '<div class="sub3" style="margin:4px 0">' + esc(o.x.survey_error || o.x.survey_why || '카톡도 문자도 실패했어요') + '</div><button class="btn sub sm" data-act="tx:asresend" data-k="' + esc(o.x.id) + '">다시 보내기</button></div>').join('')
+          + '<div class="sub3" style="margin:4px 0">' + esc(o.x.survey_error || '카톡도 문자도 실패했어요') + '</div><button class="btn sub sm" data-act="tx:asresend" data-k="' + esc(o.x.id) + '">다시 보내기</button></div>').join('')
       : '<div class="empty why"><b>못 간 알림톡이 없습니다</b>카톡과 문자가 다 실패하면 여기에 뜹니다</div>'));
 }
 async function 식단다시(id){ const x = (못감.r || []).find(r => r.id === id); if(!x) return;
@@ -11793,10 +11793,11 @@ function v배정(){
   if(배정.탭 === '할일'){
     const 물걸 = 배정.물 ? 물.filter(x => x.ask === 배정.물) : 물;
     h += '<div class="as-q">'
-      + (PT확.length ? '<div class="as-qc hot"><div class="qh"><b>PT 회원 자동 배정 · 확인</b><span>' + PT확.length + '</span></div><div class="qd">PT 선생님으로 자동 배정했거나 담당이 PT 선생님과 달라요. 보고 확인해 주세요</div>'
-        + 줄(PT확, x => 배정PT다름(x)
-          ? '<button class="as-btn g" data-act="tx:asassign" data-k="' + esc(x.id + '|' + x.pt_trainer) + '">' + esc(x.pt_trainer) + (c => (c - 0xAC00) % 28 === 0 || (c - 0xAC00) % 28 === 8 ? '로' : '으로')(String(x.pt_trainer).slice(-1).charCodeAt(0)) + ' 바꾸기</button><button class="as-btn" data-act="tx:asptok" data-k="' + esc(x.id) + '">그대로 두기</button>'
-          : '<button class="as-btn g" data-act="tx:asptok" data-k="' + esc(x.id) + '">확인</button><button class="as-btn" data-act="tx:agpick" data-k="' + esc(x.id) + '">담당 바꾸기</button>') + '</div>' : '')
+      + (PT확.length ? '<div class="as-qc hot"><div class="qh"><b>PT 회원 자동 배정 · 확인</b><span>' + PT확.length + '</span></div><div class="qd">PT를 받고 있는 회원이라 무료 PT 담당을 PT 선생님으로 맞춥니다. 줄을 누르면 자세히 보여요</div>'
+        + PT확.slice(0, 8).map(x => '<div class="as-row" data-act="tx:asopen" data-k="' + esc(x.id) + '"><b>' + esc(x.name) + '</b><span class="mt ptwhy">' + esc(배정PT이유(x)) + '</span>'
+          + (배정PT다름(x) ? '<button class="as-btn g" data-act="tx:asassign" data-k="' + esc(x.id + '|' + x.pt_trainer) + '">' + esc(x.pt_trainer) + 로조사(x.pt_trainer) + ' 바꾸기</button>'
+                          : '<button class="as-btn g" data-act="tx:asptok" data-k="' + esc(x.id) + '">확인</button>')
+          + '<button class="as-btn" data-act="tx:agpick" data-k="' + esc(x.id) + '">담당 바꾸기</button></div>').join('') + '</div>' : '')
       + (신.length ? '<div class="as-qc hot"><div class="qh"><b>신청 들어옴</b><span>' + 신.length + '</span></div><div class="qd">희망 시간 · 설문을 남겼어요. 담당을 정해 주세요</div>' + 줄(신.slice().sort((a, b) => String(a.apply_at).localeCompare(String(b.apply_at))), x => 할수('assignset') && 배정쓰기(x) ? '<button class="as-btn" data-act="tx:agpick" data-k="' + esc(x.id) + '">담당 정하기</button>' : '<span class="as-tag">' + esc((x.apply_times || []).join(' · ').slice(0, 14)) + '</span>') + '</div>' : '')
       + (교.length ? '<div class="as-qc hot"><div class="qh"><b>교체 요청</b><span>' + 교.length + '</span></div><div class="qd">담당 선생님이 바꿔 달라고 했어요</div>' + 줄(교, x => '<button class="as-btn" data-act="tx:agpick" data-k="' + esc(x.id) + '">새 담당</button>') + '</div>' : '')
       + (할수('assignall') ? '<div class="as-qc hot"><div class="qh"><b>미배정</b><span>' + 미배.length + '</span></div><div class="qd">담당이 없어요. 담당을 정해 주세요</div>' + (미배.length ? 줄(미배, x => 배정쓰기(x) ? (배정PT중(x) && x.pt_trainer ? '<button class="as-btn g" data-act="tx:asassign" data-k="' + esc(x.id + '|' + x.pt_trainer) + '">' + esc(x.pt_trainer) + ' 확인</button>' : '') + '<button class="as-btn" data-act="tx:agpick" data-k="' + esc(x.id) + '">담당 정하기</button>' : '<span class="as-tag">노션에서</span>') : '<div class="sub3">미배정이 없습니다</div>') + '</div>' : '')
@@ -11830,6 +11831,12 @@ const 배정PT중 = x => x && x.pt_state === 'PT중';      /* 중앙이 매시 �
 const 배정관리자 = () => !!(ME && (ME.super === true || ['대표자', '최고관리자', '중간관리자'].includes(등급of(ME))));
 const 배정PT자동 = x => String(x.assign_note || '').includes('PT 진행 중(');      /* 중앙 자동 배정 줄 표시 — 「자동 10/24 · PT 진행 중(장승훈)」 */
 const 배정PT다름 = x => !!x.pt_trainer && !(x.trainers || []).includes(x.pt_trainer);      /* 담당이 PT 선생님과 다름 (퇴사 담당 · 빈 담당) */
+const 로조사 = n => (c => (c - 0xAC00) % 28 === 0 || (c - 0xAC00) % 28 === 8 ? '로' : '으로')(String(n || '').slice(-1).charCodeAt(0));
+/* 줄마다 이유 한 줄 (2026-10-25 대표 작업판 A5 「퇴사로 담당을 바꿔야 하거나 재배정해 주세요처럼」) */
+const 배정PT이유 = x => { const 담 = (x.trainers || []).join(' · '), pt = x.pt_trainer || '';
+  if(!배정PT다름(x)) return pt + ' 선생님이 PT 진행 중이라 같은 선생님으로 자동 배정했어요 · 맞으면 확인';
+  if(!담) return '담당이 비어 있어요 → PT 선생님 ' + pt + 로조사(pt) + ' 배정해 주세요';
+  return ((x.trainers || []).some(t => 퇴사명().has(t)) ? '담당 ' + 담 + ' 퇴사 → ' : '담당 ' + 담 + ' · PT는 ' + pt + ' → ') + pt + 로조사(pt) + ' 재배정하거나 다른 선생님을 골라 주세요'; };
 const 배정PT확인대기 = x => 배정PT중(x) && 'pt_ok' in x && !x.pt_ok && (배정PT자동(x) || 배정PT다름(x));      /* 관리자 확인 — 자동 배정했거나 담당이 PT 선생님과 다른 줄만 (16:46 대표 「관리자 확인만」 · 16:5x 중앙 제안: 직원이 이미 PT 선생님으로 배정한 줄은 뺌) */
 const 배정상태단추 = x => 배정PT중(x) ? '<span class="as-tag ptm">PT 회원</span>' + (x.pt_note ? ' <span class="sub3">' + esc(x.pt_note) + '</span>' : '') : !배정쓰기(x) ? '<span class="as-tag" title="수정할 수 없는 줄">' + esc(x.progress) + ' · 노션</span>' : '<span class="as-st">' + [['진행중', 'p'], ['재연락 필요', 'r'], ['종료', 'e']].map(([k, c]) => '<button class="' + c + (x.progress === k ? ' on' : '') + '" data-act="tx:asst" data-k="' + esc(x.id) + '|' + k + '">' + k + '</button>').join('') + '</span>';
 async function 배정고침(id, 몸, 말){
