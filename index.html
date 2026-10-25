@@ -3163,7 +3163,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '459';
+const BUILD = '460';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -4253,7 +4253,14 @@ function 균형말(ps, W){
 const 몸3각 = Array.from({length:24}, (_, i) => String(i * 15).padStart(3, '0'));
 const 몸3N = 몸3각.length;
 const 몸3이름 = a => ['앞','앞우','우','뒤우','뒤','뒤좌','좌','앞좌'][Math.round(a * 360 / 몸3N / 45) % 8];
-const 몸3ID = { 가슴:[255,0,0], 어깨:[0,255,0], 등:[0,0,255], 팔:[255,255,0], 복근:[255,0,255], 하체:[0,255,255] };
+/* 근육 칸 21개 (2026-10-25 대표 분류 확정 · 정본 설계서\근육분류_초안.json · 그림 = 3D시험\근육\만들기4.py GG_FINE) — 지도 색은 렌더 그대로(0 · 188 · 255) */
+const 근칸 = ["chest_up", "chest", "delt_f", "delt_s", "delt_r", "biceps", "triceps", "forearm", "abs", "oblique", "trap", "midback", "lats", "lowback", "glute", "glute_med", "quad", "ham", "adductor", "calf", "shin"];
+const 근칸색 = [[255, 0, 0], [0, 255, 0], [0, 0, 255], [255, 255, 0], [255, 0, 255], [0, 255, 255], [188, 0, 0], [0, 188, 0], [0, 0, 188], [188, 188, 0], [188, 0, 188], [0, 188, 188], [255, 188, 0], [255, 0, 188], [188, 255, 0], [0, 255, 188], [188, 0, 255], [0, 188, 255], [255, 188, 188], [188, 255, 188], [188, 188, 255]];
+const 근칸부위 = {"chest_up": "가슴", "chest": "가슴", "delt_f": "어깨", "delt_s": "어깨", "delt_r": "어깨", "biceps": "팔", "triceps": "팔", "forearm": "팔", "abs": "복근", "oblique": "복근", "trap": "등", "midback": "등", "lats": "등", "lowback": "등", "glute": "하체", "glute_med": "하체", "quad": "하체", "ham": "하체", "adductor": "하체", "calf": "하체", "shin": "하체"};      /* 분석의 돌아가는 몸(부위 6개 세기)은 칸을 부위로 묶어 칠한다 */
+const 종목근칸 = {"bp":["chest"],"idp":["chest_up"],"cp":["chest"],"cf":["chest"],"x1023_cf_d":["chest"],"ohp":["delt_f","delt_s","triceps"],"ibp":["chest_up"],"lr":["delt_s"],"df":["chest"],"blr":["delt_r"],"ch01":["chest"],"lpd":["lats"],"x1023_lpd_f":["lats"],"ch02":["chest"],"fr":["delt_f"],"cnp":["delt_f","glute","trap"],"sr":["midback","lats"],"ch03":["chest"],"x1023_sr_e":["lats","midback"],"x1023_hir_c":["lats","midback"],"ch04":["chest_up"],"dsp":["delt_f","delt_s"],"hir":["lats","midback"],"sh01":["delt_f","delt_s","triceps"],"ch05":["chest"],"lin":["midback","lats"],"br":["lats","midback"],"sh02":["delt_s","delt_f"],"x1023_dc_b":["biceps","forearm"],"dc":["biceps"],"x1023_dc_c":["forearm","biceps"],"sh03":["delt_s","trap"],"pdr":["lats","midback"],"shr":["trap"],"ch08":["chest"],"sh04":["delt_f","chest_up"],"ch09":["chest_up"],"sh05":["delt_f","delt_s"],"tp":["triceps"],"x1023_tp_c":["triceps"],"x1023_tp_d":["triceps"],"oad":["lats"],"x1023_tp_b":["triceps"],"dsr":["midback","lats"],"x1023_bc_b":["forearm","biceps"],"sh06":["delt_f","delt_s"],"ch10":["chest"],"sq":["quad","glute"],"bc":["biceps"],"apd":["lats"],"rdl":["ham","glute"],"sh07":["delt_f"],"pc":["biceps"],"x1023_rdl_b":["ham","glute"],"ch11":["chest"],"bk01":["glute","quad","adductor"],"sh08":["delt_s","trap"],"ar01":["biceps"],"ch12":["chest_up"],"lp":["quad","glute"],"sh09":["delt_r","delt_s"],"lc":["ham"],"ch13":["chest","triceps"],"bk02":["quad","glute","lowback"],"bk03":["lowback","trap","glute"],"ar03":["biceps"],"ch14":["chest"],"sh10":["delt_r","midback"],"le":["quad"],"ht":["glute"],"ar04":["triceps"],"sh11":["delt_f","delt_s"],"ch15":["triceps","chest"],"pl":["abs"],"ar05":["triceps"],"fsq":["quad"],"ch16":["chest_up","delt_f"],"bk05":["ham","lowback"],"sh12":["delt_s"],"bk06":["midback","lats"],"ch17":["chest"],"ar06":["triceps","chest"],"dl":["lowback","glute","ham"],"sh13":["delt_r"],"cr":["abs"],"bk07":["midback","lats"],"ch18":["chest","triceps"],"hlr":["abs"],"ar07":["biceps"],"sh14":["delt_f","delt_s"],"lg":["quad","glute"],"x1023_bk07_x1789802114948":["lats","midback"],"ar08":["biceps"],"ch19":["chest","triceps"],"x1023_sh15_b":["delt_s"],"rlg":["glute","quad"],"bk08":["trap"],"sh15":["delt_s"],"ccr":["abs"],"sh16":["delt_f"],"bk09":["midback","lats"],"x1023_bk09_e":["lats","midback"],"ch20":["chest","triceps"],"bss":["quad","glute"],"ab01":["abs"],"ar09":["biceps"],"sh17":["delt_r"],"ar10":["triceps"],"gm":["ham","lowback"],"ab02":["abs"],"ch21":["chest","lats"],"ar11":["triceps"],"clf":["calf"],"ab03":["abs"],"sh18":["delt_s","trap"],"ch22":["lats","chest"],"ch23":["chest","triceps"],"ab04":["abs"],"ar12":["forearm"],"gsq":["quad","glute"],"sh19":["delt_r"],"dlg":["quad","glute"],"ch24":["chest"],"sh20":["delt_f"],"ab05":["abs"],"ar13":["forearm"],"sh21":["delt_f","triceps"],"ch25":["chest","abs"],"ar14":["forearm","trap"],"ab06":["oblique"],"slg":["adductor","quad","glute"],"spq":["quad","glute"],"sh22":["delt_f","triceps"],"bk15":["lats"],"ch26":["chest"],"ab07":["abs","triceps"],"x1023_ar15_c":["forearm","biceps"],"ar15":["biceps"],"x1023_ar15_b":["biceps","forearm"],"ch27":["chest"],"lg01":["quad","glute"],"bk16":["trap"],"sh23":["delt_r","midback"],"ab08":["oblique"],"ch28":["chest"],"ab09":["abs"],"sh24":["delt_r"],"bk17":["delt_r","midback"],"lg02":["glute","quad","ham"],"x1023_bk18_d":["lats","biceps"],"bk18":["lats"],"sh25":["delt_f"],"lg03":["glute","quad"],"ab10":["oblique","abs"],"lg04":["ham","lowback"],"ab11":["abs"],"sh26":["delt_f","delt_s"],"lg05":["glute"],"ar20":["triceps"],"ab12":["lowback","glute"],"bk20":["midback","lats"],"sh27":["delt_s","delt_f"],"lg06":["quad","glute"],"sh28":["delt_r"],"ch32":["chest","triceps"],"ab13":["abs"],"bk21":["lowback","glute"],"ar21":["biceps"],"lg07":["quad","glute"],"bk22":["lowback"],"ar22":["triceps"],"ab14":["abs"],"ch33":["chest"],"bk23":["forearm","lats"],"ch34":["chest"],"ar23":["triceps"],"ab15":["abs"],"sh30":["delt_s"],"ch35":["chest_up"],"ar24":["triceps"],"bk24":["lats"],"sh31":["delt_s"],"ab16":["abs"],"lg10":["quad","glute"],"ab17":["abs"],"ch36":["chest"],"sh32":["delt_f","forearm"],"bk25":["midback","lats"],"ar25":["forearm"],"et16":["delt_f","oblique","glute"],"sh33":["delt_f","delt_s"],"ab18":["abs","lats"],"bk26":["lats","midback"],"lg11":["ham"],"ch37":["chest"],"et17":["glute","ham","trap"],"lg12":["ham"],"ch38":["triceps","chest"],"sh34":["delt_r"],"ar27":["biceps"],"ab19":["abs"],"bk27":["midback","lats"],"ab20":["abs"],"et18":["glute","delt_f","trap"],"lg13":["glute_med"],"ar28":["biceps","forearm"],"bk28":["lats"],"bk29":["lats","midback"],"ab21":["oblique"],"lg14":["adductor"],"et19":["glute","quad","trap"],"ab22":["oblique"],"ar30":["triceps"],"lg15":["glute"],"et20":["trap","delt_s","glute"],"bk30":["glute","ham"],"ar31":["triceps","chest"],"et21":["quad","delt_f"],"ab23":["oblique"],"lg16":["calf"],"et22":["quad","delt_f"],"lg17":["calf"],"bk32":["lats","midback"],"ab24":["oblique"],"ab25":["oblique"],"bk33":["lowback","glute","ham"],"lg18":["calf"],"et23":["abs","lats"],"lg19":["quad","glute"],"ab26":["oblique"],"bk34":["midback","lats"],"et24":["ham","lowback"],"bk35":["trap"],"ab27":["oblique"],"lg20":["glute_med","glute","quad"],"bk36":["midback","delt_r"],"ab28":["abs"],"lg21":["quad","glute"],"bk37":["midback","delt_r"],"ab29":["abs"],"lg22":["ham","glute"],"ab30":["abs"],"bk38":["lats","midback"],"lg23":["calf"],"bk39":["midback","lats"],"ab31":["abs"],"lg24":["glute","ham","lowback"],"lg25":["glute"],"bk40":["midback","lats"],"ab32":["oblique"],"lg26":["glute_med"],"ab33":["abs"],"bk41":["lats"],"ab34":["abs"],"lg27":["glute","ham"],"bk42":["trap"],"lg28":["quad"],"bk43":["lowback"],"ab35":["abs"],"lg29":["quad","glute"],"ab36":["abs"],"ab37":["abs"],"lg30":["quad"],"lg31":["ham"],"lg32":["glute"],"lg33":["glute"],"lg34":["glute","ham"],"lg35":["calf"],"lg36":["quad","glute"],"lg37":["glute_med"],"lg38":["adductor"],"lg39":["quad","glute"],"lg40":["quad","glute","delt_s"],"lg41":["lowback","glute","ham"],"lg43":["glute","ham"],"lg44":["quad"],"lg45":["ham"],"lg46":["glute_med","quad"],"lg47":["glute_med","quad"],"lg48":["quad","glute"],"lg51":["quad","glute"],"lg52":["quad","glute"],"lg53":["quad","glute"],"lg56":["adductor","glute","quad"],"lg57":["quad","glute"],"lg58":["glute"],"lg59":["glute"],"lg60":["ham","glute"],"lg61":["glute","lowback","ham"],"lg63":["glute_med"],"lg64":["calf"],"lg65":["calf"],"lg66":["shin"],"lg67":["glute"],"lg68":["quad","glute"],"lg69":["glute","quad"],"lg70":["calf"],"lg71":["quad","glute"],"lg72":["quad","glute"],"lg73":["quad","glute"],"lg74":["quad","glute"],"lg75":["glute_med"],"lg76":["quad","glute"],"lg77":["ham","lowback"],"lg78":["glute","adductor","quad"],"lg79":["glute","quad"],"lg80":["glute"],"x1792467245379376":["chest"]};
+const 부위기본칸 = { 가슴:['chest'], 어깨:['delt_f', 'delt_s'], 등:['lats', 'midback'], 팔:['biceps', 'triceps'], 하체:['quad', 'glute'], 복근:['abs'] };      /* 분류에 없는 새 종목(직접 만든 것) — 부위로 대신 */
+const 근칸of = ex => 종목근칸[ex] || 부위기본칸[(exOf(ex) || {}).p] || [];
+const 칸맞음 = (d, i, c) => Math.abs(d[i] - c[0]) < 25 && Math.abs(d[i + 1] - c[1]) < 25 && Math.abs(d[i + 2] - c[2]) < 25;      /* 188 과 255 가 섞인 칸이 있어 40 이면 목(회색 225)이 칸으로 잡힌다 */
 const 몸3저장 = {};                                   /* '남/앞' → {몸:Image, 부위:ImageData} */
 function 몸3받기(성, 각){
   const k = 성 + '/' + 각;
@@ -4283,12 +4290,12 @@ async function 몸3그리기(id){
   const W = r.부위.width, H = r.부위.height; cv.width = W; cv.height = H;
   const x = cv.getContext('2d'); x.clearRect(0, 0, W, H); x.drawImage(r.몸, 0, 0, W, H);
   /* 부위 → 색·세기 를 미리 풀어 둔다 */
-  const 표 = Object.entries(몸3ID).map(([k, c]) => ({ c, 세기: (p.세기||{})[k] || 0, 색: 몸3색((p.색||{})[k] || '#000') }));
+  const 표 = 근칸.map((k, j) => { const 부 = 근칸부위[k]; return { c: 근칸색[j], 세기: (p.세기||{})[부] || 0, 색: 몸3색((p.색||{})[부] || '#000') }; });
   const 덮 = x.createImageData(W, H), d = r.부위.data, e = 덮.data;
   for(let i = 0; i < d.length; i += 4){
     if(d[i+3] < 128) continue;
     let 맞 = null;
-    for(const t of 표){ if(Math.abs(d[i]-t.c[0]) < 40 && Math.abs(d[i+1]-t.c[1]) < 40 && Math.abs(d[i+2]-t.c[2]) < 40){ 맞 = t; break; } }
+    for(const t of 표){ if(칸맞음(d, i, t.c)){ 맞 = t; break; } }
     if(!맞 || !맞.세기) continue;
     e[i] = 맞.색[0]; e[i+1] = 맞.색[1]; e[i+2] = 맞.색[2]; e[i+3] = Math.round(255 * Math.min(0.85, 맞.세기));
   }
@@ -6492,11 +6499,12 @@ function 옛운동화면(w){
    · 1RM 측정 · 유산소만 하는 운동은 예전 화면 · 표의 1RM/유산소/메모 줄 = 눌러서 그 종목 화면
    · 자료는 그대로: 횟수가 있는 세트 = 한 세트(done) — 마칠 때 빈 세트는 버린다 */
 const 형광 = ['#e6c84a', '#6cc070', '#5aa7e0', '#a98ae0', '#e0a35a', '#5fc9c0'];
-const 몸부위들 = ['가슴', '어깨', '등', '팔', '하체', '복근'];
 const 플래너인가 = w => !!w && w.title !== '1RM 측정' && !w.items.some(it => it.rmPlan) && !(w.items.length && w.items.every(it => (exOf(it.ex) || {}).cardio));
 function 플래너색(w){ const m = {}; let n = 0; w.items.forEach((it, i) => { const e = exOf(it.ex) || {}; if(e.cardio || isMemo(it.ex)) return; m[i] = 형광[n++ % 형광.length]; }); return m; }
-function 플래너칠(w){ const 색 = 플래너색(w), p = {};
-  w.items.forEach((it, i) => { const 부 = (exOf(it.ex) || {}).p; if(!색[i] || 몸부위들.indexOf(부) < 0) return; const a = p[부] || (p[부] = []); if(a.indexOf(색[i]) < 0) a.push(색[i]); }); return p; }
+function 플래너칠(w){ const 색 = 플래너색(w), 최 = {};      /* 칸마다 한 색 — 그날 그 칸을 쓰는 종목 중 세트가 가장 많은 종목(같으면 위 종목) (2026-10-25 대표 확정 「세트 많은 종목 색」) */
+  w.items.forEach((it, i) => { if(!색[i]) return; const n = (it.sets || []).filter(x => (x.reps || 0) > 0 || (x.kg || 0) > 0).length;
+    근칸of(it.ex).forEach(k => { if(!최[k] || n > 최[k].n) 최[k] = { n, c: 색[i] }; }); });
+  const p = {}; Object.keys(최).forEach(k => { p[k] = [최[k].c]; }); return p; }
 function 지난세트들(mid, ex, va){ const r = lastRuns(ex, va, mid, 1)[0]; return r ? r.sets.map(x => ({ kg:x.kg || 0, reps:x.reps || 0, done:false })) : null; }
 const 바탕 = sets => sets.map(x => ({ kg:x.kg, reps:x.reps }));
 /* 해부 모델(img/body3) 앞 · 뒤 두 장 — 부위마다 그 종목 형광펜 색 · 여럿이면 빗금 줄무늬 */
@@ -6506,12 +6514,12 @@ async function 플래너몸그리기(id){
   const [앞, 뒤] = await Promise.all([몸3받기(성, '000'), 몸3받기(성, '180')]); if(!앞 || !뒤) return;
   box = document.getElementById(id) || box; const cv = box.querySelector('canvas'); if(!cv) return;
   const W = 앞.부위.width, H = 앞.부위.height; cv.width = W * 2; cv.height = H; const x = cv.getContext('2d'); x.clearRect(0, 0, W * 2, H);
-  const 표 = Object.entries(몸3ID).map(([k, c]) => ({ c, 색: (p[k] || []).map(몸3색) }));
+  const 표 = 근칸.map((k, j) => ({ c: 근칸색[j], 색: (p[k] || []).map(몸3색) }));
   [앞, 뒤].forEach((r, k) => {
     x.drawImage(r.몸, k * W, 0, W, H);
     const 덮 = x.createImageData(W, H), d = r.부위.data, e = 덮.data;
     for(let i = 0; i < d.length; i += 4){ if(d[i + 3] < 128) continue;
-      let 맞 = null; for(const t of 표){ if(Math.abs(d[i] - t.c[0]) < 40 && Math.abs(d[i + 1] - t.c[1]) < 40 && Math.abs(d[i + 2] - t.c[2]) < 40){ 맞 = t; break; } }
+      let 맞 = null; for(const t of 표){ if(칸맞음(d, i, t.c)){ 맞 = t; break; } }
       if(!맞 || !맞.색.length) continue; const px = (i / 4) % W, py = Math.floor(i / 4 / W), c = 맞.색[Math.floor((px + py) / 14) % 맞.색.length];
       e[i] = c[0]; e[i + 1] = c[1]; e[i + 2] = c[2]; e[i + 3] = 205; }
     const ov = document.createElement('canvas'); ov.width = W; ov.height = H; ov.getContext('2d').putImageData(덮, 0, 0); x.drawImage(ov, k * W, 0); });
