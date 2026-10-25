@@ -1832,7 +1832,15 @@ body .prephd .ph1{font-size:21px}
   color:var(--cream);font-size:15px;font-weight:800;flex:none}
 .ordbtn:active{background:#45453f}
 
-/* 담은 종목 미리보기 — 사진첩 고르기처럼 아래에 계속 보인다 */
+/* 담은 종목 — 맨 위에 늘 붙어 있다 (2026-10-25 결정함 k5a A안) */
+.pktop{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:8px;background:var(--teal-dim);border:1px solid #3a5b66;border-radius:14px;padding:12px 10px 8px;margin:4px 0 10px;flex-wrap:wrap}
+.pktop .pktag{position:absolute;top:-9px;left:10px;font-size:12px;font-weight:800;color:var(--teal);background:var(--bg,#121211);padding:0 6px}
+.pktop .pkchips{display:flex;gap:6px;flex-wrap:wrap;flex:1;min-width:0}
+.pktop .pkc{display:inline-flex;align-items:center;gap:4px;background:#24302c;border:1px solid #3c5a53;border-radius:999px;padding:3px 4px 3px 10px;font-size:13px;font-weight:700;color:var(--cream)}
+.pktop .pkc button{width:24px;height:24px;border-radius:50%;color:var(--sub);font-size:12px;font-weight:900}
+.pktop .pkgo{flex:none;white-space:nowrap}
+.pktop.bump{animation:pk .5s ease-out}
+/* (옛) 담은 종목 미리보기 — 아래 칸 · 2026-10-25 맨 위로 옮김 */
 .picked{flex:1.15;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:3px;
   background:var(--teal-dim);border:1px solid #3a5b66;border-radius:12px;padding:8px 12px;text-align:left}
 .picked .c{font-size:12px;font-weight:800;color:var(--teal);display:flex;align-items:center;gap:5px}
@@ -2667,11 +2675,16 @@ body .wkhd:has(+ .cal2) .d::before{content:"";width:17px;height:17px;flex:none;b
 .wnum{min-width:40px;font-size:17px;font-weight:800;color:var(--cream);border-bottom:1.5px dashed #5d8994;padding:1px 2px;line-height:1.2}.wnum.on{color:var(--gold);border-bottom-color:var(--gold)}
 .pvgo{text-decoration:underline dotted;color:var(--gold-2)}
 #kpad{position:fixed;left:0;right:0;bottom:0;z-index:90;max-width:480px;margin:0 auto;background:#1b1a18;border-top:1px solid #3a3832;border-radius:18px 18px 0 0;padding:10px 12px calc(12px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:7px;box-shadow:0 -10px 30px rgba(0,0,0,.5)}
-#kpad .kpv{display:flex;align-items:baseline;gap:8px;padding:2px 4px}#kpad .kpv small{color:var(--sub);font-size:12px}#kpad .kpv b{font-size:26px;font-weight:800;color:var(--gold)}
-#kpad .kpq{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}#kpad .kpq button{border:1px solid var(--line);border-radius:10px;padding:8px 0;font-weight:700;color:#cfc7b8;font-size:13px}
-#kpad .kpg{display:grid;grid-template-columns:repeat(3,1fr) 1.1fr;gap:6px}#kpad .kpg button{border-radius:11px;background:#2a2926;padding:12px 0;font-size:19px;font-weight:700;color:var(--cream)}#kpad .kpg button:active{background:#3a3832}
-#kpad .kpg .ok{grid-row:span 2;background:linear-gradient(180deg,#f3dcae,#dfc089);color:#241a08;font-size:16px;font-weight:800}#kpad .kpg .fn{font-size:15px;color:var(--sub)}#kpad .kpg .sm{font-size:13px}#kpad .kpg button:disabled{background:none}
-body.kpon #main{padding-bottom:330px}
+#kpad .kpcs{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+#kpad .kpc{border:1px solid #3a3832;border-radius:12px;padding:5px 10px;text-align:left;background:#24221f}#kpad .kpc small{display:block;color:var(--sub);font-size:12px}
+#kpad .kpc b{font-size:24px;font-weight:800;color:var(--cream);font-variant-numeric:tabular-nums}#kpad .kpc b em{font-style:normal;font-size:13px;color:var(--sub);margin-left:3px}
+#kpad .kpc.on{border-color:var(--gold);background:#2e2718}#kpad .kpc.on b{color:var(--gold)}
+#kpad .kpl{display:flex;justify-content:space-between;font-size:12.5px;color:var(--sub);padding:0 2px}
+#kpad .kpq{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}#kpad .kpq button{border:1px solid #3c5a53;background:#1f2a27;border-radius:10px;padding:9px 0;font-weight:800;color:var(--teal);font-size:15px}
+#kpad .kpg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}#kpad .kpg button{border-radius:11px;background:#2a2926;padding:12px 0;font-size:19px;font-weight:700;color:var(--cream)}#kpad .kpg button:active{background:#3a3832}
+#kpad .kpg .fn{font-size:16px;color:var(--sub);background:#22211e}#kpad .kpg .nx{font-size:14px;color:var(--teal);background:#24302c}#kpad .kpg .w2{grid-column:span 2}
+#kpad .kpg .ok{background:linear-gradient(180deg,#f3dcae,#dfc089);color:#241a08;font-size:16px;font-weight:800}#kpad .kpg .blank{background:none}
+body.kpon #main{padding-bottom:380px}
 .dragghost{position:fixed!important;z-index:95;pointer-events:none;opacity:.92;box-shadow:0 12px 30px rgba(0,0,0,.55);transform:scale(1.02);margin:0!important}
 .dragsrc{opacity:.3}.dropb{box-shadow:0 -3px 0 var(--gold)}.dropa{box-shadow:0 3px 0 var(--gold)}
 .wkst{flex:none;border-radius:16px;border:1px solid #4a4336;background:linear-gradient(135deg,#25211a,#1a1916);padding:12px 14px;display:flex;flex-direction:column;gap:9px}.wkst .h{display:flex;align-items:baseline}.wkst .h b{font-size:14px}.wkst .h span{margin-left:auto;font-size:11.5px;color:var(--sub)}
@@ -3163,7 +3176,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '460';
+const BUILD = '461';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -5703,7 +5716,10 @@ function vPick(){
   const 추가중 = !!(w && w.begun);
   const 처음 = 추가중 ? Math.min(S.addFrom||0, w.items.length) : 0;
   const 담은 = w ? w.items.length - 처음 : 0;
-  return { top: bar('종목 선택','', (w&&w.begun)?'go:workout':'go:start'), body:`
+  /* 담은 종목은 맨 위에 늘 붙어 있다 — ✕ 로 빼고 오른쪽 단추로 바로 (2026-10-25 대표 결정함 k5a 「A안」 · 전엔 맨 아래 「추가한 종목 n개 ›」를 눌러야 보였다) */
+  const 맨위 = 담은 ? `<div class="pktop${S.just ? ' bump' : ''}"><span class="pktag">추가한 종목 ${담은}</span><div class="pkchips">${w.items.slice(처음).map((it, k) => `<span class="pkc">${esc(exName(it.ex, it.va))}<button data-act="pkrm:${처음 + k}" aria-label="${esc(exName(it.ex, it.va))} 제거">✕</button></span>`).join('')}</div>
+    <button class="btn gold sm pkgo" data-act="askstart">${추가중 ? '추가하기' : '운동 시작'} ›</button></div>` : '';
+  return { top: bar('종목 선택','', (w&&w.begun)?'go:workout':'go:start'), body:`${맨위}
     <input class="search" type="text" data-k="exq" placeholder="종목 검색 · 예) 스쿼트, bp, 코어">
     <div class="pkparts">${PARTS.map(x=>`<button class="chip ${x===S.pickPart?'on':''}" data-act="part:${x}">${x}</button>`).join('')}</div>
     <div class="pkmini" id="pickhint">
@@ -5725,12 +5741,7 @@ function vPick(){
           <small>${esc(e.e)}${last?` · 지난번 ${setTxt(e.id,last)}`:''}${n?` · 피드백 ${n}`:''}${vs.length>1?` · <u>하는 법 ${vs.length}가지</u>`:''}</small></span>
         <em class="pkadd">${담 ? '✓' + (담>1 ? 담 : '') : '＋'}</em></button>`; }).join('')}
     </div>`,
-    foot: 담은
-      ? `<button class="picked ${S.just?'bump':''}" data-act="askstart">
-           <span class="c">${추가중?'추가한':'추가한'} 종목 ${담은}개 ›</span>
-           <span class="l">${esc(w.items.slice(처음).map(it=>exName(it.ex,it.va)).join(' · '))}</span></button>
-         <button class="btn main" style="flex:1" data-act="askstart">${추가중?'추가하기':'운동 시작'}</button>`
-      : `<button class="btn ghost" data-act="${(w&&w.begun)?'go:workout':'go:start'}">취소</button>` };
+    foot: 담은 ? '' : `<button class="btn ghost" data-act="${(w&&w.begun)?'go:workout':'go:start'}">취소</button>` };
 }
 
 /* 담은 순서 확인 → 시작 */
@@ -6962,10 +6973,21 @@ function 자판열기(f, i){ const w = live(), cur = w && w.items[w.cur], x = cu
 function 자판그리기(){ let el = document.getElementById('kpad');
   if(!자판 || S.screen !== 'workout'){ 자판 = null; if(el) el.remove(); document.body.classList.remove('kpon'); return; }
   if(!el){ el = document.createElement('div'); el.id = 'kpad'; document.body.appendChild(el); } document.body.classList.add('kpon');
-  const 무 = 자판.f === 'kg', 빠 = 무 ? [-5, -2.5, 2.5, 5] : [-5, -1, 1, 5], 키 = (k, 글, 꼴) => `<button class="${꼴 || ''}" data-act="${k}">${글}</button>`;
-  el.innerHTML = `<div class="kpv"><small>${자판.i + 1}세트 ${무 ? '무게' : '횟수'}</small><b>${esc(자판.v === '' ? '0' : 자판.v)}</b><small>${무 ? 'kg' : '회'}</small></div>
-    <div class="kpq">${빠.map(n => 키('kpq:' + n, (n > 0 ? '＋' : '−') + Math.abs(n))).join('')}</div>
-    <div class="kpg">${키('kpk:1','1')}${키('kpk:2','2')}${키('kpk:3','3')}${키('kpbs','⌫','fn')}${키('kpk:4','4')}${키('kpk:5','5')}${키('kpk:6','6')}${키('kpok','완료','ok')}${키('kpk:7','7')}${키('kpk:8','8')}${키('kpk:9','9')}${무 ? 키('kpk:.','.','fn') : '<button class="fn" disabled></button>'}${키('kpk:0','0')}${(무 || 자판.it != null) ? 키('kpnx','다음 ›','fn sm') : 키('kpx','닫기','fn sm')}${(무 || 자판.it != null) ? 키('kpx','닫기','fn sm') : '<button class="fn" disabled></button>'}</div>`; }
+  /* 판 하나 (2026-10-25 대표 결정함 k5b 「1 2 3 이 위」 · 시안 「완료 · 지우기 · 초기화는 같은 자리 · 추가되는 칸만」)
+     오른쪽 줄 ⌫ · C · 다음 칸 · 완료 = 늘 같은 자리 · 무게와 횟수가 다른 칸은 맨 윗줄 빠른 값 · 왼쪽 아래 「.」 둘뿐 */
+  const w = live(), 판 = 자판.it != null, it = w && w.items[판 ? 자판.it : w.cur], st = it && it.sets[자판.i], 무 = 자판.f === 'kg';
+  const 지 = it ? ((lastRuns(it.ex, it.va, w.mid || S.mid, 1)[0] || {}).sets || [])[자판.i] : null;
+  const 앞 = it && 자판.i > 0 ? it.sets[자판.i - 1] : null;
+  const 값 = f => f === 자판.f ? (자판.v === '' ? '–' : 자판.v) : (st ? (f === 'kg' ? (st.kg ? kgfmt(st.kg) : '–') : (st.reps || '–')) : '–');
+  const 기준 = (지 && 지.kg) || (st && st.kg) || (앞 && 앞.kg) || 20;
+  const 빠 = 무 ? [기준 - 2.5, 기준, 기준 + 2.5, 기준 + 5].filter(n => n > 0).map(n => kgfmt(Math.round(n * 10) / 10)) : ['8', '10', '12', '15'];
+  const 키 = (k, 글, 꼴) => `<button class="${꼴 || ''}" data-act="${k}">${글}</button>`;
+  const 칸 = f => `<button class="kpc${f === 자판.f ? ' on' : ''}" data-act="kpf:${f}"><small>${자판.i + 1}세트 ${f === 'kg' ? '무게' : '횟수'}</small><b>${esc(String(값(f)))}<em>${f === 'kg' ? 'kg' : '회'}</em></b></button>`;
+  const 다음 = 무 ? (자판.i + 1) + '세트 횟수' : (판 ? (자판.i + 2) + '세트 무게' : '닫기');
+  el.innerHTML = `<div class="kpcs">${칸('kg')}${칸('reps')}</div>
+    <div class="kpl"><span>${지 ? '지난번 ' + (지.kg ? kgfmt(지.kg) + 'kg × ' : '') + (지.reps || 0) + '회' : '지난 기록 없음'}</span><span>다음 칸 › ${다음}</span></div>
+    <div class="kpq">${빠.map(v => 키('kpv:' + v, v, 'q')).join('')}</div>
+    <div class="kpg">${키('kpk:1','1')}${키('kpk:2','2')}${키('kpk:3','3')}${키('kpbs','⌫','fn')}${키('kpk:4','4')}${키('kpk:5','5')}${키('kpk:6','6')}${키('kpc','C','fn')}${키('kpk:7','7')}${키('kpk:8','8')}${키('kpk:9','9')}${키('kpnx','다음 칸 ›','nx')}${무 ? 키('kpk:.','.','') : '<button class="blank" disabled aria-hidden="true"></button>'}${키('kpk:0','0','w2')}${키('kpok','완료','ok')}</div>`; }
 function 자판넣기(){ if(!자판) return; const w = live(), 판 = 자판.it != null, cur = w && w.items[판 ? 자판.it : w.cur]; let st = cur && cur.sets[자판.i];
   const n = parseFloat(String(자판.v).replace(/[^0-9.]/g, '')); if(isNaN(n)) return;
   if(!st){ if(!판 || 자판.i !== cur.sets.length) return; const 앞 = cur.sets[cur.sets.length - 1]; st = { kg: 앞 ? 앞.kg : 0, reps: 0, done:false }; cur.sets.push(st); }      /* 플래너 빈 칸 = 다음 세트 */
@@ -14130,6 +14152,8 @@ document.addEventListener('click', async ev=>{
       S.sordIdx=null; S.addFrom=null; save(); closeSheet();
       if(이미) toast('추가했어요');
       go('workout'); return; }
+    case 'pkrm': { const z = live(), i = +rest[0]; if(!z || !z.items[i] || (z.begun && i < (S.addFrom || 0))) return;      /* 담은 칸 ✕ — 아직 시작 전(또는 이번에 새로 담은 것)만 · 다시 ＋ 로 담으면 되니 묻지 않는다 */
+      z.items.splice(i, 1); save(); render(); return; }
     case 'clearpick': { if(!w) return;
       w.items.forEach(it=>{ if(it._id) sv(sdel('workout_items','id=eq.'+it._id), '종목 제거'); });
       w.items=[]; w.cur=0; save(); closeSheet(); toast('비웠어요'); render(); return; }
@@ -14146,7 +14170,7 @@ document.addEventListener('click', async ev=>{
     case 'ctex': S.ct.ex = rest[0]; S.ct.spd = null; S.ct.inc = 0; drawSheet(); return;
     case 'ctd': { const c = S.ct, k = rest[0], d = +rest[1], 경 = 경사최대(c.ex);
       if(k === 'min') c.min = Math.max(5, Math.min(120, c.min + d * 5));
-      else if(k === 'spd') c.spd = Math.max(1, Math.min(경 ? 20 : 25, Math.round((c.spd + d * (경 ? 0.5 : 1)) * 10) / 10));
+      else if(k === 'spd') c.spd = Math.max(1, Math.min(경 ? 20 : 25,      /* 천국의계단 · 사이클 레벨 25단계까지 (2026-10-25 대표 확인) */ Math.round((c.spd + d * (경 ? 0.5 : 1)) * 10) / 10));
       else if(k === 'inc') c.inc = Math.max(0, Math.min(경, c.inc + d));
       drawSheet(); return; }
     case 'ctsave': { const w = live(), c = S.ct; if(!w || !c) return;
@@ -14220,12 +14244,17 @@ document.addEventListener('click', async ev=>{
     case 'kpk': { if(!자판) return; const ch = rest.join(':'); if(ch === '.' && (자판.f !== 'kg' || (!자판.새로 && 자판.v.includes('.')))) return;
       자판.v = (자판.새로 ? '' : 자판.v) + ch; if(자판.v.length > 6) 자판.v = 자판.v.slice(0, 6); 자판.새로 = false; 자판그리기(); return; }
     case 'kpbs': if(자판){ 자판.v = 자판.새로 ? '' : 자판.v.slice(0, -1); 자판.새로 = false; 자판그리기(); } return;
-    case 'kpq': if(자판){ const n = (parseFloat(자판.v) || 0) + (+rest[0]); 자판.v = String(자판.f === 'kg' ? Math.max(0, Math.round(n * 10) / 10) : Math.max(1, Math.round(n))); 자판.새로 = false; 자판그리기(); } return;
+    case 'kpv': if(자판){ 자판.v = rest.join(':'); 자판.새로 = true; 자판그리기(); } return;      /* 빠른 값 — 한 번에 넣고 다음 숫자는 새로 씀 */
+    case 'kpc': if(자판){ const z = live(), 판 = 자판.it != null, it = z && z.items[판 ? 자판.it : z.cur], st = it && it.sets[자판.i];      /* C = 이 칸 비움 · 횟수가 빈 세트는 마칠 때 기록에 안 남는다 */
+        if(st){ if(자판.f === 'kg') st.kg = 0; else { st.reps = 0; if(판) st.done = false; } save(); }
+        자판.v = ''; 자판.새로 = true; render(); 자판그리기(); } return;
+    case 'kpf': if(자판 && rest[0] !== 자판.f){ 자판넣기(); const z = 자판; 자판 = null;      /* 윗칸 — 같은 세트 다른 칸으로 (판은 그대로) */
+        if(z.it != null) 플래너자판(z.it, z.i, rest[0]); else 자판열기(rest[0], z.i); } return;
     case 'kpok': 자판넣기(); 자판 = null; 자판그리기(); render(); return;
     case 'kpnx': { 자판넣기(); if(자판 && 자판.it != null){ const z = 자판; 자판 = null;      /* 플래너 — 무게 → 같은 세트 횟수 → 다음 세트 무게 */
         const it = (live() || {}).items ? live().items[z.it] : null;
         if(z.f === 'kg') 플래너자판(z.it, z.i, 'reps'); else if(it && z.i + 1 <= it.sets.length) 플래너자판(z.it, z.i + 1, 'kg'); else { 자판그리기(); render(); } return; }
-      const i = 자판 ? 자판.i : 0; 자판 = null; 자판열기('reps', i); return; }
+      const i = 자판 ? 자판.i : 0, f = 자판 ? 자판.f : 'kg'; 자판 = null; if(f === 'kg') 자판열기('reps', i); else { 자판그리기(); render(); } return; }      /* 목록 화면 — 횟수 다음은 닫기 */
     case 'kpx': 자판 = null; 자판그리기(); render(); return;
     case 'noprev': toast('아직 지난 기록이 없어요'); return;
     case 'ootd': ootdPick(rest[0]); return;
