@@ -1336,10 +1336,6 @@ body .card.now2 .pill.t.nowp{animation:nowp 2.2s ease-in-out infinite}@keyframes
 .scnb{flex:none;border-radius:14px;border:1px solid #8a6d2f;background:rgba(217,164,65,.10);padding:11px 13px;font-size:12.5px;line-height:1.55;color:var(--cream)}.scnb b{display:block;font-size:14px;color:var(--gold);margin-bottom:2px}.scnb .w{display:block;margin-top:5px;color:#e8b65a;font-weight:700}
 #top .logo.sm{padding-left:8px;padding-right:8px;letter-spacing:.06em}
 #top .ttl.one{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#top .ttl.one small{overflow:hidden;text-overflow:ellipsis}
-.modesw{flex:none;display:inline-flex;margin-left:auto;border:1px solid #4a4640;border-radius:999px;padding:2px;background:#191816}
-.modesw button{height:28px;padding:0 9px;border-radius:999px;font-size:11.5px;font-weight:700;color:var(--sub);white-space:nowrap}
-.modesw button.on{background:var(--gold);color:#221b0e}.modesw.me button.on{background:#7fe0b0;color:#0c2219}
-.modesw + *{margin-left:8px}
 .hsgo{flex:none;width:74px;border-radius:14px;border:1px solid #3f7281;background:linear-gradient(170deg,#1b2d33,#171a19 70%);font-size:11.5px;font-weight:800;color:var(--teal);line-height:1.35}
 .hspt .mrow2{gap:10px}.hspt .ikk{flex:none;width:44px}.hsbar{flex:1;height:8px;border-radius:4px;background:#2a2925;overflow:hidden}.hsbar i{display:block;height:100%;border-radius:4px}.hsv{flex:none;font-size:13px;font-weight:800;color:var(--gold);min-width:42px;text-align:right}
 .blsay{margin-top:6px;border-radius:14px;border:1px solid #34332d;background:#1a1917;padding:12px 13px;display:flex;flex-direction:column;gap:7px}
@@ -3101,18 +3097,7 @@ const demoBox = (e, v, 접어둠) => {
 let MEMBERS = [];
 let 직원들 = [];
 let 직원줄 = null;                          /* 직원 본인의 기록 자리 — members 표의 직원 줄 */
-function 직원전환(to){
-  if(!직원줄){ toast('직원 기록 자리를 찾지 못했어요'); return; }
-  const 지금 = S.self ? 'self' : 'tr'; if(to === 지금) return;
-  let P = {}; try{ P = JSON.parse(localStorage.getItem('gg_live_park') || '{}') || {}; }catch(e){}
-  P[지금] = D.live || null; D.live = P[to] || null; P[to] = null;
-  try{ localStorage.setItem('gg_live_park', JSON.stringify(P)); }catch(e){}
-  save(); closeSheet(); S.stack = []; S.rest = null; S.subj = null; S.fold = false; S.wsel = null;
-  if(to === 'self'){ S.self = true; if(!MEMBERS.some(m => m.id === 직원줄.id)) MEMBERS.push(직원줄);
-    S.who = 'm'; S.mid = 직원줄.id; S.tab = 'home'; S.screen = 'home'; if(D.live) go('workout'); else render(); }
-  else { S.self = false; MEMBERS = MEMBERS.filter(m => m.id !== 직원줄.id);
-    S.who = 'tr'; S.ttab = 't_today'; S.screen = 't_today'; if(D.live) go('workout'); else render(); }
-}
+/* 「트레이너 / 내 운동」 전환은 2026-10-25 대표 「회원 · 트레이너 전환 아예 빼 · 자꾸 오류」로 삭제 — 직원 번호 = 트레이너 화면만 · 회원 번호 = 본인만 */
 let TRAINER = '양인수';
 
 /* 체형분석 체크리스트 — 플래너 7쪽 */
@@ -3178,7 +3163,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '458';
+const BUILD = '459';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -3332,6 +3317,15 @@ if(데스크끼움) document.documentElement.classList.add('deskin');      /* �
 const 데스크알림 = 몸 => { try{ if(데스크끼움) window.parent.postMessage(Object.assign({ gg: 'deskrec' }, 몸), '*'); }catch(e){} };
 const LIVEKEY = 데스크끼움 ? 'gladgym_live_desk' : 'gladgym_live_v1';
 function save(){ try{ localStorage.setItem(LIVEKEY, JSON.stringify(D.live)); }catch(e){} }
+/* 이 기기에 남은 **다른 사람의** 하던 운동은 버린다 (2026-10-25 대표 「김O은으로 로그인했는데 양인수가 스쳐 가듯 떴다」 · 한 폰을 여럿이 쓴 경우)
+   회원 = 내 것만 · 직원 = 직원 본인 것(옛 「내 운동」)은 버림 · 옛 보관함(gg_live_park)은 통째로 지움 */
+function 남의기록버림(){
+  try{ localStorage.removeItem('gg_live_park'); }catch(e){}
+  if(!D.live) return;
+  const au = 로그인기억.읽() || {};
+  const 남 = (S.who === 'm' && au.mid && D.live.mid !== au.mid) || (S.who === 'tr' && 직원줄 && D.live.mid === 직원줄.id);
+  if(남){ D.live = null; save(); }
+}
 function loadLive(){ try{ const r=localStorage.getItem(LIVEKEY); if(r) D.live=JSON.parse(r); }catch(e){} }
 
 let CMEDIA = [];                          /* comment_media — 피드백에 붙인 사진·영상 */
@@ -3460,8 +3454,9 @@ async function boot(){
     cmOff:m.cm_optout_at||'' });
   MEMBERS = mems.filter(m => m.role === 'member').map(회원꼴);
   직원들 = mems.filter(m => m.role === 'trainer').map(x => Object.assign(회원꼴(x), { staff:true, tr:x.name }));      /* 전화번호로 들어온 직원이 누구인지 이름(n)으로 찾는다 (2026-10-13) — 회원꼴은 이 함수 안에서만 쓸 수 있어 미리 꼴을 만들어 둔다 */
-  const t = (로그인기억.읽() || {}).who && 직원들.find(m => m.n === 로그인기억.읽().name) || 직원들[0]; if(t) TRAINER = t.n;
-  직원줄 = t || null; if(S.self && 직원줄) MEMBERS.push(직원줄);
+  { const au = 로그인기억.읽() || {}, 직원 = !!(au.who && au.who !== 'member' && !au.mid);      /* 직원 줄은 직원으로 들어왔을 때만 — 전엔 회원도 첫 직원(양인수)이 붙어 직원 폰으로 보였다 (2026-10-25) */
+    const t = 직원 ? 직원들.find(m => m.n === au.name) : null; if(t) TRAINER = t.n; else if(직원 && au.name) TRAINER = au.name;
+    직원줄 = t || null; }
 
   루틴칸 = rts.length ? ('hidden' in rts[0]) : true;      /* `29단계_SQL` 을 실행하기 전에는 by · made_at · hidden 칸이 없다 — 없는 칸을 보내면 저장이 통째로 실패하므로 있을 때만 보낸다 */
   D.routines = rts.map(r => ({ id:r.id, mid:r.member_id, no:r.no, n:r.name, purpose:r.purpose||'', grp:r.grp||'', by:r.by||'', at:r.made_at||'', hid:!!r.hidden,
@@ -3556,6 +3551,7 @@ async function boot(){
     if(au && au.who && au.who !== 'member' && !au.mid){ S.who = 'tr'; S.ttab = 't_today'; S.screen = 't_today'; }      /* 직원 — 트레이너 화면으로 */
     else if(au && au.mid && MEMBERS.some(m => m.id === au.mid)){ S.who = 'm'; S.mid = au.mid; S.tab = 'home'; S.screen = 'home'; setTimeout(인사, 0); setTimeout(갈곳열기, 0); }
     else S.screen = 'login'; }
+  남의기록버림();
   if(데스크끼움){ document.body.classList.add('deskin');
     const mid = 데스크끼움.mid;
     if(S.who === 'tr' && mid && 데스크끼움.r && D.workouts.some(w => w.id === 데스크끼움.r)){ S.tmid = mid; S.subj = mid; S.rw = 데스크끼움.r; S.screen = 'report'; }      /* 데스크 「리포트 보기」 (C-4) */
@@ -4697,6 +4693,7 @@ function 갈래받기(){
 function 갈래원(mid){ const m = MEMBERS.find(x => x.id === mid) || {}, x = m.p4 ? 갈래표[m.n + '|' + m.p4] : null, g = x && 갈래짧게[x['갈래']];
   return g ? `<span class="mi gl gl-${g[1]}" title="${esc(x['갈래'])}">${g[0]}</span>` : `<span class="mi nm1">${esc((m.n || '?').slice(0, 1))}</span>`; }
 function render(){
+  본인만();
   갈래받기();
   /* ⛔ 동의 한 장(?c= · ?pt=)은 body 를 통째로 갈아 끼운다 — 그 뒤 start() 가 render() 를 부르면 #main 이 없어
      「Cannot read properties of null (reading 'querySelectorAll')」 가 났다 (2026-10-02 전수 시험에서 잡음). 그릴 자리가 없으면 안 그린다. */
@@ -4773,6 +4770,7 @@ function render(){
   const 새수 = [...$('#main').querySelectorAll('.cnt')].map(e=>e.getAttribute('data-cnt')).join(',');
   if((!sameView || 옛수 !== 새수) && !matchMedia('(prefers-reduced-motion:reduce)').matches) 세어올리기();
 }
+function 본인만(){ const au = 로그인기억.읽(); if(S.who === 'm' && !S.rpOnly && au && au.mid && S.mid !== au.mid){ S.mid = au.mid; S.stack = []; S.screen = 'home'; S.tab = 'home'; } }      /* 회원으로 로그인한 폰은 본인 화면만 (2026-10-25) */
 function bar(title, right, back, sub){
   const bare = (S.screen==='login'||S.screen==='boot'||S.screen==='err');
   /* 윗줄 정리 (2026-10-07 대표 「여기 정리가 필요해 · 프로필 바로 가는 버튼 · 알림은 지금처럼 · 카카오톡 인스타 참조」)
@@ -4780,9 +4778,9 @@ function bar(title, right, back, sub){
      「글래드짐」 제목은 로고와 겹쳐서 뺀다. 종 · 프로필은 **탭 첫 화면**(홈 · 분석 · 식단 · 커뮤니티 · 피드백 · 내 정보)에만 — 안쪽 화면은 제목과 뒤로가기가 주인이다.
      계정 전환은 「내 정보」 맨 아래로 옮겼다. */
   if(title === '글래드짐' && !bare) title = '';
-  const 직원 = !bare && !!직원줄 && !S.rpOnly && (S.who === 'tr' || !!S.self) && (S.screen === 't_today' || S.screen === 'home');      /* 홈에서만 보인다 — 모든 화면 위에 떠 있어 잘못 누르기 쉬웠다 (2026-10-13 대표 「홈 버튼에만 있는 건 어떤지 · 누르면 바꿀 건지 안내창」) */
+  const 직원 = false;      /* 전환 단추 자리 — 2026-10-25 전환 삭제로 늘 없음 (로고 · 날짜 줄은 예전 모양 그대로) */
   const logo = bare ? '' : `<button class="logo${직원 && title ? ' sm' : ''}" data-act="${S.who==='tr' ? 'ttab:t_today' : 'tab:home'}" aria-label="홈으로">${직원 && title ? 'GG' : 'GLAD GYM'}</button>`;      /* 직원 화면은 전환 단추 자리를 내느라 로고를 줄인다 — 누르면 홈인 것은 그대로 */
-  const 전환 = 직원 ? `<span class="modesw${S.self ? ' me' : ''}"><button class="${S.self ? '' : 'on'}" data-act="mode:tr">트레이너</button><button class="${S.self ? 'on' : ''}" data-act="mode:self">내 운동</button></span>` : '';
+  const 전환 = '';      /* 전환 단추 삭제 (2026-10-25 대표) */
   /* 날짜 · 「최근 n회」 자리에 전환 단추가 온다 — 그 글은 제목 바로 아래 작은 글씨로 옮긴다 (2026-10-10 대표 「1번으로」) */
   if(직원 && right) right = right.replace(/<span class="sub">([^<]*)<\/span>/g, (m, 글) => { if(!sub) sub = 글; return ''; });      /* 날짜 · 회원 이름 같은 글은 제목 아래 작은 글씨로 — 전환 단추와 한 줄에 두면 제목이 두 줄로 꺾인다 */
   const 첫화면 = S.who !== 'tr' && !bare && ['home','records','diet','community','feedback','me'].includes(S.screen) && MEMBERS.some(m=>m.id===S.mid);
@@ -9099,7 +9097,7 @@ function sheetPost(id){
     ${!파 && p.mid===S.mid && !트 ? `<div style="display:flex;gap:9px"><button class="btn sub" style="flex:1" data-act="psave:${id}">갤러리에 저장</button><button class="btn sub" style="flex:1" data-act="pshare:${id}">공유하기</button></div>` : ''}
     <span class="lbl">댓글 ${cs.length ? '· '+cs.length : ''}</span>
     ${cs.length ? `<div class="pcms">${cs.map(c=>`<div class="pcm"><b>${esc(c.mid ? 이름of(c.mid) : c.who)}</b> ${esc(c.body)}<small>${언제(c.ts)}${(c.mid && c.mid===S.mid && !트) || 트 ? ` · <button data-act="pcdel:${c.id}">삭제</button>` : ''}</small></div>`).join('')}</div>` : '<div class="note">첫 댓글을 남겨 보세요</div>'}
-    <div class="pcmin"><input class="search" type="text" data-k="pcm" maxlength="120" placeholder="응원 한마디"><button class="btn main sm" data-act="pcsend:${id}">남기기</button></div>
+    <div class="pcmin"><input class="search" type="text" data-k="pcm:${id}" maxlength="120" placeholder="응원 한마디"><button class="btn main sm" data-act="pcsend:${id}">남기기</button></div>
     <button class="btn ghost sm" data-act="close">닫기</button>`; });
 }
 async function postShareSave(id, 공유){
@@ -12914,7 +12912,7 @@ document.addEventListener('click', async ev=>{
     case 'b3': { const b = document.getElementById(rest[0]); if(!b) return;
       b.dataset.a = String((((+b.dataset.a || 0) + Number(rest[1]) * 2) % 몸3N + 몸3N) % 몸3N); 몸3그리기(b.id); return; }
     case 'retry': S.screen='boot'; render(); start(); return;
-    case 'switch': 로그인기억.씀(null); S.lg = null; S.stack=[]; S.who=null; S.mid=null; S.self=false; S.tmid=null; go('login'); return;      /* 나가면 기억도 지운다 — 다음에는 다시 문자 인증 */
+    case 'switch': 로그인기억.씀(null); D.live = null; save(); try{ localStorage.removeItem('gg_live_park'); }catch(e){} S.lg = null; S.stack=[]; S.who=null; S.mid=null; S.self=false; S.tmid=null; go('login'); return;      /* 나가면 기억도 지운다 — 다음에는 다시 문자 인증 */
     case 'back': goBack(); return;
     case 'ttab': S.ttab=rest[0]; if(rest[0]==='t_community') S.cmode=''; goRoot(rest[0]);
       if(rest[0]==='t_community') 커뮤니티받기().then(()=>{ if(S.screen==='t_community') render(); });
@@ -13300,14 +13298,9 @@ document.addEventListener('click', async ev=>{
     case 'maadd': { const x = ((S.ma || {}).결과 || [])[+rest[0]]; if(x) 회원넣기(x.name, x.phone, (x['담당재직'] === false ? '' : (x['담당'] || '')) || (x['갈래'] === '체험수업' ? TRAINER : ''), false); return; }      /* 퇴사한 담당은 넣지 않는다 — 정본 `담당재직` · 체험 손님은 정본 담당(예약 · 수업)이 없으면 추가한 트레이너 (2026-10-14 대표) */
     case 'mahand': { const v = k => { const el = document.querySelector('[data-k="' + k + '"]'); return el ? el.value : ''; }; 회원넣기(v('mahn'), v('mahp'), '', true); return; }
     case 'rtsv': { const el = document.querySelector('[data-k="rtnm"]'); if(S.rtrec) 수업루틴저장(S.rtrec, el ? el.value : '', rest[0] === '1'); return; }
-    case 'mode': { if(rest[0] === (S.self ? 'self' : 'tr')) return;
-      확인창(rest[0] === 'self' ? '내 운동으로 바꿀까요?<br>트레이너 화면에서 나가 내 운동 기록 화면으로 갑니다.' : '트레이너 화면으로 바꿀까요?<br>내 운동 화면에서 나가 트레이너 화면으로 갑니다.', rest[0] === 'self' ? '내 운동으로' : '트레이너로', () => 직원전환(rest[0]), true); return; }
     case 'as':
       S.self = false; if(직원줄) MEMBERS = MEMBERS.filter(m => m.id !== 직원줄.id);
-      if(rest[0]==='tr'){ /* 앱을 다시 켰는데 남아 있는 운동이 내 것이면 「내 운동」 쪽에 넣어 둔다 — 트레이너 화면에서 수업처럼 보이면 안 된다 */
-        if(D.live && 직원줄 && D.live.mid === 직원줄.id){ let P = {}; try{ P = JSON.parse(localStorage.getItem('gg_live_park') || '{}') || {}; }catch(e){}
-          const 넣을 = D.live; D.live = P.tr || null; P.tr = null; P.self = 넣을; try{ localStorage.setItem('gg_live_park', JSON.stringify(P)); }catch(e){} save(); }
-        S.who='tr'; S.ttab='t_today'; go('t_today'); }
+      if(rest[0]==='tr'){ S.who='tr'; S.ttab='t_today'; go('t_today'); }
       else { S.who='m'; S.mid=rest[0]; S.tab='home'; S.screen='home'; 인사();
         /* 잠근 채로 앱을 껐다면 운동 화면으로 바로 되돌린다 */
         if(D.live && D.live.mid===rest[0] && D.live.lock) go('workout'); else go('home');
@@ -14374,7 +14367,8 @@ document.addEventListener('click', async ev=>{
       sv(sdel('posts','id=eq.'+p.id), '글 삭제');
       if(p.path && p.path.startsWith('posts/')) fetch(SB_URL+'/storage/v1/object/media/'+p.path, {method:'DELETE',headers:{apikey:SB_KEY,Authorization:'Bearer '+수파열쇠()}}).catch(()=>{});
       closeSheet(); toast('삭제했어요'); render(); return; }
-    case 'pcsend': { const el=document.querySelector('[data-k="pcm"]'); const body=el?el.value.trim():''; if(!body){ toast('한마디를 입력해 주세요'); return; }
+    case 'pcsend': { const el=document.querySelector('[data-k="pcm:'+rest[0]+'"]'); const body=el?el.value.trim():''; if(!body){ toast('한마디를 입력해 주세요'); return; }
+      el.value = ''; 초안지움('pcm:'+rest[0]);      /* 남긴 글은 칸에서 지운다 (2026-10-25 대표 「다른 사진에도 자동으로 타이핑」) */
       const g=글쓴이(), id='pc'+Date.now(), ts=new Date().toISOString();
       (D.pcm=D.pcm||[]).push({ id, pid:rest[0], mid:g.mid, who:g.who, body, ts });
       sv(spost('post_comments',[{ id, post_id:rest[0], member_id:g.mid||null, author:g.who, body }]), '댓글');
