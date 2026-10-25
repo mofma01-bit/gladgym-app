@@ -1922,10 +1922,13 @@ button.as-more{display:block;width:100%;background:none;border:0;color:var(--sub
 .kt-t{display:flex;flex-direction:column;align-items:flex-end;gap:5px;font-size:12.5px;color:var(--sub);white-space:nowrap}
 .kt-n{font-style:normal;min-width:22px;height:22px;padding:0 7px;border-radius:999px;background:#e07a3a;color:#fff;font-weight:900;font-size:12.5px;display:inline-flex;align-items:center;justify-content:center}
 .kt-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}.kt-head b{font-size:16px}.kt-head .btn.sub{margin-left:auto}
-.kt-room{display:flex;flex-direction:column;gap:8px;max-height:68vh;overflow-y:auto;background:#191815;border:1px solid var(--line);border-radius:14px;padding:12px}
+.kt-col{display:flex;flex-direction:column;gap:4px;max-width:80%}.kt-col .kt-bb{max-width:100%}.kt-nm{font-size:14px;font-weight:800;color:#e8c08f;padding-left:2px}      /* 이름 전체 (2026-10-25 대표 「김이라고 하지 말고 풀네임으로 카톡처럼」) */
+.wkdots{display:inline-flex;gap:4px;vertical-align:middle}.wkdots i{width:12px;height:12px;border-radius:50%;border:2px solid #8fd1c4}.wkdots i.on{background:#8fd1c4}
+.sumbar .sumit.last{margin-left:auto}.cmsortb{font-weight:800}
+.kt-room{display:flex;flex-direction:column;gap:12px;max-height:74vh;min-height:52vh;font-size:16px;overflow-y:auto;background:#191815;border:1px solid var(--line);border-radius:14px;padding:12px}
 .kt-day{align-self:center;font-size:12.5px;color:var(--sub);background:#24211c;border-radius:999px;padding:2px 12px;margin:4px 0}
 .kt-m{display:flex;gap:8px;align-items:flex-start}.kt-m.r{justify-content:flex-end}.kt-m .kt-av{width:34px;height:34px;border-radius:12px;font-size:14px}
-.kt-bb{max-width:78%;display:flex;flex-direction:column;gap:4px;background:#24211c;border:1px solid #3a352c;border-radius:4px 14px 14px 14px;padding:8px 11px;font-size:14.5px;line-height:1.45;white-space:pre-wrap;word-break:break-word}
+.kt-bb{max-width:78%;display:flex;flex-direction:column;gap:5px;background:#24211c;border:1px solid #3a352c;border-radius:4px 16px 16px 16px;padding:11px 14px;font-size:16.5px;line-height:1.45;white-space:pre-wrap;word-break:break-word}
 .kt-bb.me{background:#2e3a36;border-color:#3c5a53;border-radius:14px 4px 14px 14px}.kt-bb.new{border-color:#e07a3a}
 .kt-bb small{font-size:12px;color:var(--sub)}.kt-tag{align-self:flex-start;font-size:12px;font-weight:800;color:#e8c08f;background:#1c1a17;border-radius:6px;padding:1px 7px}
 .kt-ed{background:none;border:0;color:var(--sub);font:inherit;font-size:12px;text-decoration:underline;cursor:pointer;padding:0}
@@ -2372,7 +2375,7 @@ button.as-more{display:block;width:100%;background:none;border:0;color:var(--sub
 
 <script>
 "use strict";
-const BUILD = '397';
+const BUILD = '398';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -8015,8 +8018,11 @@ function vCmAll(){
     const st = 상태of(m); return st === '진행중' ? '유효' : st === '잠수' ? '잠수' : st === '종료' ? '종료' : '모름'; };
   const 후보 = D.m.filter(x=>(x.role||'member')==='member' && mine(x.id) && (갈래of(x) !== '일반FC' || PT관리(x) || cs.some(c => c.member_id === x.id) || asks.some(a => a.member_id === x.id)));
   const 상태수 = { 유효:0, 잠수:0, 종료:0 }; 후보.forEach(m => { const k = 상태칸(m); if(상태수[k] != null) 상태수[k]++; });
-  const 고른상태 = S.cmSt || '유효';
-  const 회원들 = 후보.filter(m => 고른상태 === '전체' || 상태칸(m) === 고른상태);
+  /* 탭 (2026-10-25 대표 「즐겨찾기가 첫 페이지 · 전체 목록은 가장 우측 · 유효 · 잠수 · 종료 및 순서도 골라야 해서 어려움 · 버튼 하나에 목록」) */
+  const 내별 = new Set((D.favs || []).filter(f => f.trainer === ((ME && ME.name) || '')).map(f => f.member_id));
+  const 월 = (d => { const t = new Date(d + 'T12:00:00'), g = (t.getDay() + 6) % 7; return 날더함(d, -g); })(TODAY);      /* 이번 주 월요일 */
+  const 주수업 = (D.w || []).filter(w => w.kind === '수업' && w.on_date >= 월 && w.on_date <= TODAY);
+  const 회원들 = 후보;
   const rows = 회원들.map(function(m){
     const mine2 = cs.filter(c=>c.member_id===m.id);
     return { m,
@@ -8039,10 +8045,12 @@ function vCmAll(){
      ⛔ 「남겨야 할 회원」은 **끊긴목록() 하나**로 판정한다. 여기서 다시 세지 않는다 —
         현황판 숫자와 이 페이지 숫자가 어긋나면 안 된다 */
   const 밀린ids = new Set(끊긴목록().map(x => x.m.id));
-  const 만 = S.cmOnly || '';
+  const 만 = S.cmOnly || 'fav';      /* 첫 화면 = ★ 즐겨찾기 (비어 있으면 별표 안내) */
   const 만걸러 = o => 만==='ask'    ? o.ask > 0
                     : 만==='cold'   ? 밀린ids.has(o.m.id)
-                    : 만==='none'   ? !o.n : true;
+                    : 만==='none'   ? !o.n
+                    : 만==='fav'    ? 내별.has(o.m.id)
+                    : 만==='week'   ? 주수업.some(w => w.member_id === o.m.id) : true;
   const 걸러진 = rows.filter(o => (!고른구분 || 구분(o.m) === 고른구분) && 만걸러(o));
 
   /* ── 차례 ── 기본은 「피드백 안 남긴 지 오래된 순」 (대표 지시)
@@ -8055,7 +8063,7 @@ function vCmAll(){
     ['many',   '피드백 많은 순'],
     ['name',   '이름 순'],
   ];
-  const 차례 = S.cmSort || 'old';
+  const 차례 = S.cmSort === 'recent' ? 'recent' : 'old';      /* ↑↓ 단추 하나 — 오래된(안 남긴 분 먼저) ↔ 최근 (2026-10-25 대표) */
   const 정렬된 = 걸러진.slice().sort((a,b) => {
     if(차례==='recent') return 마지막(a) < 마지막(b) ? 1 : (마지막(a) > 마지막(b) ? -1 : 0);
     if(차례==='ask')    return (b.ask-a.ask) || (마지막(a) < 마지막(b) ? -1 : 1);
@@ -8069,15 +8077,18 @@ function vCmAll(){
   });
 
   const 거르개 = [
+    { k:'fav',    이름:'★ 즐겨찾기',     색:'gold', 수: rows.filter(o => 내별.has(o.m.id)).length, 귀띔:'회원 화면에서 ★ 누른 회원' },
+    { k:'week',   이름:'이번 주 수업',    색:'teal', 수: new Set(주수업.map(w => w.member_id).filter(id => rows.some(o => o.m.id === id))).size, 귀띔:'이번 주(월요일부터) 수업한 회원 · 수업마다 피드백을 남겼는지' },
     { k:'cold',   이름:'피드백 밀림',    색:'gold', 수: 밀린ids.size,
       귀띔:피드백밀림일 + '일 넘게 피드백을 안 남긴 회원' },
     { k:'ask',    이름:'피드백 요청',    색:'warn', 수: asks.length,
       귀띔:'회원이 피드백을 요청한 것' },
     { k:'none',   이름:'피드백 0건',     색:'',     수: rows.filter(x=>!x.n).length,
       귀띔:'피드백을 아직 한 번도 안 남긴 회원' },
+    { k:'all',    이름:'전체',           색:'',     수: rows.length, 귀띔:'PT 관리 회원 전부', 끝:1 },
   ];
   const 요약 = '<div class="sumbar">' + 거르개.map(x =>
-      '<button class="sumit ' + x.색 + (만===x.k ? ' on' : '') + '" data-cmonly="' + x.k + '"'
+      '<button class="sumit ' + x.색 + (만===x.k ? ' on' : '') + (x.끝 ? ' last' : '') + '" data-cmonly="' + x.k + '"'
       + (x.귀띔 ? ' title="' + x.귀띔 + '"' : '') + '>'
       + '<span class="k2">' + x.이름 + '</span><span class="v2">' + x.수 + '</span></button>').join('')
     + '</div>';
@@ -8088,17 +8099,13 @@ function vCmAll(){
        ['미정','미정',구분수.미정]]
         .map(x => '<button class="chip ' + (고른구분===x[0]?'on':'') + '" data-cmreg="' + x[0] + '">'
           + x[1] + '<i>' + x[2] + '</i></button>').join('') + '</span>' : '')
-    + '<span class="cmg"><b>회원</b>' + [['유효','유효회원',상태수.유효],['잠수','잠수회원',상태수.잠수],['종료','종료회원',상태수.종료],['전체','전체',후보.length]]
-        .map(x => '<button class="chip ' + (고른상태===x[0]?'on':'') + '" data-cmst="' + x[0] + '">' + x[1] + '<i>' + x[2] + '</i></button>').join('') + '</span>'
-    + '<span class="cmg"><b>순서</b>'
-    + 차례들.map(x => '<button class="chip ' + (차례===x[0]?'on':'') + '" data-cmsort="' + x[0] + '">'
-        + x[1] + '</button>').join('') + '</span></div>';
+    + '<button class="chip cmsortb" data-cmsort="' + (차례 === 'old' ? 'recent' : 'old') + '" title="눌러서 순서 바꾸기">' + (차례 === 'old' ? '↓ 오래 안 남긴 순' : '↑ 최근 남긴 순') + '</button></div>';
 
   const 표 = 줄바 + '<div class="mwrap"><table class="mtb"><thead><tr>'
-    + '<th style="width:26px"></th><th>이름</th><th>담당</th><th>마지막 피드백</th>'
+    + '<th style="width:26px"></th><th>이름</th><th>담당</th>' + (만 === 'week' ? '<th>이번 주 수업</th>' : '<th>마지막 피드백</th>')      /* 이번 주 수업 탭은 그 칸이 마지막 피드백 자리에 (표가 좁아 오른쪽이 잘림) */
     + '<th class="n">피드백</th><th>요청</th>'
     + '</tr></thead><tbody>'
-    + (정렬된.length ? '' : '<tr><td colspan="6"><div class="empty">해당하는 회원이 없어요</div></td></tr>')
+    + (정렬된.length ? '' : '<tr><td colspan="7"><div class="empty why"><b>해당하는 회원이 없습니다</b>' + (만 === 'fav' ? '회원 화면에서 ★ 를 누르면 여기에 모입니다' : '위 탭을 바꿔 보세요') + '</div></td></tr>')
     + 정렬된.map(function(o){ const m=o.m;
         const 점 = o.ask ? 'warn' : (밀린ids.has(m.id) ? 'gold' : '');
         const 지난날 = o.last ? Math.round((new Date(TODAY) - new Date((o.last.created_at||'').slice(0,10)))/864e5) : null;
@@ -8109,12 +8116,14 @@ function vCmAll(){
           + (kk==='미정' ? '' : ' <span class="tag ' + (kk==='신규'?'gold':'teal') + '">' + kk + '</span>')
           + '</div></td>'
         + '<td><span class="sub3">' + esc(m.trainer||'담당 없음') + '</span></td>'
-        + '<td>' + (o.last
+        + (만 === 'week' ? '' : '<td>' + (o.last
             ? '<div style="font-weight:700">' + dateFull((o.last.created_at||'').slice(0,10))
                 + (지난날 >= 7 ? ' <span class="tag warn">' + 지난날 + '일째</span>' : '') + '</div>'
               + '<div class="sub3" style="max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'
               + esc(vaName(o.last.variant_id)) + ' — ' + esc(o.last.body||'') + '</div>'
-            : '<span class="tag warn">아직 없음</span>') + '</td>'
+            : '<span class="tag warn">아직 없음</span>') + '</td>')
+        + (만 === 'week' ? (() => { const 내수업 = 주수업.filter(w => w.member_id === m.id).sort((a, b) => String(a.on_date).localeCompare(String(b.on_date))), 남김 = 내수업.filter(w => (D.c || []).some(c => c.workout_id === w.id));
+            return '<td><span class="wkdots">' + 내수업.map(w => { const 있 = (D.c || []).some(c => c.workout_id === w.id); return '<i class="' + (있 ? 'on' : '') + '" title="' + esc(String(w.on_date).slice(5).replace('-', '/')) + (있 ? ' 피드백 남김' : ' 피드백 아직') + '"></i>'; }).join('') + '</span><span class="sub3"> 수업 ' + 내수업.length + ' · 피드백 ' + 남김.length + '</span></td>'; })() : '')      /* 수업(한 번) 단위 ● 남김 ○ 안 남김 (2026-10-25 의논 p3) */
         + '<td class="n"><span class="numbig ' + (o.n?'':'zero') + '">' + o.n + '</span></td>'
         + '<td>' + (o.ask ? '<span class="tag warn">요청 ' + o.ask + '</span>'
             : '<span class="sub3">—</span>') + '</td>'
@@ -8143,7 +8152,7 @@ function vCmAll(){
   let 앞날 = '';
   const 대화창 = 방 ? '<div class="kt-head"><button class="btn ghost sm" data-act="cmchat" data-k="">‹ 목록</button><b>' + esc(방.m.name || '') + '</b><button class="btn sub sm" data-m="' + esc(방.id) + '" data-tab="comment">피드백 남기기 ›</button></div><div class="kt-room" id="ktroom">'
       + 말.map(o => { const 날 = String(o.t).slice(0, 10), 머 = 날 && 날 !== 앞날 ? '<div class="kt-day">' + dateFull(날) + '</div>' : ''; 앞날 = 날 || 앞날;
-        if(o.k === '회원') return 머 + '<div class="kt-m l"><span class="kt-av">' + esc((방.m.name || '?').slice(0, 1)) + '</span><div class="kt-bb' + (o.a.done_at ? '' : ' new') + '"><span class="kt-tag">요청 · ' + esc(vaName(o.a.variant_id)) + '</span>' + esc(o.a.note || '피드백 요청') + '<small>' + 말때(o.t) + (o.a.done_at ? '' : ' · 아직 답 전') + '</small></div></div>';
+        if(o.k === '회원') return 머 + '<div class="kt-m l"><div class="kt-col"><span class="kt-nm">' + esc(방.m.name || '') + '</span><div class="kt-bb' + (o.a.done_at ? '' : ' new') + '"><span class="kt-tag">요청 · ' + esc(vaName(o.a.variant_id)) + '</span>' + esc(o.a.note || '피드백 요청') + '<small>' + 말때(o.t) + (o.a.done_at ? '' : ' · 아직 답 전') + '</small></div></div></div>';
         const c = o.c; return 머 + '<div class="kt-m r"><div class="kt-bb me"><span class="kt-tag">' + esc(vaName(c.variant_id)) + ' · ' + esc(String(c.created_at || '').slice(5, 10).replace('-', '/')) + '</span>'
           + (S.cmEdit === c.id ? '<textarea class="inp cmta" id="cmedit_' + esc(c.id) + '">' + esc(c.body || '') + '</textarea><div class="cmacts"><button class="btn gold sm" data-act="cmfix" data-c="' + esc(c.id) + '">수정</button><button class="btn ghost sm wn" data-act="cmdel" data-c="' + esc(c.id) + '">삭제</button><button class="btn ghost sm" data-act="cmeditx">취소</button></div>'
             : esc(c.body || '')) + 피드백첨부(c.id) + '<small>' + 말때(o.t) + ' · ' + esc(c.trainer || '') + (S.cmEdit === c.id ? '' : ' · <button class="kt-ed" data-act="cmedit" data-c="' + esc(c.id) + '">수정</button>') + '</small></div></div>'; }).join('')
@@ -8154,8 +8163,7 @@ function vCmAll(){
   return 요약
     + '<div class="cols">'
     + '<div class="sec"><div class="lbl">'
-    + (만 ? esc((거르개.find(x=>x.k===만)||{}).이름 || '') + ' · 줄을 누르면 피드백으로 가요'
-          : esc({ 유효:'유효회원', 잠수:'잠수회원', 종료:'종료회원', 전체:'전체 회원' }[고른상태] || '') + ' · 줄을 누르면 피드백으로 가요')
+    + esc((거르개.find(x=>x.k===만)||{}).이름 || '') + ' · 줄을 누르면 피드백으로 가요'
     + '<span class="r sub3">' + 정렬된.length + '명</span></div>'
     + 표 + '</div>'
     + '<div class="sec"><div class="lbl">' + (방 ? '대화' : 만 === 'ask' ? '피드백 요청 ' + 새합 + '건 · 대화' : '대화 ' + 방들.length + (새합 ? ' · 새 요청 ' + 새합 : '')) + '</div>' + (방 ? 대화창 : 대화목록) + '</div></div>';
@@ -14099,7 +14107,7 @@ document.addEventListener('click', async function(ev){
   /* 피드백 페이지 거르개 — 같은 것을 다시 누르면 풀린다 */
   const 만누름 = t.closest('[data-cmonly]');
   if(만누름){ const v = 만누름.dataset.cmonly;
-    S.cmOnly = (S.cmOnly === v || (!v && !S.cmOnly)) ? '' : v; render(); return; }
+    S.cmOnly = v; render(); return; }      /* 탭 — 다시 눌러도 그 탭 (2026-10-25) */
 
   const day = t.closest('[data-day]');
   if(day){ S.day = day.dataset.day; render(); return; }
