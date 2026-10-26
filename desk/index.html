@@ -852,6 +852,10 @@ body.tx-moving .tx-x{cursor:grabbing}
 .tx-td.on{background:var(--dark-3);box-shadow:inset 0 0 0 2px var(--gold);padding:2px 4px}
 .tx-td.sel,.tx-tr:hover>.tx-td.sel{box-shadow:inset 0 0 0 2px var(--gold);
   background:rgba(230,196,135,.07);border-radius:3px}
+.tx-clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-wrap;word-break:break-all;line-height:1.45}
+.tx-td.on.big{overflow:visible;position:relative;z-index:6}
+.tx-td.on.big .tx-cin{position:absolute;left:-2px;top:-2px;width:max(calc(100% + 4px),380px);min-height:120px;max-height:420px;overflow:auto;resize:vertical;
+  background:var(--dark-2);border:2px solid var(--gold);border-radius:6px;box-shadow:0 10px 28px rgba(0,0,0,.28);padding:8px 10px;line-height:1.5;white-space:pre-wrap}
 .tx-cin{width:100%;background:transparent;border:0;outline:none;color:var(--cream);
   font-size:13px;font-family:inherit;padding:6px;resize:none;min-height:32px}
 .tx-pmenu button.new{color:var(--gold)}
@@ -1363,6 +1367,8 @@ body.resizing{cursor:col-resize;user-select:none}
 .tx-form .fld .inp{width:100%}
 .tx-form textarea.inp{min-height:88px;resize:vertical;line-height:1.55}
 .tx-pchips{display:flex;flex-wrap:wrap;gap:6px}
+.tx-pchip.tx-pfold{padding:5px 12px;font-weight:700}.tx-pchip.tx-pfold .tx-nm,.tx-pchip.tx-pfold>span{margin-left:2px}
+.empty .tx-hid{margin-top:10px;font-size:13px;color:var(--sub);display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap}
 .tx-pchip{display:inline-flex;align-items:center;gap:6px;padding:5px 10px 5px 5px;border-radius:999px;
   border:1px solid var(--line);font-size:13px;font-weight:700;color:var(--sub)}
 .tx-pchip.on{border-color:var(--gold-2);color:var(--gold);background:var(--gold-dim)}
@@ -2581,7 +2587,7 @@ button.as-more{display:block;width:100%;background:none;border:0;color:var(--sub
 
 <script>
 "use strict";
-const BUILD = '422';
+const BUILD = '423';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -7479,7 +7485,7 @@ function 매출기록칸(g){
 매출.방금 = new Map();      /* 묶음 키 → '새' | '확' */
 function 매출팝업(강제){
   if(!매출.줄 || 진짜ME) return;      /* 선생님 계정으로 보는 중에는 안 띄운다(보기만) */
-  if(!강제 && $('#pop').classList.contains('on')){ 팝업차례('매출', () => 매출팝업()); return; }      /* 열린 창을 덮지 않는다 — 줄에 서서 닫히면 뜬다 (2026-10-21) */
+  if(!강제 && $('#pop').classList.contains('on')){ 팝업차례('매출', () => 매출팝업()); return; } 팝업줄빼기('매출');      /* 열린 창을 덮지 않는다 — 줄에 서서 닫히면 뜬다 (2026-10-21) */
   const gs = 매출묶음들(매출.줄), 끔 = g => g.줄.every(x => 매출.끔.has(x.id));
   const 방 = (g, 칸) => 매출.방금.get(g.키) === 칸;
   const 새 = gs.filter(g => (묶음상태(g) === '미확인' && !끔(g) && !매출쉼(g)) || 방(g, '새'));
@@ -7641,10 +7647,10 @@ function 비품팝업(강제){
   const 넣 = (비품.답 || {})['넣기'] === true, 방 = [...비품.방금.keys()].map(n => ((비품.답 || {})['목록'] || []).find(x => x['품목'] === n) || { 품목:n }).filter(x => !비품필요().some(y => y['품목'] === x['품목']));
   const 필 = 비품필요().concat(방); if(!필.length || 진짜ME) return;
   if(!강제 && 비품본날() === TODAY) return;      /* 하루 한 번 */
-  if(!강제 && $('#pop').classList.contains('on')){ 팝업차례('비품', () => 비품팝업()); return; }      /* 열린 창 뒤에 줄 서기 (2026-10-21) */
+  if(!강제 && $('#pop').classList.contains('on')){ 팝업차례('비품', () => 비품팝업()); return; } 팝업줄빼기('비품');      /* 열린 창 뒤에 줄 서기 (2026-10-21) */
   popOpen('<div class="ps-pop"><div class="ps-h hot">구매가 필요한 비품이 있습니다!</div><div class="sub3" style="margin-bottom:8px">주문하고 「구매 입력」을 눌러 주세요</div>'
     + 필.slice(0, 8).map(x => 비품팝칸(x, 넣)).join('') + (필.length > 8 ? '<div class="sub3">외 ' + (필.length - 8) + '건</div>' : '')
-    + (필.every(x => 비품.방금.has(x['품목'])) ? '<div class="ps-foot"><span class="sub3" style="margin-right:auto">모두 처리했어요</span><button class="btn main" data-act="popclose">닫기</button></div></div>'
+    + (필.every(x => 비품.방금.has(x['품목'])) ? '<div class="ps-foot"><span class="sub3" style="margin-right:auto">모두 처리했어요</span><button class="btn main" data-act="tx:bplater">닫기</button></div></div>'      /* 닫기 = 오늘 본 것으로 — 그냥 닫으면 다음 비품받기(첫 화면 늦은 받기 · 30분)가 같은 팝업을 또 띄웠다 (2026-10-26 시험이 잡음) */
         : '<div class="ps-foot"><button class="btn ghost" data-act="tx:bplater">나중에</button><button class="btn main" data-act="tx:bplist">비품 목록 보기</button></div></div>'));
 }
 /* 팝업 한 품목 = 한 박스 — 처리 전: 이름 · 한 줄 · 위치 · 일지만 · [다시 알림] [구매 입력] / 처리 뒤: 그 박스가 잠김 + 「수정」 (2026-10-22 22:01 대표) */
@@ -7739,7 +7745,7 @@ async function 요청자동닫기(품목){
 const 요청본 = () => { try{ return JSON.parse(localStorage.getItem('gg_rq_seen') || '[]'); }catch(e){ return []; } };
 function 요청팝업(강제){
   const 새 = 열린요청().filter(r => 강제 || 요청본().indexOf(r.id) < 0); if(!새.length || 진짜ME) return;
-  if($('#pop').classList.contains('on')){ 팝업차례('비품요청', () => 요청팝업()); return; }
+  if($('#pop').classList.contains('on')){ 팝업차례('비품요청', () => 요청팝업()); return; } 팝업줄빼기('비품요청');
   popOpen('<div class="ps-pop"><div class="ps-h hot">비품 구매 요청이 들어왔습니다!</div><div class="sub3" style="margin-bottom:8px">구매했으면 「구매함」을 눌러 닫아 주세요 · 구매 입력을 해도 저절로 닫혀요</div>'
     + '<div class="rq-boss">' + 새.slice(0, 8).map(r => 요청줄(r, true)).join('') + '</div>' + (새.length > 8 ? '<div class="sub3">외 ' + (새.length - 8) + '건</div>' : '')
     + '<div class="ps-foot"><button class="btn ghost" data-act="tx:rqlater">나중에</button><button class="btn main" data-act="tx:rqboss">비품 목록 보기</button></div></div>');
@@ -7943,7 +7949,7 @@ const 대메모 = day => ((청소.대 || []).find(r => r.day === day) || {}).mem
 const 주안 = (d, 날) => { const t = new Date(d + 'T12:00:00'), 일 = 날더함(d, -t.getDay()); return 날 >= 일 && 날 <= 날더함(일, 6); };
 function 대청소알림(오늘){
   오늘 = 오늘 || TODAY; if(진짜ME || 청소.없음) return;
-  if($('#pop').classList.contains('on')){ 팝업차례('대청소', () => 대청소알림(오늘)); return; }
+  if($('#pop').classList.contains('on')){ 팝업차례('대청소', () => 대청소알림(오늘)); return; } 팝업줄빼기('대청소');
   const 날 = 다음대청소(오늘); if(!날) return;
   const 읽 = k => { try{ return localStorage.getItem(k) || ''; }catch(e){ return ''; } }, 씀 = (k, v) => { try{ localStorage.setItem(k, v); }catch(e){} };
   const 그주 = 주안(오늘, 날), 그달 = 날.slice(0, 7) === 오늘.slice(0, 7);
@@ -8422,7 +8428,7 @@ function 매확락커줄(x){
 const 매확판묶음 = (k, 제목, 카드들, 남) => 카드들.length ? '<div class="sc-grp" style="--c:' + 매확색(k) + '"><div class="sc-gh"><span class="sc-gi">' + (k === '락커' ? '락' : k) + '</span><span class="sc-gt">' + 제목 + '</span>' + (남 != null ? '<span class="sc-gn">' + 남 + '건</span>' : '') + '</div>' + 카드들.join('') + '</div>' : '';
 /* 팝업 — 락커 1/2 → 매출 2/2 */
 function 매확팝업(강제){
-  if(!매확.답 || 진짜ME) return; if(!강제 && $('#pop').classList.contains('on')){ 팝업차례('확인할매출', () => 매확팝업()); return; }
+  if(!매확.답 || 진짜ME) return; if(!강제 && $('#pop').classList.contains('on')){ 팝업차례('확인할매출', () => 매확팝업()); return; } 팝업줄빼기('확인할매출');
   if(!강제) 매확.팝칩 = '';      /* 새로 뜰 땐 칩 「전체」 — 고른 칩이 남아 새 결제가 가려졌다 (2026-10-26) */
   const lk = 매확락할일().concat(매확미배정().filter(x => 매확락눌림(x) && 매확.방금.has('l' + x.id)));
   const 결 = 매확결제().filter(o => 매확미확인(o) || 매확.방금.has(String(o.id))), tg = 매확TG만().filter(x => !매확TG끝(x) || 매확.방금.has('t' + x['주문']));
@@ -8679,8 +8685,10 @@ const 검색칸들 = ['asq', 'rsq', 'rtq', 'rlgq', 'pzmq', 'pzgq', 'bpsq', 'q', 
 document.addEventListener('input', ev => { const t = ev.target; if(!t || t.id !== 'pzq' || !PZ) return; PZ.q2 = t.value; const q = 검색키(t.value), 칸 = 스트칸들.includes(PZ.갈) ? PZ.갈 : PZ.갈 === 'y' ? '내 동작' : 스트칸들[0];      /* 세트창 동작 검색 (2026-10-26) — 칩과 상관없이 전체 */
   document.querySelectorAll('#pzgrid [data-ps]').forEach(el => { el.style.display = (q ? !!el.dataset.psnm && 검색키(el.dataset.psnm).includes(q) : el.dataset.ps === 칸) ? '' : 'none'; });
   document.querySelectorAll('#pzmodal .chips [data-act="pzk"]').forEach(c => c.classList.toggle('on', !q && c.dataset.v2 === 칸)); });
-document.addEventListener('input', ev => { if(ev.isComposing && ev.target && 검색칸들.indexOf(ev.target.id) >= 0) ev.stopImmediatePropagation(); }, true);
-document.addEventListener('compositionend', ev => { const t = ev.target; if(t && 검색칸들.indexOf(t.id) >= 0) setTimeout(() => t.dispatchEvent(new Event('input', { bubbles:true })), 0); }, true);
+/* 목록에 이름을 적는 방식은 새 검색칸을 빠뜨린다 — 10/26 배정 묶음 탭 찾기(asgq)가 빠져 「지민」이 「ㅈㅣㅁㅣㄴ」(대표 20:55). 이제 class="srch" 인 글 칸은 저절로 같이 지킨다 */
+const 검색칸인가 = t => !!t && (검색칸들.indexOf(t.id) >= 0 || (t.tagName === 'INPUT' && t.classList && t.classList.contains('srch') && /^(text|search|)$/.test(t.getAttribute('type') || '')));
+document.addEventListener('input', ev => { if(ev.isComposing && 검색칸인가(ev.target)) ev.stopImmediatePropagation(); }, true);
+document.addEventListener('compositionend', ev => { const t = ev.target; if(검색칸인가(t)) setTimeout(() => t.dispatchEvent(new Event('input', { bubbles:true })), 0); }, true);
 document.addEventListener('input', ev => { if(!ev.target || ev.target.id !== 'asgq') return; 배정.g.q = ev.target.value; const p = ev.target.selectionStart; render(); const n = document.getElementById('asgq'); if(n){ n.focus(); n.setSelectionRange(p, p); } });      /* 묶음 탭 찾기 (2026-10-26) */
 document.addEventListener('change', ev => { const f = ev.target && ev.target.dataset && ev.target.dataset.asg; if(!f) return; 배정.g[f] = ev.target.value; render(); });
 document.addEventListener('input', ev => { if(!ev.target || ev.target.id !== 'asq') return; 배정.거.q = ev.target.value; 배정.페 = 0; const p = ev.target.selectionStart; render(); const n = document.getElementById('asq'); if(n){ n.focus(); n.setSelectionRange(p, p); } });
@@ -9385,7 +9393,7 @@ const 표정의 = {
     잠금: r => r.kind==='대표공지' && !할수('popup'),        /* 대표공지는 「공지 쓰기」 권한만 만들고 고친다 (2026-10-20 묶음) */
     정렬: (a,b) => ((b.created_at||'') > (a.created_at||'') ? 1 : (b.created_at||'') < (a.created_at||'') ? -1 : 0),      /* 노션처럼 생성일 내림차순 (2026-10-20) */
     행: r => ({ 제목:r.title,
-      칩: '<span class="tx-tag k-'+esc(r.kind||'업무')+'">'+esc(r.kind||'업무')+'</span>'
+      칩: 값칩('tasks', 'kind', r.kind || '업무')
         + (r.due ? '<span class="tx-tag '+(r.due<TODAY&&!r.done?'warn':'')+'">'+날짜한글(r.due)+'까지</span>' : '')
         + (r.note ? '<span>'+esc(r.note)+'</span>' : ''),
       오른쪽: 아바타들(r.owners), 체크:'done' }),
@@ -9435,8 +9443,8 @@ const 표정의 = {
     정렬: (a,b) => ((b.created_at||'') > (a.created_at||'') ? 1 : (b.created_at||'') < (a.created_at||'') ? -1 : 0),      /* 생성일 최신이 위 (2026-10-26 대표 「생성일이 더 뒤인데 시험 페이지 아래로」 · 노션과 같게) */
     행: r => ({ 제목: r.name + (r.segment ? ' · '+r.segment : ''),
       칩: (r.at ? '<span class="tx-tag '+(오늘인가(r.at)?'gold':'')+'">'+시각한글(r.at)+'</span>' : '')
-        + (r.channels||[]).map(c=>'<span class="tx-tag">'+esc(c)+'</span>').join('')
-        + (r.reg ? '<span class="tx-tag '+(r.reg==='o'?'teal':'')+'">등록 '+esc(r.reg)+'</span>' : '')
+        + (r.channels||[]).map(c => 값칩('leads', 'channels', c)).join('')
+        + (r.reg ? 값칩('leads', 'reg', r.reg, '등록 ' + esc(r.reg)) : '')
         + (r.note ? '<span>'+esc(r.note)+'</span>' : ''),
       오른쪽: 아바타들(r.counselors), 체크:'done' }),
   },
@@ -9818,7 +9826,9 @@ function 늘림칩(key, r){
 
 /* 목록 화면 */
 /* 업무는 본인 담당 + 대표공지 — 「업무 전체 보기」 권한만 전부 (2026-10-26 대표 결정 task=a) · 표 · 보기 숫자 · 달력이 모두 이 줄들을 쓴다 */
-const 볼줄 = key => key === 'tasks' && !할수('taskall') ? (W.tasks || []).filter(r => 내것(r.owners) || r.kind === '대표공지') : (W[key] || []);
+/* 대표공지 — 담당자를 비우면 모두 · 정하면 그 사람만(+ 업무 전체 보기) (2026-10-26 대표 「대표공지인데 담당자를 조민철로 했으면 조민철만 보여야」) */
+const 공지보임 = r => !(r.owners || []).length || 내것(r.owners) || 할수('taskall');
+const 볼줄 = key => key === 'tasks' && !할수('taskall') ? (W.tasks || []).filter(r => 내것(r.owners) || (r.kind === '대표공지' && 공지보임(r))) : (W[key] || []);
 function txTop(key){
   const T = 표정의[key], st = 표상태[key];
   const 전체 = 볼줄(key);
@@ -9840,6 +9850,7 @@ function txTools(key){
     + '<button class="tx-ib" data-act="tx:vset" data-k="'+key+'" title="보기 설정"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>'
     + '<button class="btn gold sm" data-act="tx:new" data-k="'+key+'">＋ 새로 만들기 ▾</button></div>';
 }
+const 담당칩열림 = key => { try{ return localStorage.getItem('gg_pchip_' + key) === '1'; }catch(e){ return false; } };
 function txList(key){ return '<div class="tx-db">' + txList0(key) + '</div>'; }      /* 표 전체 외곽선 (2026-10-26) */
 function txList0(key){
   const T = 표정의[key], st = 표상태[key];
@@ -9847,27 +9858,34 @@ function txList0(key){
   const v = 목록.find(x => x.k === st.보기) || 보임[0] || 목록[0];
   if(v && (v.필터고정 || 잠겼나(key)) && !할수('table') && 내변경(key).some(x => ['필터', '정렬', '그룹'].includes(x))) 보기얹기(key);      /* 필터 고정 — 각자 바꾼 것은 무시 */
   const q = (st.q||'').trim().toLowerCase();
-  let rows = 볼줄(key).filter(r => 보기맞나(v, r, key));
+  const 사람맞나 = r => { const p = r[T.사람열]; return Array.isArray(p) ? p.indexOf(st.사람)>=0 : p===st.사람; };
+  const 겉거름 = 줄 => 줄.filter(r => (!st.사람 || 사람맞나(r)) && (!q || JSON.stringify(r).toLowerCase().indexOf(q)>=0));      /* 담당자 칩 · 검색은 모든 보기에 같이 걸린다 — 보기 숫자도 같이 셈 (2026-10-26 대표 「월 예약자 2 인데 결과 없음」) */
+  const 보기줄들 = 볼줄(key).filter(r => 보기맞나(v, r, key));
+  let rows = 보기줄들;
   if(st.규칙 && st.규칙.length) rows = rows.filter(r => 규칙들맞나(st.규칙, st.op, r, key));
-  if(st.사람) rows = rows.filter(r => { const p = r[T.사람열]; return Array.isArray(p) ? p.indexOf(st.사람)>=0 : p===st.사람; });
-  if(q) rows = rows.filter(r => JSON.stringify(r).toLowerCase().indexOf(q)>=0);
+  rows = 겉거름(rows);
   const 순 = st.정렬 || (v.ord || null);
   rows = 줄세우기(rows, 순, key) || rows.slice().sort(T.정렬);
   const 보기줄 = '<div class="tx-bar"><div class="tx-views">'
     + 보임.map((x,i) => '<button class="'+(x.k===st.보기?'on':'')+'" data-act="tx:view" data-k="'+key+'" data-v2="'+x.k+'"'
         + (바꿀수있나(key) ? ' data-vtab="'+i+'" title="끌어서 순서를 변경할 수 있어요"' : '')+'>'
-        + esc(x.이름) + '<b>' + 볼줄(key).filter(r => 보기맞나(x, r, key)).length + '</b></button>').join('')
+        + esc(x.이름) + '<b>' + 겉거름(볼줄(key).filter(r => 보기맞나(x, r, key))).length + '</b></button>').join('')
     + (할수('table') && !잠겼나(key) ? '<button class="tx-vplus" data-act="tx:views" data-k="'+key+'" title="새 보기 추가">＋</button>' : '')
     + '</div><div class="sp2">'
-    + (key === 'tasks' && !할수('taskall') ? '' : '<span class="tx-pchips"><button class="tx-pchip '+(!st.사람?'on':'')+'" data-act="tx:who" data-k="'+key+'" data-v2="">모두</button>'
+    + (key === 'tasks' && !할수('taskall') ? ''
+       : key === 'leads' && !담당칩열림(key) ? '<span class="tx-pchips"><button class="tx-pchip tx-pfold'+(st.사람?' on':'')+'" data-act="tx:pfold" data-k="'+key+'" title="담당자로 거르기">담당자'+(st.사람 ? ' · '+이름딱지(st.사람) : '')+' ▾</button></span>'      /* 상담은 담당자 칩을 접어 둔다 (2026-10-26 대표 「상담에서는 많이 쓰는 기능이 아니라서 · 펼쳤다 숨겼다」) */
+       : '<span class="tx-pchips"><button class="tx-pchip '+(!st.사람?'on':'')+'" data-act="tx:who" data-k="'+key+'" data-v2="">모두</button>'
     + W.staff.filter(p=>p.active!==false).map(p => '<button class="tx-pchip '+(st.사람===p.id?'on':'')+'" data-act="tx:who" data-k="'+key+'" data-v2="'+p.id+'">'+이름딱지(p.id)+'</button>').join('')
+    + (key === 'leads' ? '<button class="tx-pchip tx-pfold" data-act="tx:pfold" data-k="'+key+'" title="담당자 칩 접기">접기 ▴</button>' : '')
     + '</span>')
     + txTools(key) + '</div></div>';
   const 달력 = T.달력 ? txCal(key, rows) : '';
   const 거름줄 = txFilterBar(key, v, 순);
   보인행[key] = rows.map(r => r.id);
   if(고른행.key === key) 고른행.ids = 고른행.ids.filter(id => 보인행[key].indexOf(id) >= 0);
-  if(!rows.length) return 보기줄 + 거름줄 + 달력 + '<div class="empty">결과 없음</div>'
+  const 가린것 = [st.사람 ? '담당 ' + esc(사람(st.사람).name || '') : '', (st.규칙 || []).length ? '필터 ' + st.규칙.length + '개' : '', q ? '검색 「' + esc(st.q.trim()) + '」' : ''].filter(Boolean);
+  if(!rows.length) return 보기줄 + 거름줄 + 달력 + '<div class="empty">결과 없음'
+    + (보기줄들.length && 가린것.length ? '<div class="tx-hid">이 보기 ' + 보기줄들.length + '건이 ' + 가린것.join(' · ') + '(으)로 가려졌어요 <button class="btn ghost sm" data-act="tx:fclear" data-k="' + key + '">모두 풀기</button></div>' : '') + '</div>'
     + '<button class="tx-newrow one" data-act="tx:rownew" data-k="'+key+'">＋ 새 '+표정의[key].제목+'</button>';
   const 표다 = 모양(key) === 'table', 카드다 = 모양(key) === 'card';
   const 그릴 = 줄 => 카드다 ? 카드보기(key, 줄) : 표다 ? txTable(key, 줄)
@@ -10128,7 +10146,19 @@ function 표칸값(key, c, r){
     const v = (c.늘림 ? (r.extra||{})[c.k.slice(6)] : r[c.k]) || [];
     if(Array.isArray(v) && v.length > 1) return '<span class="tx-nms one">' + 외몇(c.타입 === 'people' ? 사람칩(c, v[0]) : 옵칩(c, v[0], esc(v[0])), c.타입 === 'people' ? v.map(i => 사람(i).name || '') : v.map(String), c.타입 === 'people' ? '명' : '개') + '</span>';
   }
+  const v0 = c.늘림 ? (r.extra||{})[c.k.slice(6)] : r[c.k];
+  if(c.타입 !== 'check' && 값없나(v0)) return 퇴사담당칩(c, r) || '';      /* 표 칸은 빈칸 그대로 — 「비어 있음」은 페이지에서만 (2026-10-26 대표 「비어있음 하지말고 그냥 비워놔」) */
+  if(c.타입 === 'text' || c.타입 === 'long') return '<span class="tx-clamp">' + esc(블록글자(v0)) + '</span>';      /* 긴 글은 두 줄까지 · 칸을 누르면 전체 (노션처럼) */
   return 속성값보기(c, r);
+}
+/* 본문 블록(JSON {"v":1,"b":[…]})을 글로 — 표 칸에 JSON 이 그대로 찍혔다 (2026-10-26 대표 그림 윤O정) · 태그는 DOMParser 로 벗김(그림 · 글 실행 안 됨) */
+const 블록JSON인가 = v => typeof v === 'string' && /^\s*\{\s*"v"\s*:\s*1\s*,\s*"b"\s*:/.test(v);
+function 블록글자(v){
+  if(!블록JSON인가(v)) return v == null ? '' : String(v);
+  try{ const j = JSON.parse(v), 줄 = [], dp = new DOMParser();
+    const 걷기 = bs => (bs || []).forEach(b => { const x = (dp.parseFromString(String(b.x || ''), 'text/html').body.textContent || '').trim();
+      if(x) 줄.push(x); else if(b.name) 줄.push('📎 ' + b.name); 걷기(b.c); });
+    걷기(j.b); return 줄.join(String.fromCharCode(10)); }catch(e){ return String(v); }
 }
 /* 새 줄 — 표 맨 위에 넣고 잠깐 금테 + 이름 칸 바로 입력 (노션처럼) */
 const 새줄 = {};
@@ -10218,20 +10248,22 @@ function 칸안편집(key, id, k, td){
   const v = 값읽기(r, k);
   const 종 = c.타입==='number' ? 'number' : c.타입==='url' ? 'url'
            : c.타입==='email' ? 'email' : c.타입==='phone' ? 'tel' : 'text';
+  if(c.타입 === 'long' && 블록JSON인가(v)){ txView(key, id); return true; }      /* 사진 · 목록이 든 본문은 칸에서 고치면 깨진다 — 페이지로 */
   칸편집 = { key, id, k };
   칸고르기(key, id, k);
-  td.classList.add('on');
+  td.classList.add('on'); td.classList.toggle('big', c.타입 === 'long' || (c.타입 === 'text' && String(v || '').length > 30));
   td.innerHTML = (c.타입 === 'long')
     ? '<textarea class="tx-cin" rows="1"></textarea>'
     : '<input class="tx-cin" type="'+종+'">';
   const inp = td.querySelector('.tx-cin');
   inp.value = v == null ? '' : String(v);
+  if(td.classList.contains('big')){ const 키 = () => { inp.style.height = 'auto'; inp.style.height = Math.min(420, inp.scrollHeight + 4) + 'px'; }; inp.addEventListener('input', 키); setTimeout(키, 0); }
   let 끝났 = false;
   const 담기 = async (다음, 고칠까) => {
     if(끝났) return; 끝났 = true; 칸편집 = null; 칸편집끝 = null;
     const nv = inp.value;
     const 바뀜 = String(nv) !== String(v == null ? '' : v);
-    td.classList.remove('on');
+    td.classList.remove('on', 'big');
     if(바뀜) await 속성저장(key, id, k, c.타입==='number' ? (nv===''?null:Number(nv)) : (nv===''?null:nv));
     else 표칸다시(key, id, k);
     if(다음) 옆칸으로(key, id, k, 다음, !!고칠까);
@@ -10239,7 +10271,7 @@ function 칸안편집(key, id, k, td){
   };
   inp.addEventListener('keydown', e => {
     if(e.key === 'Escape'){ 끝났 = true; 칸편집 = null; 칸편집끝 = null;
-      td.classList.remove('on'); 표칸다시(key, id, k); 칸고르기(key, id, k); }
+      td.classList.remove('on', 'big'); 표칸다시(key, id, k); 칸고르기(key, id, k); }
     /* 엔터·방향키는 담고 「고른 상태」로 · Tab 은 담고 옆 칸을 바로 편집 (노션과 같다) */
     else if(e.key === 'Enter' && c.타입 !== 'long'){ e.preventDefault(); 담기('down', false); }
     else if(e.key === 'Enter' && e.ctrlKey){ e.preventDefault(); 담기('down', false); }
@@ -10942,9 +10974,23 @@ function 고칠수있나(key, r){
 const 기본팔레트 = [['연분홍', '#FBBFC8'], ['산호', '#DE948F'], ['살구', '#CC8552'], ['올리브', '#ACB25C'], ['연두', '#B0E299'], ['민트', '#89D0AA'], ['짙은 민트', '#5BAA8E'], ['연청록', '#72E9D9'], ['청록', '#40C1BD'],
   ['하늘', '#2DA9C3'], ['연하늘', '#8CC8DF'], ['파랑', '#65B4E9'], ['청보라', '#7597DC'], ['남보라', '#A8A2E1'], ['라일락', '#C9B5D6'], ['연라일락', '#F1BAFE'], ['자주', '#B784B5'], ['분홍', '#F5A0C5']];
 const 속성팔레트 = () => { const p = 명단받은 && 명단받은.색 && 명단받은.색['속성팔레트']; return Array.isArray(p) && p.length ? p.map(x => [x['이름'], x['색']]) : 기본팔레트; };
-const 칸색표 = (key, k) => ((표설정(key).colors || {})[k]) || {};
+/* 노션 상담예약 색 그대로 (2026-10-26 대표 「상담유형 · 등록여부 · 발송상태 속성값 색상 노션과 같이 · 상담유형에서 색이 너무 비슷한 것만 조금 변형」)
+   노션 색 이름(초록 · 파랑 …) → 데스크 칩 색. 노션에서 같은 색을 쓰는 상담유형은 밝기 · 결만 달리(OKLab 거리 4.5 이상 · 검은 글자 대비 4.4 이상).
+   대표가 「색 고르기」로 저장한 색(tr_meta.colors)이 언제나 먼저 */
+const 노션색 = { default:'#b9b1a2', gray:'#8e8b86', brown:'#c08f78', orange:'#df8f55', yellow:'#d4a94a', green:'#62b386', blue:'#6f98d8', purple:'#a682d9', pink:'#dc78a6', red:'#e07069' };
+const 기본색표 = { leads: {
+  channels: { '양도예약':노션색.purple, '방문':노션색.blue, '스마트콜':노션색.default, '네이버톡':'#cbb0f5', '네이버예약':노션색.red, '소개':노션색.brown, '전단지':노션색.yellow, '전화':'#83c0f0',
+    '문자':노션색.orange, '인스타':'#c36e0f', '카카오톡':노션색.green, '카카오맵':노션색.pink, '카카오비즈니스':'#eed556', '당근':노션색.gray, '무료 체험권':'#f5a77a', '재등록 리마케팅':'#86d6aa',
+    '락커회수':'#b4785a', '운닥':'#cc6048', '각종 바우처':'#ee9a3c', '양도':'#a29228', '일일입장':'#d9c2ba', '네이버톡톡':'#f4a49c' },
+  reg: { '집계제외':노션색.orange, '미방문':노션색.gray, 'o':노션색.blue, 'x':노션색.red, '재등록':노션색.pink, '무료체험':노션색.brown, 'PT체험3회':노션색.green, '일일입장':노션색.yellow, '양도':'#f5a77a', '일일권':노션색.purple, '환불':노션색.default },
+  segment: { '신규':노션색.blue, '재등록':노션색.green, '컴백':노션색.orange, '기존회원':노션색.gray, '만료회원':노션색.brown },
+  'extra.s1': { '완료':노션색.green, '보류':노션색.red, '발송':노션색.blue, '대기':노션색.gray },
+  'extra.r1': { 'o':노션색.red },
+} };
+const 칸색표 = (key, k) => Object.assign({}, ((기본색표[key] || {})[k]) || {}, ((표설정(key).colors || {})[k]) || {});
 const 자동색 = ['#c49a7e', '#e0975a', '#e3c25b', '#5fb39d', '#6ea8d6', '#a48ad6', '#d98ad6', '#8fd1c4', '#b9b1a2', '#d6a5a5'];      /* 빨강 · 신호등 없이 */
 const 옵색 = (c, o) => (c && c.색표 && c.색표[o]) || ((c && (c.타입 === 'select' || c.타입 === 'multi') && (c.옵션 || []).indexOf(o) >= 0) ? 자동색[(c.옵션 || []).indexOf(o) % 자동색.length] : '');      /* 값마다 색 (2026-10-26 대표 「등록여부 · 상담유형처럼 선택 속성들 색상」) */
+const 값칩 = (key, k, v, 글) => 옵칩(열들(key).find(z => z.k === k), v, 글 == null ? esc(v) : 글);      /* 줄 보기 · 현황판 목록의 분류 칩도 표 칸과 같은 색 (2026-10-26 대표 「네임택 · 분류카드 맞추기로 했잖아 · 일관성 · 통일성」) */
 const 옵칩 = (c, o, 글) => { const 색 = 옵색(c, o); return '<span class="tx-tag' + (색 ? ' oc" style="--oc:' + esc(색) : '') + '">' + 글 + '</span>'; };
 const 색선형 = v => { v /= 255; return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
 function 오클랩(hex){ const h = String(hex || '').replace('#', ''), r = 색선형(parseInt(h.slice(0, 2), 16)), g = 색선형(parseInt(h.slice(2, 4), 16)), b = 색선형(parseInt(h.slice(4, 6), 16));
@@ -12188,7 +12234,7 @@ function vHome(){
   /* ⛔ 홈은 사람마다 다르다 — 차례·켜짐·줄수는 `staff.home` 에서 읽는다 (2026-09-17) */
   const H = 내홈();
   const N = H.줄수;
-  const 공지 = W.tasks.filter(r=>r.kind==='대표공지' && !r.done).slice(0,3);
+  const 공지 = W.tasks.filter(r=>r.kind==='대표공지' && !r.done && 공지보임(r)).slice(0,3);
   const 이번주 = W.leave.filter(표정의.leave.보기[0].필터).sort((a,b)=>(a.day||'')>(b.day||'')?1:-1).slice(0,N);
   const 대기 = 할수('leaveok') ? W.leave.filter(승인대기).length : 0;
 
@@ -13729,6 +13775,8 @@ async function txAct(a, el){
     catch(e){ toast('바꾸지 못했어요 — '+String(e.message||'').slice(0,60)); }
     return; }
   if(a==='who'){ 표상태[k].사람 = v2 || null; 고른행 = { key:null, ids:[] }; render(); return; }
+  if(a==='pfold'){ try{ localStorage.setItem('gg_pchip_' + k, 담당칩열림(k) ? '0' : '1'); }catch(e){} render(); return; }
+  if(a==='fclear'){ Object.assign(표상태[k], { 사람:null, 규칙:[], q:'', 검색열림:false }); 고른행 = { key:null, ids:[] }; render(); return; }
   /* ── 목록 고르기 ── */
   if(a==='pick'){
     if(고른행.key !== k){ 고른행 = { key:k, ids:[] }; 마지막고름 = null; }
@@ -14972,6 +15020,8 @@ function 판칩달기(){
    데스크를 열면 공지 → PT 매출 → 비품 → 확인할 매출(결제수단 · TG · 락커) → 비품 요청 · 대청소 … 가 한 장씩 차례로. 열린 창이 있으면 줄에 서고(같은 것은 한 번만) 닫히면 다음 것이 뜬다.
    줄에서 꺼낼 때 다시 계산한다 — 그사이 처리해서 볼 것이 없으면 건너뛴다 */
 const 팝업줄 = [];
+/* 지금 그 팝업이 뜨면 줄에 서 있던 같은 팝업은 뺀다 — 닫자마자 같은 팝업이 또 떴다(2026-10-26 비품 시험 · 첫 화면에서 줄 선 비품이 「모두 처리했어요 · 닫기」 뒤에 다시) */
+const 팝업줄빼기 = 이름 => { for(let i = 팝업줄.length - 1; i >= 0; i--) if(팝업줄[i].이름 === 이름) 팝업줄.splice(i, 1); };
 function 팝업차례(이름, f){ if(typeof 진짜ME !== 'undefined' && 진짜ME) return; if(!팝업줄.some(x => x.이름 === 이름)) 팝업줄.push({ 이름, f }); }
 function 팝업다음(){ setTimeout(() => { let n = 0; while(팝업줄.length && !$('#pop').classList.contains('on') && n++ < 20){ const x = 팝업줄.shift(); try{ x.f(); }catch(e){ console.warn('팝업 줄 —', x.이름, e && e.message); } } }, 250); }
 function popClose(){ if(typeof 쪽지닫기==='function') 쪽지닫기(); if(typeof 판길 !== 'undefined' && !판되돌림){ 판길 = []; 판원인 = null; } setTimeout(팝업다음, 0); if(typeof 매출 !== 'undefined' && 매출.방금) 매출.방금.clear(); if(typeof 비품 !== 'undefined' && 비품.방금) 비품.방금.clear(); if(typeof S !== 'undefined') S.wnewDate = null;
@@ -16359,6 +16409,29 @@ window.addEventListener('popstate', function(e){
 /* 화면을 그릴 때마다 자리를 남긴다 */
 const _render = render;
 render = function(){ _render(); push(); };
+
+/* ══ 상담 실시간 ══ 2026-10-26 대표 「노션은 발송 + 체크 누르면 5초 안에 발송완료로 바뀌는데 데스크는 새로고침해야」
+   상담 표 · 상담 페이지 · 현황판 「오늘 상담」이 열려 있을 때만 5초마다 updated_at 이 지난 줄만 받아 W.leads 에 덮는다.
+   칸을 치는 중이면 그리기를 미루고(다음 차례에), 숨긴 줄(extra.archived)은 뺀다 */
+let 상담때 = '', 상담그릴것 = false;
+const 상담보는중 = () => S.view === 'leads' || ($('#pop').classList.contains('on') && ((시트 && 시트.key === 'leads') || 현황판 === '상담'));
+async function 상담바뀜받기(){
+  if(!ME || document.visibilityState === 'hidden' || !상담보는중() || !Array.isArray(W.leads)) return;
+  if(!상담때) 상담때 = W.leads.reduce((m, r) => (r.updated_at || '') > m ? r.updated_at : m, '');
+  if(!상담때) return;
+  let n = [];
+  try{ n = await uget('tr_leads?select=*&updated_at=gt.' + encodeURIComponent(상담때) + '&order=updated_at.asc&limit=100') || []; }catch(e){ return; }
+  n = n.filter(x => (x.updated_at || '') > 상담때);
+  n.forEach(x => { 상담때 = x.updated_at; const i = W.leads.findIndex(r => r.id === x.id);
+    if((x.extra || {}).archived){ if(i >= 0) W.leads.splice(i, 1); }
+    else if(i >= 0) W.leads[i] = Object.assign(W.leads[i], x); else W.leads.unshift(x);
+    상담그릴것 = true; });
+  const 치는중 = 칸편집 || (document.activeElement && (/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName) || document.activeElement.isContentEditable));
+  if(!상담그릴것 || 치는중) return;
+  상담그릴것 = false; render();
+  if(시트 && 시트.key === 'leads' && $('#pop').classList.contains('on') && W.leads.some(r => r.id === 시트.id)) 속성줄다시('leads', 시트.id);
+}
+setInterval(상담바뀜받기, 5000);
 
 boot();
 setInterval(async function(){
