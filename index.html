@@ -1591,6 +1591,27 @@ body .prephd .ph1{font-size:21px}
 .pkadd{font-style:normal;flex:none;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:var(--sub);border:1.2px solid #4a463d}
 .pson .pkadd{color:#2a1c14;border-color:transparent;background:linear-gradient(180deg,#f3d9a8,#e2c184);font-size:13px;font-weight:800}
 .pkg .mrow2.pkjust{background:rgba(240,211,160,.08)}
+/* 고르기 = 그림 카드 2열 (2026-10-26 대표 「스트레칭 · 웨이트 이질감 없이」 · 결정 st=A) — 종목 선택 · 루틴 종목 추가 · 스트레칭 동작 고르기 같은 꼴 */
+.megrp.pkg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;border:0;background:none;border-radius:0;overflow:visible}
+.megrp.pkg .mrow2{position:relative;flex-direction:column;align-items:stretch;gap:0;padding:0 0 10px;border:1.5px solid #34332d;border-radius:14px;background:linear-gradient(180deg,#1f1e1b,#171615);overflow:hidden}
+.megrp.pkg .mrow2.wide{grid-column:1/-1;flex-direction:row;align-items:center;gap:12px;padding:12px 14px}
+.megrp.pkg .mrow2.wide .mt{padding:0}
+.megrp.pkg .mrow2.wide .pkadd{position:static}
+.megrp.pkg .mrow2 .mt{padding:8px 10px 0}
+.megrp.pkg .mrow2 .mt b{font-size:14.5px;line-height:1.3;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.megrp.pkg .mrow2 .mt small{font-size:13px;margin-top:2px}
+.megrp.pkg .mrow2 .pkadd{position:absolute;top:7px;right:7px;background:rgba(20,19,17,.88)}
+.megrp.pkg .mrow2.pson{border-color:#e2c184}
+.megrp.pkg .mrow2.pson .pkadd{background:linear-gradient(180deg,#f3d9a8,#e2c184);color:#2a1c14}
+.pkim{display:flex;align-items:center;justify-content:center;height:96px;background:#1b1a17;border-bottom:1px solid #2c2b27}
+.pkim img{width:100%;height:100%;object-fit:contain;background:#fff}
+.pkim.ph .pti{width:58px;height:58px}.pkim.ph .pti i{width:44px;height:44px}.pkim.ph .pti svg{width:32px;height:32px}
+.pkim.ph>svg{width:34px;height:34px;stroke:#6f685c;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.pkms{position:absolute;top:7px;left:7px;font-size:12px;font-weight:800;color:var(--teal);background:rgba(20,30,28,.9);border:1px solid #3c5a53;border-radius:999px;padding:1px 8px}
+.pkcnt{font-style:normal;font-size:12px;color:var(--sub);margin-left:3px}
+.chip.on .pkcnt{color:inherit;opacity:.75}
+.megrp.pkg .mrow2.pknew2{border-style:dashed;justify-content:center;align-items:center;min-height:150px;color:var(--gold);font-weight:800;font-size:14.5px;padding:0}
+.pknew2 span{display:block;font-size:30px;text-align:center;line-height:1.1}
 .ikg .mrow2{padding:12px 15px;align-items:flex-start;gap:12px}
 .ikk{flex:none;width:86px;font-size:12.5px;font-weight:600;color:var(--sub);padding-top:1px}.ikv{flex:1;min-width:0;font-size:14.5px;font-weight:600;line-height:1.5;white-space:pre-wrap;word-break:keep-all}
 .megrp.ikg.t{border-color:#3f7281}
@@ -3176,7 +3197,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '461';
+const BUILD = '462';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -4522,7 +4543,7 @@ function tRnew(){
     foot:`<div class="rn-st" id="rnst">${RN상태글()}</div><button class="btn rn-go${RN됨() ? ' ready' : ''}" id="rngo" data-act="rnsave">저장</button>` };
 }
 function RN줄(e){ const va = (vars(e.id)[0] || {}).k || 'a', 있 = S.rn.items.some(x => x.ex === e.id);
-  return `<button class="mrow2 ${있 ? 'pson' : ''}" data-act="rntog:${e.id}:${va}"><span class="mt"><b>${esc(e.n)}</b><small>${e.owner ? '<u>내 종목</u> · ' : ''}${esc(e.p || '')}${e.e ? ' · ' + esc(e.e) : ''}</small></span><em class="pkadd">${있 ? '✓' : '＋'}</em></button>`; }
+  return `<button class="mrow2 ${있 ? 'pson' : ''}" data-act="rntog:${e.id}:${va}">${카드그림(e)}<span class="mt"><b>${esc(e.n)}</b><small>${e.owner ? '<u>내 종목</u> · ' : ''}${esc(e.p || '')}${e.e ? ' · ' + esc(e.e) : ''}</small></span><em class="pkadd">${있 ? '✓' : '＋'}</em></button>`; }
 function RN목록(){ const n = S.rn, q = (n.q || '').trim();
   if(q){ const k = 검색키(q), rs = RN고를().filter(e => 검색키(e.n).includes(k) || 검색키(exKey ? exKey(e) : e.n).includes(k));
     return `<div class="rn-sec">검색 결과 ${rs.length}개</div><div class="megrp pkg">${rs.slice(0, 40).map(RN줄).join('')}</div>
@@ -5615,6 +5636,7 @@ function vRoutines(){
    그림은 구매 뒤(대표 「아직은 그림 넣지 마」) — 웹앱/img/ex/<종목 id>.png 를 넣고 img/ex/목록.json 에 id 를 적으면 저절로 뜬다 · 그 전엔 부위 그림 + 「그림 준비 중」 */
 let 그림있음 = new Set();
 try{ fetch('img/ex/목록.json?v=' + BUILD).then(r => r.ok ? r.json() : []).then(a => { 그림있음 = new Set(Array.isArray(a) ? a : []); if(그림있음.size && typeof render === 'function') render(); }).catch(() => {}); }catch(e){}
+const 카드그림 = e => !e ? '' : 그림있음.has(e.id) ? `<span class="pkim"><img src="img/ex/${encodeURIComponent(e.id)}.png" alt="" loading="lazy"></span>` : `<span class="pkim ph">${부위그림(e)}</span>`;      /* 고르기 카드 맨 위 (2026-10-26) — 그림 사기 전엔 부위 그림 */
 const 종목그림 = e => !e ? '' : 그림있음.has(e.id) ? `<img class="rtimg" src="img/ex/${encodeURIComponent(e.id)}.png" alt="${esc(e.n || '')}">` : `<span class="rtph">${부위그림(e)}<small>그림 준비 중</small></span>`;
 function 지난기록표(ex, va, mid){
   const rs = lastRuns(ex, va, mid, 3); if(!rs.length) return '<div class="sm" style="color:var(--sub)">아직 기록이 없어요</div>';
@@ -5729,14 +5751,14 @@ function vPick(){
     </div>
     ${S.pickOpen?`<div class="chips pkeq">${EQS().map(x=>`<button class="chip ${x===S.pickEq?'on t':''}" data-act="peq:${x}">${x}</button>`).join('')}</div>`:''}
     <div class="megrp pkg">
-    <button class="mrow2" data-exrow="1rm 원알엠 일알엠 원rm 1알엠 1rm측정 측정 최대중량 맥스 max onerepmax" data-part="__1rm" data-eq="" style="display:none" data-act="rmaddpick">
+    <button class="mrow2 wide" data-exrow="1rm 원알엠 일알엠 원rm 1알엠 1rm측정 측정 최대중량 맥스 max onerepmax" data-part="__1rm" data-eq="" style="display:none" data-act="rmaddpick">
       <span class="mt"><b style="color:var(--gold)">1RM 측정 종목 추가</b><small>추가하면 바로 측정 계획이 열립니다</small></span><em class="pkadd">＋</em></button>
-    <button class="mrow2 pknew" id="pknew" data-act="pknew" style="display:none"><span class="mt"><b>＋ 「<span id="pknewq"></span>」 바로 추가</b><small>사전에 없는 종목 · 무게 · 횟수 대신 메모${S.who === 'tr' ? ' · 종목 추가 요청도 같이' : ''}</small></span><em class="pkadd">＋</em></button>
+    <button class="mrow2 wide pknew" id="pknew" data-act="pknew" style="display:none"><span class="mt"><b>＋ 「<span id="pknewq"></span>」 바로 추가</b><small>사전에 없는 종목 · 무게 · 횟수 대신 메모${S.who === 'tr' ? ' · 종목 추가 요청도 같이' : ''}</small></span><em class="pkadd">＋</em></button>
     ${EX.filter(고를수있나).map(e=>{ const vs=vars(e.id), n=cmOf(S.mid,e.id).length, last=lastSet(e.id), 담 = w ? w.items.slice(처음).filter(it=>it.ex===e.id).length : 0;
       return `<button class="mrow2 ${담?'pson':''}" data-exrow="${esc(exKey(e))}" data-part="${esc(e.p)}"
         data-eq="${esc(e.e||'')}"
         style="${(e.p===S.pickPart && (S.pickEq==='전체'||e.e===S.pickEq))?'':'display:none'}"
-        data-act="add:${e.id}:${(vars(e.id)[0] || {}).k || 'a'}">
+        data-act="add:${e.id}:${(vars(e.id)[0] || {}).k || 'a'}">${카드그림(e)}
         <span class="mt"><b>${esc(e.n)}</b>
           <small>${esc(e.e)}${last?` · 지난번 ${setTxt(e.id,last)}`:''}${n?` · 피드백 ${n}`:''}${vs.length>1?` · <u>하는 법 ${vs.length}가지</u>`:''}</small></span>
         <em class="pkadd">${담 ? '✓' + (담>1 ? 담 : '') : '＋'}</em></button>`; }).join('')}
@@ -6131,27 +6153,51 @@ function sheetPsetEdit(){
         const 붙 = (v.media||[]).length ? ((v.media.some(z=>z.kind==='video') ? '영상' : '사진') + ' ' + v.media.length) : '';
         return `<div class="mrow2"><span class="mi pt">${i+1}</span><span class="mt"><b>${esc(v.n)}</b><small>${it.k==='lib' ? '목록 동작' : '내 종목'}${v.t ? ' · '+esc(v.t) : ''}${붙 ? ' · '+붙 : ''}</small></span>
           <button class="psed" data-act="psup:${i}" ${i===0?'disabled':''}>▲</button><button class="psed w" data-act="psrm:${i}">제거</button></div>`; }).join('')}</div>` : '<div class="empty">아직 추가한 동작이 없습니다<small class="e2">아래 「동작 선택」을 눌러 주세요</small></div>'}
-    <button class="hline gold" data-act="pslib">${svg('h_roll',18)}<b>동작 선택</b><small>스트레칭 · 마사지 · 내 종목 ${내종목().length}</small></button>
+    <button class="hline gold" data-act="pslib">${svg('h_roll',18)}<b>동작 선택</b><small>부위별 · 검색 · 내 동작 ${내종목().length}</small></button>
     <button class="card rowc" data-act="psmem"><div><div class="nm">받을 회원 ${p.mids.length}명</div>
       <div class="sm">${p.mids.length ? esc(p.mids.map(id=>(MEMBERS.find(m=>m.id===id)||{}).n||'').filter(Boolean).slice(0,4).join(' · ')) + (p.mids.length>4?' 외':'') : '눌러서 선택 — 나중에 해도 돼요'}</div></div><span class="rt">›</span></button>
     <button class="btn main" data-act="pssave">저장</button>
     ${p.새 ? '' : `<button class="dngr" data-act="psdel">이 세트 삭제</button>`}
     <button class="btn ghost sm" data-act="psback">‹ 세트 목록</button>`);
 }
-/* 목록에서 고르기 — 스트레칭 / 마사지 */
+/* 스트레칭 동작 고르기 — 부위 칩 · 검색 · 담은 칩 · 그림 카드 (2026-10-26 대표 결정 st=A 「부위별로 칩 · 검색도 가능 · 추가 쉽게」)
+   스트레칭 · 마사지는 한 칸에 같이 두고 마사지만 딱지. 칩 = 목·어깨 · 가슴·팔 · 등·허리 · 엉덩이 · 다리 · 내 동작 */
+const 스트칸들 = ['목·어깨', '가슴·팔', '등·허리', '엉덩이', '다리', '내 동작'];
+const 스트칸 = { s01:'목·어깨', s02:'목·어깨', s03:'목·어깨', s06:'목·어깨', s31:'목·어깨', m04:'목·어깨', m05:'목·어깨', m08:'목·어깨',
+  s04:'가슴·팔', s05:'가슴·팔', s07:'가슴·팔', s08:'가슴·팔', m06:'가슴·팔', m18:'가슴·팔',
+  s09:'등·허리', s10:'등·허리', s11:'등·허리', s12:'등·허리', s13:'등·허리', s14:'등·허리', s27:'등·허리', s28:'등·허리', s32:'등·허리', m01:'등·허리', m02:'등·허리', m03:'등·허리', m07:'등·허리', m19:'등·허리', m20:'등·허리',
+  s15:'엉덩이', s16:'엉덩이', s17:'엉덩이', s18:'엉덩이', s20:'엉덩이', s25:'엉덩이', s30:'엉덩이', m12:'엉덩이', m13:'엉덩이',
+  s19:'다리', s21:'다리', s22:'다리', s23:'다리', s24:'다리', s26:'다리', s29:'다리', m09:'다리', m10:'다리', m11:'다리', m14:'다리', m15:'다리', m16:'다리', m17:'다리' };
+const 스트칸고름 = () => 스트칸들.includes(S.pslk) ? S.pslk : S.pslk === 'y' ? '내 동작' : 스트칸들[0];
+function 스트동작들(){
+  const 빈그림 = '<span class="pkim ph"><svg viewBox="0 0 24 24"><circle cx="12" cy="4.6" r="2"/><path d="M12 7.2v6.3M12 13.5l-3.6 6.3M12 13.5l3.6 6.3M5.5 6.5l6.5 2.4 6.5-2.4"/></svg></span>';      /* 그림 사기 전 — 사람 모양 */
+  return ST.concat(MS).map(x => { const id = String(x.v || '').split(':')[0];
+      return { k:'lib', i:x.i, n:x.n, t:x.t, c:스트칸[x.i] || 스트칸들[0], 마:x.i.charAt(0) === 'm', 찾:x.n + ' ' + (x.d || ''), 그림: id && 그림있음.has(id) ? `<span class="pkim"><img src="img/ex/${encodeURIComponent(id)}.png" alt="" loading="lazy"></span>` : 빈그림 }; })
+    .concat(내종목().map(x => { const 사 = (x.media || []).find(z => z.kind !== 'video');
+      return { k:'my', i:x.id, n:x.n, t:x.t, c:'내 동작', 마:false, 찾:x.n + ' ' + (x.d || ''), 그림: 사 ? `<span class="pkim"><img src="${esc(phURL(사.path))}" alt="" loading="lazy"></span>` : 빈그림 }; }));
+}
 function sheetPsetLib(){
   const p = S.pse; if(!p) return;
-  /* ⛔ 체크 표시를 만드는 값은 **그릴 때마다** 다시 센다 — 밖에서 한 번만 세면 눌러도 표시가 안 바뀐다 (2026-10-07 대표 「체크박스가 눌러지지 않아」) */
-  openSheet(()=>{ const 갈 = S.pslk || 's', 내 = 내종목(), 줄 = 갈==='s' ? ST : 갈==='m' ? MS : 내,
-      담긴 = new Set(p.items.filter(x=>x.k==='lib' || x.k==='my').map(x=>x.k+':'+x.i)), 키 = x => (갈==='y' ? 'my:'+x.id : 'lib:'+x.i);
-    return `<div class="h2">동작 선택 <small>${p.items.length}개 담음</small></div>
-    <div class="seg">${[['s','스트레칭 '+ST.length],['m','마사지 '+MS.length],['y','내 종목 '+내.length]].map(k=>`<button class="${갈===k[0]?'on':''}" data-act="pslk:${k[0]}">${k[1]}</button>`).join('')}</div>
-    <div class="pickbox">${줄.length ? `<div class="megrp">${줄.map(x=>`<button class="mrow2 ${담긴.has(키(x))?'pson':''}" data-act="pstog:${키(x)}">
-      <span class="ck">${담긴.has(키(x))?'✓':''}</span><span class="mt"><b>${esc(x.n)}</b><small>${esc([x.t, x.d].filter(Boolean).join(' · '))}</small></span></button>`).join('')}</div>`
-      : 빔('prep','아직 만든 종목이 없습니다','아래 「＋ 새 종목 만들기」를 눌러 주세요')}
-      ${갈==='y' ? `<button class="hline" data-act="pinew">${svg('h_cam',18)}<b>＋ 새 종목 만들기</b><small>이름 · 사진 · 영상</small></button>` : ''}</div>
-    <button class="btn main" data-act="psedit2">선택 완료</button>`; });
+  /* ⛔ 담은 표시는 **그릴 때마다** 다시 센다 — 밖에서 한 번만 세면 눌러도 표시가 안 바뀐다 (2026-10-07 대표 「체크박스가 눌러지지 않아」) */
+  openSheet(()=>{ const 칸 = 스트칸고름(), q = 검색키(S.psq || ''), 모두 = 스트동작들(), 키 = x => x.k + ':' + x.i,
+      담 = p.items.filter(x => x.k === 'lib' || x.k === 'my').map(x => x.k + ':' + x.i), 이름of = k => (모두.find(x => 키(x) === k) || {}).n || '(없는 동작)';
+    return `<div class="h2">동작 선택</div>
+    ${담.length ? `<div class="pktop"><span class="pktag">추가한 동작 ${담.length}</span><div class="pkchips">${담.map((k, n) => `<span class="pkc">${n + 1}. ${esc(이름of(k))}<button data-act="pstog:${k}" aria-label="${esc(이름of(k))} 제거">✕</button></span>`).join('')}</div>
+      <button class="btn gold sm pkgo" data-act="psedit2">선택 완료 ›</button></div>` : ''}
+    <input class="search" id="psq" type="search" value="${esc(S.psq || '')}" placeholder="동작 검색 · 예) 목, 햄스트링, 폼롤러" autocomplete="off" enterkeyhint="search">
+    <div class="pkparts">${스트칸들.map(c => `<button class="chip ${!q && c === 칸 ? 'on' : ''}" data-act="pslk:${c}">${c}<i class="pkcnt">${모두.filter(x => x.c === c).length}</i></button>`).join('')}</div>
+    <div class="megrp pkg" id="psgrid">
+      <button class="mrow2 pknew2" data-act="pinew" data-ps="내 동작" data-psnm="" style="${!q && 칸 === '내 동작' ? '' : 'display:none'}"><div><span>＋</span>새 동작</div></button>
+      ${모두.map(x => { const n = 담.indexOf(키(x)) + 1, 보임 = q ? 검색키(x.찾).includes(q) : x.c === 칸;
+        return `<button class="mrow2 ${n ? 'pson' : ''}" data-act="pstog:${키(x)}" data-ps="${esc(x.c)}" data-psnm="${esc(x.찾)}" style="${보임 ? '' : 'display:none'}">${x.그림}${x.마 ? '<span class="pkms">마사지</span>' : ''}
+          <span class="mt"><b>${esc(x.n)}</b><small>${esc(x.t || '')}</small></span><em class="pkadd">${n || '＋'}</em></button>`; }).join('')}
+    </div>
+    ${담.length ? '' : `<button class="btn ghost" data-act="psedit2">돌아가기</button>`}`; });
 }
+/* 검색 — 화면을 다시 그리지 않고 카드만 숨긴다(한글 조합이 끊기지 않게) · 칩과 상관없이 전체에서 찾는다 */
+document.addEventListener('input', ev => { const t = ev.target; if(!t || t.id !== 'psq') return; S.psq = t.value; const q = 검색키(t.value), 칸 = 스트칸고름();
+  document.querySelectorAll('#psgrid [data-ps]').forEach(el => { el.style.display = (q ? !!el.dataset.psnm && 검색키(el.dataset.psnm).includes(q) : el.dataset.ps === 칸) ? '' : 'none'; });
+  document.querySelectorAll('.pkparts [data-act^="pslk:"]').forEach(c => c.classList.toggle('on', !q && c.dataset.act === 'pslk:' + 칸)); });
 /* 종목 만들기 · 고치기 — 이름 · 시간/횟수 · 설명 · 사진 여러 장 또는 영상 */
 function sheetPsetOwn(){
   const d = S.pso; if(!d) return;
@@ -12615,7 +12661,7 @@ function tPickEx(){
     <div class="pkparts">${PARTS.map(x=>`<button class="chip ${x===S.pickPart?'on':''}" data-act="rpart:${x}">${x}</button>`).join('')}</div>
     <div class="pkmini"><button class="g" data-act="exnew">${svg('h_dumb',15)} ＋ 종목 만들기${내운동().length ? ` · 내 종목 ${내운동().length}` : ''}</button></div>
     <div class="megrp pkg">${list.map(e=>vars(e.id).map(v=>{ const k=VID(e.id,v.k), n=cnt(k), just=(S.just===k);
-      return `<button class="mrow2 ${n?'pson':''} ${just?'pkjust':''}" data-nm="${esc(e.n+' '+(v.n||''))}" data-act="raddv:${r.id}:${e.id}:${v.k}">
+      return `<button class="mrow2 ${n?'pson':''} ${just?'pkjust':''}" data-nm="${esc(e.n+' '+(v.n||''))}" data-act="raddv:${r.id}:${e.id}:${v.k}">${카드그림(e)}
         <span class="mt"><b>${esc(e.n)}${v.n?` (${esc(v.n)})`:''}</b>
           <small>${e.owner ? '<u>내 종목</u> · ' : ''}${esc(e.e)}${v.desc?' · 설명 있음':''}${just?' · 방금 담음':''}</small></span>
         <em class="pkadd">${n ? '✓' + (n>1 ? n : '') : '＋'}</em></button>`;
@@ -14049,8 +14095,8 @@ document.addEventListener('click', async ev=>{
       S.pse = { id:x.id, tr:x.tr, n:x.n, memo:x.memo, items:x.items.map(z=>Object.assign({}, z)), mids:x.mids.slice() }; sheetPsetEdit(); return; }
     case 'psedit2': sheetPsetEdit(); return;
     case 'psback': S.pse = null; sheetPsets(S.psMid); return;
-    case 'pslib': 세트글담기(); S.pslk = 's'; sheetPsetLib(); return;
-    case 'pslk': S.pslk = rest[0]; sheetPsetLib(); return;
+    case 'pslib': 세트글담기(); S.pslk = 스트칸들[0]; S.psq = ''; sheetPsetLib(); return;
+    case 'pslk': S.pslk = rest[0]; S.psq = ''; sheetPsetLib(); return;
     case 'pstog': { const p = S.pse; if(!p) return; const i = p.items.findIndex(z=>z.k===rest[0] && z.i===rest[1]);
       if(i >= 0) p.items.splice(i,1); else p.items.push({ k:rest[0], i:rest[1] }); drawSheet(); return; }
     /* 내 스트레칭 종목 — 세트를 고치다 들어오면(S.pse) 저장 뒤 고르기 창으로, 아니면 종목 목록으로 돌아간다 */
@@ -14058,7 +14104,7 @@ document.addEventListener('click', async ev=>{
     case 'pinew': 초안지움('pon','pot','pod'); S.pso = { id:'pi'+Date.now(), n:'', t:'', d:'', media:[], files:[], 새:true }; sheetPsetOwn(); return;
     case 'piedit': { const x = 내종목().find(z=>z.id===rest[0]); if(!x) return; 초안지움('pon','pot','pod');
       S.pso = { id:x.id, n:x.n, t:x.t, d:x.d, media:x.media.slice(), files:[] }; sheetPsetOwn(); return; }
-    case 'piback': S.pso = null; if(S.pse){ S.pslk = 'y'; sheetPsetLib(); } else sheetPitems(); return;
+    case 'piback': S.pso = null; if(S.pse){ S.pslk = '내 동작'; S.psq = ''; sheetPsetLib(); } else sheetPitems(); return;
     case 'pomrm': { const d = S.pso; if(d){ d.media.splice(+rest[0],1); drawSheet(); } return; }
     case 'pidel': { const d = S.pso; if(!d) return; const 쓰는 = 내세트().filter(x=>x.items.some(z=>z.k==='my' && z.i===d.id)).length;
       if(!await 물어(쓰는 ? `이 종목을 삭제할까요?
@@ -14085,7 +14131,7 @@ document.addEventListener('click', async ev=>{
       await sv(spost('prep_items', [{ id:x.id, trainer:x.tr, name:x.n, time:x.t, descr:x.d, media:x.media, updated_at:new Date().toISOString() }], {on:'id'}), '스트레칭 종목 저장');
       await 파일지우기(뺀, 'prep/items/'+d.id+'/');
       S.pso = null; toast('종목을 저장했어요');
-      if(S.pse){ if(d.새) S.pse.items.push({ k:'my', i:x.id }); S.pslk = 'y'; sheetPsetLib(); } else sheetPitems();
+      if(S.pse){ if(d.새) S.pse.items.push({ k:'my', i:x.id }); S.pslk = '내 동작'; S.psq = ''; sheetPsetLib(); } else sheetPitems();
       render(); return; }
     case 'psup': { const p = S.pse, i = +rest[0]; if(!p || i < 1) return; 세트글담기(); [p.items[i-1], p.items[i]] = [p.items[i], p.items[i-1]]; drawSheet(); return; }
     case 'psrm': { const p = S.pse; if(!p) return; 세트글담기(); p.items.splice(+rest[0],1); drawSheet(); return; }
