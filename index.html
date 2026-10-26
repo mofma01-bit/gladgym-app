@@ -996,11 +996,11 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .fsec .fb .mrow2{border-top:1px solid #2c2b27}.fsec .fb .mrow2:first-child{border-top:0}
 .fsec .mt small{font-size:13px!important}
 /* 인바디 결과지 — 데스크와 같은 꼴 (2026-10-26) */
-.ibrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px}.ibseg{display:inline-flex;flex:none;background:var(--dark-2);border:1px solid var(--line);border-radius:12px;padding:3px;gap:3px}.ibseg button{flex:none;min-width:110px}
+.ib-tbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px}.ibseg{display:inline-flex;flex:none;background:var(--dark-2);border:1px solid var(--line);border-radius:12px;padding:3px;gap:3px}.ibseg button{flex:none;min-width:110px}
 .ibtop{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end;margin-left:auto}.ibtop .ibdis{opacity:.6}.ibtop small{font-weight:600;margin-left:4px}
 .ibdays{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:0 0 12px}.ibdays button{border:1px solid var(--line);background:var(--dark-2);color:var(--sub);font-size:13px;font-weight:700;border-radius:999px;padding:5px 12px}.ibdays button.on{background:var(--cream);color:#151413;border-color:var(--cream)}.ibdays button.cmp{border-color:var(--teal);color:var(--teal)}.ibdays small{color:var(--sub);font-size:13px;margin-left:4px}
 .ibsheet{background:#fff;color:#222;border-radius:12px;padding:16px 20px 14px;font-size:13px;line-height:1.45;margin-bottom:16px}
-.ibhd{display:flex;align-items:flex-end;justify-content:space-between;border-bottom:3px solid #a22b2b;padding-bottom:4px;margin-bottom:8px}.ibhd b{font-size:30px;font-weight:900;color:#a22b2b;letter-spacing:-.02em}.ibhd span{font-size:12.5px;color:#555}
+.ib-logo{display:flex;align-items:flex-end;justify-content:space-between;border-bottom:3px solid #a22b2b;padding-bottom:4px;margin-bottom:8px}.ib-logo b{font-size:30px;font-weight:900;color:#a22b2b;letter-spacing:-.02em}.ib-logo span{font-size:12.5px;color:#555}
 .ibwho{display:grid;grid-template-columns:1.4fr .8fr .6fr .6fr 1.4fr;gap:8px;border-bottom:1px solid #ccc;padding:2px 0 8px;margin-bottom:12px}.ibwho span{font-weight:700;font-size:14px}.ibwho small{display:block;font-size:11.5px;color:#888;font-weight:500}
 .ibcols{display:grid;grid-template-columns:minmax(0,1.75fr) minmax(0,1fr);gap:22px}
 .ibs{margin-bottom:14px}.ibsh{font-size:15.5px;font-weight:800;color:#555;margin-bottom:5px;display:flex;align-items:baseline;gap:6px}.ibsh small{font-size:11px;color:#999;font-weight:500;font-style:italic}
@@ -1396,7 +1396,7 @@ body .card.now2 .pill.t.nowp{animation:nowp 2.2s ease-in-out infinite}@keyframes
 .hspt .mrow2{gap:10px}.hspt .ikk{flex:none;width:44px}.hsbar{flex:1;height:8px;border-radius:4px;background:#2a2925;overflow:hidden}.hsbar i{display:block;height:100%;border-radius:4px}.hsv{flex:none;font-size:13px;font-weight:800;color:var(--gold);min-width:42px;text-align:right}
 .blsay{margin-top:6px;border-radius:14px;border:1px solid #34332d;background:#1a1917;padding:12px 13px;display:flex;flex-direction:column;gap:7px}
 .blall{font-size:14px;font-weight:700;line-height:1.5;word-break:keep-all}.blall b{color:var(--gold)}
-.blrow{display:flex;gap:9px;align-items:flex-start;font-size:13px;line-height:1.5;word-break:keep-all}.blrow i{flex:none;width:9px;height:9px;border-radius:50%;margin-top:6px}.blrow b{color:var(--cream)}.blrow span{color:#cfc8bc}
+.bl-li{display:flex;gap:9px;align-items:flex-start;font-size:13px;line-height:1.5;word-break:keep-all}.bl-li i{flex:none;width:9px;height:9px;border-radius:50%;margin-top:6px}.bl-li b{color:var(--cream)}.bl-li span{color:#cfc8bc}
 .blfoot{font-size:11px;color:var(--sub);border-top:1px solid #2c2b27;padding-top:7px}
 .wdel{display:block;margin:9px 0 0 auto;font-size:12px;font-weight:700;color:var(--warn);border:1px solid #5a3830;border-radius:999px;padding:6px 12px}
 /* 지금 기록 중인 종목 — 테두리가 밝게 숨 쉰다 */
@@ -2637,7 +2637,7 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
 .pftool .z{height:30px;padding:0 10px;border-radius:9px;border:1px solid var(--line);font-size:13px;font-weight:800}.pftool .z.on{border-color:var(--gold-2);color:var(--gold)}
 .pftool .del{margin-left:auto;height:30px;padding:0 10px;border-radius:9px;border:1px solid var(--line);font-size:13px;color:var(--sub)}
 #toast small{display:block;margin-top:3px;font-size:13px;font-weight:500;color:var(--sub)}   /* 2026-10-20 두 줄 알림 — 둘째 줄 = 다음에 할 것 */
-.blall small,.blrow span small,.rmhint small{display:block;margin-top:1px;font-weight:500;color:var(--sub)}   /* 2026-10-20 줄표 대신 둘째 줄 */
+.blall small,.bl-li span small,.rmhint small{display:block;margin-top:1px;font-weight:500;color:var(--sub)}   /* 2026-10-20 줄표 대신 둘째 줄 */
 /* ── 로딩 그림 (설계서\시험페이지\로딩_모음.html 과 같은 것 · 금색 하나 · 그림 파일 없음) ── */
 @keyframes glspin{to{transform:rotate(360deg)}}@keyframes gllift{0%,100%{transform:translateY(9px)}50%{transform:translateY(-9px)}}@keyframes glbn{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
 .gload{display:flex;justify-content:center;margin:0 0 14px;color:#e9cf9b}.gload svg{width:56px;height:56px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;overflow:visible}.gload .bar{animation:gllift 1.4s ease-in-out infinite}
@@ -3253,7 +3253,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '467';
+const BUILD = '468';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -4326,7 +4326,7 @@ function 균형말(ps, W){
     : 한 <= 2 ? `<b>${부위.filter(k => 키(k) !== '없음').join(' · ')}</b>에 몰려 있어요<small>다른 부위도 골고루 해 보세요</small>`
     : (!부.length && !안.length) ? '모든 부위를 골고루 잘하고 있어요!'
     : 안.length ? `${한}개 부위를 했어요<small>빠진 부위를 채우면 더 좋아요</small>` : '골고루 하고 있어요<small>부족한 부위만 조금 더!</small>';
-  const 줄 = (색, 제목, 글) => `<div class="blrow"><i style="background:${색}"></i><span><b>${제목}</b>${글}</span></div>`;
+  const 줄 = (색, 제목, 글) => `<div class="bl-li"><i style="background:${색}"></i><span><b>${제목}</b>${글}</span></div>`;
   return `<div class="blsay"><div class="blall">${전체}</div>
     ${많.length ? 줄('#ef5350', 많.join(' · '), ' 충분해요<small>세트를 다른 부위에 나눠 보세요</small>') : ''}
     ${알.length ? 줄('#e2a63a', 알.join(' · '), ' 딱 좋아요<small>지금처럼 하면 됩니다</small>') : ''}
@@ -11477,7 +11477,7 @@ function 결과지(x, 전, 오름){
   const 범 = (a, b, d) => n(a) != null && n(b) != null ? '(' + ib1(n(a), d) + '~' + ib1(n(b), d) + ')' : '';
   const 가운 = (a, b) => n(a) != null && n(b) != null ? (n(a) + n(b)) / 2 : null;
   const m = { name: ((typeof MEMBERS !== 'undefined' ? MEMBERS : []).find(z => z.id === x.mid) || {}).n || '' };
-  const 머리 = '<div class="ibhd"><b>InBody</b><span>' + esc(r.EQUIP ? 'InBody' + r.EQUIP : '') + '</span></div>'
+  const 머리 = '<div class="ib-logo"><b>InBody</b><span>' + esc(r.EQUIP ? 'InBody' + r.EQUIP : '') + '</span></div>'
     + '<div class="ibwho"><span><small>이름</small>' + esc(m.name || '') + '</span><span><small>신장</small>' + (n('HT') != null ? ib1(n('HT'), 0) + 'cm' : '—') + '</span><span><small>나이</small>' + (n('AGE') != null ? n('AGE') : '—') + '</span><span><small>성별</small>' + ({ M:'남성', F:'여성' }[r.GENDER] || '—') + '</span><span><small>검사일시</small>' + esc(r.DATETIMES ? String(r.DATETIMES).replace(/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2}).*/, '$1.$2.$3. $4:$5') : String(x.on_date).replace(/-/g, '.')) + '</span></div>';
   const 행 = (설명, 이름, 단, v, 전v, 좋, 범위, d, 강) => '<tr' + (강 ? ' class="hl"' : '') + '><td class="q">' + 설명 + '</td><td class="nm">' + 이름 + '</td><td class="u">(' + 단 + ')</td><td class="v">' + ib1(v, d) + ib차(v, 전v, 좋) + '</td><td class="rg">' + 범위 + '</td></tr>';
   const 체성분 = '<div class="ibs"><div class="ibsh">체성분분석 <small>Body Composition Analysis</small></div><table class="ibct">'
