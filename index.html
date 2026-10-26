@@ -2661,6 +2661,10 @@ textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);ou
 .cmoffwrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:22px}
 .cmoffbox{width:100%;max-width:420px;background:var(--card,#1a1a18);border:1px solid var(--line,#33332f);
   border-radius:18px;padding:26px 22px;text-align:left}
+.aglock2{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;padding:40px 18px;margin-top:12px;border:1px solid var(--line);border-radius:16px;background:var(--card)}.aglock2 .ic{font-size:28px}.aglock2 b{font-size:17px}.aglock2 span{font-size:14px;color:var(--sub);line-height:1.6}.aglock2 .btn{margin-top:8px;min-width:160px}
+.hcli{font-size:14px;line-height:1.7}.hcmore{background:none;border:0;color:var(--gold,#e6c487);font-weight:800;padding:4px 0;font-size:14px}
+.hcbox{margin:8px 0;max-height:46vh;overflow:auto}.hcfull{width:100%;border-collapse:collapse;font-size:12.5px;line-height:1.45}.hcfull th,.hcfull td{border:1px solid var(--line,#33332f);padding:6px;text-align:left;vertical-align:top}.hcfull th{background:rgba(255,255,255,.04)}.hcnote{font-size:13px;line-height:1.6}
+.hcbtns{display:flex;gap:8px;margin-top:14px}.hcbtns button{flex:1;height:48px;border-radius:12px;font-size:15px;font-weight:800;border:1px solid var(--line,#33332f);background:transparent;color:inherit}.hcbtns .hcyes{flex:1.4;background:var(--gold,#e6c487);color:#1b1813;border:0}
 .cmoffbox.ok{border-color:var(--teal,#4a8f95)}
 .cmoffbox.warn{border-color:var(--warn,#b5695a);margin-top:12px;padding:14px 16px;font-size:13px}
 .cmoffbox .ttl{font-size:19px;font-weight:800;margin-bottom:12px;color:var(--gold,#d4af6e)}
@@ -3253,7 +3257,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '468';
+const BUILD = '470';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -3622,6 +3626,9 @@ async function boot(){
      말로 하는 협의가 아니라 **시스템에 남는다.** 설치도 로그인도 없다. */
   const 초상열쇠 = new URLSearchParams(location.search).get('pt');
   if(초상열쇠){ 초상동의화면(초상열쇠); return; }
+  /* ══ 건강정보 동의 (?hc=열쇠) ══ 2026-10-26 대표 「알림톡 붙여」 — 앱에 가입 안 한 회원도 알림톡 링크 한 장으로 동의 · 열쇠는 consent_sends.okey(한 번 쓰면 끝) */
+  const 건강열쇠 = new URLSearchParams(location.search).get('hc');
+  if(건강열쇠){ 건강동의화면(건강열쇠); return; }
 
   /* 알림톡 리포트 링크(?rp=운동id)로 들어왔으면 그 리포트를 바로 연다.
      읽고 나면 주소에서 지운다 — 안 지우면 새로고침할 때마다 리포트로 돌아온다 */
@@ -7345,6 +7352,37 @@ async function 끔동의화면(key){
 }
 
 /* ── 초상권 협의 · 회원이 고르는 한 장 ── 2026-09-30 */
+async function 건강동의화면(key){
+  const 판 = document.body, 그리기 = h => { 판.innerHTML = '<div class="cmoffwrap">' + h + '</div>'; };
+  그리기('<div class="cmoffbox"><div class="ttl">확인하는 중…</div></div>');
+  let k = null; try{ k = ((await srpc('health_info', { k: key })) || [])[0] || null; }catch(e){}
+  if(!k){ 그리기('<div class="cmoffbox"><div class="ttl">이미 처리되었거나 만료된 주소입니다</div><p>이 링크는 <b>한 번만</b> 쓸 수 있어요.<br>다시 하시려면 담당 트레이너에게 말씀해 주세요.</p></div>'); return; }
+  if(k.agree_sensitive_at){ 그리기('<div class="cmoffbox ok"><div class="ttl">이미 동의하셨어요</div><p><b>' + esc(k.name || '') + '</b> 회원님은 건강정보 처리에 동의하셨습니다.<br>취소는 앱 「내 정보 → 약관 및 동의」에서 하실 수 있어요.</p></div>'); return; }
+  const 전문 = '<table class="hcfull"><tr><th>항목</th><th>목적</th><th>수집 방법</th><th>보유 기간</th></tr>'
+    + [['인바디(체성분) 결과 — 체중, 골격근량, 체지방량, 체지방률', '체성분 변화 추이 제공, 맞춤 지도', '센터에서 측정 시 ㈜인바디 LookinBody 로부터 자동 전달'],
+       ['체형 사진 — 정면·측면·후면 등', '비포·애프터 비교, 자세·체형 점검', '회원 또는 트레이너가 촬영·업로드'],
+       ['체형 분석 기록', '자세 교정 지도', '트레이너 작성'],
+       ['트레이너 코멘트 첨부 사진·영상(음성 포함)', '자세 교정 피드백', '트레이너 촬영']].map(r => '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td><td>' + r[2] + '</td><td>회원 탈퇴 또는 동의 철회 시까지</td></tr>').join('')
+    + '</table><p class="hcnote"><b>보호 조치</b><br>· 사진·영상은 비공개 저장소에 보관하며, 1시간만 유효한 임시 주소로만 열립니다<br>· 회원 본인과 담당 트레이너 외에는 볼 수 없습니다<br>· 회원님의 별도 동의 없이 홍보·광고에 사용하지 않습니다</p>';
+  const 본 = () => 그리기('<div class="cmoffbox"><div class="ttl">인바디 · 체형 기록을 보시려면<br>건강정보 처리 동의가 필요합니다</div>'
+    + '<p><b>' + esc(k.name || '') + '</b> 회원님,<br>센터에서 측정하신 <b>인바디 결과</b>(체중·골격근량·체지방량·체지방률)와 <b>체형 사진</b>을 앱에 저장해 변화를 보여드립니다.</p>'
+    + '<p class="hcli">· 회원님과 담당 트레이너만 볼 수 있습니다<br>· 언제든 「내 정보」에서 철회하실 수 있습니다<br>· 철회하시면 저장된 기록은 삭제됩니다</p>'
+    + '<button class="hcmore" type="button">전문 보기 ›</button><div class="hcbox" hidden>' + 전문 + '</div>'
+    + '<p class="sub">동의하지 않으셔도 운동기록·식단·루틴·출석은 그대로 이용하실 수 있습니다</p>'
+    + '<div class="hcbtns"><button class="hcno" type="button">나중에</button><button class="hcyes" type="button">동의하고 시작</button></div></div>');
+  본();
+  const 손 = () => {
+    const m = 판.querySelector('.hcmore'); if(m) m.onclick = () => { const b = 판.querySelector('.hcbox'); b.hidden = !b.hidden; m.textContent = b.hidden ? '전문 보기 ›' : '전문 접기 ‹'; };
+    const n = 판.querySelector('.hcno'); if(n) n.onclick = () => {      /* 나중에 = 아무것도 안 씀 · 열쇠는 그대로(다시 열 수 있음) */
+      그리기('<div class="cmoffbox"><div class="ttl">알겠습니다</div><p>아무것도 저장하지 않았어요.<br>마음이 바뀌시면 이 링크를 다시 여시거나 담당 트레이너에게 말씀해 주세요.</p><div class="hcbtns"><button class="hcback" type="button">다시 보기</button></div></div>');
+      판.querySelector('.hcback').onclick = () => { 본(); 손(); }; };
+    const y = 판.querySelector('.hcyes'); if(y) y.onclick = async function(){ this.disabled = true; this.textContent = '처리 중…';
+      try{ const ok = await srpc('health_set', { k: key }); if(ok === false) throw new Error('이미 처리된 주소예요');
+        그리기('<div class="cmoffbox ok"><div class="ttl">고맙습니다</div><p><b>' + esc(k.name || '') + '</b> 회원님, 건강정보 처리에 동의하셨습니다.<br>이제 인바디 · 체형 기록을 앱에서 보실 수 있어요.<br>취소는 앱 「내 정보 → 약관 및 동의」에서 하실 수 있어요.</p></div>'); }
+      catch(e){ this.disabled = false; this.textContent = '동의하고 시작'; 판.querySelector('.cmoffbox').insertAdjacentHTML('beforeend', '<div class="cmoffbox warn">저장하지 못했어요<br>' + esc(오류말(e)) + '</div>'); } };
+  };
+  손();
+}
 async function 초상동의화면(key){
   const 판 = document.body;
   const 그리기 = h => { 판.innerHTML = '<div class="cmoffwrap">' + h + '</div>'; };
@@ -7637,6 +7675,12 @@ function vRecords(){
       S.who==='tr' ? 'tm:'+mid : null);
   const tabn = S.who==='tr' ? 0 : 1;
 
+  /* 인바디 · 체형분석 = 건강정보 동의 전엔 잠금 (2026-10-26 22:39 대표 「동의할 때까지 동의 창 · 동의 안 하면 그 탭 못 씀」 · 앱 전체 필수는 아님) */
+  if((at === 'body' || at === 'pose') && !건강동의함(mid)){
+    if(S.who !== 'tr' && S.동의창본 !== at){ S.동의창본 = at; setTimeout(() => sheetSensitive(at === 'pose' ? 'check' : 'inbody'), 60); }
+    return { top: topbar, tabs: tabn, body: head + '<div class="aglock2"><div class="ic">🔒</div><b>건강정보 동의 전이에요</b><span>' + (S.who === 'tr' ? '회원이 동의하면 인바디 · 체형 기록이 열립니다<br>데스크 회원 페이지에서 「동의 요청 보내기」를 눌러 주세요' : '동의하시면 인바디 · 체형 기록을 보실 수 있어요<br>동의하지 않으셔도 운동기록 · 식단은 그대로 쓰실 수 있어요') + '</span>'
+      + (S.who === 'tr' ? '' : '<button class="btn main" data-act="agree">동의하기</button>') + '</div>' }; }
+  if(at !== 'body' && at !== 'pose') S.동의창본 = null;
   if(at === 'body') return { top: topbar, tabs: tabn, body: head + bodyPane(mid, 'in') };
   if(at === 'pose') return { top: topbar, tabs: tabn, body: head + bodyPane(mid, 'pose') };
   if(at === 'log')  return { top: topbar, tabs: tabn, body: head + 지난기록판(mid) };
@@ -11627,6 +11671,7 @@ async function ibPull(mid){
   const 적어도 = new Promise(r => setTimeout(r, 1200));
   let res;
   try{ res = await 인바디가져오기(mid); }catch(e){ res = { state:'wait' }; }
+  if(res && res.state === 'consent'){ 끝 = true; clearInterval(tm); closeSheet(); if(S.who === 'tr') toast('회원이 건강정보에 동의해야 가져올 수 있어요'); else sheetSensitive('pull'); return; }      /* 서버 /hook/inbody-pull 이 동의 전이면 {state:'consent'} (2026-10-26 중앙) */
   await 적어도; 끝 = true; clearInterval(tm); 칠(100);
   if(res.state === 'ok' && res.n){
     try{ const rows = await Promise.race([sget('body_logs?select=*&member_id=eq.' + encodeURIComponent(mid) + '&order=on_date'),
