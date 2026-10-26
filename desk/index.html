@@ -1276,6 +1276,8 @@ body.resizing{cursor:col-resize;user-select:none}
 .tx-head{display:flex;align-items:center;gap:6px;padding:10px 14px 10px 18px;flex:none;
   border-bottom:1px solid var(--line);background:var(--dark-2);position:sticky;top:0;z-index:5}
 .pop.tx-side .tx-head{background:linear-gradient(90deg,#2b2417,var(--dark-2) 75%);border-bottom-color:#4a3c22}
+#pop.lite.tx-side .tx-head{background:#fff;border-bottom-color:#e9e9e7}#pop.lite.tx-side .tx-head .who2{color:#37352f}#pop.lite .tx-hb{color:#787774}#pop.lite .tx-hb:hover{background:#f1f1ef;color:#37352f}
+#pop.lite .tx-hb.tx-back{background:#fff;color:#37352f;border:1px solid #d9d8d4;font-weight:800}#pop.lite .tx-hb.tx-back:hover{background:#f7f7f5}      /* 흰 판 머리 = 흰 바탕 (2026-10-26 대표) */
 .pop.tx-side .tx-side-sec{font-size:15px!important;font-weight:800!important;color:var(--cream)!important;border-left:0;padding:3px 0 3px 10px!important;margin-top:16px!important;letter-spacing:0}
 .pop.tx-side .tx-side-sec small{font-weight:500}
 .pop.tx-side .tgrp{border-radius:16px;padding:12px 10px 4px;margin:4px 0;background:color-mix(in srgb,var(--c) 7%,var(--dark-2));border:1px solid color-mix(in srgb,var(--c) 32%,transparent)}
@@ -1548,9 +1550,8 @@ body.resizing{cursor:col-resize;user-select:none}
 .rb-meta{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--sub)}.rb-meta b{color:var(--cream);font-weight:700}
 .rb-say{font-size:13px;color:var(--sub);border-left:2px solid #4a4438;padding-left:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rb-src{font-size:13px;color:var(--sub);text-align:left;align-self:flex-start}.rb-src:hover{color:var(--gold)}.rb-srcx{font-size:13px;color:#cfc9bf;background:var(--dark-3);border-radius:8px;padding:6px 9px}
-#popbox{position:relative}#popbox > .popx{position:absolute;top:12px;right:12px;z-index:3;width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:var(--dark-3);color:var(--sub);font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center}#popbox > .popx:hover{color:var(--cream);border-color:var(--gold)}
-#pop.tx-side #popbox > .popx{display:none}
-#popbox > .popx ~ h2,#popbox > .popx + * .sc-hd,#popbox > .popx + .ps-pop > .ps-h:first-child,#popbox > .popx + .ps-pop > .ps-h + .ps-h{padding-right:46px}      /* 옆 판은 머리에 ✕ 가 이미 있다 */
+#popbox{position:relative}#popbox > .popx{float:right;position:relative;margin:-4px -4px 8px 12px;z-index:3;width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:var(--dark-3);color:var(--sub);font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center}#popbox > .popx:hover{color:var(--cream);border-color:var(--gold)}
+#pop.tx-side #popbox > .popx{display:none}      /* 옆 판은 머리에 ✕ 가 이미 있다 */
 .tx-pop .tx-pmenu button.kb,.tx-pop .tx-pchips button.kb{outline:2px solid var(--gold);outline-offset:-2px;background:var(--dark-3)}
 .sc-days{display:inline-flex;align-items:center;gap:4px;font-size:13px;color:var(--sub)}.sc-days .inp{width:58px;padding:5px 6px;text-align:center}
 .tx-db{border:1px solid var(--line);border-radius:16px;padding:12px 14px 14px;background:color-mix(in srgb,var(--dark-2) 55%,transparent)}
@@ -1559,11 +1560,11 @@ body.resizing{cursor:col-resize;user-select:none}
 .tx-lockb{font-size:15px}.tx-lockb.on{border-color:var(--gold);background:var(--gold-dim)}
 #body.lite .tx-db{background:#fff;border-color:#e3e2de}#body.lite .tx-db .tx-tools{border-left-color:#e3e2de}
 .tx-cal .lv.pc{font-weight:800;border:0;opacity:1}.tx-cal .lv.pc.req{opacity:.55;outline:1.5px dashed currentColor;outline-offset:-2px}.tx-cal .lv i{font-style:normal;margin-right:3px}
-.ibrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px}.ibseg{display:inline-flex;flex:none;background:var(--dark-2);border:1px solid var(--line);border-radius:12px;padding:3px;gap:3px}.ibseg button{flex:none;min-width:110px}
+.ib-tbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px}.ibseg{display:inline-flex;flex:none;background:var(--dark-2);border:1px solid var(--line);border-radius:12px;padding:3px;gap:3px}.ibseg button{flex:none;min-width:110px}
 .ibtop{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end;margin-left:auto}.ibtop .ibdis{opacity:.6}.ibtop small{font-weight:600;margin-left:4px}
 .ibdays{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:0 0 12px}.ibdays button{border:1px solid var(--line);background:var(--dark-2);color:var(--sub);font-size:13px;font-weight:700;border-radius:999px;padding:5px 12px}.ibdays button.on{background:var(--cream);color:#151413;border-color:var(--cream)}.ibdays button.cmp{border-color:var(--teal);color:var(--teal)}.ibdays small{color:var(--sub);font-size:13px;margin-left:4px}
 .ibsheet{background:#fff;color:#222;border-radius:12px;padding:16px 20px 14px;font-size:13px;line-height:1.45;margin-bottom:16px}
-.ibhd{display:flex;align-items:flex-end;justify-content:space-between;border-bottom:3px solid #a22b2b;padding-bottom:4px;margin-bottom:8px}.ibhd b{font-size:30px;font-weight:900;color:#a22b2b;letter-spacing:-.02em}.ibhd span{font-size:12.5px;color:#555}
+.ib-logo{display:flex;align-items:flex-end;justify-content:space-between;border-bottom:3px solid #a22b2b;padding-bottom:4px;margin-bottom:8px}.ib-logo b{font-size:30px;font-weight:900;color:#a22b2b;letter-spacing:-.02em}.ib-logo span{font-size:12.5px;color:#555}
 .ibwho{display:grid;grid-template-columns:1.4fr .8fr .6fr .6fr 1.4fr;gap:8px;border-bottom:1px solid #ccc;padding:2px 0 8px;margin-bottom:12px}.ibwho span{font-weight:700;font-size:14px}.ibwho small{display:block;font-size:11.5px;color:#888;font-weight:500}
 .ibcols{display:grid;grid-template-columns:minmax(0,1.75fr) minmax(0,1fr);gap:22px}
 .ibs{margin-bottom:14px}.ibsh{font-size:15.5px;font-weight:800;color:#555;margin-bottom:5px;display:flex;align-items:baseline;gap:6px}.ibsh small{font-size:11px;color:#999;font-weight:500;font-style:italic}
@@ -1586,6 +1587,70 @@ body.resizing{cursor:col-resize;user-select:none}
 .ibgs{overflow-x:auto}.ibgs svg{display:block}.ibgs text{font-size:11.5px;font-weight:700;text-anchor:middle;fill:#333}.ibgs circle{fill:#999}.ibgs circle.hi{fill:#e0525e}.ibgs circle.ok{fill:#2fae7a}.ibgs circle.lo{fill:#3d7fd6}
 .ibgd{display:flex;background:#f6f6f6}.ibgd span{width:70px;flex:none;text-align:center;font-size:11px;color:#666;padding:4px 0}
 .ibedit{margin-top:6px}.ibeh{width:100%;text-align:left;border:1px solid var(--line);background:var(--dark-2);color:var(--cream);font-weight:800;border-radius:12px;padding:10px 14px}.ibeh i{font-style:normal;color:var(--sub);float:right}.ibedit.on .ibeh{border-radius:12px 12px 0 0}
+.bpair{display:flex;gap:8px;justify-content:center;align-items:flex-end;width:100%}
+.bfig{position:relative;min-width:0}
+.bfig.fr{flex:0 1 267px}
+.bfig.bk{flex:0 1 342px}
+.bfig img{display:block;width:100%;height:auto}
+.bfig.b3d{flex:0 1 332px}.b3src{font-size:9.5px;color:#6f6c66;text-align:center}
+.bcap{display:block;text-align:center;font-size:11px;font-weight:700;color:#7d766e;margin-top:2px}
+.figbox2{display:flex;flex-direction:column;gap:10px;flex:none;
+  background:var(--dark-2);border:1px solid var(--line);border-radius:16px;padding:14px 12px}
+.bpin{position:absolute;left:0;top:0;width:100%;height:100%}
+.figpick{text-align:center;font-size:12.5px;font-weight:700;color:var(--cream);
+  background:var(--dark-3);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+.figpick span{display:block;font-size:11.5px;font-weight:600;color:var(--gold-2);margin-top:3px}
+.figpick.dim{color:#7d766e;font-weight:500}
+.figls{display:flex;flex-direction:column;gap:0}
+.figls .fl{display:flex;gap:8px;align-items:baseline;padding:7px 2px;border-top:1px solid var(--line)}
+.figls .fl b{font-size:11px;font-weight:800;color:var(--gold-2);min-width:26px}
+.figls .fl span{font-size:13px;font-weight:600;color:var(--cream);flex:1}
+.figls .fl i{font-style:normal;font-size:12px;font-weight:700;color:#8f8a83}
+.figls .fl{border-radius:9px;transition:background .12s}
+.figls .fl.on{background:var(--gold-dim)}
+.figls .fl.on span{color:var(--gold)}
+.lrbar{display:flex;height:34px;border-radius:9px;overflow:hidden;background:var(--dark-3);border:1px solid var(--line)}
+.lrbar span{display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;min-width:34px}
+.lrbar .l{background:var(--gold);color:#241d12}
+.lrbar .r{background:#4d7f96;color:#f2fafd}
+.lrbar .z{flex:1;color:#6f6a64;font-weight:600;font-size:12px}
+.sig{display:grid;grid-template-columns:1fr auto;gap:6px;align-items:center;
+  padding:9px 2px;border-top:1px solid var(--line)}
+.sig:first-child{border-top:none}
+.sig .t2{font-size:13px;font-weight:600;color:var(--cream)}
+.sig .t2 small{display:block;font-size:11px;font-weight:600;color:#75706a}
+.sig .b2{font-size:11.5px;font-weight:800;padding:4px 9px;border-radius:999px;white-space:nowrap}
+.sig .b2.ok{background:rgba(111,160,127,.16);color:#8fc4a2}
+.sig .b2.no{background:var(--gold-dim);color:var(--gold)}
+.sig .b2.nw{background:rgba(200,90,60,.15);color:var(--warn)}
+body .figbox2{background:radial-gradient(80% 50% at 50% 30%,rgba(240,211,160,.09),transparent 70%),linear-gradient(180deg,#201f1c,#161514);border-color:#34332d;border-radius:18px}
+.pose2 .ckcard{padding:8px 13px;margin-bottom:8px}.pose2 .ckcard .nm{font-weight:800;margin-bottom:2px}
+.ckrow{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid var(--line)}.ckrow:last-child{border-bottom:none}.ckrow .t{font-size:13.5px;flex:1}.ckrow .opts{display:flex;gap:5px}
+.ckrow .ck{border:1px solid var(--line);background:var(--dark-3);color:var(--sub);border-radius:9px;padding:4px 11px;font-size:13px}.ckrow .ck.on{border-color:var(--gold);color:var(--gold);background:var(--gold-dim);font-weight:800}
+.ib-tbar .sp{flex:1}
+#gchat .gc-fab{position:fixed;right:22px;bottom:22px;z-index:60;width:58px;height:58px;border-radius:50%;border:0;background:linear-gradient(180deg,#f3d9a8,#e2c184);color:#1b1813;font-size:26px;box-shadow:0 6px 20px rgba(0,0,0,.45)}
+#gchat .gc-fab i{position:absolute;top:-2px;right:-2px;min-width:20px;height:20px;border-radius:10px;background:var(--warn);color:#1b1813;font-size:12px;font-style:normal;font-weight:900;display:flex;align-items:center;justify-content:center;padding:0 5px}
+#gchat .gc-win{position:fixed;right:22px;bottom:92px;z-index:61;width:390px;height:min(560px,calc(100vh - 120px));background:var(--dark-2);border:1px solid var(--line);border-radius:18px;box-shadow:0 14px 40px rgba(0,0,0,.55);display:flex;flex-direction:column;overflow:hidden;color:var(--cream)}
+.gc-h{display:flex;align-items:center;gap:6px;padding:11px 14px;border-bottom:1px solid var(--line)}.gc-h b{font-size:15.5px}.gc-h .sp{flex:1}
+.gc-ic{width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:var(--dark-3);color:var(--sub);display:inline-flex;align-items:center;justify-content:center;flex:none}.gc-ic.on{border-color:var(--gold);color:var(--gold)}
+.gc-set{padding:8px 14px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--sub)}
+.gc-tabs{display:flex;border-bottom:1px solid var(--line)}.gc-tabs button{flex:1;padding:9px 0;color:var(--sub);font-weight:800;font-size:13.5px}.gc-tabs button.on{color:var(--cream);box-shadow:inset 0 -2px var(--gold)}.gc-tabs i{font-style:normal;font-size:11px;background:var(--warn);color:#1b1813;border-radius:8px;padding:0 5px;margin-left:4px}
+.gc-body{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column}.gc-body.list,.gc-body.req{display:block}
+.gc-me,.gc-bot{max-width:86%;border-radius:14px;padding:8px 11px;margin:5px 0;font-size:13.5px;white-space:pre-wrap;word-break:break-word}.gc-me{align-self:flex-end;background:#f0d3a0;color:#1b1813;border-bottom-right-radius:4px}.gc-bot{align-self:flex-start;background:var(--dark-3);border-bottom-left-radius:4px}.gc-bot.no{border:1px solid #5a3a33}.gc-bot.ntc,.gc-me.ntc{border:1px solid var(--gold)}
+.gc-msg{display:flex;flex-direction:column;align-items:flex-start}.gc-msg.me{align-items:flex-end}.gc-msg small{font-size:12px;color:var(--sub);margin-top:4px}.gc-msg .tm{font-size:11px;color:#6f6a63}
+.gc-go{margin-top:6px;border:1px solid var(--gold);color:var(--gold);border-radius:9px;padding:3px 9px;font-size:12.5px;font-weight:800;background:none}
+.gc-chips{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 8px}.gc-chips button{border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:12.5px;color:var(--sub)}.gc-chips button:hover{color:var(--cream);border-color:var(--gold)}
+.gc-in{display:flex;gap:6px;padding:10px;border-top:1px solid var(--line);align-items:center}.gc-in input{flex:1;min-width:0;background:var(--dark);border:1px solid var(--line);border-radius:10px;padding:8px 10px;color:var(--cream)}.gc-in > button:last-of-type{width:38px;height:36px;border-radius:10px;background:var(--gold);color:#1b1813;font-weight:900}
+.gc-att{display:flex;gap:8px;flex-wrap:wrap;padding:0 12px;font-size:12.5px;color:var(--gold)}.gc-att:empty{display:none}.gc-att label{color:var(--cream)}
+.gc-room{display:flex;gap:10px;align-items:center;width:100%;padding:9px 4px;border-bottom:1px solid #2a2926;text-align:left}.gc-room .av{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#121211;flex:none}.gc-room .tx{flex:1;min-width:0}.gc-room b{display:block;font-size:14px}.gc-room small{display:block;color:var(--sub);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gc-room .t{text-align:right;font-size:11.5px;color:var(--sub);flex:none}.gc-room .t i{display:block;margin-top:3px;font-style:normal;background:var(--warn);color:#1b1813;border-radius:8px;padding:0 6px;font-weight:900}
+.gc-rh{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--line)}
+.gc-img{display:block;max-width:220px;border-radius:10px;margin-top:6px;background:var(--dark-4);min-height:40px}
+.gc-new{width:100%;border:1px dashed var(--gold);color:var(--gold);font-weight:800;border-radius:12px;padding:9px;margin-bottom:8px}
+.gc-req{border:1px solid var(--line);border-radius:12px;margin-bottom:8px}.gc-req.on{border-color:var(--gold)}.gc-rq{width:100%;text-align:left;padding:9px 11px}.gc-rq b{font-size:13.5px}.gc-rq small{display:block;color:var(--sub);font-size:12.5px}.gc-rd{padding:0 11px 10px;font-size:13.5px;white-space:pre-wrap}
+.gc-req .tg{font-size:11.5px;font-weight:800;border-radius:999px;padding:1px 8px;margin-left:6px}.gc-req .tg.a{background:#1d2b3a;color:#8fc0f0}.gc-req .tg.b{background:#3a3217;color:#f0d36a}.gc-req .tg.c{background:#1f2f24;color:#8fd19e}
+.gc-reply{margin-top:8px;background:var(--dark-3);border-radius:9px;padding:7px 9px}.gc-kinds{display:flex;gap:6px;margin:8px 0}.gc-kinds button{border:1px solid var(--line);border-radius:999px;padding:3px 11px;font-size:12.5px;color:var(--sub)}.gc-kinds button.on{border-color:var(--gold);color:var(--gold);font-weight:800}
+.gc-form{border:1px solid var(--gold);border-radius:12px;padding:10px;margin-bottom:10px;display:flex;flex-direction:column;gap:6px}.gc-form textarea{min-height:70px}.gc-fb{display:flex;gap:6px;align-items:center}.gc-fb .sp{flex:1}
+.gc-ntcp{border:1px solid var(--line);border-radius:12px;padding:9px 12px;margin:6px 0;font-size:13px;color:var(--sub)}.gc-ntcp p{margin:4px 0 0;color:var(--cream);font-size:14px;white-space:pre-wrap}
 .pzlist{max-height:330px;overflow:auto;border:1px solid var(--line);border-radius:12px}
 .tx-auto{flex:none;margin-left:6px;font-size:12px;font-weight:800;color:var(--teal);border:1px solid #3c5a53;border-radius:999px;padding:0 7px;line-height:18px}
 /* 고르기 = 그림 카드 (2026-10-26 대표 「스트레칭 · 웨이트 이질감 없이」 · 앱 .megrp.pkg 와 같은 꼴) */
@@ -2091,7 +2156,13 @@ button.as-more{display:block;width:100%;background:none;border:0;color:var(--sub
 .as-st{display:inline-flex;gap:4px;flex-wrap:wrap}
 .as-st button{font:inherit;font-size:13px;border-radius:7px;padding:2px 8px;border:1px solid #3a3833;background:none;color:var(--sub);cursor:pointer}
 .as-st.big button{font-size:14px;padding:6px 14px}
-.as-st button.on{color:#1a1712;border-color:transparent;font-weight:800}.as-st button.on.p{background:var(--teal)}.as-st button.on.r{background:var(--warn)}.as-st button.on.e{background:#77736b;color:var(--cream)}
+.as-st button.on{color:#1a1712;border-color:transparent;font-weight:800}.as-st button.on.p{background:#4f8be0;color:#fff}.as-st button.on.r{background:var(--warn)}.as-st button.on.e{background:#8e2b2b;color:#fde8e4}
+.as-pr{font-size:12.5px;font-weight:800;border-radius:6px;padding:1px 8px;white-space:nowrap;background:var(--dark-4);color:var(--sub)}.as-pr.p{background:#4f8be0;color:#fff}.as-pr.l{background:#f2c94c;color:#2a210a}.as-pr.e{background:#8e2b2b;color:#fde8e4}.as-pr.r{background:var(--warn);color:#1a1712}
+.as-tag.wait.l{background:#f2c94c;color:#2a210a}
+.as-kd{font-size:12.5px;font-weight:800;border-radius:6px;padding:1px 8px;white-space:nowrap;color:#fff}.as-kd.g{background:#f39a2e}.as-kd.t{background:#4f86d9}      /* CRM 카테고리 색 — 운동가이드 주황 · 체험수업 파랑 (2026-10-26 대표 「CRM 과 통일」) */
+.as-gbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 10px}.as-gbar .srch{max-width:220px}.as-gbar select.srch{max-width:150px}.as-gbar .sp{flex:1}
+.as-tag.g{background:#1f3a26;color:#8fd19e}.as-chk{width:18px;height:18px;border-radius:5px;border:1.5px solid #6a655c;display:inline-flex;align-items:center;justify-content:center;font-size:12px;color:#1a1712;cursor:pointer}.as-chk.on{background:var(--gold);border-color:var(--gold)}
+.as-selbar{position:sticky;top:0;z-index:2;display:flex;gap:10px;align-items:center;background:#2a2318;border:1px solid var(--gold);border-radius:12px;padding:8px 12px;margin:0 0 10px}.as-selbar b{color:var(--gold)}
 .as-memo{display:flex;gap:6px;align-items:center}.as-memo .srch{flex:1;min-width:120px;width:auto;padding:6px 9px}
 .as-old{color:var(--warn);font-weight:700}.as-nm{cursor:pointer}.as-nm:hover{color:var(--gold)}
 .as-sum{font-size:13px;color:var(--sub);margin-bottom:8px}.as-sum b{color:var(--cream)}
@@ -2474,6 +2545,9 @@ button.as-more{display:block;width:100%;background:none;border:0;color:var(--sub
     <button class="nav" data-v="kits">
       <svg viewBox="0 0 24 24"><path d="M4 4h7l2 2h7a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/><path d="M9 13l2 2 4-4"/></svg>
       홍보 자료<span class="bdg" id="ktbdg" style="display:none"></span></button>
+    <button class="nav" data-v="botqa">
+      <svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg>
+      챗봇 답</button>
     <button class="nav" data-v="rules">
       <svg viewBox="0 0 24 24"><path d="M9 4h6M12 4v4M5 8h14v12H5z"/><path d="M8 12h8M8 16h5"/></svg>
       규칙</button>
@@ -2507,7 +2581,7 @@ button.as-more{display:block;width:100%;background:none;border:0;color:var(--sub
 
 <script>
 "use strict";
-const BUILD = '417';
+const BUILD = '422';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -2673,7 +2747,8 @@ const 권한줄 = [
   ['메뉴', 'rtmake', '루틴 · 스트레칭', '', [1, 1, 1, 0, 0]],
   ['메뉴', 'exreq', '종목 사전', '', [1, 1, 1, 0, 0]],
   ['메뉴', 'kits', '홍보 자료', '', [1, 1, 1, 0, 1]],
-  ['메뉴', 'rules', '규칙', '자동화 규칙 한눈에', [1, 0, 0, 0, 0]],      /* 2026-10-26 대표 「관리자만 보이게」 · 중앙 창구도 super · boss 만 */
+  ['메뉴', 'rules', '규칙', '자동화 규칙 한눈에', [1, 0, 0, 0, 0]],
+  ['메뉴', 'botqa', '챗봇 답', '도우미가 꺼내 주는 정해 둔 질문 · 답', [1, 0, 0, 0, 0]],      /* 2026-10-26 챗봇 */      /* 2026-10-26 대표 「관리자만 보이게」 · 중앙 창구도 super · boss 만 */
   ['메뉴', 'trash', '휴지통', '삭제한 것 복원', [1, 0, 0, 0, 0]],
   ['회원 · 기록', 'scope', '회원 보기 범위', '전체 = 다른 트레이너 회원 · 리포트 · 예약률까지 (읽기)', ['a', 'm', 'm', 'm', 'a']],
   ['회원 · 기록', 'otherrec', '남의 담당 회원 기록 수정', '잠수 사유 등', [1, 0, 0, 0, 0]],
@@ -5889,8 +5964,21 @@ function tabBody(){
     : '<div class="empty why"><b>아직 남긴 회차가 없습니다</b>「이 상태로 회차 남기기」를 눌러 주세요</div>';
 
   const 알약 = '<div class="seg ibseg">' + [['in', '인바디'], ['pose', '체형분석']].map(([k, n]) => '<button class="' + ((S.bodyT || 'in') === k ? 'on' : '') + '" data-act="tx:bodyt" data-k="' + k + '">' + n + '</button>').join('') + '</div>';      /* 앱 「분석 › 인바디 / 체형분석」과 같은 둘 (2026-10-26) */
-  if((S.bodyT || 'in') === 'in') return 동의배너() + '<div class="ibrow">' + 알약 + 인바디단추() + '</div>' + 인바디판(bl, 인바디);
-  return 동의배너() + '<div class="ibrow">' + 알약 + '</div>'
+  if((S.bodyT || 'in') === 'in') return 동의배너() + '<div class="ib-tbar">' + 알약 + 인바디단추() + '</div>' + 인바디판(bl, 인바디);
+  { const 켜 = (bc && bc.checks) || {}, 수 = Object.keys(켜).length, 무리 = [...new Set(BODY_TESTS.map(t => t.g))];
+    const 체크 = 무리.map(gr => '<div class="card ckcard"><div class="nm">' + esc(gr) + '</div>' + BODY_TESTS.filter(t => t.g === gr).map(t => { const v = 켜[t.k];
+        return '<div class="ckrow"><span class="t">' + esc(t.t) + '</span><span class="opts">' + [['a', t.a], ['b', t.b]].map(([o, 글]) => '<button class="ck' + (v === o ? ' on' : '') + '" data-chk="' + t.k + '" data-val="' + (v === o ? '' : o) + '"' + dis('body') + '>' + esc(글) + '</button>').join('') + '</span></div>'; }).join('') + '</div>').join('');
+    return 동의배너() + '<div class="ib-tbar">' + 알약 + '<span class="sp"></span>' + (canEdit('body') ? '<button class="btn sub sm" data-act="brsave">＋ 이 상태로 회차 남기기</button>' : '') + editBtn('body') + '</div>'
+      + '<div class="cols pose2"><div class="sec">'
+      + '<div class="lbl">체형 회차 · ' + br.length + '번</div>' + 체형회차판(br)
+      + '<div class="lbl" style="margin-top:16px">체형 한눈에 · ' + 수 + '개 표시됨</div>' + bodyFig(켜) + figList(켜)
+      + '<div class="lbl" style="margin-top:16px">좌우 균형</div>' + lrScale(켜)
+      + '</div><div class="sec"><div class="lbl">체크리스트 · ' + 수 + '개 표시됨</div>' + 체크
+      + '<div class="fld"><span class="fn">메모</span><textarea class="inp" id="bcmemo" placeholder="눈에 띄는 것과 방향을 입력해 주세요"' + dis('body') + '>' + esc((bc && bc.memo) || '') + '</textarea>'
+      + (canEdit('body') ? '<button class="btn main sm" data-act="bcmemo">메모 저장</button>' : '') + '</div>'
+      + '<div class="note">' + (canEdit('body') ? '누른 칸을 다시 누르면 정상으로 돌아가요 · 회원 앱에도 그대로 보여요' : '오른쪽 위 「수정」을 눌러야 표시할 수 있어요') + '</div>'
+      + bodyPhotos() + '<div class="lbl" style="margin-top:14px">지난 회차 ' + br.length + '건</div>' + 회차 + '</div></div>'; }
+  return 동의배너() + '<div class="ib-tbar">' + 알약 + '</div>'
     + '<div class="cols"><div class="sec"><div class="lbl">체형 검사'
     + (bc && bc.on_date ? ' · ' + dateFull(bc.on_date) : ' · 아직 없음')
     + '<span class="r">'
@@ -5938,7 +6026,7 @@ function 결과지(x, 전, 오름){
   const 범 = (a, b, d) => n(a) != null && n(b) != null ? '(' + ib1(n(a), d) + '~' + ib1(n(b), d) + ')' : '';
   const 가운 = (a, b) => n(a) != null && n(b) != null ? (n(a) + n(b)) / 2 : null;
   const m = (W.staff && null) || (D.m || []).find(z => z.id === S.mid) || {};
-  const 머리 = '<div class="ibhd"><b>InBody</b><span>' + esc(r.EQUIP ? 'InBody' + r.EQUIP : '') + '</span></div>'
+  const 머리 = '<div class="ib-logo"><b>InBody</b><span>' + esc(r.EQUIP ? 'InBody' + r.EQUIP : '') + '</span></div>'
     + '<div class="ibwho"><span><small>이름</small>' + esc(m.name || '') + '</span><span><small>신장</small>' + (n('HT') != null ? ib1(n('HT'), 0) + 'cm' : '—') + '</span><span><small>나이</small>' + (n('AGE') != null ? n('AGE') : '—') + '</span><span><small>성별</small>' + ({ M:'남성', F:'여성' }[r.GENDER] || '—') + '</span><span><small>검사일시</small>' + esc(r.DATETIMES ? String(r.DATETIMES).replace(/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2}).*/, '$1.$2.$3. $4:$5') : String(x.on_date).replace(/-/g, '.')) + '</span></div>';
   const 행 = (설명, 이름, 단, v, 전v, 좋, 범위, d, 강) => '<tr' + (강 ? ' class="hl"' : '') + '><td class="q">' + 설명 + '</td><td class="nm">' + 이름 + '</td><td class="u">(' + 단 + ')</td><td class="v">' + ib1(v, d) + ib차(v, 전v, 좋) + '</td><td class="rg">' + 범위 + '</td></tr>';
   const 체성분 = '<div class="ibs"><div class="ibsh">체성분분석 <small>Body Composition Analysis</small></div><table class="ibct">'
@@ -6000,6 +6088,260 @@ function 변화그래프(오름){
   return '<div class="ibgraph"><div class="ibgh"><b>변화그래프</b><span class="sp"></span><button class="chip' + (다 ? '' : ' on') + '" data-act="tx:iball" data-k="0">최근 30회</button><button class="chip' + (다 ? ' on' : '') + '" data-act="tx:iball" data-k="1">전체 ' + 오름.length + '회</button></div>'
     + '<div class="ibgc"><div class="ibgl">' + 합.map(o => '<b>' + o.nm + ' <i>(kg)</i></b>').join('') + '</div><div class="ibgs">' + 합.map(o => o.svg).join('') + 날 + '</div></div>'
     + 따.map(o => '<div class="ibgc one"><div class="ibgt"><b>' + o.nm + '</b><span>최저 <b>' + ib1(o.lo) + '</b> · 최고 <b>' + ib1(o.hi) + '</b> (kg)</span></div><div class="ibgs">' + o.svg + 날 + '</div></div>').join('') + '</div>';
+}
+/* ══ 체형분석 = 앱과 같은 꼴 ══ 2026-10-26 (아래 자리 값 · 그림 · 목록 · 좌우는 앱 코드 그대로) */
+const 체형자리 = {
+  /* 그룹 : [어느 면, 가운데 x, y, 좌우로 벌릴 폭] — 앞·뒤 모두 322×640 (2026-10-09 목 다듬으며 머리가 커져 다시 맞춤 — 몸은 y×0.966+21.5 · x×0.967) */
+  '경추': ['앞', 161, 87, 15],      /* 예전엔 열쇠가 '목' 이라 경추 항목이 기본 자리(배)에 찍혔다 — 항목의 묶음 이름은 '경추' 다 */
+  '어깨': ['앞', 161, 139, 64],
+  '흉추': ['뒤', 161, 168, 39],
+  '다리': ['앞', 161, 408, 37],
+  '발':   ['앞', 161, 619, 68],
+};
+/* 항목마다 따로 잡은 자리 — 좌우를 고르지 않는 다리·발 항목은 묶음 가운데(두 다리 사이 빈 곳)에 떠 있었다(2026-10-06 대표 「이 점들은 뭐야?」).
+   그 항목이 실제로 보는 곳에 찍는다: 골반 · 고관절 · 무릎 · 허벅지 앞 · 발 */
+const 항목자리 = {
+  l1: ['앞', 161, 307],     /* 골반 형태 → 골반 가운데 */
+  l2: ['앞', 132, 336],     /* 크레이그 테스트 → 고관절 */
+  l3: ['앞', 124, 483],     /* 무릎 방향 → 무릎 */
+  l4: ['앞', 198, 483],     /* O / X 다리 → 반대쪽 무릎 */
+  l5: ['앞', 194, 400],     /* 토마스 테스트 → 허벅지 앞 */
+  f1: ['앞', 103, 611],     /* 발 아치 → 발 */
+};
+const 뒤로갈것 = { l6:1, l7:1 };          /* 중둔근은 뒷면에 찍는다 */
+const 뒷자리 = { '다리': [161, 304, 43] };
+
+function bodyFig(checks){
+  const c = checks || {};
+  const 점 = { 앞: [], 뒤: [] };
+  BODY_TESTS.forEach(t => {
+    const v = c[t.k]; if(!v) return;
+    let [면, x, y, 폭] = 체형자리[t.g] || ['앞', 161, 340, 29];
+    if(뒤로갈것[t.k] && 뒷자리[t.g]) { 면 = '뒤'; [x, y, 폭] = 뒷자리[t.g]; }
+    if(항목자리[t.k]) { [면, x, y] = 항목자리[t.k]; 폭 = 0; }
+    /* 왼쪽/오른쪽을 고르는 항목이면 그 쪽으로 옮긴다 */
+    const 쪽 = (t.a === 'L' && t.b === 'R') ? (v === 'a' ? -1 : 1) : 0;
+    점[면].push({ k: t.k, t: t.t, x: x + 쪽*폭, y, 쪽 });
+  });
+  /* 같은 자리에 여럿이면 세로로 조금씩 벌린다 */
+  ['앞','뒤'].forEach(면 => {
+    const 뭉침 = {};
+    점[면].forEach(m => { const key = m.x + ':' + m.y;
+      뭉침[key] = (뭉침[key] || 0) + 1;
+      m.y += (뭉침[key] - 1) * 15; });
+  });
+  const 몸성 = (((M.intake || {}).data || {}).sex === '여') ? '여' : '남';
+  const 한면 = (면, 넓이, 그림) => `<div class="bfig b3d">
+    <img src="../img/body3/${몸성}/몸_${면==='앞'?'000':'180'}.webp?b=${BUILD}" alt="${면}모습"
+      width="${넓이}" height="640">
+    <svg class="bpin" viewBox="0 0 ${넓이} 640">
+      ${점[면].map(m => { const on = (S.figSel === m.k);
+        return `<g data-act="tx:figk" data-k="${m.k}" style="cursor:pointer">
+          <circle cx="${m.x}" cy="${m.y}" r="16" fill="transparent"/>
+          <circle cx="${m.x}" cy="${m.y}" r="${on?15:12}" fill="var(--gold)" opacity="${on?'.34':'.20'}"/>
+          <circle cx="${m.x}" cy="${m.y}" r="${on?7:5.5}" fill="var(--gold)"/>
+        </g>`; }).join('')}
+    </svg>
+    <span class="bcap">${면}</span></div>`;
+
+  const 고른것 = S.figSel && BODY_TESTS.find(t => t.k === S.figSel);
+  return `<div class="figbox2">
+    <div class="bpair">${한면('앞',322)}${한면('뒤',322)}</div>
+    ${고른것
+      ? `<div class="figpick"><b>${esc(고른것.t)}</b>
+          <span>${esc(고른것.g)} · ${esc((c[고른것.k]==='a') ? 고른것.a : 고른것.b)}</span></div>`
+      : (점.앞.length + 점.뒤.length
+          ? `<div class="figpick dim">점을 누르면 어떤 항목인지 보여 드려요</div>`
+          : `<div class="figpick dim">아직 표시된 항목이 없어요</div>`)}
+    <div class="b3src">Z-Anatomy · BodyParts3D (CC BY-SA 4.0) · 머리·손·발 MHR (Apache-2.0)</div>
+  </div>`;
+}
+function figList(checks){
+  const on = BODY_TESTS.filter(t => (checks||{})[t.k]);
+  if(!on.length) return '<div class="empty">아직 표시한 항목이 없습니다<small class="e2">' + '오른쪽 체크리스트에서 표시해 주세요' + '</small></div>';
+  return `<div class="figls">${on.map(t=>{
+    const v = (checks||{})[t.k];
+    return `<div class="fl ${S.figSel===t.k?'on':''}" data-act="tx:figk" data-k="${t.k}">
+      <b>${esc(t.g)}</b><span>${esc(t.t)}</span><i>${esc(v==='a'?t.a:t.b)}</i></div>`;
+  }).join('')}</div>
+  <div class="note">줄이나 점을 누르면 모형이 <b>그쪽으로 돕니다</b></div>`;
+}
+
+/* ② 좌우 저울 */
+function lrScale(checks){
+  const items = BODY_TESTS.filter(t => t.a==='L' && t.b==='R');
+  const l = [], r = [];
+  items.forEach(t => { const v=(checks||{})[t.k];
+    if(v==='a') l.push(t.t); else if(v==='b') r.push(t.t); });
+  const n = l.length + r.length;
+  if(!n) return `<div class="empty">좌우 항목(${items.length}개)에 아직 표시한 것이 없습니다<small class="e2">오른쪽 체크리스트에서 표시해 주세요</small></div>`;
+  const lp = Math.round(l.length/n*100);
+  const side = l.length === r.length ? '고른 편' : (l.length > r.length ? '왼쪽' : '오른쪽');
+  return `<div class="lrbar">
+      ${l.length?`<span class="l" style="width:${lp}%">L ${l.length}</span>`:''}
+      ${r.length?`<span class="r" style="width:${100-lp}%">R ${r.length}</span>`:''}
+    </div>
+    <div class="note">좌우를 묻는 ${items.length}개 가운데 <b>${n}개</b>가 표시됐고,
+      ${side==='고른 편' ? '<b>양쪽이 고릅니다.</b>' : `<b style="color:var(--gold)">${side}</b>으로 치우쳐 있습니다.`}
+      ${l.length?`<br><b>왼쪽</b> ${esc(l.join(' · '))}`:''}
+      ${r.length?`<br><b>오른쪽</b> ${esc(r.join(' · '))}`:''}</div>`;
+}
+
+
+function 체형회차판(br){      /* 처음 회차와 마지막 회차 — 풀렸어요 · 그대로 · 새로 생김 (앱 roundPane 과 같은 낱말) */
+  const rs = br.slice().sort((a, b) => a.on_date < b.on_date ? -1 : 1), A = rs[0], B = rs[rs.length - 1];
+  if(rs.length < 2) return '<div class="note">회차가 ' + rs.length + '번뿐입니다 · <b>체형 재검사</b>를 한 번 더 하면 ' + (rs.length ? '첫 검사와 비교해 드립니다' : '그때부터 회차가 쌓입니다') + '</div>';
+  const 감 = [], 그 = [], 새 = [];
+  BODY_TESTS.forEach(t => { const a = (A.checks || {})[t.k], b = (B.checks || {})[t.k]; if(a && !b) 감.push([t, a]); else if(a && b) 그.push([t, b]); else if(!a && b) 새.push([t, b]); });
+  const 줄 = ([t, v], c, l) => '<div class="sig"><span class="t2">' + esc(t.t) + '<small>' + esc(t.g) + ' · ' + esc(v === 'a' ? t.a : t.b) + '</small></span><span class="b2 ' + c + '">' + l + '</span></div>';
+  return '<div class="card" style="padding:6px 13px 8px">' + 감.map(x => 줄(x, 'ok', '풀렸어요')).join('') + 그.map(x => 줄(x, 'no', '그대로')).join('') + 새.map(x => 줄(x, 'nw', '새로 생김')).join('')
+    + (!감.length && !그.length && !새.length ? '<div class="empty">달라진 것이 없어요</div>' : '') + '</div>'
+    + '<div class="note">' + esc(dateFull(A.on_date)) + '(' + Object.keys(A.checks || {}).length + '개) → ' + esc(dateFull(B.on_date)) + '(' + Object.keys(B.checks || {}).length + '개) 비교. <b style="color:#8fc4a2">' + 감.length + '개 풀리고</b> ' + (새.length ? '<b style="color:var(--warn)">' + 새.length + '개 새로 생겼습니다.</b>' : '새로 생긴 것은 없습니다.') + '</div>';
+}
+
+/* ══ 챗봇 ══ 2026-10-26 대표 노션 「10월 26 일」 · 시안 결정 — 오른쪽 아래 늘 · 데스크에만
+   도우미 = tr_bot_qa(정해 둔 질문 · 답 · 찾는 말 · 열 화면) — AI 없음(돈 안 듦) · 기밀(급여 · 매출 · 집계 기준 · 만드는 법 · 개인정보)은 답하지 않음
+   대화 = tr_chat(전체방 'all' · 1:1 'dm:작은id:큰id') · 읽음 tr_chat_read · 전체방 공지(notice) = 그날 데스크에 한 번 팝업
+   요청 · 버그 = tr_req(받음 → 확인 중 → 끝남 · 답은 표 관리 권한) */
+const 챗 = { 열림:false, 탭:'ai', 방:null, 글:[], 읽:{}, 답:[], 요청:[], 없음:false, 때:0, 중:false, 도:[], 사진:[], 링크:null, 공지:false, 새요청:null, 펼:null };
+const 챗금지 = /급여|월급|연봉|인센|수당|매출|수익|정산|집계|기준|판정|비밀번호|비번|토큰|열쇠|api|코드|소스|만드는 ?법|만들어|똑같이|복제|분류해|주민|계좌|카드번호|주소록|개인정보|전화번호 ?(다|전부|목록)/i;
+const 챗관리 = () => 할수('table');
+const 챗나 = () => (ME && ME.id) || '';
+const 챗방id = 상대 => 'dm:' + [챗나(), 상대].sort().join(':');
+const 챗방이름 = r => r === 'all' ? '전체방' : 보임이름(((W.staff || []).find(p => p.id === r.split(':').slice(1).find(x => x !== 챗나())) || {}).name || '');
+const 챗내방 = r => r === 'all' || (r.startsWith('dm:') && r.split(':').includes(챗나()));
+const 챗안읽음 = r => 챗.글.filter(m => m.room === r && m.sender !== 챗나() && (!챗.읽[r] || m.created_at > 챗.읽[r])).length;
+const 챗설정 = (() => { try{ return JSON.parse(localStorage.getItem('gg_chat_set') || '{}') || {}; }catch(e){ return {}; } })();
+async function 챗받기(힘){
+  if(!ME || 챗.중 || (!힘 && Date.now() - 챗.때 < 25000)) return; 챗.중 = true;
+  try{ const 전 = new Date(Date.now() - 45 * 864e5).toISOString();
+    const [a, b, c, d] = await Promise.all([uget('tr_chat?select=*&created_at=gte.' + encodeURIComponent(전) + '&order=created_at.asc&limit=3000'), uget('tr_chat_read?select=*&staff_id=eq.' + 챗나()), uget('tr_bot_qa?select=*&order=sort'), uget('tr_req?select=*&order=created_at.desc&limit=300')]);
+    챗.글 = (a || []).filter(m => 챗내방(m.room)); 챗.읽 = {}; (b || []).forEach(x => { 챗.읽[x.room] = x.at; }); 챗.답 = (c || []).filter(x => !x.done); 챗.요청 = (d || []).filter(x => 챗관리() || x.staff_id === 챗나()); 챗.없음 = false; }
+  catch(e){ 챗.없음 = /404|42P01|does not exist|relation/.test(String(e.message || '')); }
+  챗.중 = false; 챗.때 = Date.now(); 챗그리기(); 챗공지띄우기(); }
+setInterval(() => { if(ME) 챗받기(챗.열림 && 챗.탭 === 'talk' && 챗.방); }, 15000);
+function 챗배지(){ return 챗.없음 ? 0 : [...new Set(챗.글.map(m => m.room))].reduce((a, r) => a + 챗안읽음(r), 0) + (챗관리() ? 챗.요청.filter(x => x.status === '받음').length : 0); }
+function 챗그리기(){
+  let el = document.getElementById('gchat'); if(!el){ el = document.createElement('div'); el.id = 'gchat'; document.body.appendChild(el); }
+  if(!ME || 진짜ME){ el.innerHTML = ''; return; }
+  const n = 챗배지();
+  const 팹 = '<button class="gc-fab" data-act="tx:gchat" title="도우미 · 대화 · 요청">💬' + (n && 챗설정.배지 !== false ? '<i>' + (n > 99 ? '99+' : n) + '</i>' : '') + '</button>';
+  if(!챗.열림){ el.innerHTML = 팹; return; }
+  const 탭 = [['ai', '도우미', 0], ['talk', '대화', [...new Set(챗.글.map(m => m.room))].reduce((a, r) => a + 챗안읽음(r), 0)], ['req', '요청 · 버그', 챗관리() ? 챗.요청.filter(x => x.status === '받음').length : 0]];
+  const 몸 = 챗.없음 ? '<div class="empty why"><b>챗봇을 준비 중이에요</b>잠시 뒤 다시 열어 주세요</div>' : 챗.탭 === 'ai' ? 챗도우미() : 챗.탭 === 'talk' ? 챗대화() : 챗요청();
+  el.innerHTML = 팹 + '<div class="gc-win"><div class="gc-h"><b>글래드짐 도우미</b><span class="sp"></span><button class="gc-ic" data-act="tx:gcset" title="알림 · 설정">⚙</button><button class="gc-ic" data-act="tx:gchat" title="닫기">✕</button></div>'
+    + (챗.설정 ? '<div class="gc-set"><label><input type="checkbox" data-gcset="배지"' + (챗설정.배지 !== false ? ' checked' : '') + '> 안 읽은 수 배지 보이기</label><label><input type="checkbox" data-gcset="공지"' + (챗설정.공지 !== false ? ' checked' : '') + '> 전체방 공지 팝업 받기</label></div>' : '')
+    + '<div class="gc-tabs">' + 탭.map(([k, 이름, 수]) => '<button class="' + (챗.탭 === k ? 'on' : '') + '" data-act="tx:gctab" data-k="' + k + '">' + 이름 + (수 ? '<i>' + 수 + '</i>' : '') + '</button>').join('') + '</div>' + 몸 + '</div>';
+  const b = el.querySelector('.gc-body'); if(b && 챗.탭 !== 'req') b.scrollTop = b.scrollHeight;
+  챗사진채우기(el);
+}
+function 챗도우미(){
+  const 칩 = 챗.답.slice(0, 8).map(x => '<button data-act="tx:gcq" data-k="' + esc(x.id) + '">' + esc(x.q) + '</button>').join('');
+  return '<div class="gc-body"><div class="gc-bot">무엇을 찾으세요? 데스크 · 앱 쓰는 법을 알려 드리고, 그 화면으로 바로 보내 드려요</div><div class="gc-chips">' + 칩 + '</div>'
+    + 챗.도.map(m => m.me ? '<div class="gc-me">' + esc(m.me) + '</div>' : '<div class="gc-bot' + (m.no ? ' no' : '') + '">' + esc(m.a) + (m.view ? '<br><button class="gc-go" data-act="tx:gcgo" data-k="' + esc(m.view) + '">' + esc(챗화면이름(m.view)) + ' 열기 ›</button>' : '') + (m.req ? '<br><button class="gc-go" data-act="tx:gctab" data-k="req">요청 · 버그로 물어보기 ›</button>' : '') + '</div>').join('')
+    + '</div><div class="gc-in"><input id="gcin" placeholder="궁금한 것을 입력해 주세요" autocomplete="off"><button data-act="tx:gcask">↑</button></div>';
+}
+const 챗화면 = { lesson:'수업 기록', home:'홈', tasks:'업무', leads:'상담', assign:'가이드 · 체험 배정', manual:'매뉴얼', voc:'VOC', kcal:'칼로리 계산기', leave:'연월차', members:'회원', check:'점검', cmall:'피드백', today:'오늘 운동', rtmake:'루틴 · 스트레칭', reports:'리포트', exreq:'종목 사전', kits:'홍보 자료' };
+const 챗화면이름 = v => 챗화면[v] || v;
+function 챗찾기(글){
+  const t = String(글 || '').trim(); if(!t) return null;
+  if(챗금지.test(t)) return { a:'그건 답할 수 없어요 🔒 관리자에게 직접 물어봐 주세요', no:1 };
+  const 낮 = t.toLowerCase().replace(/\s+/g, '');
+  let 좋 = null, 점 = 0;
+  챗.답.forEach(x => { let p = 0; String(x.keys || '').split(',').map(k => k.trim().toLowerCase().replace(/\s+/g, '')).filter(Boolean).forEach(k => { if(낮.includes(k)) p += 2; });
+    if(낮.includes(String(x.q || '').toLowerCase().replace(/\s+/g, '').replace(/[?？]/g, ''))) p += 3; if(p > 점){ 점 = p; 좋 = x; } });
+  return 좋 ? { a:좋.a, view:좋.view } : { a:'정해 둔 답을 못 찾았어요 · 「요청 · 버그」로 보내 주시면 관리자가 답해 드려요', req:1 };
+}
+function 챗대화(){
+  if(!챗.방){
+    const 방들 = ['all'].concat((W.staff || []).filter(p => p.active !== false && p.id !== 챗나()).sort((a, b) => 선생순(a.name, b.name)).map(p => 챗방id(p.id)));
+    return '<div class="gc-body list">' + 방들.map(r => { const 끝 = 챗.글.filter(m => m.room === r).slice(-1)[0], 이 = 챗방이름(r), 안 = 챗안읽음(r), 색 = r === 'all' ? '#e9cf9b' : (선생님색(이) || '#b9b1a2');
+      return '<button class="gc-room" data-act="tx:gcroom" data-k="' + esc(r) + '"><span class="av" style="background:' + esc(색) + '">' + esc(r === 'all' ? '전' : 이.slice(0, 1)) + '</span><span class="tx"><b>' + esc(이) + '</b><small>' + esc(끝 ? (끝.files && 끝.files.length ? '사진 ' : '') + (끝.link ? '🔗 ' + (끝.link.title || '') + ' ' : '') + (끝.body || '') : '대화가 없어요') + '</small></span><span class="t">' + (끝 ? 챗때(끝.created_at) : '') + (안 ? '<i>' + 안 + '</i>' : '') + '</span></button>'; }).join('') + '</div>';
+  }
+  const r = 챗.방, 글 = 챗.글.filter(m => m.room === r);
+  return '<div class="gc-rh"><button class="gc-ic" data-act="tx:gcroom" data-k="">‹</button><b>' + esc(챗방이름(r)) + '</b></div><div class="gc-body">'
+    + (글.length ? 글.map(m => { const 나 = m.sender === 챗나();
+        return '<div class="gc-msg' + (나 ? ' me' : '') + '">' + (나 ? '' : '<small>' + esc(보임이름(m.sender_name || '')) + '</small>') + '<div class="' + (나 ? 'gc-me' : 'gc-bot') + (m.notice ? ' ntc' : '') + '">' + (m.notice ? '<b>📢 오늘 공지</b><br>' : '') + esc(m.body || '')
+          + (m.files || []).map(f => '<img class="gc-img" data-gcpath="' + esc(f.path) + '" alt="">').join('') + (m.link ? '<br><button class="gc-go" data-act="tx:gcgo" data-k="' + esc(m.link.view || '') + '">🔗 ' + esc(m.link.title || 챗화면이름(m.link.view)) + ' ›</button>' : '') + '</div><span class="tm">' + 챗때(m.created_at) + '</span></div>'; }).join('')
+      : '<div class="empty why"><b>아직 대화가 없습니다</b>아래 입력칸에 첫 글을 남겨 주세요</div>')
+    + '</div>' + 챗쓰기();
+}
+function 챗쓰기(){
+  return '<div class="gc-att">' + (챗.사진.length ? '<span>사진 ' + 챗.사진.length + '장</span>' : '') + (챗.링크 ? '<span>🔗 ' + esc(챗.링크.title) + '</span>' : '')
+    + (챗.방 === 'all' && 챗관리() ? '<label><input type="checkbox" id="gcntc"' + (챗.공지 ? ' checked' : '') + '> 오늘 공지로 띄우기</label>' : '') + '</div>'
+    + '<div class="gc-in"><button class="gc-ic" data-act="tx:gcpic" title="사진">📎</button><button class="gc-ic' + (챗.링크 ? ' on' : '') + '" data-act="tx:gclink" title="지금 보는 화면 링크">🔗</button><input id="gcin" placeholder="메시지 입력" autocomplete="off"><button data-act="tx:gcsend">↑</button></div><input type="file" id="gcfile" accept="image/*" multiple hidden>';
+}
+function 챗요청(){
+  const 폼 = 챗.새요청 ? '<div class="gc-form"><div class="gc-kinds">' + ['요청', '버그'].map(k => '<button class="' + (챗.새요청.kind === k ? 'on' : '') + '" data-act="tx:gcrk" data-k="' + k + '">' + k + '</button>').join('') + '</div>'
+      + '<input id="gcrt" class="inp" placeholder="제목 — 한 줄로" value="' + esc(챗.새요청.title || '') + '"><textarea id="gcrb" class="inp" placeholder="무엇이 필요하거나 어디가 안 되는지">' + esc(챗.새요청.body || '') + '</textarea>'
+      + '<div class="gc-att">' + (챗.사진.length ? '<span>사진 ' + 챗.사진.length + '장</span>' : '') + (챗.링크 ? '<span>🔗 ' + esc(챗.링크.title) + '</span>' : '') + '</div>'
+      + '<div class="gc-fb"><button class="gc-ic" data-act="tx:gcpic">📎</button><button class="gc-ic' + (챗.링크 ? ' on' : '') + '" data-act="tx:gclink">🔗</button><span class="sp"></span><button class="btn ghost sm" data-act="tx:gcrnew" data-k="0">취소</button><button class="btn main sm" data-act="tx:gcrsend">보내기</button></div><input type="file" id="gcfile" accept="image/*" multiple hidden></div>'
+    : '<button class="gc-new" data-act="tx:gcrnew" data-k="1">＋ 요청 · 버그 보내기 (사진 · 페이지 링크 붙이기)</button>';
+  const 딱 = { '받음':'b', '확인 중':'a', '끝남':'c' };
+  return '<div class="gc-body req">' + 폼 + (챗.요청.length ? 챗.요청.map(x => '<div class="gc-req' + (챗.펼 === x.id ? ' on' : '') + '"><button class="gc-rq" data-act="tx:gcropen" data-k="' + esc(x.id) + '"><b>' + esc(x.title || '(제목 없음)') + '<span class="tg ' + (딱[x.status] || 'b') + '">' + esc(x.status) + '</span></b><small>' + esc([보임이름(x.staff_name || ''), x.kind, 챗때(x.created_at), (x.files || []).length ? '사진 ' + x.files.length : ''].filter(Boolean).join(' · ')) + '</small></button>'
+      + (챗.펼 === x.id ? '<div class="gc-rd">' + esc(x.body || '') + (x.files || []).map(f => '<img class="gc-img" data-gcpath="' + esc(f.path) + '" alt="">').join('') + (x.link ? '<br><button class="gc-go" data-act="tx:gcgo" data-k="' + esc(x.link.view || '') + '">🔗 ' + esc(x.link.title || '') + ' ›</button>' : '')
+          + (x.reply ? '<div class="gc-reply"><b>관리자 답</b> ' + esc(x.reply) + '</div>' : '')
+          + (챗관리() ? '<div class="gc-kinds">' + ['받음', '확인 중', '끝남'].map(k => '<button class="' + (x.status === k ? 'on' : '') + '" data-act="tx:gcrst" data-k="' + esc(x.id + '|' + k) + '">' + k + '</button>').join('') + '</div><div class="gc-in"><input id="gcrr_' + esc(x.id) + '" placeholder="답 남기기" value="' + esc(x.reply || '') + '"><button data-act="tx:gcrreply" data-k="' + esc(x.id) + '">저장</button></div>' : '') + '</div>' : '') + '</div>').join('')
+      : (챗관리() ? '<div class="empty why"><b>들어온 요청이 없습니다</b>직원이 보내면 여기에 뜹니다</div>' : '<div class="empty why"><b>보낸 요청이 없습니다</b>위 「＋ 요청 · 버그 보내기」를 눌러 주세요</div>')) + '</div>';
+}
+const 챗때 = t => { const d = new Date(t); if(isNaN(d)) return ''; const 오늘 = d.toDateString() === new Date().toDateString(); return 오늘 ? String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') : (d.getMonth() + 1) + '/' + d.getDate(); };
+async function 챗사진채우기(el){ const 이 = [...el.querySelectorAll('img[data-gcpath]')]; if(!이.length) return; const u = await 서명주소들(이.map(i => i.dataset.gcpath)); 이.forEach((i, k) => { if(u[k]) i.src = u[k]; }); }
+async function 챗사진올리기(){ const 길 = [];
+  for(const f of 챗.사진){ let blob = f, name = f.name; try{ blob = await 줄이기(f); name = name.replace(/\.[^.]+$/, '') + '.jpg'; }catch(e){}
+    const path = 'chat/' + 챗나() + '/' + Date.now() + '_' + Math.random().toString(36).slice(2, 6) + '.jpg';
+    const t = await 토큰(); const res = await fetch(SB_URL + '/storage/v1/object/tr/' + path, { method:'POST', headers:{ apikey:SB_KEY, Authorization:'Bearer ' + t, 'Content-Type':'image/jpeg' }, body: blob });
+    if(!res.ok) throw new Error('사진을 못 올렸어요'); 길.push({ path, name, type:'image/jpeg' }); }
+  return 길; }
+async function 챗읽음(r){ 챗.읽[r] = new Date().toISOString(); try{ await usend('tr_chat_read?on_conflict=staff_id,room', 'POST', [{ staff_id:챗나(), room:r, at:챗.읽[r] }], 'resolution=merge-duplicates,return=minimal'); }catch(e){} }
+function 챗링크지금(){ const h = document.querySelector('#top h1'); return { view:S.view, title:(h ? h.innerText.trim() : 챗화면이름(S.view)) || 챗화면이름(S.view) }; }
+/* 전체방 공지 — 그날 한 번(사람마다 · 이 기기) · 끄면 안 뜸 */
+function 챗공지띄우기(){ if(챗.없음 || 챗설정.공지 === false || 진짜ME) return;
+  const 본 = (() => { try{ const x = JSON.parse(localStorage.getItem('gg_chat_ntc') || '{}'); return x.d === TODAY ? x.ids || [] : []; }catch(e){ return []; } })();
+  const 새 = 챗.글.filter(m => m.room === 'all' && m.notice && String(m.created_at).slice(0, 10) === TODAY && !본.includes(m.id) && m.sender !== 챗나());
+  if(!새.length) return;
+  try{ localStorage.setItem('gg_chat_ntc', JSON.stringify({ d:TODAY, ids:본.concat(새.map(m => m.id)) })); }catch(e){}
+  팝업차례('채팅공지', () => popOpen('<div class="ps-pop"><div class="ps-h">📢 오늘 공지</div>' + 새.map(m => '<div class="gc-ntcp"><b>' + esc(보임이름(m.sender_name || '')) + '</b> · ' + 챗때(m.created_at) + '<p>' + esc(m.body || '') + '</p></div>').join('') + '<div class="ps-foot"><button class="btn ghost" data-act="popclose">닫기</button><button class="btn main" data-act="tx:gcntcgo">전체방 열기</button></div></div>'));
+  if(!$('#pop').classList.contains('on')) 팝업다음(); }
+document.addEventListener('change', ev => { const t = ev.target;
+  if(t && t.id === 'gcfile'){ 챗.사진 = [...(t.files || [])].slice(0, 5); 챗그리기(); return; }
+  if(t && t.id === 'gcntc'){ 챗.공지 = t.checked; return; }
+  if(t && t.dataset && t.dataset.gcset){ 챗설정[t.dataset.gcset] = t.checked; try{ localStorage.setItem('gg_chat_set', JSON.stringify(챗설정)); }catch(e){} 챗그리기(); } });
+document.addEventListener('keydown', ev => { if(ev.key !== 'Enter' || ev.isComposing || !ev.target) return;
+  if(ev.target.id === 'gcin'){ ev.preventDefault(); txAct(챗.탭 === 'ai' ? 'gcask' : 'gcsend', ev.target); } });
+async function 챗손(a, k, el){
+  if(a === 'gchat'){ 챗.열림 = !챗.열림; if(챗.열림) 챗받기(true); 챗그리기(); return true; }
+  if(a === 'gcset'){ 챗.설정 = !챗.설정; 챗그리기(); return true; }
+  if(a === 'gctab'){ 챗.탭 = k; 챗.사진 = []; 챗.링크 = null; 챗그리기(); return true; }
+  if(a === 'gcq'){ const x = 챗.답.find(z => String(z.id) === String(k)); if(x){ 챗.도.push({ me:x.q }, { a:x.a, view:x.view }); 챗그리기(); } return true; }
+  if(a === 'gcask'){ const i = document.getElementById('gcin'), t = ((i || {}).value || '').trim(); if(!t) return true; 챗.도.push({ me:t }, 챗찾기(t)); 챗그리기(); const n = document.getElementById('gcin'); if(n) n.focus(); return true; }
+  if(a === 'gcgo'){ if(!k) return true; 챗.열림 = false; 챗그리기(); if(document.querySelector('.nav[data-v="' + k + '"]')) 가기(k); else toast('그 화면은 권한이 없어요'); return true; }
+  if(a === 'gcroom'){ 챗.방 = k || null; 챗.사진 = []; 챗.링크 = null; 챗.공지 = false; if(k){ await 챗읽음(k); } 챗그리기(); return true; }
+  if(a === 'gcpic'){ const f = document.getElementById('gcfile'); if(f) f.click(); return true; }
+  if(a === 'gclink'){ 챗.링크 = 챗.링크 ? null : 챗링크지금(); 챗그리기(); return true; }
+  if(a === 'gcsend'){ const i = document.getElementById('gcin'), t = ((i || {}).value || '').trim(); if(!t && !챗.사진.length && !챗.링크) return true;
+    if(챗.공지 && !await 묻기('전체방 공지로 띄울까요?' + String.fromCharCode(10) + '오늘 데스크를 연 직원에게 한 번씩 팝업으로 떠요')) return true;
+    try{ const files = 챗.사진.length ? await 챗사진올리기() : [];
+      await usend('tr_chat', 'POST', [{ room:챗.방, sender:챗나(), sender_name:(ME && ME.name) || '', body:t, files, link:챗.링크, notice:!!(챗.공지 && 챗.방 === 'all') }], 'return=minimal');
+      챗.사진 = []; 챗.링크 = null; 챗.공지 = false; await 챗받기(true); await 챗읽음(챗.방); 챗그리기(); }
+    catch(e){ toast('못 보냈어요 — ' + String(e.message || '').slice(0, 60)); } return true; }
+  if(a === 'gcrnew'){ 챗.새요청 = k === '1' ? { kind:'요청', title:'', body:'' } : null; 챗.사진 = []; 챗.링크 = null; 챗그리기(); return true; }
+  if(a === 'gcrk'){ if(챗.새요청){ 챗.새요청.title = (document.getElementById('gcrt') || {}).value || ''; 챗.새요청.body = (document.getElementById('gcrb') || {}).value || ''; 챗.새요청.kind = k; } 챗그리기(); return true; }
+  if(a === 'gcrsend'){ const 제 = ((document.getElementById('gcrt') || {}).value || '').trim(), 본 = ((document.getElementById('gcrb') || {}).value || '').trim();
+    if(!제) return toast('제목을 입력해 주세요'), true;
+    if(!await 묻기('관리자에게 ' + (챗.새요청 || {}).kind + '을 보낼까요?' + String.fromCharCode(10) + 제)) return true;
+    try{ const files = 챗.사진.length ? await 챗사진올리기() : [];
+      await usend('tr_req', 'POST', [{ kind:(챗.새요청 || {}).kind || '요청', title:제, body:본, files, link:챗.링크, staff_id:챗나(), staff_name:(ME && ME.name) || '' }], 'return=minimal');
+      챗.새요청 = null; 챗.사진 = []; 챗.링크 = null; toast('보냈어요 · 답이 오면 여기서 봐요'); await 챗받기(true); }
+    catch(e){ toast('못 보냈어요 — ' + String(e.message || '').slice(0, 60)); } return true; }
+  if(a === 'gcropen'){ 챗.펼 = 챗.펼 === k ? null : k; 챗그리기(); return true; }
+  if(a === 'gcrst' || a === 'gcrreply'){ if(!챗관리()) return toast('관리자만 수정할 수 있어요'), true;
+    const [id, 값] = a === 'gcrst' ? String(k).split('|') : [k, null], x = 챗.요청.find(z => String(z.id) === String(id)); if(!x) return true;
+    const 몸 = a === 'gcrst' ? { status:값 } : { reply:((document.getElementById('gcrr_' + id) || {}).value || '').trim() };
+    if(!await 묻기(a === 'gcrst' ? '「' + (x.title || '') + '」을 「' + 값 + '」으로 할까요?' : '답을 저장할까요?')) return true;
+    try{ await usend('tr_req?id=eq.' + encodeURIComponent(id), 'PATCH', Object.assign(몸, { updated_at:new Date().toISOString() }), 'return=minimal'); Object.assign(x, 몸); toast('저장했어요'); 챗그리기(); }
+    catch(e){ toast('저장하지 못했어요 — ' + String(e.message || '').slice(0, 60)); } return true; }
+  if(a === 'gcntcgo'){ popClose(); 챗.열림 = true; 챗.탭 = 'talk'; 챗.방 = 'all'; await 챗읽음('all'); 챗그리기(); return true; }
+  return false;
 }
 /* ── 체형 사진 — 비포 · 애프터 ── */
 const POSES = ['정면','측면','후면'];
@@ -7006,6 +7348,7 @@ function 누락판(){
 const 매출 = { 줄:null, 없음:false, 끔:new Set(), 탭:'미확인', 기록:{}, 연기록:'', 고침:'', 선생:'' };
 const 매출갈래 = ['TG', '재등록', 'SNS', '지정상담', '체험', '체험전환', '소개'];      /* 2026-10-16 18:09 대표 「지정상담이랑 체험 카테고리 나눠」 — 옛 「지정상담&체험」 줄은 중앙이 둘 중 하나로 다시 나눈다 */
 const 매출관리자 = () => 할수('saleok');
+const 매출쉼 = g => (g.줄 || [g]).some(x => x.snooze_until && String(x.snooze_until).slice(0, 10) > TODAY);      /* 관리자가 미룬 매출 — 그날까지 팝업 · 칩에서 뺀다 (2026-10-26 대표 「담당을 고객이 이번 주 중 정해 주기로」) */
 const 원 = n => ((+n || 0) < 0 ? '−' : '') + Math.abs(+n || 0).toLocaleString('ko-KR') + '원';
 const 지난달 = () => { const d = new Date(TODAY.slice(0, 7) + '-01T00:00:00'); d.setMonth(d.getMonth() - 1); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); };
 const 매출시험줄 = x => /^TEST-/.test(String(x.sale_key || ''));      /* 중앙이 팝업 시험으로 넣는 가짜 줄(대표 13:02 「가짜로 테스트 팝업」) — 팝업 · 목록엔 「시험」으로 보이고 합에서는 뺀다 */
@@ -7057,7 +7400,7 @@ function 매출칩(){
 /* 홈 단추 — 팝업을 실수로 닫아도 여기서 다시 연다 (2026-10-16 대표 「홈 화면에 매출이 발생했다는 별도의 버튼 · 애니메이션」) */
 function 매출홈단추(){
   if(!매출.줄) return '';
-  const gs = 매출묶음들(매출.줄), 미 = gs.filter(g => 묶음상태(g) === '미확인').length, 확 = 매출관리자() ? gs.filter(g => 묶음상태(g) === '선택됨').length : 0;
+  const gs = 매출묶음들(매출.줄).filter(g => !매출쉼(g)), 미 = gs.filter(g => 묶음상태(g) === '미확인').length, 확 = 매출관리자() ? gs.filter(g => 묶음상태(g) === '선택됨').length : 0;
   if(!미 && !확) return '';
   /* 두 갈래로 가른다 (2026-10-21 대표 「첫째는 담당 · 매출 유형이 필요한 것 = 모두에게 / 둘째는 확정이 필요한 것 = 관리자」) */
   return (미 ? '<button class="pshome" data-act="tx:popen" title="누르면 매출 팝업이 다시 뜹니다"><i></i><span>PT 매출 · 담당 · 매출 유형을 골라 주세요 <b>' + 미 + '건</b></span><em>›</em></button>' : '')
@@ -7111,7 +7454,11 @@ function 매출줄(g, 손){
       + (매출관리자() && st === '선택됨' && !고침 ? '<button class="btn main sm" data-act="tx:pconf" data-k="' + esc(id) + '">확정</button>' : '')
       + (매출관리자() && st !== '삭제됨' && !고침 ? '<button class="btn ghost sm" data-act="tx:pdel" data-k="' + esc(id) + '">삭제</button>' : '')
       + (할수('saleback') && g.줄.some(y => y.status === '삭제됨') ? '<button class="btn ghost sm" data-act="tx:psback" data-k="' + esc(id) + '">복원</button>' : '')
-      + '<button class="btn ghost sm" data-act="tx:plog" data-k="' + esc(id) + '">' + (매출.연기록 === id ? '접기' : '자세히') + '</button></div>')
+      + '<button class="btn ghost sm" data-act="tx:plog" data-k="' + esc(id) + '">' + (매출.연기록 === id ? '접기' : '자세히') + '</button>'
+      + (매출관리자() && (st === '미확인' || st === '선택됨') ? (매출쉼(g)
+          ? '<span class="tag">' + (+String(x.snooze_until).slice(5, 7)) + '/' + (+String(x.snooze_until).slice(8, 10)) + '까지 알림 쉼</span><button class="btn ghost sm" data-act="tx:psnzoff" data-k="' + esc(id) + '">알림 다시 켜기</button>'
+          : '<label class="sc-days"><input class="inp" type="number" min="1" max="30" value="3" id="psn_' + esc(id) + '"><span>일 뒤</span></label><button class="btn ghost sm" data-act="tx:psnz" data-k="' + esc(id) + '">다시 알림</button>') : '')      /* 관리자만 · 비품 다시 알림과 같은 꼴 (2026-10-26) */
+      + '</div>')
     + (매출.연기록 === id ? 매출기록칸(g) : '') + '</div>';
 }
 /* 자세히 — ① 나눠 낸 결제(날짜 · 금액) ② 누가 · 무엇을 한 줄씩. 사람 이름은 사람 · 서버가 결제내역으로 한 것은 「자동(결제내역)」 */
@@ -7135,8 +7482,8 @@ function 매출팝업(강제){
   if(!강제 && $('#pop').classList.contains('on')){ 팝업차례('매출', () => 매출팝업()); return; }      /* 열린 창을 덮지 않는다 — 줄에 서서 닫히면 뜬다 (2026-10-21) */
   const gs = 매출묶음들(매출.줄), 끔 = g => g.줄.every(x => 매출.끔.has(x.id));
   const 방 = (g, 칸) => 매출.방금.get(g.키) === 칸;
-  const 새 = gs.filter(g => (묶음상태(g) === '미확인' && !끔(g)) || 방(g, '새'));
-  const 확 = 매출관리자() ? gs.filter(g => (묶음상태(g) === '선택됨' && !끔(g) && !방(g, '새')) || 방(g, '확')) : [];
+  const 새 = gs.filter(g => (묶음상태(g) === '미확인' && !끔(g) && !매출쉼(g)) || 방(g, '새'));
+  const 확 = 매출관리자() ? gs.filter(g => (묶음상태(g) === '선택됨' && !끔(g) && !매출쉼(g) && !방(g, '새')) || 방(g, '확')) : [];
   const 바 = 매출바뀐것();
   if(!새.length && !확.length && !바.length) return;
   const 남새 = 새.filter(g => 묶음상태(g) === '미확인').length, 남확 = 확.filter(g => 묶음상태(g) === '선택됨').length, 다됨 = !남새 && !남확 && !바.length;
@@ -8334,6 +8681,8 @@ document.addEventListener('input', ev => { const t = ev.target; if(!t || t.id !=
   document.querySelectorAll('#pzmodal .chips [data-act="pzk"]').forEach(c => c.classList.toggle('on', !q && c.dataset.v2 === 칸)); });
 document.addEventListener('input', ev => { if(ev.isComposing && ev.target && 검색칸들.indexOf(ev.target.id) >= 0) ev.stopImmediatePropagation(); }, true);
 document.addEventListener('compositionend', ev => { const t = ev.target; if(t && 검색칸들.indexOf(t.id) >= 0) setTimeout(() => t.dispatchEvent(new Event('input', { bubbles:true })), 0); }, true);
+document.addEventListener('input', ev => { if(!ev.target || ev.target.id !== 'asgq') return; 배정.g.q = ev.target.value; const p = ev.target.selectionStart; render(); const n = document.getElementById('asgq'); if(n){ n.focus(); n.setSelectionRange(p, p); } });      /* 묶음 탭 찾기 (2026-10-26) */
+document.addEventListener('change', ev => { const f = ev.target && ev.target.dataset && ev.target.dataset.asg; if(!f) return; 배정.g[f] = ev.target.value; render(); });
 document.addEventListener('input', ev => { if(!ev.target || ev.target.id !== 'asq') return; 배정.거.q = ev.target.value; 배정.페 = 0; const p = ev.target.selectionStart; render(); const n = document.getElementById('asq'); if(n){ n.focus(); n.setSelectionRange(p, p); } });
 document.addEventListener('input', ev => { const f = ev.target && ev.target.closest && ev.target.closest('#popbox .ck-fr'); if(!f || !예상입력) return; 예상읽기(); const t = document.getElementById('ckftot'); if(t) t.textContent = 예상만원(예상합(예상입력.줄)); });
 
@@ -9120,6 +9469,22 @@ const 표정의 = {
   },
   /* 매뉴얼 — 업무 · 상담과 같은 표 · 보기만 카드 (2026-10-26 대표 결정 n2 「데이터 형식은 데이터베이스와 동일 · 보기만 카드 · 교육 영상 썸네일 · 보기 형식을 추가해서」)
      파트 이름 · 값은 표에서 바꾼다(고르는 값 수정 · 속성 추가 · 보기 추가 = 표 관리 권한) */
+  botqa: {      /* 챗봇 정해 둔 질문 · 답 (2026-10-26 대표 「자체 질문을 세팅하고 정해진 답을 꺼내 주면」) — 관리 › 챗봇 답 · 표 관리 권한만 고침 */
+    table:'tr_bot_qa', 제목:'챗봇 답', 사람열:null, 제목열:'q',
+    열:[
+      {k:'q',    이름:'질문',     타입:'text', 필수:true, 힌트:'칩에 보이는 글'},
+      {k:'keys', 이름:'찾는 말',  타입:'text', 힌트:'쉼표로 — 이 말이 들어가면 이 답'},
+      {k:'a',    이름:'답',       타입:'long'},
+      {k:'view', 이름:'열 화면',  타입:'select', 옵션:['lesson','home','tasks','leads','assign','manual','voc','kcal','leave','members','check','cmall','today','rtmake','reports','exreq','kits'], 표시:{ lesson:'수업 기록', home:'홈', tasks:'업무', leads:'상담', assign:'가이드 · 체험 배정', manual:'매뉴얼', voc:'VOC', kcal:'칼로리 계산기', leave:'연월차', members:'회원', check:'점검', cmall:'피드백', today:'오늘 운동', rtmake:'루틴 · 스트레칭', reports:'리포트', exreq:'종목 사전', kits:'홍보 자료' }},
+      {k:'sort', 이름:'차례',     타입:'number'},
+      {k:'done', 이름:'숨김',     타입:'check'},
+    ],
+    보기:[ {k:'qall', 이름:'전체', 필터:r => !r.done}, {k:'qhide', 이름:'숨김', 필터:r => !!r.done} ],
+    템플릿:[ {이름:'새 질문', 값:{}} ],
+    기본vis:'all',
+    정렬: (a, b) => (+a.sort || 0) - (+b.sort || 0),
+    행: r => ({ 제목: r.q || '(질문 없음)', 칩: (r.view ? '<span class="tx-tag">' + esc(r.view) + '</span>' : '') + '<span>' + esc(String(r.a || '').slice(0, 40)) + '</span>', 오른쪽:'', 체크:null }),
+  },
   manual: {
     table:'tr_manual', 제목:'매뉴얼', 사람열:null, 제목열:'title',
     열:[
@@ -12144,7 +12509,7 @@ function 현황판열기(k){
   const c = 현황칸.find(x => x.k === k);
   if(c && c.직접){ 현황판 = null; c.직접(); return; }   /* 이미 있는 판을 그대로 연다 (가입 승인) */
   if(!현황목록[k]) return;
-  현황판 = k; 현황판그리기(); }
+  현황판 = k; 현황판그리기(); window.__현황머리 = 판머리; }
 function 현황판그리기(){
   if(!현황판) return;
   const k = 현황판, 칸 = 현황칸.find(x=>x.k===k) || { 이름:k };
@@ -12398,7 +12763,7 @@ function 예약없음판(t){
    표 = assign_leads(37단계 · 직원만 · 지우기 막음). 들어오는 길 = 시트(중앙) · 전산결제(중앙 · 체험) · 직접(＋추가) · 노션옮김(중앙 한 번).
    탭 = 할 일(미배정 · 첫 수업 안 잡음 · 확인 요청 · 오래 멈춤) · 진행 중(줄 안에서 진행상황 · 메모) · 전체(찾기 · 거르기 · 50줄씩).
    회차(r1~r3) · 등록여부(reg)는 중앙이 전산으로 채운다 — 트레이너가 손대는 건 진행상황 · 메모. 저장은 모두 확인 창. 관리자 = 전부 + 담당 정하기 · 트레이너 = 내 담당만 */
-const 배정 = { 줄:null, 중:false, 왜:'', 때:0, 탭:'할일', 페:0, 거:{ t:'', s:'', r:'', q:'', k:'' }, 물:'' };
+const 배정 = { 줄:null, 중:false, 왜:'', 때:0, 탭:'할일', 페:0, g:{ q:'', s:'', 유효:true }, 고름:new Set(), 거:{ t:'', s:'', r:'', q:'', k:'' }, 물:'' };
 const 배정상태 = ['진행중', '재연락 필요', '종료', '수업거부', '기타사유'], 배정묻기 = ['기존PT고객인가요', '진행중인데 수업 없음', '등록여부 고치기', '담당 넣기', '무료PT 했나요'];
 async function 배정받기(){
   if(배정오늘() >= 배정넘김날) 배정정본 = '표';      /* 주말 내내 켜 둔 데스크도 월요일엔 표로 (한 방향) */
@@ -12421,7 +12786,8 @@ const 배정열림 = x => x.progress === '진행중' || x.progress === '재연�
 const 배정미배 = x => x.assigned === '미배정' || !(x.trainers || []).length;      /* 담당이 비면 「배정완료」로 적혀 있어도 미배정 — 노션에서 옮긴 20건이 그랬다(2026-10-15) */
 const 배정범위 = () => (배정.줄 || []).filter(x => 할수('assignall') || (x.trainers || []).includes((ME && ME.name) || ''));
 const 배정일 = x => { const d = x.assigned_on || String(x.created_at || '').slice(0, 10); return d ? Math.round((new Date(TODAY) - new Date(d)) / 86400000) : 0; };
-const 배정점 = x => '<span class="as-dots">' + ['r1', 'r2', 'r3'].map(k => '<i class="' + (x[k] ? 'y' : '') + '" title="' + (x[k] ? k.slice(1) + '회차 ' + x[k] : k.slice(1) + '회차 아직') + '"></i>').join('') + '</span>';
+const 배정회수 = x => { const n = parseInt(x.lessons, 10) || +((String(x.ticket || '').match(/(\d)\s*회/) || [])[1] || 0); return n >= 1 && n <= 3 ? n : 3; };      /* 상품 회차 — 수업 횟수 칸 → 이용권 글 「(pt 2회)」 → 모르면 3 (2026-10-26 대표) */
+const 배정점 = x => '<span class="as-dots">' + ['r1', 'r2', 'r3'].slice(0, 배정회수(x)).map(k => '<i class="' + (x[k] ? 'y' : '') + '" title="' + (x[k] ? k.slice(1) + '회차 ' + x[k] : k.slice(1) + '회차 아직') + '"></i>').join('') + '</span>';
 const 배정담당 = x => (x.trainers || []).join(' · ');
 /* 담당으로 고를 수 있는 사람 = 지금 일하는 트레이너만 — 대표 · 퇴사 · FC · 인턴 빼고 (2026-10-22 대표 「담당자는 현재 근무중인 트레이너만」) · 거름(담당 전체)은 옛 이름도 그대로 */
 const 배정고를선생 = () => [...new Set((W.staff || []).filter(p => p.active !== false && ['최고관리자', '중간관리자', '트레이너'].includes(등급of(p)) && !퇴사명().has(String(p.name || '').trim())).map(p => String(p.name || '').trim()))].filter(Boolean).sort(선생순);
@@ -12461,21 +12827,31 @@ function v배정(){
     + (L.length > 8 ? '<button class="as-more" data-act="tx:astab" data-k="' + g.k + '">' + (L.length - 8) + '건 더 · 「' + g.이름 + '」 탭에서 모두 보기 ›</button>' : '');
   const 물칩 = '<div class="as-askc">' + 배정묻기.map(k => { const n = 물.filter(x => x.ask === k).length; return n ? '<button class="chip' + (배정.물 === k ? ' on' : '') + '" data-act="tx:asask" data-k="' + esc(k) + '">' + esc(k) + ' ' + n + '</button>' : ''; }).join('') + '</div>';
   const 정리단추 = 멈.filter(배정쓰기).length ? '<button class="as-more btn-l" data-act="tx:asclean">「정리」 — ' + 멈.filter(배정쓰기).length + '건 한 번에 종료 ›</button>' : '';
-  const 묶표 = g => g.L.length ? '<div class="as-tbl"><table class="ck-tb"><thead><tr><th>이름</th><th>구분</th><th>담당</th><th>배정</th><th>회차</th><th>진행상황</th><th></th></tr></thead><tbody>'
-      + g.L.slice(0, 300).map(x => '<tr class="go" data-act="tx:asopen" data-k="' + esc(x.id) + '"><td><b>' + esc(x.name) + '</b></td><td>' + esc(x.kind) + 체험설문표(x) + '</td><td>' + esc(배정담당(x) || '—') + '</td><td class="' + (배정일(x) >= 60 ? 'as-old' : 'sub3') + '">' + 배정일(x) + '일</td><td>' + 배정점(x) + '</td><td>' + esc(x.progress || '') + '</td><td class="as-act">' + g.오른(x) + '</td></tr>').join('')
-      + '</tbody></table></div>' + (g.L.length > 300 ? '<div class="as-more">300건까지 보입니다 · 「전체」 탭에서 찾아 주세요</div>' : '')
-    : '<div class="empty why"><b>' + esc(g.빈 || (g.이름 + '이 없습니다')) + '</b>새로 생기면 여기에 뜹니다</div>';
+  /* 묶음 탭 — 찾기 · 정렬 · 회원권 유효만(기본) · 여러 명 고르기 (2026-10-26 대표 「필터 · 순서 · 검색 · 회원권이 살아 있는 데이터만 · 다중선택」) */
+  const 유효있음 = (배정.줄 || []).some(x => x.mem_end), G2 = 배정.g;
+  const 거름 = L => { let r = L.filter(x => !G2.q || String(x.name || '').includes(G2.q) || String(x.phone || '').replace(/\D/g, '').includes(G2.q.replace(/\D/g, '') || '@@'));
+    if(G2.유효 && 유효있음) r = r.filter(x => !x.mem_end || x.mem_end >= TODAY);      /* 날 없음 = CRM 에 없는 분(결제 전 체험 예약자 등) — 보이게 (중앙 19:27) */
+    if(G2.s === 'new') r = r.slice().sort((a, b) => 배정일(a) - 배정일(b)); else if(G2.s === 'old') r = r.slice().sort((a, b) => 배정일(b) - 배정일(a)); else if(G2.s === 'name') r = r.slice().sort((a, b) => String(a.name).localeCompare(String(b.name), 'ko'));
+    return r; };
+  const 묶줄 = g => '<div class="as-gbar"><input class="srch" id="asgq" placeholder="이름 · 전화로 찾기" value="' + esc(G2.q) + '">'
+    + '<select class="srch" data-asg="s">' + [['', '기본 순서'], ['old', '오래된 순'], ['new', '최근 순'], ['name', '이름 순']].map(([v, n]) => '<option value="' + v + '"' + (G2.s === v ? ' selected' : '') + '>' + n + '</option>').join('') + '</select>'
+    + '<button class="chip' + (G2.유효 ? ' on' : '') + '" data-act="tx:asvalid"' + (유효있음 ? '' : ' disabled title="회원권 끝나는 날을 중앙에서 받는 중이에요"') + '>회원권 유효만</button><span class="sp"></span><span class="sub3">회원권이 끝난 분까지는 「전체」 탭에서</span></div>';
+  const 고름줄 = 목 => { const n = [...배정.고름].filter(id => (배정.줄 || []).some(x => String(x.id) === id)).length; return 배정.보냄중 ? '<div class="as-selbar"><b>보내는 중이에요</b><span class="sub3">한 명씩 띄워 보내 30명이면 20초쯤 걸려요</span></div>' : n ? '<div class="as-selbar"><b>' + n + '명 선택</b><button class="as-btn" data-act="tx:asbulk">신청 링크 보내기</button><button class="as-btn g" data-act="tx:aspickall" data-k="0">선택 풀기</button></div>' : ''; };
+  const 묶표 = g => { const 목 = 거름(g.L); return 묶줄(g) + 고름줄(목) + (목.length ? '<div class="as-tbl"><table class="ck-tb"><thead><tr><th style="width:30px"><span class="as-chk' + (목.length && 목.slice(0, 300).every(x => 배정.고름.has(String(x.id))) ? ' on' : '') + '" data-act="tx:aspickall" data-k="1" title="보이는 줄 모두">' + (목.length && 목.slice(0, 300).every(x => 배정.고름.has(String(x.id))) ? '✓' : '') + '</span></th><th>이름</th><th>구분</th><th>담당</th><th>배정</th><th>회차</th><th>진행상황</th><th></th></tr></thead><tbody>'
+      + 목.slice(0, 300).map(x => '<tr class="go' + (배정.고름.has(String(x.id)) ? ' sel' : '') + '" data-act="tx:asopen" data-k="' + esc(x.id) + '"><td><span class="as-chk' + (배정.고름.has(String(x.id)) ? ' on' : '') + '" data-act="tx:aspick" data-k="' + esc(x.id) + '">' + (배정.고름.has(String(x.id)) ? '✓' : '') + '</span></td><td><b>' + esc(x.name) + '</b>' + ((배정.보낸 || {})[String(x.id)] ? ((배정.보낸 || {})[String(x.id)].ok ? ' <span class="as-tag g">✓ 보냄</span>' : ' <span class="as-tag fail" title="' + esc(배정.보낸[String(x.id)].why) + '">안 보냄 · ' + esc(String(배정.보낸[String(x.id)].why).slice(0, 24)) + '</span>') : '') + '</td><td>' + 배정구분칩(x) + 체험설문표(x) + '</td><td>' + esc(배정담당(x) || '—') + '</td><td class="' + (배정일(x) >= 60 ? 'as-old' : 'sub3') + '">' + 배정일(x) + '일</td><td>' + 배정점(x) + '</td><td>' + 배정진행칩(x) + '</td><td class="as-act">' + g.오른(x) + '</td></tr>').join('')
+      + '</tbody></table></div>' + (목.length > 300 ? '<div class="as-more">300건까지 보입니다 · 「전체」 탭에서 찾아 주세요</div>' : '')
+    : '<div class="empty why"><b>' + esc(g.L.length ? '조건에 맞는 줄이 없습니다' : (g.빈 || (g.이름 + '이 없습니다'))) + '</b>' + (g.L.length ? '찾기 · 「회원권 유효만」을 풀어 보세요' : '새로 생기면 여기에 뜹니다') + '</div>'); };
   if(배정.탭 === '할일'){
     h += '<div class="as-q">' + 묶.map(g => '<div class="as-qc' + (g.hot ? ' hot' : '') + '"><button class="qh" data-act="tx:astab" data-k="' + g.k + '" title="「' + g.이름 + '」 탭으로"><b>' + g.이름 + '</b><span>' + 셈(g) + '</span></button><div class="qd">' + g.설 + '</div>'
         + (g.칩 ? 물칩 : '') + (g.L.length ? 줄(g.L, g.오른, g) : '<div class="sub3">' + esc(g.빈 || '없습니다') + '</div>') + (g.정리 ? 정리단추 : '') + '</div>').join('') + '</div>';
   } else if(묶.some(g => g.k === 배정.탭)){
     const g = 묶.find(z => z.k === 배정.탭);
-    h += (g.칩 ? 물칩 : '') + '<div class="as-sum">' + esc(g.이름) + ' <b>' + g.L.length + '</b>건 · ' + esc(g.설) + '</div>' + 묶표(g) + (g.정리 ? 정리단추 : '');
+    h += (g.칩 ? 물칩 : '') + '<div class="as-sum">' + esc(g.이름) + ' <b>' + 거름(g.L).length + '</b>건 · ' + esc(g.설) + '</div>' + 묶표(g) + (g.정리 ? 정리단추 : '');
   } else if(배정.탭 === '진행'){
     const L = 열.slice().sort((a, b) => (b.progress === '재연락 필요') - (a.progress === '재연락 필요') || 배정일(b) - 배정일(a));
     h += '<div class="as-sum">진행 중 <b>' + L.length + '</b>건 · <b style="color:var(--warn)">빨간 날</b>은 두 달 넘은 것</div>'
       + '<div class="as-tbl"><table class="ck-tb"><thead><tr><th>이름</th><th>구분</th>' + (할수('assignall') ? '<th>담당</th>' : '') + '<th>배정</th><th>회차</th><th>진행상황</th><th style="width:32%">메모</th></tr></thead><tbody>'
-      + L.slice(0, 200).map(x => '<tr><td><b class="as-nm" data-act="tx:asopen" data-k="' + esc(x.id) + '">' + esc(x.name) + '</b></td><td>' + esc(x.kind) + 체험설문표(x) + '</td>' + (할수('assignall') ? '<td>' + (배정담당(x) || !배정쓰기(x) || !할수('assignset') ? esc(배정담당(x) || '담당 없음') : '<button class="as-btn" data-act="tx:agpick" data-k="' + esc(x.id) + '">담당 정하기</button>') + '</td>' : '')
+      + L.slice(0, 200).map(x => '<tr><td><b class="as-nm" data-act="tx:asopen" data-k="' + esc(x.id) + '">' + esc(x.name) + '</b></td><td>' + 배정구분칩(x) + 체험설문표(x) + '</td>' + (할수('assignall') ? '<td>' + (배정담당(x) || !배정쓰기(x) || !할수('assignset') ? esc(배정담당(x) || '담당 없음') : '<button class="as-btn" data-act="tx:agpick" data-k="' + esc(x.id) + '">담당 정하기</button>') + '</td>' : '')
         + '<td class="' + (배정일(x) >= 60 ? 'as-old' : 'sub3') + '">' + 배정일(x) + '일</td><td>' + 배정점(x) + '</td><td>' + 배정상태단추(x) + '</td>'
         + '<td>' + (배정쓰기(x) ? '<div class="as-memo"><input class="srch" id="asm_' + esc(x.id) + '" value="' + esc(x.trainer_memo || '') + '" placeholder="예) 다음 주 화 7시 · 허리 주의"><button class="as-btn g" data-act="tx:asmemo" data-k="' + esc(x.id) + '">저장</button></div>' : '<span class="sub3">' + esc(x.trainer_memo || '') + '</span>') + '</td></tr>').join('')
       + '</tbody></table></div>' + (L.length > 200 ? '<div class="as-more">200건까지 보입니다 · 「전체」 탭에서 찾아 주세요</div>' : '');
@@ -12486,7 +12862,7 @@ function v배정(){
     h += '<div class="as-flt"><input class="srch" id="asq" placeholder="이름 · 전화로 찾기" value="' + esc(G.q) + '">' + (할수('assignall') ? 고('t', '담당 전체', 배정선생()) : '') + 고('k', '가이드 · 체험', ['가이드', '체험']) + 고('s', '진행상황 전체', 배정상태) + 고('r', '등록여부 전체', ['PT등록', 'PT미등록', '기존PT고객', '없음'])
       + '<span class="as-sum" style="margin:0 0 0 auto"><b>' + L.length.toLocaleString() + '</b>건 · 끝난 ' + 끝.length + '건 중 PT 등록 <b style="color:#8fd19e">' + 등 + '</b>' + (끝.length ? ' (' + Math.round(등 / 끝.length * 100) + '%)' : '') + '</span></div>'
       + (L.length ? '<div class="as-tbl"><table class="ck-tb"><thead><tr><th>이름</th><th>구분</th><th>담당</th><th>배정</th><th>회차</th><th>진행상황</th><th>등록</th></tr></thead><tbody>'
-        + L.slice(배정.페 * 50, 배정.페 * 50 + 50).map(x => '<tr class="go" data-act="tx:asopen" data-k="' + esc(x.id) + '"><td><b>' + esc(x.name) + '</b></td><td>' + esc(x.kind) + 체험설문표(x) + '</td><td>' + esc(배정담당(x) || '—') + '</td><td class="sub3">' + esc((x.assigned_on || String(x.created_at || '').slice(0, 10)).slice(2).replace(/-/g, '.')) + '</td><td>' + 배정점(x) + '</td><td>' + esc(x.progress) + '</td><td>' + (x.reg ? '<span class="as-reg ' + (x.reg === 'PT등록' ? 'g' : x.reg === 'PT미등록' ? 'r' : 'n') + '">' + esc(x.reg) + '</span>' : '—') + '</td></tr>').join('')
+        + L.slice(배정.페 * 50, 배정.페 * 50 + 50).map(x => '<tr class="go" data-act="tx:asopen" data-k="' + esc(x.id) + '"><td><b>' + esc(x.name) + '</b></td><td>' + 배정구분칩(x) + 체험설문표(x) + '</td><td>' + esc(배정담당(x) || '—') + '</td><td class="sub3">' + esc((x.assigned_on || String(x.created_at || '').slice(0, 10)).slice(2).replace(/-/g, '.')) + '</td><td>' + 배정점(x) + '</td><td>' + 배정진행칩(x) + '</td><td>' + (x.reg ? '<span class="as-reg ' + (x.reg === 'PT등록' ? 'g' : x.reg === 'PT미등록' ? 'r' : 'n') + '">' + esc(x.reg) + '</span>' : '—') + '</td></tr>').join('')
         + '</tbody></table></div><div class="as-pg"><button class="as-btn g" data-act="tx:aspg" data-k="-1">‹</button>' + (배정.페 + 1) + ' / ' + 쪽 + '쪽<button class="as-btn g" data-act="tx:aspg" data-k="1">›</button></div>'
         : '<div class="empty why"><b>조건에 맞는 배정이 없습니다</b>거르기를 풀거나 다른 이름으로 찾아 주세요</div>');
   }
@@ -12496,8 +12872,11 @@ const 배정PT중 = x => x && x.pt_state === 'PT중';      /* 중앙이 매시 �
 const 배정관리자 = () => !!(ME && (ME.super === true || ['대표자', '최고관리자', '중간관리자'].includes(등급of(ME))));
 const 배정PT자동 = x => String(x.assign_note || '').includes('PT 진행 중(');      /* 중앙 자동 배정 줄 표시 — 「자동 10/24 · PT 진행 중(장승훈)」 */
 const 배정PT다름 = x => !!x.pt_trainer && !(x.trainers || []).includes(x.pt_trainer);      /* 담당이 PT 선생님과 다름 (퇴사 담당 · 빈 담당) */
+const 배정진행칩 = x => { const 나 = 배정미배(x) && x.later_at, p = x.progress || '';
+  return '<span class="as-pr ' + (나 ? 'l' : p === '진행중' ? 'p' : p === '종료' || p === '수업거부' || p === '기타사유' ? 'e' : p === '재연락 필요' ? 'r' : '') + '">' + esc(나 ? '나중에 희망' : p || '—') + '</span>'; };      /* 진행 색 한 곳 (2026-10-26) */
+const 배정구분칩 = x => '<span class="as-kd ' + (x.kind === '체험' ? 't' : 'g') + '">' + esc(x.kind === '체험' ? '체험수업' : x.kind === '가이드' ? '운동가이드' : x.kind || '') + '</span>';
 const 배정상태단추 = x => 배정PT중(x) ? '<span class="as-tag ptm">PT 회원</span>' + (x.pt_note ? ' <span class="sub3">' + esc(x.pt_note) + '</span>' : '') : !배정쓰기(x) ? '<span class="as-tag" title="수정할 수 없는 줄">' + esc(x.progress) + '</span>'
-  : 배정미배(x) ? '<span class="as-tag wait">' + (x.later_at ? '나중에 희망' : x.apply_at ? '설문 있음' : '배정중') + '</span>'      /* 배정 전엔 진행상황이 아니다 (2026-10-25 대표 「미배정은 진행중이 아니라 배정중」) */
+  : 배정미배(x) ? '<span class="as-tag wait' + (x.later_at ? ' l' : '') + '">' + (x.later_at ? '나중에 희망' : x.apply_at ? '설문 있음' : '배정중') + '</span>'      /* 배정 전엔 진행상황이 아니다 (2026-10-25 대표 「미배정은 진행중이 아니라 배정중」) */
   : '<span class="as-st">' + [['진행중', 'p', 'tx:asst', '|진행중'], ['재연락 필요', 'r', 'tx:asrecall', ''], ['종료', 'e', 'tx:asend', '']].map(([k, c, act, 덧]) => '<button class="' + c + (x.progress === k || (k === '종료' && ['수업거부', '기타사유'].includes(x.progress)) ? ' on' : '') + '" data-act="' + act + '" data-k="' + esc(x.id) + 덧 + '">' + k + '</button>').join('') + '</span>'
     + (x.progress === '재연락 필요' && x.recall_on ? ' <span class="sub3">' + esc(String(x.recall_on).slice(5).replace('-', '/')) + ' 다시 알림</span>' : '') + (['수업거부', '기타사유'].includes(x.progress) ? ' <span class="sub3">' + esc(x.progress) + '</span>' : '');
 async function 배정고침(id, 몸, 말){
@@ -12606,6 +12985,21 @@ async function 배정정지바꿈(){ const 나 = ME && (W.staff || []).find(p =>
   const 몸 = { assign_stop: 켬, assign_stop_at: 켬 ? new Date().toISOString() : null };
   try{ await ssend('staff?id=eq.' + encodeURIComponent(나.id), 'PATCH', 몸, 'return=minimal'); Object.assign(나, 몸); if(ME.id === 나.id) Object.assign(ME, 몸); toast(켬 ? '배정 정지했어요' : '다시 배정을 받아요'); render(); }
   catch(e){ toast('저장하지 못했어요 — ' + (e.message || '').slice(0, 60)); } }
+/* 고른 분들께 무료 PT 신청 링크 — 한 명씩 차례로(0.5초 간격) · 확인 창 한 번 · 30명까지 · 끝나면 몇 명 갔는지 (2026-10-26 대표 「20명 정도 다중선택하고 설문 발송해도 되나」) */
+async function 배정여럿보내기(){
+  const 목 = [...배정.고름].map(id => (배정.줄 || []).find(x => String(x.id) === id)).filter(Boolean);
+  if(!목.length) return toast('먼저 줄을 골라 주세요');
+  if(목.length > 30) return toast('한 번에 30명까지 보낼 수 있어요 · 지금 ' + 목.length + '명');
+  if(!await 묻기(목.length + '명에게 무료 PT 신청 링크를 보낼까요?' + String.fromCharCode(10) + '알림톡으로 나갑니다 · 이미 받았거나 신청한 분은 빼고 보냅니다')) return;
+  배정.보냄중 = true; render();
+  try{ const d = await crm('guide_resend_many', { ids: 목.map(x => x.id) });      /* 중앙 창구 한 번 — 같은 번호 한 통 · 빼는 기준은 서버 (2026-10-26 중앙) */
+    if(!d || d.ok === false) throw new Error((d && d.why) || '보내지 못했어요');
+    배정.보낸 = {}; (d.results || []).forEach(r => { 배정.보낸[String(r.id)] = { ok: !!r.ok, why: r.why || '' };
+      const x = 목.find(y => String(y.id) === String(r.id)); if(r.ok && x){ x.apply_sent_at = new Date().toISOString(); x.apply_sent_n = (+x.apply_sent_n || 0) + 1; 배정.고름.delete(String(x.id)); } });
+    toast((d.sent || 0) + '명에게 보냈어요' + (d.skipped ? ' · 안 보냄 ' + d.skipped + '명(줄 옆에 이유)' : '')); }
+  catch(e){ toast('보내지 못했어요 — ' + String(e.message || '').slice(0, 60)); }
+  배정.보냄중 = false; render();
+}
 async function 배정링크보내기(id){ const x = (배정.줄 || []).find(r => String(r.id) === String(id)); if(!x) return;
   if(!await 묻기(x.name + ' 님께 무료 PT 신청 링크를 ' + (x.apply_sent_at ? '다시 ' : '') + '보낼까요?' + String.fromCharCode(10) + '알림톡으로 나갑니다')) return;
   try{ const d = await crm('guide_resend', { lead_id: x.id }); if(d && d.ok === false) throw new Error(d.why || '보내지 못했어요');
@@ -13087,6 +13481,13 @@ async function txAct(a, el){
   if(a==='mread'){ const 나 = (ME && ME.name) || ''; if(!나 || (W.mread || []).some(x => x.manual_id === id && x.name === 나)) return;      /* 매뉴얼 읽었어요 */
     try{ await usend('tr_manual_read', 'POST', { manual_id: id, name: 나 }, 'return=minimal'); W.mread = (W.mread || []).concat([{ manual_id: id, name: 나, at: new Date().toISOString() }]); toast('읽었어요'); txView('manual', id); render(); }
     catch(e){ toast('저장하지 못했어요 — ' + (/tr_manual/.test(String(e.message)) ? '서버 준비(70단계)가 아직이에요' : String(e.message || '').slice(0, 60))); } return; }
+  if(a==='aspick'){ const id = String(k); 배정.고름.has(id) ? 배정.고름.delete(id) : 배정.고름.add(id); render(); return; }      /* 여러 명 고르기 (2026-10-26 대표 「다중선택」) */
+  if(a==='aspickall'){ const 보 = [...document.querySelectorAll('#body .as-tbl [data-act="tx:aspick"]')].map(b => String(b.dataset.k));
+    if(k === '0') 배정.고름.clear(); else if(el && el.classList.contains('on')) 보.forEach(id => 배정.고름.delete(id)); else 보.forEach(id => 배정.고름.add(id)); render(); return; }
+  if(a==='asvalid'){ 배정.g.유효 = !배정.g.유효; render(); return; }
+  if(a==='asbulk'){ await 배정여럿보내기(); return; }
+  if(/^g(chat|c)/.test(a) && await 챗손(a, k, el)) return;      /* 챗봇 (2026-10-26) */
+  if(a==='figk'){ S.figSel = S.figSel === k ? null : k; render(); return; }      /* 체형 한눈에 — 점 · 줄 누르면 그 항목 (앱과 같음) */
   if(a==='bodyt'){ S.bodyT = k; render(); return; }      /* 체형 탭 알약 인바디 | 체형분석 (2026-10-26) */
   if(a==='ibday'){ S.ibDay = k; render(); return; }      /* 그날 결과지 */
   if(a==='iball'){ S.ibAll = k === '1'; render(); return; }
@@ -13162,6 +13563,14 @@ async function txAct(a, el){
   if(a==='nmclose'){ 노션영상.재생.delete(k); render(); return; }      /* 재생 칸 접기 (2026-10-22) */
   if(a==='psave'){ await 매출고르기(k); return; }
   if(a==='pconf'){ await 매출바꿈(k, '확정'); return; }
+  if(a==='psnz' || a==='psnzoff'){ if(!매출관리자()) return toast('관리자만 미룰 수 있어요');
+    const g = 묶음of(k) || { 줄:[매출찾(k)].filter(Boolean) }; if(!g.줄.length) return;
+    const n = a === 'psnz' ? Math.round(+((document.getElementById('psn_' + k) || {}).value || 0)) : 0;
+    if(a === 'psnz' && !(n >= 1 && n <= 30)) return toast('1~30일 사이로 넣어 주세요');
+    const x = g.줄[0], 날 = a === 'psnz' ? 날더함(TODAY, n) : null;
+    if(!await 묻기((x.name || '') + ' · ' + 원(g.줄.reduce((s2, y) => s2 + (+y.amount || 0), 0)) + String.fromCharCode(10) + (날 ? n + '일 동안(' + (+날.slice(5, 7)) + '/' + (+날.slice(8)) + '까지) 매출 알림을 쉴까요?' + String.fromCharCode(10) + 'PT 매출 목록엔 그대로 남아요' : '매출 알림을 다시 켤까요?'))) return;
+    if(await 매출줄들고침(g.줄, { snooze_until: 날 }, '미룸', 날 ? n + '일 뒤 다시 알림' : '알림 다시 켬')){ toast(날 ? (+날.slice(5, 7)) + '/' + (+날.slice(8)) + '까지 알림을 쉬어요' : '알림을 다시 켰어요'); 매출다시(); }
+    return; }
   if(a==='pdel'){ await 매출바꿈(k, '삭제'); return; }
   if(a==='psback'){ await 매출바꿈(k, '되돌림'); return; }
   if(a==='psedit'){ 매출.고침 = 매출.고침 === k ? '' : k; 매출다시(); return; }      /* ⛔ 옛 이름 pedit 이 옆 판 속성 수정(tx:pedit)보다 먼저 받아 속성 칸이 안 눌렸다 (2026-10-26 대표 「공지 완료 작동 안 함」) */
@@ -14277,8 +14686,9 @@ function render(){
   if(typeof 회원판 !== 'undefined' && 회원판 && $('#pop').classList.contains('on')) 회원판그리기();
   if(typeof 지정판 !== 'undefined' && 지정판 && $('#pop').classList.contains('on')) 지정판그리기();
   /* 현황판 사이드 페이지 — 여기서 완료를 누르면 목록이 **그 자리에서** 줄어야 한다 */
-  if(typeof 현황판 !== 'undefined' && 현황판 && $('#pop').classList.contains('on')) 현황판그리기();
+  if(typeof 현황판 !== 'undefined' && 현황판 && $('#pop').classList.contains('on') && (!window.__현황머리 || 판머리 === window.__현황머리)){ 현황판그리기(); window.__현황머리 = 판머리; }      /* 현황판에서 연 다른 페이지 위에 현황판을 다시 그리지 않는다 (2026-10-26) */
   if(typeof 고른칸다시 === 'function') 고른칸다시();
+  if(typeof 챗그리기 === 'function' && ME && !document.querySelector('#gchat .gc-fab')){ 챗그리기(); 챗받기(); }      /* 챗봇 단추 — 처음 그릴 때 (2026-10-26) */
   return 났;
 }
 /* 칼로리 계산기 칸은 화면 아래 끝까지만 — 넘치면 「이전 · 다음」 단추가 화면 밖으로 밀린다 */
@@ -14446,7 +14856,7 @@ function popOpen(html){ if(typeof 판길 !== 'undefined' && !판되돌림){ 판�
   /* 모든 팝업에 ✕ (2026-10-26 대표 「모든 팝업에 x 버튼 추가」) — 「나중에」가 있으면 ✕ = 나중에(쉼을 기억) */
   const 나중 = (String(html).match(/data-act="(tx:[a-z]*later)"/) || [])[1];
   $('#popbox').innerHTML = '<button class="popx" data-act="' + (나중 || 'popclose') + '" title="닫기 (Esc)">✕</button>' + html;
-  $('#pop').classList.add('on'); $('#pop').classList.remove('tx-side','tx-wide'); }
+  $('#pop').classList.add('on'); $('#pop').classList.remove('tx-side','tx-wide','lite'); }      /* 흰 판(업무 · 상담 페이지)에서 남은 lite 를 지운다 — 팝업이 하얘졌다 까매졌다 (2026-10-26 대표) */
 /* 페이지는 오른쪽에서 나오는 판으로 — 전체화면 단추도 있다 (2026-09-08 대표 지시) */
 let 판머리 = '';
 /* ══ 판 뒤로가기 ══ 2026-10-22 대표 노션 「10월 22일 밤」 「뒤로가기가 없음 · 이런 부분들도 찾아서 뒤로가기 버튼이 있어야」
