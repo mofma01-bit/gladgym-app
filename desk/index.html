@@ -1293,6 +1293,8 @@ body.resizing{cursor:col-resize;user-select:none}
 .tx-cmt{display:flex;gap:9px;align-items:flex-start}
 .tx-cmt .b{flex:1;min-width:0;background:var(--dark-3);border-radius:0 11px 11px 11px;padding:8px 11px;font-size:13px;line-height:1.55;white-space:pre-wrap;word-break:break-word}
 .tx-cmt .m{font-size:12px;color:#7c766e;margin-top:3px}
+.callbar{display:flex;align-items:center;gap:8px;background:color-mix(in srgb,#40C1BD 12%,var(--dark-3));border:1px solid color-mix(in srgb,#40C1BD 40%,transparent);border-radius:10px;padding:7px 10px;margin-bottom:6px;font-size:13.5px}.callbar .btn{margin-left:auto}
+.callck{font-size:13px;color:var(--sub);margin-top:4px}.callck b{color:var(--teal)}
 .tx-cmt .m button{color:#7c766e;margin-left:6px}
 .tx-cmt .m button:hover{color:var(--warn)}
 .tx-cmtin{display:flex;gap:8px;align-items:flex-end}
@@ -1508,6 +1510,15 @@ body.resizing{cursor:col-resize;user-select:none}
 .sc-sec{display:flex;align-items:baseline;gap:8px;margin:6px 2px 8px}.sc-sec b{font-size:16px}.sc-sec span{color:var(--sub);font-size:14px;font-weight:700}.sc-sec.lk b{color:#b8a6e0}
 .sc-div{border:0;border-top:2px solid #6b6558;margin:18px 0 14px}      /* 락커 ↔ 매출 구분 선 (2026-10-26 대표 「구분 선 확실히 하나」) */
 .sc-chips{margin:0 0 10px}
+.sec.adm{border-radius:16px;padding:12px 12px 6px;background:color-mix(in srgb,var(--c) 7%,var(--dark-2));border:1px solid color-mix(in srgb,var(--c) 32%,transparent)}.sec.adm > .lbl{color:var(--cream);font-size:15px;font-weight:800}.sec.adm > .lbl .r{color:var(--c);cursor:pointer}
+.mcgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.mcard{display:flex;flex-direction:column;text-align:left;background:var(--dark-2);border:1px solid var(--line);border-radius:14px;overflow:hidden;color:var(--cream);font:inherit;cursor:pointer;padding:0}
+.mcard:hover{border-color:#5a4c33}.mc-im{position:relative;display:block;aspect-ratio:16/9;background:#1b1a17}.mc-im img{width:100%;height:100%;object-fit:cover}
+.mc-im i{position:absolute;inset:auto auto 8px 8px;font-style:normal;background:rgba(0,0,0,.65);color:#fff;border-radius:8px;padding:2px 8px;font-size:13px}
+.mc-im.ph{display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:900;color:#6f685c}
+.mc-t{display:flex;flex-direction:column;gap:3px;padding:10px 12px 12px}.mc-t b{font-size:15px}.mc-t small{font-size:13px;color:var(--sub)}
+.mc-t em{font-style:normal;font-size:12.5px;font-weight:800;color:var(--gold);align-self:flex-start;border-radius:999px;padding:1px 8px;background:rgba(240,211,160,.12)}.mc-t em.ok{color:var(--teal);background:rgba(143,209,196,.12)}
+.mrd{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.mrd .ok{color:var(--teal);font-weight:800}
 .pzlist{max-height:330px;overflow:auto;border:1px solid var(--line);border-radius:12px}
 .tx-auto{flex:none;margin-left:6px;font-size:12px;font-weight:800;color:var(--teal);border:1px solid #3c5a53;border-radius:999px;padding:0 7px;line-height:18px}
 /* 고르기 = 그림 카드 (2026-10-26 대표 「스트레칭 · 웨이트 이질감 없이」 · 앱 .megrp.pkg 와 같은 꼴) */
@@ -2357,6 +2368,9 @@ button.as-more{display:block;width:100%;background:none;border:0;color:var(--sub
     <button class="nav" data-v="assign">
       <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
       가이드 · 체험 배정</button>
+    <button class="nav" data-v="manual">
+      <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg>
+      매뉴얼</button>
     <button class="nav" data-v="voc">
       <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 13h5"/></svg>
       VOC</button>
@@ -2423,7 +2437,7 @@ button.as-more{display:block;width:100%;background:none;border:0;color:var(--sub
 
 <script>
 "use strict";
-const BUILD = '409';
+const BUILD = '413';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -2565,7 +2579,7 @@ const 보기읽기길 = /\/auth\/v1\/(token|user)|\/storage\/v1\/object\/sign\/|
         if(Date.now() - 보기누름 < 2500){ try{ toast('선생님 화면으로 보는 중이라 저장할 수 없어요'); }catch(e){} }
         return Promise.reject(new Error('보기만 하는 중')); } }
     return 원fetch(u, o); }; }              /* staff 행 {id,name,role,color,goal} */
-const W = { staff:[], tasks:[], leads:[], leave:[], voc:[], cm:[], cols:[], views:[], meta:[] };
+const W = { staff:[], tasks:[], leads:[], leave:[], voc:[], manual:[], mread:[], cm:[], ack:[], cols:[], views:[], meta:[] };
 /* ══ 등급 · 권한 표 ══ 2026-10-19 대표 「관리자 권한 마케팅 대시보드처럼 세분화 — 대표 / 최고 관리자 / 중간 관리자 / 트레이너 / 인턴 / FC」
    등급 = staff.grade(42단계 SQL) · 없으면 옛 role 로(admin → 최고관리자 · fc → FC · 그 밖 → 트레이너) · super = 대표자(늘 전부 · 잠김)
    권한 표 = desk_perm 한 줄(대표자만 바꿈) — 없거나 빈 칸은 아래 기본값. 화면에 보이는 이름은 등급과 따로: 대표자 · ○○ 트레이너(인턴 · FC 는 그 이름) */
@@ -2576,7 +2590,8 @@ const 권한줄 = [
   ['메뉴', 'home', '홈', '', [1, 1, 1, 1, 1], 'fix1'],
   ['메뉴', 'tasks', '업무', '', [1, 1, 1, 0, 1]],
   ['메뉴', 'leads', '상담', '', [1, 1, 1, 0, 1]],
-  ['메뉴', 'voc', 'VOC (고객 소리)', '', [1, 1, 0, 0, 0]],      /* 2026-10-26 대표 결정 n4 — 처음은 관리자 · 권한 설정에서 바꿈 */
+  ['메뉴', 'voc', 'VOC (고객 소리)', '', [1, 1, 0, 0, 0]],
+  ['메뉴', 'manual', '매뉴얼', '', [1, 1, 1, 1, 1]],      /* 2026-10-26 대표 결정 n2 — 모두 읽기 · 고치기는 표 관리 권한 */      /* 2026-10-26 대표 결정 n4 — 처음은 관리자 · 권한 설정에서 바꿈 */
   ['메뉴', 'assign', '가이드 · 체험 배정', '', [1, 1, 1, 0, 1]],
   ['메뉴', 'kcal', '칼로리 계산기', '', [1, 1, 1, 0, 1]],
   ['메뉴', 'leave', '연월차', '', [1, 1, 1, 0, 1]],
@@ -8927,11 +8942,36 @@ const 표정의 = {
     기본vis:'all',                                   /* 팀 캘린더에 서로 보이게 */
     달력:true,
     정렬: (a,b) => (a.day||'') > (b.day||'') ? -1 : 1,
-    행: r => ({ 제목: 사람(r.staff_id).name + ' · ' + r.kind + (r.days ? ' ('+r.days+'일)' : ''),
+    행: r => ({ 제목: (r.staff_id ? 사람(r.staff_id).name : '(퇴사) ' + ((r.extra || {}).n_staff || '')) + ' · ' + r.kind      /* 퇴사자 줄 = extra.n_staff (71단계 · 2026-10-26) */ + (r.days ? ' ('+r.days+'일)' : ''),
       칩: '<span class="tx-tag gold">'+날짜한글(r.day)+(r.day_end?' ~ '+날짜한글(r.day_end):'')+'</span>'
         + '<span class="tx-tag '+(r.status==='ok'?'teal':r.status==='no'?'warn':'')+'">'+({req:'신청',ok:'승인',no:'반려'}[r.status]||r.status)+'</span>'
         + (r.reason ? '<span>'+esc(r.reason)+'</span>' : ''),
       오른쪽: '', 체크:null }),      /* 이름은 제목에 있다 — 동그라미를 또 달지 않는다 (2026-10-20) */
+  },
+  /* 매뉴얼 — 업무 · 상담과 같은 표 · 보기만 카드 (2026-10-26 대표 결정 n2 「데이터 형식은 데이터베이스와 동일 · 보기만 카드 · 교육 영상 썸네일 · 보기 형식을 추가해서」)
+     파트 이름 · 값은 표에서 바꾼다(고르는 값 수정 · 속성 추가 · 보기 추가 = 표 관리 권한) */
+  manual: {
+    table:'tr_manual', 제목:'매뉴얼', 사람열:null, 제목열:'title',
+    열:[
+      {k:'title', 이름:'문서',      타입:'text', 필수:true},
+      {k:'part',  이름:'파트',      타입:'select', 옵션:['데스크','청소','PT','FC','응급','기타']},
+      {k:'video', 이름:'교육 영상', 타입:'url', 힌트:'유튜브 주소 — 카드에 썸네일'},
+      {k:'body',  이름:'내용',      타입:'long'},
+      {k:'done',  이름:'보관',      타입:'check'},
+    ],
+    보기:[
+      {k:'mall', 이름:'전체', 필터:r => !r.done, 모양:'card'},
+      {k:'m데스크', 이름:'데스크', 필터:r => !r.done && r.part === '데스크', 모양:'card'},
+      {k:'m청소', 이름:'청소', 필터:r => !r.done && r.part === '청소', 모양:'card'},
+      {k:'mPT', 이름:'PT', 필터:r => !r.done && r.part === 'PT', 모양:'card'},
+      {k:'mFC', 이름:'FC', 필터:r => !r.done && r.part === 'FC', 모양:'card'},
+      {k:'m응급', 이름:'응급', 필터:r => !r.done && r.part === '응급', 모양:'card'},
+      {k:'mkeep', 이름:'보관', 필터:r => !!r.done, 모양:'table'},
+    ],
+    템플릿:[],
+    기본vis:'all',
+    정렬: (a,b) => String(a.title || '').localeCompare(String(b.title || ''), 'ko'),
+    행: r => ({ 제목: r.title || '(제목 없음)', 칩: r.part ? '<span class="tx-tag">' + esc(r.part) + '</span>' : '', 오른쪽: '', 체크:null }),
   },
   /* VOC — 노션 고객소리함 칸 이름 그대로 (2026-10-26 대표 결정 n4 · 중앙 11:49 원문) · 접수 · 답 발송은 중앙(훅 · 18:00) · 데스크는 보고 답 · 메모를 씀 */
   voc: {
@@ -8965,7 +9005,7 @@ const 표정의 = {
       오른쪽: '', 체크:'done' }),
   },
 };
-const 표상태 = { voc:{보기:'vnew', 사람:null, q:'', 규칙:[], op:'and', 정렬:null, 그룹:null, 접힘:{}}, tasks:{보기:'mine', 사람:null, q:'', 규칙:[], op:'and', 정렬:null, 그룹:null, 접힘:{}},
+const 표상태 = { manual:{보기:'mall', 사람:null, q:'', 규칙:[], op:'and', 정렬:null, 그룹:null, 접힘:{}}, voc:{보기:'vnew', 사람:null, q:'', 규칙:[], op:'and', 정렬:null, 그룹:null, 접힘:{}}, tasks:{보기:'mine', 사람:null, q:'', 규칙:[], op:'and', 정렬:null, 그룹:null, 접힘:{}},
                   leads:{보기:'nmon', 사람:null, q:'', 규칙:[], op:'and', 정렬:null, 그룹:null, 접힘:{}},
                   leave:{보기:'week', 사람:null, q:'', 규칙:[], op:'and', 정렬:null, 그룹:null, 접힘:{}} };
 
@@ -9043,7 +9083,7 @@ function 보기들(key, 서버차례){
   const 덮 = {}; vs.forEach(v => { if(v.base) 덮[v.base] = v; });
   const 기본 = T.보기.map((b, i) => { const o = 덮[b.k] || {};
     return { k:b.k, 이름:o.name || b.이름, 필터:b.필터, sort:(o.sort != null ? o.sort : i),
-             규칙:o.id ? (o.rules||[]) : (b.규칙||[]).slice(), op:o.op||'and', ord:o.ord||b.ord||null, 모양:o.layout||null,
+             규칙:o.id ? (o.rules||[]) : (b.규칙||[]).slice(), op:o.op||'and', ord:o.ord||b.ord||null, 모양:o.layout||b.모양||null,
              고정:(o.frozen == null ? (b.고정 == null ? null : b.고정) : !!o.frozen), 그룹:o.grp||null, 필터고정:!!o.fixed,
              칸:o.cols || b.칸 || null, 숨김:!!o.hidden, 붙박이:true, 덮:o.id ? o : null }; });      /* b.칸 · b.ord · b.규칙 = 코드 기본(상담 노션 보기 · 2026-10-26) */
   const 내가만든 = vs.filter(v => !v.base).map(v => ({
@@ -9147,12 +9187,15 @@ async function loadWork(){
     uget('tr_views?select=*&order=sort').catch(()=>[]),
     uget('tr_meta?select=*').catch(()=>[]),
     모두가져('tr_voc?select=*&order=received_at.desc').catch(()=>[]),      /* VOC (67단계 전이면 빈 채로) */
+    uget('tr_call_ack?select=*&order=at.desc&limit=5000').catch(()=>[]),      /* 부르기 확인 (69단계 전이면 빈 채로) */
+    uget('tr_manual?select=*&order=created_at').catch(()=>[]),      /* 매뉴얼 (70단계 전이면 빈 채로) */
+    uget('tr_manual_read?select=*').catch(()=>[]),
   ]);
   W.staff = (g[0] || []).slice().sort((p, q) => 선생순(p.name, q.name)); W.tasks = g[1]; W.leads = (g[2] || []).filter(r => !(r.extra || {}).archived); W.leave = g[3]; W.cm = g[4] || [];      /* 숨긴 상담(extra.archived)은 목록 · 집계 · 검색에서 뺀다 (2026-10-25 · 노션 휴지통과 같은 뜻) */
   try{ const pp = await uget('desk_perm?select=perm&id=eq.main'); 권한값 = (pp && pp[0] && pp[0].perm) || {}; }catch(e){ 권한값 = {}; }      /* 42단계 SQL 전이면 기본값 */
-  if(진짜ME){ ['tasks', 'leads', 'leave', 'voc'].forEach(k => { W[k] = (W[k] || []).filter(보기보임); }); 보기끼움(); }      /* 선생님 계정으로 보기 — 서버 can_see 와 같은 규칙 */
+  if(진짜ME){ ['tasks', 'leads', 'leave', 'voc', 'manual'].forEach(k => { W[k] = (W[k] || []).filter(보기보임); }); 보기끼움(); }      /* 선생님 계정으로 보기 — 서버 can_see 와 같은 규칙 */
   try{ await 사진채우기(); }catch(e){}
-  W.cols = g[5] || []; W.views = g[6] || []; W.meta = g[7] || []; W.voc = g[8] || [];
+  W.cols = g[5] || []; W.views = g[6] || []; W.meta = g[7] || []; W.voc = g[8] || []; W.ack = g[9] || []; W.manual = g[10] || []; W.mread = g[11] || [];
   /* 보기에 담긴 조건·정렬·그룹을 화면에 얹는다 — 없으면 빈 채로 */
   try{ Object.keys(표정의).forEach(k => 보기얹기(k)); }catch(e){}
 }
@@ -9281,8 +9324,8 @@ function txList(key){
   if(고른행.key === key) 고른행.ids = 고른행.ids.filter(id => 보인행[key].indexOf(id) >= 0);
   if(!rows.length) return 보기줄 + 거름줄 + 달력 + '<div class="empty">결과 없음</div>'
     + '<button class="tx-newrow one" data-act="tx:rownew" data-k="'+key+'">＋ 새 '+표정의[key].제목+'</button>';
-  const 표다 = 모양(key) === 'table';
-  const 그릴 = 줄 => 표다 ? txTable(key, 줄)
+  const 표다 = 모양(key) === 'table', 카드다 = 모양(key) === 'card';
+  const 그릴 = 줄 => 카드다 ? 카드보기(key, 줄) : 표다 ? txTable(key, 줄)
                     : '<div class="tx-list">' + 줄.map(r => txRow(key, r, true)).join('') + '</div>';
   if(st.그룹){                                        /* 그룹 묶기 */
     const c = 열들(key).find(z => z.k === st.그룹);
@@ -9454,6 +9497,24 @@ function 얼렸나(key){
   const v = 지금보기(key);
   return (v && v.고정 != null) ? !!v.고정 : true;               /* 담긴 게 없으면 고정 */
 }
+/* 카드 보기 (2026-10-26 대표 n2 「보기만 카드 형식 · 교육 영상은 썸네일」) — 어느 표에서든 레이아웃 「카드」 */
+const 유튜브id = u => { const m = String(u || '').match(/(?:youtu\.be\/|v=|shorts\/|embed\/)([\w-]{11})/); return m ? m[1] : ''; };
+function 카드썸네일(key, r){
+  const y = 유튜브id(r.video); if(y) return '<span class="mc-im"><img src="https://img.youtube.com/vi/' + y + '/hqdefault.jpg" alt="" loading="lazy"><i>▶</i></span>';
+  let b = null; try{ b = JSON.parse(r.body || r.content || 'null'); }catch(e){}
+  const 그 = b && Array.isArray(b.b) && b.b.find(x => x && x.t === 'img' && x.path); const u = 그 ? media(그.path) : '';
+  return u ? '<span class="mc-im"><img src="' + esc(u) + '" alt="" loading="lazy"></span>' : '<span class="mc-im ph">' + esc(String((표정의[key].행(r).제목 || '?')).slice(0, 1)) + '</span>'; }
+function 카드보기(key, 줄){
+  const 사람수 = (W.staff || []).filter(p => p.active !== false).length;
+  return '<div class="mcgrid">' + 줄.map(r => { const 읽 = key === 'manual' ? (W.mread || []).filter(x => x.manual_id === r.id).length : -1, 행 = 표정의[key].행(r);
+    return '<button class="mcard" data-act="tx:open" data-k="' + key + '" data-id="' + esc(r.id) + '">' + 카드썸네일(key, r)
+      + '<span class="mc-t"><b>' + esc(행.제목) + '</b><small>' + (r.part ? esc(r.part) + ' · ' : '') + esc(시각한글(r.updated_at || r.created_at)) + '</small>'
+      + (읽 >= 0 ? '<em class="' + (읽 >= 사람수 ? 'ok' : '') + '">' + (읽 >= 사람수 ? '모두 읽음' : '읽음 ' + 읽 + ' / ' + 사람수) + '</em>' : '') + '</span></button>'; }).join('') + '</div>'; }
+function 매뉴얼읽음칸(r){
+  const 나 = (ME && ME.name) || '', L = (W.mread || []).filter(x => x.manual_id === r.id), 내 = L.find(x => x.name === 나);
+  const 안 = (W.staff || []).filter(p => p.active !== false && p.name && !L.some(x => x.name === p.name)).map(p => p.name);
+  return '<div class="tx-sec mrd">' + (내 ? '<span class="ok">✓ 읽었어요 · ' + esc(시각한글(내.at)) + '</span>' : '<button class="btn gold sm" data-act="tx:mread" data-id="' + esc(r.id) + '">읽었어요</button>')
+    + '<small class="sub3">읽음 ' + L.length + '명' + (안.length ? ' · 아직 ' + esc(안.join(' · ')) : ' · 모두 읽음') + '</small></div>'; }
 function 모양(key){
   const t = 표모양[모양키(key)];
   if(t) return t;
@@ -9721,7 +9782,7 @@ async function 칸되돌리기(앞){ const 목 = 앞 ? 다시함 : 되돌림, �
 document.addEventListener('keydown', function(e){
   if(!(e.ctrlKey || e.metaKey) || 칸편집) return;
   const t = e.target; if(t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;      /* 글칸 안에서는 브라우저 것 */
-  if(!['tasks', 'leads', 'leave', 'voc'].includes(S.view)) return;
+  if(!['tasks', 'leads', 'leave', 'voc', 'manual'].includes(S.view)) return;
   const 키 = String(e.key || '').toLowerCase();
   if(키 === 'z' && !e.shiftKey){ e.preventDefault(); 칸되돌리기(false); return; }
   if(키 === 'y' || (키 === 'z' && e.shiftKey)){ e.preventDefault(); 칸되돌리기(true); return; }
@@ -9896,7 +9957,7 @@ function 보기설정창(key){
   const 줄 = (act, 이름, 값, 막) => '<button class="tx-vsr'+(막?' off':'')+'" data-act="tx:'+act+'" data-k="'+key+'"'+(act==='vname' ? ' data-v2="'+esc(v.k)+'"' : '')+'><span>'+이름+'</span><em>'+(값||'')+(막?' 🔒':' ›')+'</em></button>';
   작은판(key, '보기 설정 · ' + esc(v ? v.이름 : ''),
     (표권 ? 줄('vname', '이름', esc(v.이름)) : '')
-    + '<button class="tx-vsr" data-act="tx:layout" data-k="'+key+'"><span>레이아웃</span><em>'+(모양(key)==='table' ? '표' : '목록')+' ›</em></button>'
+    + '<button class="tx-vsr" data-act="tx:layout" data-k="'+key+'"><span>레이아웃</span><em>'+({ table:'표', list:'목록', card:'카드' }[모양(key)] || '표')+' ›</em></button>'
     + 줄('vcols', '이 보기의 항목', 표칸들(key).length + '개')
     + 줄('fnew', '필터', (st.규칙||[]).length ? (st.규칙||[]).length + '개' : '', 고)
     + 줄('sortmenu', '정렬', 순, 고)
@@ -10114,10 +10175,17 @@ function 나부른댓글(){
 }
 const 부름상태 = () => { const b = ((ME && ME.home) || {}).부름 || {};
   return { 본때: b.본때 || null, 읽음: b.읽음 || [] }; };
+/* 부르기 확인 (2026-10-26 대표 결정 n3) — 「확인했어요」를 누를 때만 사라진다 · 열기 · 닫기로는 안 사라짐 · 누가 확인했는지는 tr_call_ack(69단계) */
+const 확인한 = (cid, 이름) => (W.ack || []).some(a => a.comment_id === cid && a.name === 이름);
+const 불린사람 = c => (W.staff || []).filter(x => x.name && String(c.body || '').indexOf('@' + x.name) >= 0).map(x => x.name);
 function 안읽은부름(){
-  const { 본때, 읽음 } = 부름상태();
-  return 나부른댓글().filter(c =>
-    (!본때 || (c.created_at || '') > 본때) && 읽음.indexOf(c.id) < 0);
+  const { 본때 } = 부름상태(), 나 = (ME && ME.name) || '';
+  return 나부른댓글().filter(c => (!본때 || (c.created_at || '') > 본때) && !확인한(c.id, 나));
+}
+async function 부름확인(cid){
+  const 나 = (ME && ME.name) || ''; if(!나 || 확인한(cid, 나)) return;
+  try{ await usend('tr_call_ack', 'POST', { comment_id: cid, name: 나 }, 'return=minimal'); W.ack = (W.ack || []).concat([{ comment_id: cid, name: 나, at: new Date().toISOString() }]); toast('확인했어요'); }
+  catch(e){ toast('확인하지 못했어요 — ' + (/tr_call_ack/.test(String(e.message)) ? '서버 준비(69단계)가 아직이에요' : String(e.message || '').slice(0, 60))); }
 }
 async function 부름읽음(id){
   const b = 부름상태();
@@ -10146,7 +10214,7 @@ function txCal(key, rows){
         const 것 = 전체.filter(r => r.day<=k && (r.day_end||r.day)>=k);
         return '<div class="tx-cd '+(d.getMonth()!==m?'dim':'')+(k===TODAY?' today':'')+(d.getDay()===0?' sun':d.getDay()===6?' sat':'')+'"><span class="d">'+d.getDate()+'</span>'
           + (대청소날(+k.slice(0, 4)).indexOf(k) >= 0 ? '<span class="lv big" title="분기 대청소 · 다 같이">대청소 14시</span>' : '')      /* 분기 대청소 (2026-10-21 대표 「달력에도 표시」) */
-          + 것.map(r=>'<span class="lv '+esc(r.status)+'" data-kind="'+esc(r.kind||'')+'" data-act="tx:open" data-k="'+key+'" data-id="'+r.id+'">'+esc(사람(r.staff_id).name.slice(-2))+' '+esc(r.kind)+'</span>').join('') + '</div>'; }).join('')
+          + 것.map(r=>'<span class="lv '+esc(r.status)+'" data-kind="'+esc(r.kind||'')+'" data-act="tx:open" data-k="'+key+'" data-id="'+r.id+'">'+esc((r.staff_id ? 사람(r.staff_id).name : ((r.extra || {}).n_staff || '퇴사')).slice(-2))+' '+esc(r.kind)+'</span>').join('') + '</div>'; }).join('')
     + '</div></div>';
 }
 
@@ -10243,10 +10311,15 @@ function 첨부칸(key, r, 편집, urls){
 function 댓글칸(key, id){
   const T = 표정의[key];
   const cs = W.cm.filter(c => c.tbl===T.table && c.row_id===id);
-  return '<div class="tx-cmts" id="txcmts">' + (cs.length ? cs.map(c => '<div class="tx-cmt">'
-      + '<div><div class="b">'+본문렌더(c.body)+'</div><div class="m">'+이름딱지(c.created_by)+' · '+시각한글(c.created_at)
+  const 나 = (ME && ME.name) || '';
+  return '<div class="tx-cmts" id="txcmts" data-k="' + key + '" data-id="' + esc(id) + '">' + (cs.length ? cs.map(c => { const 불 = 불린사람(c);
+      return '<div class="tx-cmt">'
+      + '<div style="flex:1;min-width:0">' + (불.indexOf(나) >= 0 && c.created_by !== (ME && ME.id) && !확인한(c.id, 나) ? '<div class="callbar"><b>' + esc((사람(c.created_by) || {}).name || '') + '님이 불렀어요</b><button class="btn gold sm" data-act="tx:callok" data-v2="' + esc(c.id) + '">확인했어요</button></div>' : '')
+      + '<div class="b">'+본문렌더(c.body)+'</div>'
+      + (불.length ? '<div class="callck">' + 불.map(n => { const a = (W.ack || []).find(x => x.comment_id === c.id && x.name === n); return a ? '<b>✓ ' + esc(n) + ' ' + esc(시각한글(a.at)) + ' 확인</b>' : esc(n) + ' 아직'; }).join(' · ') + '</div>' : '')
+      + '<div class="m">'+이름딱지(c.created_by)+' · '+시각한글(c.created_at)
       + ((할수('otheredit') || c.created_by===(ME&&ME.id)) ? '<button data-act="tx:pgcmdel" data-id="'+c.id+'">삭제</button>' : '')
-      + '</div></div></div>').join('') : '<div class="tx-meta">댓글 없음</div>')
+      + '</div></div></div>'; }).join('') : '<div class="tx-meta">댓글 없음</div>')
     + '</div>'
     /* 부르기 — 누르면 `@이름` 이 들어간다. 부른 사람의 현황판에 뜬다 (2026-09-29 대표) */
     + '<div class="tx-at"><span class="k">부르기</span>'
@@ -10344,7 +10417,8 @@ async function 옵색저장(빼기){
 const 칸색없음 = c => !!(c && c.색표 && c.색표['__없음']);
 const 사람칩 = (c, id) => 칸색없음(c) ? '<span class="tx-nm" title="' + esc(사람(id).name || '') + '">' + esc(보임이름(사람(id).name) || '?') + '</span>' : 이름딱지(id);
 /* 업무 담당 — 노션에서 옮긴 퇴사자 이름(extra.n_owner · 64 · 65단계) · 대표가 ✕ 로 지우면 사라짐 (2026-10-25 대표 d2) */
-const 퇴사담당칩 = (c, r) => { const L = c && c.k === 'owners' && r && r.extra && Array.isArray(r.extra.n_owner) ? r.extra.n_owner : [];
+const 퇴사담당칩 = (c, r) => { if(c && c.k === 'staff_id' && r && !r.staff_id && r.extra && r.extra.n_staff) return '<span class="tx-tag ret">(퇴사) ' + esc(r.extra.n_staff) + '</span>';      /* 연월차 퇴사자 (2026-10-26) */
+  const L = c && c.k === 'owners' && r && r.extra && Array.isArray(r.extra.n_owner) ? r.extra.n_owner : [];
   return L.map(n => '<span class="tx-tag ret">(퇴사) ' + esc(n) + (할수('table') ? '<button data-act="tx:retdel" data-id="' + esc(r.id) + '" data-v2="' + esc(n) + '" title="지우기">✕</button>' : '') + '</span>').join(''); };
 function 속성값보기(c, r){
   const v = c.늘림 ? (r.extra||{})[c.k.slice(6)] : r[c.k];
@@ -10668,7 +10742,7 @@ async function txView(key, id){
     + 속성줄들(key, r, 편집)
     + (본문키 ? '<div class="tx-sec" id="txbwrap">'+블록들(bs, 편집, urlmap)+'</div>' : '')
     + 긴열.slice(1).map(c => '<div class="tx-sec"><div class="lbl">'+c.이름+'</div><div class="tx-body">'+링크살리기((c.늘림 ? (r.extra||{})[c.k.slice(6)] : r[c.k])||'')+'</div></div>').join('')
-    + (key === 'leads' ? 상담1차칸(r, 편집) : '')
+    + (key === 'leads' ? 상담1차칸(r, 편집) : '') + (key === 'manual' ? 매뉴얼읽음칸(r) : '')
     + ((r.files||[]).length ? '<div class="tx-sec"><div class="lbl">파일과 미디어</div>'+첨부칸(key, r, 편집, urls)+'</div>' : '')
     + (key === 'leads' && (r.extra || {}).transcript ? '<details class="tx-sec tx-tr"><summary class="lbl">통화 원문</summary><div class="tx-body">' + esc(String(r.extra.transcript)).replace(/\n/g, '<br>') + '</div></details>' : '')
     + '<div class="tx-sec"><div class="lbl">댓글 '+(댓글수(key,id)||'')+'</div>'+댓글칸(key, id)+'</div>'
@@ -11548,7 +11622,7 @@ function vHome(){
     leave:  () => '<div class="tx-home one">'
       + 섹('이번 주 연월차'+(대기?' <span class="tx-tag warn">승인 대기 '+대기+'</span>':''), 'leave', 이번주, '이번 주는 없어요')
       + '</div>',
-    today:  () => vToday(),
+    today:  () => (전체봄() && !진짜ME) ? v관리자할것() : vToday(),      /* 홈 — 대표 · 지점장(센터 전체)은 「처리할 것」 (2026-10-26 n5 A) · 수업 기록 화면은 그대로 */
     booking: () => 예약률카드(),
     supply: () => (대표인가() || 요청.없음) ? 비품카드() : 비품요청카드(),      /* 비품 — 대표 = 현황 카드 + 요청 · 그 밖 = 큰 요청 단추 (2026-10-21 대표) */
     clean: () => 청소카드(),      /* 오늘 내 청소 — 체크박스만 (2026-10-21 대표) */
@@ -11855,9 +11929,9 @@ function 현황판그리기(){
         + ' <span class="t2" style="display:inline">· ' + 어디 + '</span></div>'
       + '<div class="t2" style="margin-top:4px">' + 본문렌더(c.body) + '</div>'
       + '<div class="t2" style="opacity:.6;margin-top:3px">' + 시각한글(c.created_at) + '</div></div>'
-      + (r ? '<button class="btn gold sm" data-act="tx:cmgo" data-k="' + key + '" data-id="' + esc(c.row_id)
+      + (r ? '<button class="btn ghost sm" data-act="tx:cmgo" data-k="' + key + '" data-id="' + esc(c.row_id)
              + '" data-v2="' + esc(c.id) + '">열기 ›</button>'
-           : '<span class="tag warn">삭제된 줄</span>') + '</div>'; }).join('');
+           : '<span class="tag warn">삭제된 줄</span>') + '<button class="btn gold sm" data-act="tx:callok" data-v2="' + esc(c.id) + '" style="margin-left:6px">확인했어요</button></div>'; }).join('');
 
   /* 리포트 발송 실패 — 왜 못 갔는지 보이고, 그 자리에서 다시 넣는다 */
   else if(k === '실패') 속 = 목.map(r =>
@@ -12762,6 +12836,11 @@ async function txAct(a, el){
   if(a==='lspc'){ 기록회원.칩 = k; const c = $('#lspcs'), l = $('#lspl'); if(c) c.innerHTML = 기록회원칩(); if(l) l.innerHTML = 기록회원줄(); return; }
   if(a==='ckt'){ S.ckt = k || ''; render(); return; }      /* 점검 — 주간 · 예약 점검 */
   if(a==='wkwk'){ 예약점검.주 = k || ''; render(); return; }
+  if(a==='admopen'){ 가기(k); if(id) txView(k, id); return; }      /* 관리자 홈 카드 줄 → 그 페이지 */
+  if(a==='admgo'){ 가기(k); return; }
+  if(a==='mread'){ const 나 = (ME && ME.name) || ''; if(!나 || (W.mread || []).some(x => x.manual_id === id && x.name === 나)) return;      /* 매뉴얼 읽었어요 */
+    try{ await usend('tr_manual_read', 'POST', { manual_id: id, name: 나 }, 'return=minimal'); W.mread = (W.mread || []).concat([{ manual_id: id, name: 나, at: new Date().toISOString() }]); toast('읽었어요'); txView('manual', id); render(); }
+    catch(e){ toast('저장하지 못했어요 — ' + (/tr_manual/.test(String(e.message)) ? '서버 준비(70단계)가 아직이에요' : String(e.message || '').slice(0, 60))); } return; }
   if(a==='lsgorec'){ if(AUTH && AUTH.token){ 앱기록창(k); 쪽지닫기(); } else { 쪽지닫기(); 회원판열기(k); } return; }      /* 회원 검색 · 오늘 예약 → 바로 기록 */
   if(a==='arclose'){ 앱기록닫기(); if(S.mid) loadMember(S.mid); return; }
   if(a==='mrpt'){ if(!k) return toast('아직 리포트가 없어요'); 앱기록창(S.mid, k); return; }      /* 리포트 보기 = 앱 리포트 화면 그대로 (C-4) */
@@ -13111,7 +13190,7 @@ async function txAct(a, el){
     if(칸안편집(k, id3, v2, el)) return;
     속성편집(k, id3, v2, el); return; }
   if(a==='layout'){ if(!바꿀수있나(k)) return toast('잠겨 있어요. 자물쇠를 풀어 주세요');
-    표모양[모양키(k)] = 모양(k)==='table' ? 'list' : 'table'; 표모양저장();
+    표모양[모양키(k)] = ({ table:'list', list:'card', card:'table' })[모양(k)] || 'table'; 표모양저장();      /* 표 → 목록 → 카드 (2026-10-26 카드 보기) */
     render(); return; }
   if(a==='freeze'){ if(!바꿀수있나(k)) return toast('잠겨 있어요. 자물쇠를 풀어 주세요');
     const 새 = !얼렸나(k); 표얼림[모양키(k)] = 새; 표얼림저장(); popClose();
@@ -13338,7 +13417,8 @@ async function txAct(a, el){
   if(a==='numopen'){ 현황판열기(v2); return; }
   if(a==='numgo'){ const f = 현황길[v2]; popClose(); if(f) f(); return; }
   /* 부름 — 줄을 열면 **그 하나는 읽음**이 된다 */
-  if(a==='cmgo'){ 현황판 = null; await 부름읽음(v2); await txView(k, id); return; }
+  if(a==='cmgo'){ 현황판 = null; await txView(k, id); return; }      /* 열기만 — 「확인했어요」를 눌러야 사라진다 (2026-10-26 n3) */
+  if(a==='callok'){ await 부름확인(v2); const p = $('#txcmts'); if(p && p.dataset.k){ const t = document.createElement('div'); t.innerHTML = 댓글칸(p.dataset.k, p.dataset.id); const n = t.querySelector('#txcmts'); if(n) p.replaceWith(n); } else if(현황판) 현황판열기(현황판); return; }
   if(a==='cmallread'){ await 부름모두읽음(); 현황판그리기(); return; }
   /* 연월차 승인·반려 — 그 자리에서 끝낸다 */
   if(a==='lvok' || a==='lvno'){
@@ -13709,6 +13789,23 @@ function 몇줄(키, 제목, 줄들, 빈){ 홈목록[키] = { 제목, 줄들 }; 
   return 줄들.slice(0, n).join('') + (줄들.length > 5 ? '<div class="hmore">'
     + (n > 5 ? '<button class="btn ghost sm" data-act="tx:hless" data-k="' + 키 + '">접기</button>' : '') + (남 > 0 ? '<button class="btn ghost sm" data-act="tx:hmore" data-k="' + 키 + '">더보기 <b>' + Math.min(5, 남) + '</b></button>' : '')
     + '<button class="btn ghost sm" data-act="tx:hall" data-k="' + 키 + '">전체 보기 ' + 줄들.length + ' ›</button></div>' : ''); }
+/* 관리자 홈 「처리할 것」 (2026-10-26 대표 결정 n5 A · 「무조건 바꾸기보다 보기 편하고 관리하기 쉽게」) — 트레이너 홈은 그대로 */
+function 재등록임박(){ const 끝선 = (d => { d.setDate(d.getDate() + 14); return d.toISOString().slice(0, 10); })(new Date(TODAY + 'T12:00:00'));
+  return (D.m || []).filter(m => (m.role || 'member') === 'member').map(m => ({ m, x: 잔여of(m) })).filter(o => o.x && o.x['갈래'] === 'PT회원' && o.x['상태'] !== '종료')
+    .map(o => ({ m: o.m, 남: (+o.x['정규'] || 0) + (+o.x['서비스'] || 0), 끝: String(o.x['끝날'] || o.x['만료'] || '').slice(0, 10) }))
+    .filter(o => o.남 <= 2 || (o.끝 && o.끝 >= TODAY && o.끝 <= 끝선)).sort((a, b) => a.남 - b.남 || String(a.끝 || '9').localeCompare(String(b.끝 || '9'))); }
+function v관리자할것(){
+  const voc = (W.voc || []).filter(r => !r.done && (r.status || '대기') === '대기').sort((a, b) => String(b.received_at || '').localeCompare(String(a.received_at || '')));
+  const 상 = (W.leads || []).filter(r => !r.done && !r.reg && String(r.created_at || '').slice(0, 7) === TODAY.slice(0, 7));
+  const 재 = 재등록임박();
+  const 카드 = (c, k, 제목, 줄들, 빈, 전체) => '<div class="sec adm" style="--c:' + c + '"><div class="lbl">' + 제목 + ' ' + 줄들.length + '건' + (전체 ? '<span class="r" data-act="tx:admgo" data-k="' + 전체 + '">전체 ›</span>' : '') + '</div>'
+    + 몇줄(k, 제목, 줄들, '<div class="empty why"><b>없음 👍</b>처리할 것이 없습니다</div>') + '</div>';
+  return '<div class="cols3">'
+    + 카드('#40C1BD', 'voc', 'VOC 새 글', voc.map(r => '<button class="card click rowc" data-act="tx:admopen" data-k="voc" data-id="' + esc(r.id) + '"><div><div class="t1">' + esc(r.summary || '(요약 없음)') + '</div><div class="t2">' + esc(시각한글(r.received_at)) + (r.cat ? ' · ' + esc(r.cat) : '') + '</div></div>' + (r.urgency === '높음' ? '<span class="tag gold">긴급</span>' : '') + '</button>'), '', 'voc')
+    + 카드('#CC8552', '상담미', '상담 미처리', 상.map(r => '<button class="card click rowc" data-act="tx:admopen" data-k="leads" data-id="' + esc(r.id) + '"><div><div class="t1">' + esc(r.name || '이름 없음') + '</div><div class="t2">' + esc((r.channels || []).join(' · ') || '상담') + (r.at ? ' · 예약 ' + esc(시각한글(r.at)) : '') + ' · 등록여부 빈 칸</div></div></button>'), '', 'leads')
+    + 카드('#A8A2E1', '재등록', '재등록 임박', 재.map(o => '<button class="card click rowc" data-m="' + esc(o.m.id) + '"><div><div class="t1">' + esc(o.m.name || '') + '</div><div class="t2">PT 남은 ' + o.남 + '회' + (o.끝 ? ' · ' + esc(o.끝.slice(5).replace('-', '/')) + ' 끝' : '') + ' · 담당 ' + esc(o.m.trainer || '없음') + '</div></div><span class="rt">›</span></button>'), '', '')
+    + '</div>';
+}
 function vToday(){
   const mine = m => S.who==='전체' || (memOf(m).trainer||'')===S.who;
   const 오늘운동 = D.w.filter(w=>w.on_date===TODAY && mine(w.member_id));
