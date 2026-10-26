@@ -1501,6 +1501,13 @@ body.resizing{cursor:col-resize;user-select:none}
 .pzbox{width:min(980px,100%);max-height:calc(100vh - 48px);display:flex;flex-direction:column;border-radius:18px;border:1px solid #4a3f2a;background:linear-gradient(180deg,#201f1c,#161514)}
 .pzhd,.pzft{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line)}.pzhd b{flex:1;font-size:16px}.pzft{border-bottom:0;border-top:1px solid var(--line)}
 .pzbody{display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:16px 18px;overflow:auto}.pzcol{min-width:0;display:flex;flex-direction:column;gap:6px}
+.wkcard{padding:14px 16px;margin-bottom:12px}.wkh{font-size:16px;font-weight:800;margin-bottom:4px}
+.wktb{width:100%;border-collapse:collapse;font-size:14px}.wktb th{font-size:13px;color:var(--sub);font-weight:600;text-align:left;padding:6px 6px;border-bottom:1px solid var(--line)}
+.wktb td{padding:7px 6px;border-bottom:1px solid #2a2a26;vertical-align:top}.wktb td.wkn{white-space:nowrap}.wktb td.wkin{min-width:220px}.wktb td.wkin small{display:block;margin-top:2px}
+.wkm{display:grid;gap:4px;padding:8px 0;border-top:1px solid #2a2a26}.wkm:first-of-type{border-top:0}
+.sc-sec{display:flex;align-items:baseline;gap:8px;margin:6px 2px 8px}.sc-sec b{font-size:16px}.sc-sec span{color:var(--sub);font-size:14px;font-weight:700}.sc-sec.lk b{color:#b8a6e0}
+.sc-div{border:0;border-top:2px solid #6b6558;margin:18px 0 14px}      /* 락커 ↔ 매출 구분 선 (2026-10-26 대표 「구분 선 확실히 하나」) */
+.sc-chips{margin:0 0 10px}
 .pzlist{max-height:330px;overflow:auto;border:1px solid var(--line);border-radius:12px}
 .tx-auto{flex:none;margin-left:6px;font-size:12px;font-weight:800;color:var(--teal);border:1px solid #3c5a53;border-radius:999px;padding:0 7px;line-height:18px}
 /* 고르기 = 그림 카드 (2026-10-26 대표 「스트레칭 · 웨이트 이질감 없이」 · 앱 .megrp.pkg 와 같은 꼴) */
@@ -2416,7 +2423,7 @@ button.as-more{display:block;width:100%;background:none;border:0;color:var(--sub
 
 <script>
 "use strict";
-const BUILD = '407';
+const BUILD = '409';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -4740,7 +4747,8 @@ function 입력할것카드(mid){ if(memOf(mid).role === 'trainer') return '';  
   const o = 입력할것(mid); if(!o || !o.length) return '';
   return '<div class="card mvtodo"><div class="th"><h3>입력할 것</h3><b>' + o.length + '개</b><small>다 채우면 이 칸은 사라집니다</small></div><div class="tg">'
     + o.map(x => '<button class="ti" data-act="todo" data-k="' + x[0] + '"><span class="n">' + x[1] + '</span><span class="s">' + x[2] + '</span><span class="go">' + esc(x[3]) + ' ›</span></button>').join('') + '</div></div>'; }
-function tabStat(){
+function tabStat(){ return 회원점검칸(memOf(S.mid)) + tabStat0(); }      /* 예약 점검 기록 맨 위 (2026-10-26 w1u 「회원 자료는 하나 · 연동」) */
+function tabStat0(){
   /* ⛔ 「자료가 없다」를 「아직 받는 중」으로 보지 않는다 — 막 추가한 회원은 기록이 하나도 없어 「불러오는 중」이 끝없이 돌았다 (2026-10-12) */
   if(M.ok !== S.mid && !M.plan && !M.wi.length && !M.meals.length) return '<div class="empty">불러오는 중…</div>';
   /* 2026-10-12 대표 「상단에 지금 수정된 게 항상 떠 있고 · 현황에는 어떤 내용을 담을 건지 · 8주로」 — 요약 줄 = 지금의 숫자 / 현황 탭 = 흐름.
@@ -6518,6 +6526,67 @@ function 점검카드(제목, 덧, 나, 최저, 최고, goal, 나이름, 보류,
     + 점검막대(나, 최저, 최고, goal, 나이름)
     + (flag ? '<div class="ck-flag">🔴 최근 3명이 연달아 다시 등록하지 않았어요 — 상담 방식을 점검해 보세요</div>' : '') + '</div>';
 }
+/* ══ 금요일 주간 예약 점검 ══ 2026-10-26 대표 결정 w1 · w1u — 표 tr_weekcheck(68단계 · 중앙이 금 11:00 에 넣음)
+   ⭐ 회원 한 사람 줄 = 한 행. 여기서 적어도 회원 페이지 「현황」에서 적어도 같은 행 · 칸 이름 = 지침 주간_예약점검.md §3 */
+const 예약점검 = { 줄:null, 중:false, 왜:'', 주:'', 때:0 };
+const 점검갈래 = [['첫 수업 대기', '🆕'], ['잠수 의심', '💤'], ['관리 필요', '🟠']];
+async function 예약점검받기(다시){
+  if(예약점검.중 || (예약점검.줄 && !다시 && Date.now() - 예약점검.때 < 5 * 60 * 1000)) return; 예약점검.중 = true;
+  try{ 예약점검.줄 = await uget('tr_weekcheck?select=*&week=gte.' + (d => { d.setDate(d.getDate() - 63); return d.toISOString().slice(0, 10); })(new Date(TODAY + 'T12:00:00')) + '&order=week.desc,trainer,grp,name&limit=3000'); 예약점검.왜 = ''; }
+  catch(e){ 예약점검.줄 = 예약점검.줄 || []; 예약점검.왜 = /tr_weekcheck/.test(String(e.message)) ? '서버 준비(68단계)가 아직이에요' : String(e.message || '').slice(0, 60); }
+  예약점검.중 = false; 예약점검.때 = Date.now(); if(S.view === 'check' && S.ckt === 'wk') render(); if(회원판) 회원판그리기(); }
+const 점검회원줄 = m => (예약점검.줄 || []).filter(r => r.member_id ? r.member_id === m.id : (r.name === m.name && (!r.phone4 || r.phone4 === m.phone4)));
+function 예약점검칸(r, 지점장칸){      /* 한 줄 — 회원 · 남은 · 4주 · 마지막 · 사유·조치 · (지점장) · 지난주 */
+  const 내것 = 전체봄() || r.trainer === 나이름(), 끝 = r.grp === '기간 끝남', x = r.extra || {};
+  return '<tr data-wid="' + esc(r.id) + '"><td class="wkn"><b>' + esc(r.name) + '</b><span class="sub3"> ···' + esc(r.phone4 || '') + '</span></td>'
+    + (끝 ? '<td>' + esc(x['담당추정'] || '') + '</td><td>' + esc(x['수업권'] || '') + '</td><td>' + esc(x['기간끝'] || '') + '</td>'
+         : '<td>' + esc(r.remain || '') + '</td><td>' + esc(r.four_wk || '') + '</td><td>' + esc(r.last || '') + '</td>')
+    + '<td class="wkin"><input class="inp sm" data-wkf="note" data-wid="' + esc(r.id) + '" value="' + esc(r.note || '') + '" placeholder="' + (끝 ? '비고' : '예) 연락 안 됨 · 9/28 다시 전화') + '"' + (내것 ? '' : ' disabled') + '>'
+      + (r.note_by ? '<small class="sub3">' + esc(r.note_by) + (r.note_at ? ' · ' + esc(시각한글(r.note_at)) : '') + '</small>' : '') + '</td>'
+    + (지점장칸 ? '<td class="wkin"><input class="inp sm" data-wkf="mgr" data-wid="' + esc(r.id) + '" value="' + esc(r.mgr || '') + '" placeholder="지점장 답"' + (전체봄() ? '' : ' disabled') + '></td>' : '')
+    + '<td class="sub3">' + esc(r.prev_note || '') + '</td></tr>';
+}
+function 점검표(줄들, 지점장칸, 끝){
+  return '<table class="wktb"><thead><tr><th>회원</th>' + (끝 ? '<th>담당(추정)</th><th>수업권</th><th>기간 끝</th><th>비고</th>' : '<th>남은</th><th>4주</th><th>마지막</th><th>사유·조치</th>')
+    + (지점장칸 ? '<th>지점장</th>' : '') + '<th>지난주</th></tr></thead><tbody>' + 줄들.map(r => 예약점검칸(r, 지점장칸)).join('') + '</tbody></table>'; }
+function v예약점검(){
+  setTimeout(() => 예약점검받기(false), 0);
+  if(예약점검.줄 === null) return '<div class="ck-load"><b>불러오는 중이에요</b></div>';
+  const 다 = 예약점검.줄, 주들 = [...new Set(다.map(r => String(r.week)))].sort().reverse(), 주 = 주들.includes(예약점검.주) ? 예약점검.주 : 주들[0];
+  if(!주) return '<div class="empty why"><b>아직 예약 점검이 없습니다</b>' + (예약점검.왜 ? esc(예약점검.왜) : '금요일 11시에 이번 주 점검이 들어옵니다') + '</div>';
+  const 다봄 = 전체봄(), 이번 = 다.filter(r => String(r.week) === 주 && (다봄 || r.trainer === 나이름())), i = 주들.indexOf(주);
+  const 빈 = 이번.filter(r => r.grp !== '기간 끝남' && !String(r.note || '').trim()).length;
+  const 주줄 = '<div class="ck-wkstep" style="margin-bottom:12px"><button class="ar" data-act="tx:wkwk" data-k="' + esc(주들[i + 1] || '') + '"' + (주들[i + 1] ? '' : ' disabled') + '>‹</button><b>' + esc(주.slice(5).replace('-', '/')) + ' 주간 예약 점검</b>'
+    + '<button class="ar" data-act="tx:wkwk" data-k="' + esc(주들[i - 1] || '') + '"' + (i > 0 ? '' : ' disabled') + '>›</button><span class="sub3" style="margin-left:10px">사유·조치 빈 칸 ' + 빈 + '</span></div>';
+  const 갈래판 = 줄들 => 점검갈래.map(([g, e]) => { const L = 줄들.filter(r => r.grp === g); return L.length ? '<div class="lbl" style="margin:12px 0 6px">' + e + ' ' + esc(g) + ' ' + L.length + '명</div>' + 점검표(L, 다봄, false) : ''; }).join('');
+  let h = '';
+  if(다봄){
+    const 선 = [...new Set(이번.filter(r => r.trainer !== '미정').map(r => r.trainer))].sort(선생순);
+    h = 선.map(t => '<div class="card wkcard"><div class="wkh">' + esc(t) + ' <span class="sub3">' + 이번.filter(r => r.trainer === t).length + '명</span></div>' + 갈래판(이번.filter(r => r.trainer === t)) + '</div>').join('');
+    const 미 = 이번.filter(r => r.trainer === '미정');
+    if(미.length) h += '<div class="card wkcard"><div class="wkh">담당자 없음 <span class="sub3">' + 미.length + '명</span></div>' + 갈래판(미)
+      + (미.some(r => r.grp === '기간 끝남') ? '<div class="lbl" style="margin:12px 0 6px">🧹 소진 처리 대상 ' + 미.filter(r => r.grp === '기간 끝남').length + '명</div>' + 점검표(미.filter(r => r.grp === '기간 끝남'), true, true) : '') + '</div>';
+  } else h = 이번.length ? '<div class="card wkcard">' + 갈래판(이번) + '</div>' : '<div class="empty why"><b>이번 주 점검할 회원이 없습니다</b>담당 회원 모두 예약이 있어요</div>';
+  return 주줄 + h;
+}
+async function 예약점검저장(el){
+  const id = el.dataset.wid, f = el.dataset.wkf, r = (예약점검.줄 || []).find(x => x.id === id); if(!r) return;
+  const v = el.value.trim(); if(v === String(r[f] || '').trim()) return;
+  const 몸 = f === 'mgr' ? { mgr: v, mgr_by: 나이름(), mgr_at: new Date().toISOString() } : { note: v, note_by: 나이름(), note_at: new Date().toISOString() };
+  try{ const o = await usend('tr_weekcheck?id=eq.' + encodeURIComponent(id), 'PATCH', 몸, 'return=representation'); Object.assign(r, (o && o[0]) || 몸); toast('저장했어요'); }
+  catch(e){ el.value = r[f] || ''; toast('저장하지 못했어요 — ' + String(e.message || '').slice(0, 60)); }
+}
+document.addEventListener('change', ev => { const el = ev.target; if(el && el.dataset && el.dataset.wkf) 예약점검저장(el); });
+document.addEventListener('keydown', ev => { const el = ev.target; if(el && el.dataset && el.dataset.wkf && ev.key === 'Enter'){ ev.preventDefault(); el.blur(); } });
+/* 회원 페이지 「현황」 맨 위 — 같은 회원의 예약 점검 줄(최근 것부터) · 여기서 적어도 점검 탭과 같은 행 */
+function 회원점검칸(m){
+  setTimeout(() => 예약점검받기(false), 0);
+  const L = 점검회원줄(m).slice(0, 4); if(!L.length) return '';
+  return '<div class="card wkcard" style="margin-bottom:12px"><div class="wkh">주간 예약 점검 <span class="sub3">점검 탭과 같은 기록이에요</span></div>'
+    + L.map(r => '<div class="wkm"><span class="sub3">' + esc(String(r.week).slice(5).replace('-', '/')) + ' · ' + esc(r.grp) + (r.last ? ' · 마지막 ' + esc(r.last) : '') + '</span>'
+      + '<input class="inp sm" data-wkf="note" data-wid="' + esc(r.id) + '" value="' + esc(r.note || '') + '" placeholder="사유·조치"' + ((전체봄() || r.trainer === 나이름()) ? '' : ' disabled') + '>'
+      + (r.mgr ? '<small class="sub3">지점장 · ' + esc(r.mgr) + '</small>' : '') + '</div>').join('') + '</div>';
+}
 function v점검(){
   if(관리자칩꼴() && ME && 점검.거름정함 !== ME.name){ 점검.거름 = ME.name; 점검.거름정함 = ME.name; }      /* 최고관리자 본인 화면 — 처음엔 본인 칩 (2026-10-20 대표) */
   const 키 = 점검.주 || '이번';
@@ -7822,27 +7891,25 @@ const 매확판묶음 = (k, 제목, 카드들, 남) => 카드들.length ? '<div 
 /* 팝업 — 락커 1/2 → 매출 2/2 */
 function 매확팝업(강제){
   if(!매확.답 || 진짜ME) return; if(!강제 && $('#pop').classList.contains('on')){ 팝업차례('확인할매출', () => 매확팝업()); return; }
+  if(!강제) 매확.팝칩 = '';      /* 새로 뜰 땐 칩 「전체」 — 고른 칩이 남아 새 결제가 가려졌다 (2026-10-26) */
   const lk = 매확락할일().concat(매확미배정().filter(x => 매확락눌림(x) && 매확.방금.has('l' + x.id)));
   const 결 = 매확결제().filter(o => 매확미확인(o) || 매확.방금.has(String(o.id))), tg = 매확TG만().filter(x => !매확TG끝(x) || 매확.방금.has('t' + x['주문']));
   const 매출있음 = 결.length || tg.length;
   if(!lk.length && !매출있음){ if(강제) 매확판(); return; }
-  if(!매확.팝 || !매확.단계) 매확.단계 = lk.length ? '락커' : '매출';
-  if(매확.단계 === '락커' && !lk.length) 매확.단계 = '매출'; if(매확.단계 === '매출' && !매출있음) 매확.단계 = '락커';
   매확.팝 = true; 매확.마지막 = Date.now();
-  const 둘 = lk.length && 매출있음, 쪽 = n => 둘 ? '<span class="sc-step">' + n + ' / 2</span>' : '';
-  if(매확.단계 === '락커'){
-    const 남 = lk.filter(x => !매확락눌림(x)).length;
-    popOpen('<div class="ps-pop sc-pop"><div class="sc-hd"><h2 class="lk">락커 배정 확인</h2><span class="n">' + 남 + '건</span>' + 쪽(1) + '</div>'
-      + 매확판묶음('락커', 'CRM에서 락커 번호 지정', lk.map(매확락커줄), null)
-      + '<div class="ps-foot"><button class="btn ghost" data-act="tx:sclater">나중에</button>' + (매출있음 ? '<button class="btn main" data-act="tx:scstep" data-k="매출">다음 · 매출 확인</button>' : '<button class="btn main" data-act="tx:sclist">확인할 매출 보기</button>') + '</div></div>');
-    return;
-  }
+  /* 한 장 (2026-10-26 대표) — 위 = 락커(늘 맨 위) · 굵은 구분 선 · 아래 = 매출(칩 전체 · FC · PT · TG) · 1/2 · 2/2 쪽 나눔 없음 */
   const PT결 = o => (o['갈래'] || []).indexOf('PT') >= 0, 남수 = xs => xs.filter(o => 매확미확인(o)).length;
-  const FC = 결.filter(o => !PT결(o)), PT = 결.filter(PT결);
-  popOpen('<div class="ps-pop sc-pop"><div class="sc-hd"><h2>매출 확인</h2><span class="n">' + (결.filter(매확미확인).length + tg.filter(x => !매확TG끝(x)).length) + '건</span>' + 쪽(2) + '</div>'
-    + 매확판묶음('FC', 'FC 매출 · 결제수단', FC.map(매확줄), 남수(FC)) + 매확판묶음('PT', 'PT 매출 · 결제수단 · 담당', PT.map(매확줄), 남수(PT))
-    + 매확판묶음('TG', 'TG만 따로 발급 · TG메모', tg.map(매확TG줄), tg.filter(x => !매확TG끝(x)).length)
-    + '<div class="ps-foot">' + (lk.length ? '<button class="btn ghost" data-act="tx:scstep" data-k="락커">이전</button>' : '') + '<button class="btn ghost" data-act="tx:sclater">나중에</button><button class="btn main" data-act="tx:sclist">확인할 매출 보기</button></div></div>');
+  const FC = 결.filter(o => !PT결(o)), PT = 결.filter(PT결), tg남 = tg.filter(x => !매확TG끝(x)).length, 락남 = lk.filter(x => !매확락눌림(x)).length;
+  const 칩들 = [['전체', 남수(결) + tg남], ['FC', 남수(FC)], ['PT', 남수(PT)], ['TG', tg남]].filter(([k], i) => i === 0 || (k === 'FC' ? FC.length : k === 'PT' ? PT.length : tg.length));
+  const 칩 = 칩들.some(([k]) => k === 매확.팝칩) ? 매확.팝칩 : '전체', 보 = k => 칩 === '전체' || 칩 === k;
+  popOpen('<div class="ps-pop sc-pop"><div class="sc-hd"><h2>확인할 것</h2><span class="n">' + (락남 + 남수(결) + tg남) + '건</span></div>'
+    + (lk.length ? '<div class="sc-sec lk"><b>락커 배정 확인</b><span>' + 락남 + '건</span></div>' + 매확판묶음('락커', 'CRM에서 락커 번호 지정', lk.map(매확락커줄), null) : '')
+    + (lk.length && 매출있음 ? '<hr class="sc-div">' : '')
+    + (매출있음 ? '<div class="sc-sec"><b>매출 확인</b><span>' + (남수(결) + tg남) + '건</span></div>'
+      + (칩들.length > 2 ? '<div class="chips sc-chips">' + 칩들.map(([k, n]) => '<button class="chip' + (칩 === k ? ' on' : '') + '" data-act="tx:scpchip" data-k="' + k + '">' + k + ' <b>' + n + '</b></button>').join('') + '</div>' : '')
+      + (보('FC') ? 매확판묶음('FC', 'FC 매출 · 결제수단', FC.map(매확줄), 남수(FC)) : '') + (보('PT') ? 매확판묶음('PT', 'PT 매출 · 결제수단 · 담당', PT.map(매확줄), 남수(PT)) : '')
+      + (보('TG') ? 매확판묶음('TG', 'TG만 따로 발급 · TG메모', tg.map(매확TG줄), tg남) : '') : '')
+    + '<div class="ps-foot"><button class="btn ghost" data-act="tx:sclater">나중에</button><button class="btn main" data-act="tx:sclist">확인할 매출 보기</button></div></div>');
 }
 /* 목록 판 */
 /* 한 결제에 같은 상품이 여러 줄이면 「PT 30회 × 2」 — 이어 붙이면 「PT 30회 + … + PT 30회」로 두 번 보였다 (2026-10-23 대표 「이거 왜 이래?」) */
@@ -12693,6 +12760,8 @@ async function txAct(a, el){
     const q = $('#rsq'); if(q){ q.focus(); q.setSelectionRange(q.value.length, q.value.length); }
     return; }
   if(a==='lspc'){ 기록회원.칩 = k; const c = $('#lspcs'), l = $('#lspl'); if(c) c.innerHTML = 기록회원칩(); if(l) l.innerHTML = 기록회원줄(); return; }
+  if(a==='ckt'){ S.ckt = k || ''; render(); return; }      /* 점검 — 주간 · 예약 점검 */
+  if(a==='wkwk'){ 예약점검.주 = k || ''; render(); return; }
   if(a==='lsgorec'){ if(AUTH && AUTH.token){ 앱기록창(k); 쪽지닫기(); } else { 쪽지닫기(); 회원판열기(k); } return; }      /* 회원 검색 · 오늘 예약 → 바로 기록 */
   if(a==='arclose'){ 앱기록닫기(); if(S.mid) loadMember(S.mid); return; }
   if(a==='mrpt'){ if(!k) return toast('아직 리포트가 없어요'); 앱기록창(S.mid, k); return; }      /* 리포트 보기 = 앱 리포트 화면 그대로 (C-4) */
@@ -12788,7 +12857,7 @@ async function txAct(a, el){
   if(a==='bpundo'){ await 비품취소(v2, k); return; }
   if(a==='bplist2'){ 비품판(); return; }
   if(a==='scopen'){ popClose(); 매확.방금.clear(); 매확.팝 = false; 매확팝업(true); return; }
-  if(a==='scstep'){ 매확.단계 = k; 매확팝업(true); const b = $('#popbox'); if(b) b.scrollTop = 0; return; }      /* 락커 1/2 ↔ 매출 2/2 (2026-10-22) */
+  if(a==='scpchip'){ const b = $('#popbox'), y = b ? b.scrollTop : 0; 매확.팝칩 = k; 매확팝업(true); const b2 = $('#popbox'); if(b2) b2.scrollTop = y; return; }      /* 매출 칩 전체 · FC · PT · TG (2026-10-26 한 장) */
   if(a==='sclkdone'){ const m = 매확락눌(); m[v2] = Date.now(); try{ localStorage.setItem('gg_lk_done', JSON.stringify(m)); }catch(e){} 매확.방금.add('l' + v2); toast('정각에 CRM으로 확인할게요'); 매확다시(); return; }
   if(a==='sctopen'){ 매확.TG열림[k] = '열림'; 매확다시(); return; }
   if(a==='sctfold'){ 매확.TG열림[k] = '접힘'; 매확다시(); return; }
@@ -12805,7 +12874,7 @@ async function txAct(a, el){
   if(a==='sctgok'){ await 매확TG확인(v2); return; }
   if(a==='scpt'){ popClose(); 매출.탭 = '미확인'; 매출판(); return; }
   if(a==='scptg'){ const g = 묶음of(k); popClose(); 매출.탭 = !g ? '미확인' : 묶음상태(g) === '확정' ? '확정' : 묶음상태(g) === '선택됨' ? '확인대기' : '미확인'; if(g) 매출.달 = 묶음달(g); 매출.고침 = k; 매출판(); return; }      /* 고른 담당 수정 — 매출 판 그 건을 고침 상태로 */
-  if(a==='sclater'){ 매확.방금.clear(); 매확.팝 = false; 매확.단계 = ''; 매확.마지막 = Date.now(); popClose(); return; }      /* 30분 뒤 다시 (2026-10-21) */
+  if(a==='sclater'){ 매확.방금.clear(); 매확.팝 = false; 매확.팝칩 = ''; 매확.마지막 = Date.now(); popClose(); return; }      /* 30분 뒤 다시 (2026-10-21) */
   if(a==='sclist'){ 매확.방금.clear(); popClose(); 매확.tab = '고를것'; 매확판(); return; }
   if(a==='scchip'){ 매확.chip = k; 매확.방금.clear(); 매확판(); return; }
   if(a==='sctab'){ 매확.tab = k; 매확.방금.clear(); 매확판(); return; }
@@ -13415,6 +13484,7 @@ async function 구글버튼(){
   for(let i=0;i<40;i++){ if(await gsiReady()) return; await new Promise(r=>setTimeout(r,250)); }
   $('#txgoogle').style.display=''; $('#txgoogle').textContent = '구글 로그인을 못 불러왔어요. 이메일로 들어가 주세요';
 }
+try{ const q = new URLSearchParams(location.search); if(q.get('wk')){ sessionStorage.setItem('gg_wk', '1'); history.replaceState(null, '', location.pathname + '#check'); } }catch(e){}      /* 금요일 문자 링크 desk/?wk=1 (2026-10-26) */
 try{ const q = new URLSearchParams(location.search); if(q.get('m')){ sessionStorage.setItem('gg_open', JSON.stringify({ m:q.get('m'), scan:q.get('scan') === '1', t:Date.now() })); history.replaceState(null, '', location.pathname + location.hash); } }catch(e){}
 async function 들어온회원열기(){
   let o = null; try{ o = JSON.parse(sessionStorage.getItem('gg_open') || 'null'); sessionStorage.removeItem('gg_open'); }catch(e){}
@@ -13926,7 +13996,10 @@ function render0(){
     const 월일 = w => (+w.slice(5, 7)) + '/' + (+w.slice(8, 10)), 끝날 = w => { const d = new Date(w + 'T00:00:00'); d.setDate(d.getDate() + 6); return (d.getMonth() + 1) + '/' + d.getDate(); };
     /* 주 고르기 = ‹ 기간 › 넘기기 — 주마다 단추를 늘어놓으면 몇 달 뒤 단추가 넘친다 (2026-10-15 대표). ‹ = 지난 주 · › = 다음 주 */
     const 주순 = 주들.length ? [주들[0]].concat(주들.slice(1).sort().reverse()) : [], 지금i = Math.max(0, 주순.indexOf(점검.주 || 주순[0])), 주키 = i => i ? 주순[i] : '';
-    top.innerHTML = '<h1>점검</h1><span class="chip on" style="margin-left:6px">주간</span>'
+    try{ if(sessionStorage.getItem('gg_wk') === '1'){ sessionStorage.removeItem('gg_wk'); S.ckt = 'wk'; } }catch(e){}
+    const 점검칩 = '<span class="chips" style="margin:0 0 0 6px;display:inline-flex"><button class="chip' + (S.ckt === 'wk' ? '' : ' on') + '" data-act="tx:ckt" data-k="">주간</button><button class="chip' + (S.ckt === 'wk' ? ' on' : '') + '" data-act="tx:ckt" data-k="wk">예약 점검</button></span>';
+    if(S.ckt === 'wk'){ top.innerHTML = '<h1>점검</h1>' + 점검칩; b.innerHTML = v예약점검(); return true; }
+    top.innerHTML = '<h1>점검</h1>' + 점검칩
       + (주순.length ? '<div class="ck-wkstep"><button class="ar" data-act="tx:ckwk" data-k="' + esc(주키(지금i + 1)) + '" title="지난 주"' + (지금i + 1 < 주순.length ? '' : ' disabled') + '>‹</button>'
         + '<b>' + 월일(주순[지금i]) + ' ~ ' + 끝날(주순[지금i]) + (지금i ? '' : ' · 이번 주') + '</b>'
         + '<button class="ar" data-act="tx:ckwk" data-k="' + esc(주키(지금i - 1)) + '" title="다음 주"' + (지금i ? '' : ' disabled') + '>›</button>'
