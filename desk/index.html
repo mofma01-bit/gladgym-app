@@ -852,6 +852,7 @@ body.tx-moving .tx-x{cursor:grabbing}
 .tx-td.on{background:var(--dark-3);box-shadow:inset 0 0 0 2px var(--gold);padding:2px 4px}
 .tx-td.sel,.tx-tr:hover>.tx-td.sel{box-shadow:inset 0 0 0 2px var(--gold);
   background:rgba(230,196,135,.07);border-radius:3px}
+.tx-tag.tx-merge{margin-left:6px;background:transparent;border:1px solid var(--line);color:var(--sub);font-size:12.5px;font-weight:700}
 .tx-clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-wrap;word-break:break-all;line-height:1.45}
 .tx-td.on.big{overflow:visible;position:relative;z-index:6}
 .tx-td.on.big .tx-cin{position:absolute;left:-2px;top:-2px;width:max(calc(100% + 4px),380px);min-height:120px;max-height:420px;overflow:auto;resize:vertical;
@@ -1634,28 +1635,58 @@ body .figbox2{background:radial-gradient(80% 50% at 50% 30%,rgba(240,211,160,.09
 .ckrow{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid var(--line)}.ckrow:last-child{border-bottom:none}.ckrow .t{font-size:13.5px;flex:1}.ckrow .opts{display:flex;gap:5px}
 .ckrow .ck{border:1px solid var(--line);background:var(--dark-3);color:var(--sub);border-radius:9px;padding:4px 11px;font-size:13px}.ckrow .ck.on{border-color:var(--gold);color:var(--gold);background:var(--gold-dim);font-weight:800}
 .ib-tbar .sp{flex:1}
-#gchat .gc-fab{position:fixed;right:22px;bottom:22px;z-index:60;width:58px;height:58px;border-radius:50%;border:0;background:linear-gradient(180deg,#f3d9a8,#e2c184);color:#1b1813;font-size:26px;box-shadow:0 6px 20px rgba(0,0,0,.45)}
-#gchat .gc-fab i{position:absolute;top:-2px;right:-2px;min-width:20px;height:20px;border-radius:10px;background:var(--warn);color:#1b1813;font-size:12px;font-style:normal;font-weight:900;display:flex;align-items:center;justify-content:center;padding:0 5px}
-#gchat .gc-win{position:fixed;right:22px;bottom:92px;z-index:61;width:390px;height:min(560px,calc(100vh - 120px));background:var(--dark-2);border:1px solid var(--line);border-radius:18px;box-shadow:0 14px 40px rgba(0,0,0,.55);display:flex;flex-direction:column;overflow:hidden;color:var(--cream)}
-.gc-h{display:flex;align-items:center;gap:6px;padding:11px 14px;border-bottom:1px solid var(--line)}.gc-h b{font-size:15.5px}.gc-h .sp{flex:1}
-.gc-ic{width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:var(--dark-3);color:var(--sub);display:inline-flex;align-items:center;justify-content:center;flex:none}.gc-ic.on{border-color:var(--gold);color:var(--gold)}
-.gc-set{padding:8px 14px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--sub)}
-.gc-tabs{display:flex;border-bottom:1px solid var(--line)}.gc-tabs button{flex:1;padding:9px 0;color:var(--sub);font-weight:800;font-size:13.5px}.gc-tabs button.on{color:var(--cream);box-shadow:inset 0 -2px var(--gold)}.gc-tabs i{font-style:normal;font-size:11px;background:var(--warn);color:#1b1813;border-radius:8px;padding:0 5px;margin-left:4px}
-.gc-body{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column}.gc-body.list,.gc-body.req{display:block}
-.gc-me,.gc-bot{max-width:86%;border-radius:14px;padding:8px 11px;margin:5px 0;font-size:13.5px;white-space:pre-wrap;word-break:break-word}.gc-me{align-self:flex-end;background:#f0d3a0;color:#1b1813;border-bottom-right-radius:4px}.gc-bot{align-self:flex-start;background:var(--dark-3);border-bottom-left-radius:4px}.gc-bot.no{border:1px solid #5a3a33}.gc-bot.ntc,.gc-me.ntc{border:1px solid var(--gold)}
-.gc-msg{display:flex;flex-direction:column;align-items:flex-start}.gc-msg.me{align-items:flex-end}.gc-msg small{font-size:12px;color:var(--sub);margin-top:4px}.gc-msg .tm{font-size:11px;color:#6f6a63}
-.gc-go{margin-top:6px;border:1px solid var(--gold);color:var(--gold);border-radius:9px;padding:3px 9px;font-size:12.5px;font-weight:800;background:none}
-.gc-chips{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 8px}.gc-chips button{border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:12.5px;color:var(--sub)}.gc-chips button:hover{color:var(--cream);border-color:var(--gold)}
-.gc-in{display:flex;gap:6px;padding:10px;border-top:1px solid var(--line);align-items:center}.gc-in input{flex:1;min-width:0;background:var(--dark);border:1px solid var(--line);border-radius:10px;padding:8px 10px;color:var(--cream)}.gc-in > button:last-of-type{width:38px;height:36px;border-radius:10px;background:var(--gold);color:#1b1813;font-weight:900}
-.gc-att{display:flex;gap:8px;flex-wrap:wrap;padding:0 12px;font-size:12.5px;color:var(--gold)}.gc-att:empty{display:none}.gc-att label{color:var(--cream)}
-.gc-room{display:flex;gap:10px;align-items:center;width:100%;padding:9px 4px;border-bottom:1px solid #2a2926;text-align:left}.gc-room .av{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#121211;flex:none}.gc-room .tx{flex:1;min-width:0}.gc-room b{display:block;font-size:14px}.gc-room small{display:block;color:var(--sub);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gc-room .t{text-align:right;font-size:11.5px;color:var(--sub);flex:none}.gc-room .t i{display:block;margin-top:3px;font-style:normal;background:var(--warn);color:#1b1813;border-radius:8px;padding:0 6px;font-weight:900}
-.gc-rh{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--line)}
-.gc-img{display:block;max-width:220px;border-radius:10px;margin-top:6px;background:var(--dark-4);min-height:40px}
-.gc-new{width:100%;border:1px dashed var(--gold);color:var(--gold);font-weight:800;border-radius:12px;padding:9px;margin-bottom:8px}
-.gc-req{border:1px solid var(--line);border-radius:12px;margin-bottom:8px}.gc-req.on{border-color:var(--gold)}.gc-rq{width:100%;text-align:left;padding:9px 11px}.gc-rq b{font-size:13.5px}.gc-rq small{display:block;color:var(--sub);font-size:12.5px}.gc-rd{padding:0 11px 10px;font-size:13.5px;white-space:pre-wrap}
-.gc-req .tg{font-size:11.5px;font-weight:800;border-radius:999px;padding:1px 8px;margin-left:6px}.gc-req .tg.a{background:#1d2b3a;color:#8fc0f0}.gc-req .tg.b{background:#3a3217;color:#f0d36a}.gc-req .tg.c{background:#1f2f24;color:#8fd19e}
-.gc-reply{margin-top:8px;background:var(--dark-3);border-radius:9px;padding:7px 9px}.gc-kinds{display:flex;gap:6px;margin:8px 0}.gc-kinds button{border:1px solid var(--line);border-radius:999px;padding:3px 11px;font-size:12.5px;color:var(--sub)}.gc-kinds button.on{border-color:var(--gold);color:var(--gold);font-weight:800}
-.gc-form{border:1px solid var(--gold);border-radius:12px;padding:10px;margin-bottom:10px;display:flex;flex-direction:column;gap:6px}.gc-form textarea{min-height:70px}.gc-fb{display:flex;gap:6px;align-items:center}.gc-fb .sp{flex:1}
+/* 챗봇 — 흰 창 · 갈색 단추 (2026-10-26 21:3x 대표 레퍼런스 6장) */
+#gchat .gc-fab{position:fixed;right:22px;bottom:22px;z-index:60;width:54px;height:54px;border-radius:50%;border:1px solid rgba(230,196,135,.45);background:#3a2a1d;color:#f3e6cc;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 22px rgba(0,0,0,.45);transition:transform .15s}
+#gchat .gc-fab:hover{transform:translateY(-2px)}#gchat .gc-fab svg{width:24px;height:24px}
+#gchat .gc-fab.x{background:#ececec;color:#4a4a4a;border-color:#ddd}
+#gchat .gc-fab i{position:absolute;top:-3px;right:-3px;min-width:20px;height:20px;border-radius:10px;background:#ef6b57;color:#fff;font-size:12px;font-style:normal;font-weight:900;display:flex;align-items:center;justify-content:center;padding:0 5px;border:2px solid #141311}
+#gchat .gc-win{position:fixed;isolation:isolate;right:22px;bottom:90px;z-index:61;width:min(380px,calc(100vw - 24px));height:min(620px,calc(100vh - 116px));background:#fff;color:#1d1d1f;border-radius:24px;box-shadow:0 18px 50px rgba(0,0,0,.45);display:flex;flex-direction:column;overflow:hidden;font-size:14px}
+#gchat .gc-h{display:flex;align-items:center;gap:10px;padding:16px 18px 10px}#gchat .gc-h b{font-size:17px;font-weight:900}#gchat .gc-h .sp{flex:1}
+#gchat .gc-logo{width:34px;height:34px;border-radius:50%;background:#3a2a1d;color:#f0d6a4;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;flex:none}
+#gchat .gc-h small{display:block;font-size:13px;color:#8a8a8e;font-weight:600}
+#gchat .gc-ic{width:32px;height:32px;border-radius:50%;background:#f2f2f4;color:#555;display:inline-flex;align-items:center;justify-content:center;flex:none;border:0}#gchat .gc-ic.on{background:#f6ead2;color:#8a5a14}
+#gchat .gc-body{flex:1;overflow:auto;padding:6px 18px 14px;display:flex;flex-direction:column}#gchat .gc-body.list,#gchat .gc-body.req,#gchat .gc-body.set{display:block}
+#gchat .gc-pin{display:flex;gap:8px;align-items:center;background:#f6f6f8;border:1px solid #ececf0;border-radius:14px;padding:10px 12px;font-size:13.5px;color:#6b6b70;margin:2px 0 12px}
+#gchat .gc-hi{font-size:15px;line-height:1.65;margin:2px 0 10px}#gchat .gc-hi b{font-weight:900}
+#gchat .gc-chips{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 12px}#gchat .gc-chips button{border:0;border-radius:10px;padding:7px 12px;font-size:13.5px;font-weight:700;background:var(--cb,#f2f2f4);color:var(--cf,#333)}#gchat .gc-chips button:hover{filter:brightness(.97)}
+#gchat .gc-me,#gchat .gc-bot{max-width:84%;border-radius:18px;padding:9px 13px;margin:4px 0;font-size:14px;line-height:1.55;white-space:pre-wrap;word-break:break-word}
+#gchat .gc-me{align-self:flex-end;background:#e9cf9b;color:#2a1c10;border-bottom-right-radius:6px}#gchat .gc-bot{align-self:flex-start;background:#f2f2f4;color:#1d1d1f;border-bottom-left-radius:6px}
+#gchat .gc-bot.no{background:#fbeeee;color:#7a2e2e}#gchat .gc-bot.ntc,#gchat .gc-me.ntc{box-shadow:inset 0 0 0 1.5px #c99a4a}
+#gchat .gc-msg{display:flex;flex-direction:column;align-items:flex-start}#gchat .gc-msg.me{align-items:flex-end}#gchat .gc-msg small{font-size:13px;color:#8a8a8e;margin:6px 0 0 2px;font-weight:700}#gchat .gc-msg .tm{font-size:13px;color:#a5a5aa;margin:0 4px}
+#gchat .gc-go{margin-top:8px;border:0;background:#fff;color:#8a5a14;border-radius:999px;padding:5px 12px;font-size:13px;font-weight:800;box-shadow:0 0 0 1px #e6d3ad}
+#gchat .gc-in{margin:0 14px;padding:10px 12px 8px;background:#f2f2f4;border-radius:18px;display:flex;flex-wrap:wrap;align-items:center;gap:4px}
+#gchat .gc-in input{flex:1 1 100%;min-width:0;background:transparent;border:0;outline:none;padding:4px 2px 8px;color:#1d1d1f;font-size:14.5px}
+#gchat .gc-in .sp{flex:1}#gchat .gc-in .gc-ic{background:transparent;width:30px;height:30px;color:#77777c}#gchat .gc-in .gc-ic.on{color:#8a5a14;background:#f6ead2}
+#gchat .gc-in > button.gc-send,#gchat .gc-in > button[data-act="tx:gcsend"],#gchat .gc-in > button[data-act="tx:gcask"],#gchat .gc-in > button[data-act="tx:gcrreply"]{width:34px;height:34px;border-radius:50%;background:#c99a4a;color:#fff;font-weight:900;border:0;display:inline-flex;align-items:center;justify-content:center}
+#gchat .gc-foot{font-size:13px;color:#a5a5aa;text-align:center;padding:6px 16px 10px}
+#gchat input[type=checkbox]:not([data-gcset]){accent-color:#c99a4a;width:16px;height:16px}
+#gchat .gc-att{display:flex;gap:8px;flex-wrap:wrap;padding:0 18px 6px;font-size:13px;color:#8a5a14;font-weight:700}#gchat .gc-att:empty{display:none}#gchat .gc-att label{color:#444;display:flex;gap:5px;align-items:center}
+#gchat .gc-title{font-size:21px;font-weight:900;padding:18px 18px 8px}
+#gchat .gc-unread{display:flex;align-items:center;margin:0 18px 6px;background:#f2f2f4;border-radius:12px;padding:10px 12px;font-size:13.5px;color:#77777c}#gchat .gc-unread .sp{flex:1}#gchat .gc-unread button{font-weight:800;color:#3a3a3c;font-size:13.5px}
+#gchat .gc-room{display:flex;gap:12px;align-items:flex-start;width:100%;padding:11px 0;text-align:left;border:0;background:none;color:inherit}
+#gchat .gc-room .av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;color:#1d1d1f;flex:none;font-size:15px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)}
+#gchat .gc-room .tx{flex:1;min-width:0}#gchat .gc-room b{font-size:14.5px;font-weight:900}#gchat .gc-room b em{font-style:normal;font-size:13px;color:#a5a5aa;font-weight:600;margin-left:6px}
+#gchat .gc-room small{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:#4a4a4f;font-size:13.5px;line-height:1.45;margin-top:2px}
+#gchat .gc-room .t{flex:none;padding-top:16px}#gchat .gc-room .t i{display:block;min-width:20px;height:20px;border-radius:10px;background:#ef6b57;color:#fff;font-style:normal;font-weight:900;font-size:12px;text-align:center;line-height:20px;padding:0 5px}
+#gchat .gc-rh{display:flex;align-items:center;gap:10px;padding:14px 16px 8px}#gchat .gc-rh b{font-size:17px;font-weight:900}
+#gchat .gc-img{display:block;max-width:220px;border-radius:12px;margin-top:6px;background:#eee;min-height:40px}
+#gchat .gc-fly{position:absolute;left:50%;bottom:76px;transform:translateX(-50%);border:0;border-radius:999px;background:linear-gradient(180deg,#d9ad5e,#c08a3c);color:#fff;font-weight:900;font-size:14.5px;padding:12px 22px;box-shadow:0 8px 20px rgba(160,110,40,.35);display:flex;gap:8px;align-items:center;white-space:nowrap}
+#gchat .gc-req{background:#f7f7f9;border-radius:14px;margin-bottom:8px}#gchat .gc-req.on{box-shadow:inset 0 0 0 1.5px #d9b27a}#gchat .gc-rq{width:100%;text-align:left;padding:11px 13px;border:0;background:none;color:inherit}#gchat .gc-rq b{font-size:14px}#gchat .gc-rq small{display:block;color:#8a8a8e;font-size:13px;margin-top:2px}#gchat .gc-rd{padding:0 13px 12px;font-size:14px;white-space:pre-wrap}
+#gchat .gc-tg{display:inline-block;font-size:12.5px;font-weight:800;border-radius:999px;padding:1px 8px;margin-left:6px;vertical-align:1px}#gchat .gc-tg.a{background:#e6effc;color:#3b6fc4}#gchat .gc-tg.b{background:#fdf1dc;color:#a26a12}#gchat .gc-tg.c{background:#e5f4ea;color:#2f8f5b}
+#gchat .gc-reply{margin-top:8px;background:#fff;border-radius:10px;padding:8px 10px;box-shadow:0 0 0 1px #ececf0}
+#gchat .gc-kinds{display:flex;gap:6px;margin:8px 0}#gchat .gc-kinds button{border:0;background:#f2f2f4;border-radius:999px;padding:5px 13px;font-size:13.5px;color:#555;font-weight:700}#gchat .gc-kinds button.on{background:#3a2a1d;color:#f0d6a4}
+#gchat .gc-form{background:#fff;border-radius:16px;padding:12px;margin-bottom:12px;display:flex;flex-direction:column;gap:8px;box-shadow:0 0 0 1px #e6d3ad}
+#gchat .gc-form .inp{background:#f6f6f8;border:0;color:#1d1d1f;border-radius:10px}#gchat .gc-form textarea{min-height:76px}#gchat .gc-fb{display:flex;gap:6px;align-items:center}#gchat .gc-fb .sp{flex:1}
+#gchat .gc-nav{display:flex;border-top:1px solid #efeff2;background:#fff;padding:6px 6px 8px}
+#gchat .gc-nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;border:0;background:none;color:#9a9aa0;font-size:13px;font-weight:700;position:relative;padding:4px 0}
+#gchat .gc-nav button svg{width:22px;height:22px}#gchat .gc-nav button.on{color:#b9802e}
+#gchat .gc-nav button i{position:absolute;top:0;left:calc(50% + 4px);min-width:18px;height:18px;border-radius:9px;background:#ef6b57;color:#fff;font-size:11.5px;font-style:normal;font-weight:900;line-height:18px;padding:0 5px;border:2px solid #fff}
+#gchat .gc-sw{display:flex;align-items:center;gap:12px;padding:14px 2px;border-bottom:1px solid #f0f0f2}#gchat .gc-sw .tx{flex:1}#gchat .gc-sw b{display:block;font-size:14.5px}#gchat .gc-sw small{display:block;font-size:13px;color:#8a8a8e;margin-top:2px}
+#gchat .gc-sw input{appearance:none;-webkit-appearance:none;width:46px;height:28px;border-radius:14px;background:#d9d9de;position:relative;cursor:pointer;flex:none;transition:background .15s}
+#gchat .gc-sw input::after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .15s}
+#gchat .gc-sw input:checked{background:#c99a4a}#gchat .gc-sw input:checked::after{left:21px}
+#gchat .gc-sw .gc-go{margin:0}
+#gchat .empty.why{color:#8a8a8e;text-align:center;padding:30px 8px;font-size:14px}#gchat .empty.why b{display:block;color:#3a3a3c;margin-bottom:4px}
 .gc-ntcp{border:1px solid var(--line);border-radius:12px;padding:9px 12px;margin:6px 0;font-size:13px;color:var(--sub)}.gc-ntcp p{margin:4px 0 0;color:var(--cream);font-size:14px;white-space:pre-wrap}
 .pzlist{max-height:330px;overflow:auto;border:1px solid var(--line);border-radius:12px}
 .tx-auto{flex:none;margin-left:6px;font-size:12px;font-weight:800;color:var(--teal);border:1px solid #3c5a53;border-radius:999px;padding:0 7px;line-height:18px}
@@ -2179,6 +2210,20 @@ button.as-more{display:block;width:100%;background:none;border:0;color:var(--sub
 .as-reg{font-size:12.5px;font-weight:800;border-radius:6px;padding:1px 7px}.as-reg.g{background:#1f3a26;color:#8fd19e}.as-reg.r{background:#4a241b;color:var(--warn)}.as-reg.n{background:var(--dark-4);color:var(--sub)}
 .as-kvs{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px}
 .as-kv{display:flex;flex-direction:column;gap:2px;font-size:13px}.as-kv span{color:var(--sub)}.as-kv b{font-size:14px;font-weight:700}
+.ad-hero{display:flex;gap:12px;align-items:flex-start;padding:4px 2px 14px}.ad-hero .ad-ic{width:40px;height:40px;border-radius:12px;background:var(--gold-dim);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:18px;flex:none}
+.ad-hero b{display:block;font-size:15px;line-height:1.45}.ad-hero small{display:block;font-size:13px;color:var(--sub);margin-top:3px;line-height:1.5}
+.ad-card{background:var(--dark-3);border:1px solid var(--line);border-radius:14px;padding:4px 14px}
+.ad-f{display:flex;align-items:center;gap:12px;padding:10px 0}.ad-f + .ad-f{border-top:1px solid var(--line)}.ad-f span{width:68px;font-size:13.5px;color:var(--sub);font-weight:700;flex:none}.ad-f .srch{flex:1;min-width:0}
+.ad-q{display:flex;align-items:center;gap:8px;background:var(--dark-3);border:1px solid var(--gold-2);border-radius:12px;padding:0 12px;color:var(--sub)}.ad-q .srch{flex:1;border:0;background:transparent;height:44px;font-size:15px}
+.ad-list{margin-top:10px;display:flex;flex-direction:column;gap:2px;max-height:calc(100vh - 330px);overflow:auto}
+.ad-row,.ad-pick{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:10px 12px;border-radius:12px;background:none;border:0;color:inherit}.ad-row:hover{background:var(--dark-3)}
+.ad-pick{margin-top:10px;background:var(--gold-dim);border:1px solid var(--gold-2)}
+.ad-av{width:38px;height:38px;border-radius:50%;background:var(--dark-4);color:var(--cream);display:flex;align-items:center;justify-content:center;font-weight:900;flex:none}
+.ad-row .tx,.ad-pick .tx{flex:1;min-width:0}.ad-row b,.ad-pick b{display:block;font-size:14.5px}.ad-row small,.ad-pick small{display:block;font-size:13px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ad-src{font-size:12.5px;font-weight:800;color:var(--sub);border:1px solid var(--line);border-radius:999px;padding:1px 9px;flex:none}
+.ad-link{display:block;margin:12px 2px 0;color:var(--gold);font-weight:800;font-size:13.5px;background:none;border:0}
+.ad-foot{padding:12px 16px;border-top:1px solid var(--line);align-items:center}.ad-foot .sp{flex:1}.ad-foot .btn{flex:none;padding:0 20px;height:42px}
+body:has(#pop.on.tx-side) #gchat .gc-fab:not(.x){display:none}      /* 옆 판이 열리면 챗봇 단추가 판 아래 단추를 가린다 (2026-10-26) */
 .as-form{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.as-form label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--sub);font-weight:700}.as-form label.w{grid-column:1 / -1}.as-form .srch{width:100%}
 .bk-card{background:var(--dark-2);border:1px solid var(--line);border-radius:18px;padding:16px 20px}
 .bk-card.bk-me{max-width:460px}
@@ -2587,7 +2632,7 @@ button.as-more{display:block;width:100%;background:none;border:0;color:var(--sub
 
 <script>
 "use strict";
-const BUILD = '423';
+const BUILD = '426';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -6227,25 +6272,45 @@ async function 챗받기(힘){
   챗.중 = false; 챗.때 = Date.now(); 챗그리기(); 챗공지띄우기(); }
 setInterval(() => { if(ME) 챗받기(챗.열림 && 챗.탭 === 'talk' && 챗.방); }, 15000);
 function 챗배지(){ return 챗.없음 ? 0 : [...new Set(챗.글.map(m => m.room))].reduce((a, r) => a + 챗안읽음(r), 0) + (챗관리() ? 챗.요청.filter(x => x.status === '받음').length : 0); }
+const 챗아이콘 = {
+  말: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5h16v10.5H9l-5 4z"/></svg>',
+  홈: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 11l8-6.5 8 6.5V20h-5.5v-5h-5v5H4z"/></svg>',
+  대: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 4c4.7 0 8.5 3 8.5 6.8S16.7 17.6 12 17.6c-.9 0-1.8-.1-2.6-.3L5 19.5l1.2-3.6C4.5 14.6 3.5 12.8 3.5 10.8 3.5 7 7.3 4 12 4z"/></svg>',
+  요: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14v16l-3.5-2.5L12 20l-3.5-2.5L5 20z"/><path d="M9 9h6M9 12.5h4"/></svg>',
+  설: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"/></svg>',
+  클: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M16.5 8.5l-6.8 6.8a2 2 0 01-2.8-2.8l7.3-7.3a3.5 3.5 0 015 5l-7.6 7.6a5 5 0 01-7.1-7.1L11 4"/></svg>',
+  링: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1-1"/></svg>',
+  위: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5.5 11.5L12 5l6.5 6.5"/></svg>',
+  날: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 3L10 14M21 3l-7 18-4-7-7-4z"/></svg>',
+};
+const 챗칩색 = [['#fdecef', '#d6455d'], ['#fff1e3', '#c96f22'], ['#e8f6ef', '#2f8f5b'], ['#e9f1fd', '#3b6fc4'], ['#f1ecfb', '#7a52c7']];
 function 챗그리기(){
   let el = document.getElementById('gchat'); if(!el){ el = document.createElement('div'); el.id = 'gchat'; document.body.appendChild(el); }
   if(!ME || 진짜ME){ el.innerHTML = ''; return; }
-  const n = 챗배지();
-  const 팹 = '<button class="gc-fab" data-act="tx:gchat" title="도우미 · 대화 · 요청">💬' + (n && 챗설정.배지 !== false ? '<i>' + (n > 99 ? '99+' : n) + '</i>' : '') + '</button>';
+  const n = 챗배지(), 대수 = [...new Set(챗.글.map(m => m.room))].reduce((a, r) => a + 챗안읽음(r), 0), 요수 = 챗관리() ? 챗.요청.filter(x => x.status === '받음').length : 0;
+  const 팹 = 챗.열림 ? '<button class="gc-fab x" data-act="tx:gchat" title="닫기">✕</button>'
+    : '<button class="gc-fab" data-act="tx:gchat" title="도우미 · 대화 · 요청">' + 챗아이콘.말 + (n && 챗설정.배지 !== false ? '<i>' + (n > 99 ? '99+' : n) + '</i>' : '') + '</button>';
   if(!챗.열림){ el.innerHTML = 팹; return; }
-  const 탭 = [['ai', '도우미', 0], ['talk', '대화', [...new Set(챗.글.map(m => m.room))].reduce((a, r) => a + 챗안읽음(r), 0)], ['req', '요청 · 버그', 챗관리() ? 챗.요청.filter(x => x.status === '받음').length : 0]];
-  const 몸 = 챗.없음 ? '<div class="empty why"><b>챗봇을 준비 중이에요</b>잠시 뒤 다시 열어 주세요</div>' : 챗.탭 === 'ai' ? 챗도우미() : 챗.탭 === 'talk' ? 챗대화() : 챗요청();
-  el.innerHTML = 팹 + '<div class="gc-win"><div class="gc-h"><b>글래드짐 도우미</b><span class="sp"></span><button class="gc-ic" data-act="tx:gcset" title="알림 · 설정">⚙</button><button class="gc-ic" data-act="tx:gchat" title="닫기">✕</button></div>'
-    + (챗.설정 ? '<div class="gc-set"><label><input type="checkbox" data-gcset="배지"' + (챗설정.배지 !== false ? ' checked' : '') + '> 안 읽은 수 배지 보이기</label><label><input type="checkbox" data-gcset="공지"' + (챗설정.공지 !== false ? ' checked' : '') + '> 전체방 공지 팝업 받기</label></div>' : '')
-    + '<div class="gc-tabs">' + 탭.map(([k, 이름, 수]) => '<button class="' + (챗.탭 === k ? 'on' : '') + '" data-act="tx:gctab" data-k="' + k + '">' + 이름 + (수 ? '<i>' + 수 + '</i>' : '') + '</button>').join('') + '</div>' + 몸 + '</div>';
-  const b = el.querySelector('.gc-body'); if(b && 챗.탭 !== 'req') b.scrollTop = b.scrollHeight;
+  const 탭 = [['ai', '도우미', 0, 챗아이콘.홈], ['talk', '대화', 대수, 챗아이콘.대], ['req', '요청 · 버그', 요수, 챗아이콘.요], ['set', '설정', 0, 챗아이콘.설]];
+  const 몸 = 챗.없음 ? '<div class="gc-body"><div class="empty why"><b>챗봇을 준비 중이에요</b>잠시 뒤 다시 열어 주세요</div></div>' : 챗.탭 === 'ai' ? 챗도우미() : 챗.탭 === 'talk' ? 챗대화() : 챗.탭 === 'req' ? 챗요청() : 챗설정판();
+  el.innerHTML = 팹 + '<div class="gc-win">' + 몸
+    + '<div class="gc-nav gc-tabs">' + 탭.map(([k, 이름, 수, 아]) => '<button class="' + (챗.탭 === k ? 'on' : '') + '" data-act="tx:gctab" data-k="' + k + '">' + 아 + '<span>' + 이름 + '</span>' + (수 ? '<i>' + (수 > 99 ? '99+' : 수) + '</i>' : '') + '</button>').join('') + '</div></div>';
+  const b = el.querySelector('.gc-body'); if(b && (챗.탭 === 'ai' || (챗.탭 === 'talk' && 챗.방))) b.scrollTop = b.scrollHeight;
   챗사진채우기(el);
 }
+const 챗머리 = (이름, 밑) => '<div class="gc-h"><span class="gc-logo">G</span><span><b>' + 이름 + '</b>' + (밑 ? '<small>' + 밑 + '</small>' : '') + '</span><span class="sp"></span></div>';
+function 챗설정판(){
+  const 줄 = (k, 이름, 밑) => '<label class="gc-sw"><span class="tx"><b>' + 이름 + '</b><small>' + 밑 + '</small></span><input type="checkbox" data-gcset="' + k + '"' + (챗설정[k] !== false ? ' checked' : '') + '></label>';
+  return '<div class="gc-title">설정</div><div class="gc-body set">'
+    + 줄('배지', '안 읽은 수 표시', '오른쪽 아래 단추 · 탭에 숫자') + 줄('공지', '전체방 공지 팝업', '오늘 공지를 데스크 열 때 한 번 띄워요')
+    + '<div class="gc-sw"><span class="tx"><b>모두 읽음</b><small>대화방의 안 읽은 글을 다 읽은 것으로</small></span><button class="gc-go" data-act="tx:gcreadall">모두 읽기</button></div></div>';
+}
 function 챗도우미(){
-  const 칩 = 챗.답.slice(0, 8).map(x => '<button data-act="tx:gcq" data-k="' + esc(x.id) + '">' + esc(x.q) + '</button>').join('');
-  return '<div class="gc-body"><div class="gc-bot">무엇을 찾으세요? 데스크 · 앱 쓰는 법을 알려 드리고, 그 화면으로 바로 보내 드려요</div><div class="gc-chips">' + 칩 + '</div>'
+  const 칩 = 챗.답.slice(0, 8).map((x, i) => '<button data-act="tx:gcq" data-k="' + esc(x.id) + '" style="--cb:' + 챗칩색[i % 5][0] + ';--cf:' + 챗칩색[i % 5][1] + '">' + esc(x.q) + '</button>').join('');
+  return 챗머리('글래드짐 도우미', '데스크 · 앱 쓰는 법을 바로 알려 드려요') + '<div class="gc-body"><div class="gc-pin">📢 반갑습니다. 글래드짐 데스크 도우미예요 :)</div>'
+    + '<div class="gc-hi">👋 안녕하세요, <b>' + esc(보임이름((ME && ME.name) || '')) + ' 선생님.</b><br>궁금한 화면 · 기능을 편하게 물어보세요</div><div class="gc-chips">' + 칩 + '</div>'
     + 챗.도.map(m => m.me ? '<div class="gc-me">' + esc(m.me) + '</div>' : '<div class="gc-bot' + (m.no ? ' no' : '') + '">' + esc(m.a) + (m.view ? '<br><button class="gc-go" data-act="tx:gcgo" data-k="' + esc(m.view) + '">' + esc(챗화면이름(m.view)) + ' 열기 ›</button>' : '') + (m.req ? '<br><button class="gc-go" data-act="tx:gctab" data-k="req">요청 · 버그로 물어보기 ›</button>' : '') + '</div>').join('')
-    + '</div><div class="gc-in"><input id="gcin" placeholder="궁금한 것을 입력해 주세요" autocomplete="off"><button data-act="tx:gcask">↑</button></div>';
+    + '</div><div class="gc-in"><input id="gcin" placeholder="궁금한 것을 입력해 주세요" autocomplete="off"><span class="sp"></span><button data-act="tx:gcask" title="보내기">' + 챗아이콘.위 + '</button></div><div class="gc-foot">정해 둔 답으로 안내해요 · 급여 · 매출 같은 기밀은 답하지 않아요</div>';
 }
 const 챗화면 = { lesson:'수업 기록', home:'홈', tasks:'업무', leads:'상담', assign:'가이드 · 체험 배정', manual:'매뉴얼', voc:'VOC', kcal:'칼로리 계산기', leave:'연월차', members:'회원', check:'점검', cmall:'피드백', today:'오늘 운동', rtmake:'루틴 · 스트레칭', reports:'리포트', exreq:'종목 사전', kits:'홍보 자료' };
 const 챗화면이름 = v => 챗화면[v] || v;
@@ -6261,11 +6326,14 @@ function 챗찾기(글){
 function 챗대화(){
   if(!챗.방){
     const 방들 = ['all'].concat((W.staff || []).filter(p => p.active !== false && p.id !== 챗나()).sort((a, b) => 선생순(a.name, b.name)).map(p => 챗방id(p.id)));
-    return '<div class="gc-body list">' + 방들.map(r => { const 끝 = 챗.글.filter(m => m.room === r).slice(-1)[0], 이 = 챗방이름(r), 안 = 챗안읽음(r), 색 = r === 'all' ? '#e9cf9b' : (선생님색(이) || '#b9b1a2');
-      return '<button class="gc-room" data-act="tx:gcroom" data-k="' + esc(r) + '"><span class="av" style="background:' + esc(색) + '">' + esc(r === 'all' ? '전' : 이.slice(0, 1)) + '</span><span class="tx"><b>' + esc(이) + '</b><small>' + esc(끝 ? (끝.files && 끝.files.length ? '사진 ' : '') + (끝.link ? '🔗 ' + (끝.link.title || '') + ' ' : '') + (끝.body || '') : '대화가 없어요') + '</small></span><span class="t">' + (끝 ? 챗때(끝.created_at) : '') + (안 ? '<i>' + 안 + '</i>' : '') + '</span></button>'; }).join('') + '</div>';
+    const 모안 = 방들.reduce((a, r) => a + 챗안읽음(r), 0);
+    방들.sort((p, q) => { const x = (챗.글.filter(m => m.room === p).slice(-1)[0] || {}).created_at || '', y = (챗.글.filter(m => m.room === q).slice(-1)[0] || {}).created_at || ''; return p === 'all' ? -1 : q === 'all' ? 1 : y > x ? 1 : y < x ? -1 : 0; });      /* 최근 대화가 위 (카톡처럼) · 전체방은 맨 위 */
+    return '<div class="gc-title">대화</div>' + (모안 ? '<div class="gc-unread">' + 모안 + '개의 안 읽은 글이 있어요<span class="sp"></span><button data-act="tx:gcreadall">모두 읽기</button></div>' : '')
+      + '<div class="gc-body list">' + 방들.map(r => { const 끝 = 챗.글.filter(m => m.room === r).slice(-1)[0], 이 = 챗방이름(r), 안 = 챗안읽음(r), 색 = r === 'all' ? '#e9cf9b' : (선생님색(이) || '#d9d4cb');
+      return '<button class="gc-room" data-act="tx:gcroom" data-k="' + esc(r) + '"><span class="av" style="background:' + esc(색) + '">' + esc(r === 'all' ? '전' : 이.slice(0, 1)) + '</span><span class="tx"><b>' + esc(이) + (끝 ? '<em>' + 챗때(끝.created_at) + '</em>' : '') + '</b><small>' + esc(끝 ? (끝.files && 끝.files.length ? '사진 ' : '') + (끝.link ? '🔗 ' + (끝.link.title || '') + ' ' : '') + (끝.body || '') : '대화가 없어요') + '</small></span><span class="t">' + (안 ? '<i>' + 안 + '</i>' : '') + '</span></button>'; }).join('') + '</div>';
   }
   const r = 챗.방, 글 = 챗.글.filter(m => m.room === r);
-  return '<div class="gc-rh"><button class="gc-ic" data-act="tx:gcroom" data-k="">‹</button><b>' + esc(챗방이름(r)) + '</b></div><div class="gc-body">'
+  return '<div class="gc-rh"><button class="gc-ic" data-act="tx:gcroom" data-k="" title="대화 목록">‹</button><b>' + esc(챗방이름(r)) + '</b></div><div class="gc-body">'
     + (글.length ? 글.map(m => { const 나 = m.sender === 챗나();
         return '<div class="gc-msg' + (나 ? ' me' : '') + '">' + (나 ? '' : '<small>' + esc(보임이름(m.sender_name || '')) + '</small>') + '<div class="' + (나 ? 'gc-me' : 'gc-bot') + (m.notice ? ' ntc' : '') + '">' + (m.notice ? '<b>📢 오늘 공지</b><br>' : '') + esc(m.body || '')
           + (m.files || []).map(f => '<img class="gc-img" data-gcpath="' + esc(f.path) + '" alt="">').join('') + (m.link ? '<br><button class="gc-go" data-act="tx:gcgo" data-k="' + esc(m.link.view || '') + '">🔗 ' + esc(m.link.title || 챗화면이름(m.link.view)) + ' ›</button>' : '') + '</div><span class="tm">' + 챗때(m.created_at) + '</span></div>'; }).join('')
@@ -6275,20 +6343,21 @@ function 챗대화(){
 function 챗쓰기(){
   return '<div class="gc-att">' + (챗.사진.length ? '<span>사진 ' + 챗.사진.length + '장</span>' : '') + (챗.링크 ? '<span>🔗 ' + esc(챗.링크.title) + '</span>' : '')
     + (챗.방 === 'all' && 챗관리() ? '<label><input type="checkbox" id="gcntc"' + (챗.공지 ? ' checked' : '') + '> 오늘 공지로 띄우기</label>' : '') + '</div>'
-    + '<div class="gc-in"><button class="gc-ic" data-act="tx:gcpic" title="사진">📎</button><button class="gc-ic' + (챗.링크 ? ' on' : '') + '" data-act="tx:gclink" title="지금 보는 화면 링크">🔗</button><input id="gcin" placeholder="메시지 입력" autocomplete="off"><button data-act="tx:gcsend">↑</button></div><input type="file" id="gcfile" accept="image/*" multiple hidden>';
+    + '<div class="gc-in"><input id="gcin" placeholder="메시지 입력" autocomplete="off"><button class="gc-ic" data-act="tx:gcpic" title="사진">' + 챗아이콘.클 + '</button><button class="gc-ic' + (챗.링크 ? ' on' : '') + '" data-act="tx:gclink" title="지금 보는 화면 링크">' + 챗아이콘.링 + '</button><span class="sp"></span><button data-act="tx:gcsend" title="보내기">' + 챗아이콘.위 + '</button></div><div class="gc-foot"></div><input type="file" id="gcfile" accept="image/*" multiple hidden>';
 }
 function 챗요청(){
   const 폼 = 챗.새요청 ? '<div class="gc-form"><div class="gc-kinds">' + ['요청', '버그'].map(k => '<button class="' + (챗.새요청.kind === k ? 'on' : '') + '" data-act="tx:gcrk" data-k="' + k + '">' + k + '</button>').join('') + '</div>'
       + '<input id="gcrt" class="inp" placeholder="제목 — 한 줄로" value="' + esc(챗.새요청.title || '') + '"><textarea id="gcrb" class="inp" placeholder="무엇이 필요하거나 어디가 안 되는지">' + esc(챗.새요청.body || '') + '</textarea>'
       + '<div class="gc-att">' + (챗.사진.length ? '<span>사진 ' + 챗.사진.length + '장</span>' : '') + (챗.링크 ? '<span>🔗 ' + esc(챗.링크.title) + '</span>' : '') + '</div>'
-      + '<div class="gc-fb"><button class="gc-ic" data-act="tx:gcpic">📎</button><button class="gc-ic' + (챗.링크 ? ' on' : '') + '" data-act="tx:gclink">🔗</button><span class="sp"></span><button class="btn ghost sm" data-act="tx:gcrnew" data-k="0">취소</button><button class="btn main sm" data-act="tx:gcrsend">보내기</button></div><input type="file" id="gcfile" accept="image/*" multiple hidden></div>'
-    : '<button class="gc-new" data-act="tx:gcrnew" data-k="1">＋ 요청 · 버그 보내기 (사진 · 페이지 링크 붙이기)</button>';
+      + '<div class="gc-fb"><button class="gc-ic" data-act="tx:gcpic" title="사진">' + 챗아이콘.클 + '</button><button class="gc-ic' + (챗.링크 ? ' on' : '') + '" data-act="tx:gclink" title="지금 보는 화면 링크">' + 챗아이콘.링 + '</button><span class="sp"></span><button class="btn ghost sm" data-act="tx:gcrnew" data-k="0">취소</button><button class="btn main sm" data-act="tx:gcrsend">보내기</button></div><input type="file" id="gcfile" accept="image/*" multiple hidden></div>'
+    : '';
   const 딱 = { '받음':'b', '확인 중':'a', '끝남':'c' };
-  return '<div class="gc-body req">' + 폼 + (챗.요청.length ? 챗.요청.map(x => '<div class="gc-req' + (챗.펼 === x.id ? ' on' : '') + '"><button class="gc-rq" data-act="tx:gcropen" data-k="' + esc(x.id) + '"><b>' + esc(x.title || '(제목 없음)') + '<span class="tg ' + (딱[x.status] || 'b') + '">' + esc(x.status) + '</span></b><small>' + esc([보임이름(x.staff_name || ''), x.kind, 챗때(x.created_at), (x.files || []).length ? '사진 ' + x.files.length : ''].filter(Boolean).join(' · ')) + '</small></button>'
+  return '<div class="gc-title">요청 · 버그</div><div class="gc-body req">' + 폼 + (챗.요청.length ? 챗.요청.map(x => '<div class="gc-req' + (챗.펼 === x.id ? ' on' : '') + '"><button class="gc-rq" data-act="tx:gcropen" data-k="' + esc(x.id) + '"><b>' + esc(x.title || '(제목 없음)') + '<span class="gc-tg ' + (딱[x.status] || 'b') + '">' + esc(x.status) + '</span></b><small>' + esc([보임이름(x.staff_name || ''), x.kind, 챗때(x.created_at), (x.files || []).length ? '사진 ' + x.files.length : ''].filter(Boolean).join(' · ')) + '</small></button>'
       + (챗.펼 === x.id ? '<div class="gc-rd">' + esc(x.body || '') + (x.files || []).map(f => '<img class="gc-img" data-gcpath="' + esc(f.path) + '" alt="">').join('') + (x.link ? '<br><button class="gc-go" data-act="tx:gcgo" data-k="' + esc(x.link.view || '') + '">🔗 ' + esc(x.link.title || '') + ' ›</button>' : '')
           + (x.reply ? '<div class="gc-reply"><b>관리자 답</b> ' + esc(x.reply) + '</div>' : '')
           + (챗관리() ? '<div class="gc-kinds">' + ['받음', '확인 중', '끝남'].map(k => '<button class="' + (x.status === k ? 'on' : '') + '" data-act="tx:gcrst" data-k="' + esc(x.id + '|' + k) + '">' + k + '</button>').join('') + '</div><div class="gc-in"><input id="gcrr_' + esc(x.id) + '" placeholder="답 남기기" value="' + esc(x.reply || '') + '"><button data-act="tx:gcrreply" data-k="' + esc(x.id) + '">저장</button></div>' : '') + '</div>' : '') + '</div>').join('')
-      : (챗관리() ? '<div class="empty why"><b>들어온 요청이 없습니다</b>직원이 보내면 여기에 뜹니다</div>' : '<div class="empty why"><b>보낸 요청이 없습니다</b>위 「＋ 요청 · 버그 보내기」를 눌러 주세요</div>')) + '</div>';
+      : (챗관리() ? '<div class="empty why"><b>들어온 요청이 없습니다</b>직원이 보내면 여기에 뜹니다</div>' : '<div class="empty why"><b>보낸 요청이 없습니다</b>아래 「새 요청하기」를 눌러 주세요</div>')) + '<div style="height:60px"></div></div>'
+    + (챗.새요청 ? '' : '<button class="gc-fly" data-act="tx:gcrnew" data-k="1">새 요청하기 ' + 챗아이콘.날 + '</button>');
 }
 const 챗때 = t => { const d = new Date(t); if(isNaN(d)) return ''; const 오늘 = d.toDateString() === new Date().toDateString(); return 오늘 ? String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') : (d.getMonth() + 1) + '/' + d.getDate(); };
 async function 챗사진채우기(el){ const 이 = [...el.querySelectorAll('img[data-gcpath]')]; if(!이.length) return; const u = await 서명주소들(이.map(i => i.dataset.gcpath)); 이.forEach((i, k) => { if(u[k]) i.src = u[k]; }); }
@@ -6316,7 +6385,7 @@ document.addEventListener('keydown', ev => { if(ev.key !== 'Enter' || ev.isCompo
   if(ev.target.id === 'gcin'){ ev.preventDefault(); txAct(챗.탭 === 'ai' ? 'gcask' : 'gcsend', ev.target); } });
 async function 챗손(a, k, el){
   if(a === 'gchat'){ 챗.열림 = !챗.열림; if(챗.열림) 챗받기(true); 챗그리기(); return true; }
-  if(a === 'gcset'){ 챗.설정 = !챗.설정; 챗그리기(); return true; }
+  if(a === 'gcreadall'){ const 방 = [...new Set(챗.글.map(m => m.room))].filter(r => 챗안읽음(r)); if(!방.length) return toast('안 읽은 글이 없어요'), true; for(const r of 방) await 챗읽음(r); toast('모두 읽었어요'); 챗그리기(); return true; }
   if(a === 'gctab'){ 챗.탭 = k; 챗.사진 = []; 챗.링크 = null; 챗그리기(); return true; }
   if(a === 'gcq'){ const x = 챗.답.find(z => String(z.id) === String(k)); if(x){ 챗.도.push({ me:x.q }, { a:x.a, view:x.view }); 챗그리기(); } return true; }
   if(a === 'gcask'){ const i = document.getElementById('gcin'), t = ((i || {}).value || '').trim(); if(!t) return true; 챗.도.push({ me:t }, 챗찾기(t)); 챗그리기(); const n = document.getElementById('gcin'); if(n) n.focus(); return true; }
@@ -9444,7 +9513,7 @@ const 표정의 = {
     행: r => ({ 제목: r.name + (r.segment ? ' · '+r.segment : ''),
       칩: (r.at ? '<span class="tx-tag '+(오늘인가(r.at)?'gold':'')+'">'+시각한글(r.at)+'</span>' : '')
         + (r.channels||[]).map(c => 값칩('leads', 'channels', c)).join('')
-        + (r.reg ? 값칩('leads', 'reg', r.reg, '등록 ' + esc(r.reg)) : '')
+        + (r.reg ? 값칩('leads', 'reg', r.reg, '등록 ' + esc(r.reg)) : '') + 합침칩('leads', r)
         + (r.note ? '<span>'+esc(r.note)+'</span>' : ''),
       오른쪽: 아바타들(r.counselors), 체크:'done' }),
   },
@@ -10139,9 +10208,11 @@ function 표칸들(key){
   }
   return 다.filter(c => !c.숨김);
 }
+/* 같은 번호 상담 합침 — 남는 줄 extra.merged_from[ids] · 합쳐진 줄 extra.archived + merged_into (2026-10-26 중앙 · 대표 「매일 밤 자동 합침」) · 합쳐진 줄은 목록에서 이미 뺀다 */
+const 합침칩 = (key, r) => { const n = key === 'leads' && r && r.extra && Array.isArray(r.extra.merged_from) ? r.extra.merged_from.length : 0; return n ? '<span class="tx-tag tx-merge" title="같은 번호 상담 ' + n + '줄을 이 줄로 합쳤어요">합침 ' + n + '</span>' : ''; };
 function 표칸값(key, c, r){
   if(c.k === 표정의[key].제목열)
-    return '<b>' + esc(String(r[c.k] == null ? '' : r[c.k]) || '이름 없음') + '</b>';
+    return '<b>' + esc(String(r[c.k] == null ? '' : r[c.k]) || '이름 없음') + '</b>' + 합침칩(key, r);
   if(c.타입 === 'people' || c.타입 === 'multi'){      /* 표 칸은 한 줄 — 첫 하나 + 「외 n명 · 외 n개」 (2026-10-22) */
     const v = (c.늘림 ? (r.extra||{})[c.k.slice(6)] : r[c.k]) || [];
     if(Array.isArray(v) && v.length > 1) return '<span class="tx-nms one">' + 외몇(c.타입 === 'people' ? 사람칩(c, v[0]) : 옵칩(c, v[0], esc(v[0])), c.타입 === 'people' ? v.map(i => 사람(i).name || '') : v.map(String), c.타입 === 'people' ? '명' : '개') + '</span>';
@@ -12868,7 +12939,7 @@ function v배정(){
   if(!['할일', '진행', '전체'].includes(배정.탭) && !묶.some(g => g.k === 배정.탭)) 배정.탭 = '할일';
   const 탭 = [['할일', '할 일', 묶.reduce((a, g) => a + 셈(g), 0)]].concat(묶.map(g => [g.k, g.이름, 셈(g)]), [['진행', '진행 중', 열.length], ['전체', '전체', D.length]]);
   let h = 배정정지띠() + '<div class="as-tabs">' + 탭.map(([k, l, n]) => '<button class="as-tab' + (배정.탭 === k ? ' on' : '') + '" data-act="tx:astab" data-k="' + k + '">' + l + '<b>' + n.toLocaleString() + '</b></button>').join('')
-    + '<span class="as-big"><button class="as-bigbtn" data-act="tx:astradd">＋ 체험 예약자</button>' + (배정정본 === '표' ? '<button class="as-bigbtn" data-act="tx:asdirect">신청 링크 보내기</button>' : '') + '</span></div>';      /* 크게 · 탭 줄 오른쪽 빈자리 (2026-10-25 대표 「체험예약, 설문발송 크게 눈에 띄게 버튼으로」) */
+    + '<span class="as-big"><button class="as-bigbtn" data-act="tx:astradd">＋ 체험 예약자</button>' + (배정정본 === '표' ? '<button class="as-bigbtn" data-act="tx:asdirect">무료PT 설문보내기</button>' : '') + '</span></div>';      /* 크게 · 탭 줄 오른쪽 빈자리 (2026-10-25 대표 「체험예약, 설문발송 크게 눈에 띄게 버튼으로」) */
   const 줄 = (L, 오른, g) => L.slice(0, 8).map(x => '<div class="as-row" data-act="tx:asopen" data-k="' + esc(x.id) + '"><b>' + esc(x.name) + '</b><span class="mt">' + esc(배정담당(x) || '담당 없음') + ' · ' + 배정일(x) + '일 전' + (x.kind === '체험' ? ' · 체험' : '') + (x.fc_memo ? ' · ' + esc(x.fc_memo) : '') + '</span>' + (배정PT중(x) ? '<span class="as-tag ptm">PT 회원</span>' : x.pt_state === 'PT끝남' ? '<span class="as-tag">PT 끝남</span>' : '') + 체험설문표(x) + 오른(x) + '</div>').join('')
     + (L.length > 8 ? '<button class="as-more" data-act="tx:astab" data-k="' + g.k + '">' + (L.length - 8) + '건 더 · 「' + g.이름 + '」 탭에서 모두 보기 ›</button>' : '');
   const 물칩 = '<div class="as-askc">' + 배정묻기.map(k => { const n = 물.filter(x => x.ask === k).length; return n ? '<button class="chip' + (배정.물 === k ? ' on' : '') + '" data-act="tx:asask" data-k="' + esc(k) + '">' + esc(k) + ' ' + n + '</button>' : ''; }).join('') + '</div>';
@@ -13051,11 +13122,38 @@ async function 배정링크보내기(id){ const x = (배정.줄 || []).find(r =>
   try{ const d = await crm('guide_resend', { lead_id: x.id }); if(d && d.ok === false) throw new Error(d.why || '보내지 못했어요');
     x.apply_sent_at = new Date().toISOString(); x.apply_sent_n = (+x.apply_sent_n || 0) + 1; toast('신청 링크를 보냈어요'); 배정판(id); }
   catch(e){ toast(/404|없는 길/.test(String(e.message)) ? '아직 보낼 수 없어요 · 준비 중이에요' : String(e.message || '보내지 못했어요').slice(0, 60)); } }
-function 배정직접판(){      /* 줄 없는 분에게도 — 중앙 guide_resend {name, phone} (같은 번호 줄이 있으면 그 줄 · 없으면 새 줄) · 대표 20:32 「별도로 필요한 건 직접 보내도록」 */
-  판열기('신청 링크 직접 보내기', '<div class="ck-act">무료 PT 희망 시간 신청 링크를 알림톡으로 보냅니다<small>재등록 · 그 밖에 필요한 분 · 같은 번호 줄이 있으면 그 줄로 들어가요</small></div>'
-    + '<div class="as-form"><label>이름 *<input class="srch" id="asd_name"></label><label>전화 *<input class="srch" id="asd_phone" inputmode="tel" placeholder="010-0000-0000"></label></div>'
-    + '<button class="btn main" data-act="tx:asdirectgo" style="width:100%;margin-top:12px">보내기</button>'); }
-async function 배정직접보내기(){ const v = k => (($('#asd_' + k) || {}).value || '').trim(), 이름 = v('name'), 번호 = v('phone');
+/* 무료PT 설문보내기 — 찾아서 고르기 (2026-10-26 21:44 대표 「검색창으로 되어야 하지 않을까」)
+   찾는 곳 = 배정 줄 · 상담 · 앱 회원(데스크에 이미 있는 자료 · 같은 번호는 하나로) · 목록에 없으면 「직접 입력」 */
+const 직접 = { q:'', 고름:null, 손:false };
+function 직접후보(q){
+  const 키 = 검색키(q), 숫 = String(q || '').replace(/\D/g, ''); if(!키 && 숫.length < 3) return [];
+  const 본 = new Map(), 넣 = (name, phone, 곳, 밑) => { const p = String(phone || '').replace(/\D/g, ''); if(!name || p.length < 10) return; const k = p.slice(-8); if(본.has(k)) return; 본.set(k, { name, phone: p, 곳, 밑 }); };
+  (배정.줄 || []).forEach(x => 넣(x.name, x.phone, '배정', [x.kind, x.ticket].filter(Boolean).join(' · ')));
+  (W.leads || []).forEach(x => 넣(x.name, x.phone, '상담', (x.channels || []).slice(0, 2).join(' · ')));
+  (D.m || []).forEach(x => 넣(x.name, x.phone, '회원', x.trainer ? '담당 ' + x.trainer : ''));
+  return [...본.values()].filter(x => (키 && 검색키(x.name).includes(키)) || (숫.length >= 3 && x.phone.includes(숫))).slice(0, 30);
+}
+function 직접결과(){
+  if(직접.고름) return '<div class="ad-pick"><span class="ad-av">' + esc(직접.고름.name.slice(0, 1)) + '</span><span class="tx"><b>' + esc(직접.고름.name) + '</b><small>' + esc(번호보기(직접.고름.phone)) + '</small></span><button class="btn ghost sm" data-act="tx:asdre">다시 찾기</button></div>';
+  if(직접.손) return '<div class="ad-card"><label class="ad-f"><span>이름</span><input class="srch" id="asd_name" placeholder="홍길동" autocomplete="off"></label>'
+    + '<label class="ad-f"><span>전화번호</span><input class="srch" id="asd_phone" inputmode="tel" placeholder="010-0000-0000" autocomplete="off"></label></div>'
+    + '<button class="ad-link" data-act="tx:asdhand" data-k="0">‹ 찾기로 돌아가기</button>';
+  const 목 = 직접후보(직접.q);
+  return (직접.q.trim() ? (목.length ? '<div class="ad-list">' + 목.map((x, i) => '<button class="ad-row" data-act="tx:asdpick" data-k="' + i + '"><span class="ad-av">' + esc(x.name.slice(0, 1)) + '</span><span class="tx"><b>' + esc(x.name) + '</b><small>' + esc(번호보기(x.phone)) + (x.밑 ? ' · ' + esc(x.밑) : '') + '</small></span><span class="ad-src">' + x.곳 + '</span></button>').join('') + '</div>'
+      : '<div class="empty">찾는 결과가 없습니다<small class="e2">목록에 없는 분은 아래 「직접 입력」으로 보내 주세요</small></div>') : '<div class="empty">보낼 분을 아직 고르지 않았습니다<small class="e2">위 칸에 이름이나 전화번호 뒷자리를 입력해 주세요</small></div>')
+    + '<button class="ad-link" data-act="tx:asdhand" data-k="1">목록에 없으면 직접 입력 ›</button>';
+}
+function 배정직접판(){
+  Object.assign(직접, { q:'', 고름:null, 손:false });
+  판열기('무료PT 설문보내기', '<div class="ad-hero"><span class="ad-ic">✉</span><span><b>무료 PT 희망 시간 설문 링크를 알림톡으로 보냅니다</b><small>배정 · 상담 · 회원에서 찾아 고르세요 · 같은 번호가 있으면 그 줄에 기록돼요</small></span></div>'
+    + '<label class="ad-q"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input class="srch" id="asdq" placeholder="이름 · 전화 뒷자리로 찾기" autocomplete="off"></label>'
+    + '<div id="asdres">' + 직접결과() + '</div>',
+    '<div class="tx-fbtns ad-foot"><span class="sp"></span><button class="btn ghost" data-act="popclose">닫기</button><button class="btn gold" data-act="tx:asdirectgo">무료PT 설문보내기</button></div>');
+  setTimeout(() => { const q = $('#asdq'); if(q) q.focus(); }, 30); }
+function 직접다시(){ const r = $('#asdres'); if(r) r.innerHTML = 직접결과(); const q = $('#asdq'); if(q) q.closest('.ad-q').style.display = 직접.고름 || 직접.손 ? 'none' : ''; }
+document.addEventListener('input', ev => { if(!ev.target || ev.target.id !== 'asdq') return; 직접.q = ev.target.value; 직접.고름 = null; 직접다시(); });
+async function 배정직접보내기(){ const v = k => (($('#asd_' + k) || {}).value || '').trim(), 이름 = 직접.고름 ? 직접.고름.name : v('name'), 번호 = 직접.고름 ? 직접.고름.phone : v('phone');
+  if(!직접.고름 && !직접.손){ toast('보낼 분을 찾아 골라 주세요'); return; }
   if(!이름 || 번호.replace(/\D/g, '').length < 10){ toast('이름과 전화번호를 넣어 주세요'); return; }
   if(!await 묻기(이름 + ' 님께 무료 PT 신청 링크를 보낼까요?' + String.fromCharCode(10) + '알림톡으로 나갑니다')) return;
   try{ const d = await crm('guide_resend', { name: 이름, phone: 번호 }); if(d && d.ok === false) throw new Error(d.why || '보내지 못했어요'); popClose(); toast('신청 링크를 보냈어요'); 배정.때 = 0; 배정받기(); }
@@ -13728,6 +13826,9 @@ async function txAct(a, el){
   if(a==='asswapgo'){ const [id, w] = String(k).split('|'); if(await 배정고침(id, { swap_by:(ME && ME.name) || '', swap_why:w, swap_at:new Date().toISOString() }, '담당 교체 요청 · ' + w)){ if(판길.length) 배정판(id); else popClose(); } return; }
   if(a==='asstop'){ await 배정정지바꿈(); return; }
   if(a==='asdirect'){ 배정직접판(); return; }
+  if(a==='asdpick'){ const x = 직접후보(직접.q)[+k]; if(x){ 직접.고름 = x; 직접다시(); } return; }
+  if(a==='asdre'){ 직접.고름 = null; 직접다시(); const q = $('#asdq'); if(q) q.focus(); return; }
+  if(a==='asdhand'){ 직접.손 = k === '1'; 직접.고름 = null; 직접다시(); if(직접.손){ const n = $('#asd_name'); if(n) n.focus(); } return; }
   if(a==='asdirectgo'){ await 배정직접보내기(); return; }
   if(a==='asassign'){ const [id, t] = String(k).split('|'), x0 = (배정.줄 || []).find(r => String(r.id) === String(id)); if(await 배정고침(id, Object.assign({ trainers:[t], assigned:'배정완료', assigned_on:TODAY, assign_note:TODAY + ' ' + ((ME && ME.name) || '') + ' → ' + t, swap_by:null, swap_why:null, swap_at:null }, x0 && 배정PT중(x0) && 'pt_ok' in x0 && 배정관리자() ? { pt_ok: ((ME && ME.name) || '') + ' ' + new Date().toISOString().slice(0, 16).replace('T', ' ') + ' 담당 바꿈' } : {}), '담당 ' + t + ' · 배정완료')){ if(판길.length) 배정판(id); else popClose(); } return; }      /* 상세에서 왔으면 상세로(새 담당) — 뒤로 길도 거기까지 걷힘 */
   if(a==='asst'){ const [id, st] = String(k).split('|'); await 배정고침(id, Object.assign({ progress:st }, st === '진행중' ? { recall_on:null } : {}), '진행상황 「' + st + '」'); if($('#pop').classList.contains('on')) 배정판(id); return; }
