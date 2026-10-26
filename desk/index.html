@@ -317,6 +317,13 @@ img{max-width:100%;display:block}
 .card.click:hover{border-color:#4a4a44}
 .card .t1{font-size:14.5px;font-weight:700}
 .card .t2{font-size:13px;color:var(--sub);margin-top:3px}
+/* ══ 데스크 글자 규칙 (2026-10-26 대표 확정) ══
+   ① 숫자 · 딱지 = 줄이지도 줄바꿈도 않는다(나머지가 비킨다) ② 이름 = 두 줄까지 낱말 단위 · 넘치면 … ③ 설명(작은 회색 글) = 한 줄 · 넘치면 …
+   넓으면 다 보인다(…는 실제로 좁을 때만) · 줄여진 글은 마우스를 올리면 전체(글자규칙툴팁) · 검사 = 시험 「데스크글자규칙」 */
+.tag,.tx-tag,.bdg,.pill,.stp,.gn,.fc,.bk-pill,.bp-snz{white-space:nowrap;flex:none}
+.rowc > div,.rowc > span:not(.tag):not(.rt),.bp-hr > b,.bp-hr > span{min-width:0}
+.rowc .t1,.bp-hr > b,.lsp-r b,.tx-row .tx-rt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:keep-all;overflow-wrap:anywhere}
+.rowc .t2,.bp-hr > span,.lsp-r small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
 .card.gold{border-color:var(--gold-2);background:var(--gold-dim)}
 .card.gold .t1{color:var(--gold)}
 .card.teal{border-color:#3a5b66;background:var(--teal-dim)}
@@ -1020,7 +1027,8 @@ body.끄는중{user-select:none;-webkit-user-select:none}
 .hmbar .reset{color:var(--sub)}
 
 /* 현황판 숫자 — 눌리는 것이라는 티를 낸다 */
-.hblk > .homenums .num{border-radius:11px;padding:7px 12px;transition:background .12s}
+.hblk > .homenums .num{border-radius:11px;padding:7px 4px;transition:background .12s}
+.hblk > .homenums .num{width:100%;box-sizing:border-box}.hblk > .homenums .num .k{width:100%;box-sizing:border-box}      /* 칸 이름이 칸 폭을 다 씀 — 넓은데도 두 줄로 꺾였다 (2026-10-26) */      /* 칸 이름이 칸 폭을 다 쓰게 — 넓은 화면에서도 「수업 기록…」으로 잘렸다 (2026-10-26) */
 .hblk > .homenums .num:hover{background:#232320}
 .hblk > .homenums .num:hover .k{color:var(--gold-2)}
 /* @이름 — 부른 표시 */
@@ -1519,6 +1527,27 @@ body.resizing{cursor:col-resize;user-select:none}
 .mc-t{display:flex;flex-direction:column;gap:3px;padding:10px 12px 12px}.mc-t b{font-size:15px}.mc-t small{font-size:13px;color:var(--sub)}
 .mc-t em{font-style:normal;font-size:12.5px;font-weight:800;color:var(--gold);align-self:flex-start;border-radius:999px;padding:1px 8px;background:rgba(240,211,160,.12)}.mc-t em.ok{color:var(--teal);background:rgba(143,209,196,.12)}
 .mrd{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.mrd .ok{color:var(--teal);font-weight:800}
+/* 노션 흰 바탕 — 업무 · 상담 표 화면(#body.lite)과 그 페이지(#pop.lite) (2026-10-26 대표 「상담, 업무는 흰색 배경으로 노션처럼」) */
+#body.lite,#pop.lite #popbox{--dark:#ffffff;--dark-2:#ffffff;--dark-3:#f7f7f5;--dark-4:#efefed;--line:#e9e9e7;--cream:#37352f;--sub:#787774;--gold:#9a6b2f;--gold-2:#b5833f;--gold-dim:#fbf3db;--teal:#2f7c8c;--teal-dim:#e7f3f5;--warn:#c4554d;background:#ffffff;color:#37352f}
+#body.lite{border-radius:12px;padding:16px 18px}
+#body.lite .tx-table,#body.lite .tx-tr,#body.lite .tx-td,#body.lite .tx-th,#body.lite .tx-row,#body.lite .tx-list{border-color:#e9e9e7!important;background-color:transparent}
+#body.lite .tx-tr:hover,#body.lite .tx-row:hover{background:#f7f7f5}
+#body.lite .tx-th,#body.lite .tx-hd{color:#787774;background:#ffffff}
+#body.lite .chip,#pop.lite .chip{background:#ffffff;border-color:#e3e2e0;color:#37352f}#body.lite .chip.on,#pop.lite .chip.on{background:#37352f;color:#ffffff;border-color:#37352f}
+#body.lite .btn.ghost,#pop.lite .btn.ghost{color:#37352f;border-color:#e3e2e0}
+#body.lite input,#body.lite .inp,#pop.lite input,#pop.lite .inp,#pop.lite textarea{background:#ffffff;color:#37352f;border-color:#e3e2e0}
+#pop.lite #popbox{color:#37352f}#pop.lite .tx-ttl{color:#37352f}#pop.lite .tx-prow .tx-pname{color:#787774}#pop.lite .tx-cmt .b{background:#f7f7f5;color:#37352f}
+.rb-chips{margin:0 0 14px}.rb-chips .chip{position:relative}.rb-chips .chip i{font-style:normal;opacity:.7}.rb-dot{position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:var(--warn);border:2px solid var(--dark)}
+.rb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
+.rb-card{background:var(--dark-2);border:1px solid var(--line);border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;min-width:0}.rb-card.need{border-color:color-mix(in srgb,var(--warn) 60%,transparent)}
+.rb-hd{display:flex;gap:8px;align-items:flex-start}.rb-hd b{font-size:15.5px;flex:1;min-width:0}
+.tag.rb-ok{background:rgba(157,206,220,.12);color:var(--teal)}.tag.rb-need{background:rgba(232,146,124,.16);color:var(--warn)}.tag.rb-lock{background:var(--gold-dim);color:var(--gold)}
+.rb-one{color:#cfc9bf;font-size:13.5px;margin-top:-4px}
+.rb-flow{display:flex;gap:6px;flex-wrap:wrap}.rb-flow span{background:var(--dark-3);border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:13px;flex:1 1 0;min-width:90px}.rb-flow em{font-style:normal;color:var(--gold);align-self:center;flex:none}
+.rb-pp{display:flex;gap:5px;flex-wrap:wrap}.rb-pp span{font-size:13px;border-radius:8px;padding:2px 8px;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}.rb-pp .y{background:rgba(157,206,220,.10);color:var(--teal)}.rb-pp .n{background:rgba(232,146,124,.10);color:var(--warn)}
+.rb-meta{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--sub)}.rb-meta b{color:var(--cream);font-weight:700}
+.rb-say{font-size:13px;color:var(--sub);border-left:2px solid #4a4438;padding-left:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rb-src{font-size:13px;color:var(--sub);text-align:left;align-self:flex-start}.rb-src:hover{color:var(--gold)}.rb-srcx{font-size:13px;color:#cfc9bf;background:var(--dark-3);border-radius:8px;padding:6px 9px}
 .pzlist{max-height:330px;overflow:auto;border:1px solid var(--line);border-radius:12px}
 .tx-auto{flex:none;margin-left:6px;font-size:12px;font-weight:800;color:var(--teal);border:1px solid #3c5a53;border-radius:999px;padding:0 7px;line-height:18px}
 /* 고르기 = 그림 카드 (2026-10-26 대표 「스트레칭 · 웨이트 이질감 없이」 · 앱 .megrp.pkg 와 같은 꼴) */
@@ -2407,6 +2436,9 @@ button.as-more{display:block;width:100%;background:none;border:0;color:var(--sub
     <button class="nav" data-v="kits">
       <svg viewBox="0 0 24 24"><path d="M4 4h7l2 2h7a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/><path d="M9 13l2 2 4-4"/></svg>
       홍보 자료<span class="bdg" id="ktbdg" style="display:none"></span></button>
+    <button class="nav" data-v="rules">
+      <svg viewBox="0 0 24 24"><path d="M9 4h6M12 4v4M5 8h14v12H5z"/><path d="M8 12h8M8 16h5"/></svg>
+      규칙</button>
     <button class="nav" data-v="trash" id="navtrash" style="display:none">
       <svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
       휴지통</button>
@@ -2437,7 +2469,7 @@ button.as-more{display:block;width:100%;background:none;border:0;color:var(--sub
 
 <script>
 "use strict";
-const BUILD = '413';
+const BUILD = '414';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -2603,6 +2635,7 @@ const 권한줄 = [
   ['메뉴', 'rtmake', '루틴 · 스트레칭', '', [1, 1, 1, 0, 0]],
   ['메뉴', 'exreq', '종목 사전', '', [1, 1, 1, 0, 0]],
   ['메뉴', 'kits', '홍보 자료', '', [1, 1, 1, 0, 1]],
+  ['메뉴', 'rules', '규칙', '자동화 규칙 한눈에', [1, 0, 0, 0, 0]],      /* 2026-10-26 대표 「관리자만 보이게」 · 중앙 창구도 super · boss 만 */
   ['메뉴', 'trash', '휴지통', '삭제한 것 복원', [1, 0, 0, 0, 0]],
   ['회원 · 기록', 'scope', '회원 보기 범위', '전체 = 다른 트레이너 회원 · 리포트 · 예약률까지 (읽기)', ['a', 'm', 'm', 'm', 'a']],
   ['회원 · 기록', 'otherrec', '남의 담당 회원 기록 수정', '잠수 사유 등', [1, 0, 0, 0, 0]],
@@ -9515,6 +9548,32 @@ function 매뉴얼읽음칸(r){
   const 안 = (W.staff || []).filter(p => p.active !== false && p.name && !L.some(x => x.name === p.name)).map(p => p.name);
   return '<div class="tx-sec mrd">' + (내 ? '<span class="ok">✓ 읽었어요 · ' + esc(시각한글(내.at)) + '</span>' : '<button class="btn gold sm" data-act="tx:mread" data-id="' + esc(r.id) + '">읽었어요</button>')
     + '<small class="sub3">읽음 ' + L.length + '명' + (안.length ? ' · 아직 ' + esc(안.join(' · ')) : ' · 모두 읽음') + '</small></div>'; }
+/* 글자 규칙 — 줄여진(…) 글에 마우스를 올리면 전체가 뜬다 (2026-10-26 대표 확정) */
+document.addEventListener('mouseover', ev => { const e = ev.target && ev.target.closest && ev.target.closest('.t1, .t2, .k, b, small, span'); if(!e || e.title) return;
+  if(e.scrollWidth > e.clientWidth + 1 || e.scrollHeight > e.clientHeight + 2) e.title = (e.innerText || '').replace(/\s+/g, ' ').trim(); }, { passive:true });
+/* ══ 규칙 탭 ══ 2026-10-26 대표 확정(시안 KoA5n · 「관리자만」) — 파트 칩 · 카드 = 제목 · 한줄 · 흐름 화살표 · 대상 ✓ · 제외 ✕ · 언제 · 누가 · 확정 + 대표말 · 🔒 검사기 · 상태 · 근거(펼침)
+   자료 = 중앙 crm('rules_board') (규칙판.py · 정본은 지침 · 코드 — 여기는 한눈에 보기) */
+const 규칙판 = { 답:null, 중:false, 왜:'', 칩:'전체', 펼:new Set() };
+async function 규칙판받기(){ if(규칙판.중) return; 규칙판.중 = true;
+  try{ 규칙판.답 = await crm('rules_board', {}); 규칙판.왜 = ''; }catch(e){ 규칙판.왜 = String(e.message || '').slice(0, 60); }
+  규칙판.중 = false; if(S.view === 'rules') render(); }
+function v규칙(){
+  if(!규칙판.답){ if(!규칙판.중 && !규칙판.왜) setTimeout(규칙판받기, 0);
+    return 규칙판.왜 ? '<div class="empty why"><b>규칙을 불러오지 못했습니다</b>' + esc(규칙판.왜) + ' · 잠시 뒤 다시 열어 주세요</div>' : '<div class="ck-load"><b>불러오는 중이에요</b></div>'; }
+  const D2 = 규칙판.답, 카드 = D2['카드'] || [], 파트 = D2['파트'] || [], 수 = p => 카드.filter(c => p === '전체' || c['파트'] === p), 필요 = p => 수(p).some(c => c['상태'] === '최신화 필요');
+  const 칩 = ['전체'].concat(파트).includes(규칙판.칩) ? 규칙판.칩 : '전체';
+  const 상딱 = s => s === '최신' ? '<span class="tag rb-ok">최신</span>' : s === '최신화 필요' ? '<span class="tag rb-need">최신화 필요</span>' : '<span class="tag">' + esc(s || '') + '</span>';
+  return '<div class="chips rb-chips">' + ['전체'].concat(파트).map(p => '<button class="chip' + (칩 === p ? ' on' : '') + '" data-act="tx:rbchip" data-k="' + esc(p) + '">' + esc(p) + ' <i>' + 수(p).length + '</i>' + (필요(p) ? '<span class="rb-dot" title="최신화 필요"></span>' : '') + '</button>').join('') + '</div>'
+    + '<div class="rb-grid">' + 수(칩).map(c => '<div class="rb-card' + (c['상태'] === '최신화 필요' ? ' need' : '') + '">'
+      + '<div class="rb-hd"><b>' + esc(c['제목']) + '</b>' + ((c['검사기'] || []).length ? '<span class="tag rb-lock" title="' + esc((c['검사기'] || []).join(' · ')) + '">🔒 검사기</span>' : '') + 상딱(c['상태']) + '</div>'
+      + '<div class="rb-one">' + esc(c['한줄'] || '') + '</div>'
+      + '<div class="rb-flow">' + (c['흐름'] || []).map(x => '<span>' + esc(x) + '</span>').join('<em>→</em>') + '</div>'
+      + ((c['대상'] || []).length || (c['제외'] || []).length ? '<div class="rb-pp">' + (c['대상'] || []).map(x => '<span class="y" title="' + esc(x) + '">✓ ' + esc(x) + '</span>').join('') + (c['제외'] || []).map(x => '<span class="n" title="' + esc(x) + '">✕ ' + esc(x) + '</span>').join('') + '</div>' : '')
+      + '<div class="rb-meta"><span>언제 <b>' + esc(c['언제'] || '') + '</b></span><span>누가 <b>' + esc(c['누가'] || '') + '</b></span><span>확정 <b>' + esc(c['확정'] || '') + '</b></span></div>'
+      + (c['대표말'] ? '<div class="rb-say" title="' + esc(c['대표말']) + '">「' + esc(c['대표말']) + '」</div>' : '')
+      + (c['원문'] ? '<button class="rb-src" data-act="tx:rbsrc" data-k="' + esc(c['id']) + '">근거: ' + esc(c['원문']['파일']) + ' ' + (규칙판.펼.has(c['id']) ? '▴' : '▾') + '</button>' + (규칙판.펼.has(c['id']) ? '<div class="rb-srcx">' + esc(c['원문']['파일']) + ' · 「' + esc(c['원문']['절']) + '」' + (c['확인때'] ? ' · 확인 ' + esc(c['확인때']) : '') + '</div>' : '') : '<span class="rb-src">근거 원문 없음</span>')
+      + '</div>').join('') + '</div>';
+}
 function 모양(key){
   const t = 표모양[모양키(key)];
   if(t) return t;
@@ -10750,7 +10809,7 @@ async function txView(key, id){
     + '</div>',
     '<div class="tx-fbtns"><span class="tx-stat" id="txstat">'+(편집?'':'읽기 전용')+'</span>'
     + (편집 && x.체크 ? '<button class="btn gold" data-act="tx:toggle" data-k="'+key+'" data-id="'+id+'" data-f="'+x.체크+'" data-stay="1">'+(done?'완료 취소':'완료')+'</button>' : '')
-    + '</div>');
+    + '</div>', ['tasks', 'leads'].includes(key));      /* 흰 바탕 (2026-10-26) */
   if(BL) document.querySelectorAll('#txblocks .tx-x[data-bi]').forEach(el => { const b = 블록가져(el.dataset.bi); if(b) el.innerText = b.x||''; });
   const tt = document.querySelector('.tx-page .tx-ttl[contenteditable]');
   if(tt) tt.addEventListener('blur', function(){
@@ -12841,6 +12900,8 @@ async function txAct(a, el){
   if(a==='mread'){ const 나 = (ME && ME.name) || ''; if(!나 || (W.mread || []).some(x => x.manual_id === id && x.name === 나)) return;      /* 매뉴얼 읽었어요 */
     try{ await usend('tr_manual_read', 'POST', { manual_id: id, name: 나 }, 'return=minimal'); W.mread = (W.mread || []).concat([{ manual_id: id, name: 나, at: new Date().toISOString() }]); toast('읽었어요'); txView('manual', id); render(); }
     catch(e){ toast('저장하지 못했어요 — ' + (/tr_manual/.test(String(e.message)) ? '서버 준비(70단계)가 아직이에요' : String(e.message || '').slice(0, 60))); } return; }
+  if(a==='rbchip'){ 규칙판.칩 = k; render(); return; }      /* 규칙 탭 파트 칩 */
+  if(a==='rbsrc'){ 규칙판.펼.has(k) ? 규칙판.펼.delete(k) : 규칙판.펼.add(k); render(); return; }
   if(a==='lsgorec'){ if(AUTH && AUTH.token){ 앱기록창(k); 쪽지닫기(); } else { 쪽지닫기(); 회원판열기(k); } return; }      /* 회원 검색 · 오늘 예약 → 바로 기록 */
   if(a==='arclose'){ 앱기록닫기(); if(S.mid) loadMember(S.mid); return; }
   if(a==='mrpt'){ if(!k) return toast('아직 리포트가 없어요'); 앱기록창(S.mid, k); return; }      /* 리포트 보기 = 앱 리포트 화면 그대로 (C-4) */
@@ -13553,9 +13614,10 @@ async function 업무노션맞춤(){
 }
 function txRender(){
   const top = $('#top'), line = $('#topline'), b = $('#body');
+  b.classList.remove('lite');
   if(S.view==='home'){ top.innerHTML = '<h1>홈</h1><span class="cnt">'+dateFull(TODAY)+' · '+esc(ME?ME.name:'')+'</span><span class="talerts" id="talerts"><span id="schomeslot">' + 매확홈단추() + '</span><span id="pshomeslot">' + 매출홈단추() + '</span><span id="bphomeslot">' + 비품홈단추() + '</span></span>' + 이번주쉼글() + '<button class="btn ghost sm applink" type="button" data-act="tx:applink" data-k="m">앱 설치 링크</button>'; setTimeout(알림줄맞춤, 0);      /* 알림 단추가 많아지면 옆으로 밀어서 본다 (2026-10-21 대표 「공간이 부족하면 슬라이드로」) */
     line.innerHTML=''; b.innerHTML = vHome(); 홈배치붙이기(); return true; }
-  if(표정의[S.view]){ top.innerHTML = txTop(S.view); line.innerHTML=''; b.innerHTML = txList(S.view); if(S.view === 'tasks') setTimeout(업무노션맞춤, 300); return true; }
+  if(표정의[S.view]){ top.innerHTML = txTop(S.view); line.innerHTML=''; b.innerHTML = txList(S.view); b.classList.toggle('lite', ['tasks', 'leads'].includes(S.view));      /* 업무 · 상담 = 노션처럼 흰 바탕 (2026-10-26 대표) */ if(S.view === 'tasks') setTimeout(업무노션맞춤, 300); return true; }
   return false;
 }
 
@@ -14103,6 +14165,9 @@ function render0(){
         + (지금i ? '<button class="chip" data-act="tx:ckwk" data-k="">이번 주로</button>' : '') + '</div>' : '')
       + (지금 ? '<span class="ck-src" style="margin-left:auto">' + esc(지금['출처'] === '저장본' ? '저장본' : 지금['출처'] === '재계산' ? '다시 계산 · 그때와 조금 다를 수 있어요' : '지금') + (지금['기준일'] ? ' · ' + esc(String(지금['기준일']).slice(5, 16).replace('T', ' ')) + ' 기준' : '') + '</span>' : '');
     b.innerHTML = v점검();
+  } else if(S.view==='rules'){
+    top.innerHTML = '<h1>규칙</h1><span class="cnt">' + (규칙판.답 ? (규칙판.답['카드'] || []).length + '개' + (규칙판.답['최신화필요'] ? ' · 최신화 필요 ' + 규칙판.답['최신화필요'] : '') : '') + '</span>';
+    b.innerHTML = v규칙();
   } else if(S.view==='cmall'){
     top.innerHTML = '<h1>피드백</h1>';
     b.innerHTML = vCmAll();
@@ -14239,8 +14304,8 @@ function 앱링크인쇄(k){ const o = 앱링크[k] || 앱링크.m, w = window.o
     + '<h2 style="margin:0 0 6px">GLAD GYM · ' + o.이름 + '</h2><p style="margin:0 0 24px;color:#555">휴대폰 카메라로 찍으면 설치 화면이 열려요</p>' + 앱QR(k, 320)
     + '<p style="margin:22px 0 0;font-size:14px;color:#333;word-break:break-all">' + o.주소 + '</p><script>setTimeout(function(){ print(); }, 300)<\/script></body>');
   w.document.close(); }
-function 판열기(머리, 속, 발){
-  const pop = $('#pop');
+function 판열기(머리, 속, 발, 흰){
+  const pop = $('#pop'); pop.classList.toggle('lite', !!흰);      /* 업무 · 상담 페이지 = 흰 바탕 (2026-10-26) */
   /* 같은 판을 다시 그릴 때는 스크롤 자리를 지킨다 — 단추 하나 누를 때마다 맨 위로 튀었다 (2026-10-15 대표 「체형 수정 · 하나 선택할 때마다 상단으로 튐」).
      다른 판(머리가 다름)을 열 때만 맨 위에서 시작한다. 판 안의 가로 · 세로 스크롤 칸(.tx-scroll · overflow 칸)도 차례대로 되살린다 */
   const 같은판 = pop.classList.contains('on') && pop.classList.contains('tx-side') && 판머리 === 머리;
