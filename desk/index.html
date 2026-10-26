@@ -2634,7 +2634,7 @@ body:has(#pop.on.tx-side) #gchat .gc-fab:not(.x){display:none}      /* 옆 판�
 
 <script>
 "use strict";
-const BUILD = '428';
+const BUILD = '429';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -3992,6 +3992,7 @@ function 동의관문(kind){            /* 막았으면 true — 부른 쪽은 �
 }
 
 async function 동의요청보내기(){
+  if(늦은때() && !await 묻기('건강정보 동의 요청을 보낼까요?' + 늦은때())) return;
   const mid = S.mid, 지금 = new Date().toISOString();
   try{
     await ssend('members?id=eq.' + encodeURIComponent(mid), 'PATCH',
@@ -12105,9 +12106,11 @@ function 상담1차칸(r, 편집){ const ex = r.extra || {}, 끝 = ex.s1 === '�
     + (ex.s1_at ? '<span class="sub3">' + esc(시각한글(ex.s1_at)) + (ex.s1_by ? ' · ' + esc(ex.s1_by) : '') + '</span>' : '')
     + (편집 && !끝 && r.phone ? '<button class="btn gold sm" data-act="tx:lr1" data-id="' + esc(r.id) + '">1차 안내 보내기</button>' : '')
     + (편집 && !끝 && !r.phone ? '<span class="sub3">전화번호가 없어 보낼 수 없습니다</span>' : '') + '</div></div>'; }
+/* 늦은 시간 확인 — 직접 보내는 것은 시간 제한 없음 · 22:00~08:00 에 누르면 확인 한 번 (2026-10-26 22:48 대표 「막는 게 아니라 확인만」) · 시험은 window.__지금 */
+const 늦은때 = () => { const t = window.__지금 ? new Date(window.__지금) : new Date(), h = t.getHours(); return h >= 22 || h < 8 ? String.fromCharCode(10) + '⚠ 늦은 시간입니다(' + String(h).padStart(2, '0') + ':' + String(t.getMinutes()).padStart(2, '0') + ') · 지금 보낼까요?' : ''; };
 async function 상담1차보내기(id){
   const r = W.leads.find(x => x.id === id); if(!r) return;
-  if(!await 묻기((r.name || '') + '님께 1차 안내를 보낼까요?\n카카오톡으로 보내고 안 되면 문자로 보냅니다')) return;
+  if(!await 묻기((r.name || '') + '님께 1차 안내를 보낼까요?\n카카오톡으로 보내고 안 되면 문자로 보냅니다' + 늦은때())) return;
   try{ await crm('lead_remarket1', { id });
     const n = await uget('tr_leads?select=*&id=eq.' + encodeURIComponent(id)); if(n && n[0]) Object.assign(r, n[0]);
     else r.extra = Object.assign({}, r.extra || {}, { s1: '완료', s1_at: new Date().toISOString() });
@@ -13087,7 +13090,7 @@ function 체험설문칸(x){
   return 답 + 보냄;
 }
 async function 체험설문보내기(id){ const x = (배정.줄 || []).find(r => String(r.id) === String(id)); if(!x) return;
-  if(!await 묻기(x.name + ' 님께 체험 사전 설문을 ' + (x.apply_sent_at ? '다시 ' : '') + '보낼까요?' + String.fromCharCode(10) + '알림톡으로 나갑니다')) return;
+  if(!await 묻기(x.name + ' 님께 체험 사전 설문을 ' + (x.apply_sent_at ? '다시 ' : '') + '보낼까요?' + String.fromCharCode(10) + '알림톡으로 나갑니다' + 늦은때())) return;
   try{ const d = await crm('trial_send', { lead_id: x.id }); if(d && d.ok === false) throw new Error(d.why || '보내지 못했어요');
     x.apply_sent_at = new Date().toISOString(); x.apply_sent_n = (+x.apply_sent_n || 0) + 1; toast('사전 설문을 보냈어요'); 배정판(id); }
   catch(e){ toast(/404|없는 길/.test(String(e.message)) ? '아직 보낼 수 없어요 · 준비 중이에요' : String(e.message || '보내지 못했어요').slice(0, 60)); } }
@@ -13136,7 +13139,7 @@ async function 배정여럿보내기(){
   const 목 = [...배정.고름].map(id => (배정.줄 || []).find(x => String(x.id) === id)).filter(Boolean);
   if(!목.length) return toast('먼저 줄을 골라 주세요');
   if(목.length > 30) return toast('한 번에 30명까지 보낼 수 있어요 · 지금 ' + 목.length + '명');
-  if(!await 묻기(목.length + '명에게 무료 PT 신청 링크를 보낼까요?' + String.fromCharCode(10) + '알림톡으로 나갑니다 · 이미 받았거나 신청한 분은 빼고 보냅니다')) return;
+  if(!await 묻기(목.length + '명에게 무료 PT 신청 링크를 보낼까요?' + String.fromCharCode(10) + '알림톡으로 나갑니다 · 이미 받았거나 신청한 분은 빼고 보냅니다' + 늦은때())) return;
   배정.보냄중 = true; render();
   try{ const d = await crm('guide_resend_many', { ids: 목.map(x => x.id) });      /* 중앙 창구 한 번 — 같은 번호 한 통 · 빼는 기준은 서버 (2026-10-26 중앙) */
     if(!d || d.ok === false) throw new Error((d && d.why) || '보내지 못했어요');
@@ -13147,7 +13150,7 @@ async function 배정여럿보내기(){
   배정.보냄중 = false; render();
 }
 async function 배정링크보내기(id){ const x = (배정.줄 || []).find(r => String(r.id) === String(id)); if(!x) return;
-  if(!await 묻기(x.name + ' 님께 무료 PT 신청 링크를 ' + (x.apply_sent_at ? '다시 ' : '') + '보낼까요?' + String.fromCharCode(10) + '알림톡으로 나갑니다')) return;
+  if(!await 묻기(x.name + ' 님께 무료 PT 신청 링크를 ' + (x.apply_sent_at ? '다시 ' : '') + '보낼까요?' + String.fromCharCode(10) + '알림톡으로 나갑니다' + 늦은때())) return;
   try{ const d = await crm('guide_resend', { lead_id: x.id }); if(d && d.ok === false) throw new Error(d.why || '보내지 못했어요');
     x.apply_sent_at = new Date().toISOString(); x.apply_sent_n = (+x.apply_sent_n || 0) + 1; toast('신청 링크를 보냈어요'); 배정판(id); }
   catch(e){ toast(/404|없는 길/.test(String(e.message)) ? '아직 보낼 수 없어요 · 준비 중이에요' : String(e.message || '보내지 못했어요').slice(0, 60)); } }
@@ -13184,7 +13187,7 @@ document.addEventListener('input', ev => { if(!ev.target || ev.target.id !== 'as
 async function 배정직접보내기(){ const v = k => (($('#asd_' + k) || {}).value || '').trim(), 이름 = 직접.고름 ? 직접.고름.name : v('name'), 번호 = 직접.고름 ? 직접.고름.phone : v('phone');
   if(!직접.고름 && !직접.손){ toast('보낼 분을 찾아 골라 주세요'); return; }
   if(!이름 || 번호.replace(/\D/g, '').length < 10){ toast('이름과 전화번호를 넣어 주세요'); return; }
-  if(!await 묻기(이름 + ' 님께 무료 PT 신청 링크를 보낼까요?' + String.fromCharCode(10) + '알림톡으로 나갑니다')) return;
+  if(!await 묻기(이름 + ' 님께 무료 PT 신청 링크를 보낼까요?' + String.fromCharCode(10) + '알림톡으로 나갑니다' + 늦은때())) return;
   try{ const d = await crm('guide_resend', { name: 이름, phone: 번호 }); if(d && d.ok === false) throw new Error(d.why || '보내지 못했어요'); popClose(); toast('신청 링크를 보냈어요'); 배정.때 = 0; 배정받기(); }
   catch(e){ toast(/404|없는 길/.test(String(e.message)) ? '아직 보낼 수 없어요 · 준비 중이에요' : String(e.message || '보내지 못했어요').slice(0, 60)); } }
 /* 재연락 기록 — 출석 기록처럼 (2026-10-25 대표 「000 트레이너가 000일로 알림 받기 로그를 해당 페이지에서 볼 수 있게」) */
@@ -13682,7 +13685,7 @@ async function txAct(a, el){
   if(a==='rsretry'){
     const id = el.dataset.i, r = RS.find(x=>x.id===id);
     if(!r) return;
-    if(!await 묻기((r.member_name||'') + ' 회원님께 다시 보낼까요?')) return;
+    if(!await 묻기((r.member_name||'') + ' 회원님께 다시 보낼까요?' + 늦은때())) return;
     try{
       await spatch('report_sends', 'id=eq.' + encodeURIComponent(id),
                    { state:'대기', fail_why:null, tried:0, queued_at:new Date().toISOString() });
@@ -15739,6 +15742,7 @@ document.addEventListener('click', async function(ev){
     const key = 있던열쇠 ? 있던열쇠
       : Date.now().toString(36)
         + Array.from(crypto.getRandomValues(new Uint8Array(8))).map(x=>x.toString(36).slice(-1)).join('');
+    if(늦은때() && !await 묻기(m.name + ' 회원님께 피드백 안내 확인 요청을 보낼까요?' + 늦은때())) return;
     try{
       if(!있던열쇠){
         await ssend('members?id=eq.' + encodeURIComponent(m.id), 'PATCH', { cm_optout_key: key });
