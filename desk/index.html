@@ -862,6 +862,27 @@ body.tx-moving .tx-x{cursor:grabbing}
 .lg-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px}.lg-bar .srch{min-width:240px}.lgk-f{display:inline-flex;gap:4px;align-items:center;flex-wrap:wrap}.lgk-f b{font-size:13px;color:var(--sub);margin-right:2px}
 .lg-t td{vertical-align:top;font-size:13px}.lg-t td small{display:block;color:var(--sub);font-size:12.5px}.lg-t .nw{white-space:nowrap}.lg-t .n{color:var(--sub);text-align:right}.lg-d{max-width:420px;white-space:normal;word-break:break-word}
 .lg-a{display:inline-block;border-radius:6px;padding:1px 7px;font-size:12.5px;font-weight:800;background:var(--dark-3);border:1px solid var(--line);white-space:nowrap}.lg-a.z{color:var(--teal)}
+.lv2{display:grid;grid-template-columns:minmax(360px,42%) 1fr;gap:14px;align-items:start}.lv2-l{min-width:0}.lv2-r{min-width:0;position:sticky;top:8px}.lv2 .tx-calwrap{margin:0}
+@media (max-width:1100px){.lv2{grid-template-columns:1fr}}
+.lv-hol{display:block;font-size:10.5px;font-weight:800;color:#e06c5a;margin:1px 0}.lv-off{display:block;font-size:10.5px;font-weight:800;color:var(--sub);margin:1px 0}
+.dt-ord{list-style:none;padding:0;margin:0 0 8px;display:flex;flex-direction:column;gap:4px}.dt-ord li{display:flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:9px;padding:5px 8px}.dt-ord li b{color:var(--gold);min-width:18px}.dt-ord .sp{flex:1}
+.dt-add{display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin:6px 0}.dt-hol div{display:flex;gap:6px;align-items:center;font-size:13px;padding:3px 0;border-bottom:1px solid var(--line)}
+.dt-new{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.dt-new .inp{flex:1 1 140px;min-width:120px}
+.dt-his div,.dt-wait{font-size:13px;padding:3px 0}.dt-wait{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.rsv-top{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}.rsv-top .lc-back{margin:0}.rsv-top .sp,.rsv-h .sp{flex:1}
+.rsv-row{border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:10px;background:var(--card,#1c1b19)}
+.rsv-h{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}.rsv-h b{color:var(--gold);font-size:15px}.rsv-h small{color:var(--sub);font-size:12.5px}
+.rsv-nm{font-weight:800;font-size:15px}.rsv-nm.ed{cursor:pointer;border-bottom:1px dashed transparent}.rsv-nm.ed:hover{border-bottom-color:var(--sub)}.rsv-in{max-width:260px;height:34px}
+.rsv-ex{display:flex;gap:10px;flex-wrap:wrap}.rsv-x{position:relative;width:118px}.rsv-x .rsi,.rsv-x .pkim{display:block;width:118px;aspect-ratio:1/1;border-radius:10px;overflow:hidden;background:#f1f2f4}
+.rsv-x small{display:block;font-size:12.5px;margin-top:4px;color:var(--cream);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rsv-del{position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#fff;cursor:pointer;opacity:0;transition:opacity .15s}.rsv-x:hover .rsv-del{opacity:1}
+.rsv-plus{width:118px;aspect-ratio:1/1;border:1.5px dashed var(--line);border-radius:10px;background:none;color:var(--gold);font:inherit;font-weight:800;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center}.rsv-plus span{font-size:26px}.rsv-plus:hover{border-color:var(--gold)}
+.rsv-add{width:100%;border:1.5px dashed var(--line);border-radius:14px;background:none;color:var(--gold);font:inherit;font-weight:800;padding:12px;cursor:pointer;text-align:left}.rsv-add:hover{border-color:var(--gold)}
+.rsv-add.on{display:flex;gap:8px;align-items:center;cursor:default;color:var(--fg)}.rsv-add.on b{color:var(--gold)}
+.rsv-pk{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;max-height:62vh;overflow:auto}.rsv-chips{margin:0 0 10px}
+.tx-rd{font-size:12px;font-weight:700;color:var(--sub);border:1px solid var(--line);border-radius:6px;padding:1px 7px;white-space:nowrap}.tx-rd.ok{color:var(--gold);border-color:#5a4a2c}
+.ntc .lbl .on{color:var(--gold)}.ntc .lbl .off{color:var(--sub)}.ntc-r{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:6px 0}.ntc-r label.chip{display:inline-flex;gap:6px;align-items:center}.ntc-r input[type=date]{font:inherit;font-size:12.5px;border:0;background:none;color:inherit}
+.tx-cmed{display:flex;flex-direction:column;gap:6px;margin:4px 0}.tx-cmed textarea{min-height:64px}.tx-cmed .r{display:flex;gap:6px;justify-content:flex-end}
 .rowlog{margin-top:12px}.rowlog summary{cursor:pointer}.rowlog .rl{font-size:13px;padding:4px 0;border-bottom:1px solid var(--line)}.rowlog .rl .t{color:var(--sub);margin-right:6px}
 .mfw{position:relative;display:inline-flex;width:var(--mf);height:var(--mf);flex:none;vertical-align:middle}
 .mfw .mf{width:100%;height:100%;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;border:1.3px solid rgba(240,211,160,.4);background:rgba(240,211,160,.06);color:var(--gold);font-weight:900;font-size:calc(var(--mf) * .36)}
@@ -2797,7 +2818,7 @@ body:has(#pop.on.tx-side) #gchat .gc-fab:not(.x){display:none}      /* 옆 판�
 
 <script>
 "use strict";
-const BUILD = '451';
+const BUILD = '456';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -5457,22 +5478,51 @@ function 스트칸그림(it){ if(it.k === 'lib'){ const z = ST.concat(MS).find(q
   const v = 세트동작(it) || {}, 사 = (v.media || []).find(z => z.kind !== 'video'); return 사 ? '<span class="pkim"><img src="' + esc(media(사.path)) + '" alt="" loading="lazy"></span>' : '<span class="pkim ph">' + 사람그림 + '</span>'; }
 function 루틴표보기(s){
   const 스 = 표종류(s) === '스트레칭', L = 표루틴들(s), 고 = 루틴표고침(s);
-  if(!L.some(r => r.id === S.rsR)) S.rsR = (L[0] || {}).id || null;
-  const i = L.findIndex(r => r.id === S.rsR), r = L[i], 수 = x => 스 ? (x.items || []).length : (D.ri || []).filter(z => z.routine_id === x.id).length;
-  const 왼 = '<div class="lc-side"><button class="lc-back" data-act="tx:rsback">‹ ' + (스 ? '스트레칭' : '웨이트') + ' 루틴표</button>'
-    + '<div class="rsp-h">' + 루틴표표지(s) + '<div><b>' + esc(s.title || '(이름 없음)') + '</b><small>' + esc(((s.tags || []).concat([보임이름(s.owner || '')])).filter(Boolean).join(' · ')) + '</small></div></div>'
+  const 줄 = (r, k) => { const 칸들 = 스 ? (r.items || []).map(it => '<div class="rsv-x">' + 스트칸그림(it) + '<small>' + esc((세트동작(it) || { n:'?' }).n) + '</small></div>')
+      : (D.ri || []).filter(x => x.routine_id === r.id).sort((a, b) => (a.sort || 0) - (b.sort || 0)).map(x => '<div class="rsv-x">' + 종목그림(x.variant_id) + '<small>' + esc(vaName(x.variant_id) || '?') + '</small>'
+          + (고 ? '<button class="rsv-del" data-act="tx:rsxdel" data-k="' + esc(x.id) + '" title="이 종목 제거">✕</button>' : '') + '</div>');
+    return '<div class="rsv-row"><div class="rsv-h"><b>루틴 ' + (k + 1) + '</b>'
+      + (고 && S.rsRn === r.id ? '<input class="inp rsv-in" id="rsrnin" maxlength="30" value="' + esc(r.name || '') + '" data-k="' + esc(r.id) + '"><button class="btn gold sm" data-act="tx:rsrnok" data-k="' + esc(r.id) + '">저장</button><button class="btn ghost sm" data-act="tx:rsrn" data-k="">취소</button>'
+         : '<span class="rsv-nm' + (고 ? ' ed' : '') + '"' + (고 ? ' data-act="tx:rsrn" data-k="' + esc(r.id) + '" title="눌러서 이름 수정"' : '') + '>' + esc(r.name || '이름 없음') + '</span>')
+      + ((스 ? r.memo : r.sub) ? '<small>' + esc(스 ? r.memo : r.sub) + '</small>' : '') + '<span class="sp"></span>'
+      + (고 ? '<button class="btn ghost sm" data-act="tx:rsredit" data-k="' + esc(r.id) + '">자세히 수정</button>' : '') + '</div>'
+      + '<div class="rsv-ex">' + 칸들.join('') + (고 ? '<button class="rsv-plus" data-act="' + (스 ? 'tx:rsredit' : 'tx:rspick') + '" data-k="' + esc(r.id) + '"><span>＋</span>' + (스 ? '동작' : '종목') + '</button>' : '') + (!칸들.length && !고 ? '<span class="sub3">아직 종목이 없습니다</span>' : '') + '</div></div>'; };
+  return '<div class="rsv"><div class="rsv-top"><button class="lc-back" data-act="tx:rsback">‹ ' + (스 ? '스트레칭' : '웨이트') + ' 루틴표</button>'
+    + '<div class="rsp-h">' + 루틴표표지(s) + '<div><b>' + esc(s.title || '(이름 없음)') + '</b><small>' + esc(((s.tags || []).concat([보임이름(s.owner || '')])).filter(Boolean).join(' · ')) + '</small></div></div><span class="sp"></span>'
+    + '<button class="btn gold sm" data-act="tx:sgive" data-k="' + esc(s.id) + '">회원에게 주기</button>'
+    + (고 ? '<button class="btn ghost sm" data-act="tx:rsmeta" data-k="' + esc(s.id) + '">루틴표 수정</button>' : '')
+    + (s.owner !== 나이름() ? '<button class="btn ghost sm" data-act="tx:rscopy" data-k="' + esc(s.id) + '">복사해서 내 루틴표로</button>' : '') + '</div>'
     + (s.note ? '<div class="rsp-note">' + esc(s.note) + '</div>' : '')
-    + L.map((x, k) => '<button class="lc-it' + (x.id === S.rsR ? ' on' : '') + '" data-act="tx:rsr" data-k="' + esc(x.id) + '"><span class="no">' + (k + 1) + '</span><span class="t">' + esc(x.name || '') + '<small>' + 수(x) + (스 ? '동작' : '종목') + '</small></span></button>').join('')
-    + (고 ? '<button class="lc-it add" data-act="tx:rsradd" data-k="' + esc(s.id) + '"><span class="no">＋</span><span class="t">루틴 추가</span></button>' : '') + '</div>';
-  const 그림들 = !r ? '' : 스 ? (r.items || []).map(it => '<div>' + 스트칸그림(it) + '<small>' + esc((세트동작(it) || { n:'?' }).n) + '</small></div>').join('')
-    : (D.ri || []).filter(x => x.routine_id === r.id).sort((a, b) => (a.sort || 0) - (b.sort || 0)).map(x => '<div>' + 종목그림(x.variant_id) + '<small>' + esc(vaName(x.variant_id) || '?') + '</small></div>').join('');
-  const 오 = !r ? '<div class="empty why"><b>아직 루틴이 없습니다</b>' + (고 ? '왼쪽 「＋ 루틴 추가」로 만들어 주세요' : '만든 선생님이 추가하면 보입니다') + '</div>'
-    : '<h3 class="lc-h">루틴 ' + (i + 1) + ' · ' + esc(r.name || '') + '</h3>' + ((스 ? r.memo : r.sub) ? '<div class="sub3">' + esc(스 ? r.memo : r.sub) + '</div>' : '')
-      + '<div class="rs-ex' + (스 ? ' st' : '') + '">' + 그림들 + (고 ? '<button class="rs-addex" data-act="tx:rsredit" data-k="' + esc(r.id) + '"><span>＋</span>종목</button>' : '') + '</div>';
-  return '<div class="lc rsp">' + 왼 + '<div class="lc-main">' + 오
-    + '<div class="lc-nx"><button class="btn gold sm" data-act="tx:sgive" data-k="' + esc(s.id) + '">회원에게 주기</button>'
-    + (고 ? (r ? '<button class="btn ghost sm" data-act="tx:rsredit" data-k="' + esc(r.id) + '">루틴 수정</button>' : '') + '<button class="btn ghost sm" data-act="tx:rsmeta" data-k="' + esc(s.id) + '">루틴표 수정</button>' : '')
-    + (s.owner !== 나이름() ? '<button class="btn ghost sm" data-act="tx:rscopy" data-k="' + esc(s.id) + '">복사해서 내 루틴표로</button>' : '') + '</div></div></div>'; }
+    + (L.length ? L.map(줄).join('') : '<div class="empty why"><b>아직 루틴이 없습니다</b>' + (고 ? '아래 「＋ 루틴 추가」로 만들어 주세요' : '만든 선생님이 추가하면 보입니다') + '</div>')
+    + (고 ? (S.rsAdd === s.id && !스 ? '<div class="rsv-add on"><b>루틴 ' + (L.length + 1) + '</b><input class="inp rsv-in" id="rsaddin" maxlength="30" placeholder="루틴 이름 — 예) 머신 위주" data-k="' + esc(s.id) + '"><button class="btn gold sm" data-act="tx:rsaddok" data-k="' + esc(s.id) + '">추가</button><button class="btn ghost sm" data-act="tx:rsadd" data-k="">취소</button></div>'
+        : '<button class="rsv-add" data-act="' + (스 ? 'tx:rsradd' : 'tx:rsadd') + '" data-k="' + esc(s.id) + '">＋ 루틴 추가</button>') : '')
+    + '</div>'; }
+/* ＋ 종목 — 그림 고르기 창 (2026-10-27 결정 pick grid · photo choose) · 부위 칩 · 검색 · 누르면 그 루틴 끝에 바로 · 하는 법이 여럿이면 골라서 */
+let 종목픽 = null;      /* { rid, 부위, q, ex } */
+function 종목픽판(){ const p = 종목픽; if(!p) return; const r = (D.r || []).find(x => x.id === p.rid); if(!r) return;
+  const 든 = new Set((D.ri || []).filter(x => x.routine_id === r.id).map(x => String(x.variant_id || '').split(':')[0]));
+  if(p.ex){ const e = (D.ex || []).find(z => z.id === p.ex), vs = (D.va || []).filter(v => v.ex_id === p.ex).sort((a, b) => (a.sort || 0) - (b.sort || 0));
+    판열기('「' + esc((e || {}).name || '') + '」 그림 선택', '<div class="sub3" style="margin-bottom:8px">추가할 그림(하는 법)을 눌러 주세요</div><div class="pkg2 rsv-pk">' + vs.map(v => '<button class="pkc2" data-act="tx:rspkv" data-k="' + esc(v.id) + '">' + 종목그림(v.id) + '<span class="pkt"><b>' + esc(vaName(v.id) || '') + '</b></span></button>').join('') + '</div>'
+      + '<button class="btn ghost sm" data-act="tx:rspkback" style="margin-top:10px">‹ 종목 목록</button>'); return; }
+  const 부 = p.부위 || RT부위들[0], 다 = 고를종목().filter(e => 첫벌(e)), 칩 = RT부위들.concat(다.some(e => e.owner) ? ['추가한 종목'] : []);
+  판열기('루틴 ' + (표루틴들((D.rs || []).find(s => s.id === r.sheet_id) || {}).findIndex(x => x.id === r.id) + 1) + ' · ' + esc(r.name || '') + ' — 종목 추가',
+    '<input class="inp" id="rspkq" type="search" value="' + esc(p.q || '') + '" placeholder="종목 검색 — 스쿼트 · 레그컬 · 덤벨" autocomplete="off" style="margin-bottom:8px">'
+    + '<div class="chips rsv-chips">' + 칩.map(c => '<button class="chip' + (!p.q && c === 부 ? ' on' : '') + '" data-act="tx:rspkp" data-k="' + esc(c) + '">' + esc(c) + '</button>').join('') + '</div>'
+    + '<div class="pkg2 rsv-pk" id="rspkg">' + 다.map(e => { const 보 = p.q ? exKey(e).includes(검색키(p.q)) : (부 === '추가한 종목' ? !!e.owner : e.part === 부), n = (D.va || []).filter(v => v.ex_id === e.id).length;
+        return '<button class="pkc2' + (든.has(e.id) ? ' on' : '') + '" data-act="tx:rspk" data-k="' + esc(e.id) + '" data-pk="' + esc(exKey(e)) + '" data-pp="' + esc(e.owner ? '추가한 종목|' + e.part : e.part) + '" style="' + (보 ? '' : 'display:none') + '">' + 종목그림(첫벌(e).id)
+          + '<span class="pkt"><b>' + esc(e.name || '') + '</b><small>' + esc(e.equip || e.part || '') + (n > 1 ? ' · 그림 ' + n : '') + '</small></span><em class="pkad">' + (든.has(e.id) ? '✓' : '＋') + '</em></button>'; }).join('') + '</div>'
+    + '<div class="sub3" style="margin-top:8px">누르면 이 루틴 끝에 바로 들어가요 · 여러 개 연달아 골라도 돼요</div>');
+  setTimeout(() => { const q = document.getElementById('rspkq'); if(q && p.q){ q.focus(); q.setSelectionRange(q.value.length, q.value.length); } }, 20); }
+document.addEventListener('keydown', ev => { const t = ev.target; if(!t || ev.key !== 'Enter' || ev.isComposing) return;
+  if(t.id === 'rsaddin' || t.id === 'rsrnin'){ ev.preventDefault(); const b = document.querySelector(t.id === 'rsaddin' ? '[data-act="tx:rsaddok"]' : '[data-act="tx:rsrnok"]'); if(b) b.click(); } });
+document.addEventListener('input', ev => { if(!ev.target || ev.target.id !== 'rspkq' || !종목픽) return; 종목픽.q = ev.target.value; const q = 검색키(ev.target.value), 부 = 종목픽.부위 || RT부위들[0];
+  document.querySelectorAll('#rspkg .pkc2').forEach(b => { const pp = (b.dataset.pp || '').split('|'); b.style.display = (q ? (b.dataset.pk || '').includes(q) : (부 === '추가한 종목' ? pp[0] === '추가한 종목' : pp[pp.length - 1] === 부)) ? '' : 'none'; });
+  document.querySelectorAll('.rsv-chips .chip').forEach(c => c.classList.toggle('on', !q && c.dataset.k === 부)); });
+async function 종목픽넣기(vid){ const p = 종목픽, r = p && (D.r || []).find(x => x.id === p.rid); if(!r) return;
+  const 끝 = Math.max(-1, ...(D.ri || []).filter(x => x.routine_id === r.id).map(x => x.sort || 0)) + 1;
+  try{ const made = await ssend('routine_items', 'POST', [{ routine_id:r.id, sort:끝, variant_id:vid, kg:null, reps:null, sets:3, rest:60 }], 'return=representation');
+    (made || [{ id:'ri' + Date.now(), routine_id:r.id, sort:끝, variant_id:vid }]).forEach(z => D.ri.push(z)); toast((vaName(vid) || '종목') + ' 추가했어요'); p.ex = null; 종목픽판(); }
+  catch(e){ toast('추가하지 못했어요 — ' + String(e.message || '').slice(0, 60)); } }
 /* 회원에게 주기 — 루틴표 통째로 (sheet_gives) · 스트레칭이면 그 루틴들의 받는 회원(prep_sets.member_ids)에도 넣어 회원 앱 준비운동에 그대로 보임 */
 function 주기판(sid){ const s = (D.rs || []).find(x => x.id === sid); if(!s) return; S.sgSid = sid; const q = String(S.sgQ || '');
   const 이미 = new Set((D.gives || []).filter(g => g.sheet_id === sid).map(g => g.member_id));
@@ -8501,6 +8551,71 @@ function 청소누락(){
     .filter(o => !청소확인함(d, o.grp, 청소나()));      /* 구역(당직)째 「확인」한 것은 뺀다 (2026-10-25 대표 b3) · 확인은 사람마다 — 대표가 눌러도 선생님 화면엔 남는다 (2026-10-27 대표 「각각 본인이 확인해야」) */
 }
 /* ── 대청소 — 3 · 6 · 9 · 12월 셋째 금요일 14시 · 메모 하나(다 같이 하니 체크 없음) ── */
+/* ══ 당직 ══ 2026-10-27 대표 4차 · 결정함 1gb9LgBX — 설정 = tr_duty_conf 한 줄(ord 순서 · off 센터 휴무일 · hol 더한 공휴일) · 85단계
+   당직 날 = 토 · 일 · 공휴일 하루 한 명 · 빼는 날 = 둘째 · 넷째 일요일(정기휴무) · 센터 휴무일(설 · 추석 등 대표가 지정) */
+const 공휴일기본 = { '2026-01-01':'신정', '2026-02-16':'설날 연휴', '2026-02-17':'설날', '2026-02-18':'설날 연휴', '2026-03-01':'삼일절', '2026-03-02':'대체공휴일', '2026-05-05':'어린이날', '2026-05-24':'부처님오신날', '2026-05-25':'대체공휴일', '2026-06-03':'지방선거일', '2026-06-06':'현충일', '2026-08-15':'광복절', '2026-08-17':'대체공휴일', '2026-09-24':'추석 연휴', '2026-09-25':'추석', '2026-09-26':'추석 연휴', '2026-10-03':'개천절', '2026-10-05':'대체공휴일', '2026-10-09':'한글날', '2026-12-25':'성탄절',
+  '2027-01-01':'신정', '2027-02-06':'설날 연휴', '2027-02-07':'설날', '2027-02-08':'설날 연휴', '2027-02-09':'대체공휴일', '2027-03-01':'삼일절', '2027-05-05':'어린이날', '2027-05-13':'부처님오신날', '2027-06-06':'현충일', '2027-08-15':'광복절', '2027-08-16':'대체공휴일', '2027-09-14':'추석 연휴', '2027-09-15':'추석', '2027-09-16':'추석 연휴', '2027-10-03':'개천절', '2027-10-04':'대체공휴일', '2027-10-09':'한글날', '2027-10-11':'대체공휴일', '2027-12-25':'성탄절', '2027-12-27':'대체공휴일' };      /* 임시 공휴일 · 선거일은 순서표 판에서 더함 */
+const 당직기본순서 = ['양인수', '양인혁', '장승훈', '송영림', '조민철', '곽준형'];      /* 10 · 11월 달력 차례 (결정 ord now) */
+const 공휴일명 = k => { const h = ((W.duty || {}).hol || []).find(x => x.d === k); return h ? (h.n || '공휴일') : (공휴일기본[k] || ''); };
+const 당직쉼 = k => { const o = ((W.duty || {}).off || []).find(x => x.d === k); if(o) return o.n || '센터 휴무'; const t = new Date(k + 'T12:00:00'); if(t.getDay() === 0){ const n = Math.ceil(t.getDate() / 7); if(n === 2 || n === 4) return '정기휴무'; } return ''; };
+const 당직날인가 = k => { if(당직쉼(k)) return false; const g = new Date(k + 'T12:00:00').getDay(); return g === 0 || g === 6 || !!공휴일명(k); };
+const 당직순서 = () => { const 재 = (W.staff || []).filter(p => p.active !== false && p.name && !퇴사명().has(String(p.name).trim())), 있 = new Set(재.map(p => p.id));
+  const o = ((W.duty || {}).ord || []).filter(id => 있.has(id)); return o.length ? o : 당직기본순서.map(n => (재.find(p => p.name === n) || {}).id).filter(Boolean); };
+async function 당직받기(){ try{ const r = await uget('tr_duty_conf?select=*&id=eq.main'); W.duty = (r && r[0]) || { id:'main', ord:[], off:[], hol:[] }; W.duty없음 = false; }catch(e){ W.duty = { id:'main', ord:[], off:[], hol:[] }; W.duty없음 = true; }
+  await 당직자동(); if(S.view === 'leave') render(); }
+async function 당직설정저장(바꿈, 말){ if(!await 묻기(말)) return false; const 줄 = Object.assign({ id:'main', ord:당직순서(), off:(W.duty || {}).off || [], hol:(W.duty || {}).hol || [] }, 바꿈, { by:나이름(), at:new Date().toISOString() });
+  try{ await usend('tr_duty_conf?on_conflict=id', 'POST', [줄], 'resolution=merge-duplicates'); W.duty = 줄; 기록남기기({ area:'연월차', action:'수정', tbl:'tr_duty_conf', row_id:'main', detail:'당직 설정 — ' + 말.split(String.fromCharCode(10))[0] }); toast('저장했어요'); return true; }
+  catch(e){ toast('저장하지 못했어요 — ' + (/tr_duty_conf|404|42P01/.test(String(e.message)) ? '서버 준비(85단계)가 아직이에요' : String(e.message || '').slice(0, 60))); return false; } }
+const 달날들 = (y, m) => { const 끝 = new Date(y, m + 1, 0).getDate(), p = n => String(n).padStart(2, '0'); return Array.from({ length:끝 }, (_, i) => y + '-' + p(m + 1) + '-' + p(i + 1)); };
+/* 빈 당직 날을 순서표대로 — 그 날 앞의 마지막 당직(원래 순번) 다음 사람 · 이미 있는 날은 안 건드림 */
+function 당직채울것(y, m){ const ord = 당직순서(); if(!ord.length) return [];
+  const 있 = (W.leave || []).filter(r => r.kind === '당직'), 계획 = [];
+  달날들(y, m).filter(당직날인가).forEach(k => { if(있.some(r => r.day === k)) return;
+    const 앞 = 있.concat(계획).filter(r => r.day < k).sort((a, b) => a.day < b.day ? 1 : -1)[0], 앞순 = 앞 ? ((앞.extra || {}).순번 || 앞.staff_id) : null, i = ord.indexOf(앞순);
+    const 누구 = ord[(i + 1 + ord.length) % ord.length]; 계획.push({ kind:'당직', staff_id:누구, day:k, status:'ok', vis:'all', reason:'', extra:{ 순번:누구, 자동:true } }); });
+  return 계획; }
+async function 당직넣기(계획){ if(!계획.length) return 0; 계획.forEach(x => { if(!x.id) x.id = crypto.randomUUID(); });      /* id 를 미리 — 받은 답에 의존하지 않음 */
+  const o = await usend('tr_leave', 'POST', 계획, 'return=representation'); 계획.forEach(x => { if(!W.leave.some(r => r.id === x.id)) W.leave.push(Object.assign({}, x, ((o || []).find(r => r.id === x.id) || {}))); }); 기록남기기({ area:'연월차', action:'생성', tbl:'tr_leave', row_id:'당직', detail:'당직 순서대로 ' + 계획.length + '일 — ' + 계획[0].day.slice(0, 7) }); return 계획.length; }
+let 순서편 = null;      /* 고치는 중인 순서 */
+function 당직순서판(){ const 관 = 할수('leaveok'), ord = 순서편 || 당직순서(), c = W.duty || {}, 올해 = TODAY.slice(0, 4);
+  const 이름 = id => 보임이름((사람(id) || {}).name || '');
+  const 남 = (W.staff || []).filter(p => p.active !== false && p.name && !퇴사명().has(String(p.name).trim()) && !ord.includes(p.id));
+  const 다가올 = Object.keys(공휴일기본).filter(k => k >= TODAY && k.slice(0, 4) <= String(+올해 + 1)).map(k => ({ d:k, n:공휴일기본[k], 갈:'공휴일' }))
+    .concat((c.hol || []).filter(x => x.d >= TODAY).map(x => Object.assign({ 갈:'더한 공휴일' }, x)), (c.off || []).filter(x => x.d >= TODAY).map(x => Object.assign({ 갈:'센터 휴무' }, x))).sort((a, b) => a.d < b.d ? -1 : 1).slice(0, 10);
+  const t = new Date(TODAY); t.setDate(1); t.setMonth(t.getMonth() + 달력달); const y = t.getFullYear(), m = t.getMonth(), 빈 = 당직채울것(y, m).length;
+  판열기('당직 순서표', '<div class="sub3" style="margin-bottom:8px">토 · 일 · 공휴일 하루 한 명 · 둘째 · 넷째 일요일 · 센터 휴무일은 쉼<br>다음 달은 20일부터 순서대로 들어가요</div>'
+    + '<ol class="dt-ord">' + ord.map((id, i) => '<li><b>' + (i + 1) + '</b>' + 이름딱지(id) + (관 ? '<span class="sp"></span>' + (i ? '<button class="x" data-act="tx:dtup" data-k="' + i + '" title="위로">▲</button>' : '') + '<button class="x" data-act="tx:dtrm" data-k="' + i + '" title="순서에서 제거">✕</button>' : '') + '</li>').join('') + '</ol>'
+    + (관 ? (남.length ? '<div class="dt-add"><span class="sub3">순서에 추가</span>' + 남.map(p => '<button class="tx-pchip" data-act="tx:dtadd" data-k="' + esc(p.id) + '">' + 이름딱지(p.id) + '</button>').join('') + '</div>' : '')
+        + (순서편 ? '<div class="cmacts"><button class="btn ghost sm" data-act="tx:dtcancel">취소</button><button class="btn gold sm" data-act="tx:dtsave">순서 저장</button></div>' : '')
+        + '<div class="lbl" style="margin-top:14px">' + (m + 1) + '월 당직</div><div class="dt-fill">' + (빈 ? '<button class="btn gold sm" data-act="tx:dtfill">빈 날 ' + 빈 + '일 순서대로 채우기</button>' : '<span class="sub3">빈 당직 날이 없어요</span>') + '</div>' : '')
+    + '<div class="lbl" style="margin-top:14px">다가오는 공휴일 · 휴무일</div><div class="dt-hol">' + 다가올.map(x => '<div><b>' + esc(날짜한글(x.d)) + '</b> ' + esc(x.n || '') + ' <span class="sub3">' + x.갈 + '</span>'
+        + (관 && x.갈 !== '공휴일' ? '<button class="x" data-act="tx:dthrm" data-k="' + esc(x.d) + '" data-v2="' + (x.갈 === '센터 휴무' ? 'off' : 'hol') + '" title="삭제">✕</button>' : '') + '</div>').join('') + '</div>'
+    + (관 ? '<div class="dt-new"><input type="date" id="dtd" class="inp"><input id="dtn" class="inp" maxlength="20" placeholder="이름 — 예) 추석 휴무 · 임시 공휴일"><button class="btn ghost sm" data-act="tx:dthadd" data-v2="off">센터 휴무일 추가</button><button class="btn ghost sm" data-act="tx:dthadd" data-v2="hol">공휴일 추가</button></div>' : '')); }
+/* 당직 교체 — 누구나 신청(tr_leave 「당직 교체」 req) · 관리자 승인하면 그 날 당직 사람이 바뀌고 이력이 남음 (결정 swap admin · 메모 「신청은 자유롭게 · 승인은 관리자」) */
+function 당직교체칸(r){ const 나 = ME && ME.id, 관 = 할수('leaveok'), 이 = (r.extra || {}).이력 || [];
+  const 대기 = (W.leave || []).filter(x => x.kind === '당직 교체' && x.status === 'req' && ((x.extra || {}).교체 || {}).duty === r.id);
+  const 남 = (W.staff || []).filter(p => p.active !== false && p.name && p.id !== r.staff_id && !퇴사명().has(String(p.name).trim()));
+  return '<div class="tx-sec dt-sw"><div class="lbl">당직 교체</div>'
+    + (이.length ? '<div class="dt-his">' + 이.map(h => '<div>' + esc(h.from || '') + ' → <b>' + esc(h.to || '') + '</b> <span class="sub3">' + esc(h.신청 || '') + ' 신청 · ' + esc(h.승인 || '') + ' 승인 · ' + esc(시각한글(h.at)) + '</span></div>').join('') + '</div>' : '')
+    + (대기.length ? 대기.map(x => '<div class="dt-wait"><span class="tag">승인 대기</span> → <b>' + esc((사람(((x.extra || {}).교체 || {}).to) || {}).name || '') + '</b> <span class="sub3">' + esc((사람(x.staff_id) || {}).name || '') + ' 신청</span>'
+        + (관 ? '<button class="btn gold sm" data-act="tx:dswapok" data-id="' + esc(x.id) + '">승인</button><button class="btn ghost sm" data-act="tx:dswapno" data-id="' + esc(x.id) + '">반려</button>' : '') + '</div>').join('')
+      : r.day >= TODAY && 나 ? '<div class="sub3" style="margin-bottom:6px">교체할 선생님을 눌러 신청해요 · 관리자가 승인하면 교체돼요</div><div class="dt-add">' + 남.map(p => '<button class="tx-pchip" data-act="tx:dswap" data-id="' + esc(r.id) + '" data-v2="' + esc(p.id) + '">' + 이름딱지(p.id) + '</button>').join('') + '</div>' : '')
+    + '</div>'; }
+async function 당직교체승인(x, 승인){ const 교 = (x.extra || {}).교체 || {}, 당 = (W.leave || []).find(r => r.id === 교.duty);
+  if(승인 && !당){ toast('그 날 당직을 찾지 못했어요'); return; }
+  if(!await 묻기(승인 ? (날짜한글(x.day) + ' 당직을 ' + ((사람(교.to) || {}).name || '') + ' 선생님으로 교체할까요?') : '이 교체 신청을 반려할까요?')) return;
+  try{ if(승인){ const ex = Object.assign({}, 당.extra || {}), 이 = (ex.이력 || []).concat([{ from:(사람(당.staff_id) || {}).name || '', to:(사람(교.to) || {}).name || '', 신청:(사람(x.staff_id) || {}).name || '', 승인:나이름(), at:new Date().toISOString() }]);
+      ex.이력 = 이; if(!ex.순번) ex.순번 = 당.staff_id;
+      await usend('tr_leave?id=eq.' + encodeURIComponent(당.id), 'PATCH', { staff_id:교.to, extra:ex }); Object.assign(당, { staff_id:교.to, extra:ex }); }
+    await usend('tr_leave?id=eq.' + encodeURIComponent(x.id), 'PATCH', { status: 승인 ? 'ok' : 'no' }); x.status = 승인 ? 'ok' : 'no';
+    기록남기기({ area:'연월차', action:'수정', tbl:'tr_leave', row_id:교.duty || x.id, detail:'당직 교체 ' + (승인 ? '승인' : '반려') + ' — ' + x.day + ' ' + (x.reason || '') });
+    toast(승인 ? '당직을 교체했어요' : '반려했어요'); if(당) txView('leave', 당.id); render(); }
+  catch(e){ toast('저장하지 못했어요 — ' + String(e.message || '').slice(0, 60)); } }
+async function 당직자동(){      /* 매달 20일부터 다음 달 당직을 순서표대로 (결정 next auto) — 다음 달에 당직이 하나도 없을 때만 · 관리자 화면에서 */
+  if(!할수('leaveok') || W.duty없음 || new Date().getDate() < 20) return; const t = new Date(); t.setDate(1); t.setMonth(t.getMonth() + 1);
+  const y = t.getFullYear(), m = t.getMonth(), 머리 = y + '-' + String(m + 1).padStart(2, '0');
+  if((W.leave || []).some(r => r.kind === '당직' && String(r.day || '').slice(0, 7) === 머리)) return;
+  try{ const n = await 당직넣기(당직채울것(y, m)); if(n) toast((m + 1) + '월 당직을 순서대로 ' + n + '일 채웠어요'); }catch(e){ console.warn('당직 자동 —', e.message); } }
 const 대청소날 = y => [3, 6, 9, 12].map(m => { const t = new Date(y, m - 1, 1); t.setDate(1 + (5 - t.getDay() + 7) % 7 + 14); return 날글(t); });
 const 다음대청소 = d => 대청소날(+d.slice(0, 4)).concat(대청소날(+d.slice(0, 4) + 1)).find(x => x >= d);
 const 대메모 = day => ((청소.대 || []).find(r => r.day === day) || {}).memo || '';
@@ -10043,7 +10158,7 @@ const 표정의 = {
     table:'tr_leave', 제목:'연월차', 사람열:'staff_id', 제목열:'kind',
     열:[
       {k:'staff_id', 이름:'신청인', 타입:'person', 관리자만:'leaveok'},
-      {k:'kind',     이름:'유형',   타입:'select', 옵션:['연차','월차','반차','OFF','여름휴가','당직','예비군','민방위','기타사유'], 기본:'연차'},
+      {k:'kind',     이름:'유형',   타입:'select', 옵션:['연차','월차','반차','OFF','여름휴가','당직','당직 교체','예비군','민방위','기타사유'], 기본:'연차'},
       {k:'day',      이름:'날짜',   타입:'date', 필수:true},
       {k:'day_end',  이름:'끝나는 날', 타입:'date', 힌트:'하루면 비워 두세요'},
       {k:'reason',   이름:'사유',   타입:'text'},
@@ -10335,6 +10450,7 @@ async function loadWork(){
   if(진짜ME){ ['tasks', 'leads', 'leave', 'voc', 'manual'].forEach(k => { W[k] = (W[k] || []).filter(보기보임); }); 보기끼움(); }      /* 선생님 계정으로 보기 — 서버 can_see 와 같은 규칙 */
   try{ await 사진채우기(); }catch(e){}
   W.cols = g[5] || []; W.views = g[6] || []; W.meta = g[7] || []; W.voc = g[8] || []; W.ack = g[9] || []; W.manual = g[10] || []; W.mread = g[11] || [];
+  setTimeout(당직받기, 0);      /* 당직 설정 (85단계) */
   /* 보기에 담긴 조건·정렬·그룹을 화면에 얹는다 — 없으면 빈 채로 */
   try{ Object.keys(표정의).forEach(k => 보기얹기(k)); }catch(e){}
 }
@@ -10424,7 +10540,10 @@ function 늘림칩(key, r){
 /* 업무는 본인 담당 + 대표공지 — 「업무 전체 보기」 권한만 전부 (2026-10-26 대표 결정 task=a) · 표 · 보기 숫자 · 달력이 모두 이 줄들을 쓴다 */
 /* 대표공지 — 담당자를 비우면 모두 · 정하면 그 사람만(+ 업무 전체 보기) (2026-10-26 대표 「대표공지인데 담당자를 조민철로 했으면 조민철만 보여야」) */
 const 공지보임 = r => !(r.owners || []).length || 내것(r.owners) || 할수('taskall');
-const 볼줄 = key => key === 'tasks' && !할수('taskall') ? (W.tasks || []).filter(r => 내것(r.owners) || (r.kind === '대표공지' && 공지보임(r))) : (W[key] || []);
+const 공지중 = r => r.kind === '대표공지' && !r.done && (!r.due || r.due >= TODAY);      /* 올라가 있는 공지 = 안 내림 + 기한 없음 또는 기한 안 (2026-10-27 대표) */
+const 공지대상 = r => (W.staff || []).filter(p => p.active !== false && p.name && !퇴사명().has(String(p.name).trim()) && (!(r.owners || []).length || (r.owners || []).includes(p.id))).map(p => p.name);
+const 공지읽음 = (r, 이름) => (W.mread || []).some(x => x.manual_id === r.id && x.name === 이름);
+const 볼줄 = key => key === 'tasks' && !할수('taskall') ? (W.tasks || []).filter(r => 내것(r.owners) || (r.kind === '대표공지' && 공지보임(r) && (공지중(r) || 할수('popup')))) : (W[key] || []);
 function txTop(key){
   const T = 표정의[key], st = 표상태[key];
   const 전체 = 볼줄(key);
@@ -10460,6 +10579,8 @@ function txList0(key){
   let rows = 보기줄들;
   if(st.규칙 && st.규칙.length) rows = rows.filter(r => 규칙들맞나(st.규칙, st.op, r, key));
   rows = 겉거름(rows);
+  if(key === 'leave' && v.k !== 'req'){ const t = new Date(TODAY); t.setDate(1); t.setMonth(t.getMonth() + 달력달); const 머리 = t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0');      /* 달을 넘기면 목록도 그 달 (2026-10-27 4차) */
+    rows = rows.filter(r => String(r.day || '').slice(0, 7) <= 머리 && String(r.day_end || r.day || '').slice(0, 7) >= 머리); }
   const 순 = st.정렬 || (v.ord || null);
   rows = 줄세우기(rows, 순, key) || rows.slice().sort(T.정렬);
   const 보기줄 = '<div class="tx-bar"><div class="tx-views">'
@@ -10480,9 +10601,10 @@ function txList0(key){
   보인행[key] = rows.map(r => r.id);
   if(고른행.key === key) 고른행.ids = 고른행.ids.filter(id => 보인행[key].indexOf(id) >= 0);
   const 가린것 = [st.사람 ? '담당 ' + esc(사람(st.사람).name || '') : '', (st.규칙 || []).length ? '필터 ' + st.규칙.length + '개' : '', q ? '검색 「' + esc(st.q.trim()) + '」' : ''].filter(Boolean);
-  if(!rows.length) return 보기줄 + 거름줄 + 달력 + '<div class="empty">결과 없음'
+  const 나란히 = 속 => key === 'leave' ? '<div class="lv2"><div class="lv2-l">' + 속 + '</div><div class="lv2-r">' + 달력 + '</div></div>' : 달력 + 속;      /* 연월차 = 왼쪽 목록 · 오른쪽 달력 (결정 lay left) */
+  if(!rows.length) return 보기줄 + 거름줄 + 나란히('<div class="empty">결과 없음'
     + (보기줄들.length && 가린것.length ? '<div class="tx-hid">이 보기 ' + 보기줄들.length + '건이 ' + 가린것.join(' · ') + '(으)로 가려졌어요 <button class="btn ghost sm" data-act="tx:fclear" data-k="' + key + '">모두 풀기</button></div>' : '') + '</div>'
-    + '<button class="tx-newrow one" data-act="tx:rownew" data-k="'+key+'">＋ 새 '+표정의[key].제목+'</button>';
+    + '<button class="tx-newrow one" data-act="tx:rownew" data-k="'+key+'">＋ 새 '+표정의[key].제목+'</button>');
   const 표다 = 모양(key) === 'table', 카드다 = 모양(key) === 'card';
   const 그릴 = 줄 => 카드다 ? 카드보기(key, 줄) : 표다 ? txTable(key, 줄)
                     : '<div class="tx-list">' + 줄.map(r => txRow(key, r, true)).join('') + '</div>';
@@ -10500,13 +10622,13 @@ function txList0(key){
         if(!뭉치.has(nm)) 뭉치.set(nm, []); 뭉치.get(nm).push(r); });
     });
     const 접힘 = st.접힘 || {};
-    return 보기줄 + 거름줄 + 달력 + txPickBar(key, rows, 표다)
+    return 보기줄 + 거름줄 + 나란히(txPickBar(key, rows, 표다)
       + [...뭉치.entries()].map(([nm, 줄]) =>
           '<div class="tx-grp"><button class="tx-ghead" data-act="tx:gfold" data-k="'+key+'" data-v2="'+esc(nm)+'">'
           + '<i>'+(접힘[nm]?'▶':'▼')+'</i>'+esc(nm)+'<b>'+줄.length+'</b></button>'
-          + (접힘[nm] ? '' : 그릴(줄)) + '</div>').join('');
+          + (접힘[nm] ? '' : 그릴(줄)) + '</div>').join(''));
   }
-  return 보기줄 + 거름줄 + 달력 + txPickBar(key, rows, 표다) + 그릴(rows);
+  return 보기줄 + 거름줄 + 나란히(txPickBar(key, rows, 표다) + 그릴(rows));
 }
 /* ── 보기 탭·표 머리를 「마우스로 집어서」 옮기기 ──
    2026-09-09 대표: 「클릭을 하고 옮기는게 지금 선택이 된건지 마우스에 집혀서 따라오지
@@ -10772,10 +10894,24 @@ function 데스크공지막대(){
   const 필 = L.filter(매필수), 필안 = 필.filter(r => !강의읽음(r.id)).length, 안 = L.filter(r => !강의읽음(r.id)).length;
   const 글 = 필.length ? '필수 숙지 ' + 필.length + (필안 ? ' · 안 읽은 것 ' + 필안 : ' · 다 읽음') : '매뉴얼 ' + L.length + (안 ? ' · 안 읽은 것 ' + 안 : ' · 다 읽음');
   return '<button class="dk-notice' + (필안 || (!필.length && 안) ? ' new' : '') + '" data-act="tx:deskman"><b>데스크 공지</b><span class="m">' + 글 + '</span><em>매뉴얼 ›</em></button>'; }
-function 매뉴얼읽음칸(r){
+/* 대표공지 칸 — 기간(기한 없음 · 날짜까지) · 관리자 「내리기 / 다시 올리기」 · 읽음(매뉴얼과 같은 칸) */
+function 공지칸(r){ const 관 = 할수('popup'), 중 = 공지중(r);
+  const 상태 = r.done ? '내린 공지' : r.due && r.due < TODAY ? '기한 지나 내려감' : r.due ? 날짜한글(r.due) + '까지 올라가 있어요' : '기한 없이 올라가 있어요';
+  return '<div class="tx-sec ntc"><div class="lbl">공지 · <span class="' + (중 ? 'on' : 'off') + '">' + esc(상태) + '</span></div>'
+    + (관 ? '<div class="ntc-r"><button class="chip' + (!r.due ? ' on' : '') + '" data-act="tx:ntcdue" data-id="' + esc(r.id) + '" data-v2="">기한 없음</button>'
+        + '<label class="chip' + (r.due ? ' on' : '') + '">기한 있음 <input type="date" id="ntcdue" value="' + esc(r.due || '') + '" data-id="' + esc(r.id) + '"></label>'
+        + (r.done ? '<button class="btn ghost sm" data-act="tx:ntcdown" data-id="' + esc(r.id) + '" data-v2="up">다시 올리기</button>' : '<button class="btn ghost sm" data-act="tx:ntcdown" data-id="' + esc(r.id) + '" data-v2="down">내리기</button>') + '</div>' : '')
+    + 매뉴얼읽음칸(r, 'tasks', 공지대상(r)) + '</div>'; }
+async function 공지바꿈(id, 몸, 말){ const r = (W.tasks || []).find(x => x.id === id); if(!r) return;
+  if(!await 묻기(말)) { txView('tasks', id); return; }
+  try{ const o = await usend('tr_tasks?id=eq.' + encodeURIComponent(id), 'PATCH', 몸, 'return=representation'); Object.assign(r, (o && o[0]) || 몸);
+    기록남기기({ area:'업무', action:'수정', tbl:'tr_tasks', row_id:id, detail:'대표공지 — ' + 말.split(String.fromCharCode(10))[0] }); toast('저장했어요'); txView('tasks', id); render(); }
+  catch(e){ toast('저장하지 못했어요 — ' + String(e.message || '').slice(0, 60)); } }
+document.addEventListener('change', ev => { const t = ev.target; if(!t || t.id !== 'ntcdue' || !t.value) return; 공지바꿈(t.dataset.id, { due:t.value }, 날짜한글(t.value) + '까지 공지할까요?' + String.fromCharCode(10) + '그날이 지나면 저절로 내려가요'); });
+function 매뉴얼읽음칸(r, key, 대상){
   const 나 = (ME && ME.name) || '', L = (W.mread || []).filter(x => x.manual_id === r.id), 내 = L.find(x => x.name === 나);
-  const 안 = (W.staff || []).filter(p => p.active !== false && p.name && !L.some(x => x.name === p.name)).map(p => p.name);
-  return '<div class="tx-sec mrd">' + (내 ? '<span class="ok">✓ 읽었어요 · ' + esc(시각한글(내.at)) + '</span>' : '<button class="btn gold sm" data-act="tx:mread" data-id="' + esc(r.id) + '">읽었어요</button>')
+  const 안 = (대상 || (W.staff || []).filter(p => p.active !== false && p.name).map(p => p.name)).filter(n => !L.some(x => x.name === n));
+  return '<div class="tx-sec mrd">' + (내 ? '<span class="ok">✓ 읽었어요 · ' + esc(시각한글(내.at)) + '</span>' : '<button class="btn gold sm" data-act="tx:mread" data-k="' + (key || 'manual') + '" data-id="' + esc(r.id) + '">읽었어요</button>')
     + '<small class="sub3">읽음 ' + L.length + '명' + (안.length ? ' · 아직 ' + esc(안.join(' · ')) : ' · 모두 읽음') + '</small></div>'; }
 /* 글자 규칙 — 줄여진(…) 글에 마우스를 올리면 전체가 뜬다 (2026-10-26 대표 확정) */
 document.addEventListener('mouseover', ev => { const e = ev.target && ev.target.closest && ev.target.closest('.t1, .t2, .k, b, small, span'); if(!e || e.title) return;
@@ -10847,6 +10983,9 @@ function 표칸값(key, c, r){
     const v = (c.늘림 ? (r.extra||{})[c.k.slice(6)] : r[c.k]) || [];
     if(Array.isArray(v) && v.length > 1) return '<span class="tx-nms one">' + 외몇(c.타입 === 'people' ? 사람칩(c, v[0]) : 옵칩(c, v[0], esc(v[0])), c.타입 === 'people' ? v.map(i => 사람(i).name || '') : v.map(String), c.타입 === 'people' ? '명' : '개') + '</span>';
   }
+  if(key === 'tasks' && c.k === 'done' && r.kind === '대표공지'){ const 나 = (ME && ME.name) || '', 대 = 공지대상(r);      /* 공지 = 체크 대신 읽음 (2026-10-27 대표) */
+    if(!할수('popup')) return 공지읽음(r, 나) ? '<span class="tx-rd ok">✓ 읽음</span>' : '<span class="tx-rd">안 읽음</span>';
+    return '<span class="tx-rd">' + (r.done ? '내림 · ' : '') + '읽음 ' + 대.filter(n => 공지읽음(r, n)).length + '/' + 대.length + '</span>'; }
   const v0 = c.늘림 ? (r.extra||{})[c.k.slice(6)] : r[c.k];
   if(c.타입 !== 'check' && 값없나(v0)) return 퇴사담당칩(c, r) || '';      /* 표 칸은 빈칸 그대로 — 「비어 있음」은 페이지에서만 (2026-10-26 대표 「비어있음 하지말고 그냥 비워놔」) */
   if(c.타입 === 'text' || c.타입 === 'long') return '<span class="tx-clamp">' + esc(블록글자(v0)) + '</span>';      /* 긴 글은 두 줄까지 · 칸을 누르면 전체 (노션처럼) */
@@ -11552,7 +11691,9 @@ function txRow(key, r, 고르기){
     + (댓글수(key, r.id) ? '<span class="tx-cmn">💬'+댓글수(key, r.id)+'</span>' : '')
     + (x.오른쪽||'')
     /* 「완료」는 오른쪽 끝에. 왼쪽 고르기 상자와 나란히 두면 잘못 누른다 (2026-09-08 대표 지적) */
-    + (x.체크 ? '<span class="tx-ck '+(done?'on':'')+'" data-act="tx:toggle" data-k="'+key+'" data-id="'+r.id+'" data-f="'+x.체크+'" title="'+(done?'완료 — 눌러서 되돌리기':'완료로 표시')+'">'+(done?'✓':'')+'</span>' : '')
+    + (key === 'tasks' && r.kind === '대표공지' && !할수('popup') ? (공지읽음(r, (ME && ME.name) || '') ? '<span class="tx-rd ok">✓ 읽음</span>' : '<span class="tx-rd">안 읽음</span>')
+       : key === 'tasks' && r.kind === '대표공지' ? '<span class="tx-rd">읽음 ' + 공지대상(r).filter(n => 공지읽음(r, n)).length + '/' + 공지대상(r).length + '</span>' : '')
+    + (x.체크 && !(key === 'tasks' && r.kind === '대표공지' && !할수('popup')) ? '<span class="tx-ck '+(done?'on':'')+'" data-act="tx:toggle" data-k="'+key+'" data-id="'+r.id+'" data-f="'+x.체크+'" title="'+(done?'완료 — 눌러서 되돌리기':'완료로 표시')+'">'+(done?'✓':'')+'</span>' : '')
     + '</span></button>';
 }
 const 댓글수 = (key, id) => W.cm.filter(c => c.tbl===표정의[key].table && c.row_id===id).length;
@@ -11603,13 +11744,14 @@ function txCal(key, rows){
   const 셀 = [];
   for(let i=0;i<42;i++){ const d = new Date(시작); d.setDate(시작.getDate()+i); if(i>=35 && d>끝) break; 셀.push(d); }
   const ymd = d => { const p=n=>String(n).padStart(2,'0'); return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); };
-  const 전체 = 볼줄(key);
+  const 사 = (표상태[key] || {}).사람, 전체 = 볼줄(key).filter(r => r.kind !== '당직 교체' && (!사 || r.staff_id === 사));      /* 선생님 칩 = 달력도 그 선생님만 (2026-10-27 4차) */
   return '<div class="tx-calwrap"><div class="tx-calhd"><button class="ar" data-act="tx:calm" data-k="-1" title="지난달">‹</button><b>' + y + '년 ' + (m + 1) + '월</b><button class="ar" data-act="tx:calm" data-k="1" title="다음 달">›</button>'
-    + (달력달 ? '<button class="chip" data-act="tx:calm" data-k="0">이번 달로</button>' : '') + '</div>'
+    + (달력달 ? '<button class="chip" data-act="tx:calm" data-k="0">이번 달로</button>' : '') + (key === 'leave' ? '<span class="sp" style="flex:1"></span><button class="chip" data-act="tx:dutyord">당직 순서표</button>' : '') + '</div>'
     + '<div class="tx-cal">' + WDN.map((w, i)=>'<div class="h'+(i===0?' sun':i===6?' sat':'')+'">'+w+'</div>').join('')
     + 셀.map(d => { const k = ymd(d);
         const 것 = 전체.filter(r => r.day<=k && (r.day_end||r.day)>=k);
         return '<div class="tx-cd '+(d.getMonth()!==m?'dim':'')+(k===TODAY?' today':'')+(d.getDay()===0?' sun':d.getDay()===6?' sat':'')+'"><span class="d">'+d.getDate()+'</span>'
+          + (key === 'leave' && 공휴일명(k) ? '<span class="lv-hol">' + esc(공휴일명(k)) + '</span>' : '') + (key === 'leave' && 당직쉼(k) ? '<span class="lv-off">' + esc(당직쉼(k)) + '</span>' : '')
           + (대청소날(+k.slice(0, 4)).indexOf(k) >= 0 ? '<span class="lv big" title="분기 대청소 · 다 같이">대청소 14시</span>' : '')      /* 분기 대청소 (2026-10-21 대표 「달력에도 표시」) */
           + 것.map(r=>{ const 이 = r.staff_id ? 사람(r.staff_id).name : ''; const 칠 = 이 ? 사람색칠(이) : '';
               return '<span class="lv '+esc(r.status)+(칠?' pc':'')+'" data-lvk="'+esc(r.kind||'')+'"'+(칠?' style="'+칠+'"':'')+' data-act="tx:open" data-k="'+key+'" data-id="'+r.id+'" title="'+esc((이 || (r.extra || {}).n_staff || '퇴사') + ' · ' + (r.kind || '') + (r.status === 'req' ? ' (신청)' : ''))+'"><em class="lvtag"><i>'+쉼이모지(r.kind)+'</i>'+esc(r.kind)+'</em>'+esc((이 || ((r.extra || {}).n_staff || '퇴사')).slice(-2))+'</span>'; }      /* 네임텍 — 앞 흰 꼬리표(구멍 · 끝 뾰족) = 종류 · 뒤 = 선생님 색 막대 (2026-10-27 시안 T1 · 대표 「바탕을 흰색으로」) */).join('') + '</div>'; }).join('')
@@ -11713,10 +11855,11 @@ function 댓글칸(key, id){
   return '<div class="tx-cmts" id="txcmts" data-k="' + key + '" data-id="' + esc(id) + '">' + (cs.length ? cs.map(c => { const 불 = 불린사람(c);
       return '<div class="tx-cmt">'
       + '<div style="flex:1;min-width:0">' + (불.indexOf(나) >= 0 && c.created_by !== (ME && ME.id) && !확인한(c.id, 나) ? '<div class="callbar"><b>' + esc((사람(c.created_by) || {}).name || '') + '님이 불렀어요</b><button class="btn gold sm" data-act="tx:callok" data-v2="' + esc(c.id) + '">확인했어요</button></div>' : '')
-      + '<div class="b">'+본문렌더(c.body)+'</div>'
+      + (댓글수정 === c.id ? '<div class="tx-cmed"><textarea class="inp" id="txcmed">' + esc(c.body || '') + '</textarea><div class="r"><button class="btn ghost sm" data-act="tx:pgcmcancel">취소</button><button class="btn gold sm" data-act="tx:pgcmsave" data-id="' + esc(c.id) + '">저장</button></div></div>'
+         : '<div class="b">'+본문렌더(c.body)+'</div>')
       + (불.length ? '<div class="callck">' + 불.map(n => { const a = (W.ack || []).find(x => x.comment_id === c.id && x.name === n); return a ? '<b>✓ ' + esc(n) + ' ' + esc(시각한글(a.at)) + ' 확인</b>' : esc(n) + ' 아직'; }).join(' · ') + '</div>' : '')
       + '<div class="m">'+이름딱지(c.created_by)+' · '+시각한글(c.created_at)
-      + ((할수('otheredit') || c.created_by===(ME&&ME.id)) ? '<button data-act="tx:pgcmdel" data-id="'+c.id+'">삭제</button>' : '')
+      + ((할수('otheredit') || c.created_by===(ME&&ME.id)) ? '<button data-act="tx:pgcmedit" data-id="'+c.id+'">수정</button><button data-act="tx:pgcmdel" data-id="'+c.id+'">삭제</button>' : '')
       + '</div></div></div>'; }).join('') : '<div class="tx-meta">댓글 없음</div>')
     + '</div>'
     /* 부르기 — 누르면 `@이름` 이 들어간다. 부른 사람의 현황판에 뜬다 (2026-09-29 대표) */
@@ -11874,7 +12017,7 @@ function 속성줄들(key, r, 편집){
     + (빈속성숨김 && 빈수 ? '<button class="tx-padd" data-act="tx:pempty">값이 빈 항목 '+빈수+'개 표시</button>'
        : 빈수 ? '<button class="tx-padd" data-act="tx:pempty">값이 빈 항목 '+빈수+'개 숨기기</button>' : '')
     + (할수('table') ? '<button class="tx-padd" data-act="tx:padd" data-k="'+key+'">＋ 속성 추가</button>' : '')
-    + '</div>' + 줄기록칸(표정의[key].table, r.id);      /* 이 줄 작업기록 — 관리자만 (2026-10-27) */
+    + '</div>';      /* 작업기록은 여기 붙이지 않는다 — 속성 칸만 다시 그릴 때(#txprops 바꿈) 하나씩 쌓였다 (2026-10-27 대표 사진 「작업기록 2」 다섯 줄) */
 }
 function 속성줄다시(key, id){
   const box = $('#txprops'), r = W[key].find(x => x.id === id);
@@ -11968,6 +12111,8 @@ function 속성저장(key, id, k, v){
 const 되돌림 = [], 다시함 = []; let 되돌리는중 = false;
 async function 속성저장하기(key, id, k, v){
   const r = W[key].find(x => x.id === id); if(!r) return;
+  if(key === 'leave' && k === 'status' && r.kind === '당직 교체' && r.status === 'req' && (v === 'ok' || v === 'no')){ await 당직교체승인(r, v === 'ok'); return; }      /* 교체 승인 = 그 날 당직 사람 바꿈 + 이력 */
+  if(key === 'tasks' && r.kind === '대표공지' && k === 'done' && !할수('popup')){ toast('공지는 「읽었어요」로 표시해요'); return; }
   const 전값 = 값읽기(r, k);
   if(!되돌리는중){ const 옛 = 값읽기(r, k); if(JSON.stringify(옛) !== JSON.stringify(v)){ 되돌림.push({ key, id, k, 옛, 새: v }); if(되돌림.length > 50) 되돌림.shift(); 다시함.length = 0; } }      /* Ctrl+Z (2026-10-26 대표 「윈도우에서 통용되는 단축키」) */
   if(!시트 || 시트.key !== key || 시트.id !== id) 시트 = { key, id, 값: Object.assign({}, r) };
@@ -12171,15 +12316,16 @@ async function txView(key, id){
     + 속성줄들(key, r, 편집)
     + (본문키 ? '<div class="tx-sec" id="txbwrap">'+블록들(bs, 편집, urlmap)+'</div>' : '')
     + 긴열.slice(1).map(c => '<div class="tx-sec"><div class="lbl">'+c.이름+'</div><div class="tx-body">'+링크살리기((c.늘림 ? (r.extra||{})[c.k.slice(6)] : r[c.k])||'')+'</div></div>').join('')
-    + (key === 'leads' ? 상담1차칸(r, 편집) : '') + (key === 'manual' ? 매뉴얼읽음칸(r) : '')
+    + (key === 'leads' ? 상담1차칸(r, 편집) : '') + (key === 'manual' ? 매뉴얼읽음칸(r) : '') + (key === 'tasks' && r.kind === '대표공지' ? 공지칸(r) : '') + (key === 'leave' && r.kind === '당직' ? 당직교체칸(r) : '')
     + ((r.files||[]).length ? '<div class="tx-sec"><div class="lbl">파일과 미디어</div>'+첨부칸(key, r, 편집, urls)+'</div>' : '')
     + (key === 'leads' && (r.extra || {}).transcript ? '<details class="tx-sec tx-tr"><summary class="lbl">통화 원문</summary><div class="tx-body">' + esc(String(r.extra.transcript)).replace(/\n/g, '<br>') + '</div></details>' : '')
     + '<div class="tx-sec"><div class="lbl">댓글 '+(댓글수(key,id)||'')+'</div>'+댓글칸(key, id)+'</div>'
+    + 줄기록칸(표정의[key].table, r.id)      /* 이 줄 작업기록 — 관리자만 · 페이지 맨 아래 접힘 하나 (2026-10-27) */
     + '<div class="tx-meta">만든 사람 '+esc(사람(r.created_by).name)+' · '+시각한글(r.created_at)+(r.updated_at&&r.updated_at!==r.created_at?' · 고침 '+시각한글(r.updated_at):'')+'</div>'
     + '</div>',
     '<div class="tx-fbtns"><span class="tx-stat" id="txstat">'+(편집?'':'읽기 전용')+'</span>'
     + (편집 ? '<button class="btn ghost del" data-act="tx:pgdel">' + (key === 'leads' ? '숨기기' : '삭제') + '</button>' : '')      /* 페이지에서 바로 삭제 (2026-10-27 대표 「삭제나 수정은 어떻게 해」 — 전엔 속성 편집 판에만 있었다) */
-    + (편집 && x.체크 ? '<button class="btn gold" data-act="tx:toggle" data-k="'+key+'" data-id="'+id+'" data-f="'+x.체크+'" data-stay="1">'+(done?'완료 취소':'완료')+'</button>' : '')
+    + '<button class="btn gold" data-act="tx:pgclose">닫기</button>'      /* 완료는 목록 체크 · 속성으로 (2026-10-27 대표) */
     + '</div>', ['tasks', 'leads'].includes(key));      /* 흰 바탕 (2026-10-26) */
   if(BL) document.querySelectorAll('#txblocks .tx-x[data-bi]').forEach(el => { const b = 블록가져(el.dataset.bi); if(b) el.innerText = b.x||''; });
   const tt = document.querySelector('.tx-page .tx-ttl[contenteditable]');
@@ -12556,7 +12702,7 @@ function 글자넣기(){                        /* 화면의 글을 블록에 �
   });
 }
 async function 블록저장(){
-  if(!BL) return;
+  if(!BL) return; 블록미저장 = false;
   글자넣기();
   const T = 표정의[BL.key];
   const st = $('#txstat');
@@ -12569,8 +12715,10 @@ async function 블록저장(){
     if(S.view==='home' || 표정의[S.view]) render();
   }catch(e){ if(st){ st.textContent = '저장 못 함 — '+e.message; st.classList.add('bad'); } }
 }
-let 블록타이머 = null;
-function 블록자동저장(즉시){ clearTimeout(블록타이머);
+let 블록타이머 = null, 블록미저장 = false, 댓글수정 = null;      /* 댓글수정 = 고치는 중인 댓글 id */
+/* 페이지를 다시 그리기 전에 쓰던 본문을 먼저 저장한다 — 안 하면 옛 본문으로 다시 그려지고 대기 중이던 저장이 옛 글을 덮는다 (2026-10-27 「완료했더니 내용도 사라졌어」) */
+async function 본문먼저(){ if(!BL || !블록미저장) return; clearTimeout(블록타이머); 블록타이머 = null; await 블록저장(); }
+function 블록자동저장(즉시){ clearTimeout(블록타이머); 블록미저장 = true;
   const st = $('#txstat'); if(st && !즉시){ st.textContent = '저장 중…'; st.classList.remove('bad'); }
   블록타이머 = setTimeout(블록저장, 즉시 ? 0 : 900); }
 
@@ -12805,6 +12953,7 @@ async function txDel(){
 }
 async function txToggle(key, id, f){
   const T = 표정의[key], r = W[key].find(x=>x.id===id); if(!r) return;
+  if(key === 'tasks' && r.kind === '대표공지' && f === 'done' && !할수('popup')){ toast('공지는 「읽었어요」로 표시해요'); return; }
   const v = !r[f]; const body = { [f]: v };
   if(key==='tasks') body.done_at = v ? new Date().toISOString() : null;
   try{ const o = await usend(T.table+'?id=eq.'+id, 'PATCH', body, 'return=representation');
@@ -13012,7 +13161,7 @@ function vHome(){
   /* ⛔ 홈은 사람마다 다르다 — 차례·켜짐·줄수는 `staff.home` 에서 읽는다 (2026-09-17) */
   const H = 내홈();
   const N = H.줄수;
-  const 공지 = W.tasks.filter(r=>r.kind==='대표공지' && !r.done && 공지보임(r)).slice(0,3);
+  const 공지 = W.tasks.filter(r=>공지중(r) && 공지보임(r)).slice(0,3);
   const 이번주 = W.leave.filter(표정의.leave.보기[0].필터).sort((a,b)=>(a.day||'')>(b.day||'')?1:-1).slice(0,N);
   const 대기 = 할수('leaveok') ? W.leave.filter(승인대기).length : 0;
 
@@ -14380,7 +14529,7 @@ async function txAct(a, el){
   if(a==='admopen'){ 가기(k); if(id) txView(k, id); return; }      /* 관리자 홈 카드 줄 → 그 페이지 */
   if(a==='admgo'){ 가기(k); return; }
   if(a==='mread'){ const 나 = (ME && ME.name) || ''; if(!나 || (W.mread || []).some(x => x.manual_id === id && x.name === 나)) return;      /* 매뉴얼 읽었어요 */
-    try{ await usend('tr_manual_read', 'POST', { manual_id: id, name: 나 }, 'return=minimal'); W.mread = (W.mread || []).concat([{ manual_id: id, name: 나, at: new Date().toISOString() }]); toast('읽었어요'); txView('manual', id); render(); }
+    try{ await usend('tr_manual_read', 'POST', { manual_id: id, name: 나 }, 'return=minimal'); W.mread = (W.mread || []).concat([{ manual_id: id, name: 나, at: new Date().toISOString() }]); toast('읽었어요'); txView(k || 'manual', id); render(); }
     catch(e){ toast('저장하지 못했어요 — ' + (/tr_manual/.test(String(e.message)) ? '서버 준비(70단계)가 아직이에요' : String(e.message || '').slice(0, 60))); } return; }
   if(a==='aspick'){ const id = String(k); 배정.고름.has(id) ? 배정.고름.delete(id) : 배정.고름.add(id); render(); return; }      /* 여러 명 고르기 (2026-10-26 대표 「다중선택」) */
   if(a==='aspickall'){ const 보 = [...document.querySelectorAll('#body .as-tbl [data-act="tx:aspick"]')].map(b => String(b.dataset.k));
@@ -14462,7 +14611,23 @@ async function txAct(a, el){
   if(a==='pjadd'){ if(계획편){ 계획편.seq.push(''); 계획판(계획편.mid, 계획편.sheet); } return; }
   if(a==='pjdel'){ if(계획편){ 계획편.seq.splice(+k, 1); 계획판(계획편.mid, 계획편.sheet); } return; }
   if(a==='pjsave'){ await 계획저장(); return; }
-  if(a==='rsr'){ S.rsR = k; render(); return; }      /* 루틴표 열기 · 주기 (2026-10-27) */
+  if(a==='rspick'){ 종목픽 = { rid:k, 부위:'', q:'', ex:null }; 종목픽판(); return; }      /* 루틴표 줄 · 그림 고르기 (2026-10-27 4차) */
+  if(a==='rspkp'){ if(종목픽){ 종목픽.부위 = k; 종목픽.q = ''; 종목픽판(); } return; }
+  if(a==='rspk'){ if(!종목픽) return; const vs = (D.va || []).filter(v => v.ex_id === k).sort((x, y) => (x.sort || 0) - (y.sort || 0)); if(!vs.length) return;
+    if(vs.length > 1){ 종목픽.ex = k; 종목픽판(); return; } await 종목픽넣기(vs[0].id); return; }
+  if(a==='rspkv'){ await 종목픽넣기(k); return; }
+  if(a==='rspkback'){ if(종목픽){ 종목픽.ex = null; 종목픽판(); } return; }
+  if(a==='rsxdel'){ const x = (D.ri || []).find(z => z.id === k); if(!x) return; if(!await 묻기('「' + (vaName(x.variant_id) || '종목') + '」을 이 루틴에서 제거할까요?')) return;
+    try{ await 휴지통으로('routine_items', x, '루틴표 종목', ssend); D.ri = D.ri.filter(z => z.id !== k); toast('제거했어요'); render(); }catch(e){ toast('제거하지 못했어요 — ' + String(e.message || '').slice(0, 60)); } return; }
+  if(a==='rsadd'){ S.rsAdd = k || null; render(); setTimeout(() => { const e = document.getElementById('rsaddin'); if(e) e.focus(); }, 30); return; }
+  if(a==='rsaddok'){ const e = document.getElementById('rsaddin'), 이름 = e ? e.value.trim() : ''; if(!이름){ toast('루틴 이름을 입력해 주세요'); return; }
+    const 같은곳 = (D.r || []).filter(r => r.member_id == null && r.sheet_id === k), used = 같은곳.map(r => r.no); let no = 1; while(used.includes(no)) no++;
+    const 덧 = (!D.r.length || 'hidden' in D.r[0]) ? { by:나이름(), made_at:new Date().toISOString() } : {}, 줄 = Object.assign({ id:'r' + Date.now(), member_id:null, no, name:이름, purpose:'', grp:'', sheet_id:k, sub:'' }, 덧);
+    try{ await ssend('routines', 'POST', [줄]); D.r.push(줄); S.rsAdd = null; toast('루틴을 추가했어요 · ＋ 로 종목을 추가해 주세요'); render(); }catch(err){ toast('추가하지 못했어요 — ' + String(err.message || '').slice(0, 60)); } return; }
+  if(a==='rsrn'){ S.rsRn = k || null; render(); setTimeout(() => { const e = document.getElementById('rsrnin'); if(e){ e.focus(); e.select(); } }, 30); return; }
+  if(a==='rsrnok'){ const e = document.getElementById('rsrnin'), 이름 = e ? e.value.trim() : '', r = (D.r || []).find(x => x.id === k); if(!r) return; if(!이름){ toast('루틴 이름을 입력해 주세요'); return; }
+    if(이름 === (r.name || '')){ S.rsRn = null; render(); return; } if(!await 묻기('루틴 이름을 「' + 이름 + '」로 수정할까요?')) return;
+    try{ await ssend('routines?id=eq.' + encodeURIComponent(k), 'PATCH', { name:이름 }); r.name = 이름; S.rsRn = null; toast('수정했어요'); render(); }catch(err){ toast('수정하지 못했어요 — ' + String(err.message || '').slice(0, 60)); } return; }      /* 루틴표 열기 · 주기 (2026-10-27) */
   if(a==='sgive'){ S.sgQ = ''; 주기판(k); return; }
   if(a==='sgm'){ const [sid, mid] = String(k).split('|'); await 주기저장(sid, mid); return; }
   if(a==='sgpick'){ 주기고르기판(k); return; }
@@ -14934,13 +15099,42 @@ async function txAct(a, el){
   if(a==='back'){ txView(시트.key, 시트.id); return; }
   if(a==='wide'){ 넓게 = !넓게; $('#pop').classList.toggle('tx-wide', 넓게);
     const b = document.querySelector('[data-act="tx:wide"]'); if(b) b.textContent = 넓게?'⤡':'⤢'; return; }
-  if(a==='toggle'){ await txToggle(k, id, el.dataset.f); if(el.dataset.stay) txView(k, id); return; }
+  if(a==='toggle'){ if(BL && BL.key === k && BL.id === id) await 본문먼저(); await txToggle(k, id, el.dataset.f); if(el.dataset.stay) txView(k, id); return; }
+  if(a==='ntcdue'){ await 본문먼저(); await 공지바꿈(id, { due:null }, '기한 없이 공지할까요?' + String.fromCharCode(10) + '내리기 전까지 계속 올라가 있어요'); return; }      /* 대표공지 기간 · 내리기 (2026-10-27) */
+  if(a==='ntcdown'){ await 본문먼저(); const 내 = v2 === 'down'; await 공지바꿈(id, { done:내, done_at: 내 ? new Date().toISOString() : null }, 내 ? '이 공지를 내릴까요?' + String.fromCharCode(10) + '선생님들 화면에서 사라져요' : '이 공지를 다시 올릴까요?'); return; }
+  if(a==='dutyord'){ 순서편 = null; 당직순서판(); return; }      /* 당직 (2026-10-27 4차) */
+  if(a==='dtup'){ 순서편 = (순서편 || 당직순서()).slice(); const i = +k; [순서편[i - 1], 순서편[i]] = [순서편[i], 순서편[i - 1]]; 당직순서판(); return; }
+  if(a==='dtrm'){ 순서편 = (순서편 || 당직순서()).slice(); 순서편.splice(+k, 1); 당직순서판(); return; }
+  if(a==='dtadd'){ 순서편 = (순서편 || 당직순서()).concat([k]); 당직순서판(); return; }
+  if(a==='dtcancel'){ 순서편 = null; 당직순서판(); return; }
+  if(a==='dtsave'){ if(!순서편 || !순서편.length){ toast('순서에 한 명 이상 있어야 해요'); return; } if(await 당직설정저장({ ord:순서편 }, '당직 순서를 저장할까요?' + String.fromCharCode(10) + 순서편.map((id, i) => (i + 1) + ' ' + ((사람(id) || {}).name || '')).join(' → '))){ 순서편 = null; } 당직순서판(); return; }
+  if(a==='dtfill'){ const t = new Date(TODAY); t.setDate(1); t.setMonth(t.getMonth() + 달력달); const 계획 = 당직채울것(t.getFullYear(), t.getMonth()); if(!계획.length) return;
+    if(!await 묻기((t.getMonth() + 1) + '월 빈 당직 ' + 계획.length + '일을 순서대로 채울까요?' + String.fromCharCode(10) + 계획.slice(0, 6).map(x => x.day.slice(5).replace('-', '/') + ' ' + ((사람(x.staff_id) || {}).name || '')).join(' · ') + (계획.length > 6 ? ' …' : ''))) return;
+    try{ await 당직넣기(계획); toast('채웠어요'); 당직순서판(); render(); }catch(e){ toast('채우지 못했어요 — ' + String(e.message || '').slice(0, 60)); } return; }
+  if(a==='dthadd'){ const dd = ($('#dtd') || {}).value, nn = (($('#dtn') || {}).value || '').trim(); if(!dd){ toast('날짜를 선택해 주세요'); return; } const f = v2 === 'off' ? 'off' : 'hol', c = W.duty || {};
+    const 새 = (c[f] || []).filter(x => x.d !== dd).concat([{ d:dd, n:nn || (f === 'off' ? '센터 휴무' : '공휴일') }]).sort((a, b) => a.d < b.d ? -1 : 1);
+    if(await 당직설정저장({ [f]:새 }, 날짜한글(dd) + '을 ' + (f === 'off' ? '센터 휴무일(당직 없음)' : '공휴일(당직 있음)') + '로 추가할까요?')) render(); 당직순서판(); return; }
+  if(a==='dthrm'){ const f = v2 === 'off' ? 'off' : 'hol', c = W.duty || {}; if(await 당직설정저장({ [f]:(c[f] || []).filter(x => x.d !== k) }, 날짜한글(k) + ' ' + (f === 'off' ? '센터 휴무일' : '공휴일') + '을 삭제할까요?')) render(); 당직순서판(); return; }
+  if(a==='dswap'){ const r = (W.leave || []).find(x => x.id === id); if(!r) return; const 누구 = (사람(v2) || {}).name || '';
+    if(!await 묻기(날짜한글(r.day) + ' 당직을 ' + 누구 + ' 선생님과 교체 신청할까요?' + String.fromCharCode(10) + '관리자가 승인하면 교체돼요')) return;
+    const 줄 = { id:crypto.randomUUID(), kind:'당직 교체', staff_id:ME.id, day:r.day, status:'req', vis:'all', reason:((사람(r.staff_id) || {}).name || '') + ' → ' + 누구, extra:{ 교체:{ duty:r.id, from:r.staff_id, to:v2 } } };
+    try{ const o = await usend('tr_leave', 'POST', [줄], 'return=representation'); W.leave.push(Object.assign({}, 줄, (o && o[0]) || {})); 기록남기기({ area:'연월차', action:'생성', tbl:'tr_leave', row_id:r.id, detail:'당직 교체 신청 — ' + r.day + ' ' + 줄.reason }); toast('신청했어요 · 관리자가 승인하면 교체돼요'); txView('leave', r.id); render(); }
+    catch(e){ toast('신청하지 못했어요 — ' + String(e.message || '').slice(0, 60)); } return; }
+  if(a==='dswapok' || a==='dswapno'){ const x = (W.leave || []).find(z => z.id === id); if(x) await 당직교체승인(x, a === 'dswapok'); return; }
+  if(a==='pgclose'){ await 본문먼저(); popClose(); return; }      /* 페이지 아래 「닫기」 (2026-10-27 대표 「완료 말고 닫기」) */
   if(a==='upload'){ const f = $('#txfile'); if(f) f.click(); return; }
   if(a==='fdel'){ await txFileDel(시트.key, 시트.id, +el.dataset.i); return; }
   /* 페이지 댓글 — ⛔ 회원 화면에도 `cmsend`·`cmdel` 이 있다(회원 피드백).
      `tx:` 하나로 갈리면 엉뚱한 것이 지워진다. 그래서 이름을 갈랐다 (2026-09-29) */
-  if(a==='pgcmsend'){ await txCmSend(); return; }
-  if(a==='pgcmdel'){ if(!await 묻기('이 글을 휴지통으로 보낼까요?')) return; await txCmDel(id); return; }
+  if(a==='pgcmsend'){ await 본문먼저(); await txCmSend(); return; }
+  if(a==='pgcmdel'){ await 본문먼저(); if(!await 묻기('이 댓글을 삭제할까요?' + String.fromCharCode(10) + '휴지통에서 되돌릴 수 있어요')) return; await txCmDel(id); return; }
+  if(a==='pgcmedit'){ await 본문먼저(); 댓글수정 = id; txView(시트.key, 시트.id); setTimeout(() => { const t = document.getElementById('txcmed'); if(t){ t.focus(); t.setSelectionRange(t.value.length, t.value.length); } }, 30); return; }
+  if(a==='pgcmcancel'){ 댓글수정 = null; txView(시트.key, 시트.id); return; }
+  if(a==='pgcmsave'){ const t = document.getElementById('txcmed'), 글 = t ? t.value.trim() : '', c0 = W.cm.find(c => c.id === id); if(!c0) return;
+    if(!글){ toast('내용을 입력해 주세요'); return; } if(글 === String(c0.body || '').trim()){ 댓글수정 = null; txView(시트.key, 시트.id); return; }
+    if(!await 묻기('댓글을 수정할까요?')) return;
+    try{ await usend('tr_comments?id=eq.' + encodeURIComponent(id), 'PATCH', { body:글 }); c0.body = 글; 댓글수정 = null; txView(시트.key, 시트.id); toast('수정했어요'); }
+    catch(e){ toast('수정하지 못했어요 — ' + String(e.message || '').slice(0, 60)); } return; }
   if(a==='tick'){ await txTick(el); return; }
   /* ── 블록 ── */
   if(a==='badd'){ 글자넣기();
