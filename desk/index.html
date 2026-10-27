@@ -770,7 +770,8 @@ body.tx-moving .tx-x{cursor:grabbing}
 .tx-selall{display:flex;align-items:center;gap:9px;padding:6px 4px 8px;font-size:13px;color:var(--sub);
   font-weight:700;flex-wrap:wrap}
 .tx-selall b{color:var(--gold)}
-.tx-selall .acts{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
+.tx-selall .acts{display:flex;gap:6px;flex-wrap:wrap}      /* 단추는 「n개 선택됨」 바로 옆 — 창을 넓히면 오른쪽 끝 삭제가 너무 멀었다 (2026-10-27 대표 · 노션처럼) */
+.tx-selall.on{position:sticky;top:0;z-index:5;background:var(--dark-2);border:1px solid var(--line);border-radius:10px;padding:5px 8px;margin:0 0 8px;width:max-content;max-width:100%;box-shadow:0 4px 14px rgba(0,0,0,.18)}
 .tx-selall .acts button{font-size:13px;font-weight:700;padding:5px 10px;border-radius:8px;
   background:var(--dark-3);color:var(--cream)}
 .tx-selall .acts button:hover{background:var(--gold);color:#1b1b19}
@@ -1799,6 +1800,8 @@ body{word-break:keep-all}
 .mtb{min-width:1160px}
 .aglock{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:46px 20px;border:1px solid #6b5a33;background:#1e1a12;border-radius:16px;margin:6px 0}
 .aglock .ic{font-size:28px}.aglock b{font-size:16px}.aglock span{font-size:14px;color:var(--sub)}.aglock .st{font-size:13.5px;color:var(--gold);margin:6px 0 10px}
+.cm-att{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.cm-att .sp{flex:1}
+.cm-chip{display:inline-flex;align-items:center;gap:4px;background:var(--dark-3);border:1px solid var(--line);border-radius:999px;padding:3px 6px 3px 10px;font-size:13px}.cm-chip button{color:var(--sub);font-size:12px;padding:0 4px}
 .agwarn{display:flex;align-items:center;gap:14px;border-radius:14px;border:1px solid #6b5a33;background:#262012;padding:12px 16px;margin-bottom:14px}.agwarn .tx{flex:1;min-width:0;font-size:13.5px;line-height:1.6;color:#d9cdb3}.agwarn .tx b{display:block;font-size:15px;color:#f2ead9}.agwarn .tx small{display:block;color:#a39c8e;font-size:13px}.agwarn .btn{flex:none;white-space:nowrap}
 /* 달력 — 「달력」으로 보이게 (2026-10-13 대표 「달력인 건 아는데 현황판 느낌도 있어서 · 달력이라고 더 인지되면」). 머리띠(달력 그림 + 연 · 월) · 요일 줄 · 일요일 빨강 / 토요일 파랑 · 기록 있는 날은 숫자 아래 점 · 오늘은 테두리 · 아래에 풀이 한 줄. 운동 기록 · 피드백 · 식단 탭이 같이 쓴다 */
 .cal{padding:0;overflow:hidden;border-radius:14px}
@@ -2634,7 +2637,7 @@ body:has(#pop.on.tx-side) #gchat .gc-fab:not(.x){display:none}      /* 옆 판�
 
 <script>
 "use strict";
-const BUILD = '429';
+const BUILD = '432';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -5851,7 +5854,10 @@ function tabComment(){
         + '<button class="btn ' + (열림?'ghost':'sub') + ' sm" data-act="cmopen" data-v="' + esc(vid) + '">'
         + (열림 ? '접기' : '피드백 달기') + '</button></div>'
         + (열림 ? '<textarea class="inp" id="cmtx" placeholder="지금 본 것을 입력하세요"></textarea>'
-            + '<button class="btn main sm" data-act="cmsend" data-v="' + esc(vid) + '">보내기</button>' : '')
+            + '<div class="cm-att">' + (피드백붙임[vid] || []).map((f, i) => '<span class="cm-chip">' + (f.kind === 'video' ? '🎬' : '📷') + ' ' + esc(f.name.slice(0, 18)) + '<button data-act="cmattx" data-v="' + esc(vid) + '" data-i="' + i + '" title="첨부 취소">✕</button></span>').join('')
+            + '<span class="sp"></span><button class="btn ghost sm" data-act="cmatt" data-v="' + esc(vid) + '">📎 사진 · 영상</button>'
+            + '<button class="btn main sm" data-act="cmsend" data-v="' + esc(vid) + '">' + (S.cm보냄중 ? '올리는 중…' : '보내기') + '</button></div>'
+            + '<input type="file" id="cmfile" accept="image/*,video/*" multiple hidden>' : '')
         + (이번.length ? 이번.map(cmRow).join('') : '')
         + (지난.length ? '<button class="prevbtn" data-act="cmprev" data-v="' + esc(vid) + '">'
             + (지난열림 ? '▾ 지난 피드백 접기' : '▸ 지난 피드백 ' + 지난.length + '개 보기') + '</button>'
@@ -10254,6 +10260,8 @@ function 표칸값(key, c, r){
 }
 /* 본문 블록(JSON {"v":1,"b":[…]})을 글로 — 표 칸에 JSON 이 그대로 찍혔다 (2026-10-26 대표 그림 윤O정) · 태그는 DOMParser 로 벗김(그림 · 글 실행 안 됨) */
 const 블록JSON인가 = v => typeof v === 'string' && /^\s*\{\s*"v"\s*:\s*1\s*,\s*"b"\s*:/.test(v);
+/* 글만 든 본문(문단 · 꾸밈 없음)은 칸에서 바로 고친다 — 사진 · 목록 · 토글 · 굵게 같은 게 있을 때만 페이지로 (2026-10-27 대표 「입력칸 누르면 사이드페이지 열림 · 윤현정 칸만」) */
+const 꾸민본문인가 = v => { if(!블록JSON인가(v)) return false; try{ const j = JSON.parse(v); return (j.b || []).some(b => b.t !== 'p' || /<[^>]+>/.test(String(b.x || '')) || (b.c && b.c.length)); }catch(e){ return true; } };
 function 블록글자(v){
   if(!블록JSON인가(v)) return v == null ? '' : String(v);
   try{ const j = JSON.parse(v), 줄 = [], dp = new DOMParser();
@@ -10349,7 +10357,7 @@ function 칸안편집(key, id, k, td){
   const v = 값읽기(r, k);
   const 종 = c.타입==='number' ? 'number' : c.타입==='url' ? 'url'
            : c.타입==='email' ? 'email' : c.타입==='phone' ? 'tel' : 'text';
-  if(c.타입 === 'long' && 블록JSON인가(v)){ txView(key, id); return true; }      /* 사진 · 목록이 든 본문은 칸에서 고치면 깨진다 — 페이지로 */
+  if(c.타입 === 'long' && 꾸민본문인가(v)){ txView(key, id); return true; }      /* 사진 · 목록 · 꾸밈이 든 본문은 칸에서 고치면 깨진다 — 페이지로 · 글만이면 아래에서 글로 풀어 고침 */
   칸편집 = { key, id, k };
   칸고르기(key, id, k);
   td.classList.add('on'); td.classList.toggle('big', c.타입 === 'long' || (c.타입 === 'text' && String(v || '').length > 30));
@@ -10357,13 +10365,13 @@ function 칸안편집(key, id, k, td){
     ? '<textarea class="tx-cin" rows="1"></textarea>'
     : '<input class="tx-cin" type="'+종+'">';
   const inp = td.querySelector('.tx-cin');
-  inp.value = v == null ? '' : String(v);
+  inp.value = v == null ? '' : 블록글자(v);      /* 글만 든 본문 JSON 은 글로 풀어 보여 줌 */
   if(td.classList.contains('big')){ const 키 = () => { inp.style.height = 'auto'; inp.style.height = Math.min(420, inp.scrollHeight + 4) + 'px'; }; inp.addEventListener('input', 키); setTimeout(키, 0); }
   let 끝났 = false;
   const 담기 = async (다음, 고칠까) => {
     if(끝났) return; 끝났 = true; 칸편집 = null; 칸편집끝 = null;
     const nv = inp.value;
-    const 바뀜 = String(nv) !== String(v == null ? '' : v);
+    const 바뀜 = String(nv) !== (v == null ? '' : 블록글자(v));
     td.classList.remove('on', 'big');
     if(바뀜) await 속성저장(key, id, k, c.타입==='number' ? (nv===''?null:Number(nv)) : (nv===''?null:nv));
     else 표칸다시(key, id, k);
@@ -10842,12 +10850,12 @@ function txPickBar(key, rows, 표다){
     acts += '<button class="wn" data-act="tx:bulkdel" data-k="'+key+'">삭제</button>';
   }
   if(표다 && !고름.length) return '';
-  return '<div class="tx-selall">'
+  return '<div class="tx-selall'+(고름.length?' on':'')+'">'
     + (표다 ? '' : '<span class="tx-pick '+(모두?'on':'')+'" data-act="tx:pickall" data-k="'+key+'">'+(모두?'✓':'')+'</span>')
     + (고름.length
-        ? '<b>'+고름.length+'개</b> 선택 <button data-act="tx:pickno" data-k="'+key+'" style="color:#6f6a63;font-weight:600;text-decoration:underline">선택 해제</button>'
-        : '전체 선택')
-    + '<span class="acts">'+acts+'</span></div>';
+        ? '<b>'+고름.length+'개 선택됨</b><span class="acts">'+acts+'</span><button data-act="tx:pickno" data-k="'+key+'" title="선택 해제" style="color:#6f6a63;font-weight:600">✕</button>'
+        : '전체 선택<span class="acts">'+acts+'</span>')
+    + '</div>';
 }
 async function txBulk(key, body){
   const T = 표정의[key], ids = (고른행.key === key ? 고른행.ids : []).slice();
@@ -13375,11 +13383,26 @@ document.addEventListener('mouseup', async function(){
    입구는 둘이어도 된다 — 회원판 「보내기」 · 빠른 피드백 「보내기」.
    ⛔ 앞서는 식이 두 벌이었고 **빠른 피드백 쪽만 「봐 달라는 요청」을 안 닫았다.**
       그래서 ＋남기기로 답해도 「피드백 요청」 숫자가 안 줄었다. */
-async function 피드백쓰기(mid, vid, wid, 글, who){
+/* 피드백에 붙일 사진 · 영상 — 종목(vid)마다 · 보내면 비움 (2026-10-27 대표 「데스크 피드백에 사진, 영상 업로드 버튼이 없음」) */
+const 피드백붙임 = {};
+async function 피드백파일올리기(mid, cid, 파일){      /* 앱 sendcm 과 같은 길 — 사진 = 수파베이스 media · 영상 = S3(중앙 /app/media/upload) · 붙인 차례 그대로 */
+  const 올린것 = [];
+  for(let i = 0; i < 파일.length; i++){ const f = 파일[i]; toast('올리는 중 ' + (i + 1) + '/' + 파일.length);
+    if(f.kind === 'video'){ const type = (f.file.type || 'video/mp4').split(';')[0], ext = /webm/.test(type) ? 'webm' : 'mp4';
+      const j = await S3부르기('upload', { 종류:'video', 파일명: cid + '_' + i + '.' + ext, content_type: type, mid });
+      const r = await fetch(j.url, { method:'PUT', headers:{ 'Content-Type': j.content_type || type }, body: f.file });
+      if(!r.ok) throw new Error('영상을 못 올렸어요 (' + r.status + ')'); 올린것.push({ kind:'video', path: j.key }); }
+    else { const blob = await 줄이기(f.file), path = 'cm/' + mid + '/' + cid + '_' + i + '.jpg';
+      const r = await fetch(SB_URL + '/storage/v1/object/media/' + path, { method:'POST', headers:{ apikey:SB_KEY, Authorization:'Bearer ' + 열쇠(), 'Content-Type':'image/jpeg' }, body: blob });
+      if(!r.ok) throw new Error('사진을 못 올렸어요 (' + r.status + ')'); 올린것.push({ kind:'photo', path }); } }
+  return 올린것; }
+async function 피드백쓰기(mid, vid, wid, 글, who, 파일){
   const cid = 'c' + Date.now();
   const 이제 = new Date().toISOString();
+  const 올린것 = (파일 && 파일.length) ? await 피드백파일올리기(mid, cid, 파일) : [];      /* ⛔ 파일부터 — 피드백을 먼저 넣으면 회원이 첨부 없는 피드백을 먼저 받아 간다(앱과 같은 차례) */
   await ssend('comments', 'POST', [{ id:cid, member_id:mid, variant_id:vid,
-    workout_id: wid || null, trainer:who, body:글, pics:0, vids:0 }]);
+    workout_id: wid || null, trainer:who, body:글, pics:올린것.filter(x => x.kind === 'photo').length, vids:올린것.filter(x => x.kind === 'video').length }]);
+  if(올린것.length){ await ssend('comment_media', 'POST', 올린것.map(m => ({ comment_id:cid, kind:m.kind, path:m.path }))); D.cmedia = 올린것.map(m => ({ comment_id:cid, kind:m.kind, path:m.path })).concat(D.cmedia || []); }
   D.c.unshift({ id:cid, member_id:mid, variant_id:vid, workout_id: wid || null,
     trainer:who, body:글, read_at:null, created_at:이제 });
 
@@ -16100,18 +16123,25 @@ document.addEventListener('click', async function(ev){
     catch(e){ toast(e.message); }
     return;
   }
+  if(a==='cmatt'){ if(!건강동의함(S.mid)){ 동의관문('video'); return; } const f = $('#cmfile'); if(f){ f.dataset.v = act.dataset.v; f.click(); } return; }      /* 사진 · 영상은 건강정보 동의 뒤에만 (약관 동의화면_문구 ③ 「트레이너 코멘트 첨부 사진·영상」) */
+  if(a==='cmattx'){ const v = act.dataset.v; (피드백붙임[v] || []).splice(+act.dataset.i, 1); render(); return; }
   if(a==='cmsend'){
+    if(S.cm보냄중) return;
     const ta = $('#cmtx');
     const vid = act.dataset.v || S.cmopen;
-    const tx = ta ? ta.value.trim() : '';
-    if(!vid || !tx){ toast('내용을 입력해 주세요'); return; }
+    const 파일 = 피드백붙임[vid] || [];
+    let tx = ta ? ta.value.trim() : '';
+    if(!vid || (!tx && !파일.length)){ toast('내용을 입력하거나 사진 · 영상을 붙여 주세요'); return; }
+    if(파일.length && !건강동의함(S.mid)){ 동의관문('video'); return; }
+    if(!tx) tx = 파일.some(f => f.kind === 'video') ? '영상 보고 자세 확인해 보세요' : '사진 보고 확인해 보세요';      /* 앱과 같은 글 */
     const who = S.who==='전체' ? (memOf(S.mid).trainer||'트레이너') : S.who;
-    let cid = null;
+    S.cm보냄중 = true; render();
     try{
-      cid = await 피드백쓰기(S.mid, vid, S.cmw, tx, who);
-      if(ta) ta.value=''; S.cmopen=null;
-      toast('보냈어요 · 회원 화면에 바로 떠요'); render();
-    }catch(e){ toast('못 보냈어요 — ' + e.message); }
+      await 피드백쓰기(S.mid, vid, S.cmw, tx, who, 파일);
+      delete 피드백붙임[vid]; S.cmopen=null;
+      toast('보냈어요 · 회원 화면에 바로 떠요');
+    }catch(e){ toast('못 보냈어요 — ' + String(e.message || '').slice(0, 60)); }
+    S.cm보냄중 = false; render();
     return;
   }
 
@@ -16489,6 +16519,10 @@ document.addEventListener('mousedown', function(ev){
   if($('#txslash') && !ev.target.closest('#txslash') && !ev.target.closest('[data-act="tx:bmenu"]')) 블록메뉴닫기();
 });
 document.addEventListener('change', function(ev){
+  if(ev.target && ev.target.id === 'cmfile'){ const v = ev.target.dataset.v || S.cmopen; if(!v) return;
+    const 새 = [...(ev.target.files || [])].filter(f => /^(image|video)\//.test(f.type)).map(f => ({ file:f, name:f.name || '파일', kind: /^video\//.test(f.type) ? 'video' : 'photo' }));
+    const 큰 = 새.find(f => f.kind === 'video' && f.file.size > 300 * 1024 * 1024); if(큰){ toast('영상이 너무 커요(300MB 넘음) — ' + 큰.name.slice(0, 20)); }
+    피드백붙임[v] = (피드백붙임[v] || []).concat(새.filter(f => f !== 큰)).slice(0, 6); ev.target.value = ''; render(); return; }
   if(ev.target.closest && ev.target.closest('#txform') && ev.target.dataset.f && ev.target.tagName!=='TEXTAREA' && ev.target.type!=='text'){ 자동저장(true); return; }
   if(ev.target.id==='txbfile' && BL){ const at = ev.target.dataset.at || String(BL.bs.length-1);
     블록파일(at, ev.target.files); ev.target.value=''; return; }
