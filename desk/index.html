@@ -1586,6 +1586,8 @@ body.resizing{cursor:col-resize;user-select:none}
 .rs-sub{padding:6px 12px 0;color:#555;font-size:13px}.rs-flow{padding:4px 12px;color:#333;font-size:13px;font-weight:700}.rs-flow i{font-style:normal;color:#c99418}
 .rs-ex{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;padding:8px 12px 12px}.rs-ex div{min-width:0;text-align:center}.rs-ex small{display:block;font-size:12px;color:#333;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rsi{display:block;aspect-ratio:1/1;border-radius:10px;overflow:hidden;background:#f1f2f4}.rsi img{width:100%;height:100%;object-fit:contain}
+.rsi.anat{position:relative;background:#f6f4ef}.rsi.anat canvas{width:100%;height:100%;object-fit:contain;display:block}
+.rsi-dot{position:absolute;left:6px;top:6px;display:flex;gap:3px}.rsi-dot i{width:9px;height:9px;border-radius:50%;box-shadow:0 0 0 1.5px #fff}
 .rsi.none{display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--pc) 22%,#fff)}.rsi.none em{font-style:normal;font-weight:800;color:color-mix(in srgb,var(--pc) 70%,#000);font-size:13px}
 .rs-empty{color:#666;padding:20px 4px}.rs-empty b{display:block;color:#222}
 .rs-form label{display:block;margin-bottom:12px;font-weight:700}.rs-form label .inp{margin-top:6px;width:100%}.rs-cv{display:flex;gap:14px;align-items:flex-start;margin:6px 0 14px}
@@ -2095,7 +2097,8 @@ body{word-break:keep-all}
 .sc-saved{margin-left:8px;display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:6px;font-size:13px;font-weight:800;color:var(--teal);background:var(--teal-dim);border:1px solid color-mix(in srgb,var(--teal) 45%,transparent)}
 .sc-card.done{opacity:.72}.sc-ro{display:flex;gap:10px;align-items:baseline;margin-top:8px;font-size:14px;color:#d9d3c9}.sc-ro .k{width:58px;flex:none;font-size:13px;font-weight:700;color:var(--sub)}.sc-ro .by{font-size:13px;color:var(--sub)}
 .ps-locked{position:relative;opacity:.72}.ps-lk{position:absolute;right:12px;bottom:10px;font-size:13px;font-weight:800;color:var(--teal)}
-.sc-pay{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:5px;max-width:400px}.sc-pay button{height:32px;min-width:0;padding:0 6px;border-radius:999px;border:1px solid var(--line);background:var(--dark-3);font:inherit;font-size:13px;font-weight:600;color:#d9d3c9;cursor:pointer}
+.sc-pay{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:6px;margin-top:5px;max-width:520px}
+.sc-etc{display:flex;align-items:center;gap:8px;margin-top:8px;max-width:520px}.sc-etc span{color:var(--teal);font-weight:800;font-size:13px;flex:none}.sc-etc input{flex:1;min-width:0;height:32px;border-radius:9px;border:1px solid var(--teal);background:var(--dark);color:var(--cream);padding:0 10px;font:inherit;font-size:14px}.sc-pay button{height:32px;min-width:0;padding:0 6px;border-radius:999px;border:1px solid var(--line);background:var(--dark-3);font:inherit;font-size:13px;font-weight:600;color:#d9d3c9;cursor:pointer}
 .sc-pay button.on{border-color:var(--teal);background:var(--teal-dim);color:var(--teal)}
 .sc-tgl{display:block;width:100%;text-align:left;margin-top:9px;padding:8px 11px;border-radius:9px;font:inherit;font-size:13px;color:#B0E299;cursor:pointer;background:color-mix(in srgb,#B0E299 9%,transparent);border:1px dashed color-mix(in srgb,#B0E299 45%,transparent)}
 .sc-tgl b{color:var(--cream);font-weight:700}.sc-tgl.done{border-style:solid}.sc-tgl-p{display:block;margin-top:3px;color:var(--sub);font-weight:500}
@@ -2778,7 +2781,7 @@ body:has(#pop.on.tx-side) #gchat .gc-fab:not(.x){display:none}      /* 옆 판�
 
 <script>
 "use strict";
-const BUILD = '445';
+const BUILD = '447';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -5405,8 +5408,43 @@ const 루틴표고침 = s => !!s && (s.owner === 나이름() || 할수('table'))
 function 루틴표표지(s, 큰){ const c = s.cover || {}, u = c.path ? media(c.path) : '';
   return '<span class="rsc' + (큰 ? ' big' : '') + '"' + (u ? '' : ' style="background:' + esc(c.color || 표지색들[0]) + '"') + '>' + (u ? '<img src="' + esc(u) + '" alt="" loading="lazy">' : '<b' + (c.color === '#2b2a27' ? ' class="lt"' : '') + '>' + esc(s.title || '루틴표') + '</b>')
     + ((s.tags || [])[0] ? '<i>' + esc(s.tags[0]) + '</i>' : '') + '</span>'; }
+/* 종목 그림 — ① 회원 앱과 같은 그림(img/ex/<종목 id>.png · 2026-10-27 대표 「그림 다 맞췄어」 129장) ② 종목에 올린 사진 ③ 해부 그림 */
+let 종목그림있음 = new Set();
+try{ fetch('../img/ex/목록.json?v=' + BUILD).then(r => r.ok ? r.json() : []).then(a => { 종목그림있음 = new Set(Array.isArray(a) ? a : []); if(종목그림있음.size && S.view === 'rtmake') render(); }).catch(() => {}); }catch(e){}
 function 종목그림(vid){ const v = vaOf(vid), e = v ? exOf(v.ex_id) : null, m = ((v && v.media) || []).concat((e && e.media) || []).find(z => z && z.path && z.kind !== 'video');
-  return m ? '<span class="rsi"><img src="' + esc(media(m.path)) + '" alt="" loading="lazy"></span>' : '<span class="rsi none" style="--pc:' + (부위색D[(e && e.part) || ''] || '#9a938a') + '"><em>' + esc((e && e.part) || '') + '</em></span>'; }
+  if(e && 종목그림있음.has(e.id)) return '<span class="rsi"><img src="../img/ex/' + encodeURIComponent(e.id) + '.png?v=' + BUILD + '" alt="" loading="lazy"></span>';
+  if(m) return '<span class="rsi"><img src="' + esc(media(m.path)) + '" alt="" loading="lazy"></span>';
+  const 묶 = 해부묶음(e); if(!묶.length) return '<span class="rsi none" style="--pc:' + (부위색D[(e && e.part) || ''] || '#9a938a') + '"><em>' + esc((e && e.part) || '') + '</em></span>';
+  setTimeout(해부칠하기, 0);
+  return '<span class="rsi anat" title="' + esc(묶.join(' · ')) + '"><canvas data-anat="' + esc(묶.join(',')) + '"></canvas><span class="rsi-dot">' + 묶.map(g => '<i style="background:' + 해부색[g] + '"></i>').join('') + '</span></span>'; }
+/* ══ 해부 그림 ══ 회원 앱 2.5D 몸(img/body3 · 앞 000 · 뒤 180)과 같은 그림 · 같은 칸(근칸) — 칸을 9묶음으로 묶어 묶음마다 고유 색 (2026-10-27 대표)
+   종목 → 칸 = 앱 종목근칸 그대로(아래 사본 · 앱이 바뀌면 같이) · 없으면 부위 기본 칸 */
+const 해부칸 = ["chest_up", "chest", "delt_f", "delt_s", "delt_r", "biceps", "triceps", "forearm", "abs", "oblique", "trap", "midback", "lats", "lowback", "glute", "glute_med", "quad", "ham", "adductor", "calf", "shin"];
+const 해부칸색 = [[255, 0, 0], [0, 255, 0], [0, 0, 255], [255, 255, 0], [255, 0, 255], [0, 255, 255], [188, 0, 0], [0, 188, 0], [0, 0, 188], [188, 188, 0], [188, 0, 188], [0, 188, 188], [255, 188, 0], [255, 0, 188], [188, 255, 0], [0, 255, 188], [188, 0, 255], [0, 188, 255], [255, 188, 188], [188, 255, 188], [188, 188, 255]];
+const 해부칸묶음 = { chest_up:'가슴', chest:'가슴', delt_f:'어깨', delt_s:'어깨', delt_r:'어깨', biceps:'팔', triceps:'팔', forearm:'팔', abs:'복근', oblique:'복근', trap:'등', midback:'등', lats:'등', lowback:'등',
+  glute:'엉덩이', glute_med:'엉덩이', quad:'앞 허벅지', adductor:'앞 허벅지', ham:'뒤 허벅지', calf:'종아리', shin:'종아리' };
+const 해부색 = { '가슴':'#d98c7a', '어깨':'#e0b070', '등':'#7fa8c9', '팔':'#b39ad6', '복근':'#e2c96a', '엉덩이':'#e07a8a', '앞 허벅지':'#7fc9a0', '뒤 허벅지':'#c9a0e8', '종아리':'#8fd0d6' };
+const 해부기본칸 = { 가슴:['chest'], 어깨:['delt_f', 'delt_s'], 등:['lats', 'midback'], 팔:['biceps', 'triceps'], 하체:['quad', 'glute'], 복근:['abs'] };
+const 해부종목칸 = {"bp":["chest"],"idp":["chest_up"],"cp":["chest"],"cf":["chest"],"x1023_cf_d":["chest"],"ohp":["delt_f","delt_s","triceps"],"ibp":["chest_up"],"lr":["delt_s"],"df":["chest"],"blr":["delt_r"],"ch01":["chest"],"lpd":["lats"],"x1023_lpd_f":["lats"],"ch02":["chest"],"fr":["delt_f"],"cnp":["delt_f","glute","trap"],"sr":["midback","lats"],"ch03":["chest"],"x1023_sr_e":["lats","midback"],"x1023_hir_c":["lats","midback"],"ch04":["chest_up"],"dsp":["delt_f","delt_s"],"hir":["lats","midback"],"sh01":["delt_f","delt_s","triceps"],"ch05":["chest"],"lin":["midback","lats"],"br":["lats","midback"],"sh02":["delt_s","delt_f"],"x1023_dc_b":["biceps","forearm"],"dc":["biceps"],"x1023_dc_c":["forearm","biceps"],"sh03":["delt_s","trap"],"pdr":["lats","midback"],"shr":["trap"],"ch08":["chest"],"sh04":["delt_f","chest_up"],"ch09":["chest_up"],"sh05":["delt_f","delt_s"],"tp":["triceps"],"x1023_tp_c":["triceps"],"x1023_tp_d":["triceps"],"oad":["lats"],"x1023_tp_b":["triceps"],"dsr":["midback","lats"],"x1023_bc_b":["forearm","biceps"],"sh06":["delt_f","delt_s"],"ch10":["chest"],"sq":["quad","glute"],"bc":["biceps"],"apd":["lats"],"rdl":["ham","glute"],"sh07":["delt_f"],"pc":["biceps"],"x1023_rdl_b":["ham","glute"],"ch11":["chest"],"bk01":["glute","quad","adductor"],"sh08":["delt_s","trap"],"ar01":["biceps"],"ch12":["chest_up"],"lp":["quad","glute"],"sh09":["delt_r","delt_s"],"lc":["ham"],"ch13":["chest","triceps"],"bk02":["quad","glute","lowback"],"bk03":["lowback","trap","glute"],"ar03":["biceps"],"ch14":["chest"],"sh10":["delt_r","midback"],"le":["quad"],"ht":["glute"],"ar04":["triceps"],"sh11":["delt_f","delt_s"],"ch15":["triceps","chest"],"pl":["abs"],"ar05":["triceps"],"fsq":["quad"],"ch16":["chest_up","delt_f"],"bk05":["ham","lowback"],"sh12":["delt_s"],"bk06":["midback","lats"],"ch17":["chest"],"ar06":["triceps","chest"],"dl":["lowback","glute","ham"],"sh13":["delt_r"],"cr":["abs"],"bk07":["midback","lats"],"ch18":["chest","triceps"],"hlr":["abs"],"ar07":["biceps"],"sh14":["delt_f","delt_s"],"lg":["quad","glute"],"x1023_bk07_x1789802114948":["lats","midback"],"ar08":["biceps"],"ch19":["chest","triceps"],"x1023_sh15_b":["delt_s"],"rlg":["glute","quad"],"bk08":["trap"],"sh15":["delt_s"],"ccr":["abs"],"sh16":["delt_f"],"bk09":["midback","lats"],"x1023_bk09_e":["lats","midback"],"ch20":["chest","triceps"],"bss":["quad","glute"],"ab01":["abs"],"ar09":["biceps"],"sh17":["delt_r"],"ar10":["triceps"],"gm":["ham","lowback"],"ab02":["abs"],"ch21":["chest","lats"],"ar11":["triceps"],"clf":["calf"],"ab03":["abs"],"sh18":["delt_s","trap"],"ch22":["lats","chest"],"ch23":["chest","triceps"],"ab04":["abs"],"ar12":["forearm"],"gsq":["quad","glute"],"sh19":["delt_r"],"dlg":["quad","glute"],"ch24":["chest"],"sh20":["delt_f"],"ab05":["abs"],"ar13":["forearm"],"sh21":["delt_f","triceps"],"ch25":["chest","abs"],"ar14":["forearm","trap"],"ab06":["oblique"],"slg":["adductor","quad","glute"],"spq":["quad","glute"],"sh22":["delt_f","triceps"],"bk15":["lats"],"ch26":["chest"],"ab07":["abs","triceps"],"x1023_ar15_c":["forearm","biceps"],"ar15":["biceps"],"x1023_ar15_b":["biceps","forearm"],"ch27":["chest"],"lg01":["quad","glute"],"bk16":["trap"],"sh23":["delt_r","midback"],"ab08":["oblique"],"ch28":["chest"],"ab09":["abs"],"sh24":["delt_r"],"bk17":["delt_r","midback"],"lg02":["glute","quad","ham"],"x1023_bk18_d":["lats","biceps"],"bk18":["lats"],"sh25":["delt_f"],"lg03":["glute","quad"],"ab10":["oblique","abs"],"lg04":["ham","lowback"],"ab11":["abs"],"sh26":["delt_f","delt_s"],"lg05":["glute"],"ar20":["triceps"],"ab12":["lowback","glute"],"bk20":["midback","lats"],"sh27":["delt_s","delt_f"],"lg06":["quad","glute"],"sh28":["delt_r"],"ch32":["chest","triceps"],"ab13":["abs"],"bk21":["lowback","glute"],"ar21":["biceps"],"lg07":["quad","glute"],"bk22":["lowback"],"ar22":["triceps"],"ab14":["abs"],"ch33":["chest"],"bk23":["forearm","lats"],"ch34":["chest"],"ar23":["triceps"],"ab15":["abs"],"sh30":["delt_s"],"ch35":["chest_up"],"ar24":["triceps"],"bk24":["lats"],"sh31":["delt_s"],"ab16":["abs"],"lg10":["quad","glute"],"ab17":["abs"],"ch36":["chest"],"sh32":["delt_f","forearm"],"bk25":["midback","lats"],"ar25":["forearm"],"et16":["delt_f","oblique","glute"],"sh33":["delt_f","delt_s"],"ab18":["abs","lats"],"bk26":["lats","midback"],"lg11":["ham"],"ch37":["chest"],"et17":["glute","ham","trap"],"lg12":["ham"],"ch38":["triceps","chest"],"sh34":["delt_r"],"ar27":["biceps"],"ab19":["abs"],"bk27":["midback","lats"],"ab20":["abs"],"et18":["glute","delt_f","trap"],"lg13":["glute_med"],"ar28":["biceps","forearm"],"bk28":["lats"],"bk29":["lats","midback"],"ab21":["oblique"],"lg14":["adductor"],"et19":["glute","quad","trap"],"ab22":["oblique"],"ar30":["triceps"],"lg15":["glute"],"et20":["trap","delt_s","glute"],"bk30":["glute","ham"],"ar31":["triceps","chest"],"et21":["quad","delt_f"],"ab23":["oblique"],"lg16":["calf"],"et22":["quad","delt_f"],"lg17":["calf"],"bk32":["lats","midback"],"ab24":["oblique"],"ab25":["oblique"],"bk33":["lowback","glute","ham"],"lg18":["calf"],"et23":["abs","lats"],"lg19":["quad","glute"],"ab26":["oblique"],"bk34":["midback","lats"],"et24":["ham","lowback"],"bk35":["trap"],"ab27":["oblique"],"lg20":["glute_med","glute","quad"],"bk36":["midback","delt_r"],"ab28":["abs"],"lg21":["quad","glute"],"bk37":["midback","delt_r"],"ab29":["abs"],"lg22":["ham","glute"],"ab30":["abs"],"bk38":["lats","midback"],"lg23":["calf"],"bk39":["midback","lats"],"ab31":["abs"],"lg24":["glute","ham","lowback"],"lg25":["glute"],"bk40":["midback","lats"],"ab32":["oblique"],"lg26":["glute_med"],"ab33":["abs"],"bk41":["lats"],"ab34":["abs"],"lg27":["glute","ham"],"bk42":["trap"],"lg28":["quad"],"bk43":["lowback"],"ab35":["abs"],"lg29":["quad","glute"],"ab36":["abs"],"ab37":["abs"],"lg30":["quad"],"lg31":["ham"],"lg32":["glute"],"lg33":["glute"],"lg34":["glute","ham"],"lg35":["calf"],"lg36":["quad","glute"],"lg37":["glute_med"],"lg38":["adductor"],"lg39":["quad","glute"],"lg40":["quad","glute","delt_s"],"lg41":["lowback","glute","ham"],"lg43":["glute","ham"],"lg44":["quad"],"lg45":["ham"],"lg46":["glute_med","quad"],"lg47":["glute_med","quad"],"lg48":["quad","glute"],"lg51":["quad","glute"],"lg52":["quad","glute"],"lg53":["quad","glute"],"lg56":["adductor","glute","quad"],"lg57":["quad","glute"],"lg58":["glute"],"lg59":["glute"],"lg60":["ham","glute"],"lg61":["glute","lowback","ham"],"lg63":["glute_med"],"lg64":["calf"],"lg65":["calf"],"lg66":["shin"],"lg67":["glute"],"lg68":["quad","glute"],"lg69":["glute","quad"],"lg70":["calf"],"lg71":["quad","glute"],"lg72":["quad","glute"],"lg73":["quad","glute"],"lg74":["quad","glute"],"lg75":["glute_med"],"lg76":["quad","glute"],"lg77":["ham","lowback"],"lg78":["glute","adductor","quad"],"lg79":["glute","quad"],"lg80":["glute"],"x1792467245379376":["chest"]};      /* 회원 앱 종목근칸 사본 (2026-10-27) */
+function 해부묶음(e){ if(!e) return []; const 칸 = 해부종목칸[e.id] || 해부기본칸[e.part] || []; return [...new Set(칸.map(k => 해부칸묶음[k]).filter(Boolean))]; }
+const 해부받음 = {}, 해부그린 = {};
+function 해부받기(각){ if(해부받음[각]) return 해부받음[각];
+  const 하나 = src => new Promise(ok => { const im = new Image(); im.onload = () => ok(im); im.onerror = () => ok(null); im.src = src; });
+  return 해부받음[각] = Promise.all([하나('../img/body3/남/몸_' + 각 + '.webp'), 하나('../img/body3/남/부위_' + 각 + '.png')]).then(([몸, 부]) => { if(!몸 || !부) return null;
+    const c = document.createElement('canvas'); c.width = 부.naturalWidth; c.height = 부.naturalHeight; const x = c.getContext('2d', { willReadFrequently:true }); x.drawImage(부, 0, 0); return { 몸, 부: x.getImageData(0, 0, c.width, c.height) }; }); }
+async function 해부그리기(묶키){ if(해부그린[묶키]) return 해부그린[묶키];
+  const 묶 = 묶키.split(','), 둘 = await Promise.all([해부받기('000'), 해부받기('180')]); if(!둘[0] || !둘[1]) return 해부그린[묶키] = '';
+  const W = 둘[0].부.width, H = 둘[0].부.height, out = document.createElement('canvas'); out.width = W * 2; out.height = H; const o = out.getContext('2d');
+  둘.forEach((r, n) => { o.drawImage(r.몸, n * W, 0, W, H); const 덮 = o.createImageData(W, H), s = r.부.data, t = 덮.data;
+    const 표 = 해부칸.map((k, j) => ({ c: 해부칸색[j], g: 해부칸묶음[k] })).filter(z => 묶.includes(z.g)).map(z => ({ c: z.c, 색: [1, 3, 5].map(i => parseInt(해부색[z.g].slice(i, i + 2), 16)) }));
+    for(let i = 0; i < s.length; i += 4){ if(s[i + 3] < 128) continue; const m = 표.find(z => Math.abs(s[i] - z.c[0]) < 25 && Math.abs(s[i + 1] - z.c[1]) < 25 && Math.abs(s[i + 2] - z.c[2]) < 25); if(!m) continue; t[i] = m.색[0]; t[i + 1] = m.색[1]; t[i + 2] = m.색[2]; t[i + 3] = 215; }
+    const ov = document.createElement('canvas'); ov.width = W; ov.height = H; ov.getContext('2d').putImageData(덮, 0, 0); o.drawImage(ov, n * W, 0); });
+  return 해부그린[묶키] = out.toDataURL('image/png'); }
+let 해부중 = false;
+async function 해부칠하기(){ if(해부중) return; 해부중 = true;
+  try{ for(const cv of [...document.querySelectorAll('canvas[data-anat]:not([data-done])')]){ const u = await 해부그리기(cv.dataset.anat); cv.dataset.done = '1'; if(!u) continue;
+      const im = new Image(); im.onload = () => { cv.width = im.width; cv.height = im.height; cv.getContext('2d').drawImage(im, 0, 0); }; im.src = u; } }
+  finally{ 해부중 = false; } }
 const 부위색D = { '가슴':'#d98c7a', '어깨':'#e0b070', '등':'#7fa8c9', '팔':'#b39ad6', '하체':'#86c19a', '복근':'#e2c96a', '유산소':'#8fd0d6', '기타':'#9a938a' };
 function v루틴표(){
   if(S.rsId){ const s = (D.rs || []).find(x => x.id === S.rsId); if(s) return 루틴표보기(s); S.rsId = null; }
@@ -8695,13 +8733,13 @@ async function 청소사람저장(id){
 const 매확 = { 답:null, 중:false, 없음:false, 때:0, chip:'전체', tab:'고를것', 고침:{}, 펼침:{}, 방금:new Set(), 팝:false, 첫팝:false, 본:null };
 /* 할 일 열쇠 — 새로 들어온 것만 팝업으로 (2026-10-21 대표 「TG 메모는 빨리 해야 해」) */
 const 매확할일열쇠 = () => 매확결제().filter(매확미확인).map(o => 'p' + o.id).concat(매확TG만().filter(x => !매확TG끝(x)).map(x => 't' + x['주문']), 매확락할일().map(x => 'l' + x.id));
-const 매확수단 = ['카드', '현금', '계좌', '페이킹'];
+let 매확수단 = ['카드', '현금', '계좌', '페이킹'];      /* 서버(중앙 매출확인_목록.결제수단) 「수단」이 오면 그 목록 — 카드 · 현금 · 계좌 · 페이킹 · 스포츠바우처 · 네이버 · 제로페이 · 서울페이 · 기타 (2026-10-27) */
 const 매확원 = n => (+n || 0).toLocaleString('ko-KR');
 const 매확때 = t => { const s = String(t || ''); return s.length >= 16 ? (+s.slice(5, 7)) + '/' + (+s.slice(8, 10)) + ' ' + s.slice(11, 16) : s; };
 const 매확등록 = v => v === '신규' ? '<span class="sc-tag new">신규</span>' : v === '재등록' ? '<span class="sc-tag re">재등록</span>' : '<span class="sc-tag q">구분 확인</span>';
 async function 매확받기(){
   if(!ME || 매확.중) return; 매확.중 = true;
-  try{ const d = await crm('sales_check', {}); if(d && d.ok !== false){ 매확.답 = d; 매확.없음 = false; } else 매확.없음 = true; }
+  try{ const d = await crm('sales_check', {}); if(d && d.ok !== false){ 매확.답 = d; 매확.없음 = false; if(Array.isArray(d['수단']) && d['수단'].length) 매확수단 = d['수단'].map(String); } else 매확.없음 = true; }
   catch(e){ 매확.없음 = !매확.답; console.warn('확인할 매출 못 받음 —', e && e.message); }
   매확.중 = false; 매확.때 = Date.now(); 매확홈단추그리기();
   if(!매확.첫팝 && 매확.답){ 매확.첫팝 = true; 매확.본 = new Set(매확할일열쇠()); if(매확남은수() > 0) 매확팝업(); }      /* 데스크를 열 때마다 한 번 (대표 「나중에를 눌러도 남은 건은 다음에 또」) */
@@ -8848,7 +8886,8 @@ function 매확줄(o){
   }
   if(tg) h += 매확TG칸(열쇠, tg, tg['횟수'], o['TG메모'], ks.length > 0, '');
   if(PT있음) h += 매확PT줄(o);
-  h += '<div class="sc-hint">다중 결제인 경우 모두 선택</div><div class="sc-pay">' + 매확수단.map(k => '<button class="' + (임['금액'][k] !== undefined ? 'on' : '') + '" data-act="tx:scm" data-k="' + k + '" data-v2="' + esc(o.id) + '">' + k + '</button>').join('') + '</div>';
+  h += '<div class="sc-hint">다중 결제인 경우 모두 선택</div><div class="sc-pay">' + 매확수단.map(k => '<button class="' + (임['금액'][k] !== undefined ? 'on' : '') + '" data-act="tx:scm" data-k="' + k + '" data-v2="' + esc(o.id) + '">' + k + '</button>').join('') + '</div>'
+    + (임['금액']['기타'] !== undefined ? '<label class="sc-etc"><span>기타</span><input data-scetc="' + esc(o.id) + '" maxlength="30" value="' + esc(임.기타 || '') + '" placeholder="무엇으로 받았나요 — 예) 어르신 상품권 (꼭 입력)"></label>' : '');
   if(ks.length){
     if(ks.length >= 2) h += '<div class="sc-amts">' + ks.map(k => '<label class="sc-amt"><span>' + k + '</span><input inputmode="numeric" data-sca="' + k + '" data-k="' + esc(o.id) + '" value="' + (임['금액'][k] ? 매확원(임['금액'][k]) : '') + '" placeholder="0"><em>원</em></label>').join('') + '</div>';
     const 합 = ks.reduce((a, k) => a + (+임['금액'][k] || 0), 0), 차 = (+o['합'] || 0) - 합, 됨 = ks.length === 1 || 차 === 0;
@@ -9007,7 +9046,9 @@ async function 매확저장(id){
   const ks = 매확수단.filter(k => 임['금액'][k] !== undefined); if(!ks.length) return toast('결제수단을 골라 주세요');
   const 합 = ks.reduce((a, k) => a + (+임['금액'][k] || 0), 0);
   if(ks.length >= 2 && 합 !== (+o['합'] || 0)) return toast('나눈 금액의 합이 결제액과 같아야 해요');
-  const 글 = ks.length === 1 ? ks[0] + ' ' + 매확원(o['합']) + '원' : ks.map(k => k + ' ' + 매확원(임['금액'][k])).join(' + ');
+  const 기타 = String(임.기타 || '').trim(); if(ks.includes('기타') && !기타) return toast('「기타」는 무엇으로 받았는지 입력해 주세요 (예: 어르신 상품권)');
+  const 이름k = k => k === '기타' ? '기타(' + 기타 + ')' : k;
+  const 글 = ks.length === 1 ? 이름k(ks[0]) + ' ' + 매확원(o['합']) + '원' : ks.map(k => 이름k(k) + ' ' + 매확원(임['금액'][k])).join(' + ');
   const 새메모 = ['메모'].filter(t => { const w = (매확.펼침[t + id] || '').trim(); return !매확메모잠김(o) && w && w !== (((o[t] || {})['글']) || ''); });
   const 열쇠 = 'p' + id, tf = 매확.TGF[열쇠]; if(o.TG && 매확.TG바뀜[열쇠] && (매확TG있음(tf) || (tf && tf.배정))) 새메모.push('TG메모');      /* TG메모 = 양식 (2026-10-22 v2) */
   const 배정말 = tf && tf.배정 ? String.fromCharCode(10) + 'TG 배정: ' + (tf.배정 === '배정' ? (tf.배정담당 || '담당 미정') + ' 배정' : tf.배정 === '나중' ? '나중에 희망' : '건너뛰기') : '';
@@ -9015,7 +9056,7 @@ async function 매확저장(id){
   if(!await 묻기((o['이름'] || '') + ' 님 결제수단을 저장할까요?' + String.fromCharCode(10) + 글 + (새메모.length ? ' + ' + 새메모.map(t => t === '메모' ? '결제메모' : 'TG메모').join(' · ') : '') + 배정말
     + (새메모.indexOf('메모') >= 0 ? String.fromCharCode(10) + 매확CRM누구(o) : ''))) return;
   const 금액 = {}; ks.forEach(k => 금액[k] = ks.length === 1 ? 0 : +임['금액'][k]);
-  const 몸 = Object.assign({ id: o.id, 금액 }, 새메모.indexOf('메모') >= 0 ? { 메모: 매확.펼침['메모' + id].trim() } : {}, 새메모.indexOf('TG메모') >= 0 ? { TG메모: 매확TG양식값(tf) } : {});
+  const 몸 = Object.assign({ id: o.id, 금액 }, ks.includes('기타') ? { 기타: 기타.slice(0, 30) } : {}, 새메모.indexOf('메모') >= 0 ? { 메모: 매확.펼침['메모' + id].trim() } : {}, 새메모.indexOf('TG메모') >= 0 ? { TG메모: 매확TG양식값(tf) } : {});
   try{ const r = await crm('sales_check_save', 몸); if(!r || r.ok === false) return toast((r && r.why) || '저장하지 못했어요');
     delete 매확.고침[id]; 새메모.forEach(t => delete 매확.펼침[t + id]); await 매확배정적용(열쇠, o); if(새메모.indexOf('TG메모') >= 0){ delete 매확.TG바뀜[열쇠]; 매확.TG열림[열쇠] = '접힘'; } 매확.방금.add(String(o.id)); toast('저장했어요');
     if(r['결제']) Object.assign(o, r['결제']); else { o['고름'] = { 금액: ks.length === 1 ? { [ks[0]]: +o['합'] } : 금액, G: ks.length === 1 ? ks[0] : null, 누가: ME.name, 때: new Date().toISOString().replace('T', ' ').slice(0, 16), 전: o['고름'] ? [{ G: 매확G(o), 누가: o['고름']['누가'], 때: o['고름']['때'] }].concat(o['고름']['전'] || []) : [] }; }
@@ -9056,6 +9097,7 @@ async function 매확TG확인(주문){
 
 /* 금액 칸 · 메모 칸 — 적는 대로 기억(다시 그려도 남게) · 둘이면 나머지 저절로 */
 document.addEventListener('input', e => { const t = e.target; if(!t || t.id !== 'manq') return; 강의.q = t.value; const 끝 = t.selectionEnd; render(); const n = document.getElementById('manq'); if(n){ n.focus(); try{ n.setSelectionRange(끝, 끝); }catch(x){} } });      /* 매뉴얼 찾기 */
+document.addEventListener('input', e => { const t = e.target; if(!t || !t.dataset || !t.dataset.scetc) return; const 임 = 매확.고침[t.dataset.scetc]; if(임) 임.기타 = t.value; });      /* 결제수단 「기타」 내용 */
 document.addEventListener('change', e => { const t = e.target; if(!t || !t.dataset || !t.dataset.sctas) return; const f = 매확.TGF[t.dataset.sctas]; if(f){ f.배정담당 = t.value; 매확.TG바뀜[t.dataset.sctas] = true; } });
 document.addEventListener('input', e => { const t = e.target; if(!t || !t.dataset) return;
   if(t.dataset.stk){ const k = t.dataset.stk, f = 매확.TGF[k]; if(!f) return; f[t.dataset.stf] = t.value; 매확.TG바뀜[k] = true;
