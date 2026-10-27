@@ -858,6 +858,11 @@ body.tx-moving .tx-x{cursor:grabbing}
 .tx-td.sel,.tx-tr:hover>.tx-td.sel{box-shadow:inset 0 0 0 2px var(--gold);
   background:rgba(230,196,135,.07);border-radius:3px}
 .tx-tag.tx-merge{margin-left:6px;background:transparent;border:1px solid var(--line);color:var(--sub);font-size:12.5px;font-weight:700}
+.navgrp .navfold{display:flex;align-items:center;gap:6px;width:100%;padding:8px 12px 4px;color:var(--sub);font-size:13px;font-weight:800;background:none;border:0;text-align:left}.navgrp .navfold i{font-style:normal;margin-left:auto;transition:transform .15s}.navgrp.shut .navfold i{transform:rotate(-90deg)}.navgrp.shut .navgin{display:none}
+.lg-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px}.lg-bar .srch{min-width:240px}.lgk-f{display:inline-flex;gap:4px;align-items:center;flex-wrap:wrap}.lgk-f b{font-size:13px;color:var(--sub);margin-right:2px}
+.lg-t td{vertical-align:top;font-size:13px}.lg-t td small{display:block;color:var(--sub);font-size:12.5px}.lg-t .nw{white-space:nowrap}.lg-t .n{color:var(--sub);text-align:right}.lg-d{max-width:420px;white-space:normal;word-break:break-word}
+.lg-a{display:inline-block;border-radius:6px;padding:1px 7px;font-size:12.5px;font-weight:800;background:var(--dark-3);border:1px solid var(--line);white-space:nowrap}.lg-a.z{color:var(--teal)}
+.rowlog{margin-top:12px}.rowlog summary{cursor:pointer}.rowlog .rl{font-size:13px;padding:4px 0;border-bottom:1px solid var(--line)}.rowlog .rl .t{color:var(--sub);margin-right:6px}
 .tx-cp{position:fixed;z-index:40;width:26px;height:26px;border-radius:6px;background:var(--dark-2);border:1px solid var(--line);color:var(--sub);align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.18);cursor:pointer}
 .tx-cp:hover{color:var(--cream);background:var(--dark-3)}
 .tx-cp .tip{position:absolute;bottom:calc(100% + 7px);right:-4px;background:#2b2a27;color:#fff;font-size:12px;font-weight:600;padding:4px 9px;border-radius:7px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .12s .25s}
@@ -2611,12 +2616,16 @@ body:has(#pop.on.tx-side) #gchat .gc-fab:not(.x){display:none}      /* 옆 판�
     <button class="nav" data-v="kits">
       <svg viewBox="0 0 24 24"><path d="M4 4h7l2 2h7a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/><path d="M9 13l2 2 4-4"/></svg>
       홍보 자료<span class="bdg" id="ktbdg" style="display:none"></span></button>
+    <div class="navgrp" id="navsys"><button class="navfold" id="navsysbtn" type="button">시스템<i>▾</i></button><div class="navgin">      <!-- 2026-10-27 대표(중앙 전달) 「규칙 · 챗봇 답 · 작업기록 한 묶음 · 접었다 펼침」 -->
     <button class="nav" data-v="botqa">
       <svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg>
       챗봇 답</button>
     <button class="nav" data-v="rules">
       <svg viewBox="0 0 24 24"><path d="M9 4h6M12 4v4M5 8h14v12H5z"/><path d="M8 12h8M8 16h5"/></svg>
       규칙</button>
+    <button class="nav" data-v="log">
+      <svg viewBox="0 0 24 24"><path d="M12 7v5l3 2"/><circle cx="12" cy="12" r="8.5"/></svg>
+      작업기록</button></div></div>
     <button class="nav" data-v="trash" id="navtrash" style="display:none">
       <svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
       휴지통</button>
@@ -2647,7 +2656,7 @@ body:has(#pop.on.tx-side) #gchat .gc-fab:not(.x){display:none}      /* 옆 판�
 
 <script>
 "use strict";
-const BUILD = '433';
+const BUILD = '434';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -2814,7 +2823,8 @@ const 권한줄 = [
   ['메뉴', 'exreq', '종목 사전', '', [1, 1, 1, 0, 0]],
   ['메뉴', 'kits', '홍보 자료', '', [1, 1, 1, 0, 1]],
   ['메뉴', 'rules', '규칙', '자동화 규칙 한눈에', [1, 0, 0, 0, 0]],
-  ['메뉴', 'botqa', '챗봇 답', '도우미가 꺼내 주는 정해 둔 질문 · 답', [1, 0, 0, 0, 0]],      /* 2026-10-26 챗봇 */      /* 2026-10-26 대표 「관리자만 보이게」 · 중앙 창구도 super · boss 만 */
+  ['메뉴', 'botqa', '챗봇 답', '도우미가 꺼내 주는 정해 둔 질문 · 답', [1, 0, 0, 0, 0]],
+  ['메뉴', 'log', '작업기록', '데스크 · 자동화에서 바뀐 것 전부(누가 · 언제 · 무엇을)', [1, 0, 0, 0, 0]],      /* 2026-10-27 대표 「작업기록 관리자만 보이게」 */      /* 2026-10-26 챗봇 */      /* 2026-10-26 대표 「관리자만 보이게」 · 중앙 창구도 super · boss 만 */
   ['메뉴', 'trash', '휴지통', '삭제한 것 복원', [1, 0, 0, 0, 0]],
   ['회원 · 기록', 'scope', '회원 보기 범위', '전체 = 다른 트레이너 회원 · 리포트 · 예약률까지 (읽기)', ['a', 'm', 'm', 'm', 'a']],
   ['회원 · 기록', 'otherrec', '남의 담당 회원 기록 수정', '잠수 사유 등', [1, 0, 0, 0, 0]],
@@ -4018,6 +4028,7 @@ async function 동의요청보내기(){
     let 톡 = true;
     try{ await ssend('consent_sends', 'POST', [{ id:'cs_' + mid + '_hc_' + Date.now().toString(36), member_id: mid, member_name: (m && m.name) || '', trainer: (m && m.trainer) || null, kind:'건강', okey: 열쇠, state:'대기', queued_at: 지금 }]); }catch(e2){ 톡 = false; }
     건강톡[mid] = 톡 ? { state:'대기', queued_at: 지금 } : 건강톡[mid];
+    기록남기기({ area:'회원', action:'발송', tbl:'members', row_id:mid, customer:(m && m.name) || '', phone:(m && m.phone) || '', detail:'건강정보 동의 요청' + (톡 ? '(문자 · 링크)' : '(앱 알림함만)') });
     popClose(); toast(톡 ? '문자로 동의 요청을 보내요 · 10분 안에 나가요(09~21시)' : '앱 알림함에만 떴어요 · 문자 줄은 못 넣었어요'); render();
   }catch(e){
     const msg = (e && e.message) || '';
@@ -7704,7 +7715,8 @@ async function 매출줄들고침(줄들, 몸, 종류, 말){      /* 묶음 안 
   if(!줄들.length) return false;
   try{ await ssend('pt_sales?id=in.(' + 줄들.map(x => encodeURIComponent(x.id)).join(',') + ')', 'PATCH', 몸); }
   catch(e){ toast('저장하지 못했어요 — ' + (e.message || '').slice(0, 60)); return false; }
-  for(const x of 줄들){ const 전 = 매출앞(x); Object.assign(x, 몸, 몸.change_kind ? { change_at:new Date().toISOString() } : {}); await 매출기록(x, 종류, 말, 전, 몸); }
+  for(const x of 줄들){ const 전 = 매출앞(x); Object.assign(x, 몸, 몸.change_kind ? { change_at:new Date().toISOString() } : {}); await 매출기록(x, 종류, 말, 전, 몸);
+    기록남기기({ area:'매출', action: 몸.trainer !== undefined && 몸.trainer !== 전.trainer ? '담당 변경' : 종류 || '수정', tbl:'pt_sales', row_id:String(x.id), customer:x.name || '', phone:x.phone4 || '', detail:(말 || '') + (몸.trainer !== undefined && 몸.trainer !== 전.trainer ? ' · 담당: ' + (전.trainer || '(없음)') + ' → ' + (몸.trainer || '(없음)') : '') }); }
   return true;
 }
 async function 매출고르기(id){
@@ -8824,6 +8836,7 @@ document.addEventListener('input', ev => { if(ev.isComposing && 검색칸인가(
 document.addEventListener('compositionend', ev => { const t = ev.target; if(검색칸인가(t)) setTimeout(() => t.dispatchEvent(new Event('input', { bubbles:true })), 0); }, true);
 document.addEventListener('input', ev => { if(!ev.target || ev.target.id !== 'asgq') return; 배정.g.q = ev.target.value; const p = ev.target.selectionStart; render(); const n = document.getElementById('asgq'); if(n){ n.focus(); n.setSelectionRange(p, p); } });      /* 묶음 탭 찾기 (2026-10-26) */
 document.addEventListener('change', ev => { const f = ev.target && ev.target.dataset && ev.target.dataset.asg; if(!f) return; 배정.g[f] = ev.target.value; render(); });
+document.addEventListener('input', ev => { if(!ev.target || ev.target.id !== 'logq') return; 기록판.q = ev.target.value; const p = ev.target.selectionStart; render(); const n = document.getElementById('logq'); if(n){ n.focus(); n.setSelectionRange(p, p); } });      /* 작업기록 찾기 */
 document.addEventListener('input', ev => { if(!ev.target || ev.target.id !== 'cmq') return; S.cmQ = ev.target.value; const p = ev.target.selectionStart; render(); const n = document.getElementById('cmq'); if(n){ n.focus(); n.setSelectionRange(p, p); } });      /* 피드백 메뉴 회원 찾기 (2026-10-27) */
 document.addEventListener('input', ev => { if(!ev.target || ev.target.id !== 'asq') return; 배정.거.q = ev.target.value; 배정.페 = 0; const p = ev.target.selectionStart; render(); const n = document.getElementById('asq'); if(n){ n.focus(); n.setSelectionRange(p, p); } });
 document.addEventListener('input', ev => { const f = ev.target && ev.target.closest && ev.target.closest('#popbox .ck-fr'); if(!f || !예상입력) return; 예상읽기(); const t = document.getElementById('ckftot'); if(t) t.textContent = 예상만원(예상합(예상입력.줄)); });
@@ -10303,7 +10316,7 @@ async function 새줄만들기(k, 덧){
   if(k === 'leave' && (W.leave || []).some(x => x.staff_id && x.staff_id === 몸.staff_id && x.day === 몸.day && x.status !== 'no')) return toast('오늘 연월차가 이미 있어요 — 그 줄의 날짜를 확인해 주세요');
   if(k !== 'tasks') delete 몸.template;
   try{ const o = await usend(T2.table, 'POST', 몸, 'return=representation');
-    if(o && o[0]){ W[k].unshift(o[0]); 새줄[k] = o[0].id; if(S.view !== k) 가기(k); render();
+    if(o && o[0]){ W[k].unshift(o[0]); 새줄[k] = o[0].id; 기록남기기({ area:T2.제목, action:'생성', tbl:T2.table, row_id:o[0].id, customer: k === 'leads' ? (o[0].name || '') : '', detail:'새 ' + T2.제목 }); if(S.view !== k) 가기(k); render();
       const td = 칸찾기(o[0].id, T2.제목열);
       if(td){ 칸고르기(k, o[0].id, T2.제목열); td.scrollIntoView({ block:'nearest' }); 칸안편집(k, o[0].id, T2.제목열, td); }
       else txView(k, o[0].id); } }      /* 표가 아닌 모양(목록)이면 페이지를 연다 */
@@ -10522,9 +10535,50 @@ async function 범위채우기(어디){
   toast(몇 + '항목을 채웠습니다');
 }
 /* 단축키 — Ctrl+Z 되돌리기 · Ctrl+Y(Ctrl+Shift+Z) 다시 · Ctrl+C 칸 복사 · Ctrl+V 칸 붙여넣기 · Delete 칸 비우기 (2026-10-26 대표 「한글 · 엑셀에서 통용되는」) */
+/* ══ 작업기록 ══ 2026-10-27 대표 (브로제이 「센터설정 › 로그기록」 꼴 · 「데스크에서 벌어지는 일은 전부 남긴다」 · 관리자만 봄)
+   tr_log(76단계) — 데스크가 저장하는 곳마다 한 줄 · 중앙 자동화도 src '중앙' 으로 같은 표에. 쓰기만(고치기 · 지우기 없음).
+   남기기는 실패해도 본 일을 막지 않는다(조용히 · 콘솔에만) */
+function 기록남기기(o){ try{ const 누구 = (typeof 진짜ME !== 'undefined' && 진짜ME) || ME || {};
+    const 몸 = Object.assign({ at:new Date().toISOString(), src:'데스크', by_id: 누구.id || null, by_name: 누구.name || '', extra:{} }, o); 몸.phone = String(몸.phone || '').replace(/\D/g, '') || null;
+    if(몸.detail) 몸.detail = String(몸.detail).slice(0, 500);
+    usend('tr_log', 'POST', [몸], 'return=minimal').catch(e => console.warn('작업기록 못 남김 —', e.message));
+    if(기록판.줄) 기록판.줄.unshift(Object.assign({ at:new Date().toISOString() }, 몸)); }catch(e){ console.warn('작업기록 —', e.message); } }
+const 기록판 = { 줄:null, 중:false, 때:'', 기간:'7', 서비스:'', 작업:'', 누구:'', q:'' };
+async function 기록받기(힘){ if(기록판.중 || (!힘 && 기록판.줄 && Date.now() - (기록판.받은 || 0) < 60000)) return; 기록판.중 = true;
+  const 부터 = 기록판.기간 === 'all' ? '' : 날더함(TODAY, -(+기록판.기간 - 1)) + 'T00:00:00+09:00';
+  try{ 기록판.줄 = await uget('tr_log?select=*' + (부터 ? '&at=gte.' + encodeURIComponent(부터) : '') + '&order=at.desc&limit=2000') || []; 기록판.없음 = false; }
+  catch(e){ 기록판.줄 = []; 기록판.없음 = /42P01|does not exist|404/.test(String(e.message || '')); }
+  기록판.중 = false; 기록판.받은 = Date.now(); if(S.view === 'log') render(); }
+function v작업기록(){
+  if(!기록판.줄){ 기록받기(); return '<div class="empty why"><b>작업기록을 받는 중이에요</b>곧 보입니다</div>'; }
+  if(기록판.없음) return '<div class="empty why"><b>작업기록 표가 아직 없습니다</b>관리자에게 알려 주세요</div>';
+  const 줄 = 기록판.줄, q = 검색키(기록판.q), 숫 = String(기록판.q || '').replace(/\D/g, '');
+  const 보 = 줄.filter(x => (!기록판.서비스 || x.area === 기록판.서비스) && (!기록판.작업 || x.action === 기록판.작업) && (!기록판.누구 || (x.by_name || '') === 기록판.누구)
+    && (!q && 숫.length < 3 || (q && 검색키(x.customer || '').includes(q)) || (숫.length >= 3 && String(x.phone || '').includes(숫))));
+  const 칩 = (k, 목, 이름) => '<span class="lgk-f"><b>' + 이름 + '</b>' + ['', ...목].map(v => '<button class="chip' + (기록판[k] === v ? ' on' : '') + '" data-act="tx:logf" data-k="' + k + '" data-v2="' + esc(v) + '">' + esc(v || '전체') + '</button>').join('') + '</span>';
+  const 고유 = f => [...new Set(줄.map(x => x[f]).filter(Boolean))].sort();
+  const 때 = t => { const x = new Date(t); return isNaN(x) ? '' : 날글(x).slice(2).replace(/-/g, '.') + ' ' + String(x.getHours()).padStart(2, '0') + ':' + String(x.getMinutes()).padStart(2, '0'); };
+  return '<div class="lg-bar"><input class="srch" id="logq" placeholder="고객 이름 · 전화 뒷자리로 찾기" value="' + esc(기록판.q) + '" autocomplete="off">'
+    + '<span class="lgk-f"><b>기간</b>' + [['1', '오늘'], ['7', '7일'], ['30', '30일'], ['all', '전체']].map(([v, n]) => '<button class="chip' + (기록판.기간 === v ? ' on' : '') + '" data-act="tx:logp" data-k="' + v + '">' + n + '</button>').join('') + '</span></div>'
+    + '<div class="lg-bar">' + 칩('서비스', 고유('area'), '서비스') + 칩('작업', 고유('action'), '작업') + 칩('누구', 고유('by_name'), '작업자') + '</div>'
+    + '<div class="mwrap lg-tw"><table class="mtb lg-t"><thead><tr><th>번호</th><th>작업 일시</th><th>서비스</th><th>작업</th><th>고객</th><th>내용</th><th>사유</th><th>작업자</th><th>비고</th></tr></thead><tbody>'
+    + (보.length ? 보.slice(0, 500).map((x, i) => '<tr><td class="n">' + (보.length - i) + '</td><td class="nw">' + 때(x.at) + '</td><td>' + esc(x.area || '') + '</td><td><span class="lg-a">' + esc(x.action || '') + '</span></td>'
+        + '<td>' + esc(x.customer || '') + (x.phone ? '<small>' + esc(번호보기(x.phone)) + '</small>' : '') + '</td><td class="lg-d">' + esc(x.detail || '') + '</td><td>' + esc(x.reason || '') + '</td><td class="nw">' + esc(x.by_name || '') + '</td><td>' + (x.src && x.src !== '데스크' ? '<span class="lg-a z">' + esc(x.src) + '</span>' : '') + '</td></tr>').join('')
+      : '<tr><td colspan="9"><div class="empty why"><b>해당하는 기록이 없습니다</b>기간이나 거르기를 바꿔 보세요</div></td></tr>')
+    + '</tbody></table></div>' + (보.length > 500 ? '<div class="sub3" style="margin-top:6px">앞의 500줄만 보여요 · 기간을 줄이거나 찾아 주세요</div>' : '');
+}
+/* 이 줄 기록 — 상담 · 업무 페이지 아래 접힘 (관리자만) */
+const 줄기록 = {};
+async function 줄기록받기(tbl, id){ const k = tbl + ':' + id; if(줄기록[k] && 줄기록[k].중) return; 줄기록[k] = { 중:true };
+  try{ 줄기록[k] = { 줄: await uget('tr_log?select=*&tbl=eq.' + encodeURIComponent(tbl) + '&row_id=eq.' + encodeURIComponent(id) + '&order=at.desc&limit=50') || [] }; }catch(e){ 줄기록[k] = { 줄:[] }; }
+  const el = document.getElementById('rowlog'); if(el && el.dataset.k === k) el.outerHTML = 줄기록칸(tbl, id); }
+function 줄기록칸(tbl, id){ if(!할수('log')) return ''; const k = tbl + ':' + id, x = 줄기록[k];
+  const 속 = !x || x.중 ? (x ? '' : (setTimeout(() => 줄기록받기(tbl, id), 0), '')) + '<div class="sub3">불러오는 중…</div>'
+    : x.줄.length ? x.줄.map(o => '<div class="rl"><span class="t">' + esc(시각한글(o.at)) + '</span><b>' + esc(o.action || '') + '</b> ' + esc(o.detail || '') + ' <span class="sub3">' + esc(o.by_name || '') + '</span></div>').join('') : '<div class="sub3">남은 기록이 없어요</div>';
+  return '<details class="tx-sec rowlog" id="rowlog" data-k="' + esc(k) + '"><summary class="lbl">작업기록' + (x && x.줄 ? ' ' + x.줄.length : '') + '</summary>' + 속 + '</details>'; }
 /* 칸 글자 — 복사(Ctrl+C · ⧉ 단추)가 같이 쓴다 · 사람은 이름 · 날짜는 보이는 글 · 본문 JSON 은 글로 */
-function 칸글자(key, id, k){ const r = (W[key] || []).find(x => x.id === id), c = 열들(key).find(z => z.k === k); if(!r || !c) return null;
-  const v = 값읽기(r, k);
+function 칸글자(key, id, k){ const r = (W[key] || []).find(x => x.id === id), c = 열들(key).find(z => z.k === k); if(!r || !c) return null; return 값글자(c, 값읽기(r, k)); }
+function 값글자(c, v){
   if(Array.isArray(v)) return v.map(x => c.타입 === 'people' ? 사람(x).name : x).join(', ');
   if(c.타입 === 'person') return 사람(v).name || '';
   if(c.타입 === 'date') return v ? 날짜한글(v) : '';
@@ -11261,7 +11315,7 @@ function 속성줄들(key, r, 편집){
     + (빈속성숨김 && 빈수 ? '<button class="tx-padd" data-act="tx:pempty">값이 빈 항목 '+빈수+'개 표시</button>'
        : 빈수 ? '<button class="tx-padd" data-act="tx:pempty">값이 빈 항목 '+빈수+'개 숨기기</button>' : '')
     + (할수('table') ? '<button class="tx-padd" data-act="tx:padd" data-k="'+key+'">＋ 속성 추가</button>' : '')
-    + '</div>';
+    + '</div>' + 줄기록칸(표정의[key].table, r.id);      /* 이 줄 작업기록 — 관리자만 (2026-10-27) */
 }
 function 속성줄다시(key, id){
   const box = $('#txprops'), r = W[key].find(x => x.id === id);
@@ -11355,12 +11409,15 @@ function 속성저장(key, id, k, v){
 const 되돌림 = [], 다시함 = []; let 되돌리는중 = false;
 async function 속성저장하기(key, id, k, v){
   const r = W[key].find(x => x.id === id); if(!r) return;
+  const 전값 = 값읽기(r, k);
   if(!되돌리는중){ const 옛 = 값읽기(r, k); if(JSON.stringify(옛) !== JSON.stringify(v)){ 되돌림.push({ key, id, k, 옛, 새: v }); if(되돌림.length > 50) 되돌림.shift(); 다시함.length = 0; } }      /* Ctrl+Z (2026-10-26 대표 「윈도우에서 통용되는 단축키」) */
   if(!시트 || 시트.key !== key || 시트.id !== id) 시트 = { key, id, 값: Object.assign({}, r) };
   늘림열(key).forEach(c => { if(시트.값[c.k] === undefined) 시트.값[c.k] = (r.extra||{})[c.k.slice(6)]; });
   시트.값[k] = v;
   await txSave();
   const nr = W[key].find(x => x.id === id);
+  if(nr && JSON.stringify(값읽기(nr, k)) === JSON.stringify(v) && JSON.stringify(전값) !== JSON.stringify(v)){ const c = 열들(key).find(z => z.k === k) || { 이름:k };      /* 저장된 것만 기록 */
+    기록남기기({ area:표정의[key].제목, action: k === 표정의[key].사람열 ? '담당 변경' : '수정', tbl:표정의[key].table, row_id:id, customer: key === 'leads' ? (nr.name || '') : String(표정의[key].행(nr).제목 || '').slice(0, 60), phone: key === 'leads' ? nr.phone : '', detail: c.이름 + ': ' + (값글자(c, 전값) || '(빈칸)') + ' → ' + (값글자(c, v) || '(빈칸)') }); }
   if(nr){ 시트.값 = Object.assign({}, nr);
     늘림열(key).forEach(c => { 시트.값[c.k] = (nr.extra||{})[c.k.slice(6)]; }); }
   속성줄다시(key, id);
@@ -12169,7 +12226,7 @@ const 늦은때 = () => { const t = window.__지금 ? new Date(window.__지금) 
 async function 상담1차보내기(id){
   const r = W.leads.find(x => x.id === id); if(!r) return;
   if(!await 묻기((r.name || '') + '님께 1차 안내를 보낼까요?\n카카오톡으로 보내고 안 되면 문자로 보냅니다' + 늦은때())) return;
-  try{ await crm('lead_remarket1', { id });
+  try{ await crm('lead_remarket1', { id }); 기록남기기({ area:'상담', action:'발송', tbl:'tr_leads', row_id:id, customer:r.name || '', phone:r.phone, detail:'1차 안내(카톡 · 안 되면 문자)' });
     const n = await uget('tr_leads?select=*&id=eq.' + encodeURIComponent(id)); if(n && n[0]) Object.assign(r, n[0]);
     else r.extra = Object.assign({}, r.extra || {}, { s1: '완료', s1_at: new Date().toISOString() });
     toast('1차 안내를 보냈어요'); txView('leads', id); render(); }
@@ -12178,12 +12235,12 @@ async function txDel(){
   const { key, id } = 시트, T = 표정의[key];
   if(key === 'leads'){ const r = W.leads.find(x => x.id === id); if(!r || !await 묻기('이 상담을 숨길까요?\n목록 · 집계에서 빠지고 노션 백업에서는 휴지통으로 옮겨집니다')) return;      /* 상담은 지우지 않고 숨긴다 (2026-10-25 중앙 · 데스크 → 노션 백업이 휴지통으로) */
     try{ const ex = Object.assign({}, r.extra || {}, { archived: true, archived_why: '데스크에서 숨김', archived_by: (ME && ME.name) || '', archived_at: new Date().toISOString() });
-      await usend(T.table + '?id=eq.' + id, 'PATCH', { extra: ex }); W.leads = W.leads.filter(x => x.id !== id); popClose(); toast('숨겼어요'); render(); }
+      await usend(T.table + '?id=eq.' + id, 'PATCH', { extra: ex }); W.leads = W.leads.filter(x => x.id !== id); 기록남기기({ area:'상담', action:'숨김', tbl:T.table, row_id:id, customer:r.name || '', phone:r.phone, detail:'상담 숨김(노션 백업은 휴지통)' }); popClose(); toast('숨겼어요'); render(); }
     catch(e){ toast(e.message || '숨기지 못했어요'); } return; }
   if(!id || !await 묻기('이 페이지를 휴지통으로 보낼까요?\n60일 동안 휴지통에 있다가 사라집니다')) return;
   const r = W[key].find(x=>x.id===id);
   try{ await 휴지통으로(T.table, r, (r && r[T.제목열]) || T.제목);
-    W[key] = W[key].filter(x=>x.id!==id); popClose(); toast('휴지통으로 보냈어요'); render(); }
+    W[key] = W[key].filter(x=>x.id!==id); 기록남기기({ area:T.제목, action:'삭제', tbl:T.table, row_id:id, customer:String((r && r[T.제목열]) || '').slice(0, 60), detail:'휴지통으로(60일 뒤 지움)' }); popClose(); toast('휴지통으로 보냈어요'); render(); }
   catch(e){ toast(e.message); }
 }
 async function txToggle(key, id, f){
@@ -13091,7 +13148,9 @@ async function 배정고침(id, 몸, 말){
   if(!배정쓰기(x)){ toast('수정할 수 없는 줄이에요'); return false; }
   if(!await 묻기(x.name + ' — ' + 말 + String.fromCharCode(10) + '저장할까요?')) return false;
   몸 = Object.assign({}, 몸, { updated_by:(ME && ME.name) || '' });      /* 누가 고쳤나 — 다툼 때 본다(중앙 대조 20:40) */
-  try{ await ssend('assign_leads?id=eq.' + encodeURIComponent(id), 'PATCH', 몸, 'return=minimal'); Object.assign(x, 몸); toast('저장했어요'); render(); return true; }
+  try{ await ssend('assign_leads?id=eq.' + encodeURIComponent(id), 'PATCH', 몸, 'return=minimal');
+    기록남기기({ area:'배정', action: 몸.trainers ? '담당 변경' : '수정', tbl:'assign_leads', row_id:String(id), customer:x.name || '', phone:x.phone, detail: 말 + (몸.trainers ? ' · 담당: ' + ((x.trainers || []).join(', ') || '(없음)') + ' → ' + ((몸.trainers || []).join(', ') || '(없음)') : '') });
+    Object.assign(x, 몸); toast('저장했어요'); render(); return true; }
   catch(e){ toast('저장하지 못했어요 — ' + (e.message || '').slice(0, 60)); return false; }
 }
 /* 최근 출석 — TG메모(희망시간)가 없는 줄만 · 누르면 펼침 · 다시 누르면 접힘 · 처음 누를 때만 받는다(서버 30분 캐시 · 브로제이 부담 적게) */
@@ -13203,6 +13262,7 @@ async function 배정여럿보내기(){
     if(!d || d.ok === false) throw new Error((d && d.why) || '보내지 못했어요');
     배정.보낸 = {}; (d.results || []).forEach(r => { 배정.보낸[String(r.id)] = { ok: !!r.ok, why: r.why || '' };
       const x = 목.find(y => String(y.id) === String(r.id)); if(r.ok && x){ x.apply_sent_at = new Date().toISOString(); x.apply_sent_n = (+x.apply_sent_n || 0) + 1; 배정.고름.delete(String(x.id)); } });
+    (d.results || []).filter(r => r.ok).forEach(r => { const x = 목.find(y => String(y.id) === String(r.id)); if(x) 기록남기기({ area:'배정', action:'발송', tbl:'assign_leads', row_id:String(x.id), customer:x.name || '', phone:x.phone, detail:'무료 PT 신청 링크(여러 명 · 알림톡)' }); });
     toast((d.sent || 0) + '명에게 보냈어요' + (d.skipped ? ' · 안 보냄 ' + d.skipped + '명(줄 옆에 이유)' : '')); }
   catch(e){ toast('보내지 못했어요 — ' + String(e.message || '').slice(0, 60)); }
   배정.보냄중 = false; render();
@@ -13210,7 +13270,7 @@ async function 배정여럿보내기(){
 async function 배정링크보내기(id){ const x = (배정.줄 || []).find(r => String(r.id) === String(id)); if(!x) return;
   if(!await 묻기(x.name + ' 님께 무료 PT 신청 링크를 ' + (x.apply_sent_at ? '다시 ' : '') + '보낼까요?' + String.fromCharCode(10) + '알림톡으로 나갑니다' + 늦은때())) return;
   try{ const d = await crm('guide_resend', { lead_id: x.id }); if(d && d.ok === false) throw new Error(d.why || '보내지 못했어요');
-    x.apply_sent_at = new Date().toISOString(); x.apply_sent_n = (+x.apply_sent_n || 0) + 1; toast('신청 링크를 보냈어요'); 배정판(id); }
+    x.apply_sent_at = new Date().toISOString(); x.apply_sent_n = (+x.apply_sent_n || 0) + 1; 기록남기기({ area:'배정', action:'발송', tbl:'assign_leads', row_id:String(x.id), customer:x.name || '', phone:x.phone, detail:'무료 PT 신청 링크(알림톡)' }); toast('신청 링크를 보냈어요'); 배정판(id); }
   catch(e){ toast(/404|없는 길/.test(String(e.message)) ? '아직 보낼 수 없어요 · 준비 중이에요' : String(e.message || '보내지 못했어요').slice(0, 60)); } }
 /* 무료PT 설문보내기 — 찾아서 고르기 (2026-10-26 21:44 대표 「검색창으로 되어야 하지 않을까」)
    찾는 곳 = 배정 줄 · 상담 · 앱 회원(데스크에 이미 있는 자료 · 같은 번호는 하나로) · 목록에 없으면 「직접 입력」 */
@@ -13246,7 +13306,7 @@ async function 배정직접보내기(){ const v = k => (($('#asd_' + k) || {}).v
   if(!직접.고름 && !직접.손){ toast('보낼 분을 찾아 골라 주세요'); return; }
   if(!이름 || 번호.replace(/\D/g, '').length < 10){ toast('이름과 전화번호를 넣어 주세요'); return; }
   if(!await 묻기(이름 + ' 님께 무료 PT 신청 링크를 보낼까요?' + String.fromCharCode(10) + '알림톡으로 나갑니다' + 늦은때())) return;
-  try{ const d = await crm('guide_resend', { name: 이름, phone: 번호 }); if(d && d.ok === false) throw new Error(d.why || '보내지 못했어요'); popClose(); toast('신청 링크를 보냈어요'); 배정.때 = 0; 배정받기(); }
+  try{ const d = await crm('guide_resend', { name: 이름, phone: 번호 }); if(d && d.ok === false) throw new Error(d.why || '보내지 못했어요'); 기록남기기({ area:'배정', action:'발송', tbl:'assign_leads', row_id:'', customer:이름, phone:번호, detail:'무료PT 설문보내기(직접 · 알림톡)' }); popClose(); toast('신청 링크를 보냈어요'); 배정.때 = 0; 배정받기(); }
   catch(e){ toast(/404|없는 길/.test(String(e.message)) ? '아직 보낼 수 없어요 · 준비 중이에요' : String(e.message || '보내지 못했어요').slice(0, 60)); } }
 /* 재연락 기록 — 출석 기록처럼 (2026-10-25 대표 「000 트레이너가 000일로 알림 받기 로그를 해당 페이지에서 볼 수 있게」) */
 const 재연락기록 = x => { const L = Array.isArray(x.recall_log) ? x.recall_log : []; if(!L.length) return '';
@@ -13981,6 +14041,9 @@ async function txAct(a, el){
     catch(e){ toast('바꾸지 못했어요 — '+String(e.message||'').slice(0,60)); }
     return; }
   if(a==='who'){ 표상태[k].사람 = v2 || null; 고른행 = { key:null, ids:[] }; render(); return; }
+  if(a==='logf'){ 기록판[k] = v2 || ''; render(); return; }
+  if(a==='logp'){ 기록판.기간 = k; 기록판.줄 = null; render(); return; }
+  if(a==='logre'){ 기록판.줄 = null; 기록받기(true); render(); return; }
   if(a==='fbtalk'){ const m = memOf(k) || {}, 판중 = $('#pop').classList.contains('on') && $('#pop').classList.contains('tx-side');      /* 피드백톡 크게 — 옆 판 크기 · 왼쪽 위 뒤로(판 위에서 열면 판 뒤로) · 오른쪽 위 ✕ (2026-10-27 대표) */
     판열기('피드백톡 · ' + esc(m.name || ''), (판중 ? '' : '<button class="btn ghost sm" data-act="popclose" style="margin-bottom:8px">‹ 뒤로</button>') + '<div class="fbtalk big">' + 피드백톡방(k, 'ktroom3') + '</div>'); return; }
   if(a==='pfold'){ try{ localStorage.setItem('gg_pchip_' + k, 담당칩열림(k) ? '0' : '1'); }catch(e){} render(); return; }
@@ -15026,6 +15089,9 @@ function render0(){
         + (지금i ? '<button class="chip" data-act="tx:ckwk" data-k="">이번 주로</button>' : '') + '</div>' : '')
       + (지금 ? '<span class="ck-src" style="margin-left:auto">' + esc(지금['출처'] === '저장본' ? '저장본' : 지금['출처'] === '재계산' ? '다시 계산 · 그때와 조금 다를 수 있어요' : '지금') + (지금['기준일'] ? ' · ' + esc(String(지금['기준일']).slice(5, 16).replace('T', ' ')) + ' 기준' : '') + '</span>' : '');
     b.innerHTML = v점검();
+  } else if(S.view==='log'){      /* 작업기록 — 관리자만 (2026-10-27) */
+    top.innerHTML = '<h1>작업기록</h1><span class="cnt">' + (기록판.줄 ? 기록판.줄.length + '줄' : '') + '</span><div class="sp"><button class="btn ghost sm" data-act="tx:logre">새로 받기</button></div>';
+    b.innerHTML = v작업기록();
   } else if(S.view==='rules'){
     top.innerHTML = '<h1>규칙</h1><span class="cnt">' + (규칙판.답 ? (규칙판.답['카드'] || []).length + '개' + (규칙판.답['최신화필요'] ? ' · 최신화 필요 ' + 규칙판.답['최신화필요'] : '') : '') + '</span>';
     b.innerHTML = v규칙();
@@ -16627,8 +16693,12 @@ window.addEventListener('popstate', function(e){
 });
 
 /* 화면을 그릴 때마다 자리를 남긴다 */
+/* 관리 › 시스템 묶음 — 접고 펼침(이 기기 기억) · 안의 메뉴가 다 숨으면 묶음 머리도 숨김 */
+function 시스템묶음(){ const g = document.getElementById('navsys'); if(!g) return; let 접 = false; try{ 접 = localStorage.getItem('gg_navsys') === '0'; }catch(e){}
+  g.classList.toggle('shut', 접); const 보 = [...g.querySelectorAll('.nav')].some(b => b.style.display !== 'none'); g.style.display = 보 ? '' : 'none'; }
+document.addEventListener('click', ev => { const b = ev.target.closest && ev.target.closest('#navsysbtn'); if(!b) return; let 접 = false; try{ 접 = localStorage.getItem('gg_navsys') === '0'; localStorage.setItem('gg_navsys', 접 ? '1' : '0'); }catch(e){} 시스템묶음(); });
 const _render = render;
-render = function(){ _render(); push(); };
+render = function(){ _render(); push(); 시스템묶음(); };
 
 /* ══ 상담 실시간 ══ 2026-10-26 대표 「노션은 발송 + 체크 누르면 5초 안에 발송완료로 바뀌는데 데스크는 새로고침해야」
    상담 표 · 상담 페이지 · 현황판 「오늘 상담」이 열려 있을 때만 5초마다 updated_at 이 지난 줄만 받아 W.leads 에 덮는다.
