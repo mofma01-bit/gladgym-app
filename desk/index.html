@@ -1557,11 +1557,38 @@ body.resizing{cursor:col-resize;user-select:none}
 .lc{display:grid;grid-template-columns:minmax(220px,300px) minmax(0,1fr);border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--dark-2);min-height:60vh}
 .lc-side{border-right:1px solid var(--line);padding:10px;overflow-y:auto;max-height:78vh;display:flex;flex-direction:column;gap:2px}
 .lc-pg{display:flex;flex-direction:column;gap:5px;margin:0 2px 8px;font-size:13px;color:var(--sub);font-weight:700}.lc-pg i{display:block;height:5px;border-radius:5px;background:var(--dark-4)}.lc-pg i b{display:block;height:100%;border-radius:5px;background:#8fd1c4}
+.lc.one{grid-template-columns:1fr}.lc.one .lc-side{border-right:0;border-bottom:1px solid var(--line);max-height:none;padding:8px 10px}
 .lc-back{background:none;border:0;color:var(--sub);font:inherit;font-size:13.5px;font-weight:700;cursor:pointer;padding:2px 4px;text-align:left}.lc-back:hover{color:var(--gold)}
 .lc-ct{display:flex;flex-direction:column;padding:6px 6px 0}.lc-ct b{font-size:16px}.lc-ct small{color:var(--sub);font-size:12.5px}
 .lc-side > .mpg{margin:6px 6px 10px}
 .lc-it .no{flex:none;width:22px;color:var(--sub);font-weight:800;text-align:right}.lc-it .t small{display:block;color:var(--sub);font-size:12px;font-weight:600}.lc-it.on .t small{color:#c9a96a}
 .lc-lock{color:var(--sub);font-size:12.5px;margin-left:6px}.lc-nx .btn[disabled]{opacity:.45;cursor:not-allowed}
+.rs-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:6px 0 16px}.mn-chips.sm button{padding:5px 11px;font-size:13px}.rs-new{margin-left:auto}
+.rs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:18px}
+.rs-card{display:flex;flex-direction:column;background:none;border:0;color:var(--cream);font:inherit;text-align:left;cursor:pointer;padding:0;min-width:0}
+.rs-card b{font-size:15px;font-weight:800;margin-top:8px;line-height:1.35}.rs-card small{color:var(--sub);font-size:12.5px;margin-top:2px}
+.rsc{position:relative;display:flex;align-items:flex-end;aspect-ratio:3/4;border-radius:12px;overflow:hidden;padding:12px;background:#24221e}.rsc img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.rsc b{position:relative;font-size:18px;font-weight:900;line-height:1.25;color:#1b1813;word-break:keep-all}.rsc b.lt{color:#f2ead9}
+.rsc i{position:absolute;left:8px;top:8px;font-style:normal;font-size:11.5px;font-weight:800;background:rgba(0,0,0,.55);color:#fff;border-radius:6px;padding:1px 7px}
+.rs-card:hover .rsc{outline:2px solid var(--gold);outline-offset:2px}.rsc.big{width:120px;flex:none}
+.rs-old{display:flex;align-items:center;gap:12px;width:100%;margin-top:22px;background:var(--dark-2);border:1px dashed var(--line);border-radius:12px;padding:12px 14px;color:var(--cream);font:inherit;text-align:left;cursor:pointer}.rs-old span{color:var(--sub);font-size:13px;flex:1}
+.rs-bar{display:flex;gap:8px;align-items:center;margin:6px 0 12px}.rs-bar .sp{flex:1}
+.rs-paper{background:#fff;color:#1b1b1b;border-radius:14px;padding:18px 20px;max-width:980px}
+.rs-ph{display:flex;gap:16px;align-items:flex-start;margin-bottom:14px}.rs-ph h2{margin:0;font-size:22px}.rs-meta{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:4px}
+.rs-meta span{background:#f3efe6;color:#7a5a1e;border-radius:6px;padding:1px 8px;font-size:12.5px;font-weight:800}.rs-meta small{color:#888;font-size:12.5px}
+.rs-note{margin-top:8px;color:#444;font-size:14px;white-space:pre-wrap}
+.rs-rt{border:2px solid #f2b21b;border-radius:12px;margin-top:12px;overflow:hidden}.rs-rh{display:flex;align-items:center;gap:10px;background:#f2b21b;padding:6px 12px}.rs-rh b{font-size:15px}.rs-rh span{font-weight:800;flex:1}
+.rs-ed{background:rgba(255,255,255,.7);border:0;border-radius:7px;padding:2px 10px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer}
+.rs-sub{padding:6px 12px 0;color:#555;font-size:13px}.rs-flow{padding:4px 12px;color:#333;font-size:13px;font-weight:700}.rs-flow i{font-style:normal;color:#c99418}
+.rs-ex{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;padding:8px 12px 12px}.rs-ex div{min-width:0;text-align:center}.rs-ex small{display:block;font-size:12px;color:#333;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rsi{display:block;aspect-ratio:1/1;border-radius:10px;overflow:hidden;background:#f1f2f4}.rsi img{width:100%;height:100%;object-fit:contain}
+.rsi.none{display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--pc) 22%,#fff)}.rsi.none em{font-style:normal;font-weight:800;color:color-mix(in srgb,var(--pc) 70%,#000);font-size:13px}
+.rs-empty{color:#666;padding:20px 4px}.rs-empty b{display:block;color:#222}
+.rs-form label{display:block;margin-bottom:12px;font-weight:700}.rs-form label .inp{margin-top:6px;width:100%}.rs-cv{display:flex;gap:14px;align-items:flex-start;margin:6px 0 14px}
+.rs-sw{display:flex;gap:6px;margin-bottom:10px}.rs-sw button{width:28px;height:28px;border-radius:50%;border:2px solid transparent;cursor:pointer}.rs-sw button.on{border-color:var(--gold);box-shadow:0 0 0 2px #000 inset}
+.rs-up{cursor:pointer;margin-right:6px}.rte-row.rs{grid-template-columns:24px 24px 1fr 32px}
+#body.lite .tx-selall.on{background:#fff7e6;border:1.5px solid #d9a441;box-shadow:0 4px 14px rgba(120,80,10,.18)}      /* 흰 표 위 선택 줄 (2026-10-27 대표 「배경도 하얗고 저것도 하얘서 눈에 안 띄어」) */
+#body.lite .tx-selall.on b{color:#8a5a12}#body.lite .tx-selall.on .wn{background:#fde8e4;color:#b8432f;border-color:#efb4a8}
 .mn-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:18px}.mn-ttl{font-size:17px}
 .mn-chips{display:flex;gap:6px;flex-wrap:wrap}.mn-chips button{border:0;background:#24221e;color:#cfc7b8;border-radius:9px;padding:7px 14px;font:inherit;font-size:14px;font-weight:600;cursor:pointer}
 .mn-chips button:hover{background:#2e2b26}.mn-chips button.on{background:#f2ead9;color:#141311;font-weight:800}
@@ -2699,7 +2726,7 @@ body:has(#pop.on.tx-side) #gchat .gc-fab:not(.x){display:none}      /* 옆 판�
       자동 리포트 내역<span class="bdg" id="rsbdg" style="display:none"></span></button>
     <button class="nav navin" data-v="rtmake">
       <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h7"/><path d="M17 15v6M14 18h6"/></svg>
-      루틴 · 스트레칭</button>
+      루틴표 · 스트레칭</button>
     <div class="navgh">관리</div>
     <button class="nav" data-v="exreq">
       <svg viewBox="0 0 24 24"><path d="M3 12h3M18 12h3M6 8v8M18 8v8M6 12h12"/></svg>
@@ -2747,7 +2774,7 @@ body:has(#pop.on.tx-side) #gchat .gc-fab:not(.x){display:none}      /* 옆 판�
 
 <script>
 "use strict";
-const BUILD = '442';
+const BUILD = '444';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -2910,7 +2937,7 @@ const 권한줄 = [
   ['메뉴', 'cmall', '피드백', '', [1, 1, 1, 1, 0]],
   ['메뉴', 'today', '오늘 운동', '', [1, 1, 1, 1, 0]],
   ['메뉴', 'reports', '자동 리포트 내역', '', [1, 1, 1, 0, 0]],
-  ['메뉴', 'rtmake', '루틴 · 스트레칭', '', [1, 1, 1, 0, 0]],
+  ['메뉴', 'rtmake', '루틴표 · 스트레칭', '', [1, 1, 1, 0, 0]],
   ['메뉴', 'exreq', '종목 사전', '', [1, 1, 1, 0, 0]],
   ['메뉴', 'kits', '홍보 자료', '', [1, 1, 1, 0, 1]],
   ['메뉴', 'rules', '규칙', '자동화 규칙 한눈에', [1, 0, 0, 0, 0]],
@@ -2966,7 +2993,7 @@ const 홈블록허용 = { booking: 회원보임, today: () => 할수('today') &&
 let 수업알림시작 = '2026-11-02'; const 수업알림 = () => TODAY >= 수업알림시작;
 const 현황허용 = { 부름: () => 할수('tasks'), 실패: () => 수업알림() && 할수('reports'), 밀림: () => 수업알림() && 할수('cmall') && 회원보임(), 업무: () => 할수('tasks'), 요청: () => 수업알림() && 할수('cmall') && 회원보임(),
   누락: () => 수업알림() && 회원보임(), 오늘없음: () => 수업알림() && 회원보임(), 운동: () => 수업알림() && 할수('today') && 회원보임(), 상담: () => 할수('leads'), 담당: 회원보임, 빈담당: 회원보임 };
-const 수업판칸 = [['today', '✍ 수업 기록하기', '회원 찾아서 바로 기록'], ['cmall', '💬 피드백', '남겨 주세요 · 요청'], ['rtmake', '📋 루틴 · 스트레칭', '만들기 · 회원에게 추가'], ['reports', '📄 리포트 내역', '보낸 수업 리포트']];      /* 2026-10-23 대표 「수업 기록 한곳에」 */
+const 수업판칸 = [['today', '✍ 수업 기록하기', '회원 찾아서 바로 기록'], ['cmall', '💬 피드백', '남겨 주세요 · 요청'], ['rtmake', '📋 루틴표 · 스트레칭', '루틴표 만들기 · 개인운동 지정'], ['reports', '📄 리포트 내역', '보낸 수업 리포트']];      /* 2026-10-23 대표 「수업 기록 한곳에」 */
 function 메뉴가림(){ { const b = document.querySelector('.nav[data-v="lesson"]'); if(b) b.style.display = 수업판칸.some(([v]) => 할수(v)) ? '' : 'none'; }
   document.querySelectorAll('.nav[data-v]').forEach(b => { const v = b.dataset.v; if(!권한메뉴.has(v)) return;
   b.style.display = (v === 'members' ? 회원범위() !== 'x' && 할수(v) : 할수(v)) ? '' : 'none'; }); }
@@ -5219,14 +5246,15 @@ function RL미리(){ const r = (D.r || []).find(x => x.id === S.rtSel); if(!r) r
 function v루틴만들기(){
   const 탭 = S.rtTab || '운동', rs = 공통루틴들();
   /* 작은 탭 → 움직이는 그림 카드 둘 (2026-10-20 대표 「스트레칭 루틴 만들기가 너무 눈에 안 띔 · 애니메이션도 넣어서 한눈에」) */
-  const 탭줄 = '<div class="rtpick">' + [['운동', '운동 루틴', rs.length + '개 · 회원에게 추가', '<svg class="rtp-fig" viewBox="0 0 48 48" aria-hidden="true"><g class="rtp-lift"><rect x="7" y="11" width="34" height="3" rx="1.5"/><rect x="5" y="7" width="4" height="11" rx="1.2"/><rect x="39" y="7" width="4" height="11" rx="1.2"/></g><circle cx="24" cy="21" r="3.6"/><path d="M24 25v11M24 36l-5 9M24 36l5 9M24 27l-8-14M24 27l8-14" fill="none" stroke-width="2.6" stroke-linecap="round"/></svg>'], ['스트레칭', '스트레칭 루틴', 내세트().length + '개 · 내 종목 ' + 내종목().length + '개', '<svg class="rtp-fig" viewBox="0 0 48 48" aria-hidden="true"><g class="rtp-lean"><circle cx="24" cy="12" r="3.6"/><path d="M24 16v17" fill="none" stroke-width="2.6" stroke-linecap="round"/><path class="rtp-arm" d="M24 19h11" fill="none" stroke-width="2.6" stroke-linecap="round"/><path class="rtp-arm2" d="M24 19h-10" fill="none" stroke-width="2.6" stroke-linecap="round"/></g><path d="M24 33l-6 12M24 33l6 12" fill="none" stroke-width="2.6" stroke-linecap="round"/></svg>']]
+  const 탭줄 = '<div class="rtpick">' + [['운동', '루틴표', 루틴표들().length + '개 · 개인운동 지정', '<svg class="rtp-fig" viewBox="0 0 48 48" aria-hidden="true"><g class="rtp-lift"><rect x="7" y="11" width="34" height="3" rx="1.5"/><rect x="5" y="7" width="4" height="11" rx="1.2"/><rect x="39" y="7" width="4" height="11" rx="1.2"/></g><circle cx="24" cy="21" r="3.6"/><path d="M24 25v11M24 36l-5 9M24 36l5 9M24 27l-8-14M24 27l8-14" fill="none" stroke-width="2.6" stroke-linecap="round"/></svg>'], ['스트레칭', '스트레칭 루틴', 내세트().length + '개 · 내 종목 ' + 내종목().length + '개', '<svg class="rtp-fig" viewBox="0 0 48 48" aria-hidden="true"><g class="rtp-lean"><circle cx="24" cy="12" r="3.6"/><path d="M24 16v17" fill="none" stroke-width="2.6" stroke-linecap="round"/><path class="rtp-arm" d="M24 19h11" fill="none" stroke-width="2.6" stroke-linecap="round"/><path class="rtp-arm2" d="M24 19h-10" fill="none" stroke-width="2.6" stroke-linecap="round"/></g><path d="M24 33l-6 12M24 33l6 12" fill="none" stroke-width="2.6" stroke-linecap="round"/></svg>']]
     .map(([k, l, n, g]) => '<button class="rtp ' + (k === '운동' ? 'w' : 's') + (탭 === k ? ' on' : '') + '" data-act="tx:rttab" data-k="' + k + '">' + g + '<span><b>' + l + '</b><small>' + n + '</small></span></button>').join('') + '</div>';
   if(탭 === '스트레칭') return '<div class="rl-bar">' + 탭줄 + '</div>' + 세트칸();
+  if(!S.rtOld) return '<div class="rl-bar">' + 탭줄 + '</div>' + v루틴표();      /* 루틴표 (2026-10-27) — 옛 공통 루틴 목록은 「옛 루틴」 카드에서 */
   const 목 = ['전체'].concat(목적기본, ['기타']), 수 = g => g === '전체' ? rs.length : rs.filter(r => RL목적(r) === g).length, 고 = S.rtGoal || '전체';
   return '<div class="rl-bar">' + 탭줄
     + '<label class="rl-srch"><span>⌕</span><input id="rtq" type="search" value="' + esc(S.rtQ || '') + '" placeholder="루틴 · 종목 이름 검색" autocomplete="off"></label>'
     + '<div class="rl-goals">' + 목.map(g => '<button class="chip' + (g === 고 ? ' on' : '') + '" data-act="tx:rtgoalf" data-k="' + esc(g) + '">' + esc(g) + (수(g) ? '<i>' + 수(g) + '</i>' : '') + '</button>').join('') + '</div>'
-    + '<button class="btn gold sm rl-new" data-act="tx:rtnew">＋ 새 루틴</button></div>'
+    + '<button class="btn ghost sm" data-act="tx:rsnewback">‹ 루틴표</button><button class="btn gold sm rl-new" data-act="tx:rtnew">＋ 새 루틴</button></div>'
     + '<div class="rl-two"><div><div class="rl-cap l" id="rtcap1">' + RL머리1(rs) + '</div><div class="rl-list" id="rtlist">' + RL목록(rs) + '</div></div>'
     + '<div><div class="rl-cap r2" id="rtcap2">' + RL머리2() + '</div><div class="rl-pv" id="rtpv">' + RL미리() + '</div></div></div>';
 }
@@ -5235,6 +5263,7 @@ function RL머리1(rs){ return '<span class="k">1</span><span><b>루틴 목록</
 function RL머리2(){ const r = (D.r || []).find(x => x.id === S.rtSel); return '<span class="k">2</span><span><b>상세 종목</b><small>' + (r ? esc(r.name || '이름 없는 루틴') + ' · 세트 · 회 · 무게' : '왼쪽에서 루틴을 선택해 주세요') + '</small></span>' + (r ? '<span class="r">' + RL종목(r).length + '종목</span>' : ''); }
 function RL다시(){ const rs = 공통루틴들(), l = $('#rtlist'), pv = $('#rtpv'), c1 = $('#rtcap1'), c2 = $('#rtcap2'); if(!l || !pv){ render(); return; }
   l.innerHTML = RL목록(rs); pv.innerHTML = RL미리(); if(c1) c1.innerHTML = RL머리1(rs); if(c2) c2.innerHTML = RL머리2(); }
+document.addEventListener('input', ev => { if(RT && ev.target && ev.target.id === 'rtesub') RT.sub = ev.target.value; });
 document.addEventListener('input', ev => { if(S.view !== 'rtmake' || !ev.target || ev.target.id !== 'rtq') return; S.rtQ = ev.target.value;
   RL다시(); });
 /* 회원에게 넣기 — 회원을 고르면 그 회원 루틴으로 사본을 만든다(무게 · 횟수 빈칸은 회원 앱이 지난 기록으로 채운다) */
@@ -5275,11 +5304,12 @@ const RT부위들 = ['하체','가슴','등','어깨','팔','복근','유산소'
 const RT줄이름 = x => x.새 ? x.새 : (vaName(x.vid) || '?');
 const RT줄부위 = x => x.새 ? '직접 추가' : ((v => v ? exOf(v.ex_id).part : '') (vaOf(x.vid)) || '');
 const RT값 = v => v == null ? '' : String(v);
-function RT새로(mid, 이름){ RT = { id:null, mid: mid == null ? null : mid, name: 이름 || '', purpose:'', items:[], 부위:'하체', 처음:'' }; RT.처음 = JSON.stringify([RT.name, RT.purpose, RT.items]); S.view = 'rtedit'; render(); setTimeout(() => { const e = $('#rtenm'); if(e) e.focus(); }, 30); }
-function RT열기(r){ RT = { id:r.id, mid:r.member_id, name:r.name || '', purpose:r.purpose || '', 부위:'하체',
+function RT새로(mid, 이름, 표){ RT = { id:null, mid: mid == null ? null : mid, name: 이름 || '', purpose:'', items:[], 부위:'하체', 처음:'', sheet: 표 || null, sub:'' }; RT.처음 = JSON.stringify([RT.name, RT.purpose, RT.items]); S.view = 'rtedit'; render(); setTimeout(() => { const e = $('#rtenm'); if(e) e.focus(); }, 30); }
+function RT열기(r){ RT = { id:r.id, mid:r.member_id, name:r.name || '', purpose:r.purpose || '', 부위:'하체', sheet: r.sheet_id || null, sub: r.sub || '',
     items: (D.ri || []).filter(x => x.routine_id === r.id).sort((a, b) => (a.sort || 0) - (b.sort || 0)).map(x => ({ rid:x.id, vid:x.variant_id, kg:RT값(x.kg), reps:RT값(x.reps), sets:RT값(x.sets), rest:RT값(x.rest) })) };
   RT.처음 = JSON.stringify([RT.name, RT.purpose, RT.items]); S.view = 'rtedit'; render(); }
 const RT변함 = () => !!RT && JSON.stringify([RT.name, RT.purpose, RT.items]) !== RT.처음;
+const RT표루틴 = () => !!(RT && RT.sheet);      /* 루틴표 안 루틴 — 무게 · 횟수 · 세트 칸 없음 (2026-10-27 대표 「루틴 만들기에서 횟수 · 무게를 넣을 필요는 없다」) */
 const RT됨 = () => !!(RT && RT.name.trim() && RT.items.length);
 function RT상태글(){ if(!RT) return ''; const 이름 = RT.name.trim();
   return RT됨() ? '<b>' + esc(이름) + '</b> · ' + esc(RT.purpose || '목적 없음') + ' · 종목 <b>' + RT.items.length + '개</b>' : (!이름 ? '루틴 이름을 입력해 주세요' : '종목을 1개 이상 추가해야 저장돼요'); }
@@ -5289,6 +5319,8 @@ function RT미리(){ if(!RT) return '';
         return '<div class="rte-pi"><span class="k">' + (i + 1) + '</span><div><b>' + esc(RT줄이름(x)) + '</b>' + (x.kg || x.reps ? '<small>' + esc(값) + ' · 쉬기 ' + esc(x.rest || '60') + '초</small>' : '<small class="e">' + esc((x.sets || '3') + '세트') + ' · 무게 · 횟수는 수업하면서 정합니다</small>') + '</div></div>'; }).join('')
       : '<div class="rte-pe">종목을 추가하면 여기에 보여요</div>'); }
 function RT표(){
+  if(RT표루틴()) return RT.items.length ? '<div class="rte-tbl">' + RT.items.map((x, i) => '<div class="rte-row rs" draggable="true" data-ri="' + i + '"><span class="hdl" title="잡고 끌어서 순서 변경">⋮⋮</span><span class="no">' + (i + 1) + '</span><span class="nm">' + esc(RT줄이름(x)) + '<small>' + esc(RT줄부위(x)) + '</small></span><button class="x" data-act="tx:rtedel1" data-k="' + i + '" tabindex="-1" title="제거">✕</button></div>').join('') + '<div class="rte-tip">무게 · 횟수는 개인운동 지정할 때 회원 지난 기록으로 채워집니다</div></div>'
+    : '<div class="rte-empty"><b>아직 추가한 종목이 없습니다</b>위에서 검색하거나 종목을 눌러 주세요</div>';
   if(!RT.items.length) return '<div class="rte-empty"><b>아직 추가한 종목이 없습니다</b>위에서 검색하거나 종목을 눌러 주세요</div>';
   return '<div class="rte-tbl"><div class="rte-all"><b>모두</b><input id="rteas" placeholder="–" inputmode="numeric"> 세트 <input id="rtear" placeholder="–" inputmode="numeric"> 초 쉬기 <button class="btn sub sm" data-act="tx:rteall">모두 적용</button><span class="sp">칸은 Tab 으로 옮겨 다녀요</span></div>'
     + '<div class="rte-hd"><span></span><span></span><span>종목</span><span>kg</span><span>회</span><span>세트</span><span>쉬기(초)</span><span></span></div>'
@@ -5303,11 +5335,92 @@ function RT자주(){
     + RT부위들.map(p => { const c = RT.items.filter(x => RT줄부위(x) === p).length; return '<button class="rte-part' + (p === RT.부위 ? ' on' : '') + '" data-act="tx:rtepart" data-k="' + p + '">' + p + (c ? '<em>' + c + '</em>' : '') + '</button>'; }).join('') + '</div>'
     + '<div class="rte-exg">' + (자주종목(RT.부위).map(e => { const v = 첫벌(e), 있 = RT.items.some(x => x.vid === v.id); return '<button class="rte-ex' + (있 ? ' in' : '') + '" data-act="tx:rtetog" data-k="' + esc(v.id) + '"><i>' + (있 ? '✓' : '＋') + '</i><span>' + esc(e.name) + '</span></button>'; }).join('') || '<span class="sub3">이 부위 종목이 없어요</span>') + '</div></div>';
 }
+/* ══ 루틴표 ══ 2026-10-27 대표 노션 「10월27일 3차」 · 결정함 WMhK4jGV
+   루틴표(routine_sheets · 표지 사진/글자 · 대상 딱지 · 안내) ⊃ 루틴(routines · sheet_id · no · sub) ⊃ 종목(routine_items · 무게 · 횟수 안 씀)
+   「내 루틴표 / 센터 전체」 — 모두 보고 · 고치기는 만든 사람(관리자는 전부) · 「복사해서 내 루틴표로」 · 개인운동 지정은 회원 페이지(2단계) */
+const 루틴표대상 = ['초급자', '중급자', '상급자', '여성용', '남성용', '재활'];
+const 표지색들 = ['#f2c35c', '#7fa8c9', '#d98c7a', '#86c19a', '#b39ad6', '#2b2a27'];
+const 루틴표들 = () => (D.rs || []).filter(s => !s.hidden);
+const 루틴표루틴 = sid => (D.r || []).filter(r => r.member_id == null && r.sheet_id === sid).sort((a, b) => (a.no || 0) - (b.no || 0));
+const 옛공통 = () => (D.r || []).filter(r => r.member_id == null && !r.sheet_id && !/준비운동/.test(r.grp || ''));
+const 루틴표고침 = s => !!s && (s.owner === 나이름() || 할수('table'));
+function 루틴표표지(s, 큰){ const c = s.cover || {}, u = c.path ? media(c.path) : '';
+  return '<span class="rsc' + (큰 ? ' big' : '') + '"' + (u ? '' : ' style="background:' + esc(c.color || 표지색들[0]) + '"') + '>' + (u ? '<img src="' + esc(u) + '" alt="" loading="lazy">' : '<b' + (c.color === '#2b2a27' ? ' class="lt"' : '') + '>' + esc(s.title || '루틴표') + '</b>')
+    + ((s.tags || [])[0] ? '<i>' + esc(s.tags[0]) + '</i>' : '') + '</span>'; }
+function 종목그림(vid){ const v = vaOf(vid), e = v ? exOf(v.ex_id) : null, m = ((v && v.media) || []).concat((e && e.media) || []).find(z => z && z.path && z.kind !== 'video');
+  return m ? '<span class="rsi"><img src="' + esc(media(m.path)) + '" alt="" loading="lazy"></span>' : '<span class="rsi none" style="--pc:' + (부위색D[(e && e.part) || ''] || '#9a938a') + '"><em>' + esc((e && e.part) || '') + '</em></span>'; }
+const 부위색D = { '가슴':'#d98c7a', '어깨':'#e0b070', '등':'#7fa8c9', '팔':'#b39ad6', '하체':'#86c19a', '복근':'#e2c96a', '유산소':'#8fd0d6', '기타':'#9a938a' };
+function v루틴표(){
+  if(S.rsId){ const s = (D.rs || []).find(x => x.id === S.rsId); if(s) return 루틴표보기(s); S.rsId = null; }
+  const 탭 = S.rsTab || '내', 대 = S.rsTag || '', 나 = 나이름();
+  const 다 = 루틴표들(), 목 = 다.filter(s => (탭 === '내' ? s.owner === 나 : true) && (!대 || (s.tags || []).includes(대)));
+  const 옛 = 옛공통();
+  return '<div class="rs-top"><div class="mn-chips"><button class="' + (탭 === '내' ? 'on' : '') + '" data-act="tx:rstab" data-k="내">' + esc(보임이름(나)) + ' 루틴표 ' + 다.filter(s => s.owner === 나).length + '</button><button class="' + (탭 === '전체' ? 'on' : '') + '" data-act="tx:rstab" data-k="전체">센터 전체 ' + 다.length + '</button></div>'
+    + '<div class="mn-chips sm">' + 루틴표대상.map(t => '<button class="' + (대 === t ? 'on' : '') + '" data-act="tx:rstag" data-k="' + esc(t) + '">' + esc(t) + '</button>').join('') + '</div>'
+    + '<button class="btn gold sm rs-new" data-act="tx:rsnew">＋ 새 루틴표</button></div>'
+    + (목.length ? '<div class="rs-grid">' + 목.map(s => '<button class="rs-card" data-act="tx:rsopen" data-k="' + esc(s.id) + '">' + 루틴표표지(s) + '<b>' + esc(s.title || '(이름 없음)') + '</b><small>' + esc(보임이름(s.owner || '')) + ' · 루틴 ' + 루틴표루틴(s.id).length + ((s.tags || []).length ? ' · ' + esc(s.tags.join(' · ')) : '') + '</small></button>').join('') + '</div>'
+      : '<div class="empty why"><b>' + (탭 === '내' ? '아직 만든 루틴표가 없습니다' : '루틴표가 없습니다') + '</b>「＋ 새 루틴표」로 만들어 주세요</div>')
+    + (옛.length ? '<button class="rs-old" data-act="tx:rsold"><b>옛 루틴 ' + 옛.length + '개</b><span>루틴표로 묶기 전에 만든 루틴 — 열어서 루틴표에 넣거나 그대로 지정할 수 있어요</span><em>›</em></button>' : ''); }
+function 루틴표보기(s){
+  const L = 루틴표루틴(s.id), 고 = 루틴표고침(s);
+  return '<div class="rs-bar"><button class="btn ghost sm" data-act="tx:rsback">‹ 루틴표</button><span class="sp"></span>'
+    + (고 ? '<button class="btn ghost sm" data-act="tx:rsmeta" data-k="' + esc(s.id) + '">루틴표 수정</button><button class="btn sm" data-act="tx:rsradd" data-k="' + esc(s.id) + '">＋ 루틴 추가</button>' : '')
+    + (s.owner !== 나이름() ? '<button class="btn ghost sm" data-act="tx:rscopy" data-k="' + esc(s.id) + '">복사해서 내 루틴표로</button>' : '') + '</div>'
+    + '<div class="rs-paper"><div class="rs-ph">' + 루틴표표지(s, 1) + '<div><h2>' + esc(s.title || '(이름 없음)') + '</h2><div class="rs-meta">' + (s.tags || []).map(t => '<span>' + esc(t) + '</span>').join('') + '<small>' + esc(보임이름(s.owner || '')) + ' 루틴표</small></div>'
+    + (s.note ? '<div class="rs-note">' + esc(s.note) + '</div>' : '') + '</div></div>'
+    + (L.length ? L.map((r, i) => { const it = (D.ri || []).filter(x => x.routine_id === r.id).sort((a, b) => (a.sort || 0) - (b.sort || 0));
+        return '<div class="rs-rt"><div class="rs-rh"><b>루틴 ' + (i + 1) + '</b><span>' + esc(r.name || '') + '</span>' + (고 ? '<button class="rs-ed" data-act="tx:rsredit" data-k="' + esc(r.id) + '">수정</button>' : '') + '</div>'
+          + (r.sub ? '<div class="rs-sub">' + esc(r.sub) + '</div>' : '') + '<div class="rs-flow">' + it.map(x => esc(vaName(x.variant_id) || '?')).join(' <i>›</i> ') + '</div>'
+          + '<div class="rs-ex">' + it.map(x => '<div>' + 종목그림(x.variant_id) + '<small>' + esc(vaName(x.variant_id) || '?') + '</small></div>').join('') + '</div></div>'; }).join('')
+      : '<div class="rs-empty"><b>아직 루틴이 없습니다</b>' + (고 ? '「＋ 루틴 추가」로 루틴 1부터 추가해 주세요' : '만든 선생님이 루틴을 추가하면 보입니다') + '</div>') + '</div>'; }
+/* 루틴표 정보 — 옆 판 (제목 · 대상 · 표지 · 안내) */
+let 표편 = null;
+function 루틴표정보판(id){ const s = id ? (D.rs || []).find(x => x.id === id) : null;
+  표편 = 표편 && 표편.id === (s ? s.id : null) && 표편.열림 ? 표편 : { id: s ? s.id : null, title: s ? s.title : '', tags: s ? (s.tags || []).slice() : [], cover: s ? Object.assign({}, s.cover || {}) : { color: 표지색들[0] }, note: s ? s.note : '', 열림:true };
+  const c = 표편.cover || {}, u = c.path ? media(c.path) : '';
+  판열기(s ? '루틴표 수정' : '새 루틴표', '<div class="rs-form"><label>이름<input class="inp" id="rsti" value="' + esc(표편.title) + '" placeholder="예) 엉덩이 루틴표"></label>'
+    + '<div class="lbl">대상</div><div class="rte-chips">' + 루틴표대상.concat(표편.tags.filter(t => !루틴표대상.includes(t))).map(t => '<button class="rte-chip' + (표편.tags.includes(t) ? ' on' : '') + '" data-act="tx:rstagf" data-k="' + esc(t) + '">' + esc(t) + '</button>').join('') + '<button class="rte-chip add" data-act="tx:rstagown">＋ 직접 입력</button></div>'
+    + '<div class="lbl">표지</div><div class="rs-cv"><span class="rsc big"' + (u ? '' : ' style="background:' + esc(c.color || 표지색들[0]) + '"') + '>' + (u ? '<img src="' + esc(u) + '" alt="">' : '<b' + (c.color === '#2b2a27' ? ' class="lt"' : '') + '>' + esc(표편.title || '루틴표') + '</b>') + '</span>'
+      + '<div><div class="rs-sw">' + 표지색들.map(x => '<button class="' + (!c.path && c.color === x ? 'on' : '') + '" style="background:' + x + '" data-act="tx:rscolor" data-k="' + x + '" title="글자 표지"></button>').join('') + '</div>'
+      + '<label class="btn ghost sm rs-up">사진 올리기<input type="file" accept="image/*" id="rsfile" hidden></label>' + (c.path ? '<button class="btn ghost sm" data-act="tx:rscolor" data-k="' + esc(c.color || 표지색들[0]) + '">사진 삭제</button>' : '') + '</div></div>'
+    + '<label>안내<textarea class="inp" id="rsno" rows="3" placeholder="예) 운동 전 필수 — 폼롤러 마사지 · 고관절 스트레칭 후 밴드 워크로 웜업">' + esc(표편.note) + '</textarea></label>'
+    + '<div class="cmacts"><button class="btn gold" data-act="tx:rssave">저장</button>' + (s && 루틴표고침(s) ? '<button class="btn ghost wn" data-act="tx:rshide" data-k="' + esc(s.id) + '">루틴표 삭제</button>' : '') + '</div></div>'); }
+function 루틴표값읽기(){ if(!표편) return; const t = document.getElementById('rsti'), n = document.getElementById('rsno'); if(t) 표편.title = t.value; if(n) 표편.note = n.value; }
+async function 루틴표저장(){ 루틴표값읽기(); if(!표편) return; if(!표편.title.trim()){ toast('이름을 입력해 주세요'); return; }
+  const 새 = !표편.id; if(!await 묻기((새 ? '루틴표를 만들까요?' : '루틴표를 수정할까요?') + String.fromCharCode(10) + 표편.title.trim())) return;
+  const 몸 = { title: 표편.title.trim(), tags: 표편.tags, cover: 표편.cover || {}, note: 표편.note.trim(), updated_at: new Date().toISOString() };
+  try{ if(새){ const id = 's' + Date.now(); Object.assign(몸, { id, owner: 나이름(), sort: (D.rs || []).length }); await ssend('routine_sheets', 'POST', [몸]); (D.rs = D.rs || []).push(몸); S.rsId = id; }
+    else { await ssend('routine_sheets?id=eq.' + encodeURIComponent(표편.id), 'PATCH', 몸); Object.assign((D.rs || []).find(x => x.id === 표편.id) || {}, 몸); }
+    기록남기기({ area:'루틴표', action: 새 ? '생성' : '수정', tbl:'routine_sheets', row_id: S.rsId || 표편.id, detail: 몸.title });
+    표편 = null; popClose(); toast(새 ? '만들었어요' : '수정했어요'); render(); }
+  catch(e){ toast('저장하지 못했어요 — ' + (/routine_sheets|404|42P01/.test(String(e.message)) ? '서버 준비(83단계)가 아직이에요' : String(e.message || '').slice(0, 60))); } }
+async function 루틴표사진(f){ if(!f || !표편) return; 루틴표값읽기();
+  try{ const blob = await 줄이기(f), path = 'sheets/' + (표편.id || 'new') + '/' + Date.now() + '.jpg';
+    const r = await fetch(SB_URL + '/storage/v1/object/media/' + path, { method:'POST', headers:{ apikey:SB_KEY, Authorization:'Bearer ' + 열쇠(), 'Content-Type':'image/jpeg' }, body: blob });
+    if(!r.ok) throw new Error(await r.text()); 표편.cover = { path, color: (표편.cover || {}).color || 표지색들[0] }; 루틴표정보판(표편.id); }
+  catch(e){ toast('사진을 올리지 못했어요 — ' + String(e.message || '').slice(0, 50)); } }
+async function 루틴표삭제(id){ const s = (D.rs || []).find(x => x.id === id); if(!s) return;
+  if(!await 묻기('「' + (s.title || '') + '」 루틴표를 삭제할까요?' + String.fromCharCode(10) + '안의 루틴은 「옛 루틴」으로 남아요')) return;
+  try{ await ssend('routine_sheets?id=eq.' + encodeURIComponent(id), 'PATCH', { hidden:true }); s.hidden = true;
+    for(const r of 루틴표루틴(id)){ await ssend('routines?id=eq.' + encodeURIComponent(r.id), 'PATCH', { sheet_id:null }); r.sheet_id = null; }
+    기록남기기({ area:'루틴표', action:'삭제', tbl:'routine_sheets', row_id:id, detail: s.title }); 표편 = null; S.rsId = null; popClose(); toast('삭제했어요'); render(); }
+  catch(e){ toast('삭제하지 못했어요 — ' + String(e.message || '').slice(0, 60)); } }
+async function 루틴표복사(id){ const s = (D.rs || []).find(x => x.id === id); if(!s) return;
+  if(!await 묻기('「' + (s.title || '') + '」을 내 루틴표로 복사할까요?')) return;
+  try{ const nid = 's' + Date.now(), 몸 = { id:nid, title: s.title + ' (복사)', owner: 나이름(), tags: (s.tags || []).slice(), cover: Object.assign({}, s.cover || {}), note: s.note || '', sort:(D.rs || []).length };
+    await ssend('routine_sheets', 'POST', [몸]); D.rs.push(몸);
+    for(const r of 루틴표루틴(id)){ const rid = 'r' + Date.now() + Math.floor(Math.random() * 1000), 줄 = { id:rid, member_id:null, no:r.no, name:r.name, purpose:r.purpose || '', grp:'', sheet_id:nid, sub:r.sub || '', by:나이름(), made_at:new Date().toISOString() };
+      await ssend('routines', 'POST', [줄]); D.r.push(줄);
+      const it = (D.ri || []).filter(x => x.routine_id === r.id).sort((a, b) => (a.sort || 0) - (b.sort || 0)).map((x, i) => ({ routine_id:rid, sort:i, variant_id:x.variant_id, kg:null, reps:null, sets:x.sets || 3, rest:x.rest || 60 }));
+      if(it.length){ const made = await ssend('routine_items', 'POST', it, 'return=representation'); (made || []).forEach(z => D.ri.push(z)); } }
+    기록남기기({ area:'루틴표', action:'생성', tbl:'routine_sheets', row_id:nid, detail:'복사 — ' + s.title }); S.rsId = nid; S.rsTab = '내'; toast('내 루틴표로 복사했어요'); render(); }
+  catch(e){ toast('복사하지 못했어요 — ' + String(e.message || '').slice(0, 60)); } }
+document.addEventListener('change', e => { if(e.target && e.target.id === 'rsfile') 루틴표사진(e.target.files && e.target.files[0]); });
 function v루틴편집(){
   if(!RT) return '<div class="empty">루틴을 찾을 수 없어요</div>';
   const 이름 = RT.name.trim(), n = (on, k) => '<span class="rte-n' + (on ? ' ok' : '') + '">' + (on ? '✓' : k) + '</span>';
   return '<div class="rte"><div class="rte-main">'
-    + '<div class="rte-step" id="rtes1"><div class="rte-sh">' + n(이름, 1) + '<b>루틴 이름</b><span class="req">필수</span></div><input class="rte-inp" id="rtenm" value="' + esc(RT.name) + '" placeholder="예) 하체 근력 A" autocomplete="off"></div>'
+    + '<div class="rte-step" id="rtes1"><div class="rte-sh">' + n(이름, 1) + '<b>루틴 이름</b><span class="req">필수</span></div><input class="rte-inp" id="rtenm" value="' + esc(RT.name) + '" placeholder="' + (RT표루틴() ? '예) 초보자 엉덩이 머신 루틴' : '예) 하체 근력 A') + '" autocomplete="off">' + (RT표루틴() ? '<input class="rte-inp" id="rtesub" value="' + esc(RT.sub || '') + '" placeholder="한 줄 설명 (선택) — 예) 힙 볼륨과 라인 강조" autocomplete="off" style="margin-top:8px">' : '') + '</div>'
     + '<div class="rte-step"><div class="rte-sh">' + n(RT.purpose, 2) + '<b>운동 목적</b><small>하나 선택</small></div><div class="rte-chips">'
       + 목적목록().map(g => '<button class="rte-chip' + (g === RT.purpose ? ' on' : '') + '" data-act="tx:rtegoal" data-k="' + esc(g) + '">' + esc(g) + '</button>').join('')
       + '<button class="rte-chip add" data-act="tx:rteown">＋ 직접 입력</button></div><div class="rte-own" id="rteown"><input class="rte-inp" id="rtegoal" placeholder="목적을 입력해 주세요"><button class="btn sub sm" data-act="tx:rteownok">추가</button></div></div>'
@@ -5359,7 +5472,7 @@ document.addEventListener('drop', ev => { const r = ev.target.closest && ev.targ
 document.addEventListener('dragend', () => { RT끄는 = null; document.querySelectorAll('.rte-row').forEach(x => x.classList.remove('drag', 'over')); });
 function RT흔들(id){ const e = $(id); if(!e) return; e.classList.remove('rte-shake'); void e.offsetWidth; e.classList.add('rte-shake'); }
 const RT수 = (v, 기본) => { const t = String(v == null ? '' : v).trim(); if(t === '') return 기본; const n = Number(t.replace(',', '.')); return isFinite(n) ? n : 기본; };
-function RT나가기(){ const mid = RT && RT.mid; RT = null; if(mid != null){ S.mid = mid; S.view = 'member'; S.tab = 'routine'; } else S.view = 'rtmake'; render(); }
+function RT나가기(){ const mid = RT && RT.mid, 표 = RT && RT.sheet; RT = null; if(mid != null){ S.mid = mid; S.view = 'member'; S.tab = 'routine'; } else { S.view = 'rtmake'; if(표) S.rsId = 표; } render(); }
 async function RT손잡이(일, k){
   if(!RT) return false;
   if(일 === 'rtepart'){ RT.부위 = k; render(); return true; }
@@ -5392,16 +5505,17 @@ async function RT손잡이(일, k){
       const 줄값 = (x, i, rid) => ({ routine_id:rid, sort:i, variant_id:x.vid, kg:RT수(x.kg, null), reps:RT수(x.reps, null), sets:RT수(x.sets, 3), rest:RT수(x.rest, 60) });
       let rid = RT.id;
       if(!rid){
-        const 같은곳 = (D.r || []).filter(r => (RT.mid == null ? r.member_id == null : r.member_id === RT.mid));
+        const 같은곳 = (D.r || []).filter(r => (RT.mid == null ? r.member_id == null : r.member_id === RT.mid) && (!RT.sheet || r.sheet_id === RT.sheet));
         const used = 같은곳.map(r => r.no); let no = 1; while(used.includes(no)) no++;
         rid = 'r' + Date.now();
-        const 덧 = (!D.r.length || 'hidden' in D.r[0]) ? { by: 나이름(), made_at: new Date().toISOString() } : {}, 줄 = Object.assign({ id:rid, member_id:RT.mid, no, name:RT.name.trim(), purpose:RT.purpose || '', grp:'' }, 덧);
+        const 덧 = (!D.r.length || 'hidden' in D.r[0]) ? { by: 나이름(), made_at: new Date().toISOString() } : {}, 줄 = Object.assign({ id:rid, member_id:RT.mid, no, name:RT.name.trim(), purpose:RT.purpose || '', grp:'' }, 덧, RT.sheet ? { sheet_id:RT.sheet, sub:(RT.sub || '').trim() } : {});
         await ssend('routines', 'POST', [줄]); D.r.push(줄);
         const made = await ssend('routine_items', 'POST', RT.items.map((x, i) => 줄값(x, i, rid)), 'return=representation');
         (made || []).forEach(z => D.ri.push(z));
       } else {
         const r = D.r.find(x => x.id === rid);
-        await ssend('routines?id=eq.' + encodeURIComponent(rid), 'PATCH', { name:RT.name.trim(), purpose:RT.purpose || '' }); if(r){ r.name = RT.name.trim(); r.purpose = RT.purpose || ''; }
+        const 고칠 = Object.assign({ name:RT.name.trim(), purpose:RT.purpose || '' }, RT.sheet ? { sub:(RT.sub || '').trim() } : {});
+        await ssend('routines?id=eq.' + encodeURIComponent(rid), 'PATCH', 고칠); if(r) Object.assign(r, 고칠);
         const 남길 = new Set(RT.items.filter(x => x.rid).map(x => x.rid)), 뺀 = (D.ri || []).filter(x => x.routine_id === rid && !남길.has(x.id));
         if(뺀.length) await 휴지통으로여럿('routine_items', 뺀, () => '공통 루틴 종목', ssend);
         D.ri = D.ri.filter(x => !(x.routine_id === rid && !남길.has(x.id)));
@@ -5411,8 +5525,8 @@ async function RT손잡이(일, k){
           else { const made = await ssend('routine_items', 'POST', [값], 'return=representation'); (made || []).forEach(z => D.ri.push(z)); } }
       }
       toast(RT.id ? '수정했어요' : '저장했어요');
-      const mid = RT.mid; RT = null;
-      if(mid != null){ S.mid = mid; S.rid = rid; S.rtFrom = false; S.view = 'routine'; } else S.view = 'rtmake';
+      const mid = RT.mid, 표 = RT.sheet; RT = null;
+      if(mid != null){ S.mid = mid; S.rid = rid; S.rtFrom = false; S.view = 'routine'; } else { S.view = 'rtmake'; if(표){ S.rsId = 표; S.rtTab = '운동'; S.rtOld = false; } }
       render();
     }catch(e){ if(RT) RT.저장중 = false; toast('저장하지 못했어요 — ' + ((e && e.message) || '').slice(0, 60)); }
     return true; }
@@ -6520,7 +6634,7 @@ function 챗도우미(){
     + 챗.도.map(m => m.me ? '<div class="gc-me">' + esc(m.me) + '</div>' : '<div class="gc-bot' + (m.no ? ' no' : '') + '">' + esc(m.a) + (m.view ? '<br><button class="gc-go" data-act="tx:gcgo" data-k="' + esc(m.view) + '">' + esc(챗화면이름(m.view)) + ' 열기 ›</button>' : '') + (m.man && m.man.length ? '<div class="gc-mans">' + m.man.map(id => { const r = (W.manual || []).find(x => x.id === id); return r ? '<button class="gc-go" data-act="tx:gcman" data-k="' + esc(id) + '">' + esc(r.title || '') + ' <small>' + (매교육(r) ? '강의' : 매종류(r)) + '</small> ›</button>' : ''; }).join('') + '</div>' : '') + (m.req ? '<br><button class="gc-go" data-act="tx:gctab" data-k="req">요청 · 버그로 물어보기 ›</button>' : '') + '</div>').join('')
     + '</div><div class="gc-in"><input id="gcin" placeholder="궁금한 것을 입력해 주세요" autocomplete="off"><span class="sp"></span><button data-act="tx:gcask" title="보내기">' + 챗아이콘.위 + '</button></div><div class="gc-foot">정해 둔 답으로 안내해요 · 급여 · 매출 같은 기밀은 답하지 않아요</div>';
 }
-const 챗화면 = { lesson:'수업 기록', home:'홈', tasks:'업무', leads:'상담', assign:'TG · 체험 배정', manual:'매뉴얼', voc:'VOC', kcal:'칼로리 계산기', leave:'연월차', members:'회원', check:'점검', cmall:'피드백', today:'오늘 운동', rtmake:'루틴 · 스트레칭', reports:'리포트', exreq:'종목 사전', kits:'홍보 자료' };
+const 챗화면 = { lesson:'수업 기록', home:'홈', tasks:'업무', leads:'상담', assign:'TG · 체험 배정', manual:'매뉴얼', voc:'VOC', kcal:'칼로리 계산기', leave:'연월차', members:'회원', check:'점검', cmall:'피드백', today:'오늘 운동', rtmake:'루틴표 · 스트레칭', reports:'리포트', exreq:'종목 사전', kits:'홍보 자료' };
 const 챗화면이름 = v => 챗화면[v] || v;
 function 챗매뉴얼(t){ const 낱 = String(t || '').toLowerCase().split(/[\s,.?!·]+/).filter(w => w.length >= 2); if(!낱.length) return [];
   return 매목().map(r => { const 제 = String(r.title || '').toLowerCase(), 본 = 블록글자(r.body).toLowerCase(); let p = 0;
@@ -8596,7 +8710,7 @@ function 매확TG폼(열쇠, 저장){
   else if(저장){ f.메모 = typeof 저장 === 'object' ? (저장['글'] || '') : String(저장); }      /* 옛 글 메모 → 메모 칸 */
   return (매확.TGF[열쇠] = f); }
 const 매확TG있음 = f => !!(f && (f.요일.size || f.목적.size || f.주의 || f.메모 || f.직접글 || f.교대글));
-const 매확TG양식값 = f => ({ 요일:[...f.요일], 평일:매확칸들.map(k => k[0]).filter(k => f.평일.has(k)), 주말:매확칸들.map(k => k[0]).filter(k => f.주말.has(k)), 교대글:f.교대글.trim(), 직접글:f.직접글.trim(), 목적:매확목적.filter(k => f.목적.has(k)), 주의:f.주의.trim(), 메모:f.메모.trim() });
+const 매확TG양식값 = f => Object.assign(f.배정 ? { 배정: f.배정 } : {}, f.배정 === '배정' && f.배정담당 ? { 배정담당: String(f.배정담당).slice(0, 20) } : {}, { 요일:[...f.요일], 평일:매확칸들.map(k => k[0]).filter(k => f.평일.has(k)), 주말:매확칸들.map(k => k[0]).filter(k => f.주말.has(k)), 교대글:f.교대글.trim(), 직접글:f.직접글.trim(), 목적:매확목적.filter(k => f.목적.has(k)), 주의:f.주의.trim(), 메모:f.메모.trim() });
 function 매확이어(set){ const out = []; 매확칸들.filter(k => set.has(k[0])).forEach(k => { const l = out[out.length - 1]; if(l && l[1] === k[1]) l[1] = k[2]; else out.push([k[1], k[2]]); }); return out.map(([a, b]) => a + '~' + b).join(', '); }
 const 매확이전글 = tg => (tg && tg['이전TG글']) || '최근 1년 TG 진행 이력 없음';
 function 매확TG글(f, tg){      /* 중앙 TG메모글() 과 같은 꼴 — 배정 표 FC 메모에 들어가는 글 미리보기 */
@@ -8837,7 +8951,7 @@ async function 매확저장(id){
   if(ks.length >= 2 && 합 !== (+o['합'] || 0)) return toast('나눈 금액의 합이 결제액과 같아야 해요');
   const 글 = ks.length === 1 ? ks[0] + ' ' + 매확원(o['합']) + '원' : ks.map(k => k + ' ' + 매확원(임['금액'][k])).join(' + ');
   const 새메모 = ['메모'].filter(t => { const w = (매확.펼침[t + id] || '').trim(); return !매확메모잠김(o) && w && w !== (((o[t] || {})['글']) || ''); });
-  const 열쇠 = 'p' + id, tf = 매확.TGF[열쇠]; if(o.TG && 매확.TG바뀜[열쇠] && 매확TG있음(tf)) 새메모.push('TG메모');      /* TG메모 = 양식 (2026-10-22 v2) */
+  const 열쇠 = 'p' + id, tf = 매확.TGF[열쇠]; if(o.TG && 매확.TG바뀜[열쇠] && (매확TG있음(tf) || (tf && tf.배정))) 새메모.push('TG메모');      /* TG메모 = 양식 (2026-10-22 v2) */
   const 배정말 = tf && tf.배정 ? String.fromCharCode(10) + 'TG 배정: ' + (tf.배정 === '배정' ? (tf.배정담당 || '담당 미정') + ' 배정' : tf.배정 === '나중' ? '나중에 희망' : '건너뛰기') : '';
   if(tf && tf.배정 === '배정' && !tf.배정담당) return toast('배정할 담당을 골라 주세요');
   if(!await 묻기((o['이름'] || '') + ' 님 결제수단을 저장할까요?' + String.fromCharCode(10) + 글 + (새메모.length ? ' + ' + 새메모.map(t => t === '메모' ? '결제메모' : 'TG메모').join(' · ') : '') + 배정말
@@ -8863,7 +8977,7 @@ async function 매확메모저장(종류, id){
   catch(e){ toast('저장하지 못했어요 — ' + String(e.message || '').slice(0, 60)); }
 }
 async function 매확TG저장(열쇠, id){      /* 이미 고른 결제 · 따로 발급 TG — TG메모 양식만 저장 */
-  const f = 매확.TGF[열쇠]; if(!매확TG있음(f)) return toast('TG메모를 적어 주세요');
+  const f = 매확.TGF[열쇠]; if(!매확TG있음(f) && !(f && f.배정)) return toast('TG메모를 입력해 주세요');
   const o = 열쇠[0] === 'p' ? 매확찾(id) : null, t = o ? null : 매확TG만().find(x => String(x['주문']) === String(id)), 줄 = o || t; if(!줄) return;
   if(f.배정 === '배정' && !f.배정담당) return toast('배정할 담당을 골라 주세요');
   if(!await 묻기((줄['이름'] || '') + ' 님 TG메모를 저장할까요?' + String.fromCharCode(10) + '배정 표 FC 메모에 덧붙어요' + (f.배정 ? String.fromCharCode(10) + 'TG 배정: ' + (f.배정 === '배정' ? f.배정담당 + ' 배정' : f.배정 === '나중' ? '나중에 희망' : '건너뛰기') : ''))) return;
@@ -9798,7 +9912,7 @@ const 표정의 = {
       {k:'q',    이름:'질문',     타입:'text', 필수:true, 힌트:'칩에 보이는 글'},
       {k:'keys', 이름:'찾는 말',  타입:'text', 힌트:'쉼표로 — 이 말이 들어가면 이 답'},
       {k:'a',    이름:'답',       타입:'long'},
-      {k:'view', 이름:'열 화면',  타입:'select', 옵션:['lesson','home','tasks','leads','assign','manual','voc','kcal','leave','members','check','cmall','today','rtmake','reports','exreq','kits'], 표시:{ lesson:'수업 기록', home:'홈', tasks:'업무', leads:'상담', assign:'TG · 체험 배정', manual:'매뉴얼', voc:'VOC', kcal:'칼로리 계산기', leave:'연월차', members:'회원', check:'점검', cmall:'피드백', today:'오늘 운동', rtmake:'루틴 · 스트레칭', reports:'리포트', exreq:'종목 사전', kits:'홍보 자료' }},
+      {k:'view', 이름:'열 화면',  타입:'select', 옵션:['lesson','home','tasks','leads','assign','manual','voc','kcal','leave','members','check','cmall','today','rtmake','reports','exreq','kits'], 표시:{ lesson:'수업 기록', home:'홈', tasks:'업무', leads:'상담', assign:'TG · 체험 배정', manual:'매뉴얼', voc:'VOC', kcal:'칼로리 계산기', leave:'연월차', members:'회원', check:'점검', cmall:'피드백', today:'오늘 운동', rtmake:'루틴표 · 스트레칭', reports:'리포트', exreq:'종목 사전', kits:'홍보 자료' }},
       {k:'sort', 이름:'차례',     타입:'number'},
       {k:'done', 이름:'숨김',     타입:'check'},
     ],
@@ -9813,7 +9927,7 @@ const 표정의 = {
     열:[
       {k:'title', 이름:'문서',      타입:'text', 필수:true},
       {k:'kind',  이름:'종류',      타입:'select', 옵션:['매뉴얼','교육'], 기본:'매뉴얼'},      /* 교육 = 과정 안 강의(수강) · 매뉴얼 = 찾아보는 문서 (2026-10-27 82단계) */
-      {k:'course',이름:'과정',      타입:'text', 힌트:'교육일 때 — 예) 신입 교육'},
+      {k:'course',이름:'과정',      타입:'text', 힌트:'여러 강의를 묶을 때만 — 예) 신입 교육 · 비우면 단편'},
       {k:'ord',   이름:'차례',      타입:'number', 힌트:'과정 안 강의 차례'},
       {k:'part',  이름:'갈래',      타입:'select', 옵션:['데스크','청소','PT','FC','응급','기타']},
       {k:'who',   이름:'대상',      타입:'multi', 옵션:['전체','관리자','트레이너','FC','인턴']},
@@ -10405,9 +10519,11 @@ const 매종류 = r => 유튜브id(r.video) || /"t":"vid"/.test(r.body || '') ? 
 function 매대상(r){ const w = r.who || []; if(!w.length || w.includes('전체') || 할수('table')) return true;
   const g = 등급of(); return w.includes(['대표자', '최고관리자', '중간관리자'].includes(g) ? '관리자' : g); }
 const 매목 = () => (W.manual || []).filter(r => !r.done && 매대상(r));
-function 과정들(){ const m = {}; 매목().filter(매교육).forEach(r => { const k = (r.course || '').trim() || '기타 과정'; (m[k] = m[k] || []).push(r); });
-  return Object.keys(m).map(k => { const L = m[k].sort((a, b) => ((+a.ord || 0) - (+b.ord || 0)) || String(a.title || '').localeCompare(String(b.title || ''), 'ko'));
-    return { 이름:k, L, 필수: L.some(매필수), 다: L.filter(r => 강의읽음(r.id)).length }; }).sort((a, b) => (b.필수 - a.필수) || a.이름.localeCompare(b.이름, 'ko')); }
+/* 과정 = 과정 칸이 같은 강의 묶음(챕터) · 과정 칸이 비면 단편 — 그 강의 하나가 카드 (2026-10-27 대표 「단편 영상으로 올릴 수도 · 강의 제목 안에 여러 개를 수강하듯 · 하나만 올릴 수도」) */
+const 단편키 = r => '#' + r.id;
+function 과정들(){ const m = {}; 매목().filter(매교육).forEach(r => { const k = (r.course || '').trim() || 단편키(r); (m[k] = m[k] || []).push(r); });
+  return Object.keys(m).map(k => { const L = m[k].sort((a, b) => ((+a.ord || 0) - (+b.ord || 0)) || String(a.title || '').localeCompare(String(b.title || ''), 'ko')), 단 = k[0] === '#';
+    return { 키:k, 이름: 단 ? (L[0].title || '(제목 없음)') : k, 단, L, 필수: L.some(매필수), 다: L.filter(r => 강의읽음(r.id)).length }; }).sort((a, b) => (b.필수 - a.필수) || a.이름.localeCompare(b.이름, 'ko')); }
 const 매색 = s => { let h = 0; for(const c of String(s)) h = (h * 31 + c.charCodeAt(0)) % 6; return 'mt' + h; };
 function 매썸(r, 글){ const y = 유튜브id(r && r.video); if(y) return '<span class="mth"><img src="https://img.youtube.com/vi/' + y + '/hqdefault.jpg" alt="" loading="lazy"></span>';
   let b = null; try{ b = JSON.parse((r && r.body) || 'null'); }catch(e){} const 그 = b && Array.isArray(b.b) && b.b.find(x => x && x.t === 'img' && x.path), u = 그 ? media(그.path) : '';
@@ -10429,11 +10545,11 @@ function v매뉴얼(){
     .map(o => Object.assign(o, { 끝: o.c ? o.c.다 >= o.c.L.length : 강의읽음(o.r.id) })).sort((a, b) => a.끝 - b.끝);
   const 필칸 = 강의.칩 === '전체' && 필.length ? '<div class="mn-h"><b>필수</b><small>' + 필.filter(o => o.끝).length + ' / ' + 필.length + ' 완료</small></div><div class="mn-top3">'
     + 필.slice(0, 3).map((o, i) => '<button class="mn-rank" data-act="' + (o.c ? 'tx:mcourse' : 'tx:mdoc') + '" data-k="' + esc(o.c ? o.c.이름 : o.r.id) + '"><span class="n">' + (i + 1) + '</span><span class="mc">'
-      + 매썸(o.c ? o.c.L[0] : o.r, o.c ? o.c.이름 : '') + '<b>' + esc(o.c ? o.c.이름 : o.r.title || '(제목 없음)') + '</b><small>' + (o.c ? '강의 ' + o.c.L.length + ' · ' + (o.끝 ? '완료' : o.c.다 + ' / ' + o.c.L.length) : 매종류(o.r) + ' · ' + (o.끝 ? '읽음' : '안 읽음')) + '</small>'
+      + 매썸(o.c ? o.c.L[0] : o.r, o.c ? o.c.이름 : '') + '<b>' + esc(o.c ? o.c.이름 : o.r.title || '(제목 없음)') + '</b><small>' + (o.c ? (o.c.단 ? 매종류(o.c.L[0]) + ' · ' + (o.끝 ? '완료' : '안 들음') : '강의 ' + o.c.L.length + ' · ' + (o.끝 ? '완료' : o.c.다 + ' / ' + o.c.L.length)) : 매종류(o.r) + ' · ' + (o.끝 ? '읽음' : '안 읽음')) + '</small>'
       + (o.c ? 매진도(o.c.다, o.c.L.length) : '') + '</span></button>').join('') + '</div>' : '';
-  const 과칸 = 강의.칩 === '전체' || 강의.칩 === '교육' ? '<div class="mn-h"><b>교육 과정</b><small>' + 과.length + '개</small></div>' + (과.length ? '<div class="mn-grid">'
-    + 과.map(c => '<button class="mn-card" data-act="tx:mcourse" data-k="' + esc(c.이름) + '">' + 매썸(c.L[0], c.이름).replace('<span class="mth', '<span class="mth' + (c.필수 ? ' req' : '')) + 매진도(c.다, c.L.length)
-      + '<b>' + esc(c.이름) + '</b><small>강의 ' + c.L.length + ' · ' + (c.다 >= c.L.length ? '완료' : c.다 + ' / ' + c.L.length) + '</small></button>').join('') + '</div>'
+  const 과칸 = 강의.칩 === '전체' || 강의.칩 === '교육' ? '<div class="mn-h"><b>교육</b><small>' + 과.length + '개</small></div>' + (과.length ? '<div class="mn-grid">'
+    + 과.map(c => '<button class="mn-card" data-act="tx:mcourse" data-k="' + esc(c.키) + '">' + 매썸(c.L[0], c.이름).replace('<span class="mth', '<span class="mth' + (c.필수 ? ' req' : '')) + 매진도(c.다, c.L.length)
+      + '<b>' + esc(c.이름) + '</b><small>' + (c.단 ? 매종류(c.L[0]) + ' · ' + (c.다 ? '완료' : '안 들음') : '과정 · 강의 ' + c.L.length + ' · ' + (c.다 >= c.L.length ? '완료' : c.다 + ' / ' + c.L.length)) + '</small></button>').join('') + '</div>'
     : '<div class="mn-none">교육 과정이 없습니다</div>') : '';
   const 문칸 = 강의.칩 !== '교육' ? '<div class="mn-h"><b>' + (강의.칩 === '전체' ? '매뉴얼' : esc(강의.칩) + ' 매뉴얼') + '</b><small>' + 문.length + '개</small></div>'
     + (문.length ? '<div class="mn-list">' + 문.map(r => '<button class="mn-li" data-act="tx:mdoc" data-k="' + esc(r.id) + '"><span class="k">' + 매종류(r) + '</span><b>' + esc(r.title || '(제목 없음)') + '</b>'
@@ -10445,8 +10561,8 @@ const 강의본 = (() => { try{ return new Set(JSON.parse(localStorage.getItem('
 const 강의영상수 = r => (유튜브id(r.video) ? 1 : 0) + ((String(r.body || '').match(/"t":"vid"/g) || []).length);
 const 강의다봄 = r => 강의읽음(r.id) || Array.from({ length: 강의영상수(r) }, (_, i) => r.id + '|' + i).every(k => 강의본.has(k));
 function 강의끝(id, i){ const k = id + '|' + i; if(강의본.has(k)) return; 강의본.add(k); try{ localStorage.setItem('gg_lec_seen', JSON.stringify([...강의본].slice(-500))); }catch(e){} if(S.view === 'manual') render(); }
-function 과정보기(이름){
-  const c = 과정들().find(x => x.이름 === 이름); if(!c){ 강의.탭 = '홈'; return v매뉴얼(); }
+function 과정보기(키){
+  const c = 과정들().find(x => x.키 === 키 || (!x.단 && x.이름 === 키)); if(!c){ 강의.탭 = '홈'; return v매뉴얼(); }
   const 차례 = c.L; 강의.ids = 차례.map(r => r.id);
   if(!차례.some(r => r.id === 강의.id)) 강의.id = (차례.find(r => !강의읽음(r.id)) || 차례[0]).id;
   const i = 차례.findIndex(r => r.id === 강의.id), r = 차례[i], 끝 = i >= 차례.length - 1, y = 유튜브id(r.video), bs = 블록읽기(r.body), 길 = [];
@@ -10455,10 +10571,10 @@ function 과정보기(이름){
     + 차례.map((x, j) => '<button class="lc-it' + (x.id === 강의.id ? ' on' : '') + '" data-act="tx:lec" data-id="' + esc(x.id) + '"><span class="no">' + (j + 1) + '</span><span class="t">' + esc(x.title || '(제목 없음)') + '<small>' + 매종류(x) + (매필수(x) ? ' · 필수' : '') + '</small></span>' + (강의읽음(x.id) ? '<span class="c">완료</span>' : '') + '</button>').join('') + '</div>';
   const 봄 = 강의다봄(r), 다음 = 끝 ? '' : ' · 다음 ›';
   setTimeout(강의듣기, 400);
-  return '<div class="lc">' + 왼 + '<div class="lc-main" data-lid="' + esc(r.id) + '">'
+  return '<div class="lc' + (c.단 ? ' one' : '') + '">' + (c.단 ? '<div class="lc-side"><button class="lc-back" data-act="tx:mtab" data-k="홈">‹ 매뉴얼</button></div>' : 왼) + '<div class="lc-main" data-lid="' + esc(r.id) + '">'
     + (y ? '<div class="lc-vid"><iframe data-lid="' + esc(r.id) + '" src="https://www.youtube.com/embed/' + y + '?enablejsapi=1&rel=0&origin=' + encodeURIComponent(location.origin) + '" title="' + esc(r.title || '') + '" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>'
        : r.video ? '<a class="btn ghost sm lc-link" href="' + esc(r.video) + '" target="_blank" rel="noopener">링크 열기 ↗</a>' : '')
-    + '<h3 class="lc-h">' + esc(r.title || '(제목 없음)') + '</h3><div class="sub3">' + esc(c.이름) + ' · ' + (i + 1) + '강 / ' + 차례.length + '강</div>'
+    + '<h3 class="lc-h">' + esc(r.title || '(제목 없음)') + '</h3><div class="sub3">' + (c.단 ? '단편 · ' + 매종류(r) : esc(c.이름) + ' · ' + (i + 1) + '강 / ' + 차례.length + '강') + '</div>'
     + (bs.length ? '<div class="tx-sec lc-body">' + 블록들(bs, false, urls) + '</div>' : y || r.video ? '' : '<div class="empty why"><b>아직 내용이 없습니다</b>관리자가 「수정」에서 영상 · 글 · 첨부를 올립니다</div>')
     + '<div class="lc-nx">' + (i > 0 ? '<button class="btn ghost sm" data-act="tx:lec" data-id="' + esc(차례[i - 1].id) + '">‹ 이전</button>' : '<span></span>') + '<span class="sp"></span>'
     + (할수('table') ? '<button class="btn ghost sm" data-act="tx:open" data-k="manual" data-id="' + esc(r.id) + '">수정</button>' : '')
@@ -10474,7 +10590,7 @@ document.addEventListener('ended', e => { const v = e.target; if(!v || v.tagName
   const r = (W.manual || []).find(x => x.id === m.dataset.lid), 앞 = r && 유튜브id(r.video) ? 1 : 0; 강의끝(m.dataset.lid, 앞 + [...m.querySelectorAll('video')].indexOf(v)); }, true);
 /* 매뉴얼 문서 — 옆 판에서 바로 읽기 */
 function 매뉴얼문서판(id){ const r = (W.manual || []).find(x => x.id === id); if(!r) return;
-  if(매교육(r)){ 강의.탭 = '과정'; 강의.과정 = (r.course || '').trim() || '기타 과정'; 강의.id = id; if(S.view !== 'manual') 가기('manual'); else render(); return; }
+  if(매교육(r)){ 강의.탭 = '과정'; 강의.과정 = (r.course || '').trim() || 단편키(r); 강의.id = id; if(S.view !== 'manual') 가기('manual'); else render(); return; }
   const y = 유튜브id(r.video), bs = 블록읽기(r.body), 길 = []; (function 모(a){ (a || []).forEach(b => { if(b.path) 길.push(b.path); if(b.c) 모(b.c); }); })(bs); const urls = {}; 길.forEach(p => { urls[p] = media(p); });
   판열기(esc(r.title || '(제목 없음)') + ' <span class="who3">' + esc(r.part || '기타') + ' · ' + 매종류(r) + '</span>',
     (y ? '<div class="lc-vid"><iframe src="https://www.youtube.com/embed/' + y + '?rel=0" title="' + esc(r.title || '') + '" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>' : r.video ? '<a class="btn ghost sm lc-link" href="' + esc(r.video) + '" target="_blank" rel="noopener">링크 열기 ↗</a>' : '')
@@ -14180,6 +14296,22 @@ async function txAct(a, el){
     render(); toast('복사했어요 · 이름을 바꿔 주세요'); setTimeout(() => { const e = $('#rtenm'); if(e){ e.focus(); e.select(); } }, 30); return; }
   if(a==='permopen'||a==='permgrp'||a==='permall'||a==='permset'||a==='permundo'||a==='permsave'||a==='pwdec'||a==='permretire'){ await 권한손잡이(a, el); return; }      /* 권한 설정 (2026-10-19) */
   if(a==='trclaim'||a==='trcancel'||a==='trok'||a==='trno'||a==='trtab'){ await 담당신청손잡이(a, k); return; }      /* 담당 신청 · 승인 (2026-10-19) */
+  if(a==='rsnewback'){ S.rtOld = false; render(); return; }
+  if(a==='rstab'){ S.rsTab = k; render(); return; }      /* 루틴표 (2026-10-27) */
+  if(a==='rstag'){ S.rsTag = S.rsTag === k ? '' : k; render(); return; }
+  if(a==='rsopen'){ S.rsId = k; render(); return; }
+  if(a==='rsback'){ S.rsId = null; render(); return; }
+  if(a==='rsold'){ S.rtOld = true; render(); return; }
+  if(a==='rsnew'){ 표편 = null; 루틴표정보판(null); return; }
+  if(a==='rsmeta'){ 표편 = null; 루틴표정보판(k); return; }
+  if(a==='rstagf'){ 루틴표값읽기(); if(표편){ 표편.tags = 표편.tags.includes(k) ? 표편.tags.filter(t => t !== k) : 표편.tags.concat([k]); 루틴표정보판(표편.id); } return; }
+  if(a==='rstagown'){ 루틴표값읽기(); const t = (prompt('대상을 입력해 주세요 — 예) 시니어') || '').trim(); if(t && 표편 && !표편.tags.includes(t)){ 표편.tags.push(t); 루틴표정보판(표편.id); } return; }
+  if(a==='rscolor'){ 루틴표값읽기(); if(표편){ 표편.cover = { color:k }; 루틴표정보판(표편.id); } return; }
+  if(a==='rssave'){ await 루틴표저장(); return; }
+  if(a==='rshide'){ await 루틴표삭제(k); return; }
+  if(a==='rscopy'){ await 루틴표복사(k); return; }
+  if(a==='rsradd'){ RT새로(null, '', k); return; }
+  if(a==='rsredit'){ const r = (D.r || []).find(x => x.id === k); if(r) RT열기(r); return; }
   if(a==='rtepart'||a==='rtetog'||a==='rtedel1'||a==='rtegoal'||a==='rteown'||a==='rteownok'||a==='rteall'||a==='rteback'||a==='rtedrop'||a==='rtesave'){ await RT손잡이(a, k); return; }      /* 루틴 만들기 새 판 — 식은 RT손잡이 (2026-10-17) */
   if(a==='nmopen'){ 노션영상.열림.has(k) ? 노션영상.열림.delete(k) : 노션영상.열림.add(k); render(); return; }
   if(a==='nmplay'){ await 노션영상재생(k); return; }
@@ -14366,7 +14498,7 @@ async function txAct(a, el){
   if(a==='mcourse'){ 강의.탭 = '과정'; 강의.과정 = k; 강의.id = null; render(); return; }
   if(a==='mdoc'){ 매뉴얼문서판(k); return; }
   if(a==='medit'){ 강의.표편집 = true; render(); return; }
-  if(a==='mnew'){ if(!할수('table')) return; await 새줄만들기('manual', k === '교육' ? { kind:'교육', course: 강의.탭 === '과정' ? 강의.과정 : '', title:'새 강의' } : { kind:'매뉴얼', part: 매갈래.includes(강의.칩) ? 강의.칩 : '데스크', title:'새 매뉴얼' }); if(새줄.manual) txView('manual', 새줄.manual); return; }
+  if(a==='mnew'){ if(!할수('table')) return; await 새줄만들기('manual', k === '교육' ? { kind:'교육', course: 강의.탭 === '과정' && 강의.과정[0] !== '#' ? 강의.과정 : '', title:'새 강의' } : { kind:'매뉴얼', part: 매갈래.includes(강의.칩) ? 강의.칩 : '데스크', title:'새 매뉴얼' }); if(새줄.manual) txView('manual', 새줄.manual); return; }
   if(a==='lecread'){ const 나 = (ME && ME.name) || ''; const r0 = (W.manual || []).find(x => x.id === id); if(r0 && !강의다봄(r0)) return toast('영상을 끝까지 보면 켜져요');
     if(나 && !강의읽음(id)){ try{ await usend('tr_manual_read', 'POST', { manual_id: id, name: 나 }, 'return=minimal'); W.mread = (W.mread || []).concat([{ manual_id: id, name: 나, at: new Date().toISOString() }]); }
       catch(e){ toast('저장하지 못했어요 — ' + String(e.message || '').slice(0, 60)); return; } }
@@ -15318,11 +15450,13 @@ const TABS = [['routine','루틴'],['record','지난 기록'],['comment','피드
 /* ══ 화면 길 ‹ › ══ 2026-10-23 대표 「상단에 뒤로가기 앞으로가기 버튼 항상 · 홈에서 상담으로 넘어갔는데 뒤로가기 누르면 홈으로」
    화면(S.view)이 바뀔 때마다 적는다 · ‹ = 앞 화면 · › = 다시 앞으로 · 잠금을 풀면 새로 읽으므로 처음부터(홈) */
 const 화면길 = { 줄:[], i:-1, 옮김:false };
-function 화면길적기(){ const v = S.view; if(!v) return;
+const 화면키 = () => S.view === 'manual' ? 'manual|' + (강의.표편집 ? '표' : 강의.탭) + '|' + (강의.탭 === '과정' ? 강의.과정 : '') : S.view === 'rtmake' ? 'rtmake|' + (S.rsId || '') : S.view;      /* 매뉴얼 · 루틴표 안 자리도 한 칸 (2026-10-27) */
+function 화면키로(k){ const [v, a, b] = String(k).split('|'); if(v === 'manual'){ 강의.표편집 = a === '표'; 강의.탭 = a === '표' ? '홈' : (a || '홈'); 강의.과정 = b || ''; } if(v === 'rtmake'){ S.rsId = a || null; S.rtOld = false; } return v; }
+function 화면길적기(){ const v = 화면키(); if(!S.view) return;
   if(화면길.옮김){ 화면길.옮김 = false; return; }
   if(화면길.줄[화면길.i] === v) return;
   화면길.줄 = 화면길.줄.slice(0, 화면길.i + 1); 화면길.줄.push(v); if(화면길.줄.length > 40) 화면길.줄.shift(); 화면길.i = 화면길.줄.length - 1; }
-function 화면옮김(d){ const j = 화면길.i + d; if(j < 0 || j >= 화면길.줄.length) return; 화면길.i = j; 화면길.옮김 = true; popClose && popClose(); 가기(화면길.줄[j]); }
+function 화면옮김(d){ const j = 화면길.i + d; if(j < 0 || j >= 화면길.줄.length) return; 화면길.i = j; 화면길.옮김 = true; popClose && popClose(); 가기(화면키로(화면길.줄[j])); }
 function 화면길단추(){ const t = document.getElementById('top'); if(!t || t.querySelector('.vnav')) return;
   t.insertAdjacentHTML('afterbegin', '<span class="vnav"><button type="button" data-act="tx:vback" aria-label="뒤로"' + (화면길.i > 0 ? '' : ' disabled') + '>‹</button><button type="button" data-act="tx:vfwd" aria-label="앞으로"' + (화면길.i < 화면길.줄.length - 1 ? '' : ' disabled') + '>›</button></span>'); }
 function render(){
@@ -15452,7 +15586,7 @@ function render0(){
       + '</h1><span class="cnt">블로그 · 릴스 자료</span>';
     b.innerHTML = vKit();
   } else if(S.view==='rtmake'){
-    top.innerHTML = '<h1>루틴 · 스트레칭</h1><span class="cnt">회원 없이 만드는 틀 · 회원에게는 골라 넣습니다</span>';
+    top.innerHTML = '<h1>루틴표 · 스트레칭</h1><span class="cnt">회원 없이 만드는 틀 · 회원에게는 골라 넣습니다</span>';
     b.innerHTML = v루틴만들기();
   } else if(S.view==='exreq'){
     top.innerHTML = '<h1>종목 사전</h1><span class="cnt">보완 요청 · 새로 만든 종목</span>';
@@ -15670,6 +15804,7 @@ async function load(){
     D.aAll=g[6]; D.a=g[6].filter(x=>x.on_date===TODAY);
     D.ex=g[7]; D.va=g[8]; D.asks=g[9]||[]; D.cv=g[10];
     try{ D.ps = await sget('prep_sets?select=*&order=created_at'); }catch(e){ D.ps = []; }
+    try{ D.rs = await sget('routine_sheets?select=*&order=sort,created_at'); }catch(e){ D.rs = []; }      /* 루틴표 (83단계 · 없으면 빈 채로) */
     try{ D.favs = await sget('trainer_favs?select=trainer,member_id'); }catch(e){ D.favs = []; }      /* 즐겨찾기(별) — 회원앱 트레이너 화면과 같은 표 (2026-10-08) */
     try{ D.xr = await sget('ex_requests?select=*&order=created_at.desc&limit=300'); XR없음 = false; }catch(e){ D.xr = []; XR없음 = true; }      /* 종목 보완 요청 (2026-10-13) — 표가 없으면 화면에서 알린다 */
     try{ D.cmedia = await sget('comment_media?select=comment_id,kind,path'); }catch(e){ D.cmedia = D.cmedia || []; }      /* 피드백 사진 · 영상 — 피드백 화면이 쓴다(전엔 「자료」 화면을 열어야만 받았다 · 2026-10-15) */
@@ -15759,6 +15894,8 @@ document.addEventListener('click', async function(ev){
   const nav = t.closest('.nav');
   if(nav && S.view === 'rtedit' && RT변함() && !await 묻기('만들던 루틴을 저장하지 않고 나갈까요?')) return;      /* 루틴 만들던 중 (2026-10-17) */
   if(nav){ RS선생 = ''; RS찾 = ''; S.돌아갈 = null; if(S.view === 'rtedit') RT = null;     /* 화면을 옮기면 거르개를 푼다 */
+    if(nav.dataset.v === 'manual'){ 강의.탭 = '홈'; 강의.표편집 = false; 강의.칩 = '전체'; 강의.q = ''; }      /* 매뉴얼을 다시 누르면 첫 화면 (2026-10-27 대표 「마지막 페이지로 들어가져서 뒤로가기를 해야 나옴」) */
+    if(nav.dataset.v === 'rtmake'){ S.rsId = null; S.rtOld = false; }
     S.view = nav.dataset.v;
     document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('on', b===nav));
     /* 리포트 화면은 **들어올 때마다** 새로 읽는다 — 서버가 방금 보냈을 수 있다 */
