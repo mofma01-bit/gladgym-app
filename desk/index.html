@@ -1553,6 +1553,23 @@ body.resizing{cursor:col-resize;user-select:none}
 .sc-div{border:0;border-top:2px solid #6b6558;margin:18px 0 14px}      /* 락커 ↔ 매출 구분 선 (2026-10-26 대표 「구분 선 확실히 하나」) */
 .sc-chips{margin:0 0 10px}
 .sec.adm{border-radius:16px;padding:12px 12px 6px;background:color-mix(in srgb,var(--c) 7%,var(--dark-2));border:1px solid color-mix(in srgb,var(--c) 32%,transparent)}.sec.adm > .lbl{color:var(--cream);font-size:15px;font-weight:800}.sec.adm > .lbl .r{color:var(--c);cursor:pointer}
+/* 매뉴얼 강의형 (2026-10-27 m1) */
+.lc{display:grid;grid-template-columns:minmax(220px,300px) minmax(0,1fr);border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--dark-2);min-height:60vh}
+.lc-side{border-right:1px solid var(--line);padding:10px;overflow-y:auto;max-height:78vh;display:flex;flex-direction:column;gap:2px}
+.lc-pg{display:flex;flex-direction:column;gap:5px;margin:0 2px 8px;font-size:13px;color:var(--sub);font-weight:700}.lc-pg i{display:block;height:5px;border-radius:5px;background:var(--dark-4)}.lc-pg i b{display:block;height:100%;border-radius:5px;background:#8fd1c4}
+.lc-sec{display:flex;align-items:center;gap:8px;width:100%;background:none;border:0;color:var(--cream);font:inherit;padding:8px 6px 4px;cursor:pointer;text-align:left}.lc-sec b{font-size:14.5px}.lc-sec small{margin-left:auto;color:var(--sub);font-size:12.5px;font-weight:600}.lc-sec em{font-style:normal;color:var(--sub);width:14px;text-align:center}
+.lc-it{display:flex;align-items:center;gap:8px;width:100%;background:none;border:0;border-radius:8px;color:var(--cream);font:inherit;font-size:14px;padding:7px 8px;cursor:pointer;text-align:left;min-width:0}
+.lc-it:hover{background:var(--dark-3)}.lc-it.on{background:var(--gold-dim);color:var(--gold);font-weight:800}
+.lc-it .k{flex:none;width:18px;text-align:center}.lc-it .t{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lc-it .c{flex:none;color:#8fd1c4;font-weight:900}
+.lc-main{padding:16px 18px;min-width:0;overflow-y:auto;max-height:78vh}
+.lc-vid{position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000;margin-bottom:12px}.lc-vid iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.lc-link{margin-bottom:10px}.lc-h{font-size:20px;margin:4px 0 4px}.lc-body{margin-top:12px}
+.lc-nx{display:flex;align-items:center;gap:8px;margin-top:16px;padding-top:12px;border-top:1px solid var(--line)}.lc-nx .sp{flex:1}.lc-ok{color:#8fd1c4;font-weight:800;font-size:14px}
+@media (max-width:820px){ .lc{grid-template-columns:1fr} .lc-side{border-right:0;border-bottom:1px solid var(--line);max-height:40vh} }
+.dk-notice{display:flex;align-items:center;gap:10px;width:100%;background:#211e18;border:1px solid #5a4a2c;border-radius:12px;padding:11px 14px;color:var(--cream);font:inherit;cursor:pointer;text-align:left}
+.dk-notice .i{font-size:17px}.dk-notice b{color:var(--gold);font-size:15px}.dk-notice .m{color:var(--sub);font-size:14px;font-weight:700}.dk-notice em{margin-left:auto;font-style:normal;color:var(--gold);font-weight:800;font-size:14px}
+.dk-notice.new .m{color:var(--cream)}.dk-notice:hover{border-color:var(--gold)}
+.gc-mans{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
 .mcgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
 .mcard{display:flex;flex-direction:column;text-align:left;background:var(--dark-2);border:1px solid var(--line);border-radius:14px;overflow:hidden;color:var(--cream);font:inherit;cursor:pointer;padding:0}
 .mcard:hover{border-color:#5a4c33}.mc-im{position:relative;display:block;aspect-ratio:16/9;background:#1b1a17}.mc-im img{width:100%;height:100%;object-fit:cover}
@@ -2184,6 +2201,27 @@ button.as-more{display:block;width:100%;background:none;border:0;color:var(--sub
 .kt-bb{max-width:78%;display:flex;flex-direction:column;gap:5px;background:#24211c;border:1px solid #3a352c;border-radius:4px 16px 16px 16px;padding:11px 14px;font-size:16.5px;line-height:1.45;white-space:pre-wrap;word-break:break-word}
 .kt-bb.me{background:#2e3a36;border-color:#3c5a53;border-radius:14px 4px 14px 14px}.kt-bb.new{border-color:#e07a3a}
 .kt-bb small{font-size:12px;color:var(--sub)}.kt-tag{align-self:flex-start;font-size:12px;font-weight:800;color:#e8c08f;background:#1c1a17;border-radius:6px;padding:1px 7px}
+/* k1 — 채팅으로 보이게 (2026-10-27 대표 「카톡처럼 · 완전 똑같기보다 조금 달라야 · 헷갈리니까」) — 크림 바탕 · 회원 흰 말풍선 · 내 말 금색 */
+.kt-room.k1{background:#efe7da;border-color:#ddd2bf;color:#2a2620;border-radius:14px 14px 0 0}
+.kt-room.k1 .kt-day{background:rgba(60,45,20,.1);color:#5c5346}
+.kt-room.k1 .kt-nm{color:#4a4237}
+.kt-room.k1 .kt-bb{background:#fff;border:0;color:#2a2620;box-shadow:0 1px 1px rgba(60,45,20,.12)}
+.kt-room.k1 .kt-bb.new{box-shadow:0 0 0 2px #e07a3a}
+.kt-room.k1 .kt-bb.me{background:#f3d9a6;color:#2a2010}
+.kt-room.k1 .kt-bb small{color:#7a705f}.kt-room.k1 .kt-ed{color:#6a5a40}
+.kt-room.k1 .kt-tag{background:#f4efe6;color:#8a5a12}.kt-room.k1 .kt-bb.me .kt-tag{background:rgba(90,60,10,.1);color:#6a4a10}
+.kt-room.k1 .empty{color:#5c5346}.kt-room.k1 .empty b{color:#2a2620}
+.kt-room.k1 .cmta{background:#fff;color:#2a2620;border-color:#d8c9a8}
+.kt-room.k1 .mfw .mf.nm1{background:#fff;color:#8a5a12;border-color:#d8c9a8}
+.kt-head ~ .kt-room.k1{min-height:240px;max-height:calc(100vh - 480px)}      /* 피드백 대화 — 아래 입력창이 오른쪽 아래 챗봇 단추에 안 가리게 */
+.kt-inp{display:flex;align-items:center;gap:10px;width:100%;background:#fff;border:1px solid #ddd2bf;border-top:0;border-radius:0 0 14px 14px;padding:8px 10px;cursor:pointer;font:inherit}
+.kt-inp span{flex:1;text-align:left;background:#f4f1ec;border-radius:18px;padding:8px 14px;color:#8a8275;font-size:14.5px}
+.kt-inp b{width:34px;height:34px;border-radius:50%;background:#e2b058;color:#2a2010;display:flex;align-items:center;justify-content:center;font-size:17px}
+.kt-room.k1:not(:has(+ .kt-inp)){border-radius:14px}
+.kt-pin{display:flex;align-items:center;gap:8px;width:100%;margin:0 0 8px;background:#fffaf0;border:1px solid #e6d3a8;border-radius:12px;padding:9px 12px;color:#2a2620;font:inherit;font-weight:800;font-size:14.5px;cursor:pointer;text-align:left;box-shadow:0 1px 2px rgba(0,0,0,.18)}
+.kt-pin i{font-style:normal}.kt-pin span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.kt-pin em{font-style:normal;color:#8a7a5a}
+.kt-pin.none{background:transparent;border:1px dashed var(--line);color:var(--sub);box-shadow:none;font-weight:700;font-size:13.5px}.kt-pin.none small{margin-left:auto;font-weight:600;font-size:12.5px}
+.kt-pinbody{white-space:pre-wrap;word-break:break-word;font-size:16px;line-height:1.55;background:var(--dark-2);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
 .kt-ed{background:none;border:0;color:var(--sub);font:inherit;font-size:12px;text-decoration:underline;cursor:pointer;padding:0}
 .lsp-l{display:grid;gap:6px;margin-top:10px;max-height:58vh;overflow-y:auto}
 .lsp-r{display:grid;grid-template-columns:1fr auto;align-items:center;gap:2px 10px;text-align:left;background:var(--dark-3);border:1px solid var(--line);border-radius:12px;padding:10px 14px;color:var(--cream);font:inherit;cursor:pointer}
@@ -2223,6 +2261,7 @@ button.as-more{display:block;width:100%;background:none;border:0;color:var(--sub
 .tx-lockn{font-size:12.5px;color:var(--sub);align-self:center;margin-left:6px}.tx-ti{display:inline-block;width:18px;color:var(--sub);font-style:normal}
 .tx-tag.ret{background:#2a2723;color:#b9b1a2;border:1px dashed #5a5246}.tx-tag.ret button{margin-left:4px;color:var(--sub)}.as-tag.wait{background:#24302c;color:#8fd1c4;border:1px solid #3c5a53}
 .as-log{display:flex;flex-direction:column;gap:4px;font-size:13.5px}.l1row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cl-gh .cl-ok{font-size:12.5px;font-weight:800;color:#8fd1c4;margin-left:6px}
 .cl-grp{border:1px solid var(--line);border-radius:12px;padding:8px 10px;margin-bottom:10px}.cl-gh{display:flex;align-items:center;gap:8px;margin-bottom:6px}.cl-gh b{font-size:15px}.cl-gh .as-btn{margin-left:auto}.as-row .ptwhy{white-space:normal;line-height:1.4}.as-tag.fail{background:#3a2a17;color:#f0b46a;border:1px solid #6b4a24}.as-row .as-tag{margin-left:6px}
 .as-dots{display:inline-flex;gap:3px}.as-dots i{width:16px;height:6px;border-radius:3px;background:var(--dark-4);display:inline-block}.as-dots i.y{background:var(--teal)}
 .as-st{display:inline-flex;gap:4px;flex-wrap:wrap}
@@ -2671,7 +2710,7 @@ body:has(#pop.on.tx-side) #gchat .gc-fab:not(.x){display:none}      /* 옆 판�
 
 <script>
 "use strict";
-const BUILD = '438';
+const BUILD = '440';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -5822,19 +5861,46 @@ function cmRow(c){
 }
 /* 피드백톡 한 방 — 회원 피드백(나) · 요청(회원)을 날짜 차례로 · 피드백 메뉴 대화 · 회원 피드백 탭 · 크게 보기가 같이 쓴다 */
 const 톡때 = t => { const d = new Date(t || ''); if(isNaN(d)) return ''; const k = 날글(d); return k === TODAY ? String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') : k === 날더함(TODAY, -1) ? '어제' : (d.getMonth() + 1) + '/' + d.getDate(); };
-function 피드백톡방(mid, 칸id){
+/* ══ 회원 대화방 공지 ══ 2026-10-27 대표 시안 n1 「각 채팅창별로 상단에 공지 하나 · 누르면 사이드 페이지」 — 선생님끼리만(회원 앱엔 안 보임) · tr_member_pin(80단계) */
+let 회원공지 = null, 회원공지없음 = false, 회원공지중 = false;
+async function 회원공지받기(){ if(회원공지 || 회원공지중 || 회원공지없음) return; 회원공지중 = true;
+  try{ const r = await uget('tr_member_pin?select=*') || [], 판 = {}; r.forEach(x => { if(x.body) 판[x.member_id] = x; }); 회원공지 = 판; render(); }
+  catch(e){ 회원공지 = {}; if(/404|42P01|does not exist|relation|schema cache/.test(String(e.message || ''))) 회원공지없음 = true; }
+  회원공지중 = false; }
+function 회원공지줄(mid){ if(!회원공지) 회원공지받기(); if(회원공지없음 || !회원공지) return '';
+  const p = 회원공지[mid];
+  return p ? '<button class="kt-pin" data-act="tx:kpin" data-k="' + esc(mid) + '"><i>📢</i><span>' + esc(String(p.body).split(String.fromCharCode(10))[0]) + '</span><em>⌄</em></button>'
+    : '<button class="kt-pin none" data-act="tx:kpin" data-k="' + esc(mid) + '">＋ 이 회원 공지 올리기<small>선생님끼리만 봐요</small></button>'; }
+function 회원공지판(mid, 편집){ const m = memOf(mid) || {}, p = (회원공지 || {})[mid];
+  판열기('📢 ' + esc(m.name || '') + ' — 공지',
+    (편집 || !p ? '<textarea class="inp" id="kpinta" rows="6" placeholder="부상 · 주의 · 목표처럼 담당이 바뀌어도 이어 볼 것 — 첫 줄이 대화방 맨 위에 보여요">' + esc(p ? p.body : '') + '</textarea>'
+        + '<div class="cmacts"><button class="btn gold sm" data-act="tx:kpinsave" data-k="' + esc(mid) + '">저장</button>' + (p ? '<button class="btn ghost sm" data-act="tx:kpin" data-k="' + esc(mid) + '">취소</button>' : '') + '</div>'
+      : '<div class="kt-pinbody">' + esc(p.body) + '</div><div class="sub3" style="margin:8px 0">' + esc(시각한글(p.at)) + ' · ' + esc(p.by || '') + '</div>'
+        + '<div class="cmacts"><button class="btn ghost sm" data-act="tx:kpinedit" data-k="' + esc(mid) + '">수정</button><button class="btn ghost sm wn" data-act="tx:kpindel" data-k="' + esc(mid) + '">내리기</button></div>')
+    + '<div class="sub3" style="margin-top:12px">선생님끼리만 봅니다<br>회원 앱에는 보이지 않습니다</div>'); }
+async function 회원공지저장(mid){ const t = ((document.getElementById('kpinta') || {}).value || '').trim(); if(!t){ toast('내용을 입력해 주세요'); return; }
+  const p = (회원공지 || {})[mid]; if(!await 묻기((p ? '공지를 수정할까요?' : '공지를 올릴까요?') + String.fromCharCode(10) + '이 회원 대화방 맨 위에 보여요')) return;
+  const 줄 = { member_id: mid, body: t, by: (ME && ME.name) || '', at: new Date().toISOString() };
+  try{ await usend('tr_member_pin?on_conflict=member_id', 'POST', [줄], 'resolution=merge-duplicates'); (회원공지 = 회원공지 || {})[mid] = 줄;
+    기록남기기({ area:'피드백', action: p ? '수정' : '생성', tbl:'tr_member_pin', row_id: mid, customer: (memOf(mid) || {}).name || '', detail:'회원 대화방 공지' }); toast('올렸어요'); 회원공지판(mid); render(); }
+  catch(e){ toast('저장하지 못했어요 — ' + (/tr_member_pin|404|42P01/.test(String(e.message)) ? '서버 준비(80단계)가 아직이에요' : String(e.message || '').slice(0, 60))); } }
+async function 회원공지내리기(mid){ if(!await 묻기('공지를 내릴까요?' + String.fromCharCode(10) + '대화방 맨 위에서 사라져요')) return;
+  try{ await usend('tr_member_pin?member_id=eq.' + encodeURIComponent(mid), 'DELETE'); delete 회원공지[mid];
+    기록남기기({ area:'피드백', action:'삭제', tbl:'tr_member_pin', row_id: mid, customer: (memOf(mid) || {}).name || '', detail:'회원 대화방 공지 내림' }); toast('내렸어요'); popClose(); render(); }
+  catch(e){ toast('내리지 못했어요 — ' + String(e.message || '').slice(0, 60)); } }
+function 피드백톡방(mid, 칸id, 입력){
   const m = memOf(mid) || {}, 말때 = 톡때;
   const 말 = (D.c || []).filter(c => c.member_id === mid).map(c => ({ k:'나', t: c.created_at || '', c })).concat((D.asks || []).filter(a => a.member_id === mid).map(a => ({ k:'회원', t: a.created_at || '', a }))).sort((x, y) => String(x.t).localeCompare(String(y.t)));
   let 앞날 = '';
   if(칸id) setTimeout(() => { const r = document.getElementById(칸id); if(r && !S.cmEdit) r.scrollTop = r.scrollHeight; }, 0);
-  return '<div class="kt-room"' + (칸id ? ' id="' + 칸id + '"' : '') + '>'
+  return 회원공지줄(mid) + '<div class="kt-room k1"' + (칸id ? ' id="' + 칸id + '"' : '') + '>'
     + (말.length ? 말.map(o => { const 날 = String(o.t).slice(0, 10), 머 = 날 && 날 !== 앞날 ? '<div class="kt-day">' + dateFull(날) + '</div>' : ''; 앞날 = 날 || 앞날;
         if(o.k === '회원') return 머 + '<div class="kt-m l">' + 회원얼굴(mid, 36) + '<div class="kt-col"><span class="kt-nm">' + esc(m.name || '') + '</span><div class="kt-bb' + (o.a.done_at ? '' : ' new') + '"><span class="kt-tag">요청 · ' + esc(vaName(o.a.variant_id)) + '</span>' + esc(o.a.note || '피드백 요청') + '<small>' + 말때(o.t) + (o.a.done_at ? '' : ' · 아직 답 전') + '</small></div></div></div>';
         const c = o.c; return 머 + '<div class="kt-m r"><div class="kt-bb me"><span class="kt-tag">' + esc(vaName(c.variant_id)) + ' · ' + esc(String(c.created_at || '').slice(5, 10).replace('-', '/')) + '</span>'
           + (S.cmEdit === c.id ? '<textarea class="inp cmta" id="cmedit_' + esc(c.id) + '">' + esc(c.body || '') + '</textarea><div class="cmacts"><button class="btn gold sm" data-act="cmfix" data-c="' + esc(c.id) + '">수정</button><button class="btn ghost sm wn" data-act="cmdel" data-c="' + esc(c.id) + '">삭제</button><button class="btn ghost sm" data-act="cmeditx">취소</button></div>'
             : esc(c.body || '')) + 피드백첨부(c.id) + '<small>' + 말때(o.t) + ' · ' + esc(c.trainer || '') + (S.cmEdit === c.id ? '' : ' · <button class="kt-ed" data-act="cmedit" data-c="' + esc(c.id) + '">수정</button>') + '</small></div></div>'; }).join('')
       : '<div class="empty why"><b>아직 나눈 피드백이 없습니다</b>왼쪽 종목에서 「피드백 달기」를 눌러 주세요</div>')
-    + '</div>';
+    + '</div>' + (입력 ? '<button class="kt-inp" data-m="' + esc(mid) + '" data-tab="comment"><span>피드백 남기기…</span><b>↑</b></button>' : '');      /* 아래 입력창 모양 — 누르면 종목 고르고 남기는 곳으로 (2026-10-27 k1) */
 }
 function tabComment(){
   const ws = D.w.filter(w=>w.member_id===S.mid)
@@ -6414,11 +6480,14 @@ function 챗도우미(){
   const 칩 = 챗.답.slice(0, 8).map((x, i) => '<button data-act="tx:gcq" data-k="' + esc(x.id) + '" style="--cb:' + 챗칩색[i % 5][0] + ';--cf:' + 챗칩색[i % 5][1] + '">' + esc(x.q) + '</button>').join('');
   return 챗머리('글래드짐 도우미', '데스크 · 앱 쓰는 법을 바로 알려 드려요') + '<div class="gc-body"><div class="gc-pin">📢 반갑습니다. 글래드짐 데스크 도우미예요 :)</div>'
     + '<div class="gc-hi">👋 안녕하세요, <b>' + esc(보임이름((ME && ME.name) || '')) + ' 선생님.</b><br>궁금한 화면 · 기능을 편하게 물어보세요</div><div class="gc-chips">' + 칩 + '</div>'
-    + 챗.도.map(m => m.me ? '<div class="gc-me">' + esc(m.me) + '</div>' : '<div class="gc-bot' + (m.no ? ' no' : '') + '">' + esc(m.a) + (m.view ? '<br><button class="gc-go" data-act="tx:gcgo" data-k="' + esc(m.view) + '">' + esc(챗화면이름(m.view)) + ' 열기 ›</button>' : '') + (m.req ? '<br><button class="gc-go" data-act="tx:gctab" data-k="req">요청 · 버그로 물어보기 ›</button>' : '') + '</div>').join('')
+    + 챗.도.map(m => m.me ? '<div class="gc-me">' + esc(m.me) + '</div>' : '<div class="gc-bot' + (m.no ? ' no' : '') + '">' + esc(m.a) + (m.view ? '<br><button class="gc-go" data-act="tx:gcgo" data-k="' + esc(m.view) + '">' + esc(챗화면이름(m.view)) + ' 열기 ›</button>' : '') + (m.man && m.man.length ? '<div class="gc-mans">' + m.man.map(id => { const r = (W.manual || []).find(x => x.id === id); return r ? '<button class="gc-go" data-act="tx:gcman" data-k="' + esc(id) + '">' + 강의종류(r)[0] + ' ' + esc(r.title || '') + ' ›</button>' : ''; }).join('') + '</div>' : '') + (m.req ? '<br><button class="gc-go" data-act="tx:gctab" data-k="req">요청 · 버그로 물어보기 ›</button>' : '') + '</div>').join('')
     + '</div><div class="gc-in"><input id="gcin" placeholder="궁금한 것을 입력해 주세요" autocomplete="off"><span class="sp"></span><button data-act="tx:gcask" title="보내기">' + 챗아이콘.위 + '</button></div><div class="gc-foot">정해 둔 답으로 안내해요 · 급여 · 매출 같은 기밀은 답하지 않아요</div>';
 }
 const 챗화면 = { lesson:'수업 기록', home:'홈', tasks:'업무', leads:'상담', assign:'가이드 · 체험 배정', manual:'매뉴얼', voc:'VOC', kcal:'칼로리 계산기', leave:'연월차', members:'회원', check:'점검', cmall:'피드백', today:'오늘 운동', rtmake:'루틴 · 스트레칭', reports:'리포트', exreq:'종목 사전', kits:'홍보 자료' };
 const 챗화면이름 = v => 챗화면[v] || v;
+function 챗매뉴얼(t){ const 낱 = String(t || '').toLowerCase().split(/[\s,.?!·]+/).filter(w => w.length >= 2); if(!낱.length) return [];
+  return (W.manual || []).filter(r => !r.done).map(r => { const 제 = String(r.title || '').toLowerCase(), 본 = 블록글자(r.body).toLowerCase(); let p = 0;
+    낱.forEach(w => { if(제.includes(w)) p += 3; else if(본.includes(w)) p += 1; }); return { r, p }; }).filter(x => x.p > 0).sort((a, b) => b.p - a.p).slice(0, 3).map(x => x.r.id); }
 function 챗찾기(글){
   const t = String(글 || '').trim(); if(!t) return null;
   if(챗금지.test(t)) return { a:'그건 답할 수 없어요 🔒 관리자에게 직접 물어봐 주세요', no:1 };
@@ -6426,7 +6495,8 @@ function 챗찾기(글){
   let 좋 = null, 점 = 0;
   챗.답.forEach(x => { let p = 0; String(x.keys || '').split(',').map(k => k.trim().toLowerCase().replace(/\s+/g, '')).filter(Boolean).forEach(k => { if(낮.includes(k)) p += 2; });
     if(낮.includes(String(x.q || '').toLowerCase().replace(/\s+/g, '').replace(/[?？]/g, ''))) p += 3; if(p > 점){ 점 = p; 좋 = x; } });
-  return 좋 ? { a:좋.a, view:좋.view } : { a:'정해 둔 답을 못 찾았어요 · 「요청 · 버그」로 보내 주시면 관리자가 답해 드려요', req:1 };
+  const 맨 = 챗매뉴얼(t);      /* 정해 둔 답이 없어도 매뉴얼 제목 · 내용에서 찾아 「열기 ›」 */
+  return 좋 ? { a:좋.a, view:좋.view, man:맨 } : 맨.length ? { a:'매뉴얼에서 찾았어요', man:맨 } : { a:'정해 둔 답을 못 찾았어요 · 「요청 · 버그」로 보내 주시면 관리자가 답해 드려요', req:1 };
 }
 function 챗대화(){
   if(!챗.방){
@@ -6494,6 +6564,7 @@ async function 챗손(a, k, el){
   if(a === 'gctab'){ 챗.탭 = k; 챗.사진 = []; 챗.링크 = null; 챗그리기(); return true; }
   if(a === 'gcq'){ const x = 챗.답.find(z => String(z.id) === String(k)); if(x){ 챗.도.push({ me:x.q }, { a:x.a, view:x.view }); 챗그리기(); } return true; }
   if(a === 'gcask'){ const i = document.getElementById('gcin'), t = ((i || {}).value || '').trim(); if(!t) return true; 챗.도.push({ me:t }, 챗찾기(t)); 챗그리기(); const n = document.getElementById('gcin'); if(n) n.focus(); return true; }
+  if(a === 'gcman'){ 챗.열림 = false; 챗그리기(); if(!document.querySelector('.nav[data-v="manual"]')){ toast('그 화면은 권한이 없어요'); return true; } 강의.id = k; 강의.접.clear(); 가기('manual'); return true; }      /* 챗봇 → 그 매뉴얼 (2026-10-27) */
   if(a === 'gcgo'){ if(!k) return true; 챗.열림 = false; 챗그리기(); if(document.querySelector('.nav[data-v="' + k + '"]')) 가기(k); else toast('그 화면은 권한이 없어요'); return true; }
   if(a === 'gcroom'){ 챗.방 = k || null; 챗.사진 = []; 챗.링크 = null; 챗.공지 = false; if(k){ await 챗읽음(k); } 챗그리기(); return true; }
   if(a === 'gcpic'){ const f = document.getElementById('gcfile'); if(f) f.click(); return true; }
@@ -8111,12 +8182,14 @@ const 청소시각 = t => t ? '<em class="cl-tm">' + esc(t) + '</em>' : '';
 const 시간칠 = t => esc(t || '').replace(/(\d{1,2}(?:\s*~\s*\d{1,2})?시)/g, '<em class="cl-tm">$1</em>');
 const 청소글 = x => esc(x.title || '') + (x.slot ? ' ' + 청소시각(x.slot) : '');
 const 청소누락시작 = '2026-10-26';
+const 청소나 = () => (ME && ME.name) || '';
+const 청소확인함 = (d, grp, 누구) => (청소.확인 || []).some(a => a.day === d && a.grp === grp && (a.by || '') === 누구);
 function 청소누락(){
   if(!청소.목 || 청소.없음) return [];
   const d = 날더함(TODAY, -1), { 목, 결과 } = 청소배정(d), 다봄 = 할수('cleanlog');
   if(d < 청소누락시작) return [];      /* 지난 미체크는 셈하지 않는다 — 10/26 부터 (2026-10-26 대표 「어제는 휴무 · 지난 미체크는 다 무시 · 오늘 이후로 누락된 걸」) */
   return 목.filter(x => !청소체크of(x.id, d) && (다봄 || (결과[x.id].p && ME && 결과[x.id].p.id === ME.id))).map(x => ({ x, 배: 결과[x.id], d, grp: 청소묶음키(결과[x.id]) }))
-    .filter(o => !(청소.확인 || []).some(a => a.day === d && a.grp === o.grp));      /* 구역(당직)째 「확인」한 것은 뺀다 (2026-10-25 대표 b3) */
+    .filter(o => !청소확인함(d, o.grp, 청소나()));      /* 구역(당직)째 「확인」한 것은 뺀다 (2026-10-25 대표 b3) · 확인은 사람마다 — 대표가 눌러도 선생님 화면엔 남는다 (2026-10-27 대표 「각각 본인이 확인해야」) */
 }
 /* ── 대청소 — 3 · 6 · 9 · 12월 셋째 금요일 14시 · 메모 하나(다 같이 하니 체크 없음) ── */
 const 대청소날 = y => [3, 6, 9, 12].map(m => { const t = new Date(y, m - 1, 1); t.setDate(1 + (5 - t.getDay() + 7) % 7 + 14); return 날글(t); });
@@ -8174,14 +8247,14 @@ function 청소누락판(){
   const 목 = 청소누락(), d = 날더함(TODAY, -1);
   /* 줄마다가 아니라 구역(담당) · 당직째 확인 (2026-10-25 대표 「영림 구역 → 통째로 · 누락된 것만 확인 · 당직도 마찬가지」) */
   const 묶 = []; 목.forEach(o => { let g = 묶.find(z => z.k === o.grp); if(!g){ g = { k:o.grp, 배:o.배, L:[] }; 묶.push(g); } g.L.push(o); });
-  판열기('청소 누락', '<div class="sub3" style="margin-bottom:10px">' + 청소짧은날(d) + ' 체크가 안 된 것 · 구역(당직)째 확인하면 사라집니다' + (할수('cleanlog') ? '' : ' · 내 것만') + '</div>'
-    + (묶.length ? 묶.map(g => '<div class="cl-grp"><div class="cl-gh"><b>' + esc((g.배.구역 && g.배.구역.name) || '구역 없음') + (g.배.당직 ? ' · 당직' : '') + '</b><span>' + (g.배.p ? 이름딱지(g.배.p.id) : '<span class="sub3">' + esc(g.배.왜 || '담당 없음') + '</span>') + '</span>'
+  판열기('청소 누락', '<div class="sub3" style="margin-bottom:10px">' + 청소짧은날(d) + ' 체크가 안 된 것 · 구역(당직)째 확인하면 내 화면에서 사라집니다' + (할수('cleanlog') ? ' · 담당 선생님도 각자 확인해야 그 화면에서 사라집니다' : ' · 내 것만') + '</div>'
+    + (묶.length ? 묶.map(g => '<div class="cl-grp"><div class="cl-gh"><b>' + esc((g.배.구역 && g.배.구역.name) || '구역 없음') + (g.배.당직 ? ' · 당직' : '') + '</b><span>' + (g.배.p ? 이름딱지(g.배.p.id) : '<span class="sub3">' + esc(g.배.왜 || '담당 없음') + '</span>') + (g.배.p && g.배.p.name !== 청소나() && 청소확인함(d, g.k, g.배.p.name) ? '<span class="cl-ok">✓ 본인 확인</span>' : '') + '</span>'
         + '<button class="as-btn g" data-act="tx:clack" data-k="' + esc(g.k) + '">확인 · ' + g.L.length + '개</button></div>'
         + g.L.map(({ x, 배 }) => '<div class="cl-miss"><b>' + 청소글(x) + '</b>' + (배.대신 && 배.원 ? '<small>' + esc(보임이름(배.원.name)) + ' 선생님이 쉬어서 대신</small>' : '') + '</div>').join('') + '</div>').join('')
       : '<div class="empty why"><b>어제 빠진 체크가 없습니다</b>모두 체크했거나 확인했어요</div>'));
 }
 async function 청소확인(grp){ const d = 날더함(TODAY, -1), n = 청소누락().filter(o => o.grp === grp).length; if(!n) return;
-  if(!await 묻기('누락 ' + n + '개를 확인했나요?' + String.fromCharCode(10) + '확인하면 청소 누락에서 사라집니다')) return;
+  if(!await 묻기('누락 ' + n + '개를 확인했나요?' + String.fromCharCode(10) + '확인하면 내 청소 누락에서 사라집니다')) return;
   try{ await usend('tr_clean_ack', 'POST', { day:d, grp, by:(ME && ME.name) || '' }); (청소.확인 = 청소.확인 || []).push({ day:d, grp, by:(ME && ME.name) || '' }); toast('확인했어요'); 청소누락판(); render(); }
   catch(e){ toast('저장하지 못했어요 — ' + String(e.message || '').slice(0, 50)); } }
 /* 기록 — 누가 언제 눌렀나 (청소 기록 보기 권한) · 최근 7일 */
@@ -9030,7 +9103,7 @@ function vCmAll(){
       + '<span class="kt-b"><b>' + esc(r.m.name || '') + ' <small>' + esc(r.m.trainer || '') + '</small></b><span class="kt-p">' + (r.끝.내 ? '' : '요청 · ') + esc(String(r.끝.글 || '').split(String.fromCharCode(10))[0]) + '</span></span>'
       + '<span class="kt-t">' + 말때(r.끝.t) + (r.새 ? '<em class="kt-n">' + r.새 + '</em>' : '') + '</span></button>').join('') + '</div>'
     : '<div class="empty why"><b>아직 나눈 피드백이 없습니다</b>회원 화면 「피드백」 탭에서 남겨 주세요</div>';
-  const 대화창 = 방 ? '<div class="kt-head"><button class="btn ghost sm" data-act="cmchat" data-k="">‹ 목록</button><b>' + esc(방.m.name || '') + '</b><button class="btn sub sm" data-m="' + esc(방.id) + '" data-tab="comment">피드백 남기기 ›</button></div>' + 피드백톡방(방.id, 'ktroom') : '';      /* 한 방 그리기는 피드백톡방 하나 (2026-10-27) */
+  const 대화창 = 방 ? '<div class="kt-head"><button class="btn ghost sm" data-act="cmchat" data-k="">‹ 목록</button><b>' + esc(방.m.name || '') + '</b><button class="btn sub sm" data-m="' + esc(방.id) + '" data-tab="comment">피드백 남기기 ›</button></div>' + 피드백톡방(방.id, 'ktroom', 1) : '';      /* 한 방 그리기는 피드백톡방 하나 (2026-10-27) */
   const 새합 = 방들.reduce((n, r) => n + r.새, 0);
 
   return 요약
@@ -9679,18 +9752,18 @@ const 표정의 = {
     table:'tr_manual', 제목:'매뉴얼', 사람열:null, 제목열:'title',
     열:[
       {k:'title', 이름:'문서',      타입:'text', 필수:true},
-      {k:'part',  이름:'파트',      타입:'select', 옵션:['데스크','청소','PT','FC','응급','기타']},
+      {k:'part',  이름:'파트',      타입:'select', 옵션:['필수','데스크','청소','PT','FC','응급','기타']},      /* 필수 = 「📌 필수 숙지」 맨 위 (2026-10-27) */
       {k:'video', 이름:'교육 영상', 타입:'url', 힌트:'유튜브 주소 — 카드에 썸네일'},
       {k:'body',  이름:'내용',      타입:'long'},
       {k:'done',  이름:'보관',      타입:'check'},
     ],
     보기:[
-      {k:'mall', 이름:'전체', 필터:r => !r.done, 모양:'card'},
-      {k:'m데스크', 이름:'데스크', 필터:r => !r.done && r.part === '데스크', 모양:'card'},
-      {k:'m청소', 이름:'청소', 필터:r => !r.done && r.part === '청소', 모양:'card'},
-      {k:'mPT', 이름:'PT', 필터:r => !r.done && r.part === 'PT', 모양:'card'},
-      {k:'mFC', 이름:'FC', 필터:r => !r.done && r.part === 'FC', 모양:'card'},
-      {k:'m응급', 이름:'응급', 필터:r => !r.done && r.part === '응급', 모양:'card'},
+      {k:'mall', 이름:'전체', 필터:r => !r.done, 모양:'lec'},
+      {k:'m데스크', 이름:'데스크', 필터:r => !r.done && r.part === '데스크', 모양:'lec'},
+      {k:'m청소', 이름:'청소', 필터:r => !r.done && r.part === '청소', 모양:'lec'},
+      {k:'mPT', 이름:'PT', 필터:r => !r.done && r.part === 'PT', 모양:'lec'},
+      {k:'mFC', 이름:'FC', 필터:r => !r.done && r.part === 'FC', 모양:'lec'},
+      {k:'m응급', 이름:'응급', 필터:r => !r.done && r.part === '응급', 모양:'lec'},
       {k:'mkeep', 이름:'보관', 필터:r => !!r.done, 모양:'table'},
     ],
     템플릿:[],
@@ -10069,8 +10142,8 @@ function txList0(key){
   if(!rows.length) return 보기줄 + 거름줄 + 달력 + '<div class="empty">결과 없음'
     + (보기줄들.length && 가린것.length ? '<div class="tx-hid">이 보기 ' + 보기줄들.length + '건이 ' + 가린것.join(' · ') + '(으)로 가려졌어요 <button class="btn ghost sm" data-act="tx:fclear" data-k="' + key + '">모두 풀기</button></div>' : '') + '</div>'
     + '<button class="tx-newrow one" data-act="tx:rownew" data-k="'+key+'">＋ 새 '+표정의[key].제목+'</button>';
-  const 표다 = 모양(key) === 'table', 카드다 = 모양(key) === 'card';
-  const 그릴 = 줄 => 카드다 ? 카드보기(key, 줄) : 표다 ? txTable(key, 줄)
+  const 표다 = 모양(key) === 'table', 카드다 = 모양(key) === 'card', 강의다 = 모양(key) === 'lec';
+  const 그릴 = 줄 => 강의다 ? 강의보기(key, 줄) : 카드다 ? 카드보기(key, 줄) : 표다 ? txTable(key, 줄)
                     : '<div class="tx-list">' + 줄.map(r => txRow(key, r, true)).join('') + '</div>';
   if(st.그룹){                                        /* 그룹 묶기 */
     const c = 열들(key).find(z => z.k === st.그룹);
@@ -10255,6 +10328,42 @@ function 카드보기(key, 줄){
     return '<button class="mcard" data-act="tx:open" data-k="' + key + '" data-id="' + esc(r.id) + '">' + 카드썸네일(key, r)
       + '<span class="mc-t"><b>' + esc(행.제목) + '</b><small>' + (r.part ? esc(r.part) + ' · ' : '') + esc(시각한글(r.updated_at || r.created_at)) + '</small>'
       + (읽 >= 0 ? '<em class="' + (읽 >= 사람수 ? 'ok' : '') + '">' + (읽 >= 사람수 ? '모두 읽음' : '읽음 ' + 읽 + ' / ' + 사람수) + '</em>' : '') + '</span></button>'; }).join('') + '</div>'; }
+/* ══ 매뉴얼 강의형 ══ 2026-10-27 대표 시안 m1 「인터넷 강의처럼 파트별로 쭉 · 문서 매뉴얼도 모아 · 빠르게 찾게」
+   왼쪽 = 목차(파트 = 접히는 묶음 · 📌 필수 숙지 맨 위 · 줄마다 종류 ▶ 영상 · 🔗 링크 · 📎 파일 · 📄 글 · 읽으면 ✓ · 맨 위 읽음 막대)
+   오른쪽 = 고른 문서(영상 · 본문) · 「✓ 읽었어요 · 다음 ›」으로 차례대로 · 처음엔 안 읽은 첫 문서 · 위 검색 칸 = 표 검색 그대로 */
+const 강의파트 = ['필수', '데스크', '청소', 'PT', 'FC', '응급', '기타'];
+const 강의 = { id:null, 접:new Set(), ids:[] };
+const 강의읽음 = id => !!ME && (W.mread || []).some(x => x.manual_id === id && x.name === ME.name);
+const 강의종류 = r => 유튜브id(r.video) ? ['▶', '영상'] : r.video ? ['🔗', '링크'] : /"t":"file"/.test(r.body || '') ? ['📎', '파일'] : ['📄', '글'];
+const 강의파트이름 = p => p === '필수' ? '📌 필수 숙지' : (p || '기타');
+function 강의차례(줄){ const 파 = 강의파트.concat([...new Set(줄.map(r => r.part || '기타'))].filter(p => 강의파트.indexOf(p) < 0));
+  return 파.map(p => ({ p, L: 줄.filter(r => (r.part || '기타') === p) })).filter(g => g.L.length); }
+function 강의보기(key, 줄){
+  const 묶 = 강의차례(줄), 차례 = [].concat(...묶.map(g => g.L)); 강의.ids = 차례.map(r => r.id);
+  if(!차례.some(r => r.id === 강의.id)) 강의.id = (차례.find(r => !강의읽음(r.id)) || 차례[0] || {}).id || null;
+  const i = 차례.findIndex(r => r.id === 강의.id), r = 차례[i], 다 = 차례.filter(x => 강의읽음(x.id)).length;
+  const 왼 = '<div class="lc-side"><div class="lc-pg"><span>읽음 ' + 다 + ' / ' + 차례.length + '</span><i><b style="width:' + (차례.length ? Math.round(다 * 100 / 차례.length) : 0) + '%"></b></i></div>'
+    + 묶.map(g => { const 접 = 강의.접.has(g.p), n = g.L.filter(x => 강의읽음(x.id)).length;
+      return '<button class="lc-sec' + (접 ? ' fold' : '') + '" data-act="tx:lecsec" data-k="' + esc(g.p) + '"><b>' + esc(강의파트이름(g.p)) + '</b><small>' + n + ' / ' + g.L.length + '</small><em>' + (접 ? '▸' : '▾') + '</em></button>'
+        + (접 ? '' : g.L.map(x => { const 종 = 강의종류(x); return '<button class="lc-it' + (x.id === 강의.id ? ' on' : '') + '" data-act="tx:lec" data-id="' + esc(x.id) + '" title="' + esc(종[1]) + '"><span class="k">' + 종[0] + '</span><span class="t">' + esc(x.title || '(제목 없음)') + '</span>' + (강의읽음(x.id) ? '<span class="c">✓</span>' : '') + '</button>'; }).join('')); }).join('') + '</div>';
+  if(!r) return '<div class="lc">' + 왼 + '<div class="lc-main"></div></div>';
+  const y = 유튜브id(r.video), bs = 블록읽기(r.body), 길 = []; (function 모(a){ (a || []).forEach(b => { if(b.path) 길.push(b.path); if(b.c) 모(b.c); }); })(bs);
+  const urls = {}; 길.forEach(p => { urls[p] = media(p); });
+  const 끝 = i >= 차례.length - 1;
+  return '<div class="lc">' + 왼 + '<div class="lc-main">'
+    + (y ? '<div class="lc-vid"><iframe src="https://www.youtube.com/embed/' + y + '" title="' + esc(r.title || '') + '" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>' : r.video ? '<a class="btn ghost sm lc-link" href="' + esc(r.video) + '" target="_blank" rel="noopener">🔗 링크 열기 ↗</a>' : '')
+    + '<h3 class="lc-h">' + esc(r.title || '(제목 없음)') + '</h3><div class="sub3">' + esc(강의파트이름(r.part)) + ' · ' + (i + 1) + ' / ' + 차례.length + ' · ' + esc(시각한글(r.updated_at || r.created_at)) + '</div>'
+    + (bs.length ? '<div class="tx-sec lc-body">' + 블록들(bs, false, urls) + '</div>' : r.video ? '' : '<div class="empty why lc-none"><b>아직 내용이 없습니다</b>「페이지로 열기」에서 내용 · 영상 주소를 입력해 주세요</div>')
+    + '<div class="lc-nx">' + (i > 0 ? '<button class="btn ghost sm" data-act="tx:lec" data-id="' + esc(차례[i - 1].id) + '">‹ 이전</button>' : '<span></span>')
+    + '<span class="sp"></span><button class="btn ghost sm" data-act="tx:open" data-k="' + key + '" data-id="' + esc(r.id) + '">페이지로 열기</button>'
+    + (강의읽음(r.id) ? (끝 ? '<span class="lc-ok">✓ 다 읽었어요</span>' : '<button class="btn gold sm" data-act="tx:lec" data-id="' + esc(차례[i + 1].id) + '">다음 ›</button>')
+       : '<button class="btn gold sm" data-act="tx:lecread" data-id="' + esc(r.id) + '">✓ 읽었어요' + (끝 ? '' : ' · 다음 ›') + '</button>') + '</div></div></div>'; }
+/* ══ 홈 「데스크 공지」 막대 ══ 2026-10-27 대표 시안 h1 「업무로 대표 공지한 거 말고 · 데스크 공지를 홈에 하나 · 들어가면 매뉴얼로」 */
+function 데스크공지막대(){
+  const L = (W.manual || []).filter(r => !r.done); if(!L.length || !할수('manual')) return '';
+  const 필 = L.filter(r => r.part === '필수'), 필안 = 필.filter(r => !강의읽음(r.id)).length, 안 = L.filter(r => !강의읽음(r.id)).length;
+  const 글 = 필.length ? '필수 숙지 ' + 필.length + (필안 ? ' · 안 읽은 것 ' + 필안 : ' · 다 읽음') : '매뉴얼 ' + L.length + (안 ? ' · 안 읽은 것 ' + 안 : ' · 다 읽음');
+  return '<button class="dk-notice' + (필안 || (!필.length && 안) ? ' new' : '') + '" data-act="tx:deskman"><span class="i">📘</span><b>데스크 공지</b><span class="m">' + 글 + '</span><em>매뉴얼 ›</em></button>'; }
 function 매뉴얼읽음칸(r){
   const 나 = (ME && ME.name) || '', L = (W.mread || []).filter(x => x.manual_id === r.id), 내 = L.find(x => x.name === 나);
   const 안 = (W.staff || []).filter(p => p.active !== false && p.name && !L.some(x => x.name === p.name)).map(p => p.name);
@@ -10287,6 +10396,7 @@ function v규칙(){
       + '</div>').join('') + '</div>';
 }
 function 모양(key){
+  if(key === 'manual'){ const v0 = 지금보기(key); if(v0 && v0.모양 === 'lec') return 'lec'; }      /* 매뉴얼은 강의형 그대로 (2026-10-27 대표 m1) */
   const t = 잠김남(key) ? null : 표모양[모양키(key)];
   if(t) return t;
   const v = 지금보기(key);
@@ -10995,7 +11105,7 @@ function txPickBar(key, rows, 표다){
     if(T.사람열) acts += '<button data-act="tx:bulkwho" data-k="'+key+'">담당</button>';
     acts += '<button class="wn" data-act="tx:bulkdel" data-k="'+key+'">삭제</button>';
   }
-  if(표다 && !고름.length) return '';
+  if((표다 || 모양(key) === 'lec') && !고름.length) return '';      /* 매뉴얼 강의형엔 「전체 선택」 줄 없음 (2026-10-27) */
   return '<div class="tx-selall'+(고름.length?' on':'')+'">'
     + (표다 ? '' : '<span class="tx-pick '+(모두?'on':'')+'" data-act="tx:pickall" data-k="'+key+'">'+(모두?'✓':'')+'</span>')
     + (고름.length
@@ -12528,10 +12638,10 @@ function vHome(){
 
   const 공지없음 = 할수('popup') ? '<div class="sec" style="margin-bottom:14px">'
     + '<button class="tx-notice none" data-act="tx:new" data-k="tasks">＋ 공지 쓰기</button></div>' : '';
-  const 공지판 = !공지.length ? 공지없음 : '<div class="sec" style="margin-bottom:14px">'
+  const 막대 = 데스크공지막대(), 공지판 = (막대 ? '<div class="sec" style="margin-bottom:' + (공지.length || 공지없음 ? '8' : '14') + 'px">' + 막대 + '</div>' : '') + (!공지.length ? 공지없음 : '<div class="sec" style="margin-bottom:14px">'
     + 공지.map(r=>'<button class="tx-notice" style="text-align:left;width:100%" data-act="tx:open" data-k="tasks" data-id="'+r.id+'">'
       + '<div class="t1">📌 '+esc(r.title)+'</div>'
-      + (블록요약(r.body)?'<div class="t2">'+esc(블록요약(r.body))+'</div>':'')+'</button>').join('')+'</div>';
+      + (블록요약(r.body)?'<div class="t2">'+esc(블록요약(r.body))+'</div>':'')+'</button>').join('')+'</div>');
 
   const 그릴것 = {
     band:   () => 이름표,
@@ -14087,8 +14197,19 @@ async function txAct(a, el){
   if(a==='logf'){ 기록판[k] = v2 || ''; render(); return; }
   if(a==='logp'){ 기록판.기간 = k; 기록판.줄 = null; render(); return; }
   if(a==='logre'){ 기록판.줄 = null; 기록받기(true); render(); return; }
+  if(a==='lec'){ 강의.id = id; render(); return; }      /* 매뉴얼 강의형 (2026-10-27) */
+  if(a==='lecsec'){ 강의.접.has(k) ? 강의.접.delete(k) : 강의.접.add(k); render(); return; }
+  if(a==='lecread'){ const 나 = (ME && ME.name) || '';
+    if(나 && !강의읽음(id)){ try{ await usend('tr_manual_read', 'POST', { manual_id: id, name: 나 }, 'return=minimal'); W.mread = (W.mread || []).concat([{ manual_id: id, name: 나, at: new Date().toISOString() }]); }
+      catch(e){ toast('저장하지 못했어요 — ' + String(e.message || '').slice(0, 60)); return; } }
+    const j = 강의.ids.indexOf(id); if(j >= 0 && j < 강의.ids.length - 1) 강의.id = 강의.ids[j + 1]; render(); return; }
+  if(a==='deskman'){ 강의.id = null; 강의.접.clear(); 가기('manual'); return; }      /* 홈 「데스크 공지」 → 매뉴얼(안 읽은 필수부터) */
+  if(a==='kpin'){ 회원공지판(k); return; }      /* 피드백 대화방 공지 (2026-10-27 대표 n1) */
+  if(a==='kpinedit'){ 회원공지판(k, true); return; }
+  if(a==='kpinsave'){ await 회원공지저장(k); return; }
+  if(a==='kpindel'){ await 회원공지내리기(k); return; }
   if(a==='fbtalk'){ const m = memOf(k) || {}, 판중 = $('#pop').classList.contains('on') && $('#pop').classList.contains('tx-side');      /* 피드백톡 크게 — 옆 판 크기 · 왼쪽 위 뒤로(판 위에서 열면 판 뒤로) · 오른쪽 위 ✕ (2026-10-27 대표) */
-    판열기('피드백톡 · ' + esc(m.name || ''), (판중 ? '' : '<button class="btn ghost sm" data-act="popclose" style="margin-bottom:8px">‹ 뒤로</button>') + '<div class="fbtalk big">' + 피드백톡방(k, 'ktroom3') + '</div>'); return; }
+    판열기('피드백톡 · ' + esc(m.name || ''), (판중 ? '' : '<button class="btn ghost sm" data-act="popclose" style="margin-bottom:8px">‹ 뒤로</button>') + '<div class="fbtalk big">' + 피드백톡방(k, 'ktroom3', 1) + '</div>'); return; }
   if(a==='pfold'){ try{ localStorage.setItem('gg_pchip_' + k, 담당칩열림(k) ? '0' : '1'); }catch(e){} render(); return; }
   if(a==='fclear'){ Object.assign(표상태[k], { 사람:null, 규칙:[], q:'', 검색열림:false }); 고른행 = { key:null, ids:[] }; render(); return; }
   /* ── 목록 고르기 ── */
