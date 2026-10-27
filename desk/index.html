@@ -863,6 +863,15 @@ body.tx-moving .tx-x{cursor:grabbing}
 .lg-t td{vertical-align:top;font-size:13px}.lg-t td small{display:block;color:var(--sub);font-size:12.5px}.lg-t .nw{white-space:nowrap}.lg-t .n{color:var(--sub);text-align:right}.lg-d{max-width:420px;white-space:normal;word-break:break-word}
 .lg-a{display:inline-block;border-radius:6px;padding:1px 7px;font-size:12.5px;font-weight:800;background:var(--dark-3);border:1px solid var(--line);white-space:nowrap}.lg-a.z{color:var(--teal)}
 .rowlog{margin-top:12px}.rowlog summary{cursor:pointer}.rowlog .rl{font-size:13px;padding:4px 0;border-bottom:1px solid var(--line)}.rowlog .rl .t{color:var(--sub);margin-right:6px}
+.mfw{position:relative;display:inline-flex;width:var(--mf);height:var(--mf);flex:none;vertical-align:middle}
+.mfw .mf{width:100%;height:100%;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;border:1.3px solid rgba(240,211,160,.4);background:rgba(240,211,160,.06);color:var(--gold);font-weight:900;font-size:calc(var(--mf) * .36)}
+.mfw .mf.ph img{width:100%;height:100%;object-fit:cover;display:block}.mfw .mf.ph.bad img{display:none}
+.mfw .mf.gl{letter-spacing:-.02em}.mfw .mf.gl-pt{color:#7fc9d6;background:rgba(127,201,214,.14);border-color:rgba(127,201,214,.45)}.mfw .mf.gl-tg{color:#e9e1d1;background:rgba(233,225,209,.12);border-color:rgba(233,225,209,.42)}
+.mfw .mf.gl-ex{color:#b8a6e0;background:rgba(184,166,224,.14);border-color:rgba(184,166,224,.45)}.mfw .mf.gl-fc{color:#8f8a83;background:rgba(143,138,131,.08);border-color:rgba(143,138,131,.35)}
+.mfw .mfg{position:absolute;right:-6px;bottom:-4px;font-style:normal;font-size:10px;font-weight:900;padding:0 4px;border-radius:7px;background:#121211;border:1.2px solid;line-height:1.5}
+.mfw .mfg.mg-pt{color:#7fc9d6;border-color:rgba(127,201,214,.6)}.mfw .mfg.mg-tg{color:#e9e1d1;border-color:rgba(233,225,209,.55)}.mfw .mfg.mg-ex{color:#b8a6e0;border-color:rgba(184,166,224,.6)}.mfw .mfg.mg-fc{color:#8f8a83;border-color:rgba(143,138,131,.5)}
+.mfw .mfs{position:absolute;left:-5px;top:-5px;font-style:normal;font-size:12px;color:#f0cf94;text-shadow:0 0 2px #000,0 0 2px #000}
+.nm2 .mfw{margin-right:8px}
 .tx-cp{position:fixed;z-index:40;width:26px;height:26px;border-radius:6px;background:var(--dark-2);border:1px solid var(--line);color:var(--sub);align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.18);cursor:pointer}
 .tx-cp:hover{color:var(--cream);background:var(--dark-3)}
 .tx-cp .tip{position:absolute;bottom:calc(100% + 7px);right:-4px;background:#2b2a27;color:#fff;font-size:12px;font-weight:600;padding:4px 9px;border-radius:7px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .12s .25s}
@@ -1307,6 +1316,7 @@ body.resizing{cursor:col-resize;user-select:none}
 .tx-head .who2{flex:1;min-width:0;font-size:13px;color:var(--sub);overflow:hidden;
   text-overflow:ellipsis;white-space:nowrap}
 .pop.tx-side .tx-head .who2{font-size:17px;font-weight:800;color:#f0d3a0}
+.tx-hb.tx-tuck{font-size:19px;font-weight:700;letter-spacing:-1px;padding-bottom:3px}
 .tx-hb{width:32px;height:32px;border-radius:9px;color:var(--sub);display:flex;align-items:center;
   justify-content:center;font-size:15px;flex:none}
 .tx-hb:hover{background:var(--dark-3);color:var(--cream)}
@@ -1434,9 +1444,9 @@ body.resizing{cursor:col-resize;user-select:none}
 .tx-cd.today .d{background:var(--gold);color:#1a1712}
 .tx-cd .lv{font-size:12px;font-weight:700;border-radius:5px;padding:1px 5px;background:var(--gold-dim);
   color:var(--gold);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tx-cd .lv[data-kind]{--c:#b9b1a2;background:color-mix(in srgb,var(--c) 18%,transparent);color:var(--c)}      /* 종류마다 고유색 (2026-10-25 대표) — 빨강 · 신호등 없이 */
-.tx-cd .lv[data-kind="연차"]{--c:#9ec3ff}.tx-cd .lv[data-kind="월차"]{--c:#8fd1c4}.tx-cd .lv[data-kind="반차"]{--c:#b59cf0}.tx-cd .lv[data-kind="OFF"]{--c:#c9c2b4}
-.tx-cd .lv[data-kind="당직"]{--c:#f0b46a}.tx-cd .lv[data-kind="여름휴가"]{--c:#7fe0b0}.tx-cd .lv[data-kind="예비군"],.tx-cd .lv[data-kind="민방위"]{--c:#c2a36b}.tx-cd .lv[data-kind="기타사유"]{--c:#d98ad6}
+.tx-cd .lv[data-lvk]{--c:#b9b1a2;background:color-mix(in srgb,var(--c) 18%,transparent);color:var(--c)}      /* 종류마다 고유색 (2026-10-25 대표) — 빨강 · 신호등 없이 */
+.tx-cd .lv[data-lvk="연차"]{--c:#9ec3ff}.tx-cd .lv[data-lvk="월차"]{--c:#8fd1c4}.tx-cd .lv[data-lvk="반차"]{--c:#b59cf0}.tx-cd .lv[data-lvk="OFF"]{--c:#c9c2b4}
+.tx-cd .lv[data-lvk="당직"]{--c:#f0b46a}.tx-cd .lv[data-lvk="여름휴가"]{--c:#7fe0b0}.tx-cd .lv[data-lvk="예비군"],.tx-cd .lv[data-lvk="민방위"]{--c:#c2a36b}.tx-cd .lv[data-lvk="기타사유"]{--c:#d98ad6}
 .tx-cd .lv.req{opacity:.65;outline:1px dashed currentColor;outline-offset:-1px}
 .tx-cd .lv.no{background:#2e1c18;color:var(--warn)}.tx-cd .lv.req{background:var(--dark-3);color:var(--sub)}
 
@@ -1582,6 +1592,10 @@ body.resizing{cursor:col-resize;user-select:none}
 .tx-lockb{font-size:15px}.tx-lockb.on{border-color:var(--gold);background:var(--gold-dim)}
 #body.lite .tx-db{background:#fff;border-color:#e3e2de}#body.lite .tx-db .tx-tools{border-left-color:#e3e2de}
 .tx-cal .lv.pc{font-weight:800;border:0;opacity:1}.tx-cal .lv.pc.req{opacity:.55;outline:1.5px dashed currentColor;outline-offset:-2px}.tx-cal .lv i{font-style:normal;margin-right:3px}
+.tx-cal .lv{display:flex;align-items:center;gap:6px;padding:0 6px 0 0;min-height:22px;overflow:hidden;white-space:nowrap}
+.tx-cal .lv .lvtag{position:relative;flex:none;display:inline-flex;align-items:center;height:22px;padding:0 10px 0 13px;background:#fff;color:#1b1813;font-style:normal;font-weight:900;font-size:12px;clip-path:polygon(0 0,calc(100% - 7px) 0,100% 50%,calc(100% - 7px) 100%,0 100%)}
+.tx-cal .lv .lvtag::before{content:'';position:absolute;left:4px;top:50%;width:5px;height:5px;margin-top:-2.5px;border-radius:50%;background:#3a3630}
+.tx-cal .lv .lvtag i{margin-right:3px}
 .ib-tbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px}.ibseg{display:inline-flex;flex:none;background:var(--dark-2);border:1px solid var(--line);border-radius:12px;padding:3px;gap:3px}.ibseg button{flex:none;min-width:110px}
 .ibtop{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end;margin-left:auto}.ibtop .ibdis{opacity:.6}.ibtop small{font-weight:600;margin-left:4px}
 .ibdays{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:0 0 12px}.ibdays button{border:1px solid var(--line);background:var(--dark-2);color:var(--sub);font-size:13px;font-weight:700;border-radius:999px;padding:5px 12px}.ibdays button.on{background:var(--cream);color:#151413;border-color:var(--cream)}.ibdays button.cmp{border-color:var(--teal);color:var(--teal)}.ibdays small{color:var(--sub);font-size:13px;margin-left:4px}
@@ -2162,6 +2176,7 @@ button.as-more{display:block;width:100%;background:none;border:0;color:var(--sub
 .kt-col{display:flex;flex-direction:column;gap:4px;max-width:80%}.kt-col .kt-bb{max-width:100%}.kt-nm{font-size:14px;font-weight:800;color:#e8c08f;padding-left:2px}      /* 이름 전체 (2026-10-25 대표 「김이라고 하지 말고 풀네임으로 카톡처럼」) */
 .wkdots{display:inline-flex;gap:4px;vertical-align:middle}.wkdots i{width:12px;height:12px;border-radius:50%;border:2px solid #8fd1c4}.wkdots i.on{background:#8fd1c4}
 .sumbar .sumit.last{margin-left:auto}.cmsortb{font-weight:800}
+.kt-m.l{display:flex;gap:8px;align-items:flex-start}.kt-m.l > .mfw{margin-top:2px}
 .fbtalk .kt-room{max-height:360px;overflow:auto}.fbtalk.big .kt-room{max-height:none}.fbtalk{border:1px solid var(--line);border-radius:12px;padding:8px;margin-bottom:12px;background:var(--dark)}
 .kt-room{display:flex;flex-direction:column;gap:12px;max-height:74vh;min-height:52vh;font-size:16px;overflow-y:auto;background:#191815;border:1px solid var(--line);border-radius:14px;padding:12px}
 .kt-day{align-self:center;font-size:12.5px;color:var(--sub);background:#24211c;border-radius:999px;padding:2px 12px;margin:4px 0}
@@ -2656,7 +2671,7 @@ body:has(#pop.on.tx-side) #gchat .gc-fab:not(.x){display:none}      /* 옆 판�
 
 <script>
 "use strict";
-const BUILD = '435';
+const BUILD = '438';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -3931,6 +3946,21 @@ const 갈래빛 = { PT회원:'teal', 운동가이드:'gold', 체험수업:'warn'
 function 회원안온일(m, i){ const x = 잔여of(m), a = x && x['안온날'] != null && x['안온날'] !== '' ? +x['안온날'] : null, b = i && i.gap != null ? +i.gap : null;
   return a == null ? b : (b == null ? a : Math.min(a, b)); }
 const 갈래of = m => (잔여of(m) || {})['갈래'] || '';
+/* ══ 회원 얼굴 — 앱 「얼굴갈래」 와 같은 규칙 (2026-10-27 대표 「보는 곳마다 다르다 · 일치」) ══
+   회원이 앱에 넣은 프로필 사진(plans.data.prof.avatar) + PT · TG · 체험 · FC 딱지 · 사진이 없으면 갈래 동그라미 · 갈래도 모르면 이름 첫 글자 · ★ = 내 즐겨찾기
+   데스크에서 회원이 보이는 곳은 이것 하나로 그린다 — 회원 목록 · 회원 페이지 · 피드백 표 · 피드백 대화 · 피드백톡 말풍선 */
+let 회원사진 = null, 회원사진중 = false;
+async function 회원사진받기(){ if(회원사진 || 회원사진중) return; 회원사진중 = true;
+  try{ const r = await sget('plans?select=member_id,av:data->prof->>avatar&limit=5000') || []; const 판 = {}; r.forEach(x => { if(x.av) 판[x.member_id] = x.av; }); 회원사진 = 판;
+    render(); }catch(e){ 회원사진 = {}; console.warn('회원 사진 못 받음', e.message); }
+  회원사진중 = false; }
+const 갈래딱 = { 'PT회원':['PT', 'pt'], '운동가이드':['TG', 'tg'], '체험수업':['체험', 'ex'], '일반FC':['FC', 'fc'] };
+const 내즐겨찾기 = mid => !!ME && (D.favs || []).some(f => f.member_id === mid && f.trainer === ME.name);
+function 회원얼굴(mid, 크기, 별없음){      /* 별없음 — 바로 옆에 ☆ 단추가 있는 회원 목록 */ if(!회원사진) 회원사진받기();
+  const m = memOf(mid) || {}, g = 갈래딱[갈래of(m)], av = (회원사진 || {})[mid], 주 = !av ? '' : /^(https?|data):/.test(av) ? av : media(av);
+  const 속 = 주 ? '<span class="mf ph"><img src="' + esc(주) + '" alt="" onerror="this.parentNode.classList.add(\'bad\')"></span>' + (g ? '<em class="mfg mg-' + g[1] + '">' + g[0] + '</em>' : '')
+    : g ? '<span class="mf gl gl-' + g[1] + '">' + g[0] + '</span>' : '<span class="mf nm1">' + esc((m.name || '?').slice(0, 1)) + '</span>';
+  return '<span class="mfw" style="--mf:' + (크기 || 36) + 'px">' + 속 + (!별없음 && 내즐겨찾기(mid) ? '<i class="mfs" title="내 즐겨찾기">★</i>' : '') + '</span>'; }
 /* 트레이너 CRM = PT 관리 (2026-10-14 대표 「헬스장 CRM 이 아니라 PT 관리를 위한 트레이너 CRM」) — 갈래 · 상태는 중앙 정본 그대로
    · PT관리(m) = 일반FC 가 아니고 종료도 아닌 회원(PT회원 · 운동가이드 · 체험수업) — 피드백 탭 명단
      ⛔ 2026-10-15 22:40 대표 「전체를 표기하는 건 필요 없고 검색을 통해 직접 추가할 수만 있으면 돼」 → 「전산에 없음」(10/14 자동 추가된 691명 중 지금 전산 답에 없는 356명 — 지난 회원)은 뺀다.
@@ -4146,7 +4176,7 @@ function vMembers(){
     + rows.map(function(o){ const m=o.m, i=o.i;
         return '<tr data-m="' + esc(m.id) + '">'
         + '<td><span class="dot2 ' + 상태(m, i) + '" title="' + 상태글(m, i) + '"></span></td>'
-        + '<td><div class="nm2">' + (나이름 ? '<button class="favb' + (내별.has(m.id) ? ' on' : '') + '" data-act="fav" data-mm="' + esc(m.id) + '" title="' + (내별.has(m.id) ? '즐겨찾기에서 제거' : '즐겨찾기에 추가') + '">' + (내별.has(m.id) ? '★' : '☆') + '</button>' : '') + esc(m.name) + ' ' + 끔딱지(m)
+        + '<td><div class="nm2">' + (나이름 ? '<button class="favb' + (내별.has(m.id) ? ' on' : '') + '" data-act="fav" data-mm="' + esc(m.id) + '" title="' + (내별.has(m.id) ? '즐겨찾기에서 제거' : '즐겨찾기에 추가') + '">' + (내별.has(m.id) ? '★' : '☆') + '</button>' : '') + 회원얼굴(m.id, 30, 1) + esc(m.name) + ' ' + 끔딱지(m)
             + (수기회원인가(m) ? ' <span class="tag warn" title="전산 연결이 안 될 때 직접 추가한 회원">수기' + (PTST_막힘 ? '' : (잔여of(m) ? ' · 전산 확인됨' : ' · 전산에 없음')) + '</span>' : '') + '</div>'
           + (function(){ const s2 = 잔여of(m);
               /* 번호는 **앱에 저장돼 있지 않다.** 서버에서 받아온 것이 있을 때만 보여 준다.
@@ -4889,7 +4919,7 @@ function 회원판그리기(){
   if(!회원판) return;
   S.mid = 회원판.mid; S.tab = 회원판.tab;      /* 딴 데서 바뀌었어도 판은 제 것을 그린다 */
   const m = memOf(회원판.mid);
-  판열기(esc(m.name) + ' <span class="who3">' + esc(m.trainer||'담당 없음') + '</span>',
+  판열기(회원얼굴(m.id, 26) + ' ' + esc(m.name) + ' <span class="who3">' + esc(m.trainer||'담당 없음') + '</span>',
     회원요약줄(true) + '<div class="tabs mtabs">'
     + TABS.map(t => '<button class="'+(S.tab===t[0]?'on':'')+'" data-mtab="'+t[0]+'">'+t[1]+'</button>').join('')
     + '</div><div class="mpane">' + 회원탭내용() + '</div>',
@@ -5799,7 +5829,7 @@ function 피드백톡방(mid, 칸id){
   if(칸id) setTimeout(() => { const r = document.getElementById(칸id); if(r && !S.cmEdit) r.scrollTop = r.scrollHeight; }, 0);
   return '<div class="kt-room"' + (칸id ? ' id="' + 칸id + '"' : '') + '>'
     + (말.length ? 말.map(o => { const 날 = String(o.t).slice(0, 10), 머 = 날 && 날 !== 앞날 ? '<div class="kt-day">' + dateFull(날) + '</div>' : ''; 앞날 = 날 || 앞날;
-        if(o.k === '회원') return 머 + '<div class="kt-m l"><div class="kt-col"><span class="kt-nm">' + esc(m.name || '') + '</span><div class="kt-bb' + (o.a.done_at ? '' : ' new') + '"><span class="kt-tag">요청 · ' + esc(vaName(o.a.variant_id)) + '</span>' + esc(o.a.note || '피드백 요청') + '<small>' + 말때(o.t) + (o.a.done_at ? '' : ' · 아직 답 전') + '</small></div></div></div>';
+        if(o.k === '회원') return 머 + '<div class="kt-m l">' + 회원얼굴(mid, 36) + '<div class="kt-col"><span class="kt-nm">' + esc(m.name || '') + '</span><div class="kt-bb' + (o.a.done_at ? '' : ' new') + '"><span class="kt-tag">요청 · ' + esc(vaName(o.a.variant_id)) + '</span>' + esc(o.a.note || '피드백 요청') + '<small>' + 말때(o.t) + (o.a.done_at ? '' : ' · 아직 답 전') + '</small></div></div></div>';
         const c = o.c; return 머 + '<div class="kt-m r"><div class="kt-bb me"><span class="kt-tag">' + esc(vaName(c.variant_id)) + ' · ' + esc(String(c.created_at || '').slice(5, 10).replace('-', '/')) + '</span>'
           + (S.cmEdit === c.id ? '<textarea class="inp cmta" id="cmedit_' + esc(c.id) + '">' + esc(c.body || '') + '</textarea><div class="cmacts"><button class="btn gold sm" data-act="cmfix" data-c="' + esc(c.id) + '">수정</button><button class="btn ghost sm wn" data-act="cmdel" data-c="' + esc(c.id) + '">삭제</button><button class="btn ghost sm" data-act="cmeditx">취소</button></div>'
             : esc(c.body || '')) + 피드백첨부(c.id) + '<small>' + 말때(o.t) + ' · ' + esc(c.trainer || '') + (S.cmEdit === c.id ? '' : ' · <button class="kt-ed" data-act="cmedit" data-c="' + esc(c.id) + '">수정</button>') + '</small></div></div>'; }).join('')
@@ -8834,8 +8864,18 @@ document.addEventListener('input', ev => { const t = ev.target; if(!t || t.id !=
   document.querySelectorAll('#pzmodal .chips [data-act="pzk"]').forEach(c => c.classList.toggle('on', !q && c.dataset.v2 === 칸)); });
 /* 목록에 이름을 적는 방식은 새 검색칸을 빠뜨린다 — 10/26 배정 묶음 탭 찾기(asgq)가 빠져 「지민」이 「ㅈㅣㅁㅣㄴ」(대표 20:55). 이제 class="srch" 인 글 칸은 저절로 같이 지킨다 */
 const 검색칸인가 = t => !!t && (검색칸들.indexOf(t.id) >= 0 || (t.tagName === 'INPUT' && t.classList && t.classList.contains('srch') && /^(text|search|)$/.test(t.getAttribute('type') || '')));
-document.addEventListener('input', ev => { if(ev.isComposing && 검색칸인가(ev.target)) ev.stopImmediatePropagation(); }, true);
-document.addEventListener('compositionend', ev => { const t = ev.target; if(검색칸인가(t)) setTimeout(() => t.dispatchEvent(new Event('input', { bubbles:true })), 0); }, true);
+/* 빨리 쳐도 한글이 안 깨지게 (2026-10-27 대표 「타이핑 빨리하면(평소 속도) 제대로 입력이 안 됨」 · 김채은 → 김ㅊㅐㅇㅡㄴ)
+   글자 하나 끝날 때마다 화면을 다시 그려 검색칸이 새로 만들어졌고, 이미 시작된 다음 글자 조합이 끊겼다.
+   → 조합 중이면 손잡이로 안 보냄 · 찾기 칸(아이디 끝 q · 검색칸들)은 손을 멈추고 0.18초 뒤 한 번만 보냄(그동안 조합이 이어지면 더 기다림) */
+let 검색조합중 = false, 검색타이머 = null;
+const 미룰칸 = t => 검색칸인가(t) && (/q$/.test(t.id || '') || 검색칸들.indexOf(t.id) >= 0);
+function 검색미룸(t){ clearTimeout(검색타이머); 검색타이머 = setTimeout(() => { if(검색조합중) return 검색미룸(t); if(!document.body.contains(t)) return; const e = new Event('input', { bubbles:true }); e.__gg = true; t.dispatchEvent(e); }, 180); }
+document.addEventListener('compositionstart', ev => { if(검색칸인가(ev.target)) 검색조합중 = true; }, true);
+document.addEventListener('input', ev => { const t = ev.target; if(!검색칸인가(t) || ev.__gg) return;
+  if(ev.isComposing){ ev.stopImmediatePropagation(); return; }
+  if(미룰칸(t)){ ev.stopImmediatePropagation(); 검색미룸(t); } }, true);
+document.addEventListener('compositionend', ev => { const t = ev.target; if(!검색칸인가(t)) return; 검색조합중 = false;
+  if(미룰칸(t)) 검색미룸(t); else setTimeout(() => { const e = new Event('input', { bubbles:true }); e.__gg = true; t.dispatchEvent(e); }, 0); }, true);
 document.addEventListener('input', ev => { if(!ev.target || ev.target.id !== 'asgq') return; 배정.g.q = ev.target.value; const p = ev.target.selectionStart; render(); const n = document.getElementById('asgq'); if(n){ n.focus(); n.setSelectionRange(p, p); } });      /* 묶음 탭 찾기 (2026-10-26) */
 document.addEventListener('change', ev => { const f = ev.target && ev.target.dataset && ev.target.dataset.asg; if(!f) return; 배정.g[f] = ev.target.value; render(); });
 document.addEventListener('input', ev => { if(!ev.target || ev.target.id !== 'logq') return; 기록판.q = ev.target.value; const p = ev.target.selectionStart; render(); const n = document.getElementById('logq'); if(n){ n.focus(); n.setSelectionRange(p, p); } });      /* 작업기록 찾기 */
@@ -8954,7 +8994,7 @@ function vCmAll(){
         const kk = 구분(m);
         return '<tr data-m="' + esc(m.id) + '" data-tab="comment">'
         + '<td><span class="dot2 ' + 점 + '"></span></td>'
-        + '<td><div class="nm2">' + esc(m.name)
+        + '<td><div class="nm2">' + 회원얼굴(m.id, 30) + esc(m.name)
           + (kk==='미정' ? '' : ' <span class="tag ' + (kk==='신규'?'gold':'teal') + '">' + kk + '</span>')
           + '</div></td>'
         + '<td><span class="sub3">' + esc(m.trainer||'담당 없음') + '</span></td>'
@@ -8986,7 +9026,7 @@ function vCmAll(){
     const 내 = cs.filter(c => c.member_id === id), 요 = 모든요청.filter(a => a.member_id === id), 끝말 = 내.map(c => ({ t: c.created_at || '', 글: c.body || '', 내: true })).concat(요.map(a => ({ t: a.created_at || '', 글: (a.note || '피드백 요청') + ' · ' + vaName(a.variant_id), 내: false }))).sort((x, y) => String(y.t).localeCompare(String(x.t)))[0] || {};
     return { id, m: memOf(id), 끝: 끝말, 새: 요.filter(a => !a.done_at).length }; }).sort((x, y) => (y.새 > 0) - (x.새 > 0) || String(y.끝.t || '').localeCompare(String(x.끝.t || '')));
   const 방 = S.cmChat && 방들.find(r => r.id === S.cmChat);
-  const 대화목록 = 방들.length ? '<div class="kt-list">' + 방들.slice(0, 80).map(r => '<button class="kt-r" data-act="cmchat" data-k="' + esc(r.id) + '"><span class="kt-av">' + esc((r.m.name || '?').slice(0, 1)) + '</span>'
+  const 대화목록 = 방들.length ? '<div class="kt-list">' + 방들.slice(0, 80).map(r => '<button class="kt-r" data-act="cmchat" data-k="' + esc(r.id) + '">' + 회원얼굴(r.id, 40)
       + '<span class="kt-b"><b>' + esc(r.m.name || '') + ' <small>' + esc(r.m.trainer || '') + '</small></b><span class="kt-p">' + (r.끝.내 ? '' : '요청 · ') + esc(String(r.끝.글 || '').split(String.fromCharCode(10))[0]) + '</span></span>'
       + '<span class="kt-t">' + 말때(r.끝.t) + (r.새 ? '<em class="kt-n">' + r.새 + '</em>' : '') + '</span></button>').join('') + '</div>'
     : '<div class="empty why"><b>아직 나눈 피드백이 없습니다</b>회원 화면 「피드백」 탭에서 남겨 주세요</div>';
@@ -11038,7 +11078,7 @@ async function 부름모두읽음(){
 /* 달력 모양 (2026-10-15 대표 「더 달력처럼」) — 「2026년 10월 ‹ ›」 머리 · 칸을 선으로 잇기 · 일 빨강 · 토 파랑 · 오늘은 금색 동그라미 · 달 넘기기 */
 let 달력달 = 0;      /* 0 = 이번 달 · -1 = 지난달 … */
 /* 연월차 종류 이모지 — 연차 · 월차 · 반차는 달 한 갈래(하루 🌕 · 월차 🌙 · 반나절 🌗) (2026-10-26 대표 결정 cal=a + 메모) */
-const 쉼이모지 = k => ({ '연차':'🌕', '월차':'🌙', '반차':'🌗', 'OFF':'🛋', '당직':'🛡', '여름휴가':'🏖' })[k] || '📌';
+const 쉼이모지 = k => ({ '연차':'🏖️', '월차':'🏖️', '반차':'🏖️', '여름휴가':'🏖️', 'OFF':'😴', '당직':'📋' })[k] || '📌';      /* 2026-10-27 시안 확정 — 휴가는 🏖️ 하나 · 당직 📋 · OFF 😴 */
 function txCal(key, rows){
   const t = new Date(TODAY); t.setDate(1); t.setMonth(t.getMonth() + 달력달); const y = t.getFullYear(), m = t.getMonth();
   const 첫 = new Date(y, m, 1), 끝 = new Date(y, m+1, 0);
@@ -11055,7 +11095,7 @@ function txCal(key, rows){
         return '<div class="tx-cd '+(d.getMonth()!==m?'dim':'')+(k===TODAY?' today':'')+(d.getDay()===0?' sun':d.getDay()===6?' sat':'')+'"><span class="d">'+d.getDate()+'</span>'
           + (대청소날(+k.slice(0, 4)).indexOf(k) >= 0 ? '<span class="lv big" title="분기 대청소 · 다 같이">대청소 14시</span>' : '')      /* 분기 대청소 (2026-10-21 대표 「달력에도 표시」) */
           + 것.map(r=>{ const 이 = r.staff_id ? 사람(r.staff_id).name : ''; const 칠 = 이 ? 사람색칠(이) : '';
-              return '<span class="lv '+esc(r.status)+(칠?' pc':'')+'" data-kind="'+esc(r.kind||'')+'"'+(칠?' style="'+칠+'"':'')+' data-act="tx:open" data-k="'+key+'" data-id="'+r.id+'" title="'+esc((이 || (r.extra || {}).n_staff || '퇴사') + ' · ' + (r.kind || '') + (r.status === 'req' ? ' (신청)' : ''))+'"><i>'+쉼이모지(r.kind)+'</i>'+esc((이 || ((r.extra || {}).n_staff || '퇴사')).slice(-2))+' '+esc(r.kind)+'</span>'; }).join('') + '</div>'; }).join('')
+              return '<span class="lv '+esc(r.status)+(칠?' pc':'')+'" data-lvk="'+esc(r.kind||'')+'"'+(칠?' style="'+칠+'"':'')+' data-act="tx:open" data-k="'+key+'" data-id="'+r.id+'" title="'+esc((이 || (r.extra || {}).n_staff || '퇴사') + ' · ' + (r.kind || '') + (r.status === 'req' ? ' (신청)' : ''))+'"><em class="lvtag"><i>'+쉼이모지(r.kind)+'</i>'+esc(r.kind)+'</em>'+esc((이 || ((r.extra || {}).n_staff || '퇴사')).slice(-2))+'</span>'; }      /* 네임텍 — 앞 흰 꼬리표(구멍 · 끝 뾰족) = 종류 · 뒤 = 선생님 색 막대 (2026-10-27 시안 T1 · 대표 「바탕을 흰색으로」) */).join('') + '</div>'; }).join('')
     + '</div></div>';
 }
 
@@ -11621,6 +11661,7 @@ async function txView(key, id){
     + '<div class="tx-meta">만든 사람 '+esc(사람(r.created_by).name)+' · '+시각한글(r.created_at)+(r.updated_at&&r.updated_at!==r.created_at?' · 고침 '+시각한글(r.updated_at):'')+'</div>'
     + '</div>',
     '<div class="tx-fbtns"><span class="tx-stat" id="txstat">'+(편집?'':'읽기 전용')+'</span>'
+    + (편집 ? '<button class="btn ghost del" data-act="tx:pgdel">' + (key === 'leads' ? '숨기기' : '삭제') + '</button>' : '')      /* 페이지에서 바로 삭제 (2026-10-27 대표 「삭제나 수정은 어떻게 해」 — 전엔 속성 편집 판에만 있었다) */
     + (편집 && x.체크 ? '<button class="btn gold" data-act="tx:toggle" data-k="'+key+'" data-id="'+id+'" data-f="'+x.체크+'" data-stay="1">'+(done?'완료 취소':'완료')+'</button>' : '')
     + '</div>', ['tasks', 'leads'].includes(key));      /* 흰 바탕 (2026-10-26) */
   if(BL) document.querySelectorAll('#txblocks .tx-x[data-bi]').forEach(el => { const b = 블록가져(el.dataset.bi); if(b) el.innerText = b.x||''; });
@@ -15056,7 +15097,7 @@ function render0(){
     b.innerHTML = vMembers();
   } else if(S.view==='member'){
     const m = memOf(S.mid);
-    top.innerHTML = '<button class="back" data-act="toList"><span class="ar">‹</span>뒤로</button><h1>' + esc(m.name) + '</h1>'
+    top.innerHTML = '<button class="back" data-act="toList"><span class="ar">‹</span>뒤로</button>' + 회원얼굴(S.mid, 34) + '<h1>' + esc(m.name) + '</h1>'
       + '<span class="cnt">' + esc(m.trainer||'담당 없음') + '</span>';
     top.innerHTML += '<div class="sp">'
       + '<button class="btn gold sm" data-act="aspick">루틴 지정 · 예약</button></div>';
@@ -15247,7 +15288,7 @@ function 판열기(머리, 속, 발, 흰){
   if(!같은판) 판길쌓기(머리);
   판머리 = 머리;
   $('#popbox').innerHTML =
-    '<div class="tx-head">' + (판길.length ? '<button class="tx-hb tx-back" data-act="tx:panback" title="뒤로">‹ 뒤로</button>' : '') + '<button class="tx-hb" data-act="tx:wide" title="넓게 / 좁게">'+(넓게?'⤡':'⤢')+'</button>'
+    '<div class="tx-head"><button class="tx-hb tx-tuck" data-act="popclose" title="옆으로 넣기 (Esc)">»</button>' + (판길.length ? '<button class="tx-hb tx-back" data-act="tx:panback" title="뒤로">‹ 뒤로</button>' : '')      /* » = 노션 「옆으로 넣기」 (2026-10-27 대표 「모든 사이드 페이지에 다시 옆으로 넣기」) */ + '<button class="tx-hb" data-act="tx:wide" title="넓게 / 좁게">'+(넓게?'⤡':'⤢')+'</button>'
     + '<span class="who2">'+머리+'</span>'
     + '<button class="tx-hb" data-act="popclose" title="닫기 (Esc)">✕</button></div>'
     + '<div class="tx-scroll">'+속+'</div>' + (발||'');
