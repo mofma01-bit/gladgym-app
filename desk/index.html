@@ -1345,6 +1345,7 @@ body.resizing{cursor:col-resize;user-select:none}
 .cl-tk{font-size:13px;font-weight:800;color:var(--teal);margin-left:6px;white-space:nowrap}
 .cl-bx{width:18px;height:18px;border:1.5px solid #6b6255;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;margin-right:8px;flex:none;color:var(--dark)}.cl-bx.on{background:var(--teal);border-color:var(--teal)}
 .tx-scroll{flex:1;overflow:auto;padding:20px 26px 26px;display:flex;flex-direction:column;gap:11px}
+.tx-scroll > .btn,.tx-scroll > button{flex:none}      /* 옆 판 바로 아래 단추가 .btn.main(flex:1)로 판을 꽉 채웠다 (2026-10-28 대표 「체험 예약자 추가 디자인 왜 이래」) */
 .pop.tx-side .tx-fbtns{flex:none;border-top:1px solid var(--line);padding:11px 18px;margin:0;
   background:var(--dark-2);position:sticky;bottom:0}
 .pop.tx-side .tx-page .tx-ttl{font-size:26px;letter-spacing:-.03em}
@@ -2385,6 +2386,12 @@ button.as-more{display:block;width:100%;background:none;border:0;color:var(--sub
 .as-st button{font:inherit;font-size:13px;border-radius:7px;padding:2px 8px;border:1px solid #3a3833;background:none;color:var(--sub);cursor:pointer}
 .as-st.big button{font-size:14px;padding:6px 14px;border-color:transparent}.as-st.big button:not(.on):hover{color:var(--cream)}
 .as-st.big button.on,.as-st.big button.on.p,.as-st.big button.on.r,.as-st.big button.on.e{background:var(--gold);color:#1a1408;border-color:var(--gold)}.as-st.big button.on::before{content:'✓ '}      /* 고른 것만 금색 (2026-10-28) */
+.asp-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:14px}.asp-ph a{color:var(--gold);font-weight:800;font-variant-numeric:tabular-nums;text-decoration:none}.asp-dam{margin-left:auto;display:flex;align-items:center;gap:6px}
+.asp-todo{display:flex;align-items:center;gap:10px;border:1px solid var(--gold-2);background:var(--gold-dim);border-radius:12px;padding:10px 12px}.asp-todo>span{flex:1;min-width:0}.asp-todo b{display:block;font-size:14.5px}.asp-todo small{color:var(--sub);font-size:13px}.asp-todo.dim{border-color:var(--line);background:none}
+.asp-b{display:grid;gap:6px}.asp-h{font-size:13px;font-weight:800;color:var(--sub)}.asp-h span{font-weight:600;opacity:.75}
+.asp-kv{display:grid;grid-template-columns:84px 1fr;gap:5px 10px;margin:0;font-size:14px}.asp-kv dt{color:var(--sub);font-size:13px;padding-top:1px}.asp-kv dd{margin:0;min-width:0;word-break:keep-all}
+.asp-say{border-left:3px solid var(--line);padding:6px 10px;font-size:13.5px;line-height:1.6;color:var(--cream);word-break:keep-all}
+.asp-fold{display:grid;gap:8px}.asp-raw{border:1px solid var(--line);border-radius:10px;padding:8px 12px}.asp-raw summary{cursor:pointer;font-size:13px;font-weight:800;color:var(--sub)}.asp-raw div{margin-top:6px;font-size:13px;color:var(--sub);word-break:keep-all}      /* 배정 옆 판 새 차례 (2026-10-28 대표 「바꿔서 올려」) */
 .as-pair{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 4px}.as-pair>div{flex:1 1 220px;display:flex;flex-direction:column;gap:6px;border:1px solid var(--line);border-radius:12px;padding:8px 12px}.as-pair>div:last-child{flex:0 1 180px}.as-pair small{font-size:12.5px;color:var(--sub);font-weight:700}
 .as-pair .as-st.big button{padding:4px 12px}
 .sw{display:inline-flex;align-items:center;gap:8px;background:none;border:0;cursor:pointer;font:inherit;color:var(--sub);padding:2px 0}.sw i{width:42px;height:24px;border-radius:12px;background:#3a3833;position:relative;transition:background .15s}
@@ -2838,7 +2845,7 @@ body:has(#pop.on.tx-side) #gchat .gc-fab:not(.x){display:none}      /* 옆 판�
 
 <script>
 "use strict";
-const BUILD = '470';
+const BUILD = '472';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -14102,7 +14109,8 @@ const 재연락기록 = x => { const L = Array.isArray(x.recall_log) ? x.recall_
   return '<div class="lbl" style="margin:14px 0 6px">재연락 기록</div><div class="as-log">' + L.slice().reverse().slice(0, 12).map(o => '<div><b>' + esc(String(o.at || '').slice(5, 10).replace('-', '/')) + '</b> ' + esc(o.by || '') + ' 트레이너가 <b>' + esc(String(o.on || '').slice(5).replace('-', '/')) + '</b>에 알림 받기' + (o.n ? ' <span class="sub3">(' + o.n + '일 뒤)</span>' : '') + '</div>').join('') + '</div>'; };
 /* 자동 설문 끄기 — 회원 기준(재등록해도 따라감) · 끈 회원도 「다시 보내기」로 직접은 됨 (2026-10-25 의논 p2) */
 const 설문끔키 = x => x.crm_key ? 'c' + x.crm_key : (String(x.phone || '').replace(/\D/g, '').slice(-8).length === 8 ? 'p' + String(x.phone).replace(/\D/g, '').slice(-8) : '');
-const 설문끔칸 = x => { const k = 설문끔키(x); if(!k || !배정쓰기(x)) return ''; const 끔 = !!(배정.끔 && 배정.끔.has(k));
+const 설문끔칸 = x => { if(x.kind === '체험') return '<div><small>자동 설문</small><span class="as-tag">없음 · 체험수업</span></div>';      /* 체험은 자동 설문 없음 — 사전 설문은 「보내기」로만 (2026-10-28 대표 「체험수업은 설문 자동발송 꺼야 돼」) */
+  const k = 설문끔키(x); if(!k || !배정쓰기(x)) return ''; const 끔 = !!(배정.끔 && 배정.끔.has(k));
   return '<div><small>자동 설문</small><button class="sw' + (끔 ? '' : ' on') + '" data-act="tx:asoptout" data-k="' + esc(x.id) + '" role="switch" aria-checked="' + (끔 ? 'false' : 'true') + '"><i></i><b>' + (끔 ? '꺼짐' : '켜짐') + '</b></button></div>'; };      /* 켜고 끄는 스위치 (2026-10-28 대표 「눌린 건지 한눈에 안 보여」) */
 function 배정재연락판(id){ const x = (배정.줄 || []).find(r => String(r.id) === String(id)); if(!x) return;      /* 나중에 희망 = 알림일 필수 · 최장 30일 (2026-10-28 대표) */
   판열기(esc(x.name) + ' · 나중에 희망', '<div class="ck-act">언제 다시 연락할까요?<small>알림 날짜는 꼭 정해요 · 최대 30일 뒤까지 · 그날 「다시 연락할 날」과 현황판에 뜹니다</small></div>'
@@ -14190,22 +14198,59 @@ async function 배정메모보내기(k){ const x = (배정.줄 || []).find(r => 
     기록남기기({ area:'배정', action:'생성', tbl:'assign_notes', row_id:String(k), customer:x.name || '', phone:x.phone, detail:'메모 · 자료 — ' + (글.slice(0, 40) || '파일 ' + files.length + '개') });
     await 주소받기(files.map(f => f.path)).catch(() => {}); toast('남겼어요'); 배정판(k); }
   catch(e){ toast('저장하지 못했어요 — ' + (/assign_notes|404|42P01/.test(String(e.message)) ? '서버 준비(91단계)가 아직이에요' : String(e.message || '').slice(0, 60))); } }
+/* FC 메모 나누기 — 「[전산결제 10/28] …」 「[TG 10/28 남성민] 희망시간: … / 주의: … 참고: …」 를 기록마다 (2026-10-28 대표 「가독성 너무 안 좋아」) */
+function FC나눔(t){ const s = String(t || ''), 조 = s.split(/\[([^\]]+)\]/), 결 = { 결제:[], tg:[], 이전:[], 기타:[] };
+  const 이전꼴 = /이전 TG\s*[—-]\s*마지막 수업\s*(\S+)\s*·\s*([\d.\/-]+)\s*\((\d+)회 중 (\d+)회 진행\)/g;
+  const 이전뽑기 = b => b.replace(이전꼴, (m, 누, 날, 총, 한) => { if(!결.이전.some(z => z.누 === 누 && z.날 === 날)) 결.이전.push({ 누, 날, 총, 한 }); return ' '; }).replace(/참고\s*:\s*/g, ' ').replace(/\s+/g, ' ').trim();
+  if(조[0].trim()) 결.기타.push(조[0].trim());
+  for(let k = 1; k < 조.length; k += 2){ const h = 조[k].trim(), b = (조[k + 1] || '').trim(), 날 = (h.match(/\d{1,2}\/\d{1,2}/) || [''])[0];
+    if(/^전산결제/.test(h)){ 결.결제.push({ 날, 글: 이전뽑기(b) }); continue; }
+    if(/^TG\b/.test(h)){ const 누 = h.replace(/^TG\s*/, '').replace(날, '').trim(), 참위치 = b.search(/참고\s*:/), 앞 = 참위치 >= 0 ? b.slice(0, 참위치) : b, 뒤 = 참위치 >= 0 ? b.slice(참위치) : '';
+      const 칸 = []; 앞.split(/\s\/\s/).forEach(p => { const m = p.match(/^\s*([^:：]{1,12})\s*[:：]\s*([\s\S]*)$/); if(!m) return; const 키 = m[1].trim(), 값 = m[2].trim(); if(!값 || /^[—-]+$/.test(값)) return; 칸.push([키 === 'TG' ? '팝업 선택' : 키, 키 === 'TG' ? '배정 ' + 값 : 값]); });
+      결.tg.push({ 날, 누, 칸, 말: 이전뽑기(뒤) }); continue; }
+    결.기타.push((h + ' ' + b).trim()); }
+  return 결; }
+function 배정할일(x){
+  const 희 = (FC나눔(x.fc_memo).tg.flatMap(t => t.칸).find(c => c[0] === '희망시간') || [])[1] || '';
+  if(배정PT중(x)) return '';
+  if(배정미배(x) && 배정열림(x)) return 할수('assignset') && 배정쓰기(x) ? '<div class="asp-todo"><span><b>담당을 정해 주세요</b><small>' + esc(희 ? '희망시간 · ' + 희 : x.apply_at ? '설문 신청이 와 있어요' : x.kind === '체험' ? '체험수업 등록 · 배정 전' : '담당이 아직 없어요') + '</small></span><button class="btn gold" data-act="tx:agpick" data-k="' + esc(x.id) + '">담당 정하기</button></div>'
+    : '<div class="asp-todo dim"><span><b>담당 배정을 기다리고 있어요</b><small>관리자가 정해요</small></span></div>';
+  if(x.progress === '재연락 필요' && x.recall_on) return '<div class="asp-todo"><span><b>' + esc(String(x.recall_on).slice(5).replace('-', '/')) + '에 다시 연락하기로 했어요</b><small>나중에 희망 · 담당 ' + esc(배정담당(x)) + '</small></span></div>';
+  if(배정첫(x)) return '<div class="asp-todo"><span><b>첫 수업을 잡아 주세요</b><small>담당 ' + esc(배정담당(x)) + (x.assigned_on ? ' · ' + esc(String(x.assigned_on).slice(5).replace('-', '/')) + ' 배정' : '') + '</small></span></div>';
+  return ''; }
 function 배정판(id){
   const x = (배정.줄 || []).find(r => String(r.id) === String(id)); if(!x) return;
-  const 칸 = (이름, 값) => '<div class="as-kv"><span>' + 이름 + '</span><b>' + (값 || '<span class="sub3">—</span>') + '</b></div>';
-  판열기(esc(x.name) + ' <span class="who3">' + esc(x.kind) + ' · ' + esc(x.source) + '</span>',
-    '<div class="as-kvs">' + 칸('전화', x.phone ? '<a href="tel:' + esc(x.phone) + '" style="color:var(--gold)">' + esc(x.phone) + '</a>' : '') + 칸('담당', esc(배정담당(x)) + (할수('assignset') && 배정쓰기(x) ? ' <button class="as-btn" data-act="tx:agpick" data-k="' + esc(x.id) + '">' + (배정담당(x) ? '바꾸기' : '담당 정하기') + '</button>' : ''))
-      + 칸('배정', esc(x.assigned) + (x.assigned_on ? ' · ' + esc(x.assigned_on) : x.assigned_text ? ' · ' + esc(x.assigned_text) : '') + (x.assign_note ? '<br><span class="sub3">' + esc(x.assign_note) + '</span>' : '')) + 칸('성별 · 나이', esc([x.gender, x.age].filter(Boolean).join(' · '))) + 칸('이용권', esc(x.ticket)) + 칸('수업 횟수', esc(x.lessons))
-      + 칸('회차', 배정점(x) + ' <span class="sub3">' + esc(['r1', 'r2', 'r3'].map(k => x[k] || '').filter(Boolean).join(' · ')) + '</span>') + 칸('등록 여부', esc(x.reg)) + 칸('설문', 결과딱지(x.survey_sent) + (x.survey_resp ? ' <span class="sub3">' + esc(x.survey_resp) + '</span>' : '') + (x.survey_sent === '못 감' ? ' <span class="sub3">카톡도 문자도 실패 — 다시 보내거나 전화해 주세요</span>' : '')) + 칸('FC 메모', esc(x.fc_memo)) + '</div>' + 배정확인칸(x)
-      + (x.pt_state ? '<div class="note" style="margin-top:10px">' + (배정PT중(x) ? '<span class="as-tag ptm">PT 회원</span> ' : '<span class="as-tag">PT 끝남</span> ') + esc(x.pt_note || '') + '</div>' : '')
-      + 배정신청칸(x)
-      + 배정출석칸(x)
-      + '<div class="as-pair"><div><small>진행상황</small>' + 배정상태단추(x).replace('<span class="as-st">', '<span class="as-st big">')      /* 진행상황 · 자동 설문 한 줄 나란히 (2026-10-28 대표 「카드가 불필요하게 커 · 나란히」) */
-      /* 「나중에 희망」 토글 단추 뺌 — 진행상황 「나중에 희망」(알림일 필수)으로 (2026-10-28 대표) */
-      + 설문끔칸(x) + '</div>'
-      + 재연락기록(x)
-      + 배정메모칸(x)
-      + '<div class="note" style="margin-top:12px">회차 날짜 · 등록 여부는 전산에서 자동으로 채워집니다' + (x.updated_by ? ' · 마지막으로 고친 사람 ' + esc(x.updated_by) : '') + '</div>');
+  const 메 = FC나눔(x.fc_memo), kv = 줄 => 줄.length ? '<dl class="asp-kv">' + 줄.map(([k, v]) => '<dt>' + esc(k) + '</dt><dd>' + v + '</dd>').join('') + '</dl>' : '';
+  const 블 = (이름, 속, 덧) => 속 ? '<div class="asp-b"><div class="asp-h">' + 이름 + (덧 ? ' <span>' + 덧 + '</span>' : '') + '</div>' + 속 + '</div>' : '';
+  const 번 = String(x.phone || '').replace(/\D/g, ''), 번보 = 번.length === 11 ? 번.slice(0, 3) + '-' + 번.slice(3, 7) + '-' + 번.slice(7) : (x.phone || '');
+  const 상 = 배정PT중(x) ? '<span class="as-tag ptm">PT 회원</span>' : 배정미배(x) ? '<span class="as-tag wait">' + (x.apply_at ? '설문 있음' : '담당 없음') + '</span>' : 배정진행칩(x);
+  const 담 = 배정담당(x), 담칸 = (담 ? '담당 <b>' + esc(담) + '</b>' : '') + (할수('assignset') && 배정쓰기(x) && 담 ? ' <button class="as-btn" data-act="tx:agpick" data-k="' + esc(x.id) + '">바꾸기</button>' : '');
+  const 원함 = (x.apply_survey || {}).trainer ? 목록(x.apply_survey.trainer) : '';
+  const 참고 = [].concat(메.이전.map(z => ['전에 담당', '<b>' + esc(z.누) + '</b> · 이전 TG ' + esc(z.총) + '회 중 ' + esc(z.한) + '회 · 마지막 ' + esc(z.날)]),
+    메.tg.filter(t => t.누).map(t => ['팝업 메모', '<b>' + esc(t.누) + '</b> · ' + esc(t.날) + ' 결제 때']), 원함 ? [['원하는 선생님', '<b>' + esc(원함) + '</b>']] : [],
+    x.pt_state ? [['PT', (배정PT중(x) ? 'PT 진행 중' : 'PT 끝남') + (x.pt_note ? ' · ' + esc(x.pt_note) : '')]] : []);
+  const 원 = 메.tg.map(t => kv(t.칸.map(([k, v]) => [k, esc(v)])) + (t.말 ? '<div class="asp-say">' + esc(t.말) + '</div>' : '')).join('') + 메.기타.map(t => '<div class="asp-say">' + esc(t) + '</div>').join('');
+  const 진행 = kv([].concat(
+    [['회차', 배정점(x) + ' <span class="sub3">' + esc(['r1', 'r2', 'r3'].map(k => x[k] || '').filter(Boolean).join(' · ') || ((['r1', 'r2', 'r3'].filter(k => x[k]).length) + ' / ' + 배정회수(x))) + '</span>']],
+    !배정미배(x) && x.assigned_on ? [['배정', esc(String(x.assigned_on).slice(5).replace('-', '/')) + (x.assign_note ? ' <span class="sub3">' + esc(x.assign_note) + '</span>' : '')]] : x.assign_note ? [['배정', '<span class="sub3">' + esc(x.assign_note) + '</span>']] : [],
+    x.survey_sent ? [['설문', 결과딱지(x.survey_sent) + (x.survey_resp ? ' <span class="sub3">' + esc(x.survey_resp) + '</span>' : '') + (x.survey_sent === '못 감' ? ' <span class="sub3">카톡 · 문자 실패 — 다시 보내거나 전화</span>' : '')]] : []))
+    + '<div class="as-pair"><div><small>진행상황</small>' + 배정상태단추(x).replace('<span class="as-st">', '<span class="as-st big">') + '</div>' + 설문끔칸(x) + '</div>' + 재연락기록(x);
+  const 등록 = kv([].concat(
+    x.ticket || x.lessons ? [['이용권', esc([x.ticket, x.lessons && !String(x.ticket || '').includes(x.lessons + '회') ? x.lessons + '회' : ''].filter(Boolean).join(' · '))]] : [],
+    메.결제.map(z => ['결제', esc((z.날 ? z.날 + ' · ' : '') + z.글)]),
+    [['등록 여부', x.reg ? esc(x.reg) : '<span class="sub3">전산에서 자동으로 채워져요</span>']],
+    x.gender || x.age ? [['성별 · 나이', esc([x.gender, x.age].filter(Boolean).join(' · '))]] : []));
+  판열기(esc(x.name) + ' <span class="who3">' + esc(x.kind === '가이드' ? 'TG' : x.kind) + ' · ' + esc(x.source) + '</span>',
+    '<div class="asp-top">' + 상 + '<span class="asp-ph">' + (번 ? '<a href="tel:' + esc(번) + '">' + esc(번보) + '</a>' : '<span class="sub3">전화 없음</span>') + '</span><span class="asp-dam">' + 담칸 + '</span></div>'
+    + 배정할일(x) + 배정확인칸(x)
+    + 블('배정 참고', kv(참고))
+    + 블('고객이 원하는 것', 원 + 배정신청칸(x), 메.tg.length ? '팝업 TG 메모' : '')
+    + 블('수업 진행', 진행)
+    + 블('등록', 등록)
+    + '<div class="asp-fold">' + 배정출석칸(x)      /* 접힘(출석 · 원문) — 메모 카드 앞에 둔다 · 뒤에 두면 lbl 카드에 붙거나 칩 줄이 생긴다 */
+    + (x.fc_memo ? '<details class="asp-raw"><summary>FC 메모 원문</summary><div>' + esc(x.fc_memo) + '</div></details>' : '')
+    + (x.updated_by ? '<div class="sub3">마지막으로 고친 사람 ' + esc(x.updated_by) + '</div>' : '') + '</div>'
+    + 배정메모칸(x));
 }
 function 배정담당판(id){
   const x = (배정.줄 || []).find(r => String(r.id) === String(id)); if(!x) return;
