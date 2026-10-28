@@ -2376,13 +2376,16 @@ button.as-more{display:block;width:100%;background:none;border:0;color:var(--sub
 .as-st button{font:inherit;font-size:13px;border-radius:7px;padding:2px 8px;border:1px solid #3a3833;background:none;color:var(--sub);cursor:pointer}
 .as-st.big button{font-size:14px;padding:6px 14px;border-color:transparent}.as-st.big button:not(.on):hover{color:var(--cream)}
 .as-st.big button.on,.as-st.big button.on.p,.as-st.big button.on.r,.as-st.big button.on.e{background:var(--gold);color:#1a1408;border-color:var(--gold)}.as-st.big button.on::before{content:'✓ '}      /* 고른 것만 금색 (2026-10-28) */
+.as-pair{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 4px}.as-pair>div{flex:1 1 220px;display:flex;flex-direction:column;gap:6px;border:1px solid var(--line);border-radius:12px;padding:8px 12px}.as-pair>div:last-child{flex:0 1 180px}.as-pair small{font-size:12.5px;color:var(--sub);font-weight:700}
+.as-pair .as-st.big button{padding:4px 12px}
 .sw{display:inline-flex;align-items:center;gap:8px;background:none;border:0;cursor:pointer;font:inherit;color:var(--sub);padding:2px 0}.sw i{width:42px;height:24px;border-radius:12px;background:#3a3833;position:relative;transition:background .15s}
 .sw i::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#cfc7b8;transition:left .15s}.sw.on i{background:var(--gold)}.sw.on i::after{left:21px;background:#1a1408}.sw b{font-size:14px}.sw.on b{color:var(--gold)}
 .as-notes .an-row{border:1px solid var(--line);border-radius:12px;padding:8px 10px;margin-bottom:6px}.as-notes .an-row.pin{border-color:var(--gold)}.an-pin{font-size:12px;color:var(--gold);font-weight:800}
 .an-h{display:flex;gap:6px;align-items:center;font-size:13px}.an-h small{color:var(--sub)}.an-h .sp{flex:1}.an-ad{font-size:11px;font-weight:800;color:#1a1408;background:var(--gold);border-radius:5px;padding:0 6px}
 .an-b{background:none;border:0;color:var(--sub);font:inherit;font-size:12.5px;cursor:pointer}.an-b:hover{color:var(--cream)}.an-t{font-size:14px;white-space:pre-wrap;margin-top:4px}
 .an-fs{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}.an-f{font-size:13px;color:var(--cream)}.an-f.im img{width:96px;height:96px;object-fit:cover;border-radius:8px;display:block;background:#222}
-.an-in textarea{width:100%;min-height:54px}.an-act{display:flex;gap:6px;align-items:center;margin-top:6px}.an-act .sp{flex:1}.an-up{cursor:pointer}
+.an-in textarea{width:100%;min-height:54px}.an-prev{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}.an-prev:empty{display:none}
+.an-pv{position:relative;font-size:13px}.an-pv img{width:72px;height:72px;object-fit:cover;border-radius:8px;display:block}.an-pv button{position:absolute;top:2px;right:2px;width:20px;height:20px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;font-size:11px;cursor:pointer}.an-act{display:flex;gap:6px;align-items:center;margin-top:6px}.an-act .sp{flex:1}.an-up{cursor:pointer}
 .as-st button.on{color:#1a1712;border-color:transparent;font-weight:800}.as-st button.on.p{background:#4f8be0;color:#fff}.as-st button.on.r{background:var(--warn)}.as-st button.on.e{background:#8e2b2b;color:#fde8e4}
 .as-pr{font-size:12.5px;font-weight:800;border-radius:6px;padding:1px 8px;white-space:nowrap;background:var(--dark-4);color:var(--sub)}.as-pr.p{background:#4f8be0;color:#fff}.as-pr.l{background:#f2c94c;color:#2a210a}.as-pr.e{background:#8e2b2b;color:#fde8e4}.as-pr.r{background:var(--warn);color:#1a1712}
 .as-tag.wait.l{background:#f2c94c;color:#2a210a}
@@ -2826,7 +2829,7 @@ body:has(#pop.on.tx-side) #gchat .gc-fab:not(.x){display:none}      /* 옆 판�
 
 <script>
 "use strict";
-const BUILD = '460';
+const BUILD = '463';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -2930,7 +2933,7 @@ async function 주소받기(paths){
    회원 앱에서 같은 사고(2026-10-08 「사진이 뜨지 않고」)를 고친 방식 그대로 */
 const 주소시도 = {}; let 주소모음 = [], 주소타이머 = null;
 function 주소예약(p){ if(!p || SIGNED[p] || 주소시도[p]) return; 주소시도[p] = 1; 주소모음.push(p); clearTimeout(주소타이머);
-  주소타이머 = setTimeout(async () => { const 묶 = 주소모음; 주소모음 = []; try{ await 주소받기(묶); }catch(e){} if(묶.some(x => SIGNED[x])){ try{ render(); }catch(e){} } }, 60); }
+  주소타이머 = setTimeout(async () => { const 묶 = 주소모음; 주소모음 = []; try{ await 주소받기(묶); }catch(e){} if(묶.some(x => SIGNED[x])){ try{ render(); }catch(e){} document.querySelectorAll('#popbox [data-p]').forEach(el => { const u = SIGNED[el.dataset.p]; if(u) el[el.tagName === 'IMG' ? 'src' : 'href'] = u; }); } }, 60); }      /* 옆 판(배정 메모 등)은 render 로 안 바뀜 — 그림 주소만 바꿈 */
 const media = p => { if(!p) return ''; if(S3키(p) && SIGNED[p] && (S3만료[p] || 0) < Date.now()){ delete SIGNED[p]; 주소시도[p] = 0; }
   if(!SIGNED[p]) 주소예약(p); return SIGNED[p] || (S3키(p) ? '' : SB_URL+'/storage/v1/object/public/media/'+p); };
 
@@ -10033,7 +10036,7 @@ const 다음주쉼 = () => 쉼날들(7, 13).filter(o => o.r.kind !== '당직');
 const 못감 = { r:null, 중:false, 때:0 };
 async function 못감받기(){ if(못감.중 || Date.now() - 못감.때 < 600000) return; 못감.중 = true;
   try{ 못감.r = await sget('diet_sends?select=id,member_id,status,error,created_at,payload&created_at=gte.' + 날더함(TODAY, -7) + '&order=created_at.desc&limit=500'); }catch(e){ 못감.r = null; }
-  if(!배정.줄 && !배정.중 && 할수('assign')) 배정받기();
+  if((!배정.줄 || Date.now() - (배정.때 || 0) > 120000) && !배정.중 && 할수('assign')) 배정받기();      /* 2분마다 다시 받음 — 담당을 바꿔도 다른 선생님 화면에 안 떴다 (2026-10-28 대표 「지O주 곽준형으로 바꿨는데 안 떠」) */
   못감.중 = false; 못감.때 = Date.now(); if(S.view === 'home') render(); }
 const 결과딱지 = v => !v ? '' : '<span class="as-tag' + (v === '못 감' ? ' fail' : /도착|완료/.test(v) ? ' ok' : '') + '">' + esc(v) + '</span>';
 function 못감줄(){
@@ -13407,6 +13410,7 @@ const 현황칸 = [
      (2026-09-29 대표 「같은 직장에서 일하니까 급한건 아니야」) */
   /* 다음 주 연차 — 월요일 쉬는 사람을 미리 알게 (2026-10-23 대표 「다음 주 월요일인 경우 확인이 늦으니까 현황판에」) · 모두 */
   /* 알림톡 못 감 — 카톡도 문자도 실패(중앙이 끝 결과를 적음) · 기다리지 않고 바로 연락하게 (2026-10-25 대표) */
+  { k:'첫TG', 이름:'첫 수업 안 잡은 TG', 색:'gold', 셈: () => 배정범위().filter(배정첫).length, 직접: () => { 배정.탭 = '첫'; 가기('assign'); }, 보임: () => !!배정.줄 },      /* 새로 배정된 TG — 현황판에도 (2026-10-28 대표) */
   { k:'재연락', 이름:'다시 연락할 날', 색:'warn', 셈: () => 배정범위().filter(x => 배정열림(x) && x.progress === '재연락 필요' && x.recall_on && x.recall_on <= TODAY).length, 직접: () => { 배정.탭 = '재연락'; 가기('assign'); }, 보임: () => !!배정.줄 },
   { k:'못감', 이름:'알림톡 못 감', 색:'warn', 셈: () => 못감줄().length, 직접: () => 못감판(), 보임: () => !!못감.r || !!배정.줄 },
   { k:'다음주연차', 이름:'다음 주 연차', 색:'teal', 셈: () => 다음주쉼().length, 직접: () => 다음주쉼판() },
@@ -13759,8 +13763,9 @@ async function 배정받기(){
   try{ 배정.줄 = await 모두가져('assign_leads?select=*&order=created_at.desc'); 배정.왜 = '';
     배정.끔 = new Set(((await sget('guide_optout?select=k').catch(() => [])) || []).map(r => r.k)); }      /* 자동 설문 끈 회원 (63단계) */
   catch(e){ 배정.줄 = null; 배정.왜 = (e && e.message) || '안 되었어요'; }
-  배정.중 = false; 배정.때 = Date.now(); if(S.view === 'assign') render();
-}
+  배정.중 = false; 배정.때 = Date.now(); if(S.view === 'assign' || S.view === 'home') render(); }
+document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible' && 배정.줄 && !배정.중 && Date.now() - (배정.때 || 0) > 60000 && 할수('assign')) 배정받기(); });      /* 창으로 돌아오면 다시 받음 */
+const 배정첫 = x => 배정열림(x) && !배정미배(x) && !x.r1 && !배정PT중(x) && (!x.mem_end || x.mem_end >= TODAY);      /* 첫 수업 안 잡음 — TG 탭 칸 · 현황판 숫자가 같은 식 */
 /* ⛔ 정본 스위치 — 대표 20:54(중앙 창) 「아직 데스크로 완전 이전이 아니니 우선 노션으로 · 기존 작업이 멈추거나 꼬이면 안 된다」
    지금은 노션이 정본(서버 월요일 장 · 회차 · 설문이 노션을 읽고 씀). 데스크에서 노션옮김 줄을 고치면 노션에 안 가고, 넘기는 날 중앙이 노션 내용으로 다시 덮어 **사라진다**
    20:59 대표 확정 「모든 직원이 데스크로 갈아타면 그때 옮긴다」 → 데스크에서 넣거나 고친 것도 노션에 안 가 갈라진다(시트 · 체험 결제 자동 추가도 같은 이유로 그날 켬 · 중앙)
@@ -13781,7 +13786,7 @@ const 배정담당 = x => (x.trainers || []).join(' · ');
 const 배정고를선생 = () => [...new Set((W.staff || []).filter(p => p.active !== false && ['최고관리자', '중간관리자', '트레이너'].includes(등급of(p)) && !퇴사명().has(String(p.name || '').trim())).map(p => String(p.name || '').trim()))].filter(Boolean).sort(선생순);
 const 배정선생 = () => [...new Set([].concat(보기후보().map(x => x.name), 진짜ME ? [진짜ME.name] : [], ME ? [ME.name] : [], ...(배정.줄 || []).map(x => x.trainers || [])))].filter(Boolean).sort(선생순);
 function v배정(){
-  if(!배정.줄 && !배정.중 && Date.now() - 배정.때 > 5000) setTimeout(배정받기, 0);
+  if((!배정.줄 || Date.now() - (배정.때 || 0) > 60000) && !배정.중 && Date.now() - (배정.때 || 0) > 5000) setTimeout(배정받기, 0);      /* TG 탭을 열면 1분 지난 목록은 다시 받음 */
   if(!배정.줄) return 배정.왜
     ? (/404|42P01|does not exist/.test(배정.왜) ? '<div class="empty why"><b>배정을 아직 준비 중이에요</b>관리자에게 알려 주세요</div>'
        : '<div class="empty why"><b>배정 내용을 불러오지 못했어요</b>' + esc(배정.왜) + ' · 잠시 뒤 다시 열어 주세요</div>')
@@ -13792,7 +13797,7 @@ function v배정(){
      담당 없음 = 미배정 + 확인 요청 「담당 넣기」(같은 일이었다 · 나중에 희망은 뺌 · 설문 쓴 분 먼저) / 첫 수업 안 잡음 = 회원권 남은 분만 /
      수업 멈춤 = 확인 요청 「진행중인데 수업 없음」 + 오래 멈춤(60일) / 확인 = 남은 확인 요청 중 「확인」 안 한 것 / 나중에 희망 = 「나중에 희망」을 누른 분만 · 맨 오른쪽 */
   const 회원권남음 = x => !x.mem_end || x.mem_end >= TODAY;
-  const 첫 = 열.filter(x => !배정미배(x) && !x.r1 && !배정PT중(x) && 회원권남음(x));
+  const 첫 = 열.filter(배정첫);
   const 오래 = 열.filter(x => 배정일(x) >= 60 && !배정PT중(x)), 멈 = 오래;
   const 멈춤 = 열.filter(x => !배정미배(x) && !배정PT중(x) && ((x.ask === '진행중인데 수업 없음' && !배정확인됨(x)) || 배정일(x) >= 60));
   const 물 = 열.filter(x => x.ask && !['담당 넣기', '진행중인데 수업 없음'].includes(x.ask) && !배정확인됨(x));
@@ -14045,7 +14050,7 @@ const 재연락기록 = x => { const L = Array.isArray(x.recall_log) ? x.recall_
 /* 자동 설문 끄기 — 회원 기준(재등록해도 따라감) · 끈 회원도 「다시 보내기」로 직접은 됨 (2026-10-25 의논 p2) */
 const 설문끔키 = x => x.crm_key ? 'c' + x.crm_key : (String(x.phone || '').replace(/\D/g, '').slice(-8).length === 8 ? 'p' + String(x.phone).replace(/\D/g, '').slice(-8) : '');
 const 설문끔칸 = x => { const k = 설문끔키(x); if(!k || !배정쓰기(x)) return ''; const 끔 = !!(배정.끔 && 배정.끔.has(k));
-  return '<div class="lbl" style="margin:14px 0 6px">자동 설문</div><button class="sw' + (끔 ? '' : ' on') + '" data-act="tx:asoptout" data-k="' + esc(x.id) + '" role="switch" aria-checked="' + (끔 ? 'false' : 'true') + '"><i></i><b>' + (끔 ? '꺼짐' : '켜짐') + '</b></button>'; };      /* 켜고 끄는 스위치 (2026-10-28 대표 「눌린 건지 한눈에 안 보여」) */
+  return '<div><small>자동 설문</small><button class="sw' + (끔 ? '' : ' on') + '" data-act="tx:asoptout" data-k="' + esc(x.id) + '" role="switch" aria-checked="' + (끔 ? 'false' : 'true') + '"><i></i><b>' + (끔 ? '꺼짐' : '켜짐') + '</b></button></div>'; };      /* 켜고 끄는 스위치 (2026-10-28 대표 「눌린 건지 한눈에 안 보여」) */
 function 배정재연락판(id){ const x = (배정.줄 || []).find(r => String(r.id) === String(id)); if(!x) return;
   판열기(esc(x.name) + ' · 재연락 필요', '<div class="ck-act">며칠 뒤 다시 알려 드릴까요?<small>그날 배정 맨 위 「다시 연락할 날」과 현황판에 다시 뜹니다</small></div>'
     + '<div class="l1row" style="margin-top:12px"><input class="srch" id="asrcn" type="number" min="1" max="90" value="3" style="width:90px"> 일 뒤'
@@ -14086,7 +14091,7 @@ const 배정메모 = {};      /* 줄 id → { 줄:[…], 중, 없음 } */
 let 배정메모파일 = [];      /* 보내기 전 고른 파일 */
 const 메모관리자 = () => 할수('assignall');
 async function 배정메모받기(id){ const k = String(id); if(배정메모[k] && (배정메모[k].줄 || 배정메모[k].중)) return; 배정메모[k] = { 중:true };
-  try{ 배정메모[k] = { 줄: (await sget('assign_notes?select=*&lead_id=eq.' + encodeURIComponent(k) + '&order=at')) || [] }; }
+  try{ const 줄 = (await sget('assign_notes?select=*&lead_id=eq.' + encodeURIComponent(k) + '&order=at')) || []; await 주소받기(줄.flatMap(n => (n.files || []).map(f => f.path))).catch(() => {}); 배정메모[k] = { 줄 }; }      /* 잠긴 저장소 — 주소 먼저 (2026-10-28 「사진이 안 나와」) */
   catch(e){ 배정메모[k] = { 줄:[], 없음: /assign_notes|404|42P01/.test(String(e.message)) }; }
   const el = document.getElementById('asnotes'); if(el && el.dataset.k === k) el.outerHTML = 배정메모속((배정.줄 || []).find(r => String(r.id) === k) || { id:k }); }
 const 배정메모칸 = x => '<div class="lbl" style="margin:14px 0 6px">메모 · 자료</div>' + 배정메모속(x);      /* 이름표는 밖 — 옆 판이 칸으로 나눔 */
@@ -14094,7 +14099,7 @@ function 배정메모속(x){ const k = String(x.id), m = 배정메모[k], 쓰기
   if(!m || m.중){ if(!m) setTimeout(() => 배정메모받기(k), 0); return '<div class="as-notes" id="asnotes" data-k="' + esc(k) + '"><div class="sub3">불러오는 중…</div></div>'; }
   if(m.없음) return '<div class="as-notes" id="asnotes" data-k="' + esc(k) + '"><div class="sub3">서버 준비(91단계)가 아직이에요</div></div>';
   const 줄 = m.줄.slice().sort((a, b) => (b.pin - a.pin) || (a.at < b.at ? -1 : 1));
-  const 파일칸 = f => { const 그림 = f.kind === 'photo'; return '<a class="an-f' + (그림 ? ' im' : '') + '" href="' + esc(media(f.path)) + '" target="_blank" rel="noopener">' + (그림 ? '<img src="' + esc(media(f.path)) + '" alt="" loading="lazy">' : '📄 ' + esc(f.name || '파일')) + '</a>'; };
+  const 파일칸 = f => { const 그림 = f.kind === 'photo'; return '<a class="an-f' + (그림 ? ' im' : '') + '" data-p="' + esc(f.path) + '" href="' + esc(media(f.path)) + '" target="_blank" rel="noopener">' + (그림 ? '<img data-p="' + esc(f.path) + '" src="' + esc(media(f.path)) + '" alt="">' : '📄 ' + esc(f.name || '파일')) + '</a>'; };
   return '<div class="as-notes" id="asnotes" data-k="' + esc(k) + '">'
     + (줄.length ? 줄.map(n => { const 내것 = n.by === 나, 고칠 = 쓰기 && (내것 || 관);
         return '<div class="an-row' + (n.pin ? ' pin' : '') + '">' + (n.pin ? '<span class="an-pin">📌 고정</span>' : '')
@@ -14103,11 +14108,19 @@ function 배정메모속(x){ const k = String(x.id), m = 배정메모[k], 쓰기
           + (고칠 ? '<button class="an-b" data-act="tx:andel" data-id="' + esc(n.id) + '" data-k="' + esc(k) + '">삭제</button>' : '') + '</div>'
           + (n.body ? '<div class="an-t">' + 본문렌더(n.body) + '</div>' : '') + ((n.files || []).length ? '<div class="an-fs">' + n.files.map(파일칸).join('') + '</div>' : '') + '</div>'; }).join('')
       : '<div class="sub3" style="padding:4px 0 8px">아직 메모가 없어요</div>')
-    + (쓰기 ? '<div class="an-in"><textarea class="inp" id="anin" rows="2" placeholder="' + (관 ? '관리자 메모 · 상담 내용' : '메모 — 다음 수업 · 상담 내용') + '"></textarea>'
-        + '<div class="an-act"><label class="as-btn an-up">📎 사진 · 파일<input type="file" id="anfile" accept="image/*,application/pdf" multiple hidden></label><span class="sub3" id="anfn">' + (배정메모파일.length ? '파일 ' + 배정메모파일.length + '개' : '') + '</span><span class="sp"></span>'
+    + (쓰기 ? '<div class="an-in"><textarea class="inp" id="anin" rows="2" placeholder="' + (관 ? '관리자 메모 · 상담 내용' : '메모 — 다음 수업 · 상담 내용') + '"></textarea><div class="an-prev" id="anprev">' + 메모미리보기() + '</div>'
+        + '<div class="an-act"><label class="as-btn an-up">📎 사진 · 파일<input type="file" id="anfile" accept="image/*,application/pdf" multiple hidden></label><span class="sub3" id="anfn">' + (배정메모파일.length ? '파일 ' + 배정메모파일.length + '개' : 'Ctrl+V 로 사진 붙여넣기 · 끌어다 놓기도 돼요') + '</span><span class="sp"></span>'
         + '<button class="as-btn g" data-act="tx:ansend" data-k="' + esc(k) + '">남기기</button></div></div>' : '')
     + '</div>'; }
-document.addEventListener('change', ev => { if(!ev.target || ev.target.id !== 'anfile') return; 배정메모파일 = Array.from(ev.target.files || []); const s = document.getElementById('anfn'); if(s) s.textContent = 배정메모파일.length ? '파일 ' + 배정메모파일.length + '개' : ''; });
+function 메모미리보기(){ return 배정메모파일.map((f, i) => '<span class="an-pv">' + (/^image\//.test(f.type) ? '<img src="' + esc(URL.createObjectURL(f)) + '" alt="">' : '📄 ' + esc(f.name || '파일')) + '<button data-act="tx:anfrm" data-k="' + i + '" title="제거">✕</button></span>').join(''); }
+function 메모파일다시(){ const p = document.getElementById('anprev'), s = document.getElementById('anfn'); if(p) p.innerHTML = 메모미리보기(); if(s) s.textContent = 배정메모파일.length ? '파일 ' + 배정메모파일.length + '개' : 'Ctrl+V 로 사진 붙여넣기 · 끌어다 놓기도 돼요'; }
+function 메모파일더하기(fs){ const 새 = Array.from(fs || []).filter(f => /^image\//.test(f.type) || f.type === 'application/pdf'); if(!새.length) return false;
+  새.forEach((f, i) => { if(!f.name || f.name === 'image.png') f = new File([f], '붙여넣기_' + Date.now() + '_' + i + '.png', { type: f.type || 'image/png' }); 배정메모파일.push(f); }); 메모파일다시(); return true; }
+document.addEventListener('change', ev => { if(!ev.target || ev.target.id !== 'anfile') return; 메모파일더하기(ev.target.files); ev.target.value = ''; });
+document.addEventListener('paste', ev => { if(!ev.target || ev.target.id !== 'anin') return; const 그림 = Array.from((ev.clipboardData && ev.clipboardData.items) || []).filter(it => it.kind === 'file').map(it => it.getAsFile()).filter(Boolean);      /* 노션처럼 Ctrl+V (2026-10-28) */
+  if(그림.length && 메모파일더하기(그림)){ ev.preventDefault(); toast('사진 ' + 그림.length + '장을 붙였어요 · 「남기기」를 누르면 올라가요'); } });
+document.addEventListener('dragover', ev => { if(ev.target && ev.target.closest && ev.target.closest('.an-in')) ev.preventDefault(); });
+document.addEventListener('drop', ev => { const z = ev.target && ev.target.closest && ev.target.closest('.an-in'); if(!z) return; ev.preventDefault(); 메모파일더하기(ev.dataTransfer && ev.dataTransfer.files); });
 async function 배정메모보내기(k){ const x = (배정.줄 || []).find(r => String(r.id) === String(k)); if(!x || !배정쓰기(x)) return;
   const 글 = (($('#anin') || {}).value || '').trim(), fs = 배정메모파일.slice(); if(!글 && !fs.length){ toast('메모를 적거나 파일을 골라 주세요'); return; }
   const files = [];
@@ -14122,7 +14135,7 @@ async function 배정메모보내기(k){ const x = (배정.줄 || []).find(r => 
   try{ await ssend('assign_notes', 'POST', [줄], 'return=minimal'); (배정메모[String(k)] = 배정메모[String(k)] || { 줄:[] }).줄.push(줄); 배정메모파일 = [];
     if(글){ await ssend('assign_leads?id=eq.' + encodeURIComponent(x.id), 'PATCH', { trainer_memo: 글.slice(0, 200), updated_by:나이름() }, 'return=minimal').catch(() => {}); x.trainer_memo = 글.slice(0, 200); }      /* 표 칸 = 가장 최근 메모 */
     기록남기기({ area:'배정', action:'생성', tbl:'assign_notes', row_id:String(k), customer:x.name || '', phone:x.phone, detail:'메모 · 자료 — ' + (글.slice(0, 40) || '파일 ' + files.length + '개') });
-    toast('남겼어요'); 배정판(k); }
+    await 주소받기(files.map(f => f.path)).catch(() => {}); toast('남겼어요'); 배정판(k); }
   catch(e){ toast('저장하지 못했어요 — ' + (/assign_notes|404|42P01/.test(String(e.message)) ? '서버 준비(91단계)가 아직이에요' : String(e.message || '').slice(0, 60))); } }
 function 배정판(id){
   const x = (배정.줄 || []).find(r => String(r.id) === String(id)); if(!x) return;
@@ -14134,9 +14147,10 @@ function 배정판(id){
       + (x.pt_state ? '<div class="note" style="margin-top:10px">' + (배정PT중(x) ? '<span class="as-tag ptm">PT 회원</span> ' : '<span class="as-tag">PT 끝남</span> ') + esc(x.pt_note || '') + '</div>' : '')
       + 배정신청칸(x)
       + 배정출석칸(x)
-      + '<div class="lbl" style="margin:14px 0 6px">진행상황</div>' + 배정상태단추(x).replace('<span class="as-st">', '<span class="as-st big">')
-      + (배정미배(x) && 배정쓰기(x) && 할수('assignall') ? ' <button class="as-btn" data-act="tx:aslater" data-k="' + esc(x.id) + '">' + (x.later_at ? '나중에 희망 풀기' : '나중에 희망') + '</button>' : '')
-      + 재연락기록(x) + 설문끔칸(x)
+      + '<div class="as-pair"><div><small>진행상황</small>' + 배정상태단추(x).replace('<span class="as-st">', '<span class="as-st big">')      /* 진행상황 · 자동 설문 한 줄 나란히 (2026-10-28 대표 「카드가 불필요하게 커 · 나란히」) */
+      + (배정미배(x) && 배정쓰기(x) && 할수('assignall') ? ' <button class="as-btn" data-act="tx:aslater" data-k="' + esc(x.id) + '">' + (x.later_at ? '나중에 희망 풀기' : '나중에 희망') + '</button>' : '') + '</div>'
+      + 설문끔칸(x) + '</div>'
+      + 재연락기록(x)
       + 배정메모칸(x)
       + '<div class="note" style="margin-top:12px">회차 날짜 · 등록 여부는 전산에서 자동으로 채워집니다' + (x.updated_by ? ' · 마지막으로 고친 사람 ' + esc(x.updated_by) : '') + '</div>');
 }
@@ -14861,7 +14875,8 @@ async function txAct(a, el){
     try{ if(끔) await ssend('guide_optout?k=eq.' + encodeURIComponent(키), 'DELETE'); else await ssend('guide_optout', 'POST', [{ k:키, name:x.name || '', by:(ME && ME.name) || '' }]);
       배정.끔 = 배정.끔 || new Set(); if(끔) 배정.끔.delete(키); else 배정.끔.add(키); toast(끔 ? '자동 설문을 다시 켰어요' : '자동 설문을 껐어요'); 배정판(k); }
     catch(e){ toast('저장하지 못했어요 — ' + String(e.message || '').slice(0, 50)); } return; }
-  if(a==='ansend'){ await 배정메모보내기(k); return; }      /* 배정 메모 · 자료 (2026-10-28) */
+  if(a==='ansend'){ await 배정메모보내기(k); return; }
+  if(a==='anfrm'){ 배정메모파일.splice(+k, 1); 메모파일다시(); return; }      /* 배정 메모 · 자료 (2026-10-28) */
   if(a==='andel'){ const m = 배정메모[String(k)], n = m && (m.줄 || []).find(z => z.id === id); if(!n) return; if(!await 묻기('이 메모를 삭제할까요?' + String.fromCharCode(10) + '휴지통에서 되돌릴 수 있어요')) return;
     try{ await 휴지통으로('assign_notes', n, (n.body || '배정 메모').slice(0, 40), ssend); m.줄 = m.줄.filter(z => z.id !== id); toast('삭제했어요'); 배정판(k); }catch(e){ toast('삭제하지 못했어요 — ' + String(e.message || '').slice(0, 60)); } return; }
   if(a==='anpin'){ const m = 배정메모[String(k)], n = m && (m.줄 || []).find(z => z.id === id); if(!n || !메모관리자()) return; const 고 = !n.pin;
