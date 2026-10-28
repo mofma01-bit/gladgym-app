@@ -1662,6 +1662,23 @@ body .prephd .ph1{font-size:21px}
 .megrp.pkg .mrow2.pson{border-color:#e2c184}
 .megrp.pkg .mrow2.pson .pkadd{background:linear-gradient(180deg,#f3d9a8,#e2c184);color:#2a1c14}
 .pkim{display:flex;align-items:center;justify-content:center;height:96px;background:#1b1a17;border-bottom:1px solid #2c2b27}
+/* 종목 선택 보기 (2026-10-28 노션 낮) — 바둑판 3열(넓으면 칸이 늘어남 · 그림은 4:3 비율로 카드 너비를 따라감) · 크게 1장씩 · 목록 이름만 */
+.pkview{display:flex;align-items:center;gap:6px;margin:2px 0 8px;justify-content:flex-end}.pkview span{font-size:13px;color:var(--sub);margin-right:2px}
+.pkview button{height:30px;min-width:58px;padding:0 12px;border-radius:999px;border:1px solid #34332d;background:#191816;color:var(--sub);font-size:13px;font-weight:800}
+.pkview button.on{border-color:transparent;background:linear-gradient(180deg,#f3d9a8,#e2c184);color:#2a1c14}
+html[data-pkv="g3"] .megrp.pkg{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+@media (min-width:600px){html[data-pkv="g3"] .megrp.pkg{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}}
+html[data-pkv="g3"] .megrp.pkg .pkim{height:auto;aspect-ratio:4/3}
+html[data-pkv="g3"] .megrp.pkg .mrow2 .mt{padding:7px 8px 0}html[data-pkv="g3"] .megrp.pkg .mrow2 .mt b{font-size:13.5px}html[data-pkv="g3"] .megrp.pkg .mrow2 .mt small{font-size:12px}
+html[data-pkv="g3"] .megrp.pkg .mrow2 .pkadd{top:5px;right:5px;transform:scale(.88)}
+html[data-pkv="big"] .megrp.pkg{grid-template-columns:minmax(0,560px);justify-content:center}
+html[data-pkv="big"] .megrp.pkg .pkim{height:auto;aspect-ratio:16/10}
+html[data-pkv="big"] .megrp.pkg .mrow2 .mt b{font-size:17px}
+html[data-pkv="list"] .megrp.pkg{grid-template-columns:1fr;gap:6px}
+html[data-pkv="list"] .megrp.pkg .pkim{display:none}
+html[data-pkv="list"] .megrp.pkg .mrow2:not(.wide){flex-direction:row;align-items:center;padding:11px 14px;min-height:0}
+html[data-pkv="list"] .megrp.pkg .mrow2:not(.wide) .mt{padding:0;flex:1;min-width:0}html[data-pkv="list"] .megrp.pkg .mrow2:not(.wide) .pkadd{position:static;margin-left:10px}
+html[data-pkv="list"] .megrp.pkg .pkms{position:static;margin-right:8px}
 .pkim img{width:100%;height:100%;object-fit:contain;background:#fff}
 .pkim.ph .pti{width:58px;height:58px}.pkim.ph .pti i{width:44px;height:44px}.pkim.ph .pti svg{width:32px;height:32px}
 .pkim.ph>svg{width:34px;height:34px;stroke:#6f685c;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
@@ -3261,7 +3278,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '476';
+const BUILD = '477';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -5829,6 +5846,9 @@ function EQS(){
   return ['전체'].concat(EQORDER.filter(x=>있는.has(x)),
                          [...있는].filter(x=>EQORDER.indexOf(x)<0));
 }
+const 보기종류 = [['g3', '바둑판'], ['big', '크게'], ['list', '목록']];      /* 종목 선택 보기 (2026-10-28 노션 낮) */
+function 종목보기(){ try{ const v = localStorage.getItem('gg_pkview'); return 보기종류.some(x => x[0] === v) ? v : 'g3'; }catch(e){ return 'g3'; } }
+document.documentElement.dataset.pkv = 종목보기();      /* 고르기 판 전부(종목 선택 · 루틴 종목 추가 · 스트레칭 동작) 같은 보기 — 이질감 없이(st=A) */
 function vPick(){
   const w=live();
   const 추가중 = !!(w && w.begun);
@@ -5846,6 +5866,7 @@ function vPick(){
       <button class="g" data-act="rmaddpick">${svg('h_crown',14)} 1RM 종목</button>
     </div>
     ${S.pickOpen?`<div class="chips pkeq">${EQS().map(x=>`<button class="chip ${x===S.pickEq?'on t':''}" data-act="peq:${x}">${x}</button>`).join('')}</div>`:''}
+    <div class="pkview"><span>보기</span>${보기종류.map(([k, n]) => `<button class="${종목보기() === k ? 'on' : ''}" data-act="pkview:${k}">${n}</button>`).join('')}</div>
     <div class="megrp pkg">
     <button class="mrow2 wide" data-exrow="1rm 원알엠 일알엠 원rm 1알엠 1rm측정 측정 최대중량 맥스 max onerepmax" data-part="__1rm" data-eq="" style="display:none" data-act="rmaddpick">
       <span class="mt"><b style="color:var(--gold)">1RM 측정 종목 추가</b><small>추가하면 바로 측정 계획이 열립니다</small></span><em class="pkadd">＋</em></button>
@@ -14430,6 +14451,7 @@ document.addEventListener('click', async ev=>{
     case 'wlockhint': toast('자물쇠를 길게 누르면 풀립니다'); return;
     /* 부위 칩 펼치기 */
     case 'partopen': S.pickOpen=!S.pickOpen; render(); setTimeout(칠하기,0); return;
+    case 'pkview': { try{ localStorage.setItem('gg_pkview', rest[0]); }catch(e){} document.documentElement.dataset.pkv = 종목보기(); document.querySelectorAll('.pkview button').forEach(b => b.classList.toggle('on', b.dataset.act === 'pkview:' + rest[0])); return; }      /* 다시 그리지 않고 표시만 — 검색어 · 스크롤 그대로 */
     /* 담은 순서 확인 → 시작 */
     case 'askstart': S.sordIdx=null; sheetStart(); return;
     case 'sord': S.sordIdx=+rest[0]; drawSheet(); return;
