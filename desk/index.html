@@ -2848,7 +2848,7 @@ body:has(#pop.on.tx-side) #gchat .gc-fab:not(.x){display:none}      /* 옆 판�
 
 <script>
 "use strict";
-const BUILD = '473';
+const BUILD = '475';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -13233,7 +13233,7 @@ function vHome(){
   /* ⛔ 홈은 사람마다 다르다 — 차례·켜짐·줄수는 `staff.home` 에서 읽는다 (2026-09-17) */
   const H = 내홈();
   const N = H.줄수;
-  const 공지 = W.tasks.filter(r=>공지중(r) && 공지보임(r)).slice(0,3);
+  const 나공 = (ME && ME.name) || '', 공지 = W.tasks.filter(r => 공지중(r) && 공지대상(r).includes(나공) && !공지읽음(r, 나공)).slice(0,3);      /* 홈 = 나한테 온 · 안 읽은 공지만 — 읽었어요 · 담당자에서 빼면 사라짐 (2026-10-28 22:51 대표 「읽었어요 체크해도 · 담당자에서 나를 빼도 떠 있다」) */
   const 이번주 = W.leave.filter(표정의.leave.보기[0].필터).sort((a,b)=>(a.day||'')>(b.day||'')?1:-1).slice(0,N);
   const 대기 = 할수('leaveok') ? W.leave.filter(승인대기).length : 0;
 
@@ -13956,7 +13956,7 @@ async function 배정고침(id, 몸, 말){
 const 배정출석 = { 답:{}, 중:{}, 열림:new Set(), 날열림:new Set() };
 const 배정TG있음 = x => /희망시간\s*:/.test(String((x && x.fc_memo) || ''));
 function 배정출석칸(x){
-  if(!x || 배정TG있음(x)) return '';
+  if(!x) return '';      /* 희망시간이 있어도 보임 — 배정할 때 언제 오는지 본다 (2026-10-28 22:57 대표 「출석 시간 표기가 없어졌는데」) */
   const id = String(x.id), 열 = 배정출석.열림.has(id), d = 배정출석.답[id];
   let 속 = '';
   if(열){
@@ -14247,11 +14247,11 @@ function 배정판(id){
   판열기(esc(x.name) + ' <span class="who3">' + esc(x.kind === '가이드' ? 'TG' : x.kind) + ' · ' + esc(x.source) + '</span>',
     '<div class="asp-top">' + 상 + '<span class="asp-ph">' + (번 ? '<a href="tel:' + esc(번) + '">' + esc(번보) + '</a>' : '<span class="sub3">전화 없음</span>') + '</span><span class="asp-dam">' + 담칸 + '</span></div>'
     + 배정할일(x) + 배정확인칸(x)
-    + 블('배정 참고', kv(참고))
+    + 블('배정 참고', kv(참고) + 배정출석칸(x))
     + 블('고객이 원하는 것', 원 + 배정신청칸(x), 메.tg.length ? '팝업 TG 메모' : '')
     + 블('수업 진행', 진행)
     + 블('등록', 등록)
-    + '<div class="asp-fold">' + 배정출석칸(x)      /* 접힘(출석 · 원문) — 메모 카드 앞에 둔다 · 뒤에 두면 lbl 카드에 붙거나 칩 줄이 생긴다 */
+    + '<div class="asp-fold">'      /* 접힘(원문) — 메모 카드 앞에 둔다 · 뒤에 두면 lbl 카드에 붙거나 칩 줄이 생긴다 */
     + (x.fc_memo ? '<details class="asp-raw"><summary>FC 메모 원문</summary><div>' + esc(x.fc_memo) + '</div></details>' : '')
     + (x.updated_by ? '<div class="sub3">마지막으로 고친 사람 ' + esc(x.updated_by) + '</div>' : '') + '</div>'
     + 배정메모칸(x));
