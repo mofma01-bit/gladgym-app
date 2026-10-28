@@ -3255,6 +3255,42 @@ const QA = [
 
 let GOALS = {};
 
+/* ═══ 회원 화면 샘플 (?sample=1) ═══ 2026-10-28 결정함 sample=a — 회원에게 앱 쓰는 법을 보여 줄 가짜 회원 화면
+   · 자료 = sample.json(광고용 가짜 회원 · 실제 회원 없음) · 날짜는 오늘에 맞춰 밀어 줌
+   · 종목 · 동작 · 음식 사전만 진짜 서버에서 읽음 · 저장은 이 창 안에서만 · 서버 · 알림톡 · 진짜 앱 저장소는 안 건드림 */
+const 샘플판 = (() => { try{ return new URLSearchParams(location.search).get('sample') === '1'; }catch(e){ return false; } })();
+if(샘플판){
+  const 메모리 = () => { const m = new Map(); return { getItem: k => m.has(String(k)) ? m.get(String(k)) : null, setItem: (k, v) => { m.set(String(k), String(v)); }, removeItem: k => { m.delete(String(k)); }, clear: () => m.clear(), key: i => [...m.keys()][i] || null, get length(){ return m.size; } }; };
+  try{ Object.defineProperty(window, 'localStorage', { value: 메모리(), configurable: true }); Object.defineProperty(window, 'sessionStorage', { value: 메모리(), configurable: true }); }catch(e){}
+  const 원f = window.fetch.bind(window); let 자료P = null;
+  const 밀기 = (T, 날) => { const n = Math.round((new Date(new Date().toISOString().slice(0, 10)) - new Date(날)) / 86400000); if(!n) return T;
+    const 밀 = s => { const t = new Date(s.length === 10 ? s + 'T12:00:00' : s); if(isNaN(t)) return s; t.setDate(t.getDate() + n); return s.length === 10 ? t.toISOString().slice(0, 10) : t.toISOString(); };
+    Object.values(T).forEach(rows => rows.forEach(r => Object.keys(r).forEach(k => { if(typeof r[k] === 'string' && /^\d{4}-\d{2}-\d{2}($|T)/.test(r[k])) r[k] = 밀(r[k]); }))); return T; };
+  const 자료 = () => 자료P || (자료P = 원f('sample.json', { cache:'no-store' }).then(r => r.json()).then(j => { window.__샘플mid = j._mid; return 밀기(j.표, j._날); }));
+  const 거르기 = (rows, q) => { q.forEach((v, k) => { if(['select', 'order', 'limit', 'offset', 'or'].includes(k)) return; const g = r => String(r[k] == null ? '' : r[k]);
+      if(v.startsWith('eq.')) rows = rows.filter(r => g(r) === v.slice(3)); else if(v.startsWith('neq.')) rows = rows.filter(r => g(r) !== v.slice(4));
+      else if(v.startsWith('in.(')){ const s = new Set(v.slice(4, -1).split(',').map(x => x.replace(/"/g, ''))); rows = rows.filter(r => s.has(g(r))); }
+      else if(v.startsWith('gte.')) rows = rows.filter(r => g(r) >= v.slice(4)); else if(v.startsWith('lte.')) rows = rows.filter(r => g(r) <= v.slice(4));
+      else if(v.startsWith('gt.')) rows = rows.filter(r => g(r) > v.slice(3)); else if(v.startsWith('lt.')) rows = rows.filter(r => g(r) < v.slice(3));
+      else if(v === 'is.null') rows = rows.filter(r => r[k] == null); });
+    const o = q.get('order'); if(o) o.split(',').reverse().forEach(z => { const [c, ...w] = z.split('.'), 내림 = w.includes('desc'); rows = rows.slice().sort((a, b) => { const x = a[c], y = b[c]; const r = x == null ? 1 : y == null ? -1 : (typeof x === 'number' && typeof y === 'number') ? x - y : String(x) < String(y) ? -1 : String(x) > String(y) ? 1 : 0; return 내림 ? -r : r; }); });
+    const l = q.get('limit'); return l ? rows.slice(0, +l) : rows; };
+  const 답 = (b, st) => new Response(JSON.stringify(b), { status: st || 200, headers: { 'Content-Type': 'application/json' } });
+  window.fetch = async (u, o) => { o = o || {}; const s = String((u && u.url) || u), m = String(o.method || 'GET').toUpperCase();
+    if(/sample\.json/.test(s) || !/^https?:/.test(s) || s.startsWith(location.origin)) return 원f(u, o);
+    if(!/supabase\.co/.test(s)) return 답({ ok: true });      /* 중앙 서버 · 알림톡 · CRM — 보내지 않음 */
+    if(!s.includes('/rest/v1/') || s.includes('/rest/v1/rpc/')) return 답(m === 'GET' || s.includes('/rpc/') ? [] : {});
+    const url = new URL(s), 표 = url.pathname.split('/rest/v1/')[1].split('/')[0];
+    if(m === 'GET' && ['exercises', 'variants', 'foods'].includes(표)) return 원f(u, o);
+    const T = await 자료(); let j = null; try{ j = JSON.parse(o.body || 'null'); }catch(e){}
+    if(m === 'GET') return 답(거르기(T[표] || [], url.searchParams));
+    if(m === 'POST'){ const rows = Array.isArray(j) ? j : j ? [j] : []; (T[표] = T[표] || []).push(...rows); return 답(rows, 201); }
+    if(m === 'PATCH'){ const rows = 거르기(T[표] || [], url.searchParams); rows.forEach(r => Object.assign(r, j || {})); return 답(rows); }
+    if(m === 'DELETE'){ const rows = 거르기(T[표] || [], url.searchParams); T[표] = (T[표] || []).filter(r => !rows.includes(r)); return 답(rows); }
+    return 답({}); };
+  document.documentElement.classList.add('sample');
+}
+
 /* ═══ 서버 ═══ */
 const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co';
 const SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
@@ -3278,7 +3314,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '477';
+const BUILD = '478';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -3666,6 +3702,7 @@ async function boot(){
        ⚠ 이건 **막는 것이 아니라 줄이는 것**이다. 진짜 문은 전화 인증이다. */
     if(rw){ S.who='me'; S.mid=rw.mid; S.rw=rw.id; S.screen='report'; S.rpOnly=true; }
     try{ history.replaceState(null, '', location.pathname); }catch(e){} }
+  if(샘플판 && S.screen === 'boot' && MEMBERS.some(m => m.id === window.__샘플mid)){ S.who = 'm'; S.mid = window.__샘플mid; S.tab = 'home'; S.screen = 'home'; }      /* 회원 화면 샘플 — 로그인 없이 가짜 회원 */
   if(S.screen === 'boot'){ const au = 로그인기억.읽();      /* 한 번 인증한 기기 — 다시 묻지 않는다(확정 틀 3절). 명단에 없어졌으면 로그인 화면으로 */
     if(au && au.who && au.who !== 'member' && !au.mid){ S.who = 'tr'; S.ttab = 't_today'; S.screen = 't_today'; }      /* 직원 — 트레이너 화면으로 */
     else if(au && au.mid && MEMBERS.some(m => m.id === au.mid)){ S.who = 'm'; S.mid = au.mid; S.tab = 'home'; S.screen = 'home'; setTimeout(인사, 0); setTimeout(갈곳열기, 0); }
@@ -15066,7 +15103,7 @@ async function start(){
   /* 그날 처음 열 때만 길게(문구까지). 같은 날 다시 열면 짧게 — 하루에도 몇 번씩 여는 앱이다 */
   let 처음 = true; try{ 처음 = localStorage.getItem('gg_splash_day') !== ymd(new Date()); localStorage.setItem('gg_splash_day', ymd(new Date())); }catch(e){}
   const sp0 = document.getElementById('splash');
-  if(sp0 && 데스크끼움) sp0.remove();      /* 데스크 창 안 — 여는 그림 없이 바로 */
+  if(sp0 && (데스크끼움 || 샘플판)) sp0.remove();      /* 샘플도 여는 그림 없이 (10/28) */      /* 데스크 창 안 — 여는 그림 없이 바로 */
   if(sp0 && !처음){ sp0.classList.add('quick'); const c = document.getElementById('spcopy'); if(c) c.remove(); }
   try{
     const t0=Date.now();
