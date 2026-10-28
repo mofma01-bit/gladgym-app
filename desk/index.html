@@ -2419,6 +2419,9 @@ button.as-more{display:block;width:100%;background:none;border:0;color:var(--sub
 .as-reg{font-size:12.5px;font-weight:800;border-radius:6px;padding:1px 7px}.as-reg.g{background:#1f3a26;color:#8fd19e}.as-reg.r{background:#4a241b;color:var(--warn)}.as-reg.n{background:var(--dark-4);color:var(--sub)}
 .as-kvs{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px}
 .as-kv{display:flex;flex-direction:column;gap:2px;font-size:13px}.as-kv span{color:var(--sub)}.as-kv b{font-size:14px;font-weight:700}
+.ad-list2{display:grid;gap:6px;max-height:52vh;overflow-y:auto;margin-top:10px}.ad-row2{display:flex;align-items:center;gap:10px;background:var(--dark-3);border:1px solid var(--line);border-radius:12px;padding:8px 10px;min-height:52px}
+.ad-row2 .tx{flex:1;min-width:0}.ad-row2 .tx b{display:block;font-size:14.5px}.ad-row2 .tx small{display:block;font-size:12.5px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ad-done{font-size:13px;font-weight:800;color:var(--teal);padding:0 6px}.ad-hint{margin:12px 2px 4px}.ad-hand{display:flex;align-items:center;justify-content:space-between;margin-top:10px}      /* 찾고 보내기 시안 A (2026-10-28) */
 .ad-hero{display:flex;gap:12px;align-items:flex-start;padding:4px 2px 14px}.ad-hero .ad-ic{width:40px;height:40px;border-radius:12px;background:var(--gold-dim);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:18px;flex:none}
 .ad-hero b{display:block;font-size:15px;line-height:1.45}.ad-hero small{display:block;font-size:13px;color:var(--sub);margin-top:3px;line-height:1.5}
 .ad-card{background:var(--dark-3);border:1px solid var(--line);border-radius:14px;padding:4px 14px}
@@ -2845,7 +2848,7 @@ body:has(#pop.on.tx-side) #gchat .gc-fab:not(.x){display:none}      /* 옆 판�
 
 <script>
 "use strict";
-const BUILD = '472';
+const BUILD = '473';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -14070,7 +14073,7 @@ async function 배정링크보내기(id){ const x = (배정.줄 || []).find(r =>
   catch(e){ toast(/404|없는 길/.test(String(e.message)) ? '아직 보낼 수 없어요 · 준비 중이에요' : String(e.message || '보내지 못했어요').slice(0, 60)); } }
 /* 무료PT 설문보내기 — 찾아서 고르기 (2026-10-26 21:44 대표 「검색창으로 되어야 하지 않을까」)
    찾는 곳 = 배정 줄 · 상담 · 앱 회원(데스크에 이미 있는 자료 · 같은 번호는 하나로) · 목록에 없으면 「직접 입력」 */
-const 직접 = { q:'', 고름:null, 손:false };
+const 직접 = { q:'', 고름:null, 손:false, 보냄:new Set() };
 function 직접후보(q){
   const 키 = 검색키(q), 숫 = String(q || '').replace(/\D/g, ''); if(!키 && 숫.length < 3) return [];
   const 본 = new Map(), 넣 = (name, phone, 곳, 밑) => { const p = String(phone || '').replace(/\D/g, ''); if(!name || p.length < 10) return; const k = p.slice(-8); if(본.has(k)) return; 본.set(k, { name, phone: p, 곳, 밑 }); };
@@ -14079,30 +14082,31 @@ function 직접후보(q){
   (D.m || []).forEach(x => 넣(x.name, x.phone, '회원', x.trainer ? '담당 ' + x.trainer : ''));
   return [...본.values()].filter(x => (키 && 검색키(x.name).includes(키)) || (숫.length >= 3 && x.phone.includes(숫))).slice(0, 30);
 }
-function 직접결과(){
-  if(직접.고름) return '<div class="ad-pick"><span class="ad-av">' + esc(직접.고름.name.slice(0, 1)) + '</span><span class="tx"><b>' + esc(직접.고름.name) + '</b><small>' + esc(번호보기(직접.고름.phone)) + '</small></span><button class="btn ghost sm" data-act="tx:asdre">다시 찾기</button></div>';
+function 직접결과(){      /* 시안 A — 찾은 줄 옆 「보내기」 · 보낸 줄 「✓ 보냄」 (2026-10-28 대표 「멀고 넓고 불편」) */
   if(직접.손) return '<div class="ad-card"><label class="ad-f"><span>이름</span><input class="srch" id="asd_name" placeholder="홍길동" autocomplete="off"></label>'
     + '<label class="ad-f"><span>전화번호</span><input class="srch" id="asd_phone" inputmode="tel" placeholder="010-0000-0000" autocomplete="off"></label></div>'
-    + '<button class="ad-link" data-act="tx:asdhand" data-k="0">‹ 찾기로 돌아가기</button>';
+    + '<div class="ad-hand"><button class="ad-link" data-act="tx:asdhand" data-k="0">‹ 찾기로 돌아가기</button><button class="btn gold sm" data-act="tx:asdsend" data-k="손">보내기</button></div>';
   const 목 = 직접후보(직접.q);
-  return (직접.q.trim() ? (목.length ? '<div class="ad-list">' + 목.map((x, i) => '<button class="ad-row" data-act="tx:asdpick" data-k="' + i + '"><span class="ad-av">' + esc(x.name.slice(0, 1)) + '</span><span class="tx"><b>' + esc(x.name) + '</b><small>' + esc(번호보기(x.phone)) + (x.밑 ? ' · ' + esc(x.밑) : '') + '</small></span><span class="ad-src">' + x.곳 + '</span></button>').join('') + '</div>'
-      : '<div class="empty">찾는 결과가 없습니다<small class="e2">목록에 없는 분은 아래 「직접 입력」으로 보내 주세요</small></div>') : '<div class="empty">보낼 분을 아직 고르지 않았습니다<small class="e2">위 칸에 이름이나 전화번호 뒷자리를 입력해 주세요</small></div>')
+  const 줄 = (x, i) => { const 끝 = 직접.보냄.has(x.phone); return '<div class="ad-row2"><span class="ad-av">' + esc(x.name.slice(0, 1)) + '</span><span class="tx"><b>' + esc(x.name) + '</b><small>' + esc(번호보기(x.phone)) + (x.밑 ? ' · ' + esc(x.밑) : '') + '</small></span>'
+    + (끝 ? '<span class="ad-done">✓ 보냄</span>' : '<button class="btn gold sm" data-act="tx:asdsend" data-k="' + i + '">보내기</button>') + '</div>'; };
+  return (직접.q.trim() ? (목.length ? '<div class="ad-list2">' + 목.map(줄).join('') + '</div>' : '<div class="empty">찾는 결과가 없습니다</div>') : '<div class="sub3 ad-hint">이름이나 전화 뒷자리를 넣으면 바로 아래에 떠요</div>')
     + '<button class="ad-link" data-act="tx:asdhand" data-k="1">목록에 없으면 직접 입력 ›</button>';
 }
 function 배정직접판(){
-  Object.assign(직접, { q:'', 고름:null, 손:false });
-  판열기('무료PT 설문보내기', '<div class="ad-hero"><span class="ad-ic">✉</span><span><b>무료 PT 희망 시간 설문 링크를 알림톡으로 보냅니다</b><small>배정 · 상담 · 회원에서 찾아 고르세요 · 같은 번호가 있으면 그 줄에 기록돼요</small></span></div>'
+  Object.assign(직접, { q:'', 고름:null, 손:false }); 직접.보냄 = new Set();
+  가운데창('<div class="tx-ph"><b>무료PT 설문보내기</b><button data-act="popclose">✕</button></div><div class="sub3" style="margin:-4px 0 10px">희망 시간 설문 링크를 알림톡으로 보내요</div>'
     + '<label class="ad-q"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input class="srch" id="asdq" placeholder="이름 · 전화 뒷자리로 찾기" autocomplete="off"></label>'
-    + '<div id="asdres">' + 직접결과() + '</div>',
-    '<div class="tx-fbtns ad-foot"><span class="sp"></span><button class="btn ghost" data-act="popclose">닫기</button><button class="btn gold" data-act="tx:asdirectgo">무료PT 설문보내기</button></div>');
+    + '<div id="asdres">' + 직접결과() + '</div>', 440);
   setTimeout(() => { const q = $('#asdq'); if(q) q.focus(); }, 30); }
-function 직접다시(){ const r = $('#asdres'); if(r) r.innerHTML = 직접결과(); const q = $('#asdq'); if(q) q.closest('.ad-q').style.display = 직접.고름 || 직접.손 ? 'none' : ''; }
+function 직접다시(){ const r = $('#asdres'); if(r) r.innerHTML = 직접결과(); const q = $('#asdq'); if(q) q.closest('.ad-q').style.display = 직접.손 ? 'none' : ''; }
 document.addEventListener('input', ev => { if(!ev.target || ev.target.id !== 'asdq') return; 직접.q = ev.target.value; 직접.고름 = null; 직접다시(); });
-async function 배정직접보내기(){ const v = k => (($('#asd_' + k) || {}).value || '').trim(), 이름 = 직접.고름 ? 직접.고름.name : v('name'), 번호 = 직접.고름 ? 직접.고름.phone : v('phone');
-  if(!직접.고름 && !직접.손){ toast('보낼 분을 찾아 골라 주세요'); return; }
-  if(!이름 || 번호.replace(/\D/g, '').length < 10){ toast('이름과 전화번호를 넣어 주세요'); return; }
-  if(!await 묻기(이름 + ' 님께 TG 신청 링크를 보낼까요?' + String.fromCharCode(10) + '알림톡으로 나갑니다' + 늦은때())) return;
-  try{ const d = await crm('guide_resend', { name: 이름, phone: 번호 }); if(d && d.ok === false) throw new Error(d.why || '보내지 못했어요'); 기록남기기({ area:'배정', action:'발송', tbl:'assign_leads', row_id:'', customer:이름, phone:번호, detail:'TG 설문보내기(직접 · 알림톡)' }); popClose(); toast('신청 링크를 보냈어요'); 배정.때 = 0; 배정받기(); }
+async function 배정직접보내기(k){ const v = n => (($('#asd_' + n) || {}).value || '').trim(), x = k === '손' ? null : 직접후보(직접.q)[+k];
+  const 이름 = x ? x.name : v('name'), 번호 = x ? x.phone : v('phone');
+  if(!이름 || String(번호).replace(/\D/g, '').length < 10){ toast(k === '손' ? '이름과 전화번호를 넣어 주세요' : '보낼 분을 찾아 주세요'); return; }
+  if(!await 묻기(이름 + ' 님께 무료PT 설문 링크를 보낼까요?' + String.fromCharCode(10) + '알림톡으로 나갑니다' + 늦은때())) return;
+  try{ const d = await crm('guide_resend', { name: 이름, phone: 번호 }); if(d && d.ok === false) throw new Error(d.why || '보내지 못했어요');
+    기록남기기({ area:'배정', action:'발송', tbl:'assign_leads', row_id:'', customer:이름, phone:번호, detail:'TG 설문보내기(직접 · 알림톡)' });
+    직접.보냄.add(String(번호).replace(/\D/g, '')); if(k === '손') 직접.손 = false; 직접다시(); toast(이름 + ' 님께 보냈어요'); 배정.때 = 0; 배정받기(); }      /* 창은 그대로 — 이어서 다른 분도 (시안 A) */
   catch(e){ toast(/404|없는 길/.test(String(e.message)) ? '아직 보낼 수 없어요 · 준비 중이에요' : String(e.message || '보내지 못했어요').slice(0, 60)); } }
 /* 재연락 기록 — 출석 기록처럼 (2026-10-25 대표 「000 트레이너가 000일로 알림 받기 로그를 해당 페이지에서 볼 수 있게」) */
 const 재연락기록 = x => { const L = Array.isArray(x.recall_log) ? x.recall_log : []; if(!L.length) return '';
@@ -14951,10 +14955,8 @@ async function txAct(a, el){
   if(a==='asswapgo'){ const [id, w] = String(k).split('|'); if(await 배정고침(id, { swap_by:(ME && ME.name) || '', swap_why:w, swap_at:new Date().toISOString() }, '담당 교체 요청 · ' + w)){ if(판길.length) 배정판(id); else popClose(); } return; }
   if(a==='asstop'){ await 배정정지바꿈(); return; }
   if(a==='asdirect'){ 배정직접판(); return; }
-  if(a==='asdpick'){ const x = 직접후보(직접.q)[+k]; if(x){ 직접.고름 = x; 직접다시(); } return; }
-  if(a==='asdre'){ 직접.고름 = null; 직접다시(); const q = $('#asdq'); if(q) q.focus(); return; }
+  if(a==='asdsend'){ await 배정직접보내기(k); return; }
   if(a==='asdhand'){ 직접.손 = k === '1'; 직접.고름 = null; 직접다시(); if(직접.손){ const n = $('#asd_name'); if(n) n.focus(); } return; }
-  if(a==='asdirectgo'){ await 배정직접보내기(); return; }
   if(a==='asassign'){ const [id, t] = String(k).split('|'), x0 = (배정.줄 || []).find(r => String(r.id) === String(id)); if(await 배정고침(id, Object.assign({ trainers:[t], assigned:'배정완료', assigned_on:TODAY, assign_note:TODAY + ' ' + ((ME && ME.name) || '') + ' → ' + t, swap_by:null, swap_why:null, swap_at:null }, x0 && 배정PT중(x0) && 'pt_ok' in x0 && 배정관리자() ? { pt_ok: ((ME && ME.name) || '') + ' ' + new Date().toISOString().slice(0, 16).replace('T', ' ') + ' 담당 바꿈' } : {}), '담당 ' + t + ' · 배정완료')){ if(판길.length) 배정판(id); else popClose(); } return; }      /* 상세에서 왔으면 상세로(새 담당) — 뒤로 길도 거기까지 걷힘 */
   if(a==='asst'){ const [id, st] = String(k).split('|'); await 배정고침(id, Object.assign({ progress:st }, st === '진행중' ? { recall_on:null, later_at:null } : {}), '진행상황 「' + st + '」'); if($('#pop').classList.contains('on')) 배정판(id); return; }
   if(a==='clack'){ await 청소확인(k); return; }
