@@ -2829,7 +2829,7 @@ body:has(#pop.on.tx-side) #gchat .gc-fab:not(.x){display:none}      /* 옆 판�
 
 <script>
 "use strict";
-const BUILD = '463';
+const BUILD = '465';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -8610,23 +8610,33 @@ function 당직순서판(){ const 관 = 할수('leaveok'), ord = 순서편 || �
         + (관 && x.갈 !== '공휴일' ? '<button class="x" data-act="tx:dthrm" data-k="' + esc(x.d) + '" data-v2="' + (x.갈 === '센터 휴무' ? 'off' : 'hol') + '" title="삭제">✕</button>' : '') + '</div>').join('') + '</div>'
     + (관 ? '<div class="dt-new"><input type="date" id="dtd" class="inp"><input id="dtn" class="inp" maxlength="20" placeholder="이름 — 예) 추석 휴무 · 임시 공휴일"><button class="btn ghost sm" data-act="tx:dthadd" data-v2="off">센터 휴무일 추가</button><button class="btn ghost sm" data-act="tx:dthadd" data-v2="hol">공휴일 추가</button></div>' : '')); }
 /* 당직 교체 — 누구나 신청(tr_leave 「당직 교체」 req) · 관리자 승인하면 그 날 당직 사람이 바뀌고 이력이 남음 (결정 swap admin · 메모 「신청은 자유롭게 · 승인은 관리자」) */
+let 교체편 = null;      /* { duty, 상대 } — 상대 선생님을 누르면 그 선생님 당직 날짜가 뜸 */
+const 당직이름 = id => (사람(id) || {}).name || '';
 function 당직교체칸(r){ const 나 = ME && ME.id, 관 = 할수('leaveok'), 이 = (r.extra || {}).이력 || [];
-  const 대기 = (W.leave || []).filter(x => x.kind === '당직 교체' && x.status === 'req' && ((x.extra || {}).교체 || {}).duty === r.id);
+  const 대기 = (W.leave || []).filter(x => x.kind === '당직 교체' && x.status === 'req' && [((x.extra || {}).교체 || {}).duty, ((x.extra || {}).교체 || {}).duty2].includes(r.id));
   const 남 = (W.staff || []).filter(p => p.active !== false && p.name && p.id !== r.staff_id && !퇴사명().has(String(p.name).trim()));
+  const 편 = 교체편 && 교체편.duty === r.id ? 교체편 : null;
+  const 상대날 = 편 ? (W.leave || []).filter(x => x.kind === '당직' && x.staff_id === 편.상대 && x.day >= TODAY && x.id !== r.id).sort((a, b) => a.day < b.day ? -1 : 1) : [];
+  const 대기글 = x => { const 교 = (x.extra || {}).교체 || {}, 둘 = (W.leave || []).find(z => z.id === 교.duty2);
+    return 교.duty2 ? 날짜한글(x.day) + ' ' + 당직이름(교.a) + ' ↔ ' + (둘 ? 날짜한글(둘.day) : '') + ' ' + 당직이름(교.b) : '→ ' + 당직이름(교.to); };
   return '<div class="tx-sec dt-sw"><div class="lbl">당직 교체</div>'
-    + (이.length ? '<div class="dt-his">' + 이.map(h => '<div>' + esc(h.from || '') + ' → <b>' + esc(h.to || '') + '</b> <span class="sub3">' + esc(h.신청 || '') + ' 신청 · ' + esc(h.승인 || '') + ' 승인 · ' + esc(시각한글(h.at)) + '</span></div>').join('') + '</div>' : '')
-    + (대기.length ? 대기.map(x => '<div class="dt-wait"><span class="tag">승인 대기</span> → <b>' + esc((사람(((x.extra || {}).교체 || {}).to) || {}).name || '') + '</b> <span class="sub3">' + esc((사람(x.staff_id) || {}).name || '') + ' 신청</span>'
+    + (이.length ? '<div class="dt-his">' + 이.map(h => '<div>' + esc(h.from || '') + ' → <b>' + esc(h.to || '') + '</b>' + (h.맞 ? ' <span class="sub3">(' + esc(h.맞) + ')</span>' : '') + ' <span class="sub3">' + esc(h.신청 || '') + ' 신청 · ' + esc(h.승인 || '') + ' 승인 · ' + esc(시각한글(h.at)) + '</span></div>').join('') + '</div>' : '')
+    + (대기.length ? 대기.map(x => '<div class="dt-wait"><span class="tag">승인 대기</span> <b>' + esc(대기글(x)) + '</b> <span class="sub3">' + esc(당직이름(x.staff_id)) + ' 신청</span>'
         + (관 ? '<button class="btn gold sm" data-act="tx:dswapok" data-id="' + esc(x.id) + '">승인</button><button class="btn ghost sm" data-act="tx:dswapno" data-id="' + esc(x.id) + '">반려</button>' : '') + '</div>').join('')
-      : r.day >= TODAY && 나 ? '<div class="sub3" style="margin-bottom:6px">교체할 선생님을 눌러 신청해요 · 관리자가 승인하면 교체돼요</div><div class="dt-add">' + 남.map(p => '<button class="tx-pchip" data-act="tx:dswap" data-id="' + esc(r.id) + '" data-v2="' + esc(p.id) + '">' + 이름딱지(p.id) + '</button>').join('') + '</div>' : '')
+      : r.day >= TODAY && 나 ? '<div class="sub3" style="margin-bottom:6px">바꿀 선생님 → 그 선생님 당직 날짜를 고르면 서로 교체 신청돼요 · 관리자 승인 한 번이면 둘 다 바뀌어요</div>'
+        + '<div class="dt-add">' + 남.map(p => '<button class="tx-pchip' + (편 && 편.상대 === p.id ? ' on' : '') + '" data-act="tx:dswapt" data-id="' + esc(r.id) + '" data-v2="' + esc(p.id) + '">' + 이름딱지(p.id) + '</button>').join('') + '</div>'
+        + (편 ? '<div class="dt-add">' + (상대날.length ? 상대날.map(z => '<button class="chip" data-act="tx:dswap" data-id="' + esc(r.id) + '" data-v2="' + esc(z.id) + '">' + esc(날짜한글(z.day)) + '</button>').join('') : '<span class="sub3">' + esc(당직이름(편.상대)) + ' 선생님은 앞으로 당직이 없어요</span>') + '</div>' : '') : '')
     + '</div>'; }
-async function 당직교체승인(x, 승인){ const 교 = (x.extra || {}).교체 || {}, 당 = (W.leave || []).find(r => r.id === 교.duty);
-  if(승인 && !당){ toast('그 날 당직을 찾지 못했어요'); return; }
-  if(!await 묻기(승인 ? (날짜한글(x.day) + ' 당직을 ' + ((사람(교.to) || {}).name || '') + ' 선생님으로 교체할까요?') : '이 교체 신청을 반려할까요?')) return;
-  try{ if(승인){ const ex = Object.assign({}, 당.extra || {}), 이 = (ex.이력 || []).concat([{ from:(사람(당.staff_id) || {}).name || '', to:(사람(교.to) || {}).name || '', 신청:(사람(x.staff_id) || {}).name || '', 승인:나이름(), at:new Date().toISOString() }]);
-      ex.이력 = 이; if(!ex.순번) ex.순번 = 당.staff_id;
-      await usend('tr_leave?id=eq.' + encodeURIComponent(당.id), 'PATCH', { staff_id:교.to, extra:ex }); Object.assign(당, { staff_id:교.to, extra:ex }); }
+async function 당직교체승인(x, 승인){ const 교 = (x.extra || {}).교체 || {}, 당 = (W.leave || []).find(r => r.id === 교.duty), 둘 = 교.duty2 ? (W.leave || []).find(r => r.id === 교.duty2) : null;
+  if(승인 && (!당 || (교.duty2 && !둘))){ toast('교체할 당직을 찾지 못했어요'); return; }
+  const 말 = 교.duty2 ? 날짜한글(당 ? 당.day : x.day) + ' ' + 당직이름(교.a) + ' ↔ ' + 날짜한글(둘 ? 둘.day : '') + ' ' + 당직이름(교.b) : 날짜한글(x.day) + ' 당직을 ' + 당직이름(교.to) + ' 선생님으로';
+  if(!await 묻기(승인 ? 말 + ' 교체할까요?' : '이 교체 신청을 반려할까요?' + String.fromCharCode(10) + 말)) return;
+  const 바꿈 = async (줄, 새, 맞) => { const ex = Object.assign({}, 줄.extra || {}); if(!ex.순번) ex.순번 = 줄.staff_id;
+    ex.이력 = (ex.이력 || []).concat([{ from:당직이름(줄.staff_id), to:당직이름(새), 맞, 신청:당직이름(x.staff_id), 승인:나이름(), at:new Date().toISOString() }]);
+    await usend('tr_leave?id=eq.' + encodeURIComponent(줄.id), 'PATCH', { staff_id:새, extra:ex }); Object.assign(줄, { staff_id:새, extra:ex }); };
+  try{ if(승인){ if(둘){ const a = 당.staff_id, b = 둘.staff_id; await 바꿈(당, b, 날짜한글(둘.day) + '과 맞바꿈'); await 바꿈(둘, a, 날짜한글(당.day) + '과 맞바꿈'); } else await 바꿈(당, 교.to, ''); }
     await usend('tr_leave?id=eq.' + encodeURIComponent(x.id), 'PATCH', { status: 승인 ? 'ok' : 'no' }); x.status = 승인 ? 'ok' : 'no';
-    기록남기기({ area:'연월차', action:'수정', tbl:'tr_leave', row_id:교.duty || x.id, detail:'당직 교체 ' + (승인 ? '승인' : '반려') + ' — ' + x.day + ' ' + (x.reason || '') });
+    기록남기기({ area:'연월차', action:'수정', tbl:'tr_leave', row_id:교.duty || x.id, detail:'당직 교체 ' + (승인 ? '승인' : '반려') + ' — ' + 말 });
     toast(승인 ? '당직을 교체했어요' : '반려했어요'); if(당) txView('leave', 당.id); render(); }
   catch(e){ toast('저장하지 못했어요 — ' + String(e.message || '').slice(0, 60)); } }
 async function 당직자동(){      /* 매달 20일부터 다음 달 당직을 순서표대로 (결정 next auto) — 다음 달에 당직이 하나도 없을 때만 · 관리자 화면에서 */
@@ -13791,10 +13801,10 @@ function v배정(){
     ? (/404|42P01|does not exist/.test(배정.왜) ? '<div class="empty why"><b>배정을 아직 준비 중이에요</b>관리자에게 알려 주세요</div>'
        : '<div class="empty why"><b>배정 내용을 불러오지 못했어요</b>' + esc(배정.왜) + ' · 잠시 뒤 다시 열어 주세요</div>')
     : '<div class="ck-load"><b>불러오는 중이에요</b>잠시만 기다려 주세요</div>';
-  const D = 배정범위(), 열 = D.filter(배정열림), 미배 = 할수('assignall') ? (배정.줄 || []).filter(x => 배정미배(x) && 배정열림(x) && !x.later_at) : [], 나중 = 할수('assignall') ? (배정.줄 || []).filter(x => 배정미배(x) && 배정열림(x) && x.later_at) : [];
+  const D = 배정범위(), 열 = D.filter(배정열림), 미배 = 할수('assignall') ? (배정.줄 || []).filter(x => 배정미배(x) && 배정열림(x) && !x.later_at && (배정TG있음(x) || x.apply_at || x.ask === '담당 넣기')) : []      /* 담당 없음 = TG 메모 있음 · 설문 신청한 분만 (2026-10-28 대표 「메모 있는 건 말고는 담당 없음에 올리지 마」) */, 나중 = 할수('assignall') ? (배정.줄 || []).filter(x => 배정미배(x) && 배정열림(x) && x.later_at) : [];
   const 재연 = 열.filter(x => x.progress === '재연락 필요' && x.recall_on && x.recall_on <= TODAY);      /* 다시 연락할 날 (2026-10-25 대표 a1) */
   /* 카드 다시 짬 (2026-10-27 대표 결정함 b1 「설문 신청자 위주 — 담당 없는 고객 · 첫 수업 진행 안 된 고객 · 수업이 멈춰 있는 고객」)
-     담당 없음 = 미배정 + 확인 요청 「담당 넣기」(같은 일이었다 · 나중에 희망은 뺌 · 설문 쓴 분 먼저) / 첫 수업 안 잡음 = 회원권 남은 분만 /
+     담당 없음 = 미배정 중 TG 메모 · 설문 신청 · 확인 요청 「담당 넣기」 있는 분만 (2026-10-28 대표 「메모 있는 건 말고는 올리지 마」 · 나중에 희망은 뺌 · 설문 쓴 분 먼저) / 첫 수업 안 잡음 = 회원권 남은 분만 /
      수업 멈춤 = 확인 요청 「진행중인데 수업 없음」 + 오래 멈춤(60일) / 확인 = 남은 확인 요청 중 「확인」 안 한 것 / 나중에 희망 = 「나중에 희망」을 누른 분만 · 맨 오른쪽 */
   const 회원권남음 = x => !x.mem_end || x.mem_end >= TODAY;
   const 첫 = 열.filter(배정첫);
@@ -13808,7 +13818,7 @@ function v배정(){
     { k:'재연락', 이름:'다시 연락할 날', 설:'「재연락 필요」로 정한 날이 됐어요. 연락하고 진행상황을 바꿔 주세요', hot:1, L: 재연.slice().sort((a, b) => String(a.recall_on).localeCompare(String(b.recall_on))),
       오른: x => '<span class="as-tag">' + esc(String(x.recall_on).slice(5).replace('-', '/')) + ' 알림</span>' },
     { k:'교체', 이름:'교체 요청', 설:'담당 선생님이 바꿔 달라고 했어요', hot:1, L: 교, 오른: x => '<button class="as-btn" data-act="tx:agpick" data-k="' + esc(x.id) + '">새 담당</button>' },
-    { k:'미배정', 이름:'담당 없음', 설:'설문을 보냈는데 담당이 없어요. 담당을 정해 주세요', hot:1, 늘: 할수('assignall'), L: 미배.slice().sort((a, b) => (!!b.apply_at - !!a.apply_at) || String(b.apply_at || '').localeCompare(String(a.apply_at || ''))), 빈:'담당 없는 분이 없습니다',
+    { k:'미배정', 이름:'담당 없음', 설:'TG 메모가 있거나 설문을 신청했는데 담당이 없어요. 담당을 정해 주세요', hot:1, 늘: 할수('assignall'), L: 미배.slice().sort((a, b) => (!!b.apply_at - !!a.apply_at) || String(b.apply_at || '').localeCompare(String(a.apply_at || ''))), 빈:'담당 없는 분이 없습니다',
       오른: x => (x.apply_at ? '<span class="as-tag ok">설문</span>' : '') + 메모딱(x) + (배정쓰기(x) ? (배정PT중(x) && x.pt_trainer ? '<button class="as-btn g" data-act="tx:asassign" data-k="' + esc(x.id + '|' + x.pt_trainer) + '">' + esc(x.pt_trainer) + ' 확인</button>' : '') + (할수('assignset') ? '<button class="as-btn" data-act="tx:agpick" data-k="' + esc(x.id) + '">담당 정하기</button>' : '') : '') },
     { k:'첫', 이름:'첫 수업 안 잡음', 설:'배정됐는데 1회차 수업이 없어요 · 회원권 남은 분만', hot:1, 늘:1, L: 첫.slice().sort((a, b) => 배정일(b) - 배정일(a)), 오른: 메모딱 },
     { k:'멈', 이름:'수업 멈춤', 설:'배정 이후 TG 수업이 멈췄어요. 진행상황을 체크해 주세요', 늘:1, L: 멈춤.slice().sort((a, b) => 배정일(b) - 배정일(a)), 정리:1,
@@ -15051,6 +15061,7 @@ async function txAct(a, el){
   /* ── 노션식 속성 줄 ── */
   if(a==='pedit'){ 속성편집(k, 시트.id, v2, el); return; }
   if(a==='tedit'){
+    if(el.classList.contains('on') && 칸편집) return;      /* 편집 중인 칸 안을 누름 = 글 커서 — 다시 열어 전체 선택하지 않음 (2026-10-28 대표 「클릭해도 전체 선택 해제가 안 됨」) */
     const id3 = el.dataset.id;
     const 이미 = !!(고른칸 && 고른칸.key === k && 고른칸.id === id3 && 고른칸.k === v2);
     const c3 = 열들(k).find(z => z.k === v2) || {};
@@ -15196,10 +15207,13 @@ async function txAct(a, el){
     const 새 = (c[f] || []).filter(x => x.d !== dd).concat([{ d:dd, n:nn || (f === 'off' ? '센터 휴무' : '공휴일') }]).sort((a, b) => a.d < b.d ? -1 : 1);
     if(await 당직설정저장({ [f]:새 }, 날짜한글(dd) + '을 ' + (f === 'off' ? '센터 휴무일(당직 없음)' : '공휴일(당직 있음)') + '로 추가할까요?')) render(); 당직순서판(); return; }
   if(a==='dthrm'){ const f = v2 === 'off' ? 'off' : 'hol', c = W.duty || {}; if(await 당직설정저장({ [f]:(c[f] || []).filter(x => x.d !== k) }, 날짜한글(k) + ' ' + (f === 'off' ? '센터 휴무일' : '공휴일') + '을 삭제할까요?')) render(); 당직순서판(); return; }
-  if(a==='dswap'){ const r = (W.leave || []).find(x => x.id === id); if(!r) return; const 누구 = (사람(v2) || {}).name || '';
-    if(!await 묻기(날짜한글(r.day) + ' 당직을 ' + 누구 + ' 선생님과 교체 신청할까요?' + String.fromCharCode(10) + '관리자가 승인하면 교체돼요')) return;
-    const 줄 = { id:crypto.randomUUID(), kind:'당직 교체', staff_id:ME.id, day:r.day, status:'req', vis:'all', reason:((사람(r.staff_id) || {}).name || '') + ' → ' + 누구, extra:{ 교체:{ duty:r.id, from:r.staff_id, to:v2 } } };
-    try{ const o = await usend('tr_leave', 'POST', [줄], 'return=representation'); W.leave.push(Object.assign({}, 줄, (o && o[0]) || {})); 기록남기기({ area:'연월차', action:'생성', tbl:'tr_leave', row_id:r.id, detail:'당직 교체 신청 — ' + r.day + ' ' + 줄.reason }); toast('신청했어요 · 관리자가 승인하면 교체돼요'); txView('leave', r.id); render(); }
+  if(a==='dswapt'){ 교체편 = { duty:id, 상대:v2 }; txView('leave', id); return; }      /* 서로 교체 (2026-10-28) */
+  if(a==='dswap'){ const r = (W.leave || []).find(x => x.id === id), z = (W.leave || []).find(x => x.id === v2); if(!r || !z) return;
+    const 말 = 날짜한글(r.day) + ' ' + 당직이름(r.staff_id) + ' ↔ ' + 날짜한글(z.day) + ' ' + 당직이름(z.staff_id);
+    if(!await 묻기(말 + String.fromCharCode(10) + '서로 교체 신청할까요? 관리자가 승인하면 둘 다 바뀌어요')) return;
+    const 줄 = { id:crypto.randomUUID(), kind:'당직 교체', staff_id:ME.id, day:r.day, status:'req', vis:'all', reason:말, extra:{ 교체:{ duty:r.id, duty2:z.id, a:r.staff_id, b:z.staff_id } } };
+    try{ const o = await usend('tr_leave', 'POST', [줄], 'return=representation'); W.leave.push(Object.assign({}, 줄, (o && o[0]) || {})); 교체편 = null;
+      기록남기기({ area:'연월차', action:'생성', tbl:'tr_leave', row_id:r.id, detail:'당직 교체 신청 — ' + 말 }); toast('신청했어요 · 관리자가 승인하면 서로 바뀌어요'); txView('leave', r.id); render(); }
     catch(e){ toast('신청하지 못했어요 — ' + String(e.message || '').slice(0, 60)); } return; }
   if(a==='dswapok' || a==='dswapno'){ const x = (W.leave || []).find(z => z.id === id); if(x) await 당직교체승인(x, a === 'dswapok'); return; }
   if(a==='pgclose'){ await 본문먼저(); popClose(); return; }      /* 페이지 아래 「닫기」 (2026-10-27 대표 「완료 말고 닫기」) */
