@@ -3316,7 +3316,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '482';
+const BUILD = '483';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -6096,7 +6096,7 @@ const ST = [
  {i:'s09', v:'et26:a', n:'광배 스트레칭',   t:'좌우 25초', d:'기둥을 잡고 엉덩이를 뒤로 빼며 겨드랑이 옆을 늘입니다'},
  {i:'s10', v:'et06:a', n:'캣카우',                  t:'10회',      d:'네발기기에서 등을 둥글렸다 폈다. 숨에 맞춰 천천히'},
  {i:'s11', v:'et07:a', n:'흉추 회전 스트레칭',    t:'좌우 8회',  d:'한 손을 뒤통수에 대고 팔꿈치를 천장 쪽으로 열어 줍니다'},
- {i:'s12', v:'pr11:a', n:'스레드 더 니들',          t:'좌우 20초', d:'팔을 반대쪽 겨드랑이 밑으로 통과시켜 어깨를 바닥에 붙입니다'},
+ {i:'s12', v:'pr11:a', n:'흉추 가동성 ( 스레드 더 니들)', t:'좌우 20초', d:'팔을 반대쪽 겨드랑이 밑으로 통과시켜 어깨를 바닥에 붙입니다'},
  {i:'s13', v:'pr12:a', n:'차일드 포즈',             t:'30초',      d:'무릎을 벌리고 엉덩이를 발뒤꿈치로, 팔은 앞으로 멀리 뻗습니다'},
  {i:'s14', v:'pr13:a', n:'옆구리 스트레칭',           t:'좌우 20초', d:'한 팔을 머리 위로 넘겨 몸통을 옆으로 기울입니다'},
  {i:'s15', v:'et09:a', n:'장요근 스트레칭', t:'좌우 30초', d:'뒷다리 엉덩이에 힘을 주고 골반을 앞으로 밉니다. 허리를 젖히지 마세요'},
@@ -6756,8 +6756,14 @@ const 팁글 = t => `${esc((exOf(t.ex_id) || {}).n || '유산소')} ${t.minutes}
 const 팁결과 = t => t.done_at ? `<span class="ctok">✓ 유산소 ${t.done_min || t.minutes}분 함</span>` : (t.on_date < TODAY ? '<span class="ctno">— 안 함</span>' : '<span class="ctno">아직 안 함</span>');
 function 팁줄들(wid){ const ts = 팁of(wid); if(!ts.length) return '';
   return `<div class="ctips">${ts.map(t => `<div class="ctip"><span class="hl" style="background:#b9b1a2">추가한 유산소</span><span>${팁글(t)}</span>${팁결과(t)}${S.who === 'tr' && !t.done_at && t.on_date === TODAY ? `<button class="ctx" data-act="ctipdel:${t.id}" aria-label="삭제">✕</button>` : ''}</div>`).join('')}</div>`; }
+/* 수업 중 「종목 추가」로 유산소를 고르면 — 지금 수업에서 할지 · 개인운동으로 줄지 (2026-10-30 대표 「수업할 때 유산소는 개인운동으로 줄 수 있는데 선택하게 · 개인운동이면 회원 앱에 유산소 운동하기」) */
+function 유산소어디(ex, va){ const n = exName(ex, va);
+  openSheet(() => `<div class="h2">${esc(n)} <small>언제 할까요?</small></div>
+    <button class="btn blue go" data-act="ctgive:${ex}">개인운동으로 주기 <small>회원 앱에 「유산소가 들어왔어요」 · 오늘 밤까지</small></button>
+    <button class="btn ghost go" data-act="add:${ex}:${va}:now">지금 수업에서 하기</button>
+    <button class="btn ghost sm" data-act="close">닫기</button>`); }
 function sheetCtip(){ const w = live(); if(!w) return;
-  const 다 = 유넣기기구(); if(!S.ct || !다.some(e => e.id === S.ct.ex)) S.ct = { ex: (다[0] || {}).id, min: 20, spd: null, inc: 0 };
+  const 다 = 유넣기기구(); if(S.ct && S.ct.ex && !다.some(e => e.id === S.ct.ex) && (exOf(S.ct.ex) || {}).cardio) 다.unshift(exOf(S.ct.ex));      /* 종목 추가에서 고른 유산소는 센터 넷 밖이어도 그대로 */ if(!S.ct || !다.some(e => e.id === S.ct.ex)) S.ct = { ex: (다[0] || {}).id, min: 20, spd: null, inc: 0 };
   openSheet(() => { const c = S.ct, e = exOf(c.ex) || {}, 경 = 경사최대(c.ex), 속이름 = 경 || /천국/.test(e.n || '') ? '속도' : '레벨';      /* 그릴 때마다 지금 기구로 다시 센다 */
     if(c.spd == null) c.spd = 경 ? 5.5 : 6;
     const 셈 = (k, 이름, 값, 단위) => `<div class="ctc"><span class="lb">${이름}</span><div class="ctn"><button data-act="ctd:${k}:-1" aria-label="${이름} 줄이기">−</button><b>${값}<small>${단위}</small></b><button data-act="ctd:${k}:1" aria-label="${이름} 늘리기">＋</button></div></div>`;
@@ -14276,7 +14282,8 @@ document.addEventListener('click', async ev=>{
     case 'part': S.pickPart=rest[0]; render(); setTimeout(칠하기,0); return;
     case 'peq': S.pickEq=rest[0]; S.pickOpen=false; render(); setTimeout(칠하기,0); return;      /* 고르면 접는다 — 펼친 채면 종목이 두세 개만 보인다 */
     case 'pickvar': sheetPickVar(rest[0]); return;
-    case 'add': { const [ex,va]=rest;
+    case 'add': { const [ex,va,때]=rest;
+      if(w && w.kind === '수업' && S.who === 'tr' && 때 !== 'now' && (exOf(ex) || {}).cardio && D.ctips){ 유산소어디(ex, va); return; }      /* 수업 중 유산소 = 지금 / 개인운동 고르기 (2026-10-30 대표) */
       if(!w) newLive('빈 운동', [], '개인운동');
       const last=lastSet(ex,va), 하던것 = live().items[live().cur];
       { const 유 = !!exOf(ex).cardio, 지들 = 유 ? null : 지난세트들(live().mid || S.mid, ex, va);      /* 플래너 — 지난 세트 전부 채운 채 · 처음이면 빈 칸 (2026-10-23) */
@@ -14551,7 +14558,8 @@ document.addEventListener('click', async ev=>{
     case 'rgo': S.rest.until=Date.now()+S.rest.sec*1000; drawSheet(); return;
     case 'rskip': S.rest=null; closeSheet(); return;
     case 'cardio': S.cpick = null; S.cgoal = 0; sheetCardio(); return;
-    case 'ctipnew': S.ct = null; sheetCtip(); return;      /* 유산소 넣어주기 (2026-10-24) */
+    case 'ctipnew': S.ct = null; sheetCtip(); return;
+    case 'ctgive': closeSheet(); S.ct = { ex: rest[0], min: 20, spd: null, inc: 0 }; setTimeout(sheetCtip, 0); return;      /* 종목 추가 → 개인운동으로 주기 (2026-10-30) */      /* 유산소 넣어주기 (2026-10-24) */
     case 'ctex': S.ct.ex = rest[0]; S.ct.spd = null; S.ct.inc = 0; drawSheet(); return;
     case 'ctd': { const c = S.ct, k = rest[0], d = +rest[1], 경 = 경사최대(c.ex);
       if(k === 'min') c.min = Math.max(5, Math.min(120, c.min + d * 5));
