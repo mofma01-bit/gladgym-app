@@ -3326,7 +3326,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '487';
+const BUILD = '488';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -5930,7 +5930,7 @@ function vPick(){
     <button class="mrow2 wide" data-exrow="1rm 원알엠 일알엠 원rm 1알엠 1rm측정 측정 최대중량 맥스 max onerepmax" data-part="__1rm" data-eq="" style="display:none" data-act="rmaddpick">
       <span class="mt"><b style="color:var(--gold)">1RM 측정 종목 추가</b><small>추가하면 바로 측정 계획이 열립니다</small></span><em class="pkadd">＋</em></button>
     <button class="mrow2 wide pknew" id="pknew" data-act="pknew" style="display:none"><span class="mt"><b>＋ 「<span id="pknewq"></span>」 바로 추가</b><small>사전에 없는 종목 · 무게 · 횟수 대신 메모${S.who === 'tr' ? ' · 종목 추가 요청도 같이' : ''}</small></span><em class="pkadd">＋</em></button>
-    ${EX.filter(고를수있나).sort(종목차례()).map(e=>{ const vs=vars(e.id), n=cmOf(S.mid,e.id).length, last=lastSet(e.id), 담 = w ? w.items.slice(처음).filter(it=>it.ex===e.id).length : 0;
+    ${EX.filter(고를수있나).sort((차례 => S.pickPart === '추가한 종목' ? (a, b) => (b.owner === TRAINER) - (a.owner === TRAINER) || 차례(a, b) : 차례)(종목차례())).map(e=>{ const vs=vars(e.id), n=cmOf(S.mid,e.id).length, last=lastSet(e.id), 담 = w ? w.items.slice(처음).filter(it=>it.ex===e.id).length : 0;
       return `<button class="mrow2 ${담?'pson':''}" data-exrow="${esc(exKey(e))}" data-part="${esc(e.p)}"
         data-eq="${esc(e.e||'')}"${e.owner ? ' data-mine="1"' : ''}
         style="${((S.pickPart==='전체' || (S.pickPart==='추가한 종목' ? !!e.owner : e.p===S.pickPart)) && (S.pickEq==='전체'||e.e===S.pickEq))?'':'display:none'}"
