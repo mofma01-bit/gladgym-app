@@ -1716,6 +1716,8 @@ html[data-pkv="list"] .megrp.pkg .pkms{position:static;margin-right:8px}
 .fsh{font-size:13.5px;font-weight:800;color:var(--gold);letter-spacing:-.01em}
 .fsub{font-size:11.5px;font-weight:700;color:var(--sub);margin-top:2px}
 .fsec .grid2{gap:9px}.fsec .fld{gap:5px}.fsec textarea{min-height:76px}
+.iksec{width:100%;flex:none;display:flex;flex-direction:column;gap:12px;padding:16px 16px 17px;border-radius:18px;border:1px solid #34332d;background:linear-gradient(180deg,#1d1c19,#161514);margin-top:12px}      /* 상담일지 상자 — 접는 구역 .fsec 와 이름이 겹쳐 여백 0 이 되던 것 따로 (2026-10-30 대표 「배열 정렬이 안 맞음」) */
+.iksec>.fsh{font-size:15px;font-weight:800;color:var(--gold);letter-spacing:-.01em;padding-bottom:10px;border-bottom:1px solid #2c2b27}.iksec .grid2{gap:10px}.iksec .fld{gap:6px}.iksec textarea{min-height:76px}
 .lvring.pct small{font-size:8px}.lvring.pct b{font-size:15px;letter-spacing:-.04em}.lvring.pct b u{text-decoration:none;font-size:9px;font-weight:700;margin-left:.5px}
 .rkcap{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;flex:none;margin:-2px 0 4px;font-size:12px;font-weight:600;color:var(--sub)}.rkcap svg{color:var(--gold);flex:none}
 .sstat3>button{display:flex;flex-direction:column;gap:2px;padding:13px 12px 11px;border-radius:16px;background:linear-gradient(180deg,#221f1a,#181816);border:1px solid #34332d;min-width:0;text-align:left;box-shadow:inset 0 1px 0 rgba(240,211,160,.22)}
@@ -3265,7 +3267,7 @@ if(샘플판){
   const 원f = window.fetch.bind(window); let 자료P = null;
   const 밀기 = (T, 날) => { const n = Math.round((new Date(new Date().toISOString().slice(0, 10)) - new Date(날)) / 86400000); if(!n) return T;
     const 밀 = s => { const t = new Date(s.length === 10 ? s + 'T12:00:00' : s); if(isNaN(t)) return s; t.setDate(t.getDate() + n); return s.length === 10 ? t.toISOString().slice(0, 10) : t.toISOString(); };
-    Object.values(T).forEach(rows => rows.forEach(r => Object.keys(r).forEach(k => { if(typeof r[k] === 'string' && /^\d{4}-\d{2}-\d{2}($|T)/.test(r[k])) r[k] = 밀(r[k]); }))); return T; };
+    Object.values(T).forEach(rows => rows.forEach(r => Object.keys(r).forEach(k => { if(typeof r[k] === 'string' && !/_version$/.test(k) && /^\d{4}-\d{2}-\d{2}($|T)/.test(r[k])) r[k] = 밀(r[k]); }))); return T; };      /* 약관판(agree_version)은 날짜 꼴이지만 날이 아니다 — 밀면 다음 날부터 샘플이 약관 동의 화면으로 열렸다 (2026-10-30) */
   const 자료 = () => 자료P || (자료P = 원f('sample.json', { cache:'no-store' }).then(r => r.json()).then(j => { window.__샘플mid = j._mid; return 밀기(j.표, j._날); }));
   const 거르기 = (rows, q) => { q.forEach((v, k) => { if(['select', 'order', 'limit', 'offset', 'or'].includes(k)) return; const g = r => String(r[k] == null ? '' : r[k]);
       if(v.startsWith('eq.')) rows = rows.filter(r => g(r) === v.slice(3)); else if(v.startsWith('neq.')) rows = rows.filter(r => g(r) !== v.slice(4));
@@ -3314,7 +3316,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '478';
+const BUILD = '480';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -8835,7 +8837,10 @@ function ootdDraw(img, w){
      그래서 kg 그대로 쓰고, 자릿수가 늘면 글씨를 줄여 자리 안에 넣는다.
      분석 화면은 숫자가 길어져 그대로 톤을 쓴다. */
   const 볼륨 = totalKg(w);
-  const 볼글 = Math.round(볼륨).toLocaleString('en-US');
+  /* 유산소만 한 날 — 「0 KG」 대신 유산소 시간(분)이 주인공 (2026-10-30 노션 「유산소만 해도 오운완」) */
+  const 유만 = !볼륨 && w.items.some(it => it.sets.length && (exOf(it.ex) || {}).cardio) && !w.items.some(it => it.sets.length && !isMemo(it.ex) && !(exOf(it.ex) || {}).cardio);
+  const 유분 = w.items.filter(it => (exOf(it.ex) || {}).cardio).reduce((a, it) => a + it.sets.reduce((b, z) => b + (+z.reps || 0), 0), 0);
+  const 볼글 = 유만 ? String(유분) : Math.round(볼륨).toLocaleString('en-US');
   const 최대폭 = OOTD_W - 여*2 - 20;
   let 볼크기 = 214;
   글(볼크기, 400, OOTD_B, '#fff', -8);
@@ -8844,14 +8849,17 @@ function ootdDraw(img, w){
   }
   x.fillText(볼글, 여-5, 378);
   글(27, 700, OOTD_A, 'rgba(255,255,255,.92)', 4);
-  x.fillText('KG', 여, 424);
+  x.fillText(유만 ? 'MIN' : 'KG', 여, 424);
   자간끄기();
 
   /* ── 왼쪽 세로 열 ── */
   const 담긴 = w.items.filter(it => it.sets.length && !isMemo(it.ex));
-  const 세트수 = 담긴.reduce((a,it)=> a + it.sets.length, 0);
-  const 최고 = 담긴.reduce((a,it)=> Math.max(a, ...it.sets.map(z=>+z.kg||0)), 0);
-  const 값 = [[mmss(w.dur||0),'TIME'], [세트수,'SETS'],
+  const 근 = 담긴.filter(it => !(exOf(it.ex) || {}).cardio);      /* 세트 · 최고 무게는 웨이트만 — 유산소의 kg 칸은 경사다 */
+  const 세트수 = 근.reduce((a,it)=> a + it.sets.length, 0);
+  const 최고 = 근.reduce((a,it)=> Math.max(a, ...it.sets.map(z=>+z.kg||0)), 0);
+  const 거리 = 담긴.filter(it => (exOf(it.ex) || {}).cardio).reduce((a, it) => a + it.sets.reduce((b, z) => b + (+z.dist || 0), 0), 0);
+  const 값 = 유만 ? [[mmss(w.dur||0),'TIME'], [(Math.round(거리 * 10) / 10) + 'km','DISTANCE'], [담긴.length,'EXERCISES']]
+           : [[mmss(w.dur||0),'TIME'], [세트수,'SETS'],
               [담긴.length,'EXERCISES'], [kgfmt(최고)+'kg','TOP SET']];
   값.forEach(([v,k], i) => {
     const y = 534 + i*110;
@@ -9576,6 +9584,13 @@ function sheetBadges(mid){
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 
+/* 오운완 한 장 = 그날 마친 운동 전부 (2026-10-30 · 노션 10/29 저녁 「웨이트 기록 마치고 유산소까지 마치고 오운완을 찍으면 유산소 기록까지 추가」)
+   「유산소만 하기」는 따로 저장되는 운동 하나라, 마지막 것 하나만 그리면 앞서 한 웨이트가 빠졌다 — 시간 순서 그대로 이어 붙이고 시간은 더한다 */
+function 오운완묶음(w){
+  const ws = D.workouts.filter(z => z.mid === w.mid && z.date === w.date && (z.done || z.id === w.id) && 세트있나(z));
+  if(ws.length < 2) return w;
+  return Object.assign({}, w, { items: ws.flatMap(z => z.items || []), dur: ws.reduce((a, z) => a + (+z.dur || 0), 0) });
+}
 function ootdPick(wid){
   const w = D.workouts.find(z => z.id === wid); if(!w) return;
   if(w.date !== TODAY){ toast('지난 날짜 기록은 오운완을 찍을 수 없어요'); return; }
@@ -9589,7 +9604,7 @@ function ootdPick(wid){
     const img = new Image();
     img.onload = async () => { try{
       await ootd글꼴();                    /* 글꼴이 올라온 뒤에 그린다 */
-      S.ootd = { wid, url: ootdDraw(img, w) };
+      S.ootd = { wid, url: ootdDraw(img, 오운완묶음(w)) };
       URL.revokeObjectURL(img.src); sheetOotd();
     }catch(e){ console.error(e); toast('사진을 만들지 못했어요'); } };
     img.onerror = () => toast('사진을 읽지 못했어요');
@@ -10764,7 +10779,7 @@ function vIntakeEdit(){
   const mid=subj(), d=D.intake[mid]||(D.intake[mid]={});
   d.meals = d.meals || {};
   const F = k => fieldEditor('ik', d, INTAKE_FIELDS.find(f => f.k === k));
-  const 상자 = (제목, 몸) => `<div class="fsec"><span class="fsh">${제목}</span>${몸}</div>`;
+  const 상자 = (제목, 몸) => `<div class="iksec"><span class="fsh">${제목}</span>${몸}</div>`;
   const q = S.scanQ && S.scanQ.mid === mid ? S.scanQ : null;
   return { top: bar('PT 상담일지 작성', `<span class="sub">${esc(subjName())}</span>`, 'sub2:intake:'+mid), body:
       (q ? `<div class="scnb"><b>종이에서 읽은 ${q.n}칸을 채웠어요</b>확인하고 맨 아래 「저장」을 눌러야 들어갑니다.
