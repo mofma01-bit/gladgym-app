@@ -1663,6 +1663,7 @@ body .prephd .ph1{font-size:21px}
 .megrp.pkg .mrow2.pson .pkadd{background:linear-gradient(180deg,#f3d9a8,#e2c184);color:#2a1c14}
 .pkim{display:flex;align-items:center;justify-content:center;height:96px;background:#1b1a17;border-bottom:1px solid #2c2b27}
 /* 종목 선택 보기 (2026-10-28 노션 낮) — 바둑판 3열(넓으면 칸이 늘어남 · 그림은 4:3 비율로 카드 너비를 따라감) · 크게 1장씩 · 목록 이름만 */
+.mrow2{position:relative}.pkstar{position:absolute;top:6px;left:6px;z-index:2;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.5);color:#fff;font-size:14px;line-height:26px;text-align:center}.pkstar.on{color:var(--gold)}
 .pkview{display:flex;align-items:center;gap:6px;margin:2px 0 8px;justify-content:flex-end}.pkview span{font-size:13px;color:var(--sub);margin-right:2px}
 .pkview button{height:30px;min-width:58px;padding:0 12px;border-radius:999px;border:1px solid #34332d;background:#191816;color:var(--sub);font-size:13px;font-weight:800}
 .pkview button.on{border-color:transparent;background:linear-gradient(180deg,#f3d9a8,#e2c184);color:#2a1c14}
@@ -3325,7 +3326,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '486';
+const BUILD = '487';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -3465,7 +3466,7 @@ function agoTxt(iso){
 
 /* ═══ 상태 ═══ */
 let D = { routines:[], desc:{}, addvars:{}, today:{}, workouts:[], cm:[], live:null, intake:{}, body:{}, cycle:{} };
-let S = { who:null, mid:null, screen:'boot', tab:'home', pickPart:'가슴', pickEq:'전체', tmid:null,
+let S = { who:null, mid:null, screen:'boot', tab:'home', pickPart:'전체', pickEq:'전체', tmid:null,
           prepKind:'sm', prepSet:'office', prepTab:'common', prepRid:null, dayOpen:null };
 
 /* ══ 데스크 안 수업 기록 ══ 2026-10-23 확정 C-2 「데스크도 앱 기록 화면 그대로」 — 데스크가 가운데 창에 이 앱을 ?desk=1&m=회원 으로 띄운다
@@ -3596,6 +3597,7 @@ async function boot(){
   try{ D.favs = (await sget('trainer_favs?select=trainer,member_id').catch(()=>[])) || []; }catch(e){ D.favs = []; }
   try{ D.ctips = await sget('cardio_tips?select=*&order=created_at.desc&limit=600'); }catch(e){ D.ctips = null; }
   try{ D.exfb = await sget('ex_feedback?select=*&order=created_at.desc&limit=5000'); }catch(e){ D.exfb = null; }      /* 종목별 추천 피드백 — 직원만 읽힘(103단계 · 회원은 빈 목록) */
+  try{ D.exfavs = (await sget('ex_favs?select=trainer,ex_id').catch(()=>[])) || []; }catch(e){ D.exfavs = []; }      /* 종목 즐겨찾기 (107단계) */
   try{ D.sheets = (await sget('routine_sheets?select=id,kind,title,owner,note,hidden,cover').catch(()=>[])) || []; D.gives = (await sget('sheet_gives?select=*').catch(()=>[])) || []; }catch(e){ D.sheets = []; D.gives = []; }      /* 받은 루틴표 (84단계) */      /* 유산소 넣어주기 (59단계) — 표가 없으면 null = 기능 숨김 */
   /* 트레이너가 올린 스트레칭·운동 종목 사진/영상도 주소를 미리 받아 둔다 — 버킷을 잠가도 보이게 (2026-10-07) */
   try{ await 주소받기([].concat((D.pitems||[]).flatMap(x => x.media.map(m => m.path)),
@@ -5896,6 +5898,12 @@ function EQS(){
   return ['전체'].concat(EQORDER.filter(x=>있는.has(x)),
                          [...있는].filter(x=>EQORDER.indexOf(x)<0));
 }
+const 순서종류 = [['그림', '썸네일'], ['이름', '가나다'], ['기구', '기구별'], ['별', '즐겨찾기']], 기구차례 = ['머신', '덤벨', '밴드', '바벨', '케이블', '스미스', '케틀벨', '맨몸'], 기구번호 = e => { const i = 기구차례.indexOf(e.e || ''); return i < 0 ? 기구차례.length : i; };      /* 종목 고르기 순서 (2026-10-30 대표) */
+const 종목순서 = () => { try{ const v = localStorage.getItem('gg_pksort'); return 순서종류.some(x => x[0] === v) ? v : '그림'; }catch(e){ return '그림'; } };
+const 내별종목 = () => new Set((D.exfavs || []).filter(f => f.trainer === TRAINER).map(f => f.ex_id));
+const 종목차례 = () => { const 순 = 종목순서(), 별 = 내별종목(), 이름순 = (a, b) => String(a.n || '').localeCompare(String(b.n || ''), 'ko'), 그림 = e => 그림있음.has(e.id) ? 1 : 0;
+  return 순 === '그림' ? (a, b) => 그림(b) - 그림(a) || 이름순(a, b) : 순 === '기구' ? (a, b) => 기구번호(a) - 기구번호(b) || 이름순(a, b) : 순 === '별' ? (a, b) => 별.has(b.id) - 별.has(a.id) || 이름순(a, b) : 이름순; };
+const 순서줄 = () => `<div class="pkview"><span>순서</span>${순서종류.filter(([k]) => k !== '별' || S.who === 'tr').map(([k, n]) => `<button class="${종목순서() === k ? 'on' : ''}" data-act="pksort:${k}">${n}</button>`).join('')}</div>`;
 const 보기종류 = [['g3', '바둑판'], ['big', '크게'], ['list', '목록']];      /* 종목 선택 보기 (2026-10-28 노션 낮) */
 function 종목보기(){ try{ const v = localStorage.getItem('gg_pkview'); return 보기종류.some(x => x[0] === v) ? v : 'g3'; }catch(e){ return 'g3'; } }
 document.documentElement.dataset.pkv = 종목보기();      /* 고르기 판 전부(종목 선택 · 루틴 종목 추가 · 스트레칭 동작) 같은 보기 — 이질감 없이(st=A) */
@@ -5909,23 +5917,24 @@ function vPick(){
     <button class="btn gold sm pkgo" data-act="askstart">${추가중 ? '추가하기' : '운동 시작'} ›</button></div>` : '';
   return { top: bar('종목 선택','', (w&&w.begun)?'go:workout':'go:start'), body:`${맨위}
     <input class="search" type="text" data-k="exq" placeholder="종목 검색 · 예) 스쿼트, bp, 코어">
-    <div class="pkparts">${PARTS.map(x=>`<button class="chip ${x===S.pickPart?'on':''}" data-act="part:${x}">${x}</button>`).join('')}${추가운동().length ? `<button class="chip mine ${S.pickPart==='추가한 종목'?'on':''}" data-act="part:추가한 종목">추가한 종목 ${추가운동().length}</button>` : ''}</div>
+    <div class="pkparts">${['전체'].concat(PARTS).map(x=>`<button class="chip ${x===S.pickPart?'on':''}" data-act="part:${x}">${x}</button>`).join('')}${추가운동().length ? `<button class="chip mine ${S.pickPart==='추가한 종목'?'on':''}" data-act="part:추가한 종목">추가한 종목 ${추가운동().length}</button>` : ''}</div>
     <div class="pkmini" id="pickhint">${S.who==='tr' ? `<button class="g" data-act="exnew">＋ 새 종목</button>` : ''}
       <button class="${(S.pickOpen || S.pickEq!=='전체')?'on':''}" data-act="partopen">기구 · ${esc(S.pickEq)} ${S.pickOpen?'▴':'▾'}</button>
       <button data-act="memoadd">＋ 기타운동</button>
       <button class="g" data-act="rmaddpick">${svg('h_crown',14)} 1RM 종목</button>
     </div>
     ${S.pickOpen?`<div class="chips pkeq">${EQS().map(x=>`<button class="chip ${x===S.pickEq?'on t':''}" data-act="peq:${x}">${x}</button>`).join('')}</div>`:''}
+    ${순서줄()}
     <div class="pkview"><span>보기</span>${보기종류.map(([k, n]) => `<button class="${종목보기() === k ? 'on' : ''}" data-act="pkview:${k}">${n}</button>`).join('')}</div>
     <div class="megrp pkg">
     <button class="mrow2 wide" data-exrow="1rm 원알엠 일알엠 원rm 1알엠 1rm측정 측정 최대중량 맥스 max onerepmax" data-part="__1rm" data-eq="" style="display:none" data-act="rmaddpick">
       <span class="mt"><b style="color:var(--gold)">1RM 측정 종목 추가</b><small>추가하면 바로 측정 계획이 열립니다</small></span><em class="pkadd">＋</em></button>
     <button class="mrow2 wide pknew" id="pknew" data-act="pknew" style="display:none"><span class="mt"><b>＋ 「<span id="pknewq"></span>」 바로 추가</b><small>사전에 없는 종목 · 무게 · 횟수 대신 메모${S.who === 'tr' ? ' · 종목 추가 요청도 같이' : ''}</small></span><em class="pkadd">＋</em></button>
-    ${EX.filter(고를수있나).sort((a,b)=>(b.owner===TRAINER)-(a.owner===TRAINER)).map(e=>{ const vs=vars(e.id), n=cmOf(S.mid,e.id).length, last=lastSet(e.id), 담 = w ? w.items.slice(처음).filter(it=>it.ex===e.id).length : 0;
+    ${EX.filter(고를수있나).sort(종목차례()).map(e=>{ const vs=vars(e.id), n=cmOf(S.mid,e.id).length, last=lastSet(e.id), 담 = w ? w.items.slice(처음).filter(it=>it.ex===e.id).length : 0;
       return `<button class="mrow2 ${담?'pson':''}" data-exrow="${esc(exKey(e))}" data-part="${esc(e.p)}"
         data-eq="${esc(e.e||'')}"${e.owner ? ' data-mine="1"' : ''}
-        style="${((S.pickPart==='추가한 종목' ? !!e.owner : e.p===S.pickPart) && (S.pickEq==='전체'||e.e===S.pickEq))?'':'display:none'}"
-        data-act="add:${e.id}:${(vars(e.id)[0] || {}).k || 'a'}">${카드그림(e)}
+        style="${((S.pickPart==='전체' || (S.pickPart==='추가한 종목' ? !!e.owner : e.p===S.pickPart)) && (S.pickEq==='전체'||e.e===S.pickEq))?'':'display:none'}"
+        data-act="add:${e.id}:${(vars(e.id)[0] || {}).k || 'a'}">${카드그림(e)}${S.who === 'tr' ? `<span class="pkstar ${내별종목().has(e.id) ? 'on' : ''}" data-act="pkfav:${e.id}" aria-label="즐겨찾기">★</span>` : ''}
         <span class="mt"><b>${esc(e.n)}</b>
           <small>${esc(e.e)}${last?` · 지난번 ${setTxt(e.id,last)}`:''}${n?` · 피드백 ${n}`:''}${vs.length>1?` · <u>하는 법 ${vs.length}가지</u>`:''}</small></span>
         <em class="pkadd">${담 ? '✓' + (담>1 ? 담 : '') : '＋'}</em></button>`; }).join('')}
@@ -13008,11 +13017,11 @@ function sheetRecentPick(mid){
 /* ── 루틴에 담을 종목 고르기 ── */
 function tPickEx(){
   const r=rOf(S.redit); if(!r) return tRoutines();
-  const list = EX.filter(e=>e.p===S.pickPart && 고를수있나(e)).sort((a,b)=>(b.owner?1:0)-(a.owner?1:0));     /* 내가 만든 종목이 위로 */
+  const list = EX.filter(e=>(S.pickPart==='전체' || e.p===S.pickPart) && 고를수있나(e)).sort(종목차례());
   const cnt = k => r.items.filter(it=>VID(it.ex,it.va)===k).length;
   return { top: bar('종목 추가', `<span class="sub">추가한 ${r.items.length}개</span>`, 're:'+r.id), keepScroll:true, body:`
     <input class="search" type="text" data-filter="1" placeholder="종목 이름으로 검색">
-    <div class="pkparts">${PARTS.map(x=>`<button class="chip ${x===S.pickPart?'on':''}" data-act="rpart:${x}">${x}</button>`).join('')}</div>
+    <div class="pkparts">${['전체'].concat(PARTS).map(x=>`<button class="chip ${x===S.pickPart?'on':''}" data-act="rpart:${x}">${x}</button>`).join('')}</div>${순서줄()}
     <div class="pkmini"><button class="g" data-act="exnew">${svg('h_dumb',15)} ＋ 새 종목</button></div>
     <div class="megrp pkg">${list.map(e=>vars(e.id).map(v=>{ const k=VID(e.id,v.k), n=cnt(k), just=(S.just===k);
       return `<button class="mrow2 ${n?'pson':''} ${just?'pkjust':''}" data-nm="${esc(e.n+' '+(v.n||''))}" data-act="raddv:${r.id}:${e.id}:${v.k}">${카드그림(e)}
@@ -13081,7 +13090,7 @@ function 칠하기(){
     const 기구맞음 = S.pickEq==='전체' || el.getAttribute('data-eq')===S.pickEq;
     const 맞음 = q
       ? ((el.getAttribute('data-exrow')||'').includes(q) && 기구맞음)
-      : ((S.pickPart==='추가한 종목' ? el.getAttribute('data-mine')==='1' : el.getAttribute('data-part')===S.pickPart) && 기구맞음);
+      : ((S.pickPart==='전체' || (S.pickPart==='추가한 종목' ? el.getAttribute('data-mine')==='1' : el.getAttribute('data-part')===S.pickPart)) && 기구맞음);
     el.style.display = 맞음 ? '' : 'none';
     if(맞음) 보임++;
   });
@@ -14301,6 +14310,8 @@ document.addEventListener('click', async ev=>{
     case 'empty': newLive('빈 운동', [], '개인운동'); return;
 
     case 'part': S.pickPart=rest[0]; render(); setTimeout(칠하기,0); return;
+    case 'pksort': try{ localStorage.setItem('gg_pksort', rest[0]); }catch(e){} render(); setTimeout(칠하기, 0); return;
+    case 'pkfav': { const id = rest[0], 켬 = !내별종목().has(id); D.exfavs = (D.exfavs || []).filter(f => !(f.trainer === TRAINER && f.ex_id === id)); if(켬) D.exfavs.push({ trainer:TRAINER, ex_id:id }); sv(켬 ? spost('ex_favs', [{ trainer:TRAINER, ex_id:id }], { on:'trainer,ex_id' }) : sdel('ex_favs', 'trainer=eq.' + encodeURIComponent(TRAINER) + '&ex_id=eq.' + encodeURIComponent(id)), '즐겨찾기 저장'); render(); setTimeout(칠하기, 0); return; }
     case 'peq': S.pickEq=rest[0]; S.pickOpen=false; render(); setTimeout(칠하기,0); return;      /* 고르면 접는다 — 펼친 채면 종목이 두세 개만 보인다 */
     case 'pickvar': sheetPickVar(rest[0]); return;
     case 'add': { const [ex,va,때]=rest;
