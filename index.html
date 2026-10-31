@@ -1636,6 +1636,7 @@ body .prephd .ph1{font-size:21px}
 .prg .prow.m .no{border-color:rgba(169,216,230,.5);color:var(--teal);background:rgba(169,216,230,.06)}
 .prg .prow .kd{flex:none;align-self:flex-start;margin-top:5px;font-size:10.5px;letter-spacing:0;border:1px solid currentColor;border-radius:999px;padding:1px 8px;opacity:.85}
 .tmsum.btn3 b .td안{font-style:normal;font-size:10.5px;font-weight:700;color:var(--teal);margin-left:6px;white-space:nowrap}
+.recday{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 10px}.recday>span{font-size:13px;font-weight:700;color:var(--mute,#a9a294);margin-right:2px}.recday input{flex:0 1 150px;min-width:0;height:34px;padding:0 8px;font-size:13px}.recband{margin:0 0 10px;padding:8px 12px;border-radius:10px;background:rgba(230,196,135,.12);color:var(--gold);font-size:13px;font-weight:700}
 .pkparts .chip.mine{border-color:var(--gold);color:var(--gold)}.pkparts .chip.mine.on{background:var(--gold);color:#1a1408}
 .rtpics{display:flex;gap:8px;overflow-x:auto;margin:4px 0 8px}.rtpics span{flex:none;width:120px;text-align:center}.rtpics img{width:120px;height:120px;object-fit:contain;background:#fff;border-radius:10px;display:block}.rtpics small{font-size:12px;color:var(--sub)}
 .pkparts{display:flex;gap:7px;overflow-x:auto;flex:none;width:100%;scrollbar-width:none;padding-bottom:1px}.pkparts::-webkit-scrollbar{display:none}
@@ -3326,7 +3327,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '488';
+const BUILD = '489';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -3747,6 +3748,13 @@ const capSec = (n, cap) => Math.max(0, Math.min(Math.round(Number(n)||0), cap));
       끝났는지는 `w.touch`(손댄 시각)로, 얼마나 했는지는 `s.at`(세트 체크 시각)로 잰다.
       운동만 담고 세트는 안 찍은 시간은 「아직 하는 중」이지만 「운동한 시간」은 아니기 때문이다. */
 const 오늘날 = () => (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());   /* TODAY 는 켤 때 값이라 켜 둔 채 날이 넘어가면 틀린다 */
+/* 지난 수업 기록 — 2주 안의 날짜로 남긴다 (2026-10-31 직원 요청 · 대표 「기록 2주 기간 안에 작성 가능」)
+   기록하는 동안 on_date 는 오늘 · 마칠 때 고른 날로 바꾼다 — 서버 자동 종료가 on_date 지난 기록을 바로 닫기 때문 · 지난 수업은 리포트 자동 예약 안 함 */
+const 지난기록한도 = 14, 며칠전 = n => (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date(Date.now() - n * 864e5));
+const 고른수업날 = () => { const d = S.recDay; S.recDay = null; return d && d < 오늘날() && d >= 며칠전(지난기록한도) ? d : null; };
+function 수업날줄(){ const 날 = S.recDay || 오늘날(), 어제 = 며칠전(1);
+  return `<div class="recday"><span>수업 날짜</span><button class="chip ${날 === 오늘날() ? 'on' : ''}" data-act="recday:">오늘</button><button class="chip ${날 === 어제 ? 'on' : ''}" data-act="recday:${어제}">어제</button><input class="search" type="date" aria-label="수업 날짜" min="${며칠전(지난기록한도)}" max="${오늘날()}" value="${날}" onchange="수업날바꿈(this.value)"></div>`; }
+function 수업날바꿈(v){ S.recDay = v && v < 오늘날() && v >= 며칠전(지난기록한도) ? v : null; if(v && v < 며칠전(지난기록한도)) toast('2주 안의 날짜만 기록할 수 있어요'); drawSheet(); }
 function 끝났나(w){
   if(!w || w.done) return null;
   if(w.date && w.date < 오늘날()) return '날짜가 지나';
@@ -6544,7 +6552,7 @@ function 시계멈춤(w){ if(!w || !w.startAt) return;
   const 이제 = Date.now(), 쉰 = 이제 - w.pausedAt;
   w.startAt += 쉰; w.items.forEach(it => { if(!it.locked && it.startAt) it.startAt = it.startAt >= w.pausedAt ? 이제 : it.startAt + 쉰; });
   w.pausedAt = null; save(); toast('시간을 다시 잽니다'); render(); }
-async function newLive(title, items, kind, rid, mid, by){
+async function newLive(title, items, kind, rid, mid, by, 기록날){
   const id='w'+Date.now();
   mid = mid || S.mid;
   /* 직원(트레이너 · 대표)이 로그인해서 만든 기록은 무조건 「수업」 — 회원 화면 경로(빈 운동 · 루틴 · 지난 운동 · 종목 담기)로 들어와도 (2026-10-23 대표 「트레이너가 로그인해서 기록하는데 개인운동 기록을 왜 물어 무조건 수업이지」 · 김O은 기록이 개인운동이라 리포트가 안 나갔다) */
@@ -6556,6 +6564,7 @@ async function newLive(title, items, kind, rid, mid, by){
   const t0 = (시계는손으로({ kind:kd, by }) || !items.length) ? null : Date.now();
   D.live={ id, mid, title, kind:kd, rid:rid||null, date:TODAY, startAt:t0, born:Date.now(), items, cur:0,
            by:by||'회원', begun: items.length>0, mine:true };   /* 담기만 한 상태면 아직 시작 전 */
+  if(기록날) D.live.기록날 = 기록날;
   if(!t0) items.forEach(it=>{ it.startAt = null; });
   save(); go(items.length ? 'workout' : 'pick');
   await sv(spost('workouts',[{ id, member_id:mid, on_date:TODAY, kind:D.live.kind,
@@ -6660,10 +6669,11 @@ function vWorkout(){
   const w=live(); if(!w) return (S.who==='tr' ? tToday() : vHome());
   (w.items || (w.items = [])).forEach(it => { if(!Array.isArray(it.sets)) it.sets = []; });
   if(S.wfocus != null && !w.items[S.wfocus]) S.wfocus = null;
-  if(S.wfocus == null && 플래너인가(w) && !S.옛화면) return 플래너화면(w);      /* S.옛화면 = 시험에서 예전 목록 화면(1RM · 유산소만 하는 운동이 쓰는 그 화면)을 볼 때 */
+  if(S.wfocus == null && 플래너인가(w) && !S.옛화면) return 지난날표시(w, 플래너화면(w));      /* S.옛화면 = 시험에서 예전 목록 화면(1RM · 유산소만 하는 운동이 쓰는 그 화면)을 볼 때 */
   if(S.wfocus != null) w.cur = S.wfocus;
-  return 옛운동화면(w);
+  return 지난날표시(w, 옛운동화면(w));
 }
+const 지난날표시 = (w, 화면) => { if(w.기록날 && 화면 && typeof 화면.body === 'string') 화면.body = `<div class="recband">${esc(dateTxt(w.기록날))} 수업으로 저장돼요</div>` + 화면.body; return 화면; };
 function 옛운동화면(w){
   if(!(w.cur >= 0 && w.cur < w.items.length)) w.cur = Math.max(0, w.items.findIndex(it => !it.locked));
   { const c0 = w.items[w.cur]; if(c0 && !c0.sets.length) c0.sets.push({ kg:0, reps:10, done:false }); }      /* 지금 종목이 세트 0개 → 세트[-1].done 로 멈췄다 (2026-10-23 reading 'done') */
@@ -6816,7 +6826,7 @@ function 플래너화면(w){
     top: bar('운동 중', 윗시계(w), 'askleave'),
     keepScroll:true, body:`
     ${tr ? 주기줄(wmid, 'tsub:cycle:' + wmid, true) : ''}
-    <div class="pl-hd"><b>${dateTxt(w.date || TODAY)}</b><span class="k">${수업 ? '수업' : '개인운동'}</span></div>
+    <div class="pl-hd"><b>${dateTxt(w.기록날 || w.date || TODAY)}</b><span class="k">${수업 ? '수업' : '개인운동'}</span></div>
     ${몸판묶음(w)}
     <div class="pl-tools">${혼자 ? `<button class="wrchip ${c0.on ? 'on' : ''}" data-act="wrestpick">${c0.on ? '휴식 ' + c0.sec + '초' : '휴식 끔'} ▾</button>` : ''}<span class="sp"></span>${채움 ? `<button class="pl-new" data-act="plnew">새로 기록하기</button>` : ''}</div>
     ${도는중 ? `<div class="wrestbar"><b id="restleft2">${mmss(Math.max(0, (S.rest.until - Date.now()) / 1000))}</b><span>쉬는 중</span><button data-act="wrestadd">+15초</button><button data-act="wrestx">건너뛰기</button></div>` : ''}
@@ -12967,9 +12977,10 @@ function 수업시작창(mid){
 }
 function sheetStartSession(mid){
   const m = MEMBERS.find(x=>x.id===mid) || {n:''};
-  const rs = myRoutines(mid), t = D.today[mid];
+  const rs = myRoutines(mid), t = D.today[mid]; S.recDay = null;
   openSheet(()=>`
     <div class="h2">${esc(m.n)} 회원 <small>무엇으로 시작할까요</small></div>
+    ${수업날줄()}
     ${(() => { const 지난 = D.workouts.filter(w => w.mid === mid && w.done && w.kind === '수업').sort(byDateDesc)[0]; return 지난 && 팁of(지난.id).length ? `<div class="ctlast"><b>지난 수업(${dateTxt(지난.date)}) 유산소</b>${팁줄들(지난.id)}</div>` : ''; })()}
     ${주기줄(mid, 'tsub:cycle:'+mid)}
     ${t && rOf(t.rid) ? `<button class="sspick" data-act="tstart:${mid}:${t.rid}:${t.kind}">
@@ -13485,22 +13496,23 @@ document.addEventListener('click', async ev=>{
       if(m.path) 저장소지우기(m.path);
       closeSheet(); toast('삭제했어요'); render(); return; }
     case 'tstartgo': closeSheet(); S.tmid=rest[0]; sheetStartSession(rest[0]); return;
+    case 'recday': 수업날바꿈(rest[0] || ''); return;
     case 'tstartask': S.tmid=rest[0]; 수업시작창(rest[0]);
       try{ sessionStorage.setItem('cycpop_'+rest[0]+'_'+TODAY, '1'); }catch(e){}
       return;
     case 'tstart': {
       const [mid, rid, kind] = rest;
-      closeSheet(); S.tmid=mid; S.subj=mid;
+      closeSheet(); S.tmid=mid; S.subj=mid; const 날 = 고른수업날();
       if(rid && rid!=='0'){ const r=rOf(rid);
-        newLive(`루틴 ${r.no} · ${r.n}`, itemsFromRoutine(r), kind, r.id, mid, '트레이너'); }
-      else newLive('수업', [], kind, null, mid, '트레이너');
+        newLive(`루틴 ${r.no} · ${r.n}`, itemsFromRoutine(r), kind, r.id, mid, '트레이너', 날); }
+      else newLive('수업', [], kind, null, mid, '트레이너', 날);
       return; }
     case 'tstartrecs': S.tmid=rest[0]; S.trf='전체'; sheetRecentPick(rest[0]); return;
     case 'trf': S.trf=rest[1]; sheetRecentPick(rest[0]); return;
     case 'tstartrec': {
       const [mid, wid, kind] = rest; const w = D.workouts.find(x=>x.id===wid); if(!w) return;
       closeSheet(); S.tmid=mid; S.subj=mid;
-      newLive(`${dateTxt(w.date)} ${w.kind==='수업'?'수업':'개인운동'} 다시`, itemsFromWorkout(w), kind, null, mid, '트레이너');
+      newLive(`${dateTxt(w.date)} ${w.kind==='수업'?'수업':'개인운동'} 다시`, itemsFromWorkout(w), kind, null, mid, '트레이너', 고른수업날());
       return; }
     case 'tgo': { const mid=rest[0];
       if(!adoptLive(mid)){ toast('진행 중인 운동이 없어요'); return; }
@@ -15087,8 +15099,8 @@ async function finish(){
   const dur=capSec(w.startAt ? 흐른초(w)
     : w.items.reduce((a,it)=>a+(Number(it.sec)||0), 0), CAP_W);
   for(let i=0;i<w.items.length;i++) await svItem(i);
-  await sv(spatch('workouts','id=eq.'+w.id, { done:true, dur, kind:w.kind }), '운동 저장');
-  const rec={ id:w.id, mid:w.mid, date:w.date||TODAY, kind:w.kind, rid:w.rid, title:w.title, dur, done:true,
+  await sv(spatch('workouts','id=eq.'+w.id, Object.assign({ done:true, dur, kind:w.kind }, w.기록날 ? { on_date:w.기록날 } : {})), '운동 저장');
+  const rec={ id:w.id, mid:w.mid, date:w.기록날||w.date||TODAY, kind:w.kind, rid:w.rid, title:w.title, dur, done:true,
     items: w.items.filter(it=>it.sets.some(s=>s.done)).map(it=>({ _id:it._id, ex:it.ex, va:it.va, locked:true, memo: it.memo || '',
       sec:Math.round(it.sec), sets: it.sets.filter(s=>s.done).map(s=>({kg:s.kg, reps:s.reps, spd:s.spd})) })) };
   const i0=D.workouts.findIndex(x=>x.id===w.id);
@@ -15103,7 +15115,7 @@ async function finish(){
      ⛔ 안전장치 셋 — ① 「수업」만 (개인운동은 안 보낸다)  ② 기록된 세트가 있어야
         ③ **5분 뒤**(2026-10-20 · 전엔 30분) — 그 사이 잘못 끝낸 것을 「보내기 취소」(마친 화면 · 리포트 화면) · 피드백은 뒤에 올려도 열 때 보인다
      이미 예약·발송된 수업이면 건드리지 않는다 (두 번 보내기 막기). */
-  if((rec.kind || '') === '수업' && 운동요약(rec)){
+  if((rec.kind || '') === '수업' && 운동요약(rec) && !w.기록날){
     try{
       const 있 = await 리포트상태(rec.id);
       if(!있){
