@@ -1636,6 +1636,7 @@ body .prephd .ph1{font-size:21px}
 .prg .prow.m .no{border-color:rgba(169,216,230,.5);color:var(--teal);background:rgba(169,216,230,.06)}
 .prg .prow .kd{flex:none;align-self:flex-start;margin-top:5px;font-size:10.5px;letter-spacing:0;border:1px solid currentColor;border-radius:999px;padding:1px 8px;opacity:.85}
 .tmsum.btn3 b .td안{font-style:normal;font-size:10.5px;font-weight:700;color:var(--teal);margin-left:6px;white-space:nowrap}
+.rtb{flex:1;min-width:0}.rvths{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:10px 0 8px}.rvth{aspect-ratio:1;border-radius:9px;overflow:hidden;background:#fff;display:flex;align-items:center;justify-content:center}.rvth img{width:100%;height:100%;object-fit:contain;display:block}.rvth.ph{background:#26241f}.rvth.ph svg{width:60%;height:60%}.rvth.m{background:#26241f;color:var(--gold);font-weight:800;font-size:15px}.rvex{font-size:13.5px;line-height:1.45;margin-bottom:4px;overflow-wrap:anywhere}.rvex1,.mrow2 .mt small.rvex1{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-style:normal;white-space:normal;line-height:1.4;text-overflow:clip}.shc-go .btn{display:flex;flex-direction:column;align-items:flex-start;height:auto;min-height:44px;padding:8px 12px;text-align:left;gap:2px;width:100%}.shc-go .btn small{font-size:13px;font-weight:500;opacity:.85;white-space:normal;line-height:1.35}
 .recday{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 10px}.recday>span{font-size:13px;font-weight:700;color:var(--mute,#a9a294);margin-right:2px}.recday input{flex:0 1 150px;min-width:0;height:34px;padding:0 8px;font-size:13px}.recband{margin:0 0 10px;padding:8px 12px;border-radius:10px;background:rgba(230,196,135,.12);color:var(--gold);font-size:13px;font-weight:700}
 .pkparts .chip.mine{border-color:var(--gold);color:var(--gold)}.pkparts .chip.mine.on{background:var(--gold);color:#1a1408}
 .rtpics{display:flex;gap:8px;overflow-x:auto;margin:4px 0 8px}.rtpics span{flex:none;width:120px;text-align:center}.rtpics img{width:120px;height:120px;object-fit:contain;background:#fff;border-radius:10px;display:block}.rtpics small{font-size:12px;color:var(--sub)}
@@ -3327,7 +3328,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '489';
+const BUILD = '490';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -5774,15 +5775,20 @@ function recRow(w){
     <span class="rt">›</span></button>`;
 }
 
+/* 루틴 카드 — 어떤 운동인지 보이게 (2026-11-01 대표 「루틴 1, 종목 00 으로는 어떤 루틴인지 알 수 없어」 · B안 = 종목 그림 + 이름) */
+const 루틴이름줄 = r => (r.items || []).map(i => (exOf(i.ex) || {}).n || exName(i.ex, i.va)).join(' · ');
+function 루틴그림칸(r){ const es = (r.items || []).map(i => exOf(i.ex)).filter(Boolean); if(!es.length) return ''; const 넘 = es.length > 4, 보임 = es.slice(0, 넘 ? 3 : 4);
+  return `<span class="rvths">${보임.map(e => { const u = 종목그림주소(e); return u ? `<span class="rvth"><img src="${esc(u)}" alt="" loading="lazy"></span>` : `<span class="rvth ph">${부위그림(e)}</span>`; }).join('')}${넘 ? `<span class="rvth m">+${es.length - 3}</span>` : ''}</span>`; }
 /* ── 내 루틴 ── */
 function vRoutines(){
   const rs=myRoutines(S.mid), t=D.today[S.mid];
   return { top: bar('내 루틴', `<span class="sub">${rs.length}개</span>`, 'go:home'), body:
     (rs.length? rs.map(r=>{ const rc=recosOf(S.mid).find(x=>x.rid===r.id);
       return `<button class="card rowc ${(t&&t.rid===r.id)||rc?'gold':'plan'}" data-act="rt:${r.id}">
-      <div><div class="nm ${(t&&t.rid===r.id)||rc?'g':''}">루틴 ${r.no} · ${esc(r.n)}${rc?` <span class="pill">${esc(rc.slot)}</span>`:''}</div>
-      <div class="sm">${esc(r.purpose)}<br>${r.items.length}종목 · 예상 ${estMin(r)}분${넣은이표(r, true) ? '<br>' + 넣은이표(r, true) : ''}</div></div>
-      ${t&&t.rid===r.id?`<span class="pill">오늘 ${esc(t.kind)}</span>`:'<span class="rt">›</span>'}</button>`; }).join('')
+      <div class="rtb"><div class="nm ${(t&&t.rid===r.id)||rc?'g':''}">루틴 ${r.no} · ${esc(r.n)}${rc?` <span class="pill">${esc(rc.slot)}</span>`:''}${t&&t.rid===r.id?` <span class="pill">오늘 ${esc(t.kind)}</span>`:''}</div>
+      ${루틴그림칸(r)}<div class="rvex">${esc(루틴이름줄(r))}</div>
+      <div class="sm">${r.purpose ? esc(r.purpose) + '<br>' : ''}${r.items.length}종목 · 예상 ${estMin(r)}분${넣은이표(r, true) ? '<br>' + 넣은이표(r, true) : ''}</div></div>
+      </button>`; }).join('')
     : 빔('routine', 숨긴루틴(S.mid).length ? '보이는 루틴이 없습니다' : '아직 받은 루틴이 없습니다', 숨긴루틴(S.mid).length ? '아래 「숨긴 루틴」에서 다시 보이게 할 수 있습니다' : '트레이너에게 루틴을 요청해 주세요'))
     + (숨긴루틴(S.mid).length ? (S.rhid
         ? `<span class="lbl">숨긴 루틴 ${숨긴루틴(S.mid).length}개</span>` + 숨긴루틴(S.mid).map(r => `<div class="card rowc rhidc"><div><div class="nm">루틴 ${r.no} · ${esc(r.n)}</div>
@@ -5890,7 +5896,7 @@ function vStart(){
     ${(xs => { if(!xs.length) return ''; const x = 진행표(xs), 지난 = xs.filter(z => z !== x), 오 = 오늘표루틴(x.g), L = 표루틴(x.s.id);
         return `<span class="lbl">진행 중 루틴표</span><div class="card gold shcur"><div class="shc-h">${(x.s.cover || {}).img ? `<img class="shc-cv" src="img/cover/${encodeURIComponent(x.s.cover.img)}.jpg" alt="">` : ''}<div class="shc-t"><div class="nm g">${esc(x.s.title || '루틴표')}</div><div class="sm">루틴 ${L.length}개${x.s.owner ? ' · ' + esc(x.s.owner) + ' 트레이너' : ''}</div></div>
           <button class="btn ghost sm" data-act="sheet:${x.s.id}">루틴표 보기 ›</button></div>
-          <div class="shc-go">${L.map((r, i) => `<button class="btn ${r.id === 오 ? 'main' : 'sub'} sm" data-act="startr:${r.id}">루틴 ${i + 1} 시작${r.id === 오 ? ' · 오늘' : ''}</button>`).join('')}</div></div>`
+          <div class="shc-go">${L.map((r, i) => `<button class="btn ${r.id === 오 ? 'main' : 'sub'} sm" data-act="startr:${r.id}"><b>루틴 ${i + 1} 시작${r.id === 오 ? ' · 오늘' : ''}</b><small>${esc(루틴이름줄(r))}</small></button>`).join('')}</div></div>`
           + (지난.length ? `<button class="rhidlnk" data-act="sheetold">지난 루틴표 ${지난.length} ›</button>` : ''); })(내루틴표(S.mid))}
     <span class="lbl">또는</span>
     <div class="home2 st3">${칸들.map((h, i) => (칸들.length % 2 && i === 칸들.length - 1) ? h.replace('hero2 half', 'hero2 half wide2') : h).join('')}</div>
@@ -6763,7 +6769,7 @@ const 칠선들 = w => (w && w.paint && w.paint.v === 2 && w.paint.s) || [];
 const 칠묶음 = w => { if(!w.paint || w.paint.v !== 2) w.paint = { v:2, s:[] }; return w.paint.s; };
 function 붓줄(id){ return `<div class="btools" data-w="${esc(id)}">${붓색들.map(c => `<button class="plsw ${붓도구.색 === c && !붓도구.지움 ? 'on' : ''}" style="--c:${c}" data-act="bpc:${c.slice(1)}" aria-label="색"></button>`).join('')}
   ${붓굵기.map(([말, n]) => `<button class="chip ${붓도구.굵기 === n ? 'on' : ''}" data-act="bpw:${n}">${말}</button>`).join('')}<button class="chip ${붓도구.지움 ? 'on' : ''}" data-act="bpe">지우개</button><button class="chip" data-act="bpu:${esc(id)}">되돌리기</button><button class="chip" data-act="bpx:${esc(id)}">전체 삭제</button></div>`; }
-function 몸판묶음(w){ const tr = S.who === 'tr', 있음 = 칠선들(w).length; if(!tr && !있음) return ''; setTimeout(몸판그리기, 0); const 열기 = tr ? ` data-act="bpopen:${esc(w.id)}"` : '';
+function 몸판묶음(w){ const tr = S.who === 'tr' || 샘플판, 있음 = 칠선들(w).length;      /* 샘플도 실제 기록 화면과 똑같이 (2026-11-01 대표) */ if(!tr && !있음) return ''; setTimeout(몸판그리기, 0); const 열기 = tr ? ` data-act="bpopen:${esc(w.id)}"` : '';
   return `<div class="bwrap"><div class="bpad"${열기} data-w="${esc(w.id)}"><canvas width="1024" height="1024"></canvas><img src="img/body-plan.png" alt="몸 그림" draggable="false"></div>${tr ? `<div class="bdone"><button class="chip" data-act="bpopen:${esc(w.id)}">${있음 ? '칠한 그림 수정' : '몸 색칠하기'}</button></div>` : ''}</div>`; }
 function 칠창열기(id){ document.getElementById('bpfull')?.remove(); const o = document.createElement('div'); o.id = 'bpfull';
   o.innerHTML = `<div class="bphd"><b>몸 색칠하기</b><button class="chip on" data-act="bpclose">완료</button></div><div class="bpmid"><div class="bpad edit" data-w="${esc(id)}"><canvas width="1024" height="1024"></canvas><img src="img/body-plan.png" alt="몸 그림" draggable="false"></div></div>${붓줄(id)}`;
@@ -12985,18 +12991,18 @@ function sheetStartSession(mid){
     ${주기줄(mid, 'tsub:cycle:'+mid)}
     ${t && rOf(t.rid) ? `<button class="sspick" data-act="tstart:${mid}:${t.rid}:${t.kind}">
       <span class="sst"><small>${지정이름(t.kind)}</small><b>루틴 ${rOf(t.rid).no} · ${esc(rOf(t.rid).n)}</b>
-        <i>${rOf(t.rid).items.length}종목 · 예상 ${estMin(rOf(t.rid))}분</i></span><em>시작 ›</em></button>` : ''}
+        <i class="rvex1">${esc(루틴이름줄(rOf(t.rid)))}</i><i>${rOf(t.rid).items.length}종목 · 예상 ${estMin(rOf(t.rid))}분</i></span><em>시작 ›</em></button>` : ''}
     <span class="lbl">루틴에서 선택</span>
     ${rs.length ? `<div class="megrp">${rs.map(r=>{ /* 고리 속 글자 = 그 루틴에 가장 많은 부위 (실제 종목에서 센다) */
         const 셈 = {}; r.items.forEach(it => { const p = (exOf(it.ex)||{}).p; if(p) 셈[p] = (셈[p]||0) + 1; });
         const 부위 = Object.keys(셈).sort((a,b)=>셈[b]-셈[a])[0] || '';
         return `<button class="mrow2" data-act="tstart:${mid}:${r.id}:수업"><span class="mi pt">${esc(부위.slice(0,2) || '–')}</span>
-          <span class="mt"><b>루틴 ${r.no} · ${esc(r.n)}</b><small>${r.items.length}종목 · 예상 ${estMin(r)}분</small></span><em class="go">시작 ›</em></button>`; }).join('')}</div>`
+          <span class="mt"><b>루틴 ${r.no} · ${esc(r.n)}</b><small class="rvex1">${esc(루틴이름줄(r))}</small><small>${r.items.length}종목 · 예상 ${estMin(r)}분</small></span><em class="go">시작 ›</em></button>`; }).join('')}</div>`
       : 내루틴표(mid).length ? '' : '<div class="empty">만들어 둔 루틴이 없습니다<small class="e2">아래 「빈 운동으로」 시작할 수 있습니다</small></div>'}
     ${내루틴표(mid).map(x => `<div class="lbl" style="margin-top:10px">루틴표 · ${esc(x.s.title || '루틴표')}${x.s.owner ? ' · ' + esc(x.s.owner) + 'T' : ''}</div><div class="megrp">${표루틴(x.s.id).map((r, i) => {
         const 셈 = {}; r.items.forEach(it => { const p = (exOf(it.ex)||{}).p; if(p) 셈[p] = (셈[p]||0) + 1; }); const 부위 = Object.keys(셈).sort((a,b)=>셈[b]-셈[a])[0] || '';
         return `<button class="mrow2" data-act="tstart:${mid}:${r.id}:수업"><span class="mi pt">${esc(부위.slice(0,2) || '–')}</span>
-          <span class="mt"><b>루틴 ${i + 1} · ${esc(r.n)}</b><small>${r.items.length}종목 · 예상 ${estMin(r)}분</small></span><em class="go">시작 ›</em></button>`; }).join('')}</div>`).join('')}
+          <span class="mt"><b>루틴 ${i + 1} · ${esc(r.n)}</b><small class="rvex1">${esc(루틴이름줄(r))}</small><small>${r.items.length}종목 · 예상 ${estMin(r)}분</small></span><em class="go">시작 ›</em></button>`; }).join('')}</div>`).join('')}
     <div class="hrow">
       ${(()=>{ const ws = workoutsOf(mid).filter(w=>세트있나(w)); if(!ws.length) return '';
         return `<button class="hcard teal" data-act="tstartrecs:${mid}">${홈머리('h_clock','지난 기록에서')}
