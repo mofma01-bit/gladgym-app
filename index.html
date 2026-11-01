@@ -1637,7 +1637,7 @@ body .prephd .ph1{font-size:21px}
 .prg .prow .kd{flex:none;align-self:flex-start;margin-top:5px;font-size:10.5px;letter-spacing:0;border:1px solid currentColor;border-radius:999px;padding:1px 8px;opacity:.85}
 .tmsum.btn3 b .td안{font-style:normal;font-size:10.5px;font-weight:700;color:var(--teal);margin-left:6px;white-space:nowrap}
 .rtb{flex:1;min-width:0}.rvths{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:10px 0 8px}.rvth{aspect-ratio:1;border-radius:9px;overflow:hidden;background:#fff;display:flex;align-items:center;justify-content:center}.rvth img{width:100%;height:100%;object-fit:contain;display:block}.rvth.ph{background:#26241f}.rvth.ph svg{width:60%;height:60%}.rvth.m{background:#26241f;color:var(--gold);font-weight:800;font-size:15px}.rvex{font-size:13.5px;line-height:1.45;margin-bottom:4px;overflow-wrap:anywhere}.rvex1,.mrow2 .mt small.rvex1{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-style:normal;white-space:normal;line-height:1.4;text-overflow:clip}.shc-go .btn{display:flex;flex-direction:column;align-items:flex-start;height:auto;min-height:44px;padding:8px 12px;text-align:left;gap:2px;width:100%}.shc-go .btn small{font-size:13px;font-weight:500;opacity:.85;white-space:normal;line-height:1.35}
-.recday{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 10px}.recday>span{font-size:13px;font-weight:700;color:var(--mute,#a9a294);margin-right:2px}.recday input{flex:0 1 150px;min-width:0;height:34px;padding:0 8px;font-size:13px}.recband{margin:0 0 10px;padding:8px 12px;border-radius:10px;background:rgba(230,196,135,.12);color:var(--gold);font-size:13px;font-weight:700}
+.recnote{font-size:13px;color:var(--mute,#a9a294)}.recday{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 10px}.recday>span{flex:0 0 100%;font-size:13px;font-weight:700;color:var(--mute,#a9a294)}.recday input{flex:0 1 150px;min-width:0;height:34px;padding:0 8px;font-size:13px}.recband{margin:0 0 10px;padding:8px 12px;border-radius:10px;background:rgba(230,196,135,.12);color:var(--gold);font-size:13px;font-weight:700}
 .pkparts .chip.mine{border-color:var(--gold);color:var(--gold)}.pkparts .chip.mine.on{background:var(--gold);color:#1a1408}
 .rtpics{display:flex;gap:8px;overflow-x:auto;margin:4px 0 8px}.rtpics span{flex:none;width:120px;text-align:center}.rtpics img{width:120px;height:120px;object-fit:contain;background:#fff;border-radius:10px;display:block}.rtpics small{font-size:12px;color:var(--sub)}
 .pkparts{display:flex;gap:7px;overflow-x:auto;flex:none;width:100%;scrollbar-width:none;padding-bottom:1px}.pkparts::-webkit-scrollbar{display:none}
@@ -3328,7 +3328,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '492';
+const BUILD = '494';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -3759,17 +3759,20 @@ const 지난수업 = { 줄:null, 때:0, 중:false, 실패:false, 한날:{} };
 async function 지난수업받기(mid){ const 끝 = 며칠전(지난기록한도);
   try{ const r = await sget('workouts?select=on_date,rec_date&member_id=eq.' + encodeURIComponent(mid) + '&on_date=gte.' + 끝 + '&limit=200'); 지난수업.한날[mid] = new Set((r || []).map(x => x.rec_date || x.on_date)); }catch(e){ 지난수업.한날[mid] = null; }
   if(!지난수업.중 && (!지난수업.줄 || Date.now() - 지난수업.때 > 6e5)){ 지난수업.중 = true;
-    try{ const j = await 앱crm('lessons', { 부터:끝 }); 지난수업.줄 = j['수업'] || []; 지난수업.실패 = false; }catch(e){ 지난수업.줄 = 지난수업.줄 || []; 지난수업.실패 = true; }
+    try{ const j = await 앱crm('lessons', { 부터:끝 }); 지난수업.줄 = j['수업'] || []; 지난수업.실패 = false; 지난수업.왜 = ''; }catch(e){ 지난수업.줄 = 지난수업.줄 || []; 지난수업.실패 = true; 지난수업.왜 = (e && e.message) || ''; }
     지난수업.중 = false; 지난수업.때 = Date.now(); }
   if(document.querySelector('.recday')) drawSheet(); }
 const 기록없는수업 = mid => { const m = MEMBERS.find(x => x.id === mid) || {}, 한 = 지난수업.한날[mid], 오늘 = 오늘날(), 끝 = 며칠전(지난기록한도), 본 = new Set();
   return (지난수업.줄 || []).filter(L => (mid === 'c' + L.key || (String(L.name || '').trim() === m.n && (!L.phone4 || String(L.phone4) === m.p4))) && L.날짜 && L.날짜 < 오늘 && L.날짜 >= 끝 && !(한 && 한.has(L.날짜)))
     .sort((a, b) => String(b.날짜).localeCompare(String(a.날짜))).filter(L => { if(본.has(L.날짜)) return false; 본.add(L.날짜); return true; }); };
 const 수업칩글 = L => { const d = new Date(L.날짜 + 'T12:00:00'); return `${d.getMonth() + 1}/${d.getDate()} (${'일월화수목금토'[d.getDay()]})${L.시각 ? ' ' + esc(String(L.시각).slice(0, 5)) : ''}`; };
-function 수업날줄(mid){ const 고른 = S.recDay, xs = 기록없는수업(mid), 직접 = S.recOther || 지난수업.실패 || (고른 && !xs.some(L => L.날짜 === 고른));
-  return `<div class="recday"><span>수업 날짜</span><button class="chip ${!고른 ? 'on' : ''}" data-act="recday:">오늘</button></div>
-    <div class="recday"><span>기록 안 한 수업</span>${xs.map(L => `<button class="chip ${고른 === L.날짜 ? 'on' : ''}" data-act="recday:${L.날짜}">${수업칩글(L)}</button>`).join('')}${직접 ? `<input class="search" type="date" aria-label="수업 날짜" min="${며칠전(지난기록한도)}" max="${오늘날()}" value="${고른 || 오늘날()}" onchange="수업날바꿈(this.value)">` : `<button class="chip" data-act="recday:other">다른 날짜</button>`}</div>`; }
-function 수업날바꿈(v){ if(v === 'other'){ S.recOther = true; drawSheet(); return; } S.recDay = v && v < 오늘날() && v >= 며칠전(지난기록한도) ? v : null; if(v && v < 며칠전(지난기록한도)) toast('2주 안의 날짜만 기록할 수 있어요'); drawSheet(); }
+function 수업날줄(mid){ const 고른 = S.recDay, 칸 = S.recMode || '', xs = 기록없는수업(mid), 안받음 = !지난수업.줄 && !지난수업.실패, 예약고름 = !!고른 && 칸 !== 'date' && xs.some(L => L.날짜 === 고른);
+  const 지난글 = 지난수업.실패 ? `지난 예약을 불러오지 못했어요 · ${esc(지난수업.왜 || '')}` : 안받음 ? '지난 예약을 불러오는 중이에요' : '기록 안 한 지난 예약이 없어요';
+  return `<div class="recday"><span>수업 날짜</span><button class="chip ${!고른 && !칸 ? 'on' : ''}" data-act="recday:">오늘</button><button class="chip ${칸 === 'past' || 예약고름 ? 'on' : ''}" data-act="recday:past">지난 예약으로 선택</button><button class="chip ${칸 === 'date' ? 'on' : ''}" data-act="recday:date">날짜로 선택</button></div>
+    ${칸 === 'date' ? `<div class="recday"><input class="search" type="date" aria-label="수업 날짜" min="${며칠전(지난기록한도)}" max="${오늘날()}" value="${고른 || 오늘날()}" onchange="수업날바꿈(this.value)"></div>` : ''}
+    ${칸 !== 'date' && xs.length ? `<div class="recday"><span>기록 안 한 수업</span>${xs.map(L => `<button class="chip ${고른 === L.날짜 ? 'on' : ''}" data-act="recday:${L.날짜}">${수업칩글(L)}</button>`).join('')}</div>` : ''}
+    ${칸 === 'past' && !xs.length ? `<div class="recday"><small class="recnote">${지난글}</small></div>` : ''}`; }      /* 기본 = 오늘 · 기록 안 한 수업이 있으면 처음부터 보인다 (2026-11-01 대표) */
+function 수업날바꿈(v){ if(v === 'date' || v === 'past'){ S.recMode = v; S.recDay = null; drawSheet(); return; } if(!v) S.recMode = ''; S.recDay = v && v < 오늘날() && v >= 며칠전(지난기록한도) ? v : null; if(v && v < 며칠전(지난기록한도)) toast('2주 안의 날짜만 기록할 수 있어요'); drawSheet(); }
 function 끝났나(w){
   if(!w || w.done) return null;
   if(w.date && w.date < 오늘날()) return '날짜가 지나';
@@ -5291,7 +5294,7 @@ function vLogin(){
    브로제이에 닿지 않을 때만 수기 추가(이름 + 뒷 4자리 · id 가 `mh…` 로 시작 → 데스크에 「수기」 표시)가 열린다 — 데스크와 같다 */
 async function 앱crm(길, 몸){ const au = 로그인기억.읽() || {}; if(!au.token || au.mid) throw new Error('직원으로 로그인해야 검색할 수 있어요');
   /* 앱은 늘 트레이너 본인 범위 — 대신 = 로그인한 직원 이름(서버가 자기 이름이면 등급과 상관없이 트레이너 범위로 답한다) · 2026-10-23 대표 「앱은 관리자로 볼 필요가 없으니 조민철 트레이너로만」 */
-  let r; try{ r = await fetch(GG_API + '/app/crm/' + 길, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(Object.assign({ token: au.token }, 몸 || {}, au.name ? { 대신: au.name } : {})) }); }
+  let r; try{ r = await fetch(GG_API + '/app/crm/' + 길, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(Object.assign({ token: au.token }, 몸 || {}, au.name && 길 !== 'lessons' ? { 대신: au.name } : {})) }); }      /* 지난 예약은 대신을 안 붙인다 — 붙이면 관리자도 본인 수업만 와서 다른 선생님 회원을 기록할 때 비었다 (2026-11-01 대표) · 트레이너 토큰은 서버가 본인 수업만 준다 */
   catch(e){ const x = new Error('서버에 닿지 못했어요'); x.막힘 = true; throw x; }
   if(!r.ok){ const x = new Error('서버에 닿지 못했어요 (' + r.status + ')'); x.막힘 = r.status >= 500; throw x; }
   const j = await r.json(); if(!j.ok){ const x = new Error(/권한이 없/.test(j.why || '') ? '「내 정보 → 로그아웃」 뒤 다시 로그인해 주세요' : (j.why || '검색하지 못했어요')); x.막힘 = !!j['막힘']; throw x; } return j; }
@@ -12999,7 +13002,7 @@ function 수업시작창(mid){
 }
 function sheetStartSession(mid){
   const m = MEMBERS.find(x=>x.id===mid) || {n:''};
-  const rs = myRoutines(mid), t = D.today[mid]; S.recDay = null; S.recOther = false; 지난수업받기(mid);
+  const rs = myRoutines(mid), t = D.today[mid]; S.recDay = null; S.recMode = ''; 지난수업받기(mid);
   openSheet(()=>`
     <div class="h2">${esc(m.n)} 회원 <small>무엇으로 시작할까요</small></div>
     ${수업날줄(mid)}
