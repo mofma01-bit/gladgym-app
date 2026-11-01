@@ -3328,7 +3328,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '490';
+const BUILD = '491';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -3750,7 +3750,7 @@ const capSec = (n, cap) => Math.max(0, Math.min(Math.round(Number(n)||0), cap));
       운동만 담고 세트는 안 찍은 시간은 「아직 하는 중」이지만 「운동한 시간」은 아니기 때문이다. */
 const 오늘날 = () => (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());   /* TODAY 는 켤 때 값이라 켜 둔 채 날이 넘어가면 틀린다 */
 /* 지난 수업 기록 — 2주 안의 날짜로 남긴다 (2026-10-31 직원 요청 · 대표 「기록 2주 기간 안에 작성 가능」)
-   기록하는 동안 on_date 는 오늘 · 마칠 때 고른 날로 바꾼다 — 서버 자동 종료가 on_date 지난 기록을 바로 닫기 때문 · 지난 수업은 리포트 자동 예약 안 함 */
+   기록하는 동안 on_date 는 오늘 · 고른 날은 rec_date — 서버 자동 종료가 on_date 지난 기록을 바로 닫기 때문 · 닫히는 길(마침 · 앱 자동 저장 · 서버 자동 종료)이 셋이라 날짜 맞추기는 데이터베이스(110단계)가 한다 · 지난 수업은 리포트 자동 예약 안 함 */
 const 지난기록한도 = 14, 며칠전 = n => (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date(Date.now() - n * 864e5));
 const 고른수업날 = () => { const d = S.recDay; S.recDay = null; return d && d < 오늘날() && d >= 며칠전(지난기록한도) ? d : null; };
 function 수업날줄(){ const 날 = S.recDay || 오늘날(), 어제 = 며칠전(1);
@@ -6573,8 +6573,8 @@ async function newLive(title, items, kind, rid, mid, by, 기록날){
   if(기록날) D.live.기록날 = 기록날;
   if(!t0) items.forEach(it=>{ it.startAt = null; });
   save(); go(items.length ? 'workout' : 'pick');
-  await sv(spost('workouts',[{ id, member_id:mid, on_date:TODAY, kind:D.live.kind,
-    routine_id:rid||null, title, dur:0, done:false }]), '운동 시작');
+  await sv(spost('workouts',[Object.assign({ id, member_id:mid, on_date:TODAY, kind:D.live.kind,
+    routine_id:rid||null, title, dur:0, done:false }, 기록날 ? { rec_date:기록날 } : {})]), '운동 시작');      /* 110단계 — 어떤 길로 닫혀도 데이터베이스가 on_date 를 rec_date 로 맞춘다 */
   for(let i=0;i<items.length;i++) await svNewItem(i);
   D.workouts.unshift({ id, mid, date:TODAY, kind:D.live.kind, rid:rid||null, title, dur:0, done:false,
     items: items.map(it=>({ _id:it._id, ex:it.ex, va:it.va, sec:0, locked:false, sets:[] })) });
@@ -6799,19 +6799,21 @@ function 팁줄들(wid){ const ts = 팁of(wid); if(!ts.length) return '';
 /* 수업 중 「종목 추가」로 유산소를 고르면 — 지금 수업에서 할지 · 개인운동으로 줄지 (2026-10-30 대표 「수업할 때 유산소는 개인운동으로 줄 수 있는데 선택하게 · 개인운동이면 회원 앱에 유산소 운동하기」) */
 function 유산소어디(ex, va){ const n = exName(ex, va);
   openSheet(() => `<div class="h2">${esc(n)} <small>언제 할까요?</small></div>
-    <button class="btn blue go" data-act="ctgive:${ex}">개인운동으로 주기 <small>회원 앱에 「유산소가 들어왔어요」 · 오늘 밤까지</small></button>
-    <button class="btn ghost go" data-act="add:${ex}:${va}:now">지금 수업에서 하기</button>
+    <button class="btn blue go" data-act="ctgive:${ex}">개인운동 주기 <small>회원 앱에 오늘 23:59까지 떠요</small></button>
+    <button class="btn ghost go" data-act="add:${ex}:${va}:now">지금 하기</button>
     <button class="btn ghost sm" data-act="close">닫기</button>`); }
 function sheetCtip(){ const w = live(); if(!w) return;
   const 다 = 유넣기기구(); if(S.ct && S.ct.ex && !다.some(e => e.id === S.ct.ex) && (exOf(S.ct.ex) || {}).cardio) 다.unshift(exOf(S.ct.ex));      /* 종목 추가에서 고른 유산소는 센터 넷 밖이어도 그대로 */ if(!S.ct || !다.some(e => e.id === S.ct.ex)) S.ct = { ex: (다[0] || {}).id, min: 20, spd: null, inc: 0 };
   openSheet(() => { const c = S.ct, e = exOf(c.ex) || {}, 경 = 경사최대(c.ex), 속이름 = 경 || /천국/.test(e.n || '') ? '속도' : '레벨';      /* 그릴 때마다 지금 기구로 다시 센다 */
     if(c.spd == null) c.spd = 경 ? 5.5 : 6;
     const 셈 = (k, 이름, 값, 단위) => `<div class="ctc"><span class="lb">${이름}</span><div class="ctn"><button data-act="ctd:${k}:-1" aria-label="${이름} 줄이기">−</button><b>${값}<small>${단위}</small></b><button data-act="ctd:${k}:1" aria-label="${이름} 늘리기">＋</button></div></div>`;
-    return `<div class="h2">유산소 추가 <small>회원 앱에 오늘 밤까지 떠요</small></div>
+    return `<div class="h2">유산소 추가 <small>언제 할까요?</small></div>
     <span class="lbl">종류</span><div class="chips">${다.map(x => `<button class="chip ${x.id === c.ex ? 'on' : ''}" data-act="ctex:${x.id}">${esc(유이름(x))}</button>`).join('')}</div>
     ${셈('min', '시간', c.min, '분')}${셈('spd', 속이름, kgfmt(c.spd), 경 ? 'km/h' : '')}${경 ? 셈('inc', '경사', kgfmt(c.inc), '') : ''}
-    <button class="btn blue go" data-act="ctsave">추가</button><button class="btn ghost sm" data-act="close">닫기</button>`; }); }
-function 팁카드(mid){ const ts = (D.ctips || []).filter(t => t.member_id === mid && t.on_date === TODAY && !t.done_at); if(!ts.length) return '';
+    <button class="btn blue go" data-act="ctsave">개인운동 주기 <small>회원 앱에 오늘 23:59까지 떠요</small></button>
+    <button class="btn ghost go" data-act="add:${c.ex}:${(vars(c.ex)[0] || {}).k || 'a'}:now">지금 하기</button>
+    <button class="btn ghost sm" data-act="close">닫기</button>`; }); }      /* 「＋ 유산소 추가」도 개인운동 / 수업 중을 고른다 (2026-11-01 대표) */
+function 팁카드(mid){ const 오늘 = 오늘날(), ts = (D.ctips || []).filter(t => t.member_id === mid && t.on_date === 오늘 && !t.done_at);      /* 넣은 날 23:59 까지 · 켜 둔 채 자정을 넘겨도 사라진다 (2026-11-01) */ if(!ts.length) return '';
   return ts.map(t => `<div class="ctcard"><div class="k">유산소가 들어왔어요${t.by ? ' · ' + esc(t.by) + ' 트레이너' : ''}</div><div class="v">${esc((exOf(t.ex_id) || {}).n || '유산소')} ${t.minutes}분</div>${팁강도(t) ? `<div class="s">${esc(팁강도(t))}</div>` : ''}<button class="btn blue go" data-act="ctipgo:${t.id}">바로 시작</button></div>`).join(''); }
 function 플래너화면(w){
   const wmid = w.mid || S.mid, tr = S.who === 'tr', 수업 = w.kind === '수업', 색 = 플래너색(w);
@@ -6837,11 +6839,11 @@ function 플래너화면(w){
     <div class="pl-tools">${혼자 ? `<button class="wrchip ${c0.on ? 'on' : ''}" data-act="wrestpick">${c0.on ? '휴식 ' + c0.sec + '초' : '휴식 끔'} ▾</button>` : ''}<span class="sp"></span>${채움 ? `<button class="pl-new" data-act="plnew">새로 기록하기</button>` : ''}</div>
     ${도는중 ? `<div class="wrestbar"><b id="restleft2">${mmss(Math.max(0, (S.rest.until - Date.now()) / 1000))}</b><span>쉬는 중</span><button data-act="wrestadd">+15초</button><button data-act="wrestx">건너뛰기</button></div>` : ''}
     <div class="pltb"><div class="plr plh"><span class="pln">운동 명칭</span><div class="plcs"><div class="plg" style="--n:4"><span class="plhh" style="grid-column:span 4">무게(kg)</span><span class="plhh r1" style="grid-column:span 4">반복수</span></div></div></div>
-      ${근.map(행).join('') || '<div class="pl-empty">아직 종목이 없습니다 · 아래 「＋ 종목 추가」</div>'}</div>
-    <button class="pl-add" data-act="go:pick">＋ 종목 추가</button>
+      ${근.map(행).join('') || '<div class="pl-empty">아직 종목이 없습니다 · 아래 「＋ 웨이트 종목 추가」</div>'}</div>
+    <button class="pl-add" data-act="go:pick">＋ 웨이트 종목 추가</button>
     <div class="pltb plcard"><div class="plr plca plh"><span class="pln">유산소</span><span>시간</span><span>속도</span></div>
-      ${유.map(유행).join('') || '<div class="pl-empty">유산소는 「＋ 종목 추가」 → 유산소에서</div>'}</div>
-    ${수업 && tr && D.ctips ? 팁줄들(w.id) + `<button class="pl-add" data-act="ctipnew">＋ 유산소 추가 <small>회원이 오늘 할 것</small></button>` : ''}
+      ${유.map(유행).join('') || '<div class="pl-empty">아직 유산소가 없습니다 · 아래 「＋ 유산소 추가」</div>'}</div>
+    ${수업 && tr && D.ctips ? 팁줄들(w.id) : ''}<button class="pl-add" data-act="plcardio">＋ 유산소 추가</button>
     ${수업 && tr ? `<span class="lbl">트레이너 메모</span><textarea class="pl-memo" data-k="wmemo" placeholder="오늘 컨디션 · 다음 수업에 할 것">${esc(w.trmemo || '')}</textarea>` : ''}
     <button class="dngr" data-act="askcancel">기록 삭제</button>`,
     foot: 발판(w) };
@@ -14620,6 +14622,7 @@ document.addEventListener('click', async ev=>{
     case 'bpopen': 칠창열기(rest[0]); return;
     case 'bpclose': 칠창닫기(); return;
     case 'ctipnew': S.ct = null; sheetCtip(); return;
+    case 'plcardio': { const lw = live(); if(lw && lw.kind === '수업' && S.who === 'tr' && D.ctips){ S.ct = null; sheetCtip(); } else { S.pickPart = '유산소'; go('pick'); } return; }      /* 유산소 추가는 이 단추 하나 (2026-11-01 대표) */
     case 'ctgive': closeSheet(); S.ct = { ex: rest[0], min: 20, spd: null, inc: 0 }; setTimeout(sheetCtip, 0); return;      /* 종목 추가 → 개인운동으로 주기 (2026-10-30) */      /* 유산소 넣어주기 (2026-10-24) */
     case 'ctex': S.ct.ex = rest[0]; S.ct.spd = null; S.ct.inc = 0; drawSheet(); return;
     case 'ctd': { const c = S.ct, k = rest[0], d = +rest[1], 경 = 경사최대(c.ex);
@@ -14629,7 +14632,7 @@ document.addEventListener('click', async ev=>{
       drawSheet(); return; }
     case 'ctsave': { const w = live(), c = S.ct; if(!w || !c) return;
       const 줄 = { id: 'ct' + Date.now(), member_id: w.mid, workout_id: w.id, ex_id: c.ex, minutes: c.min, speed: c.spd, incline: 경사최대(c.ex) ? c.inc : null, on_date: TODAY, by: TRAINER };
-      try{ await spost('cardio_tips', [줄]); (D.ctips = D.ctips || []).unshift(줄); closeSheet(); toast('유산소를 추가했어요\n회원 앱에 오늘 밤까지 떠요'); render(); }
+      try{ await spost('cardio_tips', [줄]); (D.ctips = D.ctips || []).unshift(줄); closeSheet(); toast('유산소를 추가했어요\n회원 앱에 오늘 23:59까지 떠요'); render(); }
       catch(e){ toast('추가하지 못했어요\n' + 오류말(e)); } return; }
     case 'ctipdel': { const t = (D.ctips || []).find(x => x.id === rest[0]); if(!t) return; if(!await 묻기('추가한 유산소를 삭제할까요?')) return;
       try{ await sdel('cardio_tips', 'id=eq.' + encodeURIComponent(t.id)); D.ctips = D.ctips.filter(x => x !== t); render(); }catch(e){ toast('삭제하지 못했어요'); } return; }
