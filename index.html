@@ -3328,7 +3328,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '491';
+const BUILD = '492';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -3753,9 +3753,23 @@ const 오늘날 = () => (d => d.getFullYear() + '-' + String(d.getMonth()+1).pad
    기록하는 동안 on_date 는 오늘 · 고른 날은 rec_date — 서버 자동 종료가 on_date 지난 기록을 바로 닫기 때문 · 닫히는 길(마침 · 앱 자동 저장 · 서버 자동 종료)이 셋이라 날짜 맞추기는 데이터베이스(110단계)가 한다 · 지난 수업은 리포트 자동 예약 안 함 */
 const 지난기록한도 = 14, 며칠전 = n => (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date(Date.now() - n * 864e5));
 const 고른수업날 = () => { const d = S.recDay; S.recDay = null; return d && d < 오늘날() && d >= 며칠전(지난기록한도) ? d : null; };
-function 수업날줄(){ const 날 = S.recDay || 오늘날(), 어제 = 며칠전(1);
-  return `<div class="recday"><span>수업 날짜</span><button class="chip ${날 === 오늘날() ? 'on' : ''}" data-act="recday:">오늘</button><button class="chip ${날 === 어제 ? 'on' : ''}" data-act="recday:${어제}">어제</button><input class="search" type="date" aria-label="수업 날짜" min="${며칠전(지난기록한도)}" max="${오늘날()}" value="${날}" onchange="수업날바꿈(this.value)"></div>`; }
-function 수업날바꿈(v){ S.recDay = v && v < 오늘날() && v >= 며칠전(지난기록한도) ? v : null; if(v && v < 며칠전(지난기록한도)) toast('2주 안의 날짜만 기록할 수 있어요'); drawSheet(); }
+/* 기록 안 한 지난 수업 — 날짜를 손으로 넣다 틀리지 않게 수업을 눌러 고른다 (2026-11-01 대표 「지난 수업 예약내역으로 바로 누를 수 있게 · 오늘을 누를 수도 · 지난 것도」)
+   수업 = 중앙 /app/crm/lessons(브로제이에서 진행된 수업 · 트레이너는 본인 것) · 기록 여부 = 그 회원의 앱 기록(rec_date 또는 on_date) · 못 받거나 남의 수업이면 「다른 날짜」 */
+const 지난수업 = { 줄:null, 때:0, 중:false, 실패:false, 한날:{} };
+async function 지난수업받기(mid){ const 끝 = 며칠전(지난기록한도);
+  try{ const r = await sget('workouts?select=on_date,rec_date&member_id=eq.' + encodeURIComponent(mid) + '&on_date=gte.' + 끝 + '&limit=200'); 지난수업.한날[mid] = new Set((r || []).map(x => x.rec_date || x.on_date)); }catch(e){ 지난수업.한날[mid] = null; }
+  if(!지난수업.중 && (!지난수업.줄 || Date.now() - 지난수업.때 > 6e5)){ 지난수업.중 = true;
+    try{ const j = await 앱crm('lessons', { 부터:끝 }); 지난수업.줄 = j['수업'] || []; 지난수업.실패 = false; }catch(e){ 지난수업.줄 = 지난수업.줄 || []; 지난수업.실패 = true; }
+    지난수업.중 = false; 지난수업.때 = Date.now(); }
+  if(document.querySelector('.recday')) drawSheet(); }
+const 기록없는수업 = mid => { const m = MEMBERS.find(x => x.id === mid) || {}, 한 = 지난수업.한날[mid], 오늘 = 오늘날(), 끝 = 며칠전(지난기록한도), 본 = new Set();
+  return (지난수업.줄 || []).filter(L => (mid === 'c' + L.key || (String(L.name || '').trim() === m.n && (!L.phone4 || String(L.phone4) === m.p4))) && L.날짜 && L.날짜 < 오늘 && L.날짜 >= 끝 && !(한 && 한.has(L.날짜)))
+    .sort((a, b) => String(b.날짜).localeCompare(String(a.날짜))).filter(L => { if(본.has(L.날짜)) return false; 본.add(L.날짜); return true; }); };
+const 수업칩글 = L => { const d = new Date(L.날짜 + 'T12:00:00'); return `${d.getMonth() + 1}/${d.getDate()} (${'일월화수목금토'[d.getDay()]})${L.시각 ? ' ' + esc(String(L.시각).slice(0, 5)) : ''}`; };
+function 수업날줄(mid){ const 고른 = S.recDay, xs = 기록없는수업(mid), 직접 = S.recOther || 지난수업.실패 || (고른 && !xs.some(L => L.날짜 === 고른));
+  return `<div class="recday"><span>수업 날짜</span><button class="chip ${!고른 ? 'on' : ''}" data-act="recday:">오늘</button></div>
+    <div class="recday"><span>기록 안 한 수업</span>${xs.map(L => `<button class="chip ${고른 === L.날짜 ? 'on' : ''}" data-act="recday:${L.날짜}">${수업칩글(L)}</button>`).join('')}${직접 ? `<input class="search" type="date" aria-label="수업 날짜" min="${며칠전(지난기록한도)}" max="${오늘날()}" value="${고른 || 오늘날()}" onchange="수업날바꿈(this.value)">` : `<button class="chip" data-act="recday:other">다른 날짜</button>`}</div>`; }
+function 수업날바꿈(v){ if(v === 'other'){ S.recOther = true; drawSheet(); return; } S.recDay = v && v < 오늘날() && v >= 며칠전(지난기록한도) ? v : null; if(v && v < 며칠전(지난기록한도)) toast('2주 안의 날짜만 기록할 수 있어요'); drawSheet(); }
 function 끝났나(w){
   if(!w || w.done) return null;
   if(w.date && w.date < 오늘날()) return '날짜가 지나';
@@ -12985,10 +12999,10 @@ function 수업시작창(mid){
 }
 function sheetStartSession(mid){
   const m = MEMBERS.find(x=>x.id===mid) || {n:''};
-  const rs = myRoutines(mid), t = D.today[mid]; S.recDay = null;
+  const rs = myRoutines(mid), t = D.today[mid]; S.recDay = null; S.recOther = false; 지난수업받기(mid);
   openSheet(()=>`
     <div class="h2">${esc(m.n)} 회원 <small>무엇으로 시작할까요</small></div>
-    ${수업날줄()}
+    ${수업날줄(mid)}
     ${(() => { const 지난 = D.workouts.filter(w => w.mid === mid && w.done && w.kind === '수업').sort(byDateDesc)[0]; return 지난 && 팁of(지난.id).length ? `<div class="ctlast"><b>지난 수업(${dateTxt(지난.date)}) 유산소</b>${팁줄들(지난.id)}</div>` : ''; })()}
     ${주기줄(mid, 'tsub:cycle:'+mid)}
     ${t && rOf(t.rid) ? `<button class="sspick" data-act="tstart:${mid}:${t.rid}:${t.kind}">
