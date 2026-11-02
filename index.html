@@ -2982,6 +2982,10 @@ const 별칭기구 = { '맨몸':'bodyweight 자중 홈트 기구없이', '바벨
   '원판':'plate 플레이트', '폼롤러':'foamroller 마사지', '땅콩볼':'peanut 피넛볼 트윈볼 마사지',
   '마사지볼':'ball 라크로스볼 마사지', '도구':'tool 소도구', '유산소':'cardio' };
 const 검색키 = t => (t||'').toLowerCase().replace(/[\s·()\-—_/,]/g,'');
+/* 소리로도 찾기 (2026-11-02 대표 「v스쿼트 검색하면 브이스쿼트가 연관되게 · 앱에도」) — 영문은 한글 읽기 · ㅐ/ㅔ · ㅒ/ㅖ 같게 · 데스크와 같은 규칙 */
+const 영소리 = { a:'에이', b:'비', c:'씨', d:'디', e:'이', f:'에프', g:'지', h:'에이치', i:'아이', j:'제이', k:'케이', l:'엘', m:'엠', n:'엔', o:'오', p:'피', q:'큐', r:'알', s:'에스', t:'티', u:'유', v:'브이', w:'더블유', x:'엑스', y:'와이', z:'지' };
+const 소리판 = t => String(t || '').replace(/[a-z]/g, c => 영소리[c] || c).replace(/[가-힣]/g, ch => { const c = ch.charCodeAt(0) - 0xAC00, 중 = Math.floor(c / 28) % 21; const 새 = 중 === 1 ? 5 : 중 === 3 ? 7 : 중; return 새 === 중 ? ch : String.fromCharCode(0xAC00 + (Math.floor(c / 588) * 21 + 새) * 28 + c % 28); });
+const 찾음 = (키, q) => !!q && (String(키 || '').includes(q) || 소리판(String(키 || '')).includes(소리판(q)));
 /* 내가 만든 운동 종목 — 사전에 없는 운동을 트레이너가 만들어 루틴에 넣는다 (2026-10-07 대표).
    고르기 목록에는 **공용 사전 + 내가 만든 것**만 보인다. 이미 루틴·기록에 담긴 것은 누구에게나 그대로 보인다. */
 const 고를수있나 = e => !!e;      /* 2026-10-27 대표 「트레이너가 바로 추가하고 모두가 검색」 — 승인 없이 전원 검색 · 정리는 데스크 종목 사전 */
@@ -3019,7 +3023,7 @@ function 운동파일고르기(종){
   inp.click();
 }
 function exKey(e){
-  let t = e.n + ' ' + e.p + ' ' + (e.e||'');
+  let t = e.n + ' ' + e.p + ' ' + (e.e||'') + ' ' + (e.aliases || []).join(' ');      /* 선생님들이 쓰던 다른 이름(exercises.aliases · 115단계 · 2026-11-02) */
   for(const a of 별칭이름) if(t.indexOf(a[0])>=0) t += ' ' + a[1];
   t += ' ' + (별칭부위[e.p]||'') + ' ' + (별칭기구[e.e]||'');
   /* 같은 낱말이라도 부위에 따라 뜻이 다르다 — 레그 컬은 이두가 아니고, 덤벨 킥백은 둔근이 아니다 */
@@ -3328,7 +3332,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '497';
+const BUILD = '498';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -3610,7 +3614,7 @@ async function boot(){
   D.rm = (rms||[]).map(r => { const [ex,va] = splitV(r.variant_id);
     return { id:r.id, mid:r.member_id, ex, va, kg:Number(r.kg||0), reps:Number(r.reps||1), kind:r.kind||'추정', date:r.on_date, wid:r.workout_id||'', by:r.by||'' }; });
 
-  EX = exs.map(e => ({ id:e.id, n:e.name, p:e.part, e:e.equip, cardio: e.cardio ? 1 : 0, owner:e.owner||'', media: Array.isArray(e.media) ? e.media : [],
+  EX = exs.map(e => ({ id:e.id, n:e.name, p:e.part, e:e.equip, aliases: Array.isArray(e.aliases) ? e.aliases : [], cardio: e.cardio ? 1 : 0, owner:e.owner||'', media: Array.isArray(e.media) ? e.media : [],
     vars: vrs.filter(v => v.ex_id === e.id).map(v => ({ k:v.vkey, n:v.name||'', desc:v.descr||'', demo: v.demo?1:0, du: v.demo_url||'' })) }));
   const 회원꼴 = m => ({ id:m.id, n:m.name, tr:m.trainer, p4:m.phone4||'', reg:(m.reg_kind||'').trim(),      /* p4 = 전화 뒷 4자리 — 회원 추가 때 「이미 있음」을 가린다 */
     /* 동의 칸 — 설계서\8단계_SQL_동의칸.sql (없으면 undefined 로 들어와 「미동의」로 본다) */
@@ -4739,7 +4743,7 @@ function tRnew(){
 function RN줄(e){ const va = (vars(e.id)[0] || {}).k || 'a', 있 = S.rn.items.some(x => x.ex === e.id);
   return `<button class="mrow2 ${있 ? 'pson' : ''}" data-act="rntog:${e.id}:${va}">${카드그림(e)}<span class="mt"><b>${esc(e.n)}</b><small>${e.owner ? '<u>추가한 종목</u> · ' : ''}${esc(e.p || '')}${e.e ? ' · ' + esc(e.e) : ''}</small></span><em class="pkadd">${있 ? '✓' : '＋'}</em></button>`; }
 function RN목록(){ const n = S.rn, q = (n.q || '').trim();
-  if(q){ const k = 검색키(q), rs = RN고를().filter(e => 검색키(e.n).includes(k) || 검색키(exKey ? exKey(e) : e.n).includes(k));
+  if(q){ const k = 검색키(q), rs = RN고를().filter(e => 찾음(검색키(e.n), k) || 찾음(exKey ? exKey(e) : 검색키(e.n), k));
     return `<div class="rn-sec">검색 결과 ${rs.length}개</div><div class="megrp pkg">${rs.slice(0, 40).map(RN줄).join('')}</div>
       <button class="mrow2 rn-ownrow" data-act="rnownadd"><span class="mt"><b>「${esc(q)}」 직접 추가</b><small>목록에 없으면 이 이름 그대로 추가해요</small></span><em class="pkadd">＋</em></button>`; }
   if(n.part === '자주 쓰는'){ const fs = RN자주(); return '<div class="rn-sec">자주 쓰는 종목</div>' + (fs.length ? `<div class="megrp pkg">${fs.map(RN줄).join('')}</div>` : '<div class="empty">아직 기록이 없어요<small class="e2">위 부위를 누르거나 검색해 주세요</small></div>'); }
@@ -6420,7 +6424,7 @@ function sheetPsetLib(){
     <div class="pkparts">${스트칸들.map(c => `<button class="chip ${!q && c === 칸 ? 'on' : ''}" data-act="pslk:${c}">${c}<i class="pkcnt">${모두.filter(x => x.c === c).length}</i></button>`).join('')}</div>
     <div class="megrp pkg" id="psgrid">
       <button class="mrow2 pknew2" data-act="pinew" data-ps="추가한 동작" data-psnm="" style="${!q && 칸 === '추가한 동작' ? '' : 'display:none'}"><div><span>＋</span>새 동작</div></button>
-      ${모두.map(x => { const n = 담.indexOf(키(x)) + 1, 보임 = q ? 검색키(x.찾).includes(q) : x.c === 칸;
+      ${모두.map(x => { const n = 담.indexOf(키(x)) + 1, 보임 = q ? 찾음(검색키(x.찾), q) : x.c === 칸;
         return `<button class="mrow2 ${n ? 'pson' : ''}" data-act="pstog:${키(x)}" data-ps="${esc(x.c)}" data-psnm="${esc(x.찾)}" style="${보임 ? '' : 'display:none'}">${x.그림}${x.마 ? '<span class="pkms">마사지</span>' : ''}
           <span class="mt"><b>${esc(x.n)}</b><small>${esc(x.t || '')}</small></span><em class="pkadd">${n || '＋'}</em></button>`; }).join('')}
     </div>
@@ -6428,7 +6432,7 @@ function sheetPsetLib(){
 }
 /* 검색 — 화면을 다시 그리지 않고 카드만 숨긴다(한글 조합이 끊기지 않게) · 칩과 상관없이 전체에서 찾는다 */
 document.addEventListener('input', ev => { const t = ev.target; if(!t || t.id !== 'psq') return; S.psq = t.value; const q = 검색키(t.value), 칸 = 스트칸고름();
-  document.querySelectorAll('#psgrid [data-ps]').forEach(el => { el.style.display = (q ? !!el.dataset.psnm && 검색키(el.dataset.psnm).includes(q) : el.dataset.ps === 칸) ? '' : 'none'; });
+  document.querySelectorAll('#psgrid [data-ps]').forEach(el => { el.style.display = (q ? !!el.dataset.psnm && 찾음(검색키(el.dataset.psnm), q) : el.dataset.ps === 칸) ? '' : 'none'; });
   document.querySelectorAll('.pkparts [data-act^="pslk:"]').forEach(c => c.classList.toggle('on', !q && c.dataset.act === 'pslk:' + 칸)); });
 /* 종목 만들기 · 고치기 — 이름 · 시간/횟수 · 설명 · 사진 여러 장 또는 영상 */
 function sheetPsetOwn(){
@@ -13131,7 +13135,7 @@ function tEx(){
 }
 function 사전칠하기(){ const el = document.querySelector('#main [data-k="texq"]'); if(!el) return;
   const q = 검색키(el.value || ''), 부 = PARTS.includes(S.expart) ? S.expart : PARTS[0]; let n = 0;
-  document.querySelectorAll('#main [data-texrow]').forEach(r => { const 보 = q ? 검색키(r.dataset.texrow).includes(q) : r.dataset.texpart === 부; r.style.display = 보 ? '' : 'none'; if(보) n++; });
+  document.querySelectorAll('#main [data-texrow]').forEach(r => { const 보 = q ? 찾음(검색키(r.dataset.texrow), q) : r.dataset.texpart === 부; r.style.display = 보 ? '' : 'none'; if(보) n++; });
   const x = document.querySelector('#main .texnone'); if(x) x.style.display = n ? 'none' : '';
   const c = document.querySelector('#main .texparts'); if(c) c.style.opacity = q ? '.4' : ''; }      /* 검색 중에는 부위를 가리지 않는다 — 칩을 흐리게 */
 
@@ -13142,7 +13146,7 @@ function 칠하기(){
   document.querySelectorAll('[data-exrow]').forEach(el=>{
     const 기구맞음 = S.pickEq==='전체' || el.getAttribute('data-eq')===S.pickEq;
     const 맞음 = q
-      ? ((el.getAttribute('data-exrow')||'').includes(q) && 기구맞음)
+      ? (찾음(el.getAttribute('data-exrow'), q) && 기구맞음)
       : ((S.pickPart==='전체' || (S.pickPart==='추가한 종목' ? el.getAttribute('data-mine')==='1' : el.getAttribute('data-part')===S.pickPart)) && 기구맞음);
     el.style.display = 맞음 ? '' : 'none';
     if(맞음) 보임++;
@@ -13662,7 +13666,7 @@ document.addEventListener('click', async ev=>{
     case 'rnpart': if(S.rn){ S.rn.part = rest.join(':'); S.rn.q = ''; render(); const m = $('#main'); if(m) m.scrollTop = 0; } return;
     case 'rntog': if(S.rn){ const ex = rest[0], va = rest[1] || 'a', i = S.rn.items.findIndex(x => x.ex === ex); const 이름 = exName(ex, va);
       if(i >= 0){ S.rn.items.splice(i, 1); toast(이름 + ' 삭제했어요'); } else { S.rn.items.push({ ex, va, kg:'', reps:'', sets:'', rest:'' }); toast(이름 + ' 추가했어요'); } render(); } return;
-    case 'rnownadd': if(S.rn){ const q = (S.rn.q || '').trim(); if(!q) return; const 같은 = RN고를().find(e => 검색키(e.n) === 검색키(q));
+    case 'rnownadd': if(S.rn){ const q = (S.rn.q || '').trim(); if(!q) return; const 같은 = RN고를().find(e => 검색키(e.n) === 검색키(q) || 소리판(검색키(e.n)) === 소리판(검색키(q)));
       if(같은){ if(!S.rn.items.some(x => x.ex === 같은.id)) S.rn.items.push({ ex:같은.id, va:(vars(같은.id)[0] || {}).k || 'a', kg:'', reps:'', sets:'', rest:'' }); }
       else if(!S.rn.items.some(x => x.새 === q)) S.rn.items.push({ 새:q, kg:'', reps:'', sets:'', rest:'' });
       toast(q + ' 추가했어요'); S.rn.q = ''; render(); } return;
