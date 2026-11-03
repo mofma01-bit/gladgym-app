@@ -169,6 +169,22 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .plca>span{display:flex;align-items:center;justify-content:center;font-size:13.5px;font-weight:800;border-left:1px solid #2a2722;min-height:36px}.plca>span.pln{justify-content:flex-start;border-left:0}
 .plca.plh>span{font-size:13px;color:var(--sub);font-weight:700}
 .pl-empty{padding:12px;font-size:13px;color:var(--sub);text-align:center}
+.zbtn{display:flex;align-items:center;gap:10px;width:100%;margin:8px 0 0;padding:14px 14px;border-radius:14px;font:inherit;font-weight:800;font-size:15.5px;line-height:1.25;text-align:left;cursor:pointer}
+.zbtn small{display:block;font-weight:600;font-size:13px;opacity:.85;margin-top:2px}.zbtn .e{font-size:20px;flex:none}.zbtn > span:not(.e):not(.go){flex:1;min-width:0}
+.zrest{background:linear-gradient(180deg,#2c2618,#221d13);border:1.5px solid #8a7240;color:#f0d3a0}.zcar{background:linear-gradient(180deg,#183026,#12241c);border:1.5px solid #3f9a6c;color:#9fe2bd}
+.zas{display:flex;align-items:center;gap:10px;margin:8px 0 0;padding:11px 12px;border-radius:12px;font-size:14px}.zas b{font-weight:800}.zas small{display:block;color:var(--sub);font-size:13px;margin-top:2px}.zas > div{flex:1;min-width:0}
+.zas .x{flex:none;border:1px solid #5a554c;border-radius:9px;padding:7px 10px;color:var(--cream);font:inherit;font-size:13px;font-weight:700;background:#1b1a17}.zas .zok{flex:none;color:#9fe2bd;font-size:13px;font-weight:800}
+.zas.c{background:rgba(63,154,108,.12);border:1px solid rgba(63,154,108,.5)}.zas.r{background:rgba(240,211,160,.08);border:1px solid rgba(240,211,160,.35)}
+.zas.new{animation:zpop .5s cubic-bezier(.2,1.4,.4,1),zglow 1.6s ease-out .2s 2}@keyframes zpop{from{transform:scale(.92);opacity:0}to{transform:none;opacity:1}}@keyframes zglow{0%{box-shadow:0 0 0 0 rgba(240,211,160,.55)}100%{box-shadow:0 0 0 12px rgba(240,211,160,0)}}
+@media (prefers-reduced-motion:reduce){.zas.new{animation:none}}
+.zrow{display:flex;align-items:center;gap:10px;width:100%;padding:10px;border-radius:12px;background:#1d1c19;border:1px solid #34322d;margin-bottom:7px;color:inherit;font:inherit;text-align:left;cursor:pointer}.zrow .rtimg,.zrow .rtph{width:52px;height:52px;border-radius:9px;object-fit:cover;flex:none}.zrow > div{flex:1;min-width:0}.zrow b{display:block;font-size:14.5px}.zrow small{color:var(--sub);font-size:13px}
+.zrow .ck{width:28px;height:28px;border-radius:8px;border:2px solid #5a554c;flex:none;display:flex;align-items:center;justify-content:center;font-weight:900}.zrow.on{border-color:#c9a86a;background:#25211a}.zrow.on .ck{background:#f0d3a0;border-color:#f0d3a0;color:#141311}
+.zqk{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0 12px}.zqk button{padding:12px 8px;border-radius:11px;border:1px solid #5a554c;background:#1b1a17;color:var(--cream);font:inherit;font-weight:800;font-size:14px}
+.zfind{display:flex;width:100%;align-items:center;padding:11px 12px;margin-top:6px;border-radius:10px;border:1px solid #34322d;background:#1b1a17;color:var(--cream);font:inherit;font-size:14px;text-align:left}.zfind span{margin-left:auto;color:var(--gold-2,#e2c184);font-weight:800}
+.zmh{display:flex;flex-direction:column;gap:10px;margin:0 0 14px}.zmh .lbl{margin:0}.zmh .zbtn{margin:0;padding:16px 14px;font-size:16.5px}.zmh .zbtn .go{margin-left:auto;flex:none;white-space:nowrap;font-size:14px;border-radius:999px;padding:7px 14px;background:rgba(255,255,255,.08)}
+.zrp{border:1px solid #3a352c;border-radius:14px;padding:10px 12px;margin:6px 0 10px;background:#1b1a17}.zrp .l{display:flex;gap:8px;align-items:flex-start;padding:8px 0;border-top:1px dashed rgba(255,255,255,.08);font-size:14px}.zrp .l:first-child{border-top:0}
+.zrp .tg{flex:none;font-size:12.5px;font-weight:800;border-radius:6px;padding:2px 7px}.zrp .tg.c{background:rgba(63,154,108,.2);color:#9fe2bd}.zrp .tg.r{background:rgba(240,211,160,.15);color:#f0d3a0}.zrp .l > span:nth-child(2){flex:1;min-width:0}.zrp .ok{flex:none;color:#9fe2bd;font-size:13px;font-weight:800}.zrp .ok.no{color:var(--sub)}
+.zsame{display:flex;flex-direction:column;gap:6px;border:1.5px solid #8a7240;background:#251f15;border-radius:14px;padding:12px;margin:0 0 12px}.zsame b{color:#f0d3a0;font-size:15px}.zsame small{color:var(--sub);font-size:13px}.zsame .btn{align-self:flex-start}
 .pl-add{display:block;width:100%;margin:8px 0 0;border:1px dashed var(--line);border-radius:10px;padding:10px;background:none;color:var(--cream);font:inherit;font-weight:800}
 .pl-memo{width:100%;min-height:64px}
 .pl-big{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0 12px}.pl-big button{border:1px solid var(--line);background:var(--dark-2);border-radius:14px;padding:18px 12px;color:var(--cream);font:inherit;text-align:left}
@@ -3397,11 +3413,19 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '523';
+const BUILD = '528';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const 큰안내패드 = () => /ipad/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const 안드로이드 = () => /android/i.test(navigator.userAgent || '');
+function 안드로이드안내글(이름){      /* 안드로이드 — 설치 신호가 없을 때 메뉴로 설치 3단계 (2026-11-03) */
+  const 삼성 = /SamsungBrowser/i.test(navigator.userAgent || '');
+  return '<div class="ga-big"><div class="ga-t">홈 화면에 「' + 이름 + '」 설치하기</div>'
+    + (삼성 ? '<ol><li>화면 맨 아래 <span class="ga-ic">메뉴 <i>≡</i></span> 를 누르세요</li><li><span class="ga-ic">현재 페이지 추가</span> → <span class="ga-ic">홈 화면</span></li><li><span class="ga-ic">추가</span> 를 누르면 끝!</li></ol>'
+      : '<ol><li>크롬 <b>오른쪽 위</b> <span class="ga-ic">더보기 <i>⋮</i></span> 를 누르세요</li><li><span class="ga-ic">앱 설치</span> 또는 <span class="ga-ic">홈 화면에 추가</span></li><li><span class="ga-ic">설치</span> 를 누르면 끝!</li></ol>')
+    + '<div class="ga-s">다음부터는 홈 화면의 「' + 이름 + '」 아이콘으로 여세요</div></div>';
+}
 function 홈추가안내글(이름){      /* 아이폰 · 아이패드 사파리 — 「홈 화면에 추가」 3단계(큰 글씨) */
   const 패드 = 큰안내패드();
   return '<div class="ga-big"><div class="ga-t">홈 화면에 「' + 이름 + '」 추가하기</div>'
@@ -3669,6 +3693,7 @@ async function boot(){
   try{ 종목담기(await sget('prep_items?select=*&order=created_at').catch(()=>[])); }catch(e){ D.pitems = []; }
   try{ D.favs = (await sget('trainer_favs?select=trainer,member_id').catch(()=>[])) || []; }catch(e){ D.favs = []; }
   try{ D.ctips = await sget('cardio_tips?select=*&order=created_at.desc&limit=600'); }catch(e){ D.ctips = null; }
+  try{ D.rtips = await sget('rest_tips?select=*&order=created_at.desc&limit=600'); }catch(e){ D.rtips = null; }      /* 나머지 운동 지정 (122단계 · 2026-11-03) */
   try{ D.exfb = await 전부받기('ex_feedback?select=*&order=created_at.desc,id'); }catch(e){ D.exfb = null; }      /* 종목별 추천 피드백 — 직원만 읽힘(103단계 · 회원은 빈 목록) */
   try{ D.exfavs = (await sget('ex_favs?select=trainer,ex_id').catch(()=>[])) || []; }catch(e){ D.exfavs = []; }      /* 종목 즐겨찾기 (107단계) */
   try{ D.sheets = (await sget('routine_sheets?select=id,kind,title,owner,note,hidden,cover').catch(()=>[])) || []; D.gives = (await sget('sheet_gives?select=*').catch(()=>[])) || []; }catch(e){ D.sheets = []; D.gives = []; }      /* 받은 루틴표 (84단계) */      /* 유산소 넣어주기 (59단계) — 표가 없으면 null = 기능 숨김 */
@@ -6957,8 +6982,34 @@ function sheetCtip(){ const w0 = live(), 지정만 = S.ct && S.ct.mid && (!w0 ||
     <button class="btn blue go" data-act="ctsave">개인운동 주기 <small>회원 앱에 오늘 23:59까지 떠요</small></button>
     ${지정만 ? '' : `<button class="btn ghost go" data-act="add:${c.ex}:${(vars(c.ex)[0] || {}).k || 'a'}:now">지금 하기</button>`}
     <button class="btn ghost sm" data-act="close">닫기</button>`; }); }      /* 「＋ 유산소 추가」도 개인운동 / 수업 중을 고른다 (2026-11-01 대표) */
-function 팁카드(mid){ const 오늘 = 오늘날(), ts = (D.ctips || []).filter(t => t.member_id === mid && t.on_date === 오늘 && !t.done_at);      /* 넣은 날 23:59 까지 · 켜 둔 채 자정을 넘겨도 사라진다 (2026-11-01) */ if(!ts.length) return '';
-  return ts.map(t => `<div class="ctcard"><div class="k">유산소가 들어왔어요${t.by ? ' · ' + esc(t.by) + ' 트레이너' : ''}</div><div class="v">${esc((exOf(t.ex_id) || {}).n || '유산소')} ${t.minutes}분</div>${팁강도(t) ? `<div class="s">${esc(팁강도(t))}</div>` : ''}<button class="btn blue go" data-act="ctipgo:${t.id}">바로 시작</button></div>`).join(''); }
+/* 수업에서 회원에게 넣은 것 — 유산소(초록) · 나머지 운동(금색) · ✕ 취소 · 새로 넣은 것은 애니메이션 (2026-11-03 대표 「추가됐다는 걸 인지할 수 있게」) */
+const 나머지of = wid => (D.rtips || []).filter(t => t.workout_id === wid);
+const 방금 = t => Date.now() - Date.parse(t.created_at || 0) < 5000 || String(t.id || '').endsWith(String(S.zNew || '-'));
+function 지정카드들(wid){ const 결 = (끝, 분) => 끝 ? `<span class="zok">✓ 회원이 함${분 ? ' ' + 분 + '분' : ''}</span>` : '';
+  const 유 = (D.ctips ? 팁of(wid) : []).map(t => `<div class="zas c${방금(t) ? ' new' : ''}"><span class="e">🏃</span><div><b>유산소 · ${esc((exOf(t.ex_id) || {}).n || '유산소')} ${t.minutes}분</b><small>${esc([팁강도(t), '회원 앱 「유산소 하기」'].filter(Boolean).join(' · '))}</small></div>${결(t.done_at, t.done_min)}${S.who === 'tr' && !t.done_at && t.on_date === TODAY ? `<button class="x" data-act="ctipdel:${t.id}">✕ 취소</button>` : ''}</div>`);
+  const 나 = 나머지of(wid).map(t => { const its = t.items || []; return `<div class="zas r${방금(t) ? ' new' : ''}"><span class="e">📋</span><div><b>나머지 운동 ${its.length}종목</b><small>${esc(its.map(x => exName(x.ex, x.va)).join(' · '))}</small></div>${결(t.done_at)}${S.who === 'tr' && !t.done_at && t.on_date === TODAY ? `<button class="x" data-act="rtdel:${t.id}">✕ 취소</button>` : ''}</div>`; });
+  return 유.concat(나).join(''); }
+function 나머지창(){ const w = live(); if(!w) return; const 고른 = S.rsel || (S.rsel = w.items.filter(it => !(exOf(it.ex) || {}).cardio && !isMemo(it.ex) && !it.sets.some(x => x.done)).map(it => it.ex + ':' + it.va));
+  const 오늘 = w.items.filter(it => !(exOf(it.ex) || {}).cardio && !isMemo(it.ex)), 더 = (S.radd || []).filter(k => !오늘.some(it => it.ex + ':' + it.va === k));
+  const 줄 = (k, 말) => { const [ex, va] = k.split(':'), e = exOf(ex), on = 고른.includes(k); return `<button class="zrow ${on ? 'on' : ''}" data-act="rtsel:${esc(k)}">${종목그림(e)}<div><b>${esc(exName(ex, va))}</b><small>${말}</small></div><span class="ck">${on ? '✓' : ''}</span></button>`; };
+  const q = (S.rq || '').trim(), 찾음 = q ? EX.filter(e => !e.cardio && !isMemo(e.id) && 검색맞음(e, q)).slice(0, 8) : [];
+  openSheet(() => `<div class="h2">나머지 운동 지정하기 <small>오늘 개인운동으로</small></div>
+    <div class="zqk"><button data-act="rtall:0">안 한 것 모두</button><button data-act="rtall:1">오늘 루틴 전부</button></div>
+    <span class="lbl">오늘 루틴</span>${오늘.map(it => 줄(it.ex + ':' + it.va, it.sets.some(x => x.done) ? '✓ 수업에서 함 · ' + it.sets.filter(x => x.done).length + '세트' : '아직 안 함 · ' + Math.max(3, it.sets.length) + '세트')).join('') || '<div class="sub">아직 오늘 수업에 종목이 없어요</div>'}
+    ${더.length ? `<span class="lbl">검색해서 추가</span>${더.map(k => 줄(k, '3세트')).join('')}` : ''}
+    <input class="search" type="text" data-k="rq" placeholder="종목 검색해서 추가" value="${esc(S.rq || '')}">
+    ${찾음.map(e => `<button class="zfind" data-act="rtadd:${e.id}:${(vars(e.id)[0] || {}).k || 'a'}">${esc(e.n)} <span>＋ 추가</span></button>`).join('')}
+    <button class="btn main" data-act="rtsave"${고른.length ? '' : ' disabled'}>${고른.length ? 고른.length + '종목 지정하기' : '종목을 선택해 주세요'}</button><button class="btn ghost sm" data-act="close">닫기</button>`); }
+/* 나머지 운동 창 검색 — 칠 때마다 결과(한글 조합 중엔 기다림) */
+const 나머지검색 = t => { clearTimeout(window.__rqT); window.__rqT = setTimeout(() => { S.rq = t.value; 나머지창(); const n = document.querySelector('[data-k="rq"]'); if(n){ n.focus(); n.setSelectionRange(n.value.length, n.value.length); } }, 250); };
+document.addEventListener('input', e => { const t = e.target; if(t && t.dataset && t.dataset.k === 'rq' && !e.isComposing) 나머지검색(t); });
+document.addEventListener('compositionend', e => { const t = e.target; if(t && t.dataset && t.dataset.k === 'rq') 나머지검색(t); });
+const 검색맞음 = (e, q) => { const k = s => String(s || '').replace(/\s/g, '').toLowerCase(); return k(e.n).includes(k(q)) || (e.aliases || []).some(a => k(a).includes(k(q))); };
+function 팁카드(mid){ const 오늘 = 오늘날(), 나 = (D.rtips || []).filter(t => t.member_id === mid && t.on_date === 오늘 && !t.done_at);      /* 회원 홈 — 유산소 하기 · 나머지 웨이트 하기 (2026-11-03) */
+  const 위 = 팁카드옛(mid), 아래 = 나.map(t => { const its = t.items || []; return `<button class="zbtn zrest zmh1" data-act="rtgo:${t.id}"><span class="e">🏋️</span><span>나머지 웨이트 하기<small>${esc(its.map(x => exName(x.ex, x.va)).join(' · '))}</small></span><span class="go">시작 ›</span></button>`; }).join('');
+  return 위 || 아래 ? `<div class="zmh"><span class="lbl">오늘 선생님이 지정한 운동</span>${위}${아래}</div>` : ''; }
+function 팁카드옛(mid){ const 오늘 = 오늘날(), ts = (D.ctips || []).filter(t => t.member_id === mid && t.on_date === 오늘 && !t.done_at);      /* 넣은 날 23:59 까지 · 켜 둔 채 자정을 넘겨도 사라진다 (2026-11-01) */ if(!ts.length) return '';
+  return ts.map(t => `<button class="zbtn zcar zmh1" data-act="ctipgo:${t.id}"><span class="e">🏃</span><span>유산소 하기<small>${esc([((exOf(t.ex_id) || {}).n || '유산소') + ' ' + t.minutes + '분', 팁강도(t)].filter(Boolean).join(' · '))}</small></span><span class="go">시작 ›</span></button>`).join(''); }
 function 플래너화면(w){
   const wmid = w.mid || S.mid, tr = S.who === 'tr', 수업 = w.kind === '수업', 색 = 플래너색(w);
   const 줄들 = w.items.map((it, i) => ({ it, i, e: exOf(it.ex) || {} }));
@@ -6985,9 +7036,10 @@ function 플래너화면(w){
     <div class="pltb"><div class="plr plh"><span class="pln">운동 명칭</span><div class="plcs"><div class="plg" style="--n:4"><span class="plhh" style="grid-column:span 4">무게(kg)</span><span class="plhh r1" style="grid-column:span 4">반복수</span></div></div></div>
       ${근.map(행).join('') || '<div class="pl-empty">아직 종목이 없습니다 · 아래 「＋ 웨이트 종목 추가」</div>'}</div>
     <button class="pl-add" data-act="go:pick">＋ 웨이트 종목 추가</button>
-    <div class="pltb plcard"><div class="plr plca plh"><span class="pln">유산소</span><span>시간</span><span>속도</span></div>
-      ${유.map(유행).join('') || '<div class="pl-empty">아직 유산소가 없습니다 · 아래 「＋ 유산소 추가」</div>'}</div>
-    ${수업 && tr && D.ctips ? 팁줄들(w.id) : ''}<button class="pl-add" data-act="plcardio">＋ 유산소 추가</button>
+    ${수업 && tr ? `<button class="zbtn zrest" data-act="rtrest"><span class="e">📋</span><span>나머지 운동 지정하기<small>오늘 루틴에서 · 검색해서 추가</small></span></button>` : ''}
+    ${유.length ? `<div class="pltb plcard"><div class="plr plca plh"><span class="pln">유산소</span><span>시간</span><span>속도</span></div>${유.map(유행).join('')}</div>` : ''}
+    <button class="zbtn zcar" data-act="plcardio"><span class="e">🏃</span><span>유산소 운동 추가<small>종목 · 시간 · 속도 · 경사</small></span></button>
+    ${수업 && tr ? 지정카드들(w.id) : ''}
     ${수업 && tr ? `<span class="lbl">트레이너 메모</span><textarea class="pl-memo" data-k="wmemo" placeholder="오늘 컨디션 · 다음 수업에 할 것">${esc(w.trmemo || '')}</textarea>` : ''}
     <button class="dngr" data-act="askcancel">기록 삭제</button>`,
     foot: 발판(w) };
@@ -7933,6 +7985,9 @@ function vReport(){
     ${루틴줄 ? `<div class="rp2sec">오늘 한 운동 <small>${종목수}종목</small></div>
       ${rt ? `<div class="rp3rt"><i>루틴 ${esc(String(rt.no||''))}</i>${esc(rt.n)}</div>` : ''}<div class="rp3g">${루틴줄}</div>` : ''}
     ${기록칸}
+    ${(() => { const 유 = (D.ctips || []).filter(t => t.workout_id === w.id), 나 = 나머지of(w.id); if(!유.length && !나.length) return '';      /* 오늘 코칭 — 글만 · 그림 없음 (2026-11-03 대표 「그림이 있으면 정신없을 것」) */
+      const 결 = (끝, 분) => 끝 ? `<span class="ok">✓ 회원이 함${분 ? ' ' + 분 + '분' : ''}</span>` : `<span class="ok no">아직 안 함</span>`;
+      return `<div class="rp2sec">오늘 코칭 <small>수업 뒤에 할 것</small></div><div class="zrp">${유.map(t => `<div class="l"><span class="tg c">🏃 유산소</span><span>${esc([((exOf(t.ex_id) || {}).n || '유산소') + ' ' + t.minutes + '분', 팁강도(t)].filter(Boolean).join(' · '))}</span>${결(t.done_at, t.done_min)}</div>`).join('')}${나.map(t => `<div class="l"><span class="tg r">📋 나머지 운동</span><span>${esc((t.items || []).map(x => exName(x.ex, x.va)).join(' · '))}</span>${결(t.done_at)}</div>`).join('')}</div>`; })()}
     ${피드백들.length ? `<div class="rp2sec">트레이너 피드백 <small>${피드백들.length}개</small></div>${피드백들.map(코카드).join('')}` : ''}
     ${몸}
     <div class="rp2sec">${m}월 <small>오늘까지</small></div>
@@ -13211,6 +13266,7 @@ function sheetStartSession(mid){
   openSheet(()=>`
     <div class="h2">${esc(m.n)} 회원 <small>무엇으로 시작할까요</small></div>
     ${수업날줄(mid)}
+    ${(() => { const 날 = (S.recDay && S.recDay < 오늘날() ? S.recDay : null) || TODAY, 있 = D.workouts.filter(w => w.mid === mid && w.done && w.kind === '수업' && w.date === 날 && 세트있나(w)).sort(byDateDesc)[0]; return 있 ? `<div class="zsame"><b>${날 === TODAY ? '오늘' : dateTxt(날)} 수업 기록이 이미 있어요</b><small>${esc(수업제목(있))} · ${있.items.filter(it => it.sets.length).length}종목 · 같은 수업이면 이어서 기록해 주세요(리포트가 두 번 나가지 않게)</small><button class="btn main sm" data-act="recedit:${있.id}">이어서 기록</button></div>` : ''; })()}
     ${(() => { const 지난 = D.workouts.filter(w => w.mid === mid && w.done && w.kind === '수업').sort(byDateDesc)[0]; return 지난 && 팁of(지난.id).length ? `<div class="ctlast"><b>지난 수업(${dateTxt(지난.date)}) 유산소</b>${팁줄들(지난.id)}</div>` : ''; })()}
     ${주기줄(mid, 'tsub:cycle:'+mid)}
     ${t && rOf(t.rid) ? `<button class="sspick" data-act="tstart:${mid}:${t.rid}:${t.kind}">
@@ -14871,7 +14927,21 @@ document.addEventListener('click', async ev=>{
       try{ await spost('cardio_tips', [줄]); (D.ctips = D.ctips || []).unshift(줄); closeSheet(); toast('유산소를 추가했어요\n회원 앱에 오늘 23:59까지 떠요'); render(); }
       catch(e){ if(줄.steps && /steps|PGRST204|400/.test(String(e && e.message))){ toast('목표 걸음은 서버 준비(120단계)가 아직이에요\n걸음 수 없이 넣지 않았어요'); return; }      /* 칸이 없으면 말없이 빼지 않는다 */
         toast('추가하지 못했어요\n' + 오류말(e)); } return; }
-    case 'ctipdel': { const t = (D.ctips || []).find(x => x.id === rest[0]); if(!t) return; if(!await 묻기('추가한 유산소를 삭제할까요?')) return;
+    case 'rtrest': { if(D.rtips == null){ toast('나머지 운동은 서버 준비(122단계)가 아직이에요'); return; } S.rsel = null; S.radd = []; S.rq = ''; 나머지창(); return; }      /* 나머지 운동 지정 (2026-11-03) */
+    case 'rtsel': { const k2 = rest.join(':'), i = S.rsel.indexOf(k2); if(i >= 0) S.rsel.splice(i, 1); else S.rsel.push(k2); 나머지창(); return; }
+    case 'rtall': { const w = live(); if(!w) return; const 오늘 = w.items.filter(it => !(exOf(it.ex) || {}).cardio && !isMemo(it.ex)); S.rsel = 오늘.filter(it => rest[0] === '1' || !it.sets.some(x => x.done)).map(it => it.ex + ':' + it.va).concat((S.radd || []).filter(k2 => S.rsel.includes(k2))); 나머지창(); return; }
+    case 'rtadd': { const k2 = rest[0] + ':' + rest[1]; S.radd = S.radd || []; if(!S.radd.includes(k2)) S.radd.push(k2); if(!S.rsel.includes(k2)) S.rsel.push(k2); S.rq = ''; 나머지창(); return; }
+    case 'rtsave': { const w = live(); if(!w || !S.rsel || !S.rsel.length) return;
+      const items = S.rsel.map(k2 => { const [ex, va] = k2.split(':'), it = w.items.find(x => x.ex === ex && x.va === va); return { ex, va, sets: Math.max(3, it ? it.sets.length : 3) }; });
+      const 줄 = { id: 'rt' + Date.now(), member_id: w.mid, workout_id: w.id, items, on_date: TODAY, by: TRAINER || '' };
+      try{ await spost('rest_tips', [줄]); 줄.created_at = new Date().toISOString(); (D.rtips = D.rtips || []).unshift(줄); closeSheet(); toast('나머지 운동을 지정했어요\n회원 앱에 오늘 23:59까지 떠요'); render(); }
+      catch(e){ const 없음 = /rest_tips|PGRST|404|42P01/.test(String(e && e.message)); toast(없음 ? '나머지 운동은 서버 준비(122단계)가 아직이에요' : '지정하지 못했어요\n' + 오류말(e)); } return; }
+    case 'rtdel': { const t = (D.rtips || []).find(x => x.id === rest[0]); if(!t) return; if(!await 물어('지정한 나머지 운동을 취소할까요?', '취소하기')) return;
+      try{ await sdel('rest_tips', 'id=eq.' + encodeURIComponent(t.id)); D.rtips = D.rtips.filter(x => x !== t); render(); }catch(e){ toast('취소하지 못했어요'); } return; }
+    case 'rtgo': { const t = (D.rtips || []).find(x => x.id === rest[0]); if(!t) return; if(live()){ toast('진행 중인 운동이 있어요'); return; }
+      const its = itemsFromRoutine({ mid: S.mid, items: (t.items || []).map(x => ({ ex: x.ex, va: x.va, kg: '', reps: '', sets: x.sets || 3, rest: 60 })) }).map(it => Object.assign(it, { rtip: t.id }));      /* 무게 · 횟수는 지난 기록으로 */
+      S.subj = S.mid; await newLive('나머지 운동', its, '개인운동', null, S.mid); return; }
+    case 'ctipdel': { const t = (D.ctips || []).find(x => x.id === rest[0]); if(!t) return; if(!await 물어('추가한 유산소를 삭제할까요?', '삭제')) return;      /* 묻기 = 데스크 함수 · 앱엔 없어 ✕ 가 조용히 멈췄다 (2026-11-03 노션 저녁) */
       try{ await sdel('cardio_tips', 'id=eq.' + encodeURIComponent(t.id)); D.ctips = D.ctips.filter(x => x !== t); render(); }catch(e){ toast('삭제하지 못했어요'); } return; }
     case 'ctipgo': { const t = (D.ctips || []).find(x => x.id === rest[0]), e = t && exOf(t.ex_id); if(!e) return; if(live()){ toast('진행 중인 운동이 있어요'); return; }
       const v = (e.vars||[])[0], it = { ex:e.id, va:(v&&v.k)||'a', rest:0, locked:false, sec:0, startAt:Date.now(), sets:[], ctip:t.id };
@@ -15388,6 +15458,9 @@ async function finish(){
     }catch(e){ console.warn('리포트 예약 실패', e); }   /* 예약이 안 돼도 운동 마치기는 그대로 끝난다 */
   }
 
+  /* 나머지 운동 — 그 줄로 시작한 운동을 마치면 「했다」 (2026-11-03) */
+  { const ids = [...new Set(w.items.map(it => it.rtip).filter(Boolean))]; for(const id of ids){ const t = (D.rtips || []).find(x => x.id === id); if(!t || t.done_at) continue; const 몸 = { done_at: new Date().toISOString(), done_wid: rec.id };
+    try{ await spatch('rest_tips', 'id=eq.' + encodeURIComponent(t.id), 몸); Object.assign(t, 몸); }catch(e){ console.warn('나머지 운동 저장 실패', e); } } }
   /* 유산소 넣어주기 — 넣어 준 줄로 시작한 유산소를 마치면 그 줄에 「했다」 · 한 분 (2026-10-24 대표 「지난 수업 때 유산소를 마무리했구나」) */
   for(const it of w.items){ const t = it.ctip && (D.ctips || []).find(x => x.id === it.ctip); if(!t || t.done_at) continue;
     const 분 = Math.max(1, Math.round((Number(it.sec) || 0) / 60) || (it.sets.find(x => x.done) || {}).reps || 0);
@@ -15542,11 +15615,11 @@ function 바로가기띠(){
   const el = document.getElementById('pwabar'); if(!el) return;
   let 껐나 = false;
   try{ 껐나 = localStorage.getItem('pwabar_off') === '1'; }catch(e){}
-  if(설치됨() || 껐나 || (!설치신호 && !아이폰사파리())){ el.classList.remove('on'); return; }
+  if(설치됨() || 껐나 || (!설치신호 && !아이폰사파리() && !안드로이드())){ el.classList.remove('on'); return; }      /* 안드로이드는 신호가 없어도 메뉴 설치 안내 (2026-11-03) */
   el.innerHTML = 설치신호
     ? '<span class="t">바로가기를 만들어 두세요<small>다음부터 주소를 찾지 않고 바로 열립니다</small></span>'
       + '<button id="pwago">＋ 바로가기 만들기</button><button class="x" id="pwax">✕</button>'
-    : '<div style="flex:1;min-width:0">' + 홈추가안내글('글래드짐') + '</div><button class="x" id="pwax" style="align-self:flex-start">✕</button>';      /* 큰 글씨 3단계 (2026-10-23 대표) */
+    : '<div style="flex:1;min-width:0">' + (아이폰사파리() ? 홈추가안내글('글래드짐') : 안드로이드안내글('글래드짐')) + '</div><button class="x" id="pwax" style="align-self:flex-start">✕</button>';      /* 큰 글씨 3단계 (2026-10-23 대표) */
   el.classList.add('on');
   const go = document.getElementById('pwago');
   if(go) go.onclick = async () => {
