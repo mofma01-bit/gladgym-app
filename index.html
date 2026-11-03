@@ -1486,6 +1486,16 @@ body .cm2 .tx{font-size:14px;line-height:1.6;color:var(--cream)}
 .tmsum small{font-size:11.5px;color:var(--sub)}.tmsum b{font-size:24px;font-weight:800;color:var(--gold);line-height:1.15}.tmsum b i{font-style:normal;font-size:11.5px;color:var(--cream);margin-left:2px}
 .tmsum>div.t{border-color:#3f7281;background:linear-gradient(170deg,#1b2d33,#171a19 70%)}.tmsum>div.t b{color:var(--teal)}
 .mrow2 .mi.nm1{font-size:15px;font-weight:800}.mi.nm1 svg{width:56%;height:56%}.mi.nm1.tx{font-size:11.5px;letter-spacing:-.03em}
+.pz.ed button.pz-c{background:none;border:0;padding:2px 0;cursor:pointer;font:inherit;font-size:14px;color:#3a342b}.pz.ed .pz-days button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:3px 0;font-weight:800;border:0;border-left:1px solid #2a241b;background:none;color:inherit;font:inherit;cursor:pointer}.pz.ed .pz-days button:first-child{border-left:0}
+.pz.ed .pz-days button i{width:18px;height:18px;border:1.5px solid #2a241b;border-radius:4px;font-style:normal;font-size:13px;display:flex;align-items:center;justify-content:center}.pz.ed .pz-days button.on i{background:#2a241b;color:#fff}
+.pz.ed input.pzin{font:inherit;color:#2a241b;outline:none;background:#fff}.pz.ed textarea.pzin{width:100%;min-height:70px;font:inherit;color:#2a241b;border:1.5px solid #2a241b;border-radius:7px;padding:6px 8px;background:#fff;resize:vertical;box-sizing:border-box}
+.pz.ed input.pzin:focus,.pz.ed textarea.pzin:focus{border-color:#b8862e;box-shadow:0 0 0 2px rgba(184,134,46,.25)}.pz-tip{font-size:13px;color:var(--sub);margin:10px 2px 4px}
+.tmlast{display:block;border:1px solid #3a3731;border-radius:16px;padding:12px 14px;margin:12px 0;background:#1b1a17;cursor:pointer}.tmlast.none{cursor:default}.tmlast.none span{display:block;color:var(--sub);font-size:13px;margin-top:2px}
+.tmlast small{color:var(--sub);font-size:13px}.tmlast .tlh{display:flex;align-items:baseline;gap:8px;margin-bottom:8px}.tmlast .tlh b{font-size:15px}.tmlast .tlh i{margin-left:auto;font-style:normal;color:var(--sub)}
+.tmlast .rp3mv{margin:0 0 8px}.tmlast .tlt{display:flex;flex-direction:column;gap:6px}.tmlast .tlr{display:flex;flex-direction:column;gap:4px;padding:6px 0;border-top:1px dashed rgba(255,255,255,.08)}.tmlast .tlr b{font-size:14px}
+.tmlast .tlr span{display:flex;flex-wrap:wrap;gap:5px}.tmlast .tlr i{font-style:normal;font-size:13px;border:1px solid #3a3731;border-radius:8px;padding:2px 8px}.tmlast .tlr i u{text-decoration:none;color:var(--sub);margin-right:4px;font-size:12px}
+.lbl.tmfold{display:flex;align-items:center;gap:8px;width:100%;background:none;border:0;color:inherit;text-align:left;padding:0;cursor:pointer}.lbl.tmfold small{color:var(--sub);font-weight:600}
+.tmrt{display:block;width:100%;margin:10px 0 4px}.rtpk{display:flex;gap:8px;margin:10px 0}.rtpk .btn{flex:1;display:flex;flex-direction:column;gap:2px;padding:14px 10px}.rtpk .btn small{font-size:13px;opacity:.8;font-weight:600}
 .jfh{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:2px}.jfh b{font-size:16px}.jfx{background:none;border:0;color:var(--sub);font-size:18px;cursor:pointer;padding:4px 6px}
 .jfs{font-size:13px;color:var(--sub);margin:2px 0 10px}.jfq{width:100%;box-sizing:border-box;border:1px solid rgba(255,255,255,.18);border-radius:10px;background:transparent;color:inherit;padding:8px 10px;font-size:14px;margin-bottom:10px}
 .jfl{display:flex;flex-direction:column;gap:8px;overflow:auto;min-height:0}
@@ -2092,9 +2102,8 @@ html[data-pkv="list"] .megrp.pkg .pkms{position:static;margin-right:8px}
 .addbox b{font-size:17px;font-weight:800;color:var(--teal)}
 .addbox:active{background:var(--dark-2)}
 /* ── 되돌릴 수 없는 것 ── 작게, 멀리 */
-.dngr{display:block;margin:12px auto 4px;background:none;border:none;padding:6px 10px;
-  font-size:12px;font-weight:600;color:#8b8379;text-decoration:underline;
-  text-underline-offset:3px;text-decoration-color:#55524a}
+.dngr{display:block;margin:16px auto 6px;background:transparent;border:1px solid #5a554c;border-radius:12px;padding:11px 24px;min-width:150px;
+  font-size:14px;font-weight:700;color:#e3d9c8}      /* 2026-11-03 대표 「기록 삭제 단추가 너무 작고 안 보여」 — 밑줄 글자 → 테두리 단추 */
 #main.lite .varr{background:#f6efe3;border-color:#e6ddcf;color:#8a6f3f}
 #main.lite .vnum{background:#fff;border-color:#e6ddcf}
 #main.lite .vnum input{color:#2b231c}
@@ -3367,7 +3376,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '507';
+const BUILD = '511';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -5115,15 +5124,17 @@ function unseen(w){
 }
 function noCmItems(w){ return w.items.filter(it => it.sets.length && !피드백있나(w.mid, it.ex, it.va)); }
 function askOf(mid, ex, va){ return (D.asks||[]).filter(a => a.mid===mid && a.ex===ex && a.va===va && !a.done); }
-function openAsks(){ return (D.asks||[]).filter(a => !a.done); }
+/* 트레이너 피드백 탭 = 내 담당 회원만 (2026-11-03 대표 노션 「양인혁으로 들어갔는데 다른 트레이너들의 모든 피드백 요청이 떠 · 각자 본인 것만」 · 담당 = 중앙 정본 members.trainer) */
+const 내회원 = mid => !!TRAINER && ((MEMBERS.find(x => x.id === mid) || {}).tr || '') === TRAINER;
+function openAsks(){ return (D.asks||[]).filter(a => !a.done && 내회원(a.mid)); }
 /* 숫자는 이번 주만 (2026-10-21 대표 「매번 피드백 자료를 올리는 게 아닌데 매번 불이 들어오고 숫자가 쌓이게 될 거야 · 데스크에서 확인 · 앱은 주간 데이터 위주」) — 주 = 주간 달력과 같은 일~토 */
 const 이번주에 = d => weekOf(TODAY).indexOf(d) >= 0;
-function todoCount(){ return D.workouts.filter(w=>w.done && unseen(w) && 이번주에(w.date)).length; }
-function mealTodo(){ return (D.meals||[]).filter(m=>!m.note && 이번주에(m.date)); }
+function todoCount(){ return D.workouts.filter(w=>w.done && unseen(w) && 이번주에(w.date) && 내회원(w.mid)).length; }
+function mealTodo(){ return (D.meals||[]).filter(m=>!m.note && 이번주에(m.date) && 내회원(m.mid)); }
 /* 새로 올라온 식단 — 이 기기에서 아직 안 연 이번 주 식단 (회원 식단을 열면 그 회원 것은 「봄」) */
 const 식단본 = (() => { try{ return new Set(JSON.parse(localStorage.getItem('gg_mseen') || '[]')); }catch(e){ return new Set(); } })();
 function 식단봄(mid){ (D.meals||[]).filter(x => x.mid === mid).forEach(x => 식단본.add(x.id)); try{ localStorage.setItem('gg_mseen', JSON.stringify([...식단본].slice(-3000))); }catch(e){} }
-function 새식단(){ return (D.meals||[]).filter(m => 이번주에(m.date) && !식단본.has(m.id)); }
+function 새식단(){ return (D.meals||[]).filter(m => 이번주에(m.date) && !식단본.has(m.id) && 내회원(m.mid)); }
 function 식단할일(){ return new Set(새식단().map(x => x.id).concat(mealTodo().map(x => x.id))).size; }
 function trTodo(){ return todoCount() + 식단할일() + openAsks().length + 오늘기록전().length; }
 function tabBarTr(){
@@ -6866,11 +6877,11 @@ const 칠선들 = w => (w && w.paint && w.paint.v === 2 && w.paint.s) || [];
 const 칠묶음 = w => { if(!w.paint || w.paint.v !== 2) w.paint = { v:2, s:[] }; return w.paint.s; };
 function 붓줄(id){ return `<div class="btools" data-w="${esc(id)}">${붓색들.map(c => `<button class="plsw ${붓도구.색 === c && !붓도구.지움 ? 'on' : ''}" style="--c:${c}" data-act="bpc:${c.slice(1)}" aria-label="색"></button>`).join('')}
   ${붓굵기.map(([말, n]) => `<button class="chip ${붓도구.굵기 === n ? 'on' : ''}" data-act="bpw:${n}">${말}</button>`).join('')}<button class="chip ${붓도구.지움 ? 'on' : ''}" data-act="bpe">지우개</button><button class="chip" data-act="bpu:${esc(id)}">되돌리기</button><button class="chip" data-act="bpx:${esc(id)}">전체 삭제</button></div>`; }
-/* 리포트 「오늘 움직인 부위」 — 트레이너가 몸 색칠하기로 칠했으면 그 그림 · 아니면 오늘 한 종목 부위를 2D 몸에 자동 색칠 (2026-11-03 대표) */
+/* 리포트 「오늘 자극 부위」 — 트레이너가 몸 색칠하기로 칠했으면 그 그림 · 아니면 오늘 한 종목 부위를 2D 몸에 자동 색칠 (2026-11-03 대표) */
 function 오늘부위판(w, tr){ const 칸 = [...new Set(w.items.filter(it => it.sets.length && !isMemo(it.ex) && !(exOf(it.ex) || {}).cardio).flatMap(it => 근칸of(it.ex)))], 묶들 = 몸2묶들(칸), 있음 = 칠선들(w).length;
   if(!있음 && !칸.length) return tr ? 몸판묶음(w) : '';
   setTimeout(몸2채우기, 0);
-  return `<div class="rp3mv">${있음 ? 몸판묶음(w) : `<span class="b2w"><img class="b2d" data-k="${esc(칸.join(','))}" alt="오늘 움직인 부위"></span>`}<div><div class="t">오늘 움직인 부위${있음 ? ' <small>· 트레이너가 칠함</small>' : ''}</div>
+  return `<div class="rp3mv">${있음 ? 몸판묶음(w) : `<span class="b2w"><img class="b2d" data-k="${esc(칸.join(','))}" alt="오늘 자극 부위"></span>`}<div><div class="t">오늘 자극 부위${있음 ? ' <small>· 트레이너가 칠함</small>' : ''}</div>
     <div class="rp3ch">${묶들.map(g => `<span><i style="background:${몸2색[g]}"></i>${g}</span>`).join('')}</div>${tr && !있음 ? `<button class="chip" data-act="bpopen:${esc(w.id)}">✎ 직접 칠하기</button>` : ''}</div></div>`; }
 /* 리포트 맨 아래 「n월 오늘까지」 — 몇 번 · 모두 몇 kg · 부위별 든 무게 막대(이름 · kg 붙임) (2026-11-03 대표 「딱딱 · 톤은 안 와닿음 · 막대가 뭔지 안 읽혀」) */
 function 이달판(이달, 수업, 개인, 합){ const 부 = {};
@@ -7391,6 +7402,11 @@ function 자판그리기(){ let el = document.getElementById('kpad');
     <div class="kpl"><span>${지 ? '지난번 ' + (지.kg ? kgfmt(지.kg) + 'kg × ' : '') + (지.reps || 0) + '회' : '지난 기록 없음'}</span><span>다음 칸 › ${다음}</span></div>
     <div class="kpq">${빠.map(v => 키('kpv:' + v, v, 'q')).join('')}</div>
     <div class="kpg">${키('kpk:1','1')}${키('kpk:2','2')}${키('kpk:3','3')}${키('kpbs','⌫','fn')}${키('kpk:4','4')}${키('kpk:5','5')}${키('kpk:6','6')}${키('kpc','C','fn')}${키('kpk:7','7')}${키('kpk:8','8')}${키('kpk:9','9')}${키('kpnx','다음 칸 ›','nx')}${무 ? 키('kpk:.','.','') : '<button class="blank" disabled aria-hidden="true"></button>'}${키('kpk:0','0','w2')}${키('kpok','완료','ok')}</div>`; }
+/* 컴퓨터 자판 = 숫자판 (2026-11-03 대표 노션 「클릭만 되고 숫자 키보드가 안 먹음 · 계산기처럼 · 엔터 완료 · 백스페이스 지우기」)
+   숫자 · 숫자패드(NumLock 꺼져도 자리로) → 그 숫자 · . → 점 · Backspace ⌫ · Delete/Esc C · Enter 완료 · Tab/→ 다음 칸 — 판에 있는 단추를 그대로 누른다 */
+document.addEventListener('keydown', e => { if(!자판 || e.ctrlKey || e.metaKey || e.altKey) return; const t = e.target; if(t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+  const c = e.code || '', k = /^Numpad[0-9]$/.test(c) ? c.slice(-1) : c === 'NumpadDecimal' ? '.' : c === 'NumpadEnter' ? 'Enter' : e.key, 단 = /^[0-9]$/.test(k) ? 'kpk:' + k : (k === '.' || k === ',' || k === 'Decimal') ? 'kpk:.' : k === 'Backspace' ? 'kpbs' : (k === 'Delete' || k === 'Escape') ? 'kpc' : k === 'Enter' ? 'kpok' : (k === 'Tab' || k === 'ArrowRight') ? 'kpnx' : '';
+  if(!단) return; const b = document.querySelector('#kpad [data-act="' + 단 + '"]'); if(!b) return; e.preventDefault(); b.click(); });
 function 자판넣기(){ if(!자판) return; const w = live(), 판 = 자판.it != null, cur = w && w.items[판 ? 자판.it : w.cur]; let st = cur && cur.sets[자판.i];
   const n = parseFloat(String(자판.v).replace(/[^0-9.]/g, '')); if(isNaN(n)) return;
   if(!st){ if(!판 || 자판.i !== cur.sets.length) return; const 앞 = cur.sets[cur.sets.length - 1]; st = { kg: 앞 ? 앞.kg : 0, reps: 0, done:false }; cur.sets.push(st); }      /* 플래너 빈 칸 = 다음 세트 */
@@ -10804,28 +10820,34 @@ const 종이칸 = {
   hist: ['최근 수술', '골절', '무릎부상', '허리부상', '관절염', '목디스크', '허리디스크', '고혈압', '저혈압', '당뇨', '다낭성난소증후군', '무월경', '갑상선기능', '폐질환', '천식'].map(x => [x, x]),
   goals: [['다이어트', '다이어트 (체중 감량)'], ['근력 향상', '근력 향상 · 근육량'], ['체형 교정', '체형 교정 · 자세'], ['통증 개선', '통증 개선 · 재활'], ['체력 향상', '체력 · 건강 관리'], ['바디프로필', '바디프로필 · 대회'], ['기타', '기타']],
 };
-function 상담지종이(ik, m, 트, 좁){
-  ik = ik || {}; m = m || {}; const 식 = (ik.meals && typeof ik.meals === 'object') ? ik.meals : {};
+function 상담지종이(ik, m, 트, 좁, 편){      /* 편 = 그 자리에서 작성 · 수정 (2026-11-03 대표 「앱도 · 용지 위치 그대로」) */
+  ik = ik || {}; m = m || {}; const 식 = (ik.meals && typeof ik.meals === 'object') ? ik.meals : {}, 초 = S.draft || {};
   const 배열 = v => Array.isArray(v) ? v : (v ? String(v).split(/\s*[,·]\s*/).filter(Boolean) : []);
-  const 체 = (켬, 글) => '<span class="pz-c' + (켬 ? ' on' : '') + '"><i>' + (켬 ? '✓' : '') + '</i>' + esc(글) + '</span>';
-  const 여럿 = k => { const a = 배열(ik[k]); return 종이칸[k].map(([v, t]) => 체(a.indexOf(v) >= 0, t)).join('') + a.filter(v => !종이칸[k].some(([x]) => x === v)).map(v => 체(true, v)).join(''); };
-  const 하나 = k => 종이칸[k].map(([v, t]) => 체(String(ik[k] || '') === v, t)).join('') + (ik[k] && !종이칸[k].some(([x]) => x === ik[k]) ? 체(true, ik[k]) : '');
-  const 칸 = (값, 꼬리, 넓) => '<span class="pz-b' + (넓 ? ' w' : '') + '">' + (값 ? esc(String(값)) + (꼬리 ? ' <small>' + 꼬리 + '</small>' : '') : '') + '</span>';
+  const 체 = (켬, 글, k, v, 하나만) => 편 ? '<button class="pz-c pzed' + (켬 ? ' on' : '') + '" data-act="' + (하나만 ? 'pick1' : 'pickn') + ':ik:' + esc(k) + ':' + esc(v) + '"><i>' + (켬 ? '✓' : '') + '</i>' + esc(글) + '</button>'
+    : '<span class="pz-c' + (켬 ? ' on' : '') + '"><i>' + (켬 ? '✓' : '') + '</i>' + esc(글) + '</span>';
+  const 여럿 = k => { const a = 배열(ik[k]); return 종이칸[k].map(([v, t]) => 체(a.indexOf(v) >= 0, t, k, v)).join('') + a.filter(v => !종이칸[k].some(([x]) => x === v)).map(v => 체(true, v, k, v)).join(''); };
+  const 하나 = k => 종이칸[k].map(([v, t]) => 체(String(ik[k] || '') === v, t, k, v, 1)).join('') + (ik[k] && !종이칸[k].some(([x]) => x === ik[k]) ? 체(true, ik[k], k, ik[k], 1) : '');
+  const 키값 = (키, 값) => 초[키] != null ? 초[키] : 값;      /* 저장 전 초안(종이에서 읽은 값 · 입력 중) 먼저 */
+  const 칸 = (값, 꼬리, 넓, 키) => 편 && 키 ? '<input class="pz-b pzin' + (넓 ? ' w' : '') + '" data-k="' + esc(키) + '" value="' + esc(String(키값(키, 값 == null ? '' : 값))) + '">' + (꼬리 ? ' <small class="pz-u">' + 꼬리 + '</small>' : '')
+    : '<span class="pz-b' + (넓 ? ' w' : '') + '">' + (값 ? esc(String(값)) + (꼬리 ? ' <small>' + 꼬리 + '</small>' : '') : '') + '</span>';
   const 줄 = (이름, 속) => '<div class="pz-r"><span class="pz-k">' + 이름 + '</span><div class="pz-v">' + 속 + '</div></div>';
   const 판 = (꼬리표, 말, 속) => '<section class="pz-s"><div class="pz-t"><b>' + 꼬리표 + '</b>' + (말 ? '<small>' + 말 + '</small>' : '') + '</div>' + 속 + '</section>';
   const 요일 = 배열(ik.time);
-  return '<div class="pz' + (좁 ? ' n' : '') + '">'
+  const 날칸 = d => 편 ? '<button class="' + (요일.indexOf(d) >= 0 ? 'on' : '') + '" data-act="pickn:ik:time:' + d + '">' + d + '<i>' + (요일.indexOf(d) >= 0 ? '✓' : '') + '</i></button>'
+    : '<span class="' + (요일.indexOf(d) >= 0 ? 'on' : '') + '">' + d + '<i>' + (요일.indexOf(d) >= 0 ? '✓' : '') + '</i></span>';
+  const 글칸 = (k, v) => 편 ? '<textarea class="pz-memo pzin" data-k="ik:' + k + '">' + esc(키값('ik:' + k, v || '')) + '</textarea>' : '<div class="pz-memo">' + esc(v || '') + '</div>';
+  return '<div class="pz' + (좁 ? ' n' : '') + (편 ? ' ed' : '') + '">'
     + '<div class="pz-h"><b>GLAD GYM PT 상담지</b><small>구산역촌점</small><span class="pz-hd"><span>담당</span>' + 칸(m.trainer || '') + '</span></div>'
-    + 판('기본', '', 줄('이름', 칸(m.name || '', '', 1)) + 줄('성별', 하나('sex')) + 줄('전화번호', 칸(m.phone || '', '', 1)) + 줄('생년월일', 칸(ik.birth || '', '', 1))
-        + 줄('신장', 칸(String(ik.height || '').replace(/cm/i, ''), 'cm')) + 줄('직업', 칸(ik.job || '', '', 1)) + 줄('직업환경', 하나('jobenv')) + 줄('교대근무', 하나('shift')))
+    + 판('기본', '', 줄('이름', 칸(m.name || '', '', 1)) + 줄('성별', 하나('sex')) + 줄('전화번호', 칸(m.phone || '', '', 1)) + 줄('생년월일', 칸(ik.birth || '', '', 1, 'ik:birth'))
+        + 줄('신장', 편 ? 칸(ik.height || '', /cm/i.test(String(ik.height || '')) ? '' : 'cm', 0, 'ik:height') : 칸(String(ik.height || '').replace(/cm/i, ''), 'cm'))      /* 수정 땐 적힌 그대로(157cm) — 안 고친 칸이 바뀌지 않게 */ + 줄('직업', 칸(ik.job || '', '', 1, 'ik:job')) + 줄('직업환경', 하나('jobenv')) + 줄('교대근무', 하나('shift')))
     + 판('글래드짐을 알게 된 경로', '여러 개 표시해도 됩니다', '<div class="pz-v">' + 여럿('route') + '</div>')
-    + 판('운동 · 생활', '', 줄('경험한 운동', 여럿('exprs') + '<span class="pz-x">그 밖 ' + 칸(ik.expr || '') + '</span>') + 줄('스트레스 요인', 칸(ik.stress || '', '', 1)) + 줄('스트레스 강도', 하나('stressLv'))
-        + 줄('해소 방법', 여럿('relief')) + 줄('평소 활동량', 하나('act')) + 줄('취침 시간', 칸(식['취침'] || '') + '<span class="pz-x">하루 평균 수면 ' + 칸(ik.sleepH || '') + '</span>'))
-    + 판('건강', '', 줄('현재 겪는 것', 여럿('cond')) + 줄('과거 병력', 여럿('hist')) + 줄('그 밖의 병력', 칸(ik.histEtc || '', '', 1)))
-    + 판('운동 가능 시간', '', '<div class="pz-v"><span class="pz-days">' + ['월', '화', '수', '목', '금', '토', '일'].map(d => '<span class="' + (요일.indexOf(d) >= 0 ? 'on' : '') + '">' + d + '<i>' + (요일.indexOf(d) >= 0 ? '✓' : '') + '</i></span>').join('') + '</span><span class="pz-x">시간대 ' + 칸(ik.timeTxt || '', '', 1) + '</span></div>')
-    + 판('나의 식습관', '보통 무엇을 언제 드시는지 · 음주는 일주일에 몇 번, 얼마나', '<div class="pz-g2">' + ['아침', '점심', '저녁', '간식', '영양제', '음주'].map(k => 줄(k, 칸(식[k] || '', '', 1))).join('') + '</div>')
+    + 판('운동 · 생활', '', 줄('경험한 운동', 여럿('exprs') + '<span class="pz-x">그 밖 ' + 칸(ik.expr || '', '', 0, 'ik:expr') + '</span>') + 줄('스트레스 요인', 칸(ik.stress || '', '', 1, 'ik:stress')) + 줄('스트레스 강도', 하나('stressLv'))
+        + 줄('해소 방법', 여럿('relief')) + 줄('평소 활동량', 하나('act')) + 줄('취침 시간', 칸(식['취침'] || '', '', 0, 'ikm:취침') + '<span class="pz-x">하루 평균 수면 ' + 칸(ik.sleepH || '', '', 0, 'ik:sleepH') + '</span>'))
+    + 판('건강', '', 줄('현재 겪는 것', 여럿('cond')) + 줄('과거 병력', 여럿('hist')) + 줄('그 밖의 병력', 칸(ik.histEtc || '', '', 1, 'ik:histEtc')))
+    + 판('운동 가능 시간', '', '<div class="pz-v"><span class="pz-days">' + ['월', '화', '수', '목', '금', '토', '일'].map(날칸).join('') + '</span><span class="pz-x">시간대 ' + 칸(ik.timeTxt || '', '', 1, 'ik:timeTxt') + '</span></div>')
+    + 판('나의 식습관', '보통 무엇을 언제 드시는지 · 음주는 일주일에 몇 번, 얼마나', '<div class="pz-g2">' + ['아침', '점심', '저녁', '간식', '영양제', '음주'].map(k => 줄(k, 칸(식[k] || '', '', 1, 'ikm:' + k))).join('') + '</div>')
     + '<div class="pz-g2 pz-last">' + 판('회원님이 원하는 것', '여러 개 표시해도 됩니다', '<div class="pz-v pz-col">' + 여럿('goals') + '</div>')
-      + 판('메모', '구체적인 내용', '<div class="pz-memo">' + esc(ik.needs || '') + '</div>' + (트 && ik.notes ? '<div class="pz-note"><small>특이사항 · 트레이너만 봅니다</small>' + esc(ik.notes) + '</div>' : '')) + '</div>'
+      + 판('메모', '구체적인 내용', 글칸('needs', ik.needs) + (트 && (편 || ik.notes) ? '<div class="pz-note"><small>특이사항 · 트레이너만 봅니다</small>' + (편 ? 글칸('notes', ik.notes) : esc(ik.notes)) + '</div>' : '')) + '</div>'
     + '</div>';
 }
 function vIntake(){
@@ -10983,25 +11005,16 @@ function 상담지채움(mid, r){
 function vIntakeEdit(){
   const mid=subj(), d=D.intake[mid]||(D.intake[mid]={});
   d.meals = d.meals || {};
-  const F = k => fieldEditor('ik', d, INTAKE_FIELDS.find(f => f.k === k));
-  const 상자 = (제목, 몸) => `<div class="iksec"><span class="fsh">${제목}</span>${몸}</div>`;
   const q = S.scanQ && S.scanQ.mid === mid ? S.scanQ : null;
-  return { top: bar('PT 상담일지 작성', `<span class="sub">${esc(subjName())}</span>`, 'sub2:intake:'+mid), body:
+  return { top: bar('PT 상담일지 수정', `<span class="sub">${esc(subjName())}</span>`, 'sub2:intake:'+mid), body:
       (q ? `<div class="scnb"><b>종이에서 읽은 ${q.n}칸을 채웠어요</b>확인하고 맨 아래 「저장」을 눌러야 들어갑니다.
         ${(q.다름||[]).length ? `<span class="df"><b>이미 있던 값과 종이가 다른 칸 ${q.다름.length}개</b>${q.다름.map((x, i) => `<i><u>${esc(x.이름)}</u> ${esc(x.옛)} → 종이 <em>${esc(x.새)}</em> <button data-act="scanuse:${i}">종이 값으로</button></i>`).join('')}
           ${q.다름.length > 1 ? `<button class="all" data-act="scanuse:all">전부 종이 값으로</button>` : ''}</span>` : ''}
         ${q.n < 6 && !(q.다름||[]).length ? `<span class="w">읽은 칸이 적어요<br>사진이 잘 안 나왔을 수 있어요</span><button class="rs" data-act="scanpaper:${mid}">다시 찍기</button>` : ''}
         ${(q.숫자||[]).length ? `<span class="num"><b>숫자는 종이와 꼭 맞춰 보세요</b>${q.숫자.map(p => `<i>${esc(p[0])} <em>${esc(p[1])}</em></i>`).join('')}</span>` : ''}
         ${q.모름.length ? `<span class="w">글씨 확인: ${esc(q.모름.join(' · '))}</span>` : ''}${q.다른 ? `<span class="w">종이의 이름이 「${esc(q.다른)}」예요<br>다른 분의 상담지가 아닌지 확인해 주세요</span>` : ''}</div>` : '') +
-      상자('기본', `<div class="grid2">${F('birth')}${F('height')}</div>${F('sex')}${F('job')}${F('jobenv')}${F('shift')}`)
-    + 상자('글래드짐을 알게 된 경로', F('route'))
-    + 상자('운동 · 생활', F('exprs') + F('expr') + F('stress') + F('stressLv') + F('relief') + F('act')
-        + `<div class="grid2"><div class="fld"><span class="fn">취침 시간</span><input class="search" type="text" data-k="ikm:취침" placeholder="예) 23시 30분" value="${esc(d.meals['취침']||'')}"></div>${F('sleepH')}</div>`)
-    + 상자('건강', F('cond') + F('hist') + F('histEtc'))
-    + 상자('운동 가능 시간', F('time') + F('timeTxt'))
-    + 상자('나의 식습관', `<div class="grid2">${MEAL_KEYS.filter(k => k !== '취침').map(k=>`<div class="fld"><span class="fn">${k}</span>
-        <input class="search" type="text" data-k="ikm:${k}" value="${esc(d.meals[k]||'')}"></div>`).join('')}</div>`)
-    + (S.who==='tr' ? 상자('원하는 것 · 메모', F('goals') + F('needs') + F('notes')) : 상자('원하는 것 · 메모', F('goals') + F('needs'))),
+      상담지종이(d, { name: subjName(), trainer: (MEMBERS.find(m => m.id === mid) || {}).tr || '' }, S.who === 'tr', true, true)      /* 2026-11-03 대표 「용지 위치 그대로 수정」 — 보는 화면과 같은 종이 */
+      + '<div class="pz-tip">체크는 눌러서 · 칸은 그 자리에서 입력해요 · 맨 아래 「저장」</div>',
     foot: `<button class="btn main" style="flex:1" data-act="saveintake:${mid}">저장</button>` };
 }
 
@@ -12678,7 +12691,7 @@ function tFeed(){
   if(mode==='diet'){
     const 새 = 새식단(), 안단 = mealTodo(), 묶 = 목 => { const g = {}; 목.forEach(x => (g[x.mid] = g[x.mid] || []).push(x)); return Object.entries(g).map(([mid, xs]) => ({ mid, xs: xs.slice().sort((a,b)=> a.date<b.date?1:a.date>b.date?-1:(a.at||'')<(b.at||'')?1:-1) })).sort((a,b)=> a.xs[0].date<b.xs[0].date?1:-1); };
     const since = addDays(TODAY, -13);
-    const 올린 = MEMBERS.map(m => { const ms = (D.meals||[]).filter(x=>x.mid===m.id).slice().sort((a,b)=> a.date<b.date?1:a.date>b.date?-1:0); return { m, ms, 새: ms.filter(x => 새.indexOf(x) >= 0).length }; })
+    const 올린 = MEMBERS.filter(m => 내회원(m.id)).map(m => { const ms = (D.meals||[]).filter(x=>x.mid===m.id).slice().sort((a,b)=> a.date<b.date?1:a.date>b.date?-1:0); return { m, ms, 새: ms.filter(x => 새.indexOf(x) >= 0).length }; })
       .filter(r => r.ms.length && r.ms[0].date >= since).sort((a,b)=> b.새 - a.새 || (a.ms[0].date<b.ms[0].date?1:-1));
     const 끼 = x => `${dateTxt(x.date)} ${esc(x.slot||'')}`.trim();
     return { top: bar('피드백', `<span class="sub">식단</span>`), body: head
@@ -12692,10 +12705,10 @@ function tFeed(){
 
   /* ── 운동 — 주간 달력(맨 위 그대로) · 오늘 예약 · 피드백 요청 · 남겨 주세요(이번 주) · 고른 날 수업 기록 ── */
   const sel = S.tfDay || TODAY, wkd = weekOf(sel);
-  const dayWs = d => D.workouts.filter(w=>w.done && w.date===d && w.items.some(i=>i.sets.length))
+  const dayWs = d => D.workouts.filter(w=>w.done && w.date===d && w.items.some(i=>i.sets.length) && 내회원(w.mid))
     .slice().sort((a,b)=> a.mid<b.mid?-1:1);
   const list = dayWs(sel);
-  const todo = D.workouts.filter(w=>w.done && unseen(w) && w.items.some(i=>i.sets.length) && 이번주에(w.date)).sort(byDateDesc);
+  const todo = D.workouts.filter(w=>w.done && unseen(w) && w.items.some(i=>i.sets.length) && 이번주에(w.date) && 내회원(w.mid)).sort(byDateDesc);
   const asks = openAsks(), 예 = 오늘예약줄(), 전 = 오늘기록전();
   const 종류 = x => ({ PT:'PT', 서비스:'서비스', 가이드:'운동가이드', 체험:'체험', 기타:'수업' }[x['종목']] || x['종목'] || '수업');
   return { top: bar('피드백', `<span class="sub">${dateTxt(sel)}</span>`), body: head + `
@@ -12797,6 +12810,8 @@ function tMember(){
   const mx=Math.max(...bench,1);
   const 내별 = 즐찾().includes(m.id);
   return { top: bar(m.n, `<span class="sub">최근 ${ws.length}회</span><button class="favbtn top ${내별?'on':''}" data-act="tmfav:${m.id}" aria-label="${내별?'즐겨찾기 해제':'즐겨찾기'}">${별(내별)}</button>`, 'go:t_members'), body:`
+    ${(()=>{ /* 맨 위 생리주기 — 여성 · 회원이 주기 알림을 켠 사람만 (2026-11-03 대표 「빨간 부분에 생리주기 · 여성 및 동의자 한해서」) */
+      if(!여성인가(m.id)) return ''; const c = cycOf(m.id); return c && c.on ? 주기줄(m.id, 'tsub:cycle:'+m.id, true) : ''; })()}
     ${(()=>{ /* 맨 위 — 목표 · 이번 주 횟수 고리 · 단추 둘 */
       const 주 = weekOf(TODAY), 이번주 = ws.filter(w => w.date >= 주[0] && w.date <= 주[6] && 세트있나(w)).length;
       const 목 = Number(g.freq) || Number(((g.work||'').match(/\d+/)||[])[0]) || 0;
@@ -12813,10 +12828,7 @@ function tMember(){
           : `<button class="g" data-act="tstartask:${m.id}">수업 시작</button><button class="t" data-act="go:t_routines">${r ? 지정이름(t.kind) + ' ✓' : '개인운동 지정'}</button>`}</div>
         <div class="tmf">${lv ? `지금 운동 중 · ${esc(lv.title||'')}` : (r ? `${지정이름(t.kind)} · 루틴 ${r.no} ${esc(r.n)}` : '지정한 개인운동이 아직 없어요')}</div>
       </div>`; })()}
-    <div class="tmsend">      <!-- 2026-10-20 대표 「앱에서 루틴 보내기가 없음」 — 자료 탭 깊이 있던 것을 회원 화면 맨 위로 -->
-      <button class="w" data-act="rtsend:${m.id}"><span><b>웨이트 루틴 보내기</b><small>지난 기록으로 채워요</small></span></button>
-      <button class="s" data-act="psets:${m.id}"><span><b>스트레칭 루틴 보내기</b><small>${(n => n ? `${n}개 보냄` : '내 루틴에서 골라요')(내세트().filter(x=>x.mids.includes(m.id)).length)}</small></span></button>
-    </div>
+    ${지난수업판(m, ws)}
 
     ${(()=>{ /* 체중 추이 — 인바디 기록이 둘 이상일 때만 곡선 */
       const { logs, ds } = 체중점들(((D.blog||{})[m.id]||[]).map(x => ({ w: x.w, d: x.date })));      /* 최근 3개월 · 20개 · 날짜 · 목표 없음 (2026-11-02 대표) */
@@ -12825,8 +12837,8 @@ function tMember(){
         ${logs.length >= 2 ? 체중곡선(logs, 0, ds) + `<span class="mgl"><span><small>처음 기록 · ${체중날(ds[0])}</small><b>${kgfmt(logs[0])}kg</b></span><span class="now"><small>지금 · ${체중날(ds[ds.length-1])}</small><b>${kgfmt(logs[logs.length-1])}kg</b></span></span>` : ''}
       </button>`; })()}
 
-    <span class="lbl">회원 자료</span>
-    <div class="megrp">${(()=>{ const 모 = 사진모음(m.id, false), 요 = 모.filter(x=>x.dreq).length;
+    <button class="lbl tmfold" data-act="tmfold">회원 자료 <small>${S.tmOpen ? '접기 ▴' : '펼치기 ▾'}</small></button>      <!-- 2026-11-03 대표 「데스크에서 바로 볼 수 있는 메뉴라 접어 놓고」 -->
+    ${S.tmOpen ? `<div class="megrp">${(()=>{ const 모 = 사진모음(m.id, false), 요 = 모.filter(x=>x.dreq).length;
       return [['note','PT 상담일지', D.intake[m.id] && Object.keys(D.intake[m.id]).length ? '눌러서 보기 · 수정' : '아직 작성 전입니다', 'tsub:intake:'+m.id, '']      /* 첫 화면은 늘 상담일지 화면 — 비었을 때만 입력창으로 가서 화면이 바뀌었다 (2026-10-20 대표) */,
         ['plan','운동계획', (g.now&&g.now.w)?`${g.now.w}kg → ${(g.to&&g.to.w)||'?'}kg`:'아직 없음', 'tsub:plan:'+m.id, ''],
         ['bowl','식단', mealsOf(m.id).length?`${mealsOf(m.id).length}장 · 최근 ${dateTxt(mealsOf(m.id)[0].date)}`:'아직 없음', 'tsub:diet:'+m.id, ''],
@@ -12835,17 +12847,22 @@ function tMember(){
         ['chart','인바디 · 비포애프터', `사진 ${((D.bph||[]).filter(x=>x.mid===m.id && x.kind!=='ootd' && x.kind!=='pair')).length}장`, 'tsub:body:'+m.id, ''],
         ['h_user','체형분석 기록', `${Object.keys(checksOf(m.id)).length}개 표시 · ${roundsOf(m.id).length}회차`, 'tposture:'+m.id, '']]
         .map(x=>`<button class="mrow2" data-act="${x[3]}"><span class="mi">${svg(x[0],19)}</span>
-          <span class="mt"><b>${x[1]}</b><small>${x[2]}</small></span>${x[4]?`<em class="nb w">${x[4]}</em>`:''}<i>›</i></button>`).join(''); })()}</div>
-    ${(()=>{ if(!여성인가(m.id)) return '';
-      const c=cycOf(m.id); if(!c||!c.on) return `<div class="card rowc dim"><div><div class="nm">생리주기</div>
-        <div class="sm">회원님이 켜지 않았어요</div></div></div>`;
-      return 주기줄(m.id, 'tsub:cycle:'+m.id); })()}
+          <span class="mt"><b>${x[1]}</b><small>${x[2]}</small></span>${x[4]?`<em class="nb w">${x[4]}</em>`:''}<i>›</i></button>`).join(''); })()}</div>` : ''}
+    <button class="btn sub tmrt" data-act="rtpick:${m.id}">루틴표 지정하기</button>      <!-- 웨이트 / 스트레칭 고르는 창 (2026-11-03 대표) -->
     <div class="hr"></div><span class="lbl">운동 기록 <small>최근 ${Math.min(ws.length,5)}회${ws.length>5?` · 전체 ${ws.length}회`:''}</small></span>
     ${ws.slice(0,5).map(기록줄).join('') || '<div class="empty">아직 운동 기록이 없습니다<small class="e2">수업을 기록하면 여기에 나옵니다</small></div>'}
     ${(n => `<button class="card rowc" data-act="tfbchat:${m.id}"><div><div class="nm">피드백 대화</div><div class="sm">${n ? n + '개 · 카톡처럼 날짜 순서로' : '아직 나눈 피드백이 없어요'}</div></div><span class="rt">›</span></button>`)(대화줄들(m.id).length)}
     ${ws.length>5 ? `<button class="card rowc teal" data-act="twall:${m.id}"><div><div class="nm t">지난 운동 기록 모두 보기</div>
       <div class="sm">전체 ${ws.length}회 · 수업 / 개인운동으로 선택해 보기</div></div><span class="rt">›</span></button>` : ''}` };
 }
+/* 수업 시작 아래 「지난 수업 기록」 — 색칠한 그림(안 칠했으면 종목으로 자동) + 종목 · 무게 × 횟수 표 (2026-11-03 대표 「이번에 바꾼 색칠한 그림과 루틴표를 직관적으로」) */
+function 지난수업판(m, ws){ const w = ws.find(x => 세트있나(x));
+  if(!w) return `<div class="tmlast none"><small>지난 수업 기록</small><span>아직 기록이 없어요 · 수업을 기록하면 여기에 나와요</span></div>`;
+  const its = w.items.filter(it => it.sets.length && !isMemo(it.ex) && !(exOf(it.ex) || {}).cardio);
+  const 세트 = s => (s.kg ? kgfmt(s.kg) + 'kg × ' : '') + (s.reps || 0);
+  return `<div class="tmlast" data-act="tw:${w.id}"><div class="tlh"><small>지난 수업 기록</small><b>${dateTxt(w.date)} · ${esc(w.kind || '')}${w.title ? ' · ' + esc(w.title) : ''}</b><i>›</i></div>
+    ${오늘부위판(w, false).replace('>오늘 자극 부위', '>자극 부위')}
+    <div class="tlt">${its.map(it => `<div class="tlr"><b>${esc(exName(it.ex, it.va))}</b><span>${it.sets.map((s, k) => `<i><u>${k + 1}</u>${세트(s)}</i>`).join('')}</span></div>`).join('') || '<div class="sub">무게 기록이 없는 수업이에요</div>'}</div></div>`; }
 /* 트레이너 회원 화면의 기록 한 줄 — 화면·전체 보기 창이 같이 쓴다 */
 const 기록줄 = w => 펼줄(w, `<button class="btn sub sm" data-act="tw:${w.id}">피드백 ›</button>`);      /* 펼치면 기록했던 화면 그대로 (2026-10-26 a3) */
 /* 지난 운동 기록 모두 — 화면에 끝없이 늘어놓지 않고 창 안에서 스크롤 (2026-10-05 대표) */
@@ -13119,18 +13136,8 @@ function sheetPickAssign(){
     <div class="note">지정하면 회원 홈에 <b>오늘 할 루틴</b>으로 뜹니다</div>`);
 }
 
-/* 수업 시작 — 지난 수업 뒤 나눈 피드백이 있으면 먼저 보여 준다 (C-3 · 대표 「인바디 알림처럼 · 최근 나눈 피드백이 있습니다」) · 「수업 시작 ›」 = 원래 시작 창 */
-function 최근대화(mid){
-  const 지난 = D.workouts.filter(w => w.mid === mid && w.done && w.kind === '수업' && w.date < TODAY).map(w => w.date).sort().pop() || '';
-  return 대화줄들(mid).filter(o => String(o.ts).slice(0, 10) >= 지난 && o.ex !== 'memo');
-}
-function 수업시작창(mid){
-  const 줄들 = 최근대화(mid);
-  if(!줄들.length) return sheetStartSession(mid);
-  openSheet(() => `<div class="h2">최근 나눈 피드백이 있습니다 <small>지난 수업 뒤 ${줄들.length}개</small></div>
-    <div class="fbroom sm">${대화방(mid, 줄들.slice(-6))}</div>
-    <button class="btn blue go" data-act="tstartgo:${mid}">수업 시작 ›</button>`);
-}
+/* 수업 시작 = 바로 시작 창 (2026-11-03 대표 노션 「수업기록할 때 최근 나눈 피드백 팝업 안 뜨게」 · 옛 C-3 「최근 나눈 피드백이 있습니다」 창 없앰) */
+function 수업시작창(mid){ return sheetStartSession(mid); }
 function sheetStartSession(mid){
   const m = MEMBERS.find(x=>x.id===mid) || {n:''};
   const rs = myRoutines(mid), t = D.today[mid]; S.recDay = null; S.recMode = ''; 지난수업받기(mid);
@@ -13651,7 +13658,6 @@ document.addEventListener('click', async ev=>{
         if(g && !식단사진들(m.mid, m.date).length){ D.posts = D.posts.filter(x=>x.id!==g.id); sv(sdel('posts','id=eq.'+g.id), '식단 글 내리기'); } }
       if(m.path) 저장소지우기(m.path);
       closeSheet(); toast('삭제했어요'); render(); return; }
-    case 'tstartgo': closeSheet(); S.tmid=rest[0]; sheetStartSession(rest[0]); return;
     case 'recday': 수업날바꿈(rest[0] || ''); return;
     case 'tstartask': S.tmid=rest[0]; 수업시작창(rest[0]);
       try{ sessionStorage.setItem('cycpop_'+rest[0]+'_'+TODAY, '1'); }catch(e){}
@@ -15131,6 +15137,10 @@ document.addEventListener('click', async ev=>{
     case 'rm': S.tmid=rest[0]; S.rgrp='전체'; closeSheet(); go('t_routines'); return;
     case 're': S.redit=rest[0]; go('t_redit'); return;
     case 'raddpick': S.rcart = []; S.rsendTm = null; sheetRAdd(); return;
+    case 'tmfold': S.tmOpen = !S.tmOpen; render(); return;      /* 회원 자료 접기 · 펼치기 (2026-11-03) */
+    case 'rtpick': openSheet(() => `<div class="h2">어떤 루틴표를 보낼까요? <small>${esc((MEMBERS.find(x => x.id === rest[0]) || {}).n || '')} 회원에게</small></div>
+      <div class="rtpk"><button class="btn main" data-act="rtsend:${rest[0]}"><b>웨이트 루틴</b><small>지난 기록으로 채워요</small></button><button class="btn sub" data-act="psets:${rest[0]}"><b>스트레칭 루틴</b><small>내 루틴에서 골라요</small></button></div>
+      <button class="btn ghost sm" data-act="close">닫기</button>`); return;      /* 루틴표 지정하기 → 웨이트 / 스트레칭 (2026-11-03 대표) */
     case 'rtsend': S.tmid = rest[0]; S.rcart = []; S.rsendTm = rest[0]; sheetRAdd(); return;      /* 회원 화면 「웨이트 루틴 보내기」 (2026-10-20) */
     case 'raddback': sheetRAdd(); return;      /* 확인 창에서 뒤로 — 담은 것은 그대로 */
     case 'rcart': { const [op, rid] = rest;
