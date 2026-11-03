@@ -588,6 +588,21 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .ootdnudge .go{margin-left:auto;font-size:20px;font-weight:700;color:var(--gold)}
 /* 트레이너 피드백 — 사진·영상 첨부를 맨 위에 크게 (2026-09-19 대표) */
 .attbig{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.mu-go{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:54px;margin:12px 0 4px;border-radius:14px;border:1.5px solid #4f7f86;background:linear-gradient(180deg,#1d3a3f,#152c30);color:#bfe6ec;font:inherit;font-weight:900;font-size:16px;cursor:pointer}.mu-go .e{font-size:20px}.mu-go small{display:block;font-weight:600;font-size:13px;opacity:.85}.mu-go.sm{min-height:46px;font-size:15px;margin-top:10px}
+.tmmemo{margin-top:10px;border-top:1px dashed rgba(255,255,255,.12);padding-top:8px;font-size:13.5px;color:#d9d3c9}.tmmemo b{color:#f0d3a0;font-size:13px;margin-right:6px}
+.vu-band{position:sticky;top:-1px;z-index:2;background:var(--dark-2,#1b1a17);padding:8px 0 10px;border-bottom:1px solid #34322d;margin-bottom:10px}.vu-band .t{font-size:13px;color:var(--sub);margin-bottom:6px}.vu-band .r{display:flex;gap:6px;overflow-x:auto}
+.vu-band span{flex:none;display:flex;align-items:center;gap:5px;height:34px;padding:0 11px;border-radius:999px;border:1px solid #5a554c;background:#22201c;font-size:13.5px;font-weight:800;color:var(--cream)}.vu-band span i{font-style:normal;width:20px;height:20px;border-radius:50%;background:#f2ead9;color:#141311;font-size:12px;display:flex;align-items:center;justify-content:center}.vu-band span em{font-style:normal;color:#f0d3a0}.vu-band span.no{opacity:.45}
+.vu-row{display:grid;grid-template-columns:96px minmax(0,1fr);gap:10px;padding:10px;border:1px solid #34322d;border-radius:14px;background:#1d1c19;margin-bottom:8px}.vu-row.off{opacity:.45}
+.vu-th{position:relative;width:96px;height:120px;border-radius:10px;overflow:hidden;background:#000}.vu-th img,.vu-th video{width:96px;height:120px;object-fit:cover}.vu-th b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:28px;text-shadow:0 1px 6px #000;pointer-events:none}.vu-th small{position:absolute;left:6px;bottom:5px;color:#fff;font-size:12px;font-weight:800;background:rgba(0,0,0,.55);border-radius:5px;padding:1px 5px}
+.vu-b{display:flex;flex-direction:column;gap:7px;min-width:0}.vu-c{display:flex;gap:5px;flex-wrap:wrap}.vu-c button{height:32px;padding:0 10px;border-radius:999px;border:1px solid #34322d;background:#1a1917;color:#a9a29a;font:inherit;font-weight:700;font-size:13px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.vu-c button.on{background:#f2ead9;color:#141311;border-color:#f2ead9}
+.mu-one{display:flex;gap:6px}.mu-one input{flex:1;min-width:0;height:36px;border-radius:9px;border:1px solid #4a453b;background:#1d1c19;color:var(--cream);padding:0 10px;font:inherit;font-size:14px}.mu-one button{flex:none;height:36px;padding:0 10px;border-radius:9px;border:1px solid #5a554c;background:#1f1d1a;color:#f0d3a0;font:inherit;font-weight:800;font-size:13px}
+.vu-a{display:flex;gap:6px}.vu-a button{height:32px;padding:0 10px;border-radius:9px;border:1px solid #4a453b;background:#1a1917;color:#d9d3c9;font:inherit;font-weight:700;font-size:13px}
+.vu-go{width:100%;height:52px;border-radius:14px;border:0;background:linear-gradient(180deg,#f3d9a8,#e2c184);color:#2a1c14;font:inherit;font-weight:900;font-size:16.5px;margin-top:8px}.vu-go:disabled{opacity:.5}
+.attlbl{font-size:14px;font-weight:800;color:#bfe6ec;margin:2px 0 6px}
+.fbq{display:flex;align-items:center;gap:10px;width:100%;min-height:50px;margin:8px 0;padding:0 14px;border-radius:12px;border:1.5px solid #5a554c;background:#1f1d1a;color:var(--cream);font:inherit;font-weight:800;font-size:15px;text-align:left;cursor:pointer}.fbq i{font-style:normal;font-size:18px}.fbq em{margin-left:auto;font-style:normal;color:var(--gold-2,#e2c184)}
+.fbsent{display:flex;align-items:center;width:100%;padding:10px 4px;border:0;background:none;color:var(--sub);font:inherit;font-weight:800;font-size:14px;cursor:pointer}.fbsent i{margin-left:auto;font-style:normal}
+#ospick{position:fixed;inset:0;z-index:9999}#ospick .osv{position:absolute;inset:0;background:rgba(0,0,0,.5)}#ospick .osb{position:absolute;left:0;right:0;bottom:0;background:#2b2a27;border-radius:18px 18px 0 0;padding:14px 12px calc(18px + env(safe-area-inset-bottom,0px))}
+#ospick .t{color:#cfc9be;font-size:14px;font-weight:700;padding:4px 8px 10px}#ospick button{display:flex;align-items:center;gap:14px;width:100%;height:56px;padding:0 14px;border:0;border-radius:12px;background:#35332f;color:#f2ead9;font:inherit;font-weight:800;font-size:16px;margin-bottom:8px}#ospick button .e{font-size:22px}#ospick .x{justify-content:center;background:none;color:#a9a29a;height:44px}
 .attbig button{display:flex;align-items:center;justify-content:center;gap:7px;padding:15px 8px;border-radius:14px;
   border:1.5px dashed var(--teal);background:#1e343b;color:var(--teal);font-size:15px;font-weight:800}
 .attbig button .ic{font-size:19px;line-height:1}
@@ -3413,7 +3428,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '528';
+const BUILD = '529';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -4963,29 +4978,69 @@ document.addEventListener('scroll', ev => {
   넘김표시(t, Math.round(t.scrollLeft / Math.max(1, t.clientWidth)));
 }, true);
 /* 사진은 여러 장 한 번에, 영상은 한 개씩 — 영상은 줄이는 데 길이만큼 걸린다 */
-function 첨부고르기(종, K){
+function 올리기고르기(종, K){ let o = document.getElementById('ospick'); if(o) o.remove(); o = document.createElement('div'); o.id = 'ospick';
+  o.innerHTML = `<div class="osv" data-act="attx2"></div><div class="osb"><div class="t">${종 === 'pic' ? '사진' : 종 === 'vid' ? '영상' : '사진 · 영상'} 올리기</div><button data-act="attgo:${종}:cam:${K}"><span class="e">${종 === 'vid' ? '📹' : '📷'}</span>촬영하기</button><button data-act="attgo:${종}:lib:${K}"><span class="e">🖼️</span>갤러리에서 선택</button><button class="x" data-act="attx2">취소</button></div>`;
+  document.body.appendChild(o); }
+function 첨부고르기(종, K, 찍기){
   const inp = document.createElement('input');
   inp.type = 'file'; inp.accept = 종==='pic' ? 'image/*' : 'video/*';
-  if(종==='pic') inp.multiple = true;
+  if(찍기) inp.setAttribute('capture', 'environment'); else inp.multiple = true;      /* 촬영 = 카메라 바로 · 갤러리 = 여러 개 */
   inp.style.display = 'none'; document.body.appendChild(inp);
   inp.addEventListener('change', async () => {
     const fs = Array.from(inp.files||[]); inp.remove();
     if(!fs.length) return;
-    const A = att(K); A.files = A.files || [];
+    const A = att(K); A.files = A.files || []; (S.attMid = S.attMid || {})[K] = (live() || {}).mid || S.subj || S.mid;
     try{
       if(종==='pic'){
         for(const f of fs){
           const d = await shrinkPhoto(f), blob = await (await fetch(d)).blob();
           A.files.push({ kind:'photo', blob, ext:'jpg', url: URL.createObjectURL(blob) }); }
       } else {
-        const r = await 영상줄이기(fs[0], null, true);   /* 피드백 영상 = 트레이너 목소리가 알맹이 */
-        A.files.push({ kind:'video', blob:r.blob, ext:r.ext, url: URL.createObjectURL(r.blob) });
+        for(const f of fs){ const r = await 영상줄이기(f, null, true);   /* 피드백 영상 = 트레이너 목소리가 알맹이 · 갤러리에서 여러 개 (2026-11-03) */
+          A.files.push({ kind:'video', blob:r.blob, ext:r.ext, url: URL.createObjectURL(r.blob) }); }
       }
       drawSheet();
     }catch(e){ console.error(e); toast('파일을 읽지 못했어요\n' + 오류말(e)); }
   });
   inp.click();
 }
+/* 피드백 보내기 알맹이 — 종목 창 · 몰아서 올리기 (2026-11-03) · 파일부터 올리고 그 차례대로 */
+async function 피드백보내기(mid, ex, va, tx, 파일, wid){ const K = ex + '|' + va, cid = 'c' + Date.now() + Math.floor(Math.random() * 1000), 사진 = 파일.filter(x => x.kind === 'photo'), 영상 = 파일.filter(x => x.kind === 'video');
+  const 몸 = tx || (영상.length ? '영상 보고 자세 확인해 보세요' : '사진 보고 확인해 보세요'), 올린것 = [], 다 = 파일.length;
+  for(let i = 0; i < 파일.length; i++){ const x = 파일[i], path = `cm/${mid}/${cid}_${i}.${x.ext}`; toast('올리는 중 ' + (i + 1) + '/' + 다);
+    const 들어간 = await 파일올리기(path, x.blob, x.kind === 'photo' ? 'image/jpeg' : (x.ext === 'webm' ? 'video/webm' : 'video/mp4'), mid); 올린것.push({ kind:x.kind, path:들어간 }); }
+  await spost('comments', [{ id:cid, member_id:mid, variant_id:VID(ex, va), trainer:TRAINER, body:몸, pics:사진.length, vids:영상.length, workout_id: wid || null }]);
+  if(올린것.length) await spost('comment_media', 올린것.map(m => ({ comment_id:cid, kind:m.kind, path:m.path })));
+  CMEDIA = 올린것.map(m => ({ comment_id:cid, kind:m.kind, path:m.path })).concat(CMEDIA);
+  D.cm.unshift({ id:cid, mid, ex, va, tr:TRAINER, at:'방금', tx:몸, pics:사진.length, vids:영상.length, read:false, ts:new Date().toISOString(), media:올린것, wid: wid || null });
+  if(S.att) delete S.att[K]; if(S.draft) delete S.draft['cm:' + K];
+  const open = askOf(mid, ex, va); if(open.length){ open.forEach(a => a.done = true); sv(spatch('asks', 'id=in.(' + open.map(a => a.id).join(',') + ')', { done_at: new Date().toISOString() }), '요청 처리'); }
+  return cid; }
+/* 피드백 몰아서 올리기 (2026-11-03 대표 확정) */
+function 몰아종목(b){ const w = (live() && live().id === b.wid) ? live() : D.workouts.find(x => x.id === b.wid); return w ? w.items.filter(it => !isMemo(it.ex)).map(it => ({ ex:it.ex, va:it.va, n:exName(it.ex, it.va) })).filter((o, i, a) => a.findIndex(z => z.ex === o.ex && z.va === o.va) === i) : []; }
+function 몰아고르기(찍기){ const b = S.bulk; if(!b) return; const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*,video/*';
+  if(찍기) inp.setAttribute('capture', 'environment'); else inp.multiple = true; inp.style.display = 'none'; document.body.appendChild(inp);
+  inp.addEventListener('change', async () => { const fs = Array.from(inp.files || []).sort((x, y) => (x.lastModified || 0) - (y.lastModified || 0)); inp.remove(); if(!fs.length) return;      /* 찍은 시각 순 */
+    const 종 = 몰아종목(b), 앞 = b.rows.length;
+    try{ for(let i = 0; i < fs.length; i++){ const f = fs[i]; toast('준비 중 ' + (i + 1) + '/' + fs.length);
+        if(/^video\//.test(f.type)){ const r = await 영상줄이기(f, null, true); b.rows.push({ kind:'video', blob:r.blob, ext:r.ext, url:URL.createObjectURL(r.blob), tx:'', off:false }); }
+        else { const d = await shrinkPhoto(f), blob = await (await fetch(d)).blob(); b.rows.push({ kind:'photo', blob, ext:'jpg', url:URL.createObjectURL(blob), tx:'', off:false }); } }
+    }catch(e){ console.error(e); toast('파일을 읽지 못했어요\n' + 오류말(e)); }
+    b.rows.forEach((r, j) => { if(j >= 앞 && 종.length) r.k = 종[Math.min(j, 종.length - 1)].ex + '|' + 종[Math.min(j, 종.length - 1)].va; });      /* 종목 순서대로 미리 붙임 */
+    몰아창(); });
+  inp.click(); }
+function 몰아창(){ const b = S.bulk; if(!b) return; const 종 = 몰아종목(b);
+  openSheet(() => { const 쓸 = b.rows.filter(r => !r.off), 수 = k => 쓸.filter(r => r.k === k).length;
+    return `<div class="h2">피드백 몰아서 올리기 <small>${esc(dateTxt((D.workouts.find(w => w.id === b.wid) || live() || {}).date || TODAY))} · ${쓸.length}개</small></div>
+    <div class="vu-band"><div class="t">오늘 루틴 종목</div><div class="r">${종.map((o, i) => { const k = o.ex + '|' + o.va, c = 수(k); return `<span class="${c ? '' : 'no'}"><i>${i + 1}</i>${esc(o.n)}${c ? ` <em>${c}</em>` : ''}</span>`; }).join('')}</div></div>
+    ${b.rows.length ? '' : '<div class="empty">아직 선택한 사진 · 영상이 없습니다<br>아래 「＋ 더 선택」을 눌러 주세요</div>'}
+    ${b.rows.map((r, j) => { const [ex] = (r.k || '|').split('|'); return `<div class="vu-row${r.off ? ' off' : ''}"><div class="vu-th">${r.kind === 'video' ? `<video src="${r.url}#t=0.1" muted playsinline preload="metadata"></video><b>▶</b>` : `<img src="${r.url}" alt="">`}<small>${r.kind === 'video' ? '영상' : '사진'} ${j + 1}</small></div><div class="vu-b">
+      <div class="vu-c">${종.map(o => { const k = o.ex + '|' + o.va; return `<button class="${k === r.k ? 'on' : ''}" data-act="bkk:${j}:${esc(k)}">${esc(o.n)}</button>`; }).join('')}</div>
+      <div class="mu-one"><input data-k="bk:${j}" value="${esc(r.tx || '')}" oninput="S.bulk && S.bulk.rows[${j}] && (S.bulk.rows[${j}].tx = this.value)" placeholder="이 종목 피드백 한 줄 (안 써도 돼요)"><button data-act="jfopen:${esc(ex)}:bk:${j}">💬 인용</button></div>
+      <div class="vu-a"><button data-act="bkoff:${j}">${r.off ? '다시 올림' : '안 올림'}</button></div></div></div>`; }).join('')}
+    <button class="btn sub" data-act="attask:both:bulk">＋ 더 선택</button>
+    <button class="vu-go" data-act="bksend"${쓸.length && !b.중 ? '' : ' disabled'}>${b.중 ? '올리는 중…' : 쓸.length + '개 올리기'}</button><button class="btn ghost sm" data-act="close">닫기</button>`; }); }
+const 안보낸것 = mid => Object.keys(S.att || {}).filter(K => (S.att[K].files || []).length && (!mid || (S.attMid || {})[K] === mid)).reduce((n, K) => n + S.att[K].files.length, 0);
 async function 파일올리기(path, blob, type, 회원){
   if(회원 && /^video\//.test(type || '')) return await S3올리기(blob, 'video', String(path).split('/').pop(), String(type).split(';')[0], 회원);      /* 회원 개인 영상 → S3 (2026-10-14) */
   const r = await fetch(SB_URL+'/storage/v1/object/media/'+path, { method:'POST',
@@ -7040,7 +7095,8 @@ function 플래너화면(w){
     ${유.length ? `<div class="pltb plcard"><div class="plr plca plh"><span class="pln">유산소</span><span>시간</span><span>속도</span></div>${유.map(유행).join('')}</div>` : ''}
     <button class="zbtn zcar" data-act="plcardio"><span class="e">🏃</span><span>유산소 운동 추가<small>종목 · 시간 · 속도 · 경사</small></span></button>
     ${수업 && tr ? 지정카드들(w.id) : ''}
-    ${수업 && tr ? `<span class="lbl">트레이너 메모</span><textarea class="pl-memo" data-k="wmemo" placeholder="오늘 컨디션 · 다음 수업에 할 것">${esc(w.trmemo || '')}</textarea>` : ''}
+    ${tr ? `<button class="mu-go" data-act="bulkopen:${w.id}"><span class="e">📤</span><span>피드백 몰아서 올리기<small>사진 · 영상 여러 개 → 종목마다 붙이기</small></span></button>` : ''}
+    ${수업 && tr ? `<span class="lbl">수업 메모 <small style="font-weight:600">이 수업에만 · 지난 수업 기록 맨 아래에 보여요</small></span><textarea class="pl-memo" data-k="wmemo" placeholder="오늘 컨디션 · 다음 수업에 할 것">${esc(w.trmemo || '')}</textarea>` : ''}
     <button class="dngr" data-act="askcancel">기록 삭제</button>`,
     foot: 발판(w) };
 }
@@ -7061,6 +7117,7 @@ function 플래너정리(w){ if(!플래너인가(w)) return;
   save(); }
 /* 종목 이름을 누르면 — 설명 · 피드백(큰 단추 둘) · 직전 기록 · 세트 추가 · 빼기 */
 function sheetPlName(i){ const w = live(), it = w && w.items[i]; if(!it) return; w.cur = i; save();
+  if(S.who === 'tr' && !isMemo(it.ex)){ S.vplay = null; S.editDesc = null; S.cmWid = w.id; S.plIdx = i; sheetExDesc(it.ex, it.va, w.mid || S.mid); return; }      /* 트레이너 = 통일 피드백 창 (2026-11-03) */
   const tr = S.who === 'tr', wmid = w.mid || S.mid, cms = cmOf(wmid, it.ex, it.va), nw = cms.filter(c => !c.read).length;
   openSheet(() => { const 지 = isMemo(it.ex) ? null : lastRuns(it.ex, it.va, wmid, 1)[0];
     return `<div class="h2">${esc(isMemo(it.ex) ? exName(it.ex, it.va) : (exOf(it.ex) || {}).n || '')}</div>
@@ -7198,20 +7255,25 @@ function sheetExDesc(exid, vk, mid){
       <div style="display:flex;gap:9px">
         <button class="btn main sm" data-act="savedesc:${exid}:${vk}:${mid}">저장</button>
         <button class="btn ghost sm" data-act="canceldesc">취소</button></div>`;
-    if(tr) return head + `
+    if(tr){ if(!지난.글 && !지난.받는중) 지난받기().then(() => drawSheet()).catch(() => {});      /* 피드백 창 하나 (2026-11-03 대표 확정) */
+      const 인 = 지난.글 ? 지난목(exid, 나선생()).filter(o => !o.hid).length : null, 붙 = (att(K).files || []).length, 지 = lastRuns(exid, vk, mid, 1)[0], lw = live(), 레 = S.plIdx != null && lw && lw.items[S.plIdx] && lw.items[S.plIdx].ex === exid;
+      return head + `
       ${askOf(mid, exid, vk).length?`<div class="note" style="border-color:var(--gold-2)">
         <b style="color:var(--gold)">회원이 이 종목 피드백을 요청했습니다</b>
         <div>${esc(askOf(mid, exid, vk)[0].note||'따로 입력한 말은 없습니다.')}</div></div>`:''}
+      ${지 ? `<div class="pl-prev">지난번 ${esc(dateTxt(지.date))} · ${지.sets.map(x => (x.kg ? kgfmt(x.kg) + '×' : '') + x.reps).join(' · ')}</div>` : ''}
       <div class="attbig">
-        <button data-act="att:pic:${K}"><span class="ic">📷</span>사진 첨부</button>
-        <button data-act="att:vid:${K}"><span class="ic">🎬</span>영상 첨부</button></div>
-      ${붙인것(K)}
-      <textarea data-k="cm:${K}" placeholder="피드백을 입력해 주세요"></textarea>
-      <button class="btn main sm" data-act="sendcm:${exid}:${vk}:${mid}">${S.보내는중?'보내는 중…':'보내기'}</button>
+        <button data-act="attask:pic:${K}"><span class="ic">📷</span>사진 올리기</button>
+        <button data-act="attask:vid:${K}"><span class="ic">🎬</span>영상 올리기</button></div>
+      ${붙 ? `<div class="attlbl">🎬 올린 사진 · 영상 ${붙}개가 붙어 있어요</div>` : ''}${붙인것(K)}
+      <textarea data-k="cm:${K}" placeholder="${esc(e.n)} 피드백을 입력해 주세요${붙 ? ' (비워 두면 사진 · 영상만 가요)' : ''}"></textarea>
+      <button class="fbq" data-act="jfopen:${esc(exid)}:${esc(K)}"><i>💬</i>지난 피드백 인용하기${인 != null ? ' (' + 인 + '개)' : ''}<em>›</em></button>
+      <button class="btn main" data-act="sendcm:${exid}:${vk}:${mid}">${S.보내는중?'보내는 중…':'보내기'}</button>
+      ${레 ? `<div class="pl-small"><button class="btn ghost sm" data-act="trio:prev">직전 기록</button><button class="btn ghost sm" data-act="plsadd:${S.plIdx}">＋ 세트 추가</button><button class="btn ghost sm" data-act="wdel:${S.plIdx}">종목 삭제</button></div>` : ''}
       <div class="hr"></div>
-      <span class="lbl">지난 피드백 ${cms.length?`${cms.length}개`:''}</span>
-      ${피드백회차(cms, K, true)}
-      <button class="btn ghost sm" data-act="close">닫기</button>`;      /* 기본 설명은 「기구 사용법」 창으로 옮겼다 (2026-10-19) */
+      <button class="fbsent" data-act="cmlist:${esc(K)}">보낸 피드백 ${cms.length}개 <i>${S.cmList === K ? '▴' : '▾'}</i></button>
+      ${S.cmList === K ? 피드백회차(cms, K, true) : ''}
+      <button class="btn ghost sm" data-act="close">닫기</button>`;      /* 기본 설명은 「기구 사용법」 창으로 옮겼다 (2026-10-19) */ }
     /* 피드백 창은 어디서 열든 트레이너 피드백만 — 기본 설명 · 시범은 「기구 사용법」 창 (2026-10-19 대표 · 10/09 은 피드백 탭에서만 뺐었다) */
     return head + `
       <span class="lbl">피드백 ${cms.length?`${cms.length}개`:''}</span>
@@ -12953,7 +13015,7 @@ function 지난기록카드(m, ws){ const 다 = ws.filter(x => 세트있나(x)),
   const 세트 = s => (s.kg ? kgfmt(s.kg) + 'kg × ' : '') + (s.reps || 0);
   const 카드 = w => { const its = w.items.filter(it => it.sets.length && !isMemo(it.ex)), 근 = its.filter(it => !(exOf(it.ex) || {}).cardio), 유 = its.filter(it => (exOf(it.ex) || {}).cardio);
     return `<div class="tmrc" data-act="tw:${w.id}"><div class="tlh"><b>${dateTxt(w.date)}</b><span class="k">${esc(w.kind || '')}</span>${w.title ? `<small>${esc(w.title)}</small>` : ''}<i>›</i></div>
-      <div class="tmfig tmfig2">${오늘부위판(w, false)}</div><div class="tlt">${플래너표(w)}</div></div>`; };      /* 표 = 수업 기록 그대로 (2026-11-03 19:25) */
+      <div class="tmfig tmfig2">${오늘부위판(w, false)}</div><div class="tlt">${플래너표(w)}</div>${(() => { const 메 = (D.cm || []).filter(c => c.wid === w.id && c.ex === 'memo').map(c => c.tx).filter(Boolean); return 메.length ? `<div class="tmmemo"><b>수업 메모</b>${메.map(t => esc(t)).join(' · ')}</div>` : ''; })()}<button class="mu-go sm" data-act="bulkopen:${w.id}"><span class="e">📤</span><span>이 수업 피드백 몰아서 올리기</span></button></div>`; };      /* 수업 메모 맨 아래 · 몰아서 올리기 (2026-11-03) */      /* 표 = 수업 기록 그대로 (2026-11-03 19:25) */
   return `<span class="lbl">지난 기록 <small>수업 · 개인운동 ${다.length}회</small></span><div class="tmrs">${보.map(카드).join('')}</div>`
     + (다.length > 보.length ? `<button class="btn ghost tmmore" data-act="tmmore:${m.id}">더 보기 · ${다.length - 보.length}회 남음</button>` : ''); }
 /* 트레이너 회원 화면의 기록 한 줄 — 화면·전체 보기 창이 같이 쓴다 */
@@ -14245,11 +14307,11 @@ document.addEventListener('click', async ev=>{
       drawSheet(); return; }
     case 'cmgo': { const K=rest[0];
       S.cmIdx = S.cmIdx || {}; S.cmIdx[K] = +rest[1]; S.cmOpen = null; drawSheet(); return; }
-    case 'exd': S.vplay=null; S.editDesc=null; S.cmWid=null;
+    case 'exd': S.vplay=null; S.editDesc=null; S.cmWid=null; S.plIdx=null;
       S.cmOpen=null; sheetExDesc(rest[0], rest[1], rest[2]); return;
     /* 수업 기록 화면에서 연 피드백 — **어느 수업인지** 기억해 뒀다가 같이 담는다 (2026-09-29).
        그래야 그 수업 리포트에 그 피드백만 뜬다. 종목 사전에는 그대로 다 쌓인다. */
-    case 'exdw': S.vplay=null; S.editDesc=null; S.cmWid=rest[3];
+    case 'exdw': S.vplay=null; S.editDesc=null; S.cmWid=rest[3]; S.plIdx=null;
       sheetExDesc(rest[0], rest[1], rest[2]); return;
     case 'editdesc': { const K=rest[0]+'|'+rest[1]; if(S.draft) delete S.draft['desc:'+K]; S.editDesc=K; drawSheet(); return; }
     case 'canceldesc': if(S.draft&&S.editDesc) delete S.draft['desc:'+S.editDesc]; S.editDesc=null; drawSheet(); return;
@@ -14264,6 +14326,20 @@ document.addEventListener('click', async ev=>{
         updated_at:new Date().toISOString() }], {on:'member_id,variant_id'}), '설명 저장');
       toast('이 회원용 설명으로 저장했어요'); drawSheet(); return; }
     case 'att': 첨부고르기(rest[0], rest[1]); return;
+    case 'attask': 올리기고르기(rest[0], rest[1]); return;      /* 촬영하기 / 갤러리에서 선택 (2026-11-03 대표 「어떤 폰은 촬영이 안 떠」) */
+    case 'attgo': { const o = document.getElementById('ospick'); if(o) o.remove(); if(rest[2] === 'bulk'){ if(S.bulk && !S.bulk.rows.length && !document.getElementById('sheet').classList.contains('on')) 몰아창(); 몰아고르기(rest[1] === 'cam'); return; } else 첨부고르기(rest[0], rest.slice(2).join(':'), rest[1] === 'cam'); return; }
+    case 'attx2': { const o = document.getElementById('ospick'); if(o) o.remove(); return; }
+    case 'bulkopen': { const wid = rest[0], w = (live() && live().id === wid) ? live() : D.workouts.find(x => x.id === wid); if(!w) return; S.bulk = { wid, mid: w.mid || S.tmid || S.mid, rows:[] }; 올리기고르기('both', 'bulk'); return; }
+    case 'bkk': { const r = S.bulk && S.bulk.rows[+rest[0]]; if(r){ r.k = rest.slice(1).join(':'); 몰아창(); } return; }
+    case 'bkoff': { const r = S.bulk && S.bulk.rows[+rest[0]]; if(r){ r.off = !r.off; 몰아창(); } return; }
+    case 'bksend': { const b = S.bulk; if(!b || b.중) return; const 쓸 = b.rows.filter(r => !r.off && r.k); if(!쓸.length) return; b.중 = true; 몰아창();
+      const 묶 = {}; 쓸.forEach(r => (묶[r.k] = 묶[r.k] || []).push(r)); let 보낸 = 0, 붙인 = 0;
+      try{ for(const k2 of Object.keys(묶)){ const [ex, va] = k2.split('|'), rs = 묶[k2], tx = rs.map(r => String(r.tx || '').trim()).filter(Boolean).join('\n'), 파일 = rs.map(r => ({ kind:r.kind, blob:r.blob, ext:r.ext, url:r.url }));
+          if(tx){ await 피드백보내기(b.mid, ex, va, tx, 파일, b.wid); 보낸++; }
+          else { const A = att(k2); A.files = (A.files || []).concat(파일); (S.attWid = S.attWid || {})[k2] = b.wid; (S.attMid = S.attMid || {})[k2] = b.mid; 붙인++; } }      /* 글 없는 종목 = 그 종목 창에 붙어 기다림 */
+        S.bulk = null; closeSheet(); toast((보낸 ? 보낸 + '종목 보냈어요' : '') + (보낸 && 붙인 ? '\n' : '') + (붙인 ? 붙인 + '종목은 종목 창에 붙여 뒀어요 · 인용해서 보내 주세요' : '')); render(); }
+      catch(e){ b.중 = false; 몰아창(); toast('올리지 못했어요\n' + 오류말(e)); } return; }
+    case 'cmlist': S.cmList = S.cmList === rest.join(':') ? null : rest.join(':'); drawSheet(); return;
     /* ── 동의 · 알림 (2026-09-21) ── */
     case 'agchk': { S.ag = S.ag || {}; S.ag[rest[0]] = !S.ag[rest[0]]; render(); return; }
     case 'agopen': { S.agOpen = (S.agOpen === rest[0]) ? '' : rest[0]; render(); return; }
@@ -14347,30 +14423,8 @@ document.addEventListener('click', async ev=>{
       if(S.보내는중) return;
       S.보내는중 = true; drawSheet();
       (async () => {
-        const cid='c'+Date.now();
-        const 몸 = tx || (영상.length ? '영상 보고 자세 확인해 보세요' : '사진 보고 확인해 보세요');
-        try{
-          /* ⛔ 파일부터 올린다 — 피드백을 먼저 넣으면 회원 화면이 첨부 없는 피드백을 먼저 받아 간다 */
-          /* 붙인 차례 그대로 올린다 — comment_media 의 id 가 곧 보는 차례다 */
-          const 올린것 = [], 다 = 파일.length;
-          for(let i=0;i<파일.length;i++){ const x=파일[i], path=`cm/${mid}/${cid}_${i}.${x.ext}`;
-            toast('올리는 중 ' + (i+1) + '/' + 다);
-            const 들어간 = await 파일올리기(path, x.blob, x.kind==='photo' ? 'image/jpeg' : (x.ext==='webm' ? 'video/webm' : 'video/mp4'), mid);      /* 영상이면 S3 키 */
-            올린것.push({ kind:x.kind, path: 들어간 }); }
-          await spost('comments',[{ id:cid, member_id:mid, variant_id:VID(ex,va), trainer:TRAINER,
-            body:몸, pics:사진.length, vids:영상.length,
-            workout_id: S.cmWid || null }]);      /* 수업에서 열었으면 그 수업 번호 */
-          if(올린것.length) await spost('comment_media', 올린것.map(m => ({ comment_id:cid, kind:m.kind, path:m.path })));
-          CMEDIA = 올린것.map(m => ({ comment_id:cid, kind:m.kind, path:m.path })).concat(CMEDIA);
-          D.cm.unshift({ id:cid, mid, ex, va, tr:TRAINER, at:'방금', tx:몸, pics:사진.length, vids:영상.length,
-            read:false, ts:new Date().toISOString(), media:올린것, wid:S.cmWid || null });
-          if(S.att) delete S.att[K]; if(S.draft) delete S.draft['cm:'+K];
+        try{ await 피드백보내기(mid, ex, va, tx, 파일, S.cmWid || (S.attWid || {})[K] || null); if(S.attWid) delete S.attWid[K];
           const t2=document.querySelector('textarea[data-k="cm:'+K+'"]'); if(t2) t2.value='';
-          const open = askOf(mid, ex, va);
-          if(open.length){
-            open.forEach(a => a.done = true);
-            sv(spatch('asks','id=in.('+open.map(a=>a.id).join(',')+')', { done_at: new Date().toISOString() }), '요청 처리');
-          }
           toast('보냈어요\n회원 화면에 바로 나옵니다');
         }catch(e){ console.error('피드백 보내기', e); toast('보내지 못했어요\n' + 오류말(e)); }
         finally{ S.보내는중 = false; drawSheet(); }
@@ -14897,7 +14951,7 @@ document.addEventListener('click', async ev=>{
     case 'jfhid': 지난.숨김봄 = !지난.숨김봄; 지난.열린 = ''; 지난그리기(); return;
     case 'jfcard': case 'jfput': case 'jfstar': case 'jfhide': case 'jfback': { const o = 지난.보[+rest[0]], 나 = 나선생(); if(!o) return;
       if(k === 'jfcard'){ 지난.열린 = 지난.열린 === o.body ? '' : o.body; 지난그리기(); return; }
-      if(k === 'jfput'){ const t = document.querySelector('#sheet textarea[data-k="cm:' + 지난.칸 + '"]'); 지난닫기(); if(t){ t.value = (t.value.trim() ? t.value.replace(/\s+$/, '') + '\n' : '') + o.body; t.focus(); } return; }
+      if(k === 'jfput'){ const 줄칸 = 지난.칸.startsWith('bk:'), t = document.querySelector('#sheet [data-k="' + (줄칸 ? 지난.칸 : 'cm:' + 지난.칸) + '"]'); 지난닫기(); if(t){ t.value = (t.value.trim() ? t.value.replace(/\s+$/, '') + (줄칸 ? ' ' : '\n') : '') + o.body; t.focus(); if(줄칸 && S.bulk){ const r = S.bulk.rows[+지난.칸.slice(3)]; if(r) r.tx = t.value; } } return; }
       try{
         if(k === 'jfstar'){ const 옛 = (o.row && o.row.stars) || []; await 지난줄(o, { stars:옛.includes(나) ? 옛.filter(n => n !== 나) : 옛.concat([나]) }); }
         if(k === 'jfhide'){ if(!await 물어('이 글을 목록에서 숨길까요?\n회원에게 보낸 피드백은 그대로예요', '숨기기')) return; await 지난줄(o, { gone_at:new Date().toISOString(), gone_by:나 }); 지난.열린 = ''; }
@@ -14990,7 +15044,8 @@ document.addEventListener('click', async ev=>{
         save(); render();
       }
       sheetFinish(); return; }
-    case 'askfin': if(w && w.items.some(it => it.cs && it.cs.ph === 'go' && !it.locked)){ toast('유산소를 먼저 종료해 주세요'); return; } 자판 = null; 자판그리기(); if(w) 플래너정리(w); sheetFinish(); return;
+    case 'askfin': if(w && w.items.some(it => it.cs && it.cs.ph === 'go' && !it.locked)){ toast('유산소를 먼저 종료해 주세요'); return; }
+      if(w && S.who === 'tr' && 안보낸것(w.mid) && !await 물어('보내지 않은 사진 · 영상이 ' + 안보낸것(w.mid) + '개 있어요\n종목을 눌러 보내거나 그대로 마칠 수 있어요', '그대로 마치기')) return;      /* 몰아서 올린 것 · 붙여 둔 것 (2026-11-03) */ 자판 = null; 자판그리기(); if(w) 플래너정리(w); sheetFinish(); return;
     case 'dofin': if(w && w.lock){ w.lock = false; save(); } if(w) 플래너정리(w); closeSheet(); finish(); return;
     case 'morego': closeSheet(); go('pick'); return;      /* 「더 할래요」 = 바로 종목 추가 (2026-10-14 대표) */
     case 'wrestpick': sheetRestPick(); return;
