@@ -317,7 +317,8 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .lbl::before{content:'';width:3px;height:14px;border-radius:2px;background:#7a4d3c;flex:none}
 /* 구분 머리 = 데스크 구분머리와 한 꼴 (2026-10-26 대표 「5번 진행」) — 색 네모 + 첫 글자 · 굵은 이름 · 색은 데스크 구분색 차례(청록 · 살구 · 남보라 · 연두) */
 .lbl[data-gi]:not(.plain){font-size:15px;font-weight:800;color:#fdfaf6;gap:9px;margin-top:14px}
-.lbl[data-gi]:not(.plain)::before{content:attr(data-gi);width:26px;height:26px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:900;color:#121211;background:var(--gc,#40C1BD)}
+.lbl[data-gi]:not(.plain)::before{content:'';background-image:var(--ic);background-repeat:no-repeat;background-position:center;background-size:17px 17px;width:26px;height:26px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:900;color:#121211;background:var(--gc,#40C1BD)}
+.lbl[data-gi]:not(.plain)::before{background-image:var(--ic) !important;background-repeat:no-repeat !important;background-position:center !important;background-size:17px 17px !important}
 .lbl.plain{margin-top:0}
 .lbl.plain::before{display:none}
 .h1{font-size:21px;font-weight:900;letter-spacing:-.03em;line-height:1.3}
@@ -1034,7 +1035,7 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .fsec .fe{padding:14px 15px;font-size:13px;color:#8f8a83}
 /* 구분머리 — 데스크(.tgrp)와 같은 색 네모 · 숫자 판 색 (2026-10-26 대표 「구분하는 네임택은 데스크와 톤을 맞춰서 · 앱과 데스크 통일감」) */
 .fsec>.fh .gi{width:30px;height:30px;flex:none;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#121211;background:var(--lc,#8f8a83)}
-.fsec.zero>.fh .gi{background:#4a4741;color:#d6cfc3}
+.fsec.zero>.fh .gi{background:#4a4741;color:#d6cfc3}.fsec>.fh .gi{background-image:var(--ic) !important;background-repeat:no-repeat;background-position:center;background-size:18px 18px}
 .fsec.live>.fh .fc{background:color-mix(in srgb,var(--lc) 22%,transparent);color:var(--lc)}
 .tdfb{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border-radius:18px;border:1px solid #2f4a44;background:linear-gradient(180deg,#1b2a27,#151d1b);padding:14px 15px;margin-top:12px}
 .tdfb .gi{width:30px;height:30px;flex:none;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#121211;background:#a9d8e6}
@@ -1338,7 +1339,7 @@ body .card.now2 .pill.t.nowp{animation:nowp 2.2s ease-in-out infinite}@keyframes
 .czgl{display:flex;align-items:center;font-size:15px;color:var(--cream);margin:2px 2px -2px}.czgl button{margin-left:auto;background:none;border:0;color:var(--sub);font-size:12.5px;text-decoration:underline;text-underline-offset:3px}
 .czgset{display:flex;align-items:center;gap:12px;width:100%;height:58px;padding:0 16px;border-radius:16px;border:1.5px solid var(--run2);background:linear-gradient(170deg,#173328,#1b1a18 85%);text-align:left;flex:none}
 .czgset .ic{width:38px;height:38px;border-radius:50%;background:#1f4535;display:flex;align-items:center;justify-content:center;flex:none}.czgset svg{width:21px;height:21px;stroke:var(--run);fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-.czgset b{font-size:15.5px;color:var(--run)}.czgset i{margin-left:auto;font-style:normal;font-size:24px;color:var(--run)}
+.czgset b{font-size:15.5px;color:var(--run);white-space:nowrap;flex:none}.czgset i{margin-left:auto;font-style:normal;font-size:24px;color:var(--run)}
 .czfeel{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.czfeel button{height:46px;border-radius:14px;border:1px solid #35322d;background:#1b1a18;color:var(--cream);font-size:14px;font-weight:700}.czfeel button.on{border-color:var(--run);color:var(--run);background:#173328}
 .czback{background:none;border:0;color:var(--sub);font-size:12.5px;text-decoration:underline;text-underline-offset:3px;padding:6px;align-self:center}
 .czdone{border-radius:16px;background:#1b1a18;border:1px solid #35322d;padding:13px 10px}.czdone .g{display:flex;justify-content:space-around;text-align:center;gap:4px}.czdone small{display:block;font-size:11px;color:var(--sub)}.czdone b{font-size:16.5px;color:var(--cream);white-space:nowrap}
@@ -1450,7 +1451,7 @@ body .card.now2 .pill.t::before{content:"";display:inline-block;width:6px;height
   background:radial-gradient(110% 90% at 0% 0%,rgba(240,211,160,.17),transparent 62%),linear-gradient(180deg,#221e17,#161513);box-shadow:inset 0 1px 0 rgba(240,211,160,.2)}
 .tmt{display:flex;flex-direction:column;gap:2px;min-width:0}.tmt small{font-size:11.5px;color:var(--sub)}.tmt b{font-size:21px;font-weight:800;letter-spacing:-.02em}.tmt i{font-style:normal;font-size:12.5px;color:var(--sub)}
 .mring b u{text-decoration:none;font-size:12px;color:var(--sub);font-weight:700}
-.tmb{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.tmb{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:9px}.tmb:has(.r){grid-template-columns:1.1fr 1.3fr 1fr}.tmb:has(.r) button{font-size:13.5px;white-space:nowrap;padding:12px 4px}.tmb .r{background:transparent;color:var(--gold-2,#e2c184);border:1px solid rgba(226,193,132,.5)}
 .tmsend{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:10px 0 4px}
 .tmsend button{display:flex;align-items:center;gap:9px;text-align:left;padding:11px 10px 11px 12px;border-left-width:3px!important;border-radius:14px;border:1px solid var(--line);background:var(--dark-2);color:var(--cream);min-width:0}
 .tmsend button svg{flex:none}.tmsend button span{min-width:0}
@@ -1486,13 +1487,19 @@ body .cm2 .tx{font-size:14px;line-height:1.6;color:var(--cream)}
 .tmsum small{font-size:11.5px;color:var(--sub)}.tmsum b{font-size:24px;font-weight:800;color:var(--gold);line-height:1.15}.tmsum b i{font-style:normal;font-size:11.5px;color:var(--cream);margin-left:2px}
 .tmsum>div.t{border-color:#3f7281;background:linear-gradient(170deg,#1b2d33,#171a19 70%)}.tmsum>div.t b{color:var(--teal)}
 .mrow2 .mi.nm1{font-size:15px;font-weight:800}.mi.nm1 svg{width:56%;height:56%}.mi.nm1.tx{font-size:11.5px;letter-spacing:-.03em}
+.asgtop{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:4px 0 12px}.asgtop .btn{padding:12px 6px;font-size:14px}
+.rsrow{border:1px solid #3a3731;border-radius:16px;padding:10px 12px 12px;margin:0 0 10px;background:#1b1a17;cursor:pointer}.rsrow.on{border-color:var(--gold-2,#e2c184)}
+.rsh{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;margin-bottom:8px}.rsh b{color:var(--gold-2,#e2c184);font-size:14.5px}.rsh .nm{font-weight:800;font-size:14.5px}.rsh small{color:var(--sub);font-size:13px}.rsh .sp{flex:1}
+.rsg{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px}.rst{flex:none;width:86px;display:flex;flex-direction:column;gap:4px}.rst > :first-child{width:86px;height:86px;border-radius:10px;object-fit:contain;background:#f1f2f4;display:block;overflow:hidden}.rst i{font-style:normal;font-size:12.5px;line-height:1.25;color:var(--cream);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.czstp{margin-top:2px;color:var(--gold-2,#e2c184) !important;font-weight:800}
 .pz.ed button.pz-c{background:none;border:0;padding:2px 0;cursor:pointer;font:inherit;font-size:14px;color:#3a342b}.pz.ed .pz-days button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:3px 0;font-weight:800;border:0;border-left:1px solid #2a241b;background:none;color:inherit;font:inherit;cursor:pointer}.pz.ed .pz-days button:first-child{border-left:0}
 .pz.ed .pz-days button i{width:18px;height:18px;border:1.5px solid #2a241b;border-radius:4px;font-style:normal;font-size:13px;display:flex;align-items:center;justify-content:center}.pz.ed .pz-days button.on i{background:#2a241b;color:#fff}
 .pz.ed input.pzin{font:inherit;color:#2a241b;outline:none;background:#fff}.pz.ed textarea.pzin{width:100%;min-height:70px;font:inherit;color:#2a241b;border:1.5px solid #2a241b;border-radius:7px;padding:6px 8px;background:#fff;resize:vertical;box-sizing:border-box}
 .pz.ed input.pzin:focus,.pz.ed textarea.pzin:focus{border-color:#b8862e;box-shadow:0 0 0 2px rgba(184,134,46,.25)}.pz-tip{font-size:13px;color:var(--sub);margin:10px 2px 4px}
 .tmlast{display:block;border:1px solid #3a3731;border-radius:16px;padding:12px 14px;margin:12px 0;background:#1b1a17;cursor:pointer}.tmlast.none{cursor:default}.tmlast.none span{display:block;color:var(--sub);font-size:13px;margin-top:2px}
 .tmlast small{color:var(--sub);font-size:13px}.tmlast .tlh{display:flex;align-items:baseline;gap:8px;margin-bottom:8px}.tmlast .tlh b{font-size:15px}.tmlast .tlh i{margin-left:auto;font-style:normal;color:var(--sub)}
-.tmlast .rp3mv{margin:0 0 8px}.tmlast .tlt{display:flex;flex-direction:column;gap:6px}.tmlast .tlr{display:flex;flex-direction:column;gap:4px;padding:6px 0;border-top:1px dashed rgba(255,255,255,.08)}.tmlast .tlr b{font-size:14px}
+.tmlast .rp3mv{margin:0 0 8px}.tmrs{display:flex;flex-direction:column;gap:10px;margin:8px 0 10px}.tmrc{border:1px solid #3a3731;border-radius:16px;padding:10px 12px;background:#1b1a17;cursor:pointer}.tmrc .tlh{display:flex;align-items:baseline;gap:8px;margin-bottom:8px}.tmrc .tlh b{font-size:15px}.tmrc .tlh .k{font-size:12px;border:1px solid #3a3731;border-radius:999px;padding:0 8px;color:var(--sub)}.tmrc .tlh small{color:var(--sub);font-size:13px}.tmrc .tlh i{margin-left:auto;font-style:normal;color:var(--sub)}
+.tmrb{display:grid;grid-template-columns:118px 1fr;gap:12px;align-items:start}.tmfig{width:118px;overflow:hidden}.tmfig .rp3mv{display:block;margin:0;padding:0;border:0;background:none;width:118px;min-width:0}.tmfig .b2w{padding:0;border:0;background:none}.tmfig .rp3mv > div:not(.bwrap){display:none}.tmfig .b2w,.tmfig .bwrap{display:block;width:118px}.tmfig .bdone{display:none}.tmfig img.b2d{width:118px;height:118px;border-radius:10px;background:#fff;object-fit:contain}.tmfig .bpad{width:118px;height:118px}
+.tmrc .tlt{display:flex;flex-direction:column;gap:2px;min-width:0}.tmrc .tlr{display:flex;flex-direction:column;gap:3px;padding:4px 0;border-top:1px dashed rgba(255,255,255,.08)}.tmrc .tlr:first-child{border-top:0;padding-top:0}.tmrc .tlr b{font-size:13.5px}.tmrc .tlr span{display:flex;flex-wrap:wrap;gap:4px}.tmrc .tlr .sg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}.tmrc .tlr .sg i{display:flex;flex-direction:column;align-items:center;padding:3px 0 4px;position:relative;line-height:1.2}.tmrc .tlr .sg i u{display:none}.tmrc .tlr .sg em{font-style:normal;font-weight:800;font-size:13px}.tmrc .tlr .sg small{font-size:12px;color:var(--sub)}.tmrc .tlr i{font-style:normal;font-size:12.5px;border:1px solid #3a3731;border-radius:7px;padding:1px 6px}.tmrc .tlr i u{text-decoration:none;color:var(--sub);margin-right:3px;font-size:11.5px}.tmmore{display:block;width:100%;margin:0 0 12px}.tmlast .tlt{display:flex;flex-direction:column;gap:6px}.tmlast .tlr{display:flex;flex-direction:column;gap:4px;padding:6px 0;border-top:1px dashed rgba(255,255,255,.08)}.tmlast .tlr b{font-size:14px}
 .tmlast .tlr span{display:flex;flex-wrap:wrap;gap:5px}.tmlast .tlr i{font-style:normal;font-size:13px;border:1px solid #3a3731;border-radius:8px;padding:2px 8px}.tmlast .tlr i u{text-decoration:none;color:var(--sub);margin-right:4px;font-size:12px}
 .lbl.tmfold{display:flex;align-items:center;gap:8px;width:100%;background:none;border:0;color:inherit;text-align:left;padding:0;cursor:pointer}.lbl.tmfold small{color:var(--sub);font-weight:600}
 .tmrt{display:block;width:100%;margin:10px 0 4px}.rtpk{display:flex;gap:8px;margin:10px 0}.rtpk .btn{flex:1;display:flex;flex-direction:column;gap:2px;padding:14px 10px}.rtpk .btn small{font-size:13px;opacity:.8;font-weight:600}
@@ -2841,7 +2848,7 @@ body.kpon #main{padding-bottom:380px}
 .wkst{flex:none;border-radius:16px;border:1px solid #4a4336;background:linear-gradient(135deg,#25211a,#1a1916);padding:12px 14px;display:flex;flex-direction:column;gap:9px}.wkst .h{display:flex;align-items:baseline}.wkst .h b{font-size:14px}.wkst .h span{margin-left:auto;font-size:11.5px;color:var(--sub)}
 .wkst .g{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.wkst .g div{border-radius:11px;background:#1d1c1a;border:1px solid #2c2b27;padding:7px 10px;font-size:11.5px;color:var(--sub)}.wkst .g b{display:block;font-size:19px;color:var(--cream);font-weight:800}.wkst .g b small{font-size:11px;color:var(--sub);font-weight:600;margin-left:1px}
 .wkst .wb{height:7px;border-radius:4px;background:#2a2926;overflow:hidden}.wkst .wb i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,#4fbf8f,#7fe0b0)}.wkst>small{font-size:11.5px;color:var(--sub);margin-top:-3px}
-.czgset small{display:block;font-size:11.5px;font-weight:500;color:#9fc9b4;margin-left:8px}
+.czgset small{display:block;flex:1;min-width:0;font-size:13px;font-weight:500;color:#9fc9b4;margin-left:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}      /* 글씨가 두 줄로 깨지지 않게 (2026-11-03) */
 .mrow2.notir .mi{color:var(--gold-2)}.mrow2.notir.new .mt b{color:var(--gold)}.mrow2.notir .mt small{display:block}
 .dlinks{display:flex;justify-content:flex-end;gap:8px;flex:none;margin:-4px 0 -2px}.dlink{font-size:12.5px;font-weight:700;color:var(--gold-2);padding:4px 2px}
 .mthumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;flex:none}.mth{position:relative;aspect-ratio:1;border-radius:13px;overflow:hidden;background:#22211e;border:1px solid var(--line);display:block;padding:0}
@@ -3376,7 +3383,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '511';
+const BUILD = '518';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -3779,7 +3786,7 @@ async function boot(){
     const mid = 데스크끼움.mid;
     if(S.who === 'tr' && mid && 데스크끼움.r && D.workouts.some(w => w.id === 데스크끼움.r)){ S.tmid = mid; S.subj = mid; S.rw = 데스크끼움.r; S.screen = 'report'; }      /* 데스크 「리포트 보기」 (C-4) */
     else if(S.who === 'tr' && mid && MEMBERS.some(m => m.id === mid)){ S.tmid = mid; S.subj = mid; S.screen = 't_member';
-      setTimeout(() => { if(liveOf(mid) && adoptLive(mid)) go('workout'); else { S.tmid = mid; 수업시작창(mid); } }, 0); }
+      setTimeout(() => { if(liveOf(mid) && adoptLive(mid)) go('workout'); }, 0); }      /* 시작 창은 안 띄운다 — 회원 화면에서 「수업 시작」 (2026-11-03 대표 노션 「데스크에서 기록하기 눌렀을 때 팝업 없어도 됨」) */
     else if(S.who === 'tr' && mid) setTimeout(() => toast('이 회원을 앱에서 열 수 없어요\n담당 범위를 확인해 주세요'), 0); }
   if(!histOn) histInit();
 }
@@ -4853,7 +4860,8 @@ async function RN저장(){
     D.routines.push(Object.assign({ id, mid:n.mid, no, n:n.name.trim(), purpose:n.purpose || '', grp:g0, items }, 루틴덧꼴()));
     await sv(spost('routines', [Object.assign({ id, member_id:n.mid, no, name:n.name.trim(), purpose:n.purpose || '', grp:g0 }, 루틴덧())])
       .then(() => spost('routine_items', items.map((it, i) => ({ routine_id:id, sort:i, variant_id:VID(it.ex, it.va), kg:it.kg, reps:it.reps, sets:it.sets, rest:it.rest })))), '루틴 만들기');
-    save(); S.rn = null; S.rnOwn = false; toast('저장했어요'); goBack();
+    if(n.지정 && !공){ D.today[n.mid] = { rid:id, kind:'개인운동', by:'트레이너' }; await sv(spost('assignments', [{ member_id:n.mid, on_date:TODAY, routine_id:id, kind:'개인운동', assigned_by:'트레이너' }], {on:'member_id,on_date'}), '지정 저장'); }      /* 직접 추가해서 지정 (2026-11-03) */
+    save(); S.rn = null; S.rnOwn = false; toast(n.지정 && !공 ? '오늘 개인운동으로 지정했어요' : '저장했어요'); goBack();
   }catch(e){ if(S.rn) S.rn.저장중 = false; console.error(e); toast('저장하지 못했어요'); }
 }
       /* 회원이 비어 있는 루틴 = 공통 루틴(틀) */
@@ -4997,8 +5005,8 @@ function 갈래받기(){
   앱crm('states', { 목록 }).then(j => { 갈래표 = j['사람'] || {}; render(); }).catch(e => { 갈래때 = Date.now() - 480000; console.warn('갈래 못 받음', e); });      /* 실패하면 2분 뒤 다시 */
 }
 const 사람그림 = '<svg class="pfi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4.5 20.5a7.5 7.5 0 0 1 15 0"/></svg>';      /* 트레이너 사진 없을 때 (2026-11-03 대표 「트레이너는 사진 없으면 사람 모습 · 회원은 PT · TG」) */
-function 갈래원(mid){ const m = MEMBERS.find(x => x.id === mid) || {}, x = m.p4 ? 갈래표[m.n + '|' + m.p4] : null, g = x && 갈래짧게[x['갈래']];
-  return g ? `<span class="mi gl gl-${g[1]}" title="${esc(x['갈래'])}">${g[0]}</span>` : `<span class="mi nm1 tx" title="${esc(m.n || '')}">회원</span>`; }      /* 사진 · 갈래 없으면 사람 그림 — 성 한 글자 ✕ (2026-11-03 대표) */
+function 갈래원(mid, 대신){ const m = MEMBERS.find(x => x.id === mid) || {}, x = m.p4 ? 갈래표[m.n + '|' + m.p4] : null, g = (x && 갈래짧게[x['갈래']]) || 대신;      /* 대신 = 예약 종목에서 (PT · TG · 체험) */
+  return g ? `<span class="mi gl gl-${g[1]}" title="${esc((x && x['갈래']) || g[0])}">${g[0]}</span>` : `<span class="mi nm1 tx" title="${esc(m.n || '')}">회원</span>`; }      /* 사진 · 갈래 없으면 사람 그림 — 성 한 글자 ✕ (2026-11-03 대표) */
 function render(){
   if(S.who === 'm') 피드백예약(S.mid);
   본인만();
@@ -5985,6 +5993,7 @@ function vStart(){
         <span class="dd">원하는 종목을 선택해 시작</span></button>`].filter(Boolean);
   return { top: bar('운동 시작', `<span class="sub">${dateTxt(TODAY)}</span>`, 'go:home'), body:`
     ${이번주판(S.mid)}
+    <button class="czgset" data-act="cardio"><span class="ic"><svg viewBox="0 0 24 24">${유선.달리기}</svg></span><b>유산소만 하기</b><small>런닝머신 · 사이클 · 천국의계단 · 야외</small><i>›</i></button>      <!-- 2026-11-03 대표 「유산소만 하기가 상단으로」 -->
     ${큰 === '지정' ? `<button class="hero2 tall ${사진있나('assigned')}" data-act="rt:${r.id}"
         style="${사진꾸밈('assigned','#1f4048','#0e1517')}">
       <span class="art c2"></span>
@@ -6007,8 +6016,7 @@ function vStart(){
           <div class="shc-go">${L.map((r, i) => `<button class="btn ${r.id === 오 ? 'main' : 'sub'} sm" data-act="startr:${r.id}"><b>루틴 ${i + 1} 시작${r.id === 오 ? ' · 오늘' : ''}</b><small>${esc(루틴이름줄(r))}</small></button>`).join('')}</div></div>`
           + (지난.length ? `<button class="rhidlnk" data-act="sheetold">지난 루틴표 ${지난.length} ›</button>` : ''); })(내루틴표(S.mid))}
     <span class="lbl">또는</span>
-    <div class="home2 st3">${칸들.map((h, i) => (칸들.length % 2 && i === 칸들.length - 1) ? h.replace('hero2 half', 'hero2 half wide2') : h).join('')}</div>
-    <button class="czgset" data-act="cardio"><span class="ic"><svg viewBox="0 0 24 24">${유선.달리기}</svg></span><b>유산소만 하기</b><small>런닝머신 · 사이클 · 천국의계단 · 야외</small><i>›</i></button>` };
+    <div class="home2 st3">${칸들.map((h, i) => (칸들.length % 2 && i === 칸들.length - 1) ? h.replace('hero2 half', 'hero2 half wide2') : h).join('')}</div>` };
 }
 
 /* ── 종목 고르기 ── 담기만 하고, 「운동 시작」을 눌러야 진행 화면으로 간다 */
@@ -6911,8 +6919,9 @@ const 붓줄다시 = () => document.querySelectorAll('.btools').forEach(e => { e
    강도: 런닝머신 · 마이마운틴 = 속도 + 경사(최대 20 · 50) / 사이클 · 천국의계단 = 속도(레벨) · 시간 · 강도는 − 숫자 + 카운터 */
 const 유넣기기구 = () => [...new Set(['tm', 'cyc', 'cd07'].map(exOf).concat([EX.find(x => x.cardio && /마이마운틴/.test(x.n))]).filter(e => e && e.cardio))];      /* 센터 기구 넷 — 런닝머신 · 사이클 · 천국의계단 · 마이마운틴 */
 const 팁of = wid => (D.ctips || []).filter(t => t.workout_id === wid);
+const 계단인가 = id => id === 'cd07' || /천국/.test((exOf(id) || {}).n || '');      /* 천국의계단 = 목표 걸음 (2026-11-03) */
 const 팁강도 = t => { const e = exOf(t.ex_id) || {}, 속 = 경사최대(t.ex_id) || /천국/.test(e.n || '') ? '속도' : '레벨';
-  return [t.speed != null && t.speed !== '' ? 속 + ' ' + kgfmt(+t.speed) : '', +t.incline ? '경사 ' + kgfmt(+t.incline) : ''].filter(Boolean).join(' · '); };
+  return [t.speed != null && t.speed !== '' ? 속 + ' ' + kgfmt(+t.speed) : '', +t.incline ? '경사 ' + kgfmt(+t.incline) : '', +t.steps ? '목표 ' + (+t.steps).toLocaleString() + '걸음' : ''].filter(Boolean).join(' · '); };
 const 팁글 = t => `${esc((exOf(t.ex_id) || {}).n || '유산소')} ${t.minutes}분${팁강도(t) ? ' · ' + esc(팁강도(t)) : ''}`;
 const 팁결과 = t => t.done_at ? `<span class="ctok">✓ 유산소 ${t.done_min || t.minutes}분 함</span>` : (t.on_date < TODAY ? '<span class="ctno">— 안 함</span>' : '<span class="ctno">아직 안 함</span>');
 function 팁줄들(wid){ const ts = 팁of(wid); if(!ts.length) return '';
@@ -6923,16 +6932,16 @@ function 유산소어디(ex, va){ const n = exName(ex, va);
     <button class="btn blue go" data-act="ctgive:${ex}">개인운동 주기 <small>회원 앱에 오늘 23:59까지 떠요</small></button>
     <button class="btn ghost go" data-act="add:${ex}:${va}:now">지금 하기</button>
     <button class="btn ghost sm" data-act="close">닫기</button>`); }
-function sheetCtip(){ const w = live(); if(!w) return;
+function sheetCtip(){ const w0 = live(), 지정만 = S.ct && S.ct.mid && (!w0 || S.ct.noLive), w = 지정만 ? { mid:S.ct.mid, id:null } : w0; if(!w) return;      /* 지정만 = 개인운동 지정 화면에서 (수업 없이) */
   const 다 = 유넣기기구(); if(S.ct && S.ct.ex && !다.some(e => e.id === S.ct.ex) && (exOf(S.ct.ex) || {}).cardio) 다.unshift(exOf(S.ct.ex));      /* 종목 추가에서 고른 유산소는 센터 넷 밖이어도 그대로 */ if(!S.ct || !다.some(e => e.id === S.ct.ex)) S.ct = { ex: (다[0] || {}).id, min: 20, spd: null, inc: 0 };
   openSheet(() => { const c = S.ct, e = exOf(c.ex) || {}, 경 = 경사최대(c.ex), 속이름 = 경 || /천국/.test(e.n || '') ? '속도' : '레벨';      /* 그릴 때마다 지금 기구로 다시 센다 */
     if(c.spd == null) c.spd = 경 ? 5.5 : 6;
     const 셈 = (k, 이름, 값, 단위) => `<div class="ctc"><span class="lb">${이름}</span><div class="ctn"><button data-act="ctd:${k}:-1" aria-label="${이름} 줄이기">−</button><b>${값}<small>${단위}</small></b><button data-act="ctd:${k}:1" aria-label="${이름} 늘리기">＋</button></div></div>`;
     return `<div class="h2">유산소 추가 <small>언제 할까요?</small></div>
     <span class="lbl">종류</span><div class="chips">${다.map(x => `<button class="chip ${x.id === c.ex ? 'on' : ''}" data-act="ctex:${x.id}">${esc(유이름(x))}</button>`).join('')}</div>
-    ${셈('min', '시간', c.min, '분')}${셈('spd', 속이름, kgfmt(c.spd), 경 ? 'km/h' : '')}${경 ? 셈('inc', '경사', kgfmt(c.inc), '') : ''}
+    ${셈('min', '시간', c.min, '분')}${셈('spd', 속이름, kgfmt(c.spd), 경 ? 'km/h' : '')}${경 ? 셈('inc', '경사', kgfmt(c.inc), '') : ''}${계단인가(c.ex) ? 셈('stp', '목표 걸음', c.stp ? (+c.stp).toLocaleString() : '안 정함', c.stp ? '걸음' : '') : ''}
     <button class="btn blue go" data-act="ctsave">개인운동 주기 <small>회원 앱에 오늘 23:59까지 떠요</small></button>
-    <button class="btn ghost go" data-act="add:${c.ex}:${(vars(c.ex)[0] || {}).k || 'a'}:now">지금 하기</button>
+    ${지정만 ? '' : `<button class="btn ghost go" data-act="add:${c.ex}:${(vars(c.ex)[0] || {}).k || 'a'}:now">지금 하기</button>`}
     <button class="btn ghost sm" data-act="close">닫기</button>`; }); }      /* 「＋ 유산소 추가」도 개인운동 / 수업 중을 고른다 (2026-11-01 대표) */
 function 팁카드(mid){ const 오늘 = 오늘날(), ts = (D.ctips || []).filter(t => t.member_id === mid && t.on_date === 오늘 && !t.done_at);      /* 넣은 날 23:59 까지 · 켜 둔 채 자정을 넘겨도 사라진다 (2026-11-01) */ if(!ts.length) return '';
   return ts.map(t => `<div class="ctcard"><div class="k">유산소가 들어왔어요${t.by ? ' · ' + esc(t.by) + ' 트레이너' : ''}</div><div class="v">${esc((exOf(t.ex_id) || {}).n || '유산소')} ${t.minutes}분</div>${팁강도(t) ? `<div class="s">${esc(팁강도(t))}</div>` : ''}<button class="btn blue go" data-act="ctipgo:${t.id}">바로 시작</button></div>`).join(''); }
@@ -7235,7 +7244,7 @@ function 유산소판(cur, e, mid){
     const 프 = c.prog && 유샘플.find(x => x.id === c.prog), 지 = 프 && 유샘플지금(프, 초);
     const 구간판 = !프 ? '' : 지 ? `<div class="cpnow" style="--c:${유구색(지.x[1])}"><div class="a"><b>지금 ${지.x[1]}구간 · ${esc(지.x[2])}</b><span id="cpleft">${mmss(지.남)} 남음</span></div><div class="b">${esc(지.x[3])} · 심박 ${심박구간(지.x[1], mid).join('~')}</div>${지.다음 ? `<div class="c">다음 · ${지.다음[1]}구간 ${esc(지.다음[2])} ${지.다음[0] < 1 ? 지.다음[0] * 60 + '초' : 지.다음[0] + '분'}</div>` : '<div class="c">마지막 구간이에요</div>'}</div>` : `<div class="cpnow done"><div class="a"><b>프로그램을 다 했어요</b></div></div>`;
     return `<div class="czbox">${구간판}<div class="czring"><svg viewBox="0 0 250 250"><circle class="bg" cx="125" cy="125" r="110"/><circle class="fg" id="czr" cx="125" cy="125" r="110" stroke-dasharray="${둘}" stroke-dashoffset="${둘 * (1 - 분)}"/></svg>
-        <div class="in"><div class="n">${esc(e.n)}</div><div class="t" id="czt">${mmss(초)}</div><div class="s" id="czs">${!c.on ? '잠시 멈춤' : !c.goal ? '진행 중' : 남 > 0 ? '목표 ' + c.goal + '분 · ' + Math.ceil(남/60) + '분 남음' : '목표 ' + c.goal + '분 달성'}</div></div></div>
+        <div class="in"><div class="n">${esc(e.n)}</div><div class="t" id="czt">${mmss(초)}</div><div class="s" id="czs">${!c.on ? '잠시 멈춤' : !c.goal ? '진행 중' : 남 > 0 ? '목표 ' + c.goal + '분 · ' + Math.ceil(남/60) + '분 남음' : '목표 ' + c.goal + '분 달성'}</div>${+c.stp ? `<div class="s czstp">목표 ${(+c.stp).toLocaleString()}걸음</div>` : ''}</div></div>
       <div class="czlive"><div class="off"><small>심박</small><b>워치 연결 시</b></div><div class="off"><small>거리</small><b>워치 연결 시</b></div><div><small>지난번</small><b>${지난 ? 지난.reps + '분' : '처음'}</b></div></div>
       <div class="cztwo"><button class="czbig ghost" data-act="cz:pause">${c.on ? '잠시 멈춤' : '다시 시작'}</button><button class="czbig stop" data-act="cz:stop">종료</button></div>
       <div class="czhint">화면을 꺼도 시간은 계속 흐릅니다</div></div>`; }
@@ -9195,8 +9204,10 @@ const 언제 = ts => { if(!ts) return ''; const d = new Date(ts), m = (Date.now(
 const 파트너경력 = ['6개월 미만','6개월~1년','1~3년','3~5년','5년 이상'];
 const 파트너부위 = ['가슴','등','어깨','팔','하체','복근','유산소','전신'];
 /* 랭킹 — 기간을 받아 센다. 달마다 다시 세면 그게 곧 월간 기록이다 */
+const 랭킹사람 = () => MEMBERS.filter(m => m.aT || m.id === S.mid);
 const 회원성별 = mid => ((D.intake||{})[mid]||{}).sex || '';
 function 랭킹계산(시작, 끝){
+  const MEMBERS = 랭킹사람();      /* 앱에 가입(약관 동의)한 회원끼리만 경쟁 (2026-11-03 대표 「커뮤니티 이제 가입한 사람들끼리만 · 올린 사람들끼리 경쟁」) */
   const 안 = d => d && d >= 시작 && d <= 끝;
   const row = (mid, v, t, ds) => ({ mid, v, t: t || '', ds: ds || null });      /* ds = 기록한 날짜들(오름차순) — 레벨에 닿은 날을 잰다 */
   const 끝날 = ds => ds.length ? ds.slice().sort()[ds.length-1] : '';
@@ -12590,29 +12601,17 @@ function tToday(){
     ${/* 2026-10-06 융합 — 큰 카드는 「오늘 수업 기록하기」 하나 · 숫자 셋(실제 수) · 나머지 둘은 반쪽 카드 */''}
     <button class="hero photo" data-act="pickmem">
       <span class="tag">수업</span>
-      <div class="ht">오늘 수업 기록하기</div>
-      <div class="hs">회원을 찾아 루틴을 선택해 바로 시작합니다</div>
-      <span class="hgo">회원 검색 ›</span></button>
+      <div class="ht">회원을 찾아 기록합니다</div>      <!-- 2026-11-03 대표 — 오늘 수업은 아래 예약 명단에서 · 이 카드는 회원을 찾아 자유롭게 -->
+      <span class="hgo">회원 검색</span></button>
     ${live.map(x=>`<button class="hline" data-act="tgo:${x.m.id}">${svg('h_clock',18)}<b>${esc(x.m.n)} · 기록 중</b>
         <small>${esc((it=>it?exName(it.ex,it.va):'')(x.w.items[x.w.cur]||x.w.items[0]))}</small><i>›</i></button>`).join('')}
-    ${(()=>{ const 식 = (D.meals||[]).filter(m=>m.date===TODAY), 안단 = 식.filter(m=>!m.note).length;
-      return `<div class="tmsum btn3">
-      <button class="t ${live.length?'':'zero'}" ${live.length ? `data-act="${live.length===1 ? 'tgo:'+live[0].m.id : 'tdlive'}"` : 'disabled'}><small>기록 중인 수업</small><b>${live.length}<i>명</i></b></button>
-      <button class="${todo.length?'':'zero'}" ${todo.length ? 'data-act="tdtodo"' : 'disabled'}><small>피드백 대기</small><b>${todo.length}<i>건</i></b></button>
-      <button class="${식.length?'':'zero'}" ${식.length ? 'data-act="tdmeal"' : 'disabled'}><small>오늘 식단</small><b>${식.length}<i>장</i>${안단 ? `<em class="td안">안 단 것 ${안단}</em>` : ''}</b></button>
-    </div>`; })()}
-    <div class="hrow">
-      <button class="hcard teal" data-act="pickasg">${홈머리('h_cal','루틴 지정하기')}
-        <span class="hs">회원이 오늘 할 루틴을<br>미리 정해 둡니다</span></button>
-      <button class="hcard gold2" data-act="rmpickmem">${홈머리('h_crown','1RM 측정하기')}
-        <span class="hs">워밍업부터 무게 · 횟수 ·<br>쉬는 시간 자동</span></button>
-    </div>
+    ${''/* 2026-11-03 대표 노션 오후4시 「오늘 수업 기록하기 바로 아래 예약 명단만 · 그 아래 개인운동 지정한 회원 · 첫 화면은 단순하게」 — 숫자 칸 · 루틴 지정 · 1RM(→ 회원 화면) 카드 걷음 */}
     ${(()=>{ /* 2026-10-26 대표 a2 — 「피드백 기다리는 회원」은 목록 대신 단추 하나(→ 피드백 탭) · 「오늘 수업 예약」(내 수업만 · 시간 순)과 「오늘 루틴을 지정한 회원」은 접칸(접기 기억) */
       setTimeout(예약받기, 0);
       const 지정 = MEMBERS.filter(m => D.today[m.id]), 기다 = new Set(todo.map(w => w.mid).filter(id => MEMBERS.some(x => x.id === id))).size, 예 = 오늘예약줄();
-      return `<button class="tdfb${기다 ? '' : ' zero'}" data-act="tfm2:ex"><span class="gi">피</span><span><b>피드백 기다리는 회원</b><small>${기다 ? '이번 주 운동 · 눌러서 피드백 탭으로' : '이번 주 밀린 피드백이 없습니다'}</small></span><span class="n">${기다}<i>명</i> ›</span></button>`
+      return ''
         + 접칸('tdbk', 'now', '오늘 수업 예약', `${dateTxt(TODAY)} · 내 수업`, 예.length, 오늘예약줄들(예), 오늘기록전().length)
-        + (지정.length ? 접칸('tdasg', 'ask', '오늘 루틴을 지정한 회원', '', 지정.length, 지정.map(m => { const t = D.today[m.id], r = t && t.rid ? rOf(t.rid) : null;
+        + (지정.length ? 접칸('tdasg', 'ask', '오늘 개인운동 지정한 회원', '', 지정.length, 지정.map(m => { const t = D.today[m.id], r = t && t.rid ? rOf(t.rid) : null;
             return `<button class="mrow2" data-act="tgo:${m.id}">${갈래원(m.id)}<span class="mt"><b>${esc(m.n)}</b><small>${esc([t && t.kind, r && r.n].filter(Boolean).join(' · ') || '루틴 지정됨')}</small></span><i>›</i></button>`; }).join(''), 지정.length) : ''); })()}
 ` };
 }
@@ -12650,19 +12649,39 @@ function sheetTdMeal(){
 const 칸접힘 = (() => { try{ return JSON.parse(localStorage.getItem('gg_fsec') || '{}'); }catch(e){ return {}; } })();
 /* 구분 머리 꾸밈 — 그려지는 .lbl 마다 첫 글자 · 색을 단다(글자는 안 바꿈 · 모양만) · 한 곳에서 (2026-10-26 「5번」) */
 const 구분색들 = ['#40C1BD', '#CC8552', '#A8A2E1', '#B0E299'];
+const 네모길 = {
+  청소:'M12 3l1.8 4.2L18 9l-4.2 1.8L12 15l-1.8-4.2L6 9l4.2-1.8zM18 15l.8 1.7 1.7.8-1.7.8L18 20l-.8-1.7-1.7-.8 1.7-.8z',
+  상자:'M3 7l9-4 9 4-9 4-9-4zM3 7v10l9 4 9-4V7M12 11v10', 말:'M4 5h16v11H9l-5 4z', 전화:'M6 3h4l2 5-2.5 1.5a11 11 0 0 0 5 5L16 12l5 2v4a2 2 0 0 1-2 2A17 17 0 0 1 4 5a2 2 0 0 1 2-2z',
+  돌기:'M20 11a8 8 0 0 0-14.5-4.5M4 3v4h4M4 13a8 8 0 0 0 14.5 4.5M20 21v-4h-4', 덤벨:'M6 7v10M3 10v4M18 7v10M21 10v4M6 12h12',
+  사람:'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0', 별:'M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z',
+  휴지통:'M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6', 보냄:'M21 3L3 10l7 3 3 7zM10 13l11-10', 경고:'M12 3l10 18H2zM12 10v4M12 17v.5',
+  그림:'M4 5h16v14H4zM4 15l5-5 4 4 3-3 4 4M15 9h.01', 돈:'M12 3v18M7 7h7a3 3 0 0 1 0 6H8a3 3 0 0 0 0 6h9', 문서:'M7 3h7l5 5v13H7zM14 3v5h5M10 13h6M10 17h6',
+  공지:'M4 10v4h3l6 4V6L7 10zM17 9a4 4 0 0 1 0 6', 할일:'M9 6h11M9 12h11M9 18h11M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2',
+  시계:'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 7v5l3 2', 달력:'M4 5h16v15H4zM4 10h16M8 3v4M16 3v4', 점검:'M8 4h8v3H8zM6 5H5v16h14V5h-1M9 13l2 2 4-4',
+  몸:'M3 12h4l3-7 4 14 3-7h4', 식단:'M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10M17 3c-2 0-3 3-3 6s1 3 3 3v9', 자물쇠:'M6 11h12v10H6zM8 11V7a4 4 0 0 1 8 0v4',
+  진행:'M7 4l13 8-13 8z', 더하기:'M12 5v14M5 12h14', 완료:'M4 12l5 5L20 6', 점:'M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0-6 0' };
+const 네모표 = [[/보내는 때|몇 시|시간대/, '시계'], [/당직|공휴일|휴무/, '달력'], [/구역/, '청소'], [/고객|성별/, '사람'], [/^최근/, '시계'], [/직접 추가|새로 추가/, '더하기'], [/입력한|후보/, '할일'], [/청소/, '청소'], [/비품|구매/, '상자'], [/VOC|소리|건의/, '말'], [/휴지통|삭제|사라짐/, '휴지통'], [/못 ?보냄|실패|못 받|오류/, '경고'],
+  [/재등록|만료|컴백/, '돌기'], [/상담|연락|부름/, '전화'], [/피드백|대화|요청|댓글/, '말'], [/즐겨찾기|★/, '별'], [/발송|보냄|보내/, '보냄'],
+  [/자료|초상권|사진|홍보|준비 완료/, '그림'], [/매출|결제|PT 매출|돈/, '돈'], [/리포트|보고/, '문서'], [/공지|필독|숙지|매뉴얼|강의/, '공지'], [/업무|할 일|일정/, '할일'],
+  [/점검|확인|돌아보기/, '점검'], [/인바디|체형|몸|체중/, '몸'], [/식단|칼로리/, '식단'], [/락커/, '자물쇠'], [/이번 주|주간|달력|연차|휴가/, '달력'],
+  [/대기|나중|기다|보내는 때|시간|일 뒤|일 안|예약/, '시계'], [/루틴|운동|수업|준비운동|스트레칭|TG|체험|가이드|종목/, '덤벨'], [/회원|담당|선생님|트레이너|분$|사람/, '사람'],
+  [/진행/, '진행'], [/완료|종료|끝/, '완료'], [/전체/, '할일']];
+const 네모주소들 = {};      /* 데스크와 같은 아이콘 표 (2026-11-03) — 색 네모에 첫 글자 대신 그 칸 이름에 맞는 그림 */
+const 네모열쇠 = 이름 => { const 찾 = 네모표.find(([r]) => r.test(String(이름 || ''))); return 찾 ? 찾[1] : '점'; };
+const 네모주소 = 이름 => { const k = 네모열쇠(이름); return 네모주소들[k] || (네모주소들[k] = 'url("data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#121211" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="' + 네모길[k] + '"/></svg>') + '")'); };
 function 구분꾸밈(){ document.querySelectorAll('.lbl:not(.plain):not([data-gi])').forEach(h => {
   const t = (h.textContent || '').replace(/[^0-9A-Za-z가-힣]/g, ''); if(!t) return;
   const 형 = h.parentElement ? [...h.parentElement.children].filter(x => x.classList.contains('lbl') && !x.classList.contains('plain')) : [h];
-  h.dataset.gi = t.slice(0, 1); h.style.setProperty('--gc', 구분색들[Math.max(0, 형.indexOf(h)) % 구분색들.length]); }); }
+  h.dataset.gi = 네모열쇠(h.textContent); h.style.setProperty('--ic', 네모주소(h.textContent)); h.style.setProperty('--gc', 구분색들[Math.max(0, 형.indexOf(h)) % 구분색들.length]); }); }
 let 구분꾸밈예약 = 0;
 new MutationObserver(() => { if(구분꾸밈예약) return; 구분꾸밈예약 = requestAnimationFrame(() => { 구분꾸밈예약 = 0; 구분꾸밈(); }); }).observe(document.documentElement, { childList:true, subtree:true });
 function 접칸(k, 꼴, 제목, 부제, n, 속, 불){
   const 접 = 칸접힘[k] === true, 산 = (불 === undefined ? n : 불) > 0;
-  return `<div class="fsec ${꼴}${꼴 === 'day' ? '' : 산 ? ' live' : ' zero'}${접 ? ' shut' : ''}" data-k="${k}"><button class="fh" data-act="fsec:${k}">${산 && 꼴 !== 'day' ? '<span class="pd"></span>' : ''}<span class="gi">${esc(String(제목).replace(/^[^가-힣A-Za-z]+/, '').slice(0, 1))}</span><span class="ft"><b>${제목}</b>${부제 ? `<small>${부제}</small>` : ''}</span><span class="fc">${n}</span><i>⌄</i></button><div class="fb">${속}</div></div>`; }
+  return `<div class="fsec ${꼴}${꼴 === 'day' ? '' : 산 ? ' live' : ' zero'}${접 ? ' shut' : ''}" data-k="${k}"><button class="fh" data-act="fsec:${k}">${산 && 꼴 !== 'day' ? '<span class="pd"></span>' : ''}<span class="gi" aria-hidden="true" style="--ic:${esc(네모주소(String(제목)))}"></span><span class="ft"><b>${제목}</b>${부제 ? `<small>${부제}</small>` : ''}</span><span class="fc">${n}</span><i>⌄</i></button><div class="fb">${속}</div></div>`; }
 /* 프로필 원 — 회원이 넣은 사진 + PT · TG · 체험 딱지 · 사진이 없으면 갈래 원 */
-function 얼굴갈래(mid){
+function 얼굴갈래(mid, 대신){
   const a = profOf(mid).avatar, m = MEMBERS.find(x => x.id === mid) || {}, x = m.p4 ? 갈래표[m.n + '|' + m.p4] : null, g = x && 갈래짧게[x['갈래']];
-  if(!a) return 갈래원(mid);
+  if(!a) return 갈래원(mid, 대신);
   return `<span class="av2"><img src="${esc(phURL(a))}" alt="" onerror="picFail(this)">${g ? `<em class="gb ${g[1]}">${g[0]}</em>` : ''}</span>`; }
 /* 오늘 예약 수업 — 데스크와 같은 서버 자료(/app/crm/booking 「오늘예약」 · 트레이너 토큰은 본인 것만) · 10분마다 · 무료 그룹수업은 뺀다 */
 const 예약 = { 줄:null, 중:false, 때:0, 말:'' };
@@ -12676,7 +12695,8 @@ const 오늘기록함 = m => !!m && D.workouts.some(w => w.mid === m.id && w.dat
 function 오늘기록전(){ return 오늘예약줄().filter(o => o.x['상태'] !== '노쇼' && !오늘기록함(o.m)); }
 const 예약종류 = x => ({ PT:'PT', 서비스:'서비스', 가이드:'운동가이드', 체험:'체험', 기타:'수업' }[x['종목']] || x['종목'] || '수업');
 function 오늘예약줄들(예){ return 예.length ? 예.map(o => { const 됨 = 오늘기록함(o.m), 노 = o.x['상태'] === '노쇼';
-    return `<button class="mrow2" ${o.m ? `data-act="tm:${o.m.id}"` : ''}>${o.m ? 얼굴갈래(o.m.id) : `<span class="mi nm1 tx">회원</span>`}<span class="mt"><b>${esc(o.x.name || '')} 회원</b><small>${esc(o.x['시각'] || '')} · ${예약종류(o.x)}${o.m ? '' : ' · 앱 미가입'}</small></span><span class="stp ${노 ? 'ns' : 됨 ? 'ok' : 'no'}">${노 ? '노쇼' : 됨 ? '기록함' : '기록 전'}</span></button>`; }).join('')
+    const 갈 = { PT:['PT','pt'], 서비스:['PT','pt'], 가이드:['TG','tg'], 체험:['체험','ex'] }[o.x['종목']];      /* 회원 갈래를 모르면 예약 종목으로 (2026-11-03) */
+    return `<button class="mrow2" ${o.m ? `data-act="tm:${o.m.id}"` : ''}>${o.m ? 얼굴갈래(o.m.id, 갈) : 갈 ? `<span class="mi gl gl-${갈[1]}">${갈[0]}</span>` : `<span class="mi nm1 tx">회원</span>`}<span class="mt"><b>${esc(o.x.name || '')} 회원</b><small>${esc(o.x['시각'] || '')} · ${예약종류(o.x)}${o.m ? '' : ' · 앱 미가입'}</small></span><span class="stp ${노 ? 'ns' : 됨 ? 'ok' : 'no'}">${노 ? '노쇼' : 됨 ? '기록함' : '수업하기'}</span></button>`; }).join('')
   : `<div class="fe">${예약.줄 === null ? '불러오는 중이에요' : 예약.말 ? '오늘 예약을 불러오지 못했어요 · 잠시 뒤 다시 열어 주세요' : '오늘 예약된 수업이 없습니다'}</div>`; }
 function tFeed(){
   const nm = id => (MEMBERS.find(x=>x.id===id)||{}).n || '?';
@@ -12825,10 +12845,10 @@ function tMember(){
           <i><b>${이번주}${목 ? `<u>/${목}</u>` : ''}</b><small>이번 주</small></i></span>
         <div class="tmb">${lv
           ? `<button class="g" data-act="tgo:${m.id}">이어서 기록하기</button><button class="t" data-act="tlive:${m.id}">종목별 피드백</button>`
-          : `<button class="g" data-act="tstartask:${m.id}">수업 시작</button><button class="t" data-act="go:t_routines">${r ? 지정이름(t.kind) + ' ✓' : '개인운동 지정'}</button>`}</div>
-        <div class="tmf">${lv ? `지금 운동 중 · ${esc(lv.title||'')}` : (r ? `${지정이름(t.kind)} · 루틴 ${r.no} ${esc(r.n)}` : '지정한 개인운동이 아직 없어요')}</div>
+          : `<button class="g" data-act="tstartask:${m.id}">수업 시작</button><button class="t" data-act="go:t_routines">개인운동 지정${r ? ' ✓' : ''}</button><button class="r" data-act="rmstart:${m.id}">1RM 측정</button>`}</div>
+        <div class="tmf">${lv ? `지금 운동 중 · ${esc(lv.title||'')}` : (r ? `개인운동 지정 · 루틴 ${r.no} ${esc(r.n)}` : '지정한 개인운동이 아직 없어요')}</div>
       </div>`; })()}
-    ${지난수업판(m, ws)}
+    ${지난기록카드(m, ws)}
 
     ${(()=>{ /* 체중 추이 — 인바디 기록이 둘 이상일 때만 곡선 */
       const { logs, ds } = 체중점들(((D.blog||{})[m.id]||[]).map(x => ({ w: x.w, d: x.date })));      /* 최근 3개월 · 20개 · 날짜 · 목표 없음 (2026-11-02 대표) */
@@ -12849,20 +12869,18 @@ function tMember(){
         .map(x=>`<button class="mrow2" data-act="${x[3]}"><span class="mi">${svg(x[0],19)}</span>
           <span class="mt"><b>${x[1]}</b><small>${x[2]}</small></span>${x[4]?`<em class="nb w">${x[4]}</em>`:''}<i>›</i></button>`).join(''); })()}</div>` : ''}
     <button class="btn sub tmrt" data-act="rtpick:${m.id}">루틴표 지정하기</button>      <!-- 웨이트 / 스트레칭 고르는 창 (2026-11-03 대표) -->
-    <div class="hr"></div><span class="lbl">운동 기록 <small>최근 ${Math.min(ws.length,5)}회${ws.length>5?` · 전체 ${ws.length}회`:''}</small></span>
-    ${ws.slice(0,5).map(기록줄).join('') || '<div class="empty">아직 운동 기록이 없습니다<small class="e2">수업을 기록하면 여기에 나옵니다</small></div>'}
     ${(n => `<button class="card rowc" data-act="tfbchat:${m.id}"><div><div class="nm">피드백 대화</div><div class="sm">${n ? n + '개 · 카톡처럼 날짜 순서로' : '아직 나눈 피드백이 없어요'}</div></div><span class="rt">›</span></button>`)(대화줄들(m.id).length)}
-    ${ws.length>5 ? `<button class="card rowc teal" data-act="twall:${m.id}"><div><div class="nm t">지난 운동 기록 모두 보기</div>
-      <div class="sm">전체 ${ws.length}회 · 수업 / 개인운동으로 선택해 보기</div></div><span class="rt">›</span></button>` : ''}` };
+` };      /* 「모두 보기」 창 대신 지난 기록 「더 보기」 (2026-11-03) */
 }
-/* 수업 시작 아래 「지난 수업 기록」 — 색칠한 그림(안 칠했으면 종목으로 자동) + 종목 · 무게 × 횟수 표 (2026-11-03 대표 「이번에 바꾼 색칠한 그림과 루틴표를 직관적으로」) */
-function 지난수업판(m, ws){ const w = ws.find(x => 세트있나(x));
-  if(!w) return `<div class="tmlast none"><small>지난 수업 기록</small><span>아직 기록이 없어요 · 수업을 기록하면 여기에 나와요</span></div>`;
-  const its = w.items.filter(it => it.sets.length && !isMemo(it.ex) && !(exOf(it.ex) || {}).cardio);
+/* 수업 시작 아래 「지난 기록」 — 수업 · 개인운동 최근 5개 · 카드마다 왼쪽 자극 부위 그림 · 오른쪽 종목 · 무게 × 횟수 · 「더 보기」로 5개씩 (2026-11-03 16:35 대표 「그림이랑 우측에 종목 · 무게 · 횟수 · 최근 5개 · 더 보기」) */
+function 지난기록카드(m, ws){ const 다 = ws.filter(x => 세트있나(x)), n = S.tmN && S.tmN.mid === m.id ? S.tmN.n : 5, 보 = 다.slice(0, n);
+  if(!다.length) return `<div class="tmlast none"><small>지난 기록</small><span>아직 기록이 없어요 · 수업을 기록하면 여기에 나와요</span></div>`;
   const 세트 = s => (s.kg ? kgfmt(s.kg) + 'kg × ' : '') + (s.reps || 0);
-  return `<div class="tmlast" data-act="tw:${w.id}"><div class="tlh"><small>지난 수업 기록</small><b>${dateTxt(w.date)} · ${esc(w.kind || '')}${w.title ? ' · ' + esc(w.title) : ''}</b><i>›</i></div>
-    ${오늘부위판(w, false).replace('>오늘 자극 부위', '>자극 부위')}
-    <div class="tlt">${its.map(it => `<div class="tlr"><b>${esc(exName(it.ex, it.va))}</b><span>${it.sets.map((s, k) => `<i><u>${k + 1}</u>${세트(s)}</i>`).join('')}</span></div>`).join('') || '<div class="sub">무게 기록이 없는 수업이에요</div>'}</div></div>`; }
+  const 카드 = w => { const its = w.items.filter(it => it.sets.length && !isMemo(it.ex)), 근 = its.filter(it => !(exOf(it.ex) || {}).cardio), 유 = its.filter(it => (exOf(it.ex) || {}).cardio);
+    return `<div class="tmrc" data-act="tw:${w.id}"><div class="tlh"><b>${dateTxt(w.date)}</b><span class="k">${esc(w.kind || '')}</span>${w.title ? `<small>${esc(w.title)}</small>` : ''}<i>›</i></div>
+      <div class="tmrb"><div class="tmfig">${오늘부위판(w, false)}</div><div class="tlt">${근.map(it => `<div class="tlr"><b>${esc(exName(it.ex, it.va))}</b><span class="sg">${it.sets.map((s, k) => `<i><u>${k + 1}</u><em>${s.kg ? kgfmt(s.kg) + 'kg' : '–'}</em><small>${s.reps || 0}회</small></i>`).join('')}</span></div>`).join('')}${유.map(it => `<div class="tlr"><b>${esc(exName(it.ex, it.va))}</b><span><i>유산소</i></span></div>`).join('')}</div></div></div>`; };
+  return `<span class="lbl">지난 기록 <small>수업 · 개인운동 ${다.length}회</small></span><div class="tmrs">${보.map(카드).join('')}</div>`
+    + (다.length > 보.length ? `<button class="btn ghost tmmore" data-act="tmmore:${m.id}">더 보기 · ${다.length - 보.length}회 남음</button>` : ''); }
 /* 트레이너 회원 화면의 기록 한 줄 — 화면·전체 보기 창이 같이 쓴다 */
 const 기록줄 = w => 펼줄(w, `<button class="btn sub sm" data-act="tw:${w.id}">피드백 ›</button>`);      /* 펼치면 기록했던 화면 그대로 (2026-10-26 a3) */
 /* 지난 운동 기록 모두 — 화면에 끝없이 늘어놓지 않고 창 안에서 스크롤 (2026-10-05 대표) */
@@ -12930,10 +12948,10 @@ function tRoutines(){
       ${loose&&gs.length?`<button class="chip ${sel==='그룹 없음'?'on':''}" data-act="rgrp:그룹 없음">그룹 없음 ${loose}</button>`:''}
       <button class="chip t" data-act="grpman">＋ 그룹</button>
     </div>
-    ${rs.map(r=>`<button class="card rowc ${t&&t.rid===r.id?'gold':'plan'}" data-act="re:${r.id}">
-      <div><div class="nm ${t&&t.rid===r.id?'g':''}">루틴 ${r.no} · ${esc(r.n)}</div>
-      <div class="sm">${r.grp?`<span style="color:var(--gold-2)">${esc(r.grp)}</span> · `:''}${esc(r.purpose)}<br>${r.items.length}종목 · 예상 ${estMin(r)}분${넣은이표(r) ? ' · ' + 넣은이표(r) : ''}</div></div>
-      ${t&&t.rid===r.id?`<span class="pill">오늘 ${esc(t.kind)}</span>`: r.hid ? '<span class="pill q">회원이 숨김</span>' : '<span class="rt">›</span>'}</button>`).join('')
+    <div class="asgtop"><button class="btn sub" data-act="asgcardio:${mid}">유산소만 지정</button><button class="btn sub" data-act="asgdirect:${mid}">직접 추가해서 지정</button></div>      <!-- 2026-11-03 대표 -->
+    ${rs.map(r=>`<div class="rsrow ${t&&t.rid===r.id?'on':''}" data-act="re:${r.id}">
+      <div class="rsh"><b>루틴 ${r.no}</b><span class="nm">${esc(r.n)}</span>${r.purpose ? `<small>${esc(r.purpose)}</small>` : ''}<span class="sp"></span>${t&&t.rid===r.id?`<span class="pill">오늘 ${esc(지정이름(t.kind))}</span>`: r.hid ? '<span class="pill q">회원이 숨김</span>' : `<small>${r.items.length}종목 · ${estMin(r)}분</small>`}</div>
+      <div class="rsg">${r.items.map(it => { const e = exOf(it.ex); return `<span class="rst">${종목그림(e)}<i>${esc(exName(it.ex, it.va))}</i></span>`; }).join('') || '<span class="sub">종목이 없어요</span>'}</div></div>`).join('')
       || '<div class="empty">이 그룹에는 루틴이 없습니다<small class="e2">「＋ 새 루틴 만들기」를 눌러 주세요</small></div>'}
     <div style="display:flex;gap:9px">
       <button class="btn main sm" data-act="rblank">＋ 새 루틴 만들기</button>
@@ -14789,21 +14807,24 @@ document.addEventListener('click', async ev=>{
     case 'ctipnew': S.ct = null; sheetCtip(); return;
     case 'plcardio': { const lw = live(); if(lw && lw.kind === '수업' && S.who === 'tr' && D.ctips){ S.ct = null; sheetCtip(); } else { S.pickPart = '유산소'; go('pick'); } return; }      /* 유산소 추가는 이 단추 하나 (2026-11-01 대표) */
     case 'ctgive': closeSheet(); S.ct = { ex: rest[0], min: 20, spd: null, inc: 0 }; setTimeout(sheetCtip, 0); return;      /* 종목 추가 → 개인운동으로 주기 (2026-10-30) */      /* 유산소 넣어주기 (2026-10-24) */
-    case 'ctex': S.ct.ex = rest[0]; S.ct.spd = null; S.ct.inc = 0; drawSheet(); return;
+    case 'ctex': S.ct.ex = rest[0]; S.ct.spd = null; S.ct.inc = 0; S.ct.stp = 0; drawSheet(); return;
     case 'ctd': { const c = S.ct, k = rest[0], d = +rest[1], 경 = 경사최대(c.ex);
       if(k === 'min') c.min = Math.max(5, Math.min(120, c.min + d * 5));
       else if(k === 'spd') c.spd = Math.max(1, Math.min(경 ? 20 : 25,      /* 천국의계단 · 사이클 레벨 25단계까지 (2026-10-25 대표 확인) */ Math.round((c.spd + d * (경 ? 0.5 : 1)) * 10) / 10));
       else if(k === 'inc') c.inc = Math.max(0, Math.min(경, c.inc + d));
+      else if(k === 'stp') c.stp = Math.max(0, Math.min(5000, (c.stp || 0) + d * 100));      /* 천국의계단 목표 걸음 · 100씩 · 0 = 안 정함 */
       drawSheet(); return; }
-    case 'ctsave': { const w = live(), c = S.ct; if(!w || !c) return;
+    case 'ctsave': { const c = S.ct, w0 = live(), w = c && c.mid && (!w0 || c.noLive) ? { mid:c.mid, id:null } : w0; if(!w || !c) return;      /* 수업 없이 지정만 — workout_id 없음 */
       const 줄 = { id: 'ct' + Date.now(), member_id: w.mid, workout_id: w.id, ex_id: c.ex, minutes: c.min, speed: c.spd, incline: 경사최대(c.ex) ? c.inc : null, on_date: TODAY, by: TRAINER };
+      if(계단인가(c.ex) && c.stp) 줄.steps = c.stp;
       try{ await spost('cardio_tips', [줄]); (D.ctips = D.ctips || []).unshift(줄); closeSheet(); toast('유산소를 추가했어요\n회원 앱에 오늘 23:59까지 떠요'); render(); }
-      catch(e){ toast('추가하지 못했어요\n' + 오류말(e)); } return; }
+      catch(e){ if(줄.steps && /steps|PGRST204|400/.test(String(e && e.message))){ toast('목표 걸음은 서버 준비(120단계)가 아직이에요\n걸음 수 없이 넣지 않았어요'); return; }      /* 칸이 없으면 말없이 빼지 않는다 */
+        toast('추가하지 못했어요\n' + 오류말(e)); } return; }
     case 'ctipdel': { const t = (D.ctips || []).find(x => x.id === rest[0]); if(!t) return; if(!await 묻기('추가한 유산소를 삭제할까요?')) return;
       try{ await sdel('cardio_tips', 'id=eq.' + encodeURIComponent(t.id)); D.ctips = D.ctips.filter(x => x !== t); render(); }catch(e){ toast('삭제하지 못했어요'); } return; }
     case 'ctipgo': { const t = (D.ctips || []).find(x => x.id === rest[0]), e = t && exOf(t.ex_id); if(!e) return; if(live()){ toast('진행 중인 운동이 있어요'); return; }
       const v = (e.vars||[])[0], it = { ex:e.id, va:(v&&v.k)||'a', rest:0, locked:false, sec:0, startAt:Date.now(), sets:[], ctip:t.id };
-      const c = 유처음(it, e, S.mid); c.goal = t.minutes; c.ph = 'go'; c.on = Date.now(); if(t.speed != null) c.spd = +t.speed; if(t.incline != null) c.inc = +t.incline;      /* 넣어 준 값 그대로 */
+      const c = 유처음(it, e, S.mid); c.goal = t.minutes; c.ph = 'go'; c.on = Date.now(); if(t.speed != null) c.spd = +t.speed; if(t.incline != null) c.inc = +t.incline; if(+t.steps) c.stp = +t.steps;      /* 넣어 준 값 그대로 · 천국의계단 목표 걸음 */
       S.subj = S.mid; await newLive(유이름(e), [it], '개인운동', null, S.mid); return; }
     case 'cpick': S.cpick = rest[0]; drawSheet(); return;
     case 'ctab': S.ctab = rest[0]; drawSheet(); return;      /* 유산소 — 직접 / 샘플 프로그램 (2026-10-20) */
@@ -15136,8 +15157,11 @@ document.addEventListener('click', async ev=>{
     case 'twf': S.twf=rest[1]; sheetTWAll(rest[0]); return;
     case 'rm': S.tmid=rest[0]; S.rgrp='전체'; closeSheet(); go('t_routines'); return;
     case 're': S.redit=rest[0]; go('t_redit'); return;
+    case 'asgcardio': { const w = live(); S.ct = { ex:'tm', min:20, spd:null, inc:0, mid:rest[0] }; if(w && w.mid !== rest[0]) S.ct.noLive = true; sheetCtip(); return; }      /* 유산소만 지정 (2026-11-03) */
+    case 'asgdirect': RN시작(false); if(S.rn){ S.rn.지정 = true; if(!S.rn.name) S.rn.name = dateTxt(TODAY) + ' 개인운동'; } render(); return;      /* 직접 추가해서 지정 — 저장하면 오늘 개인운동 */
     case 'raddpick': S.rcart = []; S.rsendTm = null; sheetRAdd(); return;
-    case 'tmfold': S.tmOpen = !S.tmOpen; render(); return;      /* 회원 자료 접기 · 펼치기 (2026-11-03) */
+    case 'tmfold': S.tmOpen = !S.tmOpen; render(); return;
+    case 'tmmore': S.tmN = { mid:rest[0], n:((S.tmN && S.tmN.mid === rest[0]) ? S.tmN.n : 5) + 5 }; render(); return;      /* 지난 기록 5개씩 더 (2026-11-03) */      /* 회원 자료 접기 · 펼치기 (2026-11-03) */
     case 'rtpick': openSheet(() => `<div class="h2">어떤 루틴표를 보낼까요? <small>${esc((MEMBERS.find(x => x.id === rest[0]) || {}).n || '')} 회원에게</small></div>
       <div class="rtpk"><button class="btn main" data-act="rtsend:${rest[0]}"><b>웨이트 루틴</b><small>지난 기록으로 채워요</small></button><button class="btn sub" data-act="psets:${rest[0]}"><b>스트레칭 루틴</b><small>내 루틴에서 골라요</small></button></div>
       <button class="btn ghost sm" data-act="close">닫기</button>`); return;      /* 루틴표 지정하기 → 웨이트 / 스트레칭 (2026-11-03 대표) */
