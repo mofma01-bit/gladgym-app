@@ -3444,7 +3444,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '539';
+const BUILD = '540';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -5040,7 +5040,16 @@ async function 피드백보내기(mid, ex, va, tx, 파일, wid){ const K = ex + 
 function 몰아검색글(j, q){ q = String(q || '').trim().toLowerCase(); if(!q) return '';
   const 맞 = EX.filter(e => !e.memo && (String(e.n || '') + ' ' + (e.aliases || []).join(' ')).toLowerCase().includes(q)).slice(0, 8);
   return 맞.length ? 맞.map(e => `<button data-act="bkk:${j}:${esc(e.id)}|">${esc(e.n)}</button>`).join('') : '<small>찾는 종목이 없습니다 · 다른 이름으로 검색해 주세요</small>'; }
-document.addEventListener('input', ev => { const f = ev.target.closest && ev.target.closest('[data-bkq]'); if(!f || !S.bulk) return; const j = +f.dataset.bkq, r = S.bulk.rows[j]; if(!r) return; r.q = f.value; const el = document.getElementById('bksr' + j); if(el) el.innerHTML = 몰아검색글(j, f.value); });
+/* 종목 이름은 직접 쓴다 — 검색이 아니라 임의로 쓰고 나중에 붙인다 (2026-11-04 21:20 대표) · 이미 있는 이름과 같으면 그 종목 · 없으면 「내가 추가한 종목」(부위 기타)으로 만들어 붙임 → 데스크 「추가한 종목」에서 정식 종목에 붙임 */
+const 이름같음 = (a, b) => String(a || '').replace(/\s+/g, '').toLowerCase() === String(b || '').replace(/\s+/g, '').toLowerCase();
+async function 몰아종목만듦(이름){ const 있 = EX.find(e => !e.memo && 이름같음(e.n, 이름)); if(있) return 있.id + '|' + (((있.vars || [])[0] || {}).k || '');
+  const id = 'x' + Date.now() + Math.floor(Math.random() * 1000);
+  EX.push({ id, n:이름, p:'기타', e:'', cardio:0, owner:TRAINER, media:[], vars:[{ k:'a', n:'', desc:'', demo:0, du:'' }] });
+  await sv(spost('exercises', [{ id, name:이름, part:'기타', equip:'', cardio:false, sort:9000, owner:TRAINER, media:[] }], {on:'id'}), '종목 저장');
+  await sv(spost('variants', [{ id:VID(id, 'a'), ex_id:id, vkey:'a', name:'', descr:'', demo:false, sort:0 }], {on:'id'}), '종목 저장');
+  return id + '|a'; }
+document.addEventListener('input', ev => { const f = ev.target.closest && ev.target.closest('[data-bkq]'); if(!f || !S.bulk) return; const j = +f.dataset.bkq, r = S.bulk.rows[j]; if(!r) return; r.nm = f.value;
+  const 쓸 = S.bulk.rows.filter(x => !x.off), 됨 = 쓸.filter(x => x.k || String(x.nm || '').trim()).length, b = document.querySelector('#sheetbox [data-act="bksend"]'); if(b && !S.bulk.중){ b.disabled = !됨; b.textContent = 됨 + '개 올리기'; } });
 function 몰아종목(b){ const w = (live() && live().id === b.wid) ? live() : D.workouts.find(x => x.id === b.wid); return w ? w.items.filter(it => !isMemo(it.ex)).map(it => ({ ex:it.ex, va:it.va, n:exName(it.ex, it.va) })).filter((o, i, a) => a.findIndex(z => z.ex === o.ex && z.va === o.va) === i) : []; }
 function 몰아고르기(찍기){ const b = S.bulk; if(!b) return; const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*,video/*';
   if(찍기) inp.setAttribute('capture', 'environment'); else inp.multiple = true; inp.style.display = 'none'; document.body.appendChild(inp);
@@ -5060,12 +5069,12 @@ function 몰아창(){ const b = S.bulk; if(!b) return; const 종 = 몰아종목(
     ${b.rows.length ? '' : '<div class="empty">아직 선택한 사진 · 영상이 없습니다<br>아래 「＋ 더 선택」을 눌러 주세요</div>'}
     ${b.rows.map((r, j) => { const [ex] = (r.k || '|').split('|'); return `<div class="vu-row${r.off ? ' off' : ''}"><div class="vu-th">${r.kind === 'video' ? `<video src="${r.url}#t=0.1" muted playsinline preload="metadata"></video><b>▶</b>` : `<img src="${r.url}" alt="">`}<small>${r.kind === 'video' ? '영상' : '사진'} ${j + 1}</small></div><div class="vu-b">
       <div class="vu-c">${종.map(o => { const k = o.ex + '|' + o.va; return `<button class="${k === r.k ? 'on' : ''}" data-act="bkk:${j}:${esc(k)}">${esc(o.n)}</button>`; }).join('')}${r.k && !종.some(o => o.ex + '|' + o.va === r.k) ? `<button class="on">✓ ${esc(exName(...r.k.split('|')))}</button>` : ''}</div>
-      <div class="vu-s"><input data-bkq="${j}" value="${esc(r.q || '')}" placeholder="${r.k ? '다른 종목 검색' : '종목 검색 (꼭 선택해 주세요)'}" autocomplete="off"><div class="vu-sr" id="bksr${j}">${몰아검색글(j, r.q)}</div></div>
+      ${종.length && r.k ? '' : `<div class="vu-s"><input data-bkq="${j}" value="${esc(r.nm || '')}" placeholder="종목 이름 (필수 · 편하게 써도 돼요)" autocomplete="off"></div>`}
       <div class="mu-one"><input data-k="bk:${j}" value="${esc(r.tx || '')}" oninput="S.bulk && S.bulk.rows[${j}] && (S.bulk.rows[${j}].tx = this.value)" placeholder="이 종목 피드백 한 줄 (안 써도 돼요)"><button data-act="jfopen:${esc(ex)}:bk:${j}">💬 인용</button></div>
       <div class="vu-a"><button data-act="bkoff:${j}">${r.off ? '다시 올림' : '안 올림'}</button></div></div></div>`; }).join('')}
     <button class="btn sub" data-act="attask:both:bulk">＋ 더 선택</button>
-    ${쓸.some(r => !r.k) ? `<div class="note">종목을 선택하지 않은 사진 · 영상 ${쓸.filter(r => !r.k).length}개는 올라가지 않아요<br>줄마다 종목을 선택해 주세요</div>` : ''}
-    <button class="vu-go" data-act="bksend"${쓸.some(r => r.k) && !b.중 ? '' : ' disabled'}>${b.중 ? '올리는 중…' : 쓸.filter(r => r.k).length + '개 올리기'}</button><button class="btn ghost sm" data-act="close">닫기</button>`; }); }
+    ${쓸.some(r => !r.k && !String(r.nm || '').trim()) ? `<div class="note">종목 이름이 없는 사진 · 영상은 올라가지 않아요<br>줄마다 종목 이름을 써 주세요</div>` : ''}
+    <button class="vu-go" data-act="bksend"${쓸.some(r => r.k || String(r.nm || '').trim()) && !b.중 ? '' : ' disabled'}>${b.중 ? '올리는 중…' : 쓸.filter(r => r.k || String(r.nm || '').trim()).length + '개 올리기'}</button><button class="btn ghost sm" data-act="close">닫기</button>`; }); }
 const 안보낸것 = mid => Object.keys(S.att || {}).filter(K => (S.att[K].files || []).length && (!mid || (S.attMid || {})[K] === mid)).reduce((n, K) => n + S.att[K].files.length, 0);
 async function 파일올리기(path, blob, type, 회원){
   if(회원 && /^video\//.test(type || '')) return await S3올리기(blob, 'video', String(path).split('/').pop(), String(type).split(';')[0], 회원);      /* 회원 개인 영상 → S3 (2026-10-14) */
@@ -14431,7 +14440,10 @@ document.addEventListener('click', async ev=>{
     case 'bulkopen': { const wid = rest[0], w = (live() && live().id === wid) ? live() : D.workouts.find(x => x.id === wid); if(!w) return; S.bulk = { wid, mid: w.mid || S.tmid || S.mid, rows:[] }; 올리기고르기('both', 'bulk'); return; }
     case 'bkk': { const r = S.bulk && S.bulk.rows[+rest[0]]; if(r){ r.k = rest.slice(1).join(':'); r.q = ''; 몰아창(); } return; }
     case 'bkoff': { const r = S.bulk && S.bulk.rows[+rest[0]]; if(r){ r.off = !r.off; 몰아창(); } return; }
-    case 'bksend': { const b = S.bulk; if(!b || b.중) return; const 쓸 = b.rows.filter(r => !r.off && r.k); if(!쓸.length) return; b.중 = true; 몰아창();
+    case 'bksend': { const b = S.bulk; if(!b || b.중) return; b.rows.forEach((r, j) => { const el = document.querySelector('[data-bkq="' + j + '"]'); if(el) r.nm = el.value; });
+      if(!b.rows.some(r => !r.off && (r.k || String(r.nm || '').trim()))) return; b.중 = true; 몰아창();
+      try{ for(const r of b.rows.filter(r => !r.off && !r.k && String(r.nm || '').trim())) r.k = await 몰아종목만듦(String(r.nm).trim()); }catch(e){ b.중 = false; 몰아창(); toast('종목을 만들지 못했어요' + String.fromCharCode(10) + 오류말(e)); return; }      /* 직접 쓴 이름 → 종목으로 */
+      const 쓸 = b.rows.filter(r => !r.off && r.k);
       const 묶 = {}; 쓸.forEach(r => (묶[r.k] = 묶[r.k] || []).push(r)); let 보낸 = 0, 붙인 = 0;
       try{ for(const k2 of Object.keys(묶)){ const [ex, va] = k2.split('|'), rs = 묶[k2], tx = rs.map(r => String(r.tx || '').trim()).filter(Boolean).join('\n'), 파일 = rs.map(r => ({ kind:r.kind, blob:r.blob, ext:r.ext, url:r.url }));
           if(tx || !몰아종목(b).some(o => o.ex + '|' + o.va === k2)){ await 피드백보내기(b.mid, ex, va, tx, 파일, b.wid); 보낸++; }      /* 기록에 없는 종목 = 붙여 둘 종목 창이 없으니 글이 없어도 바로 보냄 (2026-11-04) */
