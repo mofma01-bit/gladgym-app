@@ -3442,7 +3442,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '536';
+const BUILD = '537';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -4273,11 +4273,14 @@ function myWorkouts(){ return D.workouts.filter(w=>w.mid===S.mid && w.done).slic
 const 세트있나 = w => !!(w.items && w.items.some(i => i.sets && i.sets.length));
 function lastRealWorkouts(){ return myWorkouts().filter(세트있나); }
 const 직원화면 = () => !!(직원줄 || S.who === 'tr' || S.self);      /* 트레이너 · 대표 폰 — 남의 안 끝난 기록을 「기록 중」으로 보지 않는다 (2026-10-23) */
+/* 서버의 오늘 안 끝난 기록 — 직원 화면은 개인운동(회원이 자기 폰으로 하던 것)을 빼고 · 여럿이면 가장 최근 것 (2026-11-04) */
+function 진행기록(mid){ return D.workouts.filter(x => !x.done && x.mid === mid && x.date === TODAY && !(직원화면() && x.kind === '개인운동') && x.items && x.items.length).sort((a, b) => String(b.id).localeCompare(String(a.id)))[0] || null; }
 function liveOf(mid){
   if(D.live && D.live.mid===mid) return D.live;
-  if(직원화면()) return null;      /* 김O정 「기록 중」 사고 — 회원이 자기 폰으로 하던 운동 · 다른 선생님 내 운동이 떠서 눌렀다가 남의 기록을 이어받았다 */
+  /* 2026-11-04 대표 「앱으로 기록하다 데스크로 · 태블릿 데스크 → PC 데스크 이어서 하면 수업 기록이 여러 개 남는다」 → 직원 화면도 **수업 기록은** 서버의 진행 중 기록을 이어받는다 · 회원 개인운동은 그대로 막음(아래) */
+  if(false) return null;      /* 김O정 「기록 중」 사고 — 회원이 자기 폰으로 하던 운동 · 다른 선생님 내 운동이 떠서 눌렀다가 남의 기록을 이어받았다 */
   /* 오늘 것만 「기록 중」으로 본다 — 지난날 끝내지 않은 기록이 계속 떠 있지 않게 */
-  const w = D.workouts.find(x=>!x.done && x.mid===mid && x.date===TODAY);
+  const w = 진행기록(mid);
   if(!w || !w.items || !w.items.length) return null;
   if(w.cur==null || w.cur<0 || w.cur>=w.items.length){
     const i = w.items.findIndex(it=>!it.locked);
@@ -6810,8 +6813,7 @@ async function newLive(title, items, kind, rid, mid, by, 기록날){
 /* 다른 기기에서 시작한 운동을 이 기기에서 이어받는다 */
 function adoptLive(mid){
   if(D.live && D.live.mid===mid) return true;
-  if(직원화면()) return false;      /* 남의 기록은 이어받지 않는다 (2026-10-23) */
-  const w = D.workouts.find(x=>!x.done && x.mid===mid && x.date===TODAY);
+  const w = 진행기록(mid);      /* 직원 화면 = 수업 기록만 이어받음 · 개인운동은 안 받음 (2026-10-23 → 2026-11-04) */
   if(!w || !w.items || !w.items.length) return false;
   const i = w.items.findIndex(it=>!it.locked);
   const 꺼둠 = 시계는손으로(w) && !Number(w.dur);           /* 시계 없이 하던 수업은 이어받아도 꺼 둔다 */
