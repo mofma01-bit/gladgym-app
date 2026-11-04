@@ -170,6 +170,7 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .rmck{border:0;border-left:1px solid #2a2722;background:#2c2924;color:var(--cream);font:inherit;font-size:14px;font-weight:800}
 .rmr.ok{opacity:.6}.rmr.ok .rmck{background:#1d3a2c;color:#8fe0b0}.rmr.now .rmck{background:linear-gradient(180deg,#f3d9a8,#e2c184);color:#2a1c14}.rmr.now .rmst{color:var(--gold)}
 .rmtm{display:flex;align-items:center;gap:8px;white-space:nowrap;padding:8px 12px;background:#14302a;border-top:1px solid #2a2722}.rmtm span{font-size:14px;font-weight:800;color:#8fe0b0}.rmtm b{font-size:20px;font-weight:900;color:var(--cream);font-variant-numeric:tabular-nums}.rmtm small{font-size:13px;color:var(--sub)}.rmtm button{margin-left:auto;height:32px;padding:0 9px;white-space:nowrap;flex:none;border-radius:9px;border:1px solid #4a453b;background:#1a1917;color:var(--cream);font:inherit;font-size:13px;font-weight:800}.rmtm button+button{margin-left:0}
+.rmall{margin-top:6px;border-style:solid;border-color:#3d6b52;color:#8fe0b0}
 .rmdone{margin:6px 2px;font-size:14px;font-weight:800;color:var(--gold)}.rmmore{margin-top:6px}.plc.now{box-shadow:inset 0 0 0 2px var(--gold);color:var(--gold)}
 .plm{display:flex;align-items:center;padding:0 10px;font:inherit;font-size:13px;color:var(--sub);min-height:36px;background:none;border:0;text-align:left}
 .plcard{margin-top:8px}.plca{grid-template-columns:27% 1fr 1fr;background:none;border-left:0;border-right:0;border-bottom:0;color:inherit;font:inherit;padding:0}
@@ -3435,7 +3436,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '534';
+const BUILD = '535';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -7088,8 +7089,8 @@ function 플래너화면(w){
       const 쉼줄 = j === 끝 && S.rest && S.rest.until && S.rest.rm === o.i ? `<div class="rmtm"><span>⏱ 쉬는 중</span><b id="restleft3">${mmss(Math.max(0, (S.rest.until - Date.now()) / 1000))}</b><small>⏰ 알람</small><button data-act="wrestadd">+15초</button><button data-act="wrestx">건너뛰기</button></div>` : '';
       return 쉼줄 + `<div class="plr rmr${됨 ? ' ok' : j === 끝 ? ' now' : ''}"><span class="pln rmst">${esc(q.단계)}<small>${Math.round((q.pct || 1) * 100)}%${q.쉼 ? ' · ' + q.쉼 : ''}</small></span>
         <div class="rm3">${칸(o, j, 'kg', false)}${칸(o, j, 'reps', true)}<button class="rmck" data-act="rmck:${o.i}:${j}">${됨 ? '✓' : '완료'}</button></div></div>`; }).join('');
-    const 다 = 끝 && 끝 === it.sets.length;
-    return 위 + 줄 + (it.rmDone ? `<div class="rmdone">✓ 1RM 실측 ${kg표(it.rmDone)}kg 남겼어요</div>` : '') + (다 ? `<button class="pl-add rmmore" data-act="rmmore2:${o.i}">＋ 한 번 더 시도</button>` : ''); };
+    const 다 = 끝 && 끝 === it.sets.length, 남 = it.sets.length - 끝;
+    return 위 + 줄 + (남 >= 2 ? `<button class="pl-add rmall" data-act="rmall:${o.i}">✓ 남은 ${남}단계 모두 완료</button>` : '') + (it.rmDone ? `<div class="rmdone">✓ 1RM 실측 ${kg표(it.rmDone)}kg 남겼어요</div>` : '') + (다 ? `<button class="pl-add rmmore" data-act="rmmore2:${o.i}">＋ 한 번 더 시도</button>` : ''); };
   const 행 = o => {
     if(o.it.rm || o.it.rmPlan) return 일알엠(o);
     if(isMemo(o.it.ex)) return `<div class="plr">${이름(o)}<button class="plm" data-act="${tr ? 'exd:memo:' + esc(o.it.va) + ':' + wmid : 'plfocus:' + o.i}">${tr ? '메모 · 눌러서 피드백으로 남기기 ›' : '메모 종목 ›'}${o.it.part ? ' <small>' + esc(o.it.part) + '</small>' : ''}</button></div>`;
@@ -15164,6 +15165,14 @@ document.addEventListener('click', async ev=>{
         S.rest = null; save(); toast('🏆 1RM 실측 ' + kg표(x.kg) + 'kg 남겼어요'); render(); return; }
       if(다음 && q.쉼초){ 알람준비(); S.rest = { sec:q.쉼초, until: Date.now() + q.쉼초 * 1000, alarm:true, rm:i }; toast('쉬기 ' + q.쉼 + ' → 다음 ' + ((다음단계 || {}).단계 || '') + ' ' + kg표(다음.kg) + 'kg × ' + 다음.reps + '회'); }
       save(); render(); return; }
+    case 'rmall': { const w = live(), i = +rest[0], it = w && w.items[i]; if(!it || !it.rmPlan) return; const 남 = it.sets.filter(x => !x.done);
+      if(!남.length) return; if(남.some(x => !(Number(x.reps) > 0))) return toast('횟수가 빈 단계가 있어요');
+      if(!await 물어('남은 ' + 남.length + '단계를 모두 완료할까요?\n본 시도 무게가 1RM 실측으로 남아요', '모두 완료')) return;
+      const 지금 = Date.now(); 남.forEach(x => { x.done = true; x.at = 지금; }); w.cur = i; S.rest = null;
+      const 실 = it.sets.map((x, j) => ({ x, q: (it.rmPlan || [])[j] || {} })).filter(o => (o.q.pct || 0) >= 1 && Number(o.x.kg) > 0 && Number(o.x.reps) >= 1).map(o => Number(o.x.kg));
+      const kg = 실.length ? Math.max(...실) : 0;
+      if(kg && !(it.rmDone >= kg)){ it.rmDone = kg; await rm기록(w.mid || S.mid, it.ex, it.va, kg, 1, '실측', w.id, S.who === 'tr' ? (TRAINER || '트레이너') : '회원'); }
+      save(); toast(kg ? '🏆 모두 완료 · 1RM 실측 ' + kg표(kg) + 'kg 남겼어요' : '모두 완료했어요'); render(); return; }
     case 'rmmore2': { const w = live(), it = w && w.items[+rest[0]]; if(!it || !it.rmPlan) return; const last = it.sets[it.sets.length - 1]; if(!last || !last.done) return;
       const 배 = RM종목[it.ex] === '상체' ? 1.025 : 1.05, kg = Math.max(Number(last.kg) + 2.5, Math.round(Number(last.kg) * 배 / 2.5) * 2.5);
       it.rmPlan.push({ 단계:'한 번 더', pct: kg / (it.rmGoal || kg), reps:1, 쉼:'3~4분', 쉼초:210, kg }); it.sets.push({ kg, reps:1, done:false });
