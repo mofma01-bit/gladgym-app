@@ -3444,7 +3444,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '541';
+const BUILD = '542';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -15616,7 +15616,10 @@ document.addEventListener('click', async ev=>{
 });
 
 async function finish(){
-  const w=live(), done=w.items.filter(it=>it.sets.some(s=>s.done));
+  const w=live(); let done=w.items.filter(it=>it.sets.some(s=>s.done));
+  /* 세트는 없지만 이 수업에 남긴 종목 피드백이 있으면 그 종목을 「피드백」 세트로 넣고 마침 — 기록이 지워지지 않게 (2026-11-04 22:20 대표 「기록할 세트가 없어요 라고 하면서 기록 저장이 안 돼」) */
+  if(!done.length){ const 피 = (D.cm || []).filter(c => c.wid === w.id && c.ex && !isMemo(c.ex));
+    if(피.length){ try{ await 몰아기록에넣기({ wid:w.id }, [...new Set(피.map(c => c.ex + '|' + (c.va || '')))]); }catch(e){ console.warn('마침 — 피드백 종목 추가', e); } done = w.items.filter(it => it.sets.some(s => s.done)); } }
   /* 플래너 「트레이너 메모」 — 그 수업 번호에 붙는 피드백 한 줄로 (회원 피드백 · 리포트에 같이) · 2026-10-23 대표 시안2 「하단에 트레이너 메모」 */
   if(done.length && (w.trmemo || '').trim() && w.kind === '수업'){ const cid = 'c' + Date.now(), mid = w.mid, 몸 = w.trmemo.trim().slice(0, 1000);
     try{ await spost('comments', [{ id:cid, member_id:mid, variant_id:VID('memo', '트레이너 메모'), trainer:TRAINER, body:몸, pics:0, vids:0, workout_id:w.id }]);
