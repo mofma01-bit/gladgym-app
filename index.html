@@ -8,7 +8,7 @@ try{ if(Math.min(screen.width, window.innerWidth || screen.width) < 360) documen
 /* 아이폰은 글씨 16px 미만인 입력 칸을 누르면 화면을 저절로 확대한다(누른 뒤 화면이 옆으로 밀린다). maximum-scale=1 이면 그 확대만 꺼지고 손가락 확대는 그대로 된다 — 아이폰에만 건다(안드로이드에선 손가락 확대까지 막힌다). 2026-10-10 기종 조사 */
 try{ if(/iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)){ const v = document.querySelector('meta[name="viewport"]'); v.setAttribute('content', v.getAttribute('content') + ', maximum-scale=1'); } }catch(e){}</script>
 <meta name="theme-color" content="#131312">
-<meta name="color-scheme" content="dark">
+<meta name="color-scheme" content="dark only">      <!-- only = 폰 브라우저가 밝은 단추를 저절로 어둡게 바꾸지 못하게 (2026-11-04 노션 「수업 시작이 흐린 붉은 계열」 · 금색 단추만 어두워진 꼴 = 강제 어둡게 하기) -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -24,7 +24,7 @@ try{ if(/iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap">
 
 <style>
-:root{color-scheme:dark;
+:root{color-scheme:dark only;
   /* 바닥을 한 단씩 올렸다 — 어둡되 지하실처럼 눌리지 않게 */
   --dark:#1e1e1b; --dark-2:#282824; --dark-3:#33332e; --dark-4:#41413b;
   --brown:#5a3a2e; --gold:#f0d3a0; --gold-2:#d6b87e; --gold-dim:#332b1d;
@@ -2937,7 +2937,13 @@ body.kpon #main{padding-bottom:380px}
 .pz-g2{display:grid;grid-template-columns:1fr 1fr;gap:4px 14px}.pz-last{gap:8px}.pz-last .pz-s{margin-bottom:0}
 .pz-memo{min-height:70px;border:1.5px solid #2a241b;border-radius:8px;padding:6px 8px;white-space:pre-wrap;font-weight:600}
 .pz-note{margin-top:8px;border:1.5px dashed #8a7f6c;border-radius:8px;padding:6px 8px;white-space:pre-wrap}.pz-note small{display:block;color:#6b6253;font-size:13px}
-@media (max-width:640px){.pz-r{grid-template-columns:1fr}.pz-g2{grid-template-columns:1fr}.pz-hd{margin-left:0}.pz-days{grid-template-columns:repeat(7,1fr)}}
+@media (max-width:640px){.pz:not(.dk) .pz-r{grid-template-columns:1fr}.pz:not(.dk) .pz-g2{grid-template-columns:1fr}.pz:not(.dk) .pz-hd{margin-left:0}.pz:not(.dk) .pz-days{grid-template-columns:repeat(7,1fr)}}      /* .dk = 데스크와 같은 A4 모양(맞춰 줄임) — 한 줄로 접지 않는다 (2026-11-04) */
+.pzbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:2px 2px 8px;font-size:13px;color:var(--sub)}.pzfit{overflow:hidden;border-radius:12px}.pzfit.big{overflow-x:auto;-webkit-overflow-scrolling:touch}.pzfit>.pz{width:760px;max-width:none}
+.tmpg{display:flex;gap:8px;margin-top:8px}.tmpg .btn{flex:1;height:44px}
+.fdh{display:flex;align-items:baseline;gap:8px;padding:8px 14px;background:#24221d;border-top:1px solid #34332d;font-weight:900;font-size:14.5px;color:#f6e7c6}.fdh:first-child{border-top:0}.fdh small{color:var(--sub);font-weight:700;font-size:13px}.fdh i{margin-left:auto;font-style:normal;color:var(--gold-2);font-size:13px}
+.tmrc .tlh{margin:-10px -12px 10px;padding:10px 12px;border-radius:15px 15px 0 0;border-bottom:1.5px solid #6a5a3a;background:linear-gradient(180deg,#2f281c,#211d16)}.tmrc .tlh b{font-size:17px;color:#f6e7c6}.tmrc .tlh b u{text-decoration:none;font-size:13.5px;color:#d9c9a5}
+.tmrc.self .tlh{border-bottom-color:#3f7281;background:linear-gradient(180deg,#1d3036,#162327)}.tmrc.self .tlh b{color:#d8f1f7}.tmrc.self .tlh .k{color:var(--teal)}.tmrc.self{border-color:#2f5a66}
+.topme.trme{font-size:14px;font-weight:900;color:var(--gold-2)}
 .pz.n .pz-r{grid-template-columns:1fr;gap:3px}.pz.n .pz-g2{grid-template-columns:1fr}.pz.n .pz-hd{margin-left:0}.pz.n .pz-days{display:grid;grid-template-columns:repeat(7,1fr);width:100%}.pz.n .pz-x{margin:4px 0 0}
 
 /* 피드백 대화방 (C-3) */
@@ -3436,7 +3442,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '535';
+const BUILD = '536';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -5133,7 +5139,7 @@ function render(){
     t_members:tMembers,t_member:tMember,t_live:tLive,t_write:tWrite,t_routines:tRoutines,t_redit:tRedit,t_rnew:tRnew,t_rpick:tRpick,t_ex:tEx,
     intake:vIntake, plan:vPlan, body:vBody, cycle:vCycle, qa:vQa, boot:vBoot, err:vErr,
     newmem:vNewMem, intake_edit:vIntakeEdit, plan_edit:vPlanEdit, t_pickex:tPickEx,
-    t_today:tToday, t_feed:tFeed, t_tools:tTools, t_community:vCommunity, diet:vDiet, days:vDays, t_meals:tMeals,
+    t_today:tToday, t_feed:tFeed, t_tools:tTools, t_community:vCommunity, t_routine:tRoutineTab, t_consult:tConsult, diet:vDiet, days:vDays, t_meals:tMeals,
     noti:vNoti, agree:vAgree, terms:vTerms};
   /* ── 관문 (2026-09-21) ─────────────────────────────────────────────
      · 필수 둘(이용약관·개인정보)에 동의하기 전에는 **동의 화면만** 보인다
@@ -5207,6 +5213,8 @@ function bar(title, right, back, sub){
     right = (right && right.indexOf('notibell') < 0 ? right : '') + `<span class="tright">
       <button class="notibell" data-act="go:noti" aria-label="알림${n?' '+n+'개':''}">${svg('종',20)}${n?`<b>${n>9?'9+':n}</b>`:''}</button>
       <button class="topme" data-act="go:profile" aria-label="내 프로필">${얼굴(S.mid)}</button></span>`; }
+  if(S.who === 'tr' && !bare && ['t_today','t_members','t_feed','t_routine','t_consult'].includes(S.screen))      /* 트레이너 탭 첫 화면 — 내 이름 동그라미 → 로그아웃 (2026-11-04 · 자료 탭 없앰) */
+    right = (right || '') + `<span class="tright"><button class="topme trme" data-act="trme" aria-label="내 메뉴">${esc(String(TRAINER || '').slice(0, 1))}</button></span>`;
   const hasHist = !!(S.stack && S.stack.length);
   const force = (back === 'reccancel' || back === 'rnback' || back === 'wfback');            /* wfback = 플래너 표에서 연 한 종목 → 표로 (2026-10-23) */            /* 수정 그만두기 · 새 루틴 만들다 나가기(묻고 나간다 · 2026-10-17)는 그대로 */
   const act = force ? back : (hasHist ? 'back' : (back || ''));
@@ -5247,13 +5255,13 @@ const 식단본 = (() => { try{ return new Set(JSON.parse(localStorage.getItem('
 function 식단봄(mid){ (D.meals||[]).filter(x => x.mid === mid).forEach(x => 식단본.add(x.id)); try{ localStorage.setItem('gg_mseen', JSON.stringify([...식단본].slice(-3000))); }catch(e){} }
 function 새식단(){ return (D.meals||[]).filter(m => 이번주에(m.date) && !식단본.has(m.id) && 내회원(m.mid)); }
 function 식단할일(){ return new Set(새식단().map(x => x.id).concat(mealTodo().map(x => x.id))).size; }
-function trTodo(){ return todoCount() + 식단할일() + openAsks().length + 오늘기록전().length; }
+function trTodo(){ return todoCount() + 식단할일() + openAsks().length; }      /* 오늘 예약(기록 전)은 오늘 탭 한 곳 — 피드백 탭에서 뺌 (2026-11-04) */
 function tabBarTr(){
   const n = trTodo();
   const t=(id,ic,nm,bd)=>`<button data-act="ttab:${id}" class="${S.ttab===id?'on':''}">
     <span class="ic">${ic}${bd?'<span class="bd"></span>':''}</span><span>${nm}</span></button>`;
   return t('t_today',svg('clock',22),'오늘')+t('t_members',svg('grid',22),'회원')
-       +t('t_feed',svg('pen',22),'피드백',n>0)+t('t_community',svg('pic',22),'커뮤니티')+t('t_tools',svg('flag',22),'자료');
+       +t('t_feed',svg('pen',22),'피드백',n>0)+t('t_routine',svg('routine',22),'루틴')+t('t_consult',svg('h_note',22),'상담');      /* 커뮤니티 · 자료 → 루틴 · 상담 (2026-11-04 대표 시안 앱재구성_시안_1104 「이대로」) */
 }
 
 /* ── 불러오는 중 · 오류 ── */
@@ -10987,6 +10995,11 @@ const 종이칸 = {
   hist: ['최근 수술', '골절', '무릎부상', '허리부상', '관절염', '목디스크', '허리디스크', '고혈압', '저혈압', '당뇨', '다낭성난소증후군', '무월경', '갑상선기능', '폐질환', '천식'].map(x => [x, x]),
   goals: [['다이어트', '다이어트 (체중 감량)'], ['근력 향상', '근력 향상 · 근육량'], ['체형 교정', '체형 교정 · 자세'], ['통증 개선', '통증 개선 · 재활'], ['체력 향상', '체력 · 건강 관리'], ['바디프로필', '바디프로필 · 대회'], ['기타', '기타']],
 };
+/* 데스크와 같은 A4 모양 그대로(760px) · 폰 폭에 맞춰 줄여 보이고 · 「크게 보기」면 원래 크기로 옆으로 밀어 봄 (2026-11-04 대표 「상담지도 데스크처럼 · 똑같이 붙이고 확대해서 보는 방식」) */
+const 상담지맞춤 = h => `<div class="pzbar"><span>데스크와 같은 상담지예요</span><button class="chip" data-act="pzbig">${S.pzBig ? '화면에 맞추기' : '크게 보기'}</button></div><div class="pzfit${S.pzBig ? ' big' : ''}">${h.replace('<div class="pz', '<div class="pz dk')}</div>`;
+function 상담지맞춰줄임(){ document.querySelectorAll('.pzfit').forEach(w => { const p = w.firstElementChild; if(!p) return; p.style.zoom = w.classList.contains('big') ? '' : String(Math.min(1, (w.clientWidth || 360) / 760)); }); }
+new MutationObserver(() => { if(document.querySelector('.pzfit')) requestAnimationFrame(상담지맞춰줄임); }).observe(document.documentElement, { childList:true, subtree:true });
+window.addEventListener('resize', 상담지맞춰줄임);
 function 상담지종이(ik, m, 트, 좁, 편){      /* 편 = 그 자리에서 작성 · 수정 (2026-11-03 대표 「앱도 · 용지 위치 그대로」) */
   ik = ik || {}; m = m || {}; const 식 = (ik.meals && typeof ik.meals === 'object') ? ik.meals : {}, 초 = S.draft || {};
   const 배열 = v => Array.isArray(v) ? v : (v ? String(v).split(/\s*[,·]\s*/).filter(Boolean) : []);
@@ -11027,7 +11040,7 @@ function vIntake(){
   const 몸 = `${상담작성카드(d, tr)}
     ${tr ?`<button class="hline gold" data-act="editintake:${mid}">${svg('h_note',18)}<b>PT 상담일지 작성 · 수정</b><small>눌러서 입력</small></button>`:''}
     ${tr ? `<button class="hline" data-act="scanpaper:${mid}">${svg('h_note',18)}<b>종이 상담지 올리기</b><small>찍거나 앨범에서 · 읽어서 채워요</small></button>` : ''}
-    ${상담지종이(d, { name: subjName(), trainer: (MEMBERS.find(m => m.id === mid) || {}).tr || '' }, tr, true)}      ${''/* 종이 상담지 그대로 — 데스크와 같은 그림 (2026-10-24 00:47 대표 「종이로」 · 결정함 c1) */}`;
+    ${상담지맞춤(상담지종이(d, { name: subjName(), trainer: (MEMBERS.find(m => m.id === mid) || {}).tr || '' }, tr, false))}      ${''/* 종이 상담지 그대로 — 데스크와 같은 그림 (2026-10-24 00:47 대표 「종이로」 · 결정함 c1) */}`;
   return { top: bar('PT 상담일지', `<span class="sub">${esc(subjName())}</span>`, tr?'tm:'+mid:'tab:me'), body: 몸 + (상담작성(d).n > 3 && 상담작성(d).빈.length      /* 「아직 작성 전」(3항목 이하)일 땐 위 카드와 겹친다 · 숫자는 카드와 같은 셈으로 (2026-10-20) */
     ? (tr ? `<button class="hline" data-act="editintake:${mid}">${svg('h_note',18)}<b>입력 안 한 항목 ${상담작성(d).빈.length}개</b><small>눌러서 채우기</small></button>`
           : '')
@@ -11035,6 +11048,8 @@ function vIntake(){
 }
 
 const DESK_KEY = 'gg_desk_auth', GG_API = 'https://dash.gladgym.co.kr';
+/* 상담지 사진 읽기 증표 — 앱에 직원으로 로그인했으면 그 증표(token)로 바로 (2026-11-04 노션 「사진 올리기 하면 구글 로그인하라고 나와」 · 서버 직원증표 = token 먼저 → desk) · 없을 때만 대시보드 계정 */
+const 앱직원증표 = () => { try{ const au = (typeof 로그인기억 !== 'undefined' && 로그인기억.읽()) || {}; return au.token && !au.mid ? au.token : ''; }catch(e){ return ''; } };
 async function 직원토큰(){
   let a = null; try{ a = JSON.parse(localStorage.getItem(DESK_KEY) || 'null'); }catch(e){}
   if(!a || !a.access_token) return null;
@@ -11142,8 +11157,8 @@ async function 상담지보냄(mid, b64){
     else toast('상담지를 읽지 못했어요\n' + 오류말(e)); }
 }
 async function 상담지읽기(b64){
-  const t = await 직원토큰(); if(!t) throw new Error('직원 로그인이 필요해요');
-  const r = await fetch(GG_API + '/app/scan/intake', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ desk:t, image:b64, form:'GG-INTAKE-A4 v4' }) });
+  const 앱 = 앱직원증표(), t = 앱 ? '' : await 직원토큰(); if(!앱 && !t) throw new Error('직원 로그인이 필요해요');
+  const r = await fetch(GG_API + '/app/scan/intake', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(Object.assign(앱 ? { token:앱 } : { desk:t }, { image:b64, form:'GG-INTAKE-A4 v4' })) });
   if(!r.ok) throw new Error('서버에 닿지 못했어요 (' + r.status + ')');
   const d = await r.json(); if(!d.ok) throw new Error(d.why || '읽지 못했어요'); return d;
 }
@@ -11180,7 +11195,7 @@ function vIntakeEdit(){
         ${q.n < 6 && !(q.다름||[]).length ? `<span class="w">읽은 칸이 적어요<br>사진이 잘 안 나왔을 수 있어요</span><button class="rs" data-act="scanpaper:${mid}">다시 찍기</button>` : ''}
         ${(q.숫자||[]).length ? `<span class="num"><b>숫자는 종이와 꼭 맞춰 보세요</b>${q.숫자.map(p => `<i>${esc(p[0])} <em>${esc(p[1])}</em></i>`).join('')}</span>` : ''}
         ${q.모름.length ? `<span class="w">글씨 확인: ${esc(q.모름.join(' · '))}</span>` : ''}${q.다른 ? `<span class="w">종이의 이름이 「${esc(q.다른)}」예요<br>다른 분의 상담지가 아닌지 확인해 주세요</span>` : ''}</div>` : '') +
-      상담지종이(d, { name: subjName(), trainer: (MEMBERS.find(m => m.id === mid) || {}).tr || '' }, S.who === 'tr', true, true)      /* 2026-11-03 대표 「용지 위치 그대로 수정」 — 보는 화면과 같은 종이 */
+      상담지맞춤(상담지종이(d, { name: subjName(), trainer: (MEMBERS.find(m => m.id === mid) || {}).tr || '' }, S.who === 'tr', false, true))      /* 2026-11-03 대표 「용지 위치 그대로 수정」 — 보는 화면과 같은 종이 */
       + '<div class="pz-tip">체크는 눌러서 · 칸은 그 자리에서 입력해요 · 맨 아래 「저장」</div>',
     foot: `<button class="btn main" style="flex:1" data-act="saveintake:${mid}">저장</button>` };
 }
@@ -12746,7 +12761,7 @@ function vQa(){
   /* 2026-10-14 대표 「옛 모양 권안대로」 — 번호 동그라미 목록 → 주제 칩 + 눌러서 펼치는 카드. 주제는 질문 글로 가른다 */
   const 열 = S.qaOpen == null ? 0 : S.qaOpen, 주제 = x => /유산소|러닝|런닝/.test(x.q) ? '유산소' : /매일|자주|횟수|빈도/.test(x.q) ? '빈도' : /식사|먹|배가|야식|식단/.test(x.q) ? '식사' : '기타';
   const 다 = [...new Set(QA.map(주제))], 고 = S.qaTag && 다.includes(S.qaTag) ? S.qaTag : '';
-  return { top: bar('자주 묻는 질문', `<span class="sub">${QA.length}개</span>`, S.who==='tr'?'go:t_tools':'tab:me'), body:
+  return { top: bar('자주 묻는 질문', `<span class="sub">${QA.length}개</span>`, S.who==='tr'?'ttab:t_today':'tab:me'), body:
     `<div class="chips"><button class="chip ${고?'':'on'}" data-act="qatag:">전체</button>${다.map(t=>`<button class="chip ${고===t?'on':''}" data-act="qatag:${t}">${t}</button>`).join('')}</div>
     ${QA.map((x,i)=>[x,i]).filter(([x])=>!고 || 주제(x)===고).map(([x,i])=>`<button class="qacard ${열===i?'on':''}" data-act="qaopen:${i}">
       <span class="qh"><em>${주제(x)}</em><b>${esc(x.q)}</b><i>${열===i?'⌃':'⌄'}</i></span>${열===i ? `<p>${esc(x.a)}</p>` : ''}</button>`).join('')}` };
@@ -12775,6 +12790,10 @@ function tToday(){
             return `<button class="mrow2" data-act="tgo:${m.id}">${갈래원(m.id)}<span class="mt"><b>${esc(m.n)}</b><small>${esc([t && t.kind, r && r.n].filter(Boolean).join(' · ') || '루틴 지정됨')}</small></span><i>›</i></button>`; }).join(''), 지정.length) : ''); })()}
 ` };
 }
+/* 날짜 머리 — 같은 날 줄을 묶고 머리에 오늘 · 어제 · 11/2 (월) + 건수 (2026-11-04 대표 시안2 A) */
+function 날짜머리묶음(ws, 한줄){ const 날 = [...new Set(ws.map(w => w.date))], 요 = d => '일월화수목금토'[new Date(d + 'T00:00:00').getDay()];
+  return 날.map(d => { const xs = ws.filter(w => w.date === d), 이름 = d === TODAY ? '오늘' : d === addDays(TODAY, -1) ? '어제' : dateTxt(d);
+    return `<div class="fdh"><b>${이름}</b><small>${이름 === dateTxt(d) ? '(' + 요(d) + ')' : dateTxt(d) + ' (' + 요(d) + ')'}</small><i>${xs.length}</i></div>` + xs.map(한줄).join(''); }).join(''); }
 /* 오늘 화면 숫자 칸을 누르면 뜨는 내역 창 셋 */
 function sheetTdLive(){
   const live = MEMBERS.map(m=>({m, w:liveOf(m.id)})).filter(x=>x.w);
@@ -12862,7 +12881,7 @@ function tFeed(){
   const nm = id => (MEMBERS.find(x=>x.id===id)||{}).n || '?';
   const mode = S.tfeed || 'ex';
   setTimeout(예약받기, 0);
-  const 운동수 = 오늘기록전().length + openAsks().length + todoCount(), 식수 = 식단할일();
+  const 운동수 = openAsks().length + todoCount(), 식수 = 식단할일();      /* 오늘 예약은 오늘 탭 (2026-11-04) */
   const head = `<div class="seg">
     <button class="${mode==='ex'?'on':''}" data-act="tfm:ex">운동${운동수?' '+운동수:''}</button>
     <button class="${mode==='diet'?'on':''}" data-act="tfm:diet">식단${식수?' '+식수:''}</button></div>`;
@@ -12900,13 +12919,11 @@ function tFeed(){
       </div>
       ${주간줄(wkd, sel, 'tfd', d => { const n = dayWs(d).length; return { has: n > 0, n }; })}
     </div>`
-    + 접칸('today', 'now', '오늘 예약 수업', `${dateTxt(TODAY)} · 내 수업`, 예.length,
-        오늘예약줄들(예), 전.length)
     + 접칸('ask', 'ask', '회원 피드백 요청', '회원이 봐 달라고 한 것', asks.length,
         asks.length ? asks.map(a=>`<button class="mrow2" data-act="exd:${a.ex}:${a.va}:${a.mid}">${얼굴갈래(a.mid)}<span class="mt"><b>${esc(nm(a.mid))} · ${esc(exName(a.ex,a.va))}</b><small>${esc(a.note||'따로 입력한 말은 없어요')} · ${esc(agoTxt(a.ts))}</small></span><em class="go">쓰기 ›</em></button>`).join('')
           : '<div class="fe">회원이 봐 달라고 한 것이 없습니다</div>')
-    + 접칸('miss', 'miss', '피드백을 남겨 주세요 (주간)', '이번 주만 · 지난 건 데스크에서', todo.length,
-        todo.length ? todo.map(w=>`<button class="mrow2" data-act="tw:${w.id}">${얼굴갈래(w.mid)}<span class="mt"><b>${esc(nm(w.mid))} · ${dateTxt(w.date)}</b><small>${esc(w.kind||'')} · 피드백 없는 종목 ${noCmItems(w).length}개</small></span><em class="go">쓰기 ›</em></button>`).join('')
+    + 접칸('miss', 'miss', '피드백을 남겨 주세요', '이번 주 수업 · 최근 날 먼저', todo.length,
+        todo.length ? 날짜머리묶음(todo, w=>`<button class="mrow2" data-act="tw:${w.id}">${얼굴갈래(w.mid)}<span class="mt"><b>${esc(nm(w.mid))} · ${dateTxt(w.date)}</b><small>${esc(w.kind||'')} · 피드백 없는 종목 ${noCmItems(w).length}개</small></span><em class="go">쓰기 ›</em></button>`)
           : '<div class="fe">이번 주 수업은 피드백을 다 남겼어요</div>')
     + 접칸('day', 'day', `${dateTxt(sel)} 수업 기록`, '위 달력에서 선택한 날 · 다른 주도 ‹ › 로', list.length,
         list.length ? list.map(w=>{ const miss = noCmItems(w).length, 종 = w.items.filter(i=>i.sets.length);
@@ -12926,7 +12943,29 @@ function tMeals(){
       : 빔('bowl', S.tmAll ? '올라온 식단이 없습니다' : '피드백을 안 단 식단이 없습니다', S.tmAll ? '회원이 식단을 기록하면 여기에 나옵니다' : '「전체」에서 지난 식단을 볼 수 있습니다')}` };
 }
 
-/* 자료 */
+/* ══ 루틴 탭 ══ (2026-11-04 대표 시안 「이대로」) — 자료 탭 「수업 준비」 셋을 탭으로 · 종목 사전은 따로 메뉴 없이 루틴 만들 때 종목 검색 안에서 */
+function tRoutineTab(){
+  const 줄 = (ico, 이름, act, 수) => `<button class="mrow2" data-act="${act}"><span class="mi">${svg(ico, 19)}</span><span class="mt"><b>${이름}</b></span>${수 ? `<em class="tn">${수}</em>` : ''}<i>›</i></button>`;
+  return { top: bar('루틴'), body:`
+    <div class="megrp">${줄('routine', '루틴 만들기 · 지정', 'tromake')}${줄('prep', '스트레칭 루틴 만들기 · 지정', 'psets', 내세트().length + '개')}${줄('h_hands', '나만의 스트레칭 종목 만들기', 'pitems', 내종목().length + '개')}</div>` };
+}
+/* ══ 상담 탭 ══ (2026-11-04 대표 시안2 「검색창이 가장 위 · 바로 아래 종이 상담지 올리기」) — 상담지는 데스크와 같은 A4 모양(상담지종이 · 맞춰 보기 · 크게 보기) */
+function tConsult(){
+  const 작 = m => 상담작성(D.intake[m.id] || {}), 최근 = MEMBERS.filter(m => 작(m).n > 3).sort((a, b) => 작(b).p - 작(a).p).slice(0, 10);
+  const 줄 = (m, 숨) => `<button class="mrow2${숨 ? ' csr' : ''}" data-csnm="${esc(m.n)}" data-act="csopen:${m.id}"${숨 ? ' style="display:none"' : ''}>${갈래원(m.id)}<span class="mt"><b>${esc(m.n)}</b><small>${(a => a.n > 3 ? a.p + '% 작성 · ' + a.n + ' / ' + a.모두 + '항목' : '아직 작성 전')(작(m))}${m.tr ? ' · 담당 ' + esc(m.tr) : ''}</small></span><em class="go">보기 ›</em></button>`;
+  return { top: bar('상담'), body:`
+    <input class="search" type="text" data-csq="1" placeholder="상담지 열 회원 검색" autocomplete="off">
+    <button class="hline gold" data-act="csscan">${svg('h_note',18)}<b>종이 상담지 올리기</b><small>찍거나 앨범에서 · 읽어서 채워요</small></button>
+    <span class="lbl" id="cslbl">최근 상담 <small>${최근.length}</small></span>
+    <div class="megrp" id="csrecent">${최근.length ? 최근.map(m => 줄(m)).join('') : '<div class="fe">아직 작성한 상담지가 없습니다<br>위에서 회원을 검색해 상담지를 열어 주세요</div>'}</div>
+    <div class="megrp" id="csall" style="display:none">${MEMBERS.map(m => 줄(m, true)).join('')}<div class="fe" id="csnone" style="display:none">찾는 회원이 없습니다<br>이름을 다시 확인해 주세요</div></div>` };
+}
+document.addEventListener('input', ev => { const f = ev.target.closest && ev.target.closest('[data-csq]'); if(!f) return;      /* 상담 탭 검색 — 치면 전체 회원에서 · 비우면 최근 상담 */
+  const q = (f.value || '').trim().toLowerCase(), 모 = document.getElementById('csall'), 최 = document.getElementById('csrecent'), 머 = document.getElementById('cslbl'); if(!모) return;
+  let n = 0; 모.querySelectorAll('.csr').forEach(el => { const 맞 = !!q && el.dataset.csnm.toLowerCase().includes(q); el.style.display = 맞 ? '' : 'none'; if(맞) n++; });
+  모.style.display = q ? '' : 'none'; if(최) 최.style.display = q ? 'none' : ''; if(머) 머.style.display = q ? 'none' : ''; const 빈 = document.getElementById('csnone'); if(빈) 빈.style.display = q && !n ? '' : 'none'; });
+
+/* 자료 (2026-11-04 아래 탭에서 뺌 — 옛 주소로 들어와도 열리게만 둔다) */
 function tTools(){
   /* 2026-10-13 디자인 새 안 — 글만 있던 줄 여섯 개 → 회원 「내 정보」와 같은 아이콘 묶음. 아이콘 + 이름 + 숫자만(설명 문장은 뺐다). 세 묶음: 수업 준비 / 자료 / 계정 */
   const 줄 = (ico, 이름, act, 수, 딱, 꼴) => `<button class="mrow2${꼴 ? ' ' + 꼴 : ''}" data-act="${act}"><span class="mi">${svg(ico, 19)}</span><span class="mt"><b>${이름}</b></span>${수 ? `<em class="tn${딱 ? ' bd' : ''}">${수}</em>` : ''}<i>›</i></button>`;
@@ -12955,33 +12994,47 @@ function 즐찾옮김(){ let 옛 = []; try{ 옛 = JSON.parse(localStorage.getIte
   if(새.length){ 새.forEach(id => D.favs.push({ trainer:TRAINER, member_id:id })); sv(spost('trainer_favs', 새.map(id => ({ trainer:TRAINER, member_id:id })), {on:'trainer,member_id'}), '즐겨찾기 옮기기'); }
   try{ localStorage.removeItem(즐찾키()); }catch(e){} }
 const 별 = on => `<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 3.2l2.7 5.6 6.1.8-4.5 4.3 1.1 6.1L12 17.1 6.6 20l1.1-6.1L3.2 9.6l6.1-.8z" fill="${on?'currentColor':'none'}" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
-function tMembers(){
-  return { top: bar('회원 목록', `<span class="sub">담당 ${MEMBERS.length}명</span>`), body:
-    (()=>{ const 거름 = S.tmreg || '';
-      const 수 = { 신규: MEMBERS.filter(m=>m.reg==='신규').length, 재등록: MEMBERS.filter(m=>m.reg==='재등록').length };
-      const 별들 = 즐찾().filter(id => MEMBERS.some(m=>m.id===id));
-      const 다줄 = MEMBERS.map(m=>{
-        const ws=D.workouts.filter(w=>w.mid===m.id&&w.done).slice().sort(byDateDesc), last=ws[0];
-        const lv=liveOf(m.id), nofb=last && !D.cm.some(c=>c.mid===m.id && c.at==='방금');
-        return { m, last, lv, nofb, fav: 별들.includes(m.id) }; });
-      const 안본수 = 다줄.filter(x=>!x.lv && x.nofb).length;
-      const 줄 = 다줄.filter(x => !거름 || (거름==='★' ? x.fav : 거름==='안봄' ? (!x.lv && x.nofb) : x.m.reg === 거름)).sort((a,b)=>(b.fav?1:0)-(a.fav?1:0));      /* 즐겨찾기가 맨 위 (나머지 차례는 그대로) */
-      /* 맨 위 숫자 셋 — 실제 수. 그래프는 안 넣는다(넣을 실제 자료가 없다) */
-      return `<div class="tmsum">
-          <div><small>담당 회원</small><b>${다줄.length}<i>명</i></b></div>
-          <div class="t"><small>지금 운동 중</small><b>${다줄.filter(x=>x.lv).length}<i>명</i></b></div>
-          <div><small>안 본 기록</small><b>${안본수}<i>명</i></b></div></div>
-        <div class="chips">${[['','전체',MEMBERS.length],['신규','신규',수.신규],['재등록','재등록',수.재등록],['★','★ 즐겨찾기',별들.length],['안봄','안 본 기록',안본수]].map(k=>`<button class="chip ${k[0]==='★'?'fav':''} ${거름===k[0]?'on':''}" data-act="tmreg:${k[0]}">${k[1]} ${k[2]}</button>`).join('')}</div>
-        <input class="search" type="text" data-filter="1" placeholder="회원 이름으로 검색">
-        <div class="megrp">${줄.length ? '' : `<div class="empty">${거름==='★' ? '아직 즐겨찾기한 회원이 없어요<br>회원 이름 옆 별을 눌러 보세요' : '해당하는 회원이 없어요'}</div>`}${줄.map(({m,last,lv,nofb,fav})=>`<div class="mrow2 favrow" data-nm="${esc(m.n)}">
+/* ══ 회원 탭 ══ (2026-11-04 대표 시안2 「이대로」 · 말씀 「기본은 전체 검색 / 담당 및 즐겨찾기 전체 나열 · 버튼으로 원하는 목록 · 처음 10명 · 그다음 10명씩 · 느려지지 않게 끊어서」)
+   위 검색 = 전체 회원에서(담당 아닌 회원도) · 칩 = 담당 + ★(기본) · 담당 · ★ · 신규 · 재등록 · 안 본 기록 · 「10명 더 보기」 · 「전체 보기」 · 「접기」 · 회원 추가(전산 검색)는 맨 아래 한 줄 */
+function 회원줄들(){
+  const 별들 = 즐찾().filter(id => MEMBERS.some(m=>m.id===id));
+  return MEMBERS.map(m => { const ws=D.workouts.filter(w=>w.mid===m.id&&w.done).slice().sort(byDateDesc), last=ws[0];
+    const lv=liveOf(m.id), nofb=last && !D.cm.some(c=>c.mid===m.id && c.at==='방금');
+    return { m, last, lv, nofb, fav: 별들.includes(m.id), 담: (m.tr || '') === TRAINER }; });
+}
+function 회원목록글(){
+  const 거름 = S.tmreg || '담별', q = String(S.tmq || '').trim().toLowerCase(), 다 = 회원줄들(), N = S.tmPg || 10;
+  const 맞 = x => q ? String(x.m.n || '').toLowerCase().includes(q) : 거름 === '담별' ? (x.담 || x.fav) : 거름 === '담당' ? x.담 : 거름 === '★' ? x.fav : 거름 === '안봄' ? (!x.lv && x.nofb) : x.m.reg === 거름;
+  const 줄 = 다.filter(맞).sort((a,b) => (b.fav?1:0)-(a.fav?1:0) || (b.담?1:0)-(a.담?1:0)), 보 = 줄.slice(0, N);
+  const 한줄 = ({m,last,lv,nofb,fav,담}) => `<div class="mrow2 favrow">
           <button class="favbtn ${fav?'on':''}" data-act="tmfav:${m.id}" aria-label="${fav?'즐겨찾기 해제':'즐겨찾기'}">${별(fav)}</button>
           <button class="tmgo" data-act="tm:${m.id}">
           ${갈래원(m.id)}
           <span class="mt"><b>${esc(m.n)}</b><small>${lv?`지금 운동 중 · ${esc((it0=>it0?exName(it0.ex,it0.va):'')(lv.items[lv.cur]||lv.items[0]))}`
-            :(last?`${dateTxt(last.date)} · ${esc(last.kind||'')}`:'기록 없음')}</small></span>
-          ${lv?'<span class="pill t">진행 중</span>':(nofb?'<span class="nbdot" title="안 본 기록"></span>':'')}<i>›</i></button></div>`).join('')}</div>`; })()
-    + `<button class="btn sub" data-act="newmem" style="margin-top:4px;flex:none">＋ 회원 추가</button>` };
+            :(last?`${dateTxt(last.date)} · ${esc(last.kind||'')}`:'기록 없음')}${!담 && m.tr ? ' · 담당 ' + esc(m.tr) : ''}</small></span>
+          ${lv?'<span class="pill t">진행 중</span>':(nofb?'<span class="nbdot" title="안 본 기록"></span>':'')}<i>›</i></button></div>`;
+  const 빈 = q ? '<div class="empty">찾는 회원이 없습니다<small class="e2">전산에 있는 회원이면 아래 「전산에서 찾아 추가」를 눌러 주세요</small></div>'
+    : 거름 === '★' ? '<div class="empty">아직 즐겨찾기한 회원이 없습니다<small class="e2">회원 이름 옆 별을 눌러 주세요</small></div>'
+    : 거름 === '담별' || 거름 === '담당' ? '<div class="empty">담당 회원이 없습니다<small class="e2">위 검색에서 회원을 찾아 별을 눌러 주세요</small></div>' : '<div class="empty">해당하는 회원이 없습니다<small class="e2">다른 칩을 눌러 주세요</small></div>';
+  const 남 = 줄.length - 보.length;
+  return `<div class="megrp">${보.length ? 보.map(한줄).join('') : 빈}</div>`
+    + (남 > 0 ? `<div class="tmpg"><button class="btn ghost" data-act="tmpg:more">${Math.min(10, 남)}명 더 보기 ⌄</button><button class="btn ghost" data-act="tmpg:all">전체 보기 ${줄.length}</button></div>`
+      : 보.length > 10 ? `<div class="tmpg"><button class="btn ghost" data-act="tmpg:fold">접기 ⌃</button></div>` : '');
 }
+function tMembers(){
+  const 거름 = S.tmreg || '담별', 다 = 회원줄들(), 수 = k => 다.filter(x => k === '담별' ? (x.담 || x.fav) : k === '담당' ? x.담 : k === '★' ? x.fav : k === '안봄' ? (!x.lv && x.nofb) : x.m.reg === k).length;
+  const 안본수 = 수('안봄');
+  return { top: bar('회원', `<span class="sub">담당 ${수('담당')}명</span>`), body:
+    `<div class="tmsum">
+          <div><small>담당 회원</small><b>${수('담당')}<i>명</i></b></div>
+          <div class="t"><small>지금 운동 중</small><b>${다.filter(x=>x.lv).length}<i>명</i></b></div>
+          <div><small>안 본 기록</small><b>${안본수}<i>명</i></b></div></div>
+        <input class="search" type="text" data-tmq="1" placeholder="전체 회원에서 이름으로 검색" autocomplete="off" value="${esc(S.tmq || '')}">
+        <div class="chips">${[['담별','담당 + ★'],['담당','담당'],['★','★ 즐겨찾기'],['신규','신규'],['재등록','재등록'],['안봄','안 본 기록']].map(k=>`<button class="chip ${k[0]==='★'?'fav':''} ${거름===k[0]?'on':''}" data-act="tmreg:${k[0]}">${k[1]} ${수(k[0])}</button>`).join('')}</div>
+        <div id="tmlist">${회원목록글()}</div>
+        <button class="hline" data-act="newmem">${svg('h_user',18)}<b>전산에서 찾아 추가</b><small>앱에 없는 회원 · 이름이나 전화 뒷자리</small></button>` };
+}
+document.addEventListener('input', ev => { const f = ev.target.closest && ev.target.closest('[data-tmq]'); if(!f) return; S.tmq = f.value; S.tmPg = 10; const el = document.getElementById('tmlist'); if(el) el.innerHTML = 회원목록글(); });      /* 다시 그리지 않고 목록만 — 치는 중 글자칸이 안 끊긴다 */
 function tMember(){
   if(!MEMBERS.find(x=>x.id===S.tmid)){ S.tmid = null; return tMembers(); }      /* 못 찾는 회원(직원 기록 · 지워진 회원)이면 회원 목록으로 — 오류 화면을 띄우지 않는다 (2026-10-14) */
   const m=MEMBERS.find(x=>x.id===S.tmid), ws=D.workouts.filter(w=>w.mid===m.id&&w.done).slice().sort(byDateDesc);
@@ -13037,10 +13090,10 @@ function 지난기록카드(m, ws){ const 다 = ws.filter(x => 세트있나(x)),
   if(!다.length) return `<div class="tmlast none"><small>지난 기록</small><span>아직 기록이 없어요 · 수업을 기록하면 여기에 나와요</span></div>`;
   const 세트 = s => (s.kg ? kgfmt(s.kg) + 'kg × ' : '') + (s.reps || 0);
   const 카드 = w => { const its = w.items.filter(it => it.sets.length && !isMemo(it.ex)), 근 = its.filter(it => !(exOf(it.ex) || {}).cardio), 유 = its.filter(it => (exOf(it.ex) || {}).cardio);
-    return `<div class="tmrc" data-act="tw:${w.id}"><div class="tlh"><b>${dateTxt(w.date)}</b><span class="k">${esc(w.kind || '')}</span>${w.title ? `<small>${esc(w.title)}</small>` : ''}<i>›</i></div>
+    return `<div class="tmrc${w.kind === '개인운동' ? ' self' : ''}" data-act="tw:${w.id}"><div class="tlh"><b>${dateTxt(w.date)} <u>(${'일월화수목금토'[new Date(w.date + 'T00:00:00').getDay()]})</u></b><span class="k">${esc(w.kind || '')}</span>${w.title ? `<small>${esc(w.title)}</small>` : ''}<i>›</i></div>
       <div class="tmfig tmfig2">${오늘부위판(w, false)}</div><div class="tlt">${플래너표(w)}</div>${(() => { const 메 = (D.cm || []).filter(c => c.wid === w.id && c.ex === 'memo').map(c => c.tx).filter(Boolean); return 메.length ? `<div class="tmmemo"><b>수업 메모</b>${메.map(t => esc(t)).join(' · ')}</div>` : ''; })()}<button class="mu-go sm" data-act="bulkopen:${w.id}"><span class="e">📤</span><span>이 수업 피드백 몰아서 올리기</span></button></div>`; };      /* 수업 메모 맨 아래 · 몰아서 올리기 (2026-11-03) */      /* 표 = 수업 기록 그대로 (2026-11-03 19:25) */
   return `<span class="lbl">지난 기록 <small>수업 · 개인운동 ${다.length}회</small></span><div class="tmrs">${보.map(카드).join('')}</div>`
-    + (다.length > 보.length ? `<button class="btn ghost tmmore" data-act="tmmore:${m.id}">더 보기 · ${다.length - 보.length}회 남음</button>` : ''); }
+    + (다.length > 보.length ? `<button class="btn ghost tmmore" data-act="tmmore:${m.id}">${Math.min(5, 다.length - 보.length)}개 더 보기 ⌄</button>` : ''); }      /* 「n개 더 보기」 = 데스크와 같은 말 (2026-11-04 대표) */
 /* 트레이너 회원 화면의 기록 한 줄 — 화면·전체 보기 창이 같이 쓴다 */
 const 기록줄 = w => 펼줄(w, `<button class="btn sub sm" data-act="tw:${w.id}">피드백 ›</button>`);      /* 펼치면 기록했던 화면 그대로 (2026-10-26 a3) */
 /* 지난 운동 기록 모두 — 화면에 끝없이 늘어놓지 않고 창 안에서 스크롤 (2026-10-05 대표) */
@@ -13743,6 +13796,11 @@ document.addEventListener('click', async ev=>{
     case 'tfm': S.tfeed=rest[0]; render(); return;
     case 'fsec': { const 지금 = document.querySelector('.fsec[data-k="' + rest[0] + '"]'); 칸접힘[rest[0]] = !(지금 && 지금.classList.contains('shut')); try{ localStorage.setItem('gg_fsec', JSON.stringify(칸접힘)); }catch(e){} if(지금) 지금.classList.toggle('shut', 칸접힘[rest[0]]); return; }      /* 칸 접기 (2026-10-21) */
     case 'tfm2': S.tfeed=rest[0]; S.ttab='t_feed'; go('t_feed'); return;
+    case 'trme': openSheet(() => `<div class="h2">${esc(TRAINER || '')} <small>트레이너</small></div><div class="megrp">${시험판 ? `<button class="mrow2" data-act="switch"><span class="mi">${svg('user', 19)}</span><span class="mt"><b>회원 화면으로 전환</b></span><em class="tn">시험판</em></button>` : `<button class="mrow2 out" data-act="switch"><span class="mi">${svg('flag', 19)}</span><span class="mt"><b>로그아웃</b></span><i>›</i></button>`}</div><button class="btn ghost sm" data-act="close">닫기</button>`); return;
+    case 'tmpg': S.tmPg = rest[0] === 'more' ? (S.tmPg || 10) + 10 : rest[0] === 'all' ? 99999 : 10; { const el = document.getElementById('tmlist'); if(el) el.innerHTML = 회원목록글(); else render(); } return;
+    case 'csscan': openSheet(() => `<div class="h2">종이 상담지 올리기 <small>누구 상담지인가요</small></div><input class="search" type="text" data-filter="1" placeholder="회원 이름으로 검색"><div class="pickbox"><div class="megrp">${MEMBERS.slice().sort((a, b) => ((b.tr === TRAINER) - (a.tr === TRAINER)) || String(a.n).localeCompare(String(b.n))).map(m => `<button class="mrow2" data-nm="${esc(m.n)}" data-act="scanpaper:${m.id}">${갈래원(m.id)}<span class="mt"><b>${esc(m.n)}</b><small>${esc(m.tr ? '담당 ' + m.tr : '담당 없음')}</small></span><i>›</i></button>`).join('')}</div></div><button class="btn ghost sm" data-act="close">닫기</button>`); return;
+    case 'pzbig': S.pzBig = !S.pzBig; document.querySelectorAll('.pzfit').forEach(w => w.classList.toggle('big', !!S.pzBig)); document.querySelectorAll('[data-act="pzbig"]').forEach(b => b.textContent = S.pzBig ? '화면에 맞추기' : '크게 보기'); 상담지맞춰줄임(); return;
+    case 'csopen': S.subj = rest[0]; S.tmid = rest[0]; go('intake'); return;
     case 'pickmem': sheetPickMember(); return;
     case 'pickasg': sheetPickAssign(); return;
     case 'tassign': S.tmid=rest[0]; S.asgMode=true; closeSheet(); go('t_routines'); 주기팝업(rest[0]); return;
@@ -13893,7 +13951,7 @@ document.addEventListener('click', async ev=>{
     case 'sub2': S.subj=rest[1]; go(rest[0]); return;
 
     /* 상담일지 · 운동계획 편집 */
-    case 'scanpaper': { if(S.who !== 'tr') return; S.scanTok = !!(await 직원토큰()); sheetScan(rest[0]); return; }
+    case 'scanpaper': { if(S.who !== 'tr') return; S.scanTok = !!(앱직원증표() || await 직원토큰()); sheetScan(rest[0]); return; }      /* 앱 직원 로그인이면 로그인 창 없이 바로 찍기 · 앨범 (2026-11-04) */
     case 'scanlogin': { const mid = rest[0]; closeSheet(); 직원로그인창(() => { S.scanTok = true; sheetScan(mid); }); return; }
     case 'scanuse': { const q = S.scanQ; if(!q || !q.다름) return; const d = D.intake[q.mid] || (D.intake[q.mid] = {}); d.meals = d.meals || {};
       const 넣 = x => { const 칸 = (k, v) => { S.draft = S.draft || {}; S.draft[k] = v; const el = document.querySelector('[data-k="' + k + '"]'); if(el) el.value = v; };
@@ -15214,7 +15272,7 @@ document.addEventListener('click', async ev=>{
     case 'rkb': S.rkb=rest[0]; render(); return;
     case 'rks': S.rks=rest[0]; render(); return;
     case 'rkmine': sheetRkMine(); return;
-    case 'tmreg': S.tmreg = rest[0] || ''; render(); return;
+    case 'tmreg': S.tmreg = rest[0] || '담별'; S.tmPg = 10; S.tmq = ''; render(); return;      /* 칩을 누르면 검색은 비우고 10명부터 */
     case 'tmfav': { 즐찾옮김(); const 켬 = 즐찾바꿈(rest[0]); toast(켬 ? '즐겨찾기에 추가했어요' : '즐겨찾기에서 삭제했어요'); render(); return; }
     case 'tdlive': sheetTdLive(); return;
     case 'tdtodo': sheetTdTodo(); return;
