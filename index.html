@@ -2940,6 +2940,8 @@ body.kpon #main{padding-bottom:380px}
 @media (max-width:640px){.pz:not(.dk) .pz-r{grid-template-columns:1fr}.pz:not(.dk) .pz-g2{grid-template-columns:1fr}.pz:not(.dk) .pz-hd{margin-left:0}.pz:not(.dk) .pz-days{grid-template-columns:repeat(7,1fr)}}      /* .dk = 데스크와 같은 A4 모양(맞춰 줄임) — 한 줄로 접지 않는다 (2026-11-04) */
 .cgate.off{opacity:.45;cursor:default;pointer-events:none}
 .vu-s{margin-top:6px}.vu-s input{width:100%;height:38px;border-radius:10px;border:1px solid #4a473f;background:#1a1917;color:var(--cream);font:inherit;font-size:14px;padding:0 12px}.vu-sr{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.vu-sr button{border:1px solid #4a473f;border-radius:999px;padding:4px 11px;background:#1d1c1a;color:var(--cream);font:inherit;font-size:13px;font-weight:700}.vu-sr small{color:var(--sub);font-size:13px}
+.jfc{position:relative}.jfc .jfn{position:absolute;left:10px;top:10px;width:24px;height:24px;border-radius:50%;border:1.5px solid #5a554c;background:#1a1917;color:#2a1c14;font:inherit;font-size:12.5px;font-weight:900;display:flex;align-items:center;justify-content:center;padding:0}.jfc .jfn.on{background:var(--gold);border-color:var(--gold)}.jfc:has(.jfn) .t{padding-left:30px}.jfc.sel{border-color:var(--gold-2)}.jfputn{position:sticky;bottom:0;width:100%;margin-top:8px}
+.pkmini button.b{color:#9cc8ff;border-color:#3a6aa0;background:rgba(80,140,220,.14);font-weight:800}
 .pzbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:2px 2px 8px;font-size:13px;color:var(--sub)}.pzfit{overflow:hidden;border-radius:12px;flex:none}      /* flex:none — 세로 flex 안에서 줄어들어 아래가 잘리고 스크롤이 안 생겼다 (2026-11-05 대표 「상담일지 작성 스크롤 안 됨 · PC · 태블릿」) */.pzfit.big{position:fixed;inset:0;z-index:9000;background:#151513;overflow:auto;-webkit-overflow-scrolling:touch;border-radius:0;padding:calc(58px + env(safe-area-inset-top, 0px)) 8px calc(24px + env(safe-area-inset-bottom, 0px))}
 .pzfit .pzx{display:none}.pzfit.big .pzx{display:block;position:fixed;top:calc(10px + env(safe-area-inset-top, 0px));right:12px;z-index:9001;height:40px;padding:0 16px;border-radius:999px;border:0;background:linear-gradient(180deg,#f3d9a8,#e2c184);color:#2a1c14;font:inherit;font-size:15px;font-weight:900;box-shadow:0 4px 14px rgba(0,0,0,.5)}.pzfit>.pz{width:760px;max-width:none}
 .tmpg{display:flex;gap:8px;margin-top:8px}.tmpg .btn{flex:1;height:44px}
@@ -3445,7 +3447,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '545';
+const BUILD = '548';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -5254,7 +5256,7 @@ function bar(title, right, back, sub){
 }
 /* 데스크 창 안 — 아래 탭 숨김 (나가기는 데스크 창 ✕) */
 (() => { const st = document.createElement('style'); st.textContent = '.deskin #tabs{display:none!important}.deskin #frame{max-width:none;width:100%;height:100vh;border:none;border-radius:0}'      /* 데스크 안 넓은 화면 — 글씨 1.2배 · 본문은 가운데 넓게 · 아래 창은 가운데 대화창 (2026-10-24 대표 「PC 와 모바일 사이즈가 다르듯 크게」) */
-    + '@media (min-width:760px){.deskin #frame{zoom:1.2}.deskin #top,.deskin #main,.deskin #foot{width:100%;max-width:900px;margin-left:auto;margin-right:auto;box-sizing:border-box}'
+    + '@media (min-width:760px){.deskin #frame{zoom:1.2;height:calc(100vh / 1.2)}.deskin #top,.deskin #main,.deskin #foot{width:100%;max-width:900px;margin-left:auto;margin-right:auto;box-sizing:border-box}'
     + '.deskin #sheet{align-items:center;justify-content:center}.deskin #sheetbox{width:min(640px,92%);max-width:640px;border-radius:20px;border:1px solid var(--line)}}'; document.head.appendChild(st); })();
 function tabBar(){
   const u=unreadOf(S.mid);
@@ -6189,10 +6191,11 @@ function vPick(){
   return { top: bar('종목 선택','', (w&&w.begun)?'go:workout':'go:start'), body:`${맨위}
     <input class="search" type="text" data-k="exq" placeholder="종목 검색 · 예) 스쿼트, bp, 코어">
     <div class="pkparts">${['전체'].concat(PARTS).map(x=>`<button class="chip ${x===S.pickPart?'on':''}" data-act="part:${x}">${x}</button>`).join('')}${추가운동().length ? `<button class="chip mine ${S.pickPart==='직접 추가'?'on':''}" data-act="part:직접 추가">직접 추가 ${추가운동().length}</button>` : ''}</div>
-    <div class="pkmini" id="pickhint">${S.who==='tr' ? `<button class="g" data-act="exnew">＋ 새 종목</button>` : ''}
-      <button class="${(S.pickOpen || S.pickEq!=='전체')?'on':''}" data-act="partopen">기구 · ${esc(S.pickEq)} ${S.pickOpen?'▴':'▾'}</button>
-      <button data-act="memoadd">＋ 기타운동</button>
+    <div class="pkmini" id="pickhint">      ${''/* 차례 = 간편추가 · 새 종목 · 1RM · 기구 · 추가 단추는 파랑 (2026-11-05 대표 시안 ⑦ 「+종목 간편추가 , +새 종목 / 1rm 종목 / 기구-전체 · 추가버튼은 푸른색으로」 · 기타운동 = 간편추가로 합침) */}
+      <button class="b" data-act="memoadd">＋ 종목 간편추가</button>
+      ${S.who==='tr' ? `<button class="b" data-act="exnew">＋ 새 종목</button>` : ''}
       <button class="g" data-act="rmaddpick">${svg('h_crown',14)} 1RM 종목</button>
+      <button class="${(S.pickOpen || S.pickEq!=='전체')?'on':''}" data-act="partopen">기구 · ${esc(S.pickEq)} ${S.pickOpen?'▴':'▾'}</button>
     </div>
     ${S.pickOpen?`<div class="chips pkeq">${EQS().map(x=>`<button class="chip ${x===S.pickEq?'on t':''}" data-act="peq:${x}">${x}</button>`).join('')}</div>`:''}
     ${순서줄()}
@@ -6241,7 +6244,7 @@ function sheetStart(){
 }
 function sheetMemoAdd(){
   openSheet(()=>`
-    <div class="h2">기타운동 추가 <small>이름을 입력해 주세요</small></div>
+    <div class="h2">종목 간편추가 <small>이름만 써도 돼요</small></div>
     <input class="search" type="text" data-k="memo:n" placeholder="예) 팔로프 프레스 · 케틀벨 스윙 · 밴드 워크">
     <div class="chips">${['팔로프 프레스','케틀벨 스윙','밴드 워크','TRX','메디신볼','박스 점프','스텝업','데드버그']
       .map(x=>`<button class="chip" data-act="memofill:${x}">${x}</button>`).join('')}</div>
@@ -6829,7 +6832,7 @@ async function newLive(title, items, kind, rid, mid, by, 기록날){
            by:by||'회원', begun: items.length>0, mine:true };   /* 담기만 한 상태면 아직 시작 전 */
   if(기록날) D.live.기록날 = 기록날;
   if(!t0) items.forEach(it=>{ it.startAt = null; });
-  save(); go(items.length ? 'workout' : 'pick');
+  save(); go(items.length || by === '트레이너' ? 'workout' : 'pick');      /* 빈 수업 = 종목 선택 말고 기록 화면(그림 · 무게 표)부터 (2026-11-05 대표 시안 ⑦ 「빈 종목으로 수업 시작 누르면 그 페이지가 뜨도록 · 임의로 올려서 바로 등록할 수도 있으니까」) */
   await sv(spost('workouts',[Object.assign({ id, member_id:mid, on_date:TODAY, kind:D.live.kind,
     routine_id:rid||null, title, dur:0, done:false }, 기록날 ? { rec_date:기록날 } : {})]), '운동 시작');      /* 110단계 — 어떤 길로 닫혀도 데이터베이스가 on_date 를 rec_date 로 맞춘다 */
   for(let i=0;i<items.length;i++) await svNewItem(i);
@@ -7278,15 +7281,17 @@ function 지난목(exid, 나){ const 묶 = new Map();      /* 같은 글은 한 
     if(o) o.row = x; else if((x.stars || []).includes(나) || x.gone_at) 묶.set(b, { body:b, n:0, last:String(x.created_at || ''), row:x }); });
   return [...묶.values()].map(o => Object.assign(o, { star:!!(o.row && (o.row.stars || []).includes(나)), hid:!!(o.row && o.row.gone_at) })).sort((a, b) => (b.star - a.star) || b.last.localeCompare(a.last)); }
 function 지난속(이름, 나, 끝){ const 주 = 'btn main sm', 보조 = 'btn ghost sm';  const L = 지난목(지난.exid, 나), q = 지난.찾기.trim(), 보 = L.filter(o => o.hid === 지난.숨김봄 && (!q || o.body.includes(q))), 숨수 = L.filter(o => o.hid).length; 지난.보 = 보;
-  const 카드 = (o, i) => { const 열 = 지난.열린 === o.body;
-    return '<div class="jfc' + (열 ? ' open' : '') + '" data-act="jfcard:' + i + '"><div class="t">' + esc(o.body) + '</div>'
+  const 고 = 지난.고름 || [];
+  const 카드 = (o, i) => { const 열 = 지난.열린 === o.body, 번 = 고.indexOf(o.body);
+    return '<div class="jfc' + (열 ? ' open' : '') + (번 >= 0 ? ' sel' : '') + '" data-act="jfcard:' + i + '">' + (지난.숨김봄 ? '' : '<button class="jfn' + (번 >= 0 ? ' on' : '') + '" data-act="jfsel:' + i + '" aria-label="이어 붙이기 차례">' + (번 >= 0 ? 번 + 1 : '') + '</button>') + '<div class="t">' + esc(o.body) + '</div>'
       + (열 ? '<div class="act"><button class="' + 주 + ' jfput" data-act="jfput:' + i + '">불러오기</button>' + (지난.숨김봄 ? '<button class="' + 보조 + '" data-act="jfback:' + i + '">다시 보이기</button>' : '<button class="' + 보조 + '" data-act="jfhide:' + i + '">목록에서 숨기기</button>') + '</div>' : '')
       + '<div class="m"><span>' + (o.n > 1 ? o.n + '번 씀 · ' : '') + 지난날(o.last) + '</span>' + (지난.숨김봄 ? '' : '<button class="jfst' + (o.star ? ' on' : '') + '" data-act="jfstar:' + i + '" aria-label="즐겨찾기">' + (o.star ? '★' : '☆') + '</button>') + '</div></div>'; };
   return '<div class="jfh"><b>' + (지난.숨김봄 ? '숨긴 글 · ' : '지난 피드백 · ') + esc(이름) + '</b><button class="jfx" data-act="jfclose" aria-label="닫기">✕</button></div>'
     + '<div class="jfs">' + (지난.숨김봄 ? '누르면 펼쳐져요 · 「다시 보이기」로 돌아와요' : '내가 쓴 것만 ' + L.filter(o => !o.hid).length + '개 · ★ 먼저 · 최근 순') + '</div>'
     + (지난.숨김봄 ? '' : '<input class="jfq" id="jfq" placeholder="검색" value="' + esc(지난.찾기) + '">')
     + '<div class="jfl" id="jfl">' + (보.length ? 보.map(카드).join('') : '<div class="jfs">' + (q ? '검색 결과가 없어요' : 지난.숨김봄 ? '숨긴 글이 없어요' : '이 종목에 쓴 피드백이 아직 없어요') + '</div>') + '</div>'
-    + (숨수 || 지난.숨김봄 ? '<button class="' + 보조 + ' jfhid" data-act="jfhid">' + (지난.숨김봄 ? '돌아가기' : '숨긴 글 ' + 숨수) + '</button>' : ''); }
+    + (숨수 || 지난.숨김봄 ? '<button class="' + 보조 + ' jfhid" data-act="jfhid">' + (지난.숨김봄 ? '돌아가기' : '숨긴 글 ' + 숨수) + '</button>' : '')
+    + (!지난.숨김봄 && 고.length ? '<button class="btn main jfputn" data-act="jfputn">' + 고.length + '줄 순서대로 붙이기</button>' : ''); }      /* 동그라미를 누른 차례대로 이어 붙임 (2026-11-05 대표 시안 ⑭ 「여러 개 눌러 순서대로 이어 붙이기」) */
 function 지난그리기(){ let w = document.getElementById('jfw'); if(!w){ w = document.createElement('div'); w.id = 'jfw'; w.addEventListener('click', e => { if(e.target === w) 지난닫기(); }); document.body.appendChild(w); }
   const 이름 = (exOf(지난.exid) || {}).n || '';
   w.innerHTML = '<div class="bx">' + 지난속(이름, 나선생(), '') + '</div>';
@@ -15064,7 +15069,10 @@ document.addEventListener('click', async ev=>{
     case 'rgo': S.rest.until=Date.now()+S.rest.sec*1000; drawSheet(); return;
     case 'rskip': S.rest=null; closeSheet(); return;
     case 'cardio': S.cpick = null; S.cgoal = 0; sheetCardio(); return;
-    case 'jfopen': { Object.assign(지난, { exid:rest[0], 칸:rest.slice(1).join(':'), 열린:'', 찾기:'', 숨김봄:false }); 지난그리기();      /* 지난 피드백 (2026-11-03 A안) */
+    case 'jfsel': { const o = 지난.보[+rest[0]]; if(!o) return; 지난.고름 = 지난.고름 || []; const i = 지난.고름.indexOf(o.body); if(i >= 0) 지난.고름.splice(i, 1); else 지난.고름.push(o.body); 지난그리기(); return; }
+    case 'jfputn': { const 줄칸 = 지난.칸.startsWith('bk:'), t = document.querySelector('#sheet [data-k="' + (줄칸 ? 지난.칸 : 'cm:' + 지난.칸) + '"]'), 글 = (지난.고름 || []).join(줄칸 ? ' ' : String.fromCharCode(10)); 지난.고름 = []; 지난닫기();
+      if(t && 글){ t.value = (t.value.trim() ? t.value.replace(/\s+$/, '') + (줄칸 ? ' ' : String.fromCharCode(10)) : '') + 글; t.focus(); if(줄칸 && S.bulk){ const r = S.bulk.rows[+지난.칸.slice(3)]; if(r) r.tx = t.value; } } return; }
+    case 'jfopen': { Object.assign(지난, { exid:rest[0], 칸:rest.slice(1).join(':'), 열린:'', 찾기:'', 숨김봄:false, 고름:[] }); 지난그리기();      /* 지난 피드백 (2026-11-03 A안) */
       document.querySelector('#jfw .bx').innerHTML = '<div class="jfs">불러오는 중…</div>';
       try{ await 지난받기(); }catch(e){ 지난닫기(); toast('지난 피드백을 불러오지 못했어요'); return; }
       지난그리기(); return; }
