@@ -608,7 +608,7 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .vu-go{width:100%;height:52px;border-radius:14px;border:0;background:linear-gradient(180deg,#f3d9a8,#e2c184);color:#2a1c14;font:inherit;font-weight:900;font-size:16.5px;margin-top:8px}.vu-go:disabled{opacity:.5}
 .attlbl{font-size:14px;font-weight:800;color:#bfe6ec;margin:2px 0 6px}
 .fbq{display:flex;align-items:center;gap:10px;width:100%;min-height:50px;margin:8px 0;padding:0 14px;border-radius:12px;border:1.5px solid #5a554c;background:#1f1d1a;color:var(--cream);font:inherit;font-weight:800;font-size:15px;text-align:left;cursor:pointer}.fbq i{font-style:normal;font-size:18px}.fbq em{margin-left:auto;font-style:normal;color:var(--gold-2,#e2c184)}
-.fbsent{display:flex;align-items:center;width:100%;padding:10px 4px;border:0;background:none;color:var(--sub);font:inherit;font-weight:800;font-size:14px;cursor:pointer}.fbsent i{margin-left:auto;font-style:normal}
+.fbsent{display:flex;align-items:center;gap:8px;width:100%;padding:11px 14px;margin:4px 0;border:1px solid #3f7281;border-radius:12px;background:linear-gradient(160deg,#1e343b,#162327);color:var(--teal);font:inherit;font-weight:800;font-size:14.5px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25)}.fbsent::before{content:'💬'}.fbsent i{margin-left:auto;font-style:normal;color:var(--teal)}.fbsent:active{transform:translateY(1px)}      /* 눌러 보고 싶게 단추 모양 (2026-11-05 노션 「보낸 피드백 1개가 눈에 잘 안 보여 · 버튼식에 효과」) */
 #ospick{position:fixed;inset:0;z-index:9999}#ospick .osv{position:absolute;inset:0;background:rgba(0,0,0,.5)}#ospick .osb{position:absolute;left:0;right:0;bottom:0;background:#2b2a27;border-radius:18px 18px 0 0;padding:14px 12px calc(18px + env(safe-area-inset-bottom,0px))}
 #ospick .t{color:#cfc9be;font-size:14px;font-weight:700;padding:4px 8px 10px}#ospick button{display:flex;align-items:center;gap:14px;width:100%;height:56px;padding:0 14px;border:0;border-radius:12px;background:#35332f;color:#f2ead9;font:inherit;font-weight:800;font-size:16px;margin-bottom:8px}#ospick button .e{font-size:22px}#ospick .x{justify-content:center;background:none;color:#a9a29a;height:44px}
 .attbig button{display:flex;align-items:center;justify-content:center;gap:7px;padding:15px 8px;border-radius:14px;
@@ -2940,7 +2940,8 @@ body.kpon #main{padding-bottom:380px}
 @media (max-width:640px){.pz:not(.dk) .pz-r{grid-template-columns:1fr}.pz:not(.dk) .pz-g2{grid-template-columns:1fr}.pz:not(.dk) .pz-hd{margin-left:0}.pz:not(.dk) .pz-days{grid-template-columns:repeat(7,1fr)}}      /* .dk = 데스크와 같은 A4 모양(맞춰 줄임) — 한 줄로 접지 않는다 (2026-11-04) */
 .cgate.off{opacity:.45;cursor:default;pointer-events:none}
 .vu-s{margin-top:6px}.vu-s input{width:100%;height:38px;border-radius:10px;border:1px solid #4a473f;background:#1a1917;color:var(--cream);font:inherit;font-size:14px;padding:0 12px}.vu-sr{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.vu-sr button{border:1px solid #4a473f;border-radius:999px;padding:4px 11px;background:#1d1c1a;color:var(--cream);font:inherit;font-size:13px;font-weight:700}.vu-sr small{color:var(--sub);font-size:13px}
-.pzbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:2px 2px 8px;font-size:13px;color:var(--sub)}.pzfit{overflow:hidden;border-radius:12px}.pzfit.big{overflow-x:auto;-webkit-overflow-scrolling:touch}.pzfit>.pz{width:760px;max-width:none}
+.pzbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:2px 2px 8px;font-size:13px;color:var(--sub)}.pzfit{overflow:hidden;border-radius:12px;flex:none}      /* flex:none — 세로 flex 안에서 줄어들어 아래가 잘리고 스크롤이 안 생겼다 (2026-11-05 대표 「상담일지 작성 스크롤 안 됨 · PC · 태블릿」) */.pzfit.big{position:fixed;inset:0;z-index:9000;background:#151513;overflow:auto;-webkit-overflow-scrolling:touch;border-radius:0;padding:calc(58px + env(safe-area-inset-top, 0px)) 8px calc(24px + env(safe-area-inset-bottom, 0px))}
+.pzfit .pzx{display:none}.pzfit.big .pzx{display:block;position:fixed;top:calc(10px + env(safe-area-inset-top, 0px));right:12px;z-index:9001;height:40px;padding:0 16px;border-radius:999px;border:0;background:linear-gradient(180deg,#f3d9a8,#e2c184);color:#2a1c14;font:inherit;font-size:15px;font-weight:900;box-shadow:0 4px 14px rgba(0,0,0,.5)}.pzfit>.pz{width:760px;max-width:none}
 .tmpg{display:flex;gap:8px;margin-top:8px}.tmpg .btn{flex:1;height:44px}
 .fdh{display:flex;align-items:baseline;gap:8px;padding:8px 14px;background:#24221d;border-top:1px solid #34332d;font-weight:900;font-size:14.5px;color:#f6e7c6}.fdh:first-child{border-top:0}.fdh small{color:var(--sub);font-weight:700;font-size:13px}.fdh i{margin-left:auto;font-style:normal;color:var(--gold-2);font-size:13px}
 .tmrc .tlh{margin:-10px -12px 10px;padding:10px 12px;border-radius:15px 15px 0 0;border-bottom:1.5px solid #6a5a3a;background:linear-gradient(180deg,#2f281c,#211d16)}.tmrc .tlh b{font-size:17px;color:#f6e7c6}.tmrc .tlh b u{text-decoration:none;font-size:13.5px;color:#d9c9a5}
@@ -3444,7 +3445,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '542';
+const BUILD = '545';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -11028,8 +11029,8 @@ const 종이칸 = {
   goals: [['다이어트', '다이어트 (체중 감량)'], ['근력 향상', '근력 향상 · 근육량'], ['체형 교정', '체형 교정 · 자세'], ['통증 개선', '통증 개선 · 재활'], ['체력 향상', '체력 · 건강 관리'], ['바디프로필', '바디프로필 · 대회'], ['기타', '기타']],
 };
 /* 데스크와 같은 A4 모양 그대로(760px) · 폰 폭에 맞춰 줄여 보이고 · 「크게 보기」면 원래 크기로 옆으로 밀어 봄 (2026-11-04 대표 「상담지도 데스크처럼 · 똑같이 붙이고 확대해서 보는 방식」) */
-const 상담지맞춤 = h => `<div class="pzbar"><span>데스크와 같은 상담지예요</span><button class="chip" data-act="pzbig">${S.pzBig ? '화면에 맞추기' : '크게 보기'}</button></div><div class="pzfit${S.pzBig ? ' big' : ''}">${h.replace('<div class="pz', '<div class="pz dk')}</div>`;
-function 상담지맞춰줄임(){ document.querySelectorAll('.pzfit').forEach(w => { const p = w.firstElementChild; if(!p) return; p.style.zoom = w.classList.contains('big') ? '' : String(Math.min(1, (w.clientWidth || 360) / 760)); }); }
+const 상담지맞춤 = h => `<div class="pzbar"><span>데스크와 같은 상담지예요</span><button class="chip" data-act="pzbig">${S.pzBig ? '화면에 맞추기' : '크게 보기'}</button></div><div class="pzfit${S.pzBig ? ' big' : ''}"><button class="pzx" data-act="pzbig">✕ 닫기</button>${h.replace('<div class="pz', '<div class="pz dk')}</div>`;      /* 크게 보기 = 폰 화면 전체 · 위아래 · 옆 모두 밀어 봄 · 오른쪽 위 금색 닫기 (2026-11-05 노션 「확대는 되는데 아래로 스크롤이 안 돼 · 크게 보기하면 전체 화면 꽉 차게 · 우측 상단 닫기 황금색」) */
+function 상담지맞춰줄임(){ document.querySelectorAll('.pzfit').forEach(w => { const p = w.querySelector('.pz'); if(!p) return; p.style.zoom = w.classList.contains('big') ? '' : String(Math.min(1, (w.clientWidth || 360) / 760)); }); }
 new MutationObserver(() => { if(document.querySelector('.pzfit')) requestAnimationFrame(상담지맞춰줄임); }).observe(document.documentElement, { childList:true, subtree:true });
 window.addEventListener('resize', 상담지맞춰줄임);
 function 상담지종이(ik, m, 트, 좁, 편){      /* 편 = 그 자리에서 작성 · 수정 (2026-11-03 대표 「앱도 · 용지 위치 그대로」) */
@@ -13124,7 +13125,7 @@ function 지난기록카드(m, ws){ const 다 = ws.filter(x => 세트있나(x)),
   const 카드 = w => { const its = w.items.filter(it => it.sets.length && !isMemo(it.ex)), 근 = its.filter(it => !(exOf(it.ex) || {}).cardio), 유 = its.filter(it => (exOf(it.ex) || {}).cardio);
     return `<div class="tmrc${w.kind === '개인운동' ? ' self' : ''}" data-act="tw:${w.id}"><div class="tlh"><b>${dateTxt(w.date)} <u>(${'일월화수목금토'[new Date(w.date + 'T00:00:00').getDay()]})</u></b><span class="k">${esc(w.kind || '')}</span>${w.title ? `<small>${esc(w.title)}</small>` : ''}<i>›</i></div>
       <div class="tmfig tmfig2">${오늘부위판(w, false)}</div><div class="tlt">${플래너표(w)}</div>${(() => { const 메 = (D.cm || []).filter(c => c.wid === w.id && c.ex === 'memo').map(c => c.tx).filter(Boolean); return 메.length ? `<div class="tmmemo"><b>수업 메모</b>${메.map(t => esc(t)).join(' · ')}</div>` : ''; })()}<button class="mu-go sm" data-act="bulkopen:${w.id}"><span class="e">📤</span><span>이 수업 피드백 몰아서 올리기</span></button></div>`; };      /* 수업 메모 맨 아래 · 몰아서 올리기 (2026-11-03) */      /* 표 = 수업 기록 그대로 (2026-11-03 19:25) */
-  return `<span class="lbl">지난 기록 <small>수업 · 개인운동 ${다.length}회</small></span><div class="tmrs">${보.map(카드).join('')}</div>`
+  return `<span class="lbl">지난 기록</span><div class="tmrs">${보.map(카드).join('')}</div>`
     + (다.length > 보.length ? `<button class="btn ghost tmmore" data-act="tmmore:${m.id}">${Math.min(5, 다.length - 보.length)}개 더 보기 ⌄</button>` : ''); }      /* 「n개 더 보기」 = 데스크와 같은 말 (2026-11-04 대표) */
 /* 트레이너 회원 화면의 기록 한 줄 — 화면·전체 보기 창이 같이 쓴다 */
 const 기록줄 = w => 펼줄(w, `<button class="btn sub sm" data-act="tw:${w.id}">피드백 ›</button>`);      /* 펼치면 기록했던 화면 그대로 (2026-10-26 a3) */
@@ -15626,9 +15627,11 @@ async function finish(){
       D.cm.unshift({ id:cid, mid, ex:'memo', va:'트레이너 메모', tr:TRAINER, at:'방금', tx:몸, pics:0, vids:0, read:false, ts:new Date().toISOString(), media:[], wid:w.id }); w.trmemo = ''; }
     catch(e){ console.warn('트레이너 메모 저장 실패', e); toast('트레이너 메모를 저장하지 못했어요\n피드백에서 다시 남겨 주세요'); } }
   if(!done.length){
+    /* 저장할 세트도 피드백도 없으면 — 저절로 지우고 나가지 않는다 · 묻고 「기록 삭제하고 나가기」 눌러야 나감 · 아니면 기록 화면 그대로 (2026-11-05 14:03 대표 「창이 넘어가지 말고 · 기록 삭제하고 나가기로 해야 나가지게 · 기록이 안 되고 끝내지 말고」) */
+    if(!await 물어('저장할 세트가 없어요' + String.fromCharCode(10) + '종목을 추가해 기록하거나 이 기록을 삭제하고 나가 주세요', '기록 삭제하고 나가기')) return;
     await sv(sdel('workouts','id=eq.'+w.id), '운동 삭제');
     D.workouts=D.workouts.filter(x=>x.id!==w.id);
-    D.live=null; save(); toast('기록할 세트가 없어요');
+    D.live=null; save(); toast('기록을 삭제했어요');
     if(S.who==='tr'){ S.tmid=w.mid; S.subj=w.mid; S.stack=[]; S.screen='t_today'; S.ttab='t_today'; go('t_member'); } else go('home');
     return; }
   done.forEach(it=>{ if(!it.locked){ it.locked=true; it.sec=(it.sec||0)+(it.startAt ? Math.max(0, (시계지금(w)-it.startAt)/1000) : 0); } });
