@@ -3489,7 +3489,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '553';
+const BUILD = '554';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -8526,12 +8526,25 @@ function vRecord(){
               <span class="go2">＋ 세트 추가</span></button>`
           : `<div class="sm" style="margin-top:5px">${it.sets.map(st=>setTxt(it.ex,st)).join('  ·  ')||'세트 없음'}</div>`}
       </div>`).join('')
+    + (ed ? `<button class="btn sub" data-act="recaddex" style="margin-top:4px">＋ 종목 추가 <small>빠뜨린 종목 넣기</small></button>` : '')      /* 마친 기록 수정에도 종목 추가 (2026-11-06 대표 「수업 기록 완료하고 수정할 때 종목 추가가 안 돼 · 실수로 누락」) */
     ,
     foot: ed
       ? `<button class="btn ghost" data-act="reccancel">취소</button>
          <button class="btn blue" data-act="recask">수정 완료</button>`
       : (canEdit ? `<button class="btn blue go" data-act="recedit:${w.id}">기록 수정하기</button>` : '') };
 }
+
+/* 마친 기록에 종목 더하기 — 찾기 → 누르면 수정 중 기록 맨 아래에 1세트(지난 기록 값) · 저장은 「수정 완료」 때 */
+document.addEventListener('input', ev => { const t = ev.target; if(!t || !t.dataset || t.dataset.k !== 'recq' || !S.recEdit) return; S.recq = t.value; const q = t.value.trim(), box = document.getElementById('recqbox'); if(!box) return;      /* 칸은 그대로 두고 목록만 — 치는 중 끊기지 않게 */
+  const 목 = EX.filter(e => 고를수있나(e) && !e.memo && (!q || 검색맞음(e, q))).slice(0, 40);
+  box.innerHTML = 목.length ? 목.map(e => `<button class="card rowc" data-act="recaddgo:${esc(e.id)}"><div><div class="nm">${esc(e.n)}</div><div class="sm">${esc(e.p || '')}${e.e ? ' · ' + esc(e.e) : ''}</div></div><span class="rt">추가 ›</span></button>`).join('') : '<div class="note">찾는 종목이 없어요</div>'; });
+function sheetRecAddEx(){ const E = S.recEdit; if(!E) return;
+  openSheet(() => { const q = String(S.recq || '').trim(), 목 = EX.filter(e => 고를수있나(e) && !e.memo && (!q || 검색맞음(e, q))).slice(0, 40);
+    return `<div class="h2">종목 추가 <small>빠뜨린 종목</small></div>
+      <input class="search" type="search" data-k="recq" value="${esc(S.recq || '')}" placeholder="종목 검색 · 예) 스쿼트, bp" autocomplete="off">
+      <div class="pickbox" id="recqbox">${목.length ? 목.map(e => `<button class="card rowc" data-act="recaddgo:${esc(e.id)}"><div><div class="nm">${esc(e.n)}</div><div class="sm">${esc(e.p || '')}${e.e ? ' · ' + esc(e.e) : ''}</div></div><span class="rt">추가 ›</span></button>`).join('') : '<div class="note">찾는 종목이 없어요</div>'}</div>
+      <button class="btn ghost sm" data-act="close">닫기</button>`; });
+  setTimeout(() => { const el = document.querySelector('[data-k="recq"]'); if(el) el.focus(); }, 30); }
 
 /* 세트 하나 고치기 */
 function sheetSetEdit(i, j){
@@ -8564,6 +8577,9 @@ async function recSave(){
   if(!w) return;
   toast('수정하는 중이에요');
   for(const it of E.items){
+    if(!it._id && it.새){ if(!it.sets.length) continue;      /* 수정 중 더한 종목 — 줄부터 만든다 */
+      const back = await sv(spost('workout_items', [{ workout_id:w.id, sort:w.items.length, variant_id:VID(it.ex, it.va), sec:0, locked:false }], {ret:true}), '종목 추가');
+      if(!(back && back[0])) continue; it._id = back[0].id; w.items.push({ _id:it._id, ex:it.ex, va:it.va, sets:[], rest:60, sec:0, locked:true }); }
     const src = w.items.find(x=>x._id===it._id) || {};
     src.sets = it.sets.map(x=>({ kg:Number(x.kg)||0, reps:Number(x.reps)||0,
       spd: x.spd==null||x.spd==='' ? undefined : Number(x.spd) }));
@@ -15674,6 +15690,11 @@ document.addEventListener('click', async ev=>{
       const [i,j] = rest.map(Number);
       S.recEdit.items[i].sets.splice(j,1);
       closeSheet(); toast('삭제했어요\n「저장」을 눌러야 반영됩니다'); render(); return; }
+    case 'recaddex': S.recq = ''; sheetRecAddEx(); return;
+    case 'recaddgo': { const E = S.recEdit; if(!E) return; const e = exOf(rest[0]); if(!e) return; const va = (vars(e.id)[0] || {}).k || 'a', w = D.workouts.find(x => x.id === E.wid);
+      const 지 = w && w.mid ? 지난한것(w.mid, e.id, va) : null, 첫 = 지 || { kg:0, reps: e.cardio ? 0 : 10 };
+      E.items.push({ _id:null, ex:e.id, va, 새:true, sets:[{ kg:Number(첫.kg) || 0, reps:Number(첫.reps) || (e.cardio ? 0 : 10), spd:첫.spd }] });
+      closeSheet(); toast(e.n + ' 추가했어요\n세트를 고치고 「수정 완료」를 눌러야 반영됩니다'); render(); return; }
     case 'raddset': {
       const i = Number(rest[0]), it = S.recEdit.items[i];
       const last = it.sets[it.sets.length-1] || { kg:0, reps:10 };
