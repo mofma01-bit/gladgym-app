@@ -1,0 +1,325 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>GLAD 트레이너 연습</title>
+<link rel="icon" href="icon-192.png">
+<style>
+/* GLAD 트레이너 연습 — 진짜 앱(가짜 회원 샘플 · 저장 안 됨)을 옆에 띄우고 단계마다 눌러 보며 배운다 (2026-11-06 대표 「직접 눌러 보는 프로그램 · 나란히 놓고」) */
+:root{--bg:#121211;--card:#1b1a18;--c2:#23211e;--line:#34322d;--cream:#fffcf8;--sub:#c6bdb2;--gold:#f0d3a0;--gold-2:#d6b87e;--teal:#a9d8e6;--ok:#8fd19e;--blue:#d6ecff}
+*{box-sizing:border-box}html,body{height:100%}body{margin:0;background:var(--bg);color:var(--cream);font:15px/1.6 "Pretendard","Malgun Gothic",sans-serif;word-break:keep-all;overflow-wrap:break-word}
+button{font:inherit;cursor:pointer}
+.top{display:flex;align-items:center;gap:12px;padding:10px max(16px,env(safe-area-inset-left));border-bottom:1px solid var(--line);flex-wrap:wrap}
+.top .lg{border:1px solid #5a4c33;color:var(--gold);border-radius:8px;padding:3px 10px;font-weight:900;letter-spacing:.14em;font-size:13px}
+.top b{font-size:17px}.top .sp{flex:1}
+.top select{background:var(--c2);color:var(--cream);border:1px solid var(--line);border-radius:10px;padding:7px 10px;font:inherit;font-size:14px;max-width:62vw}
+.prog{min-width:120px;font-size:13px;color:var(--sub)}.prog i{display:block;height:6px;border-radius:9px;background:#2a2824;margin-top:3px;overflow:hidden}.prog u{display:block;height:100%;background:var(--gold);transition:width .3s}
+.lay{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;padding:16px max(16px,env(safe-area-inset-left));height:calc(100% - 60px)}
+@media(max-width:900px){.lay{grid-template-columns:1fr;height:auto}}
+.steps{display:flex;flex-direction:column;gap:8px;min-height:0;overflow:auto}
+.chh{font-size:20px;font-weight:900}.chh small{display:block;font-size:14px;color:var(--gold);font-weight:800;margin-top:2px}
+.st{border:1px solid var(--line);border-radius:12px;padding:9px 12px;color:var(--sub);font-size:14.5px;background:none;text-align:left;color:var(--sub)}
+.st.ok{color:var(--ok)}.st.ok::before{content:'✓ '}
+.st.now{border-color:var(--gold-2);background:#221e16;color:var(--cream);display:flex;gap:10px;padding:12px}
+.st .n{flex:none;width:28px;height:28px;border-radius:50%;background:var(--gold);color:#2a1c14;font-weight:900;display:flex;align-items:center;justify-content:center}
+.st.now b{font-size:16.5px;display:block}.st.now .d{color:var(--sub);font-size:14.5px;margin-top:2px}
+.tip{display:block;margin-top:8px;padding:8px 10px;border-radius:9px;background:rgba(70,150,230,.14);border:1px solid #4f8fd0;color:var(--blue);font-size:14px;font-weight:700}
+.hint{display:none;margin-top:8px;color:var(--gold);font-weight:800;font-size:14px}.hint.on{display:block;animation:hb .5s 2}
+@keyframes hb{50%{transform:translateX(4px)}}
+.nx{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.st.now>div:last-child{flex:1;min-width:0}.free{justify-content:flex-end}      /* 단추는 오른쪽 (2026-11-06 13:41 대표) */
+.btn{border-radius:12px;min-height:44px;padding:0 16px;font-weight:900;border:1px solid var(--line);background:var(--c2);color:var(--cream)}
+.btn.g{background:linear-gradient(180deg,#f3d9a8,#e2c184);color:#2a1c14;border:0}
+.btn.s{min-height:36px;font-size:13.5px;font-weight:800;color:var(--sub)}
+.free{display:flex;align-items:center;gap:8px;color:var(--sub);font-size:13.5px;margin-top:4px}
+.done{border:1px solid #3d6b49;background:#16241a;border-radius:12px;padding:14px;color:var(--ok);font-weight:900}
+.stage{display:flex;align-items:flex-start;justify-content:center;gap:18px;min-height:0}
+.ph{display:flex;flex-direction:column;align-items:center;gap:6px}
+.ph .lab{font-size:13.5px;font-weight:900;color:var(--gold)}.ph .lab small{color:var(--sub);font-weight:600;margin-left:6px}
+.fr{width:390px;height:844px;border-radius:34px;border:3px solid #3a3731;overflow:hidden;background:#000;transform-origin:top center;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.fr iframe{width:390px;height:844px;border:0;display:block}
+.arr{align-self:center;font-size:34px;color:var(--gold);font-weight:900;text-align:center}.arr small{display:block;font-size:12.5px;color:var(--sub)}
+.pics{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.pic{position:relative;width:250px}.pic img{width:100%;border-radius:18px;border:2px solid #3a3731;display:block}
+.pic .cap,.cap{font-size:14px;font-weight:800;margin-top:6px}.pic .no,.dpic .no{position:absolute;width:30px;height:30px;border-radius:50%;background:var(--gold);color:#2a1c14;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 4px rgba(240,211,160,.35)}
+.dpic{position:relative;width:min(100%,980px)}.pic .im{position:relative}.pic .im img{display:block}.dpic img{width:100%;border-radius:14px;border:2px solid #3a3731;display:block}
+.ring{position:absolute;border:3px solid var(--gold);border-radius:14px;box-shadow:0 0 14px rgba(240,211,160,.7)}
+
+/* 설명 : 화면 = 1 : 1 · PC 에서 글을 크게 (2026-11-06 13:40 대표 「설명이랑 화면이 1:1」) · 둘 나란히 장은 화면 쪽을 넓게 */
+@media(min-width:901px){body.duo .lay{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr)}}.stage{flex-wrap:wrap;min-width:0}
+@media(min-width:1100px){.steps{padding:6px 8px 20px;gap:10px}.chh{font-size:27px}.chh small{font-size:17px;margin-top:6px}
+ .st{font-size:17px;padding:12px 16px}.st.now{padding:18px 18px}.st .n{width:36px;height:36px;font-size:17px}.st.now b{font-size:22px}.st.now .d{font-size:18px;line-height:1.65;margin-top:6px}
+ .tip{font-size:16px;padding:10px 14px}.hint{font-size:16px}.btn{min-height:52px;font-size:17px;padding:0 22px}.btn.s{min-height:42px;font-size:15px}.free{font-size:15px}.done{font-size:18px}}
+[hidden]{display:none!important}
+/* 아이폰 사파리 모양(그림) — 배경은 우리 앱 화면 */
+.ios{position:relative;width:250px;height:541px;border-radius:30px;border:2px solid #3a3731;overflow:hidden;background:#000 center top/cover no-repeat}
+.ios .dim{position:absolute;inset:0;background:rgba(0,0,0,.45)}
+.ios .sbar{position:absolute;left:0;right:0;bottom:0;height:74px;background:rgba(36,36,38,.96);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:8px;gap:6px}
+.ios .url{width:86%;height:26px;border-radius:9px;background:#3a3a3c;color:#ddd;font-size:11px;display:flex;align-items:center;justify-content:center}
+.ios .ico{display:flex;justify-content:space-between;width:82%;color:#0a84ff;font-size:17px}
+.ios .sheet{position:absolute;left:0;right:0;bottom:0;background:#2c2c2e;border-radius:14px 14px 0 0;padding:12px 12px 22px;color:#fff;font-size:12.5px}
+.ios .sheet .row{display:flex;justify-content:space-between;align-items:center;background:#3a3a3c;border-radius:10px;padding:10px 12px;margin-top:6px}
+.ios .sheet .row.hl{box-shadow:0 0 0 3px var(--gold)}
+.ios .dlg{position:absolute;left:0;right:0;top:0;height:60%;background:#1c1c1e;color:#fff;font-size:12.5px;padding:10px 12px}
+.ios .dlg .bar{display:flex;justify-content:space-between;color:#0a84ff;font-weight:700}.ios .dlg .bar b{color:#fff}.ios .dlg .bar .add{box-shadow:0 0 0 3px var(--gold);border-radius:6px;padding:0 5px}
+.ios .dlg .app{display:flex;gap:10px;align-items:center;margin-top:16px;background:#2c2c2e;border-radius:10px;padding:10px}
+.ios .dlg .app i{width:44px;height:44px;border-radius:10px;background:#1a1917 url(icon-192.png) center/cover}
+</style></head><body>
+<div class="top"><span class="lg">GLAD GYM</span><b>트레이너 연습</b><span class="sp"></span>
+  <select id="chsel" aria-label="장 고르기"></select>
+  <span id="who" style="font-size:12.5px;color:var(--sub)"></span><div class="prog"><span id="progt">0 / 0 장</span><i><u id="progb" style="width:0"></u></i></div></div>
+<div class="lay">
+  <div class="steps" id="steps"></div>
+  <div class="stage" id="stage">
+    <div class="ph" id="phtr"><div class="lab">트레이너 앱<small>연습용 · 저장 안 됨</small></div><div class="fr" id="frtr"><iframe id="ftr" title="트레이너 앱 연습"></iframe></div></div>
+    <div class="arr" id="arr" hidden>→<small>바로</small></div>
+    <div class="ph" id="phm" hidden><div class="lab">회원 앱<small>같은 가짜 회원</small></div><div class="fr" id="frm"><iframe id="fm" title="회원 앱 연습"></iframe></div></div>
+    <div class="pics" id="pics" hidden></div>
+  </div>
+</div>
+<script>
+/* ── 두 화면이 같이 쓰는 연습 자료 (앱 샘플 모드가 window.parent.__연습 을 본다) ── */
+window.__연습 = { P: null, mid: null, 바뀜: (w, 표) => 바뀜(w, 표) };
+const $ = s => document.querySelector(s), ftr = $('#ftr'), fm = $('#fm');
+const 앱주소 = who => 'index.html?sample=1' + (who === 'tr' ? '&who=tr' : '') + '&t=' + Date.now();
+const 창 = w => w === 'm' ? fm.contentWindow : ftr.contentWindow;
+const 문서 = w => { try{ return 창(w).document; }catch(e){ return null; } };
+const 값 = (w, js) => { try{ return 창(w).eval(js); }catch(e){ return undefined; } };      /* 앱 안 let 변수(S 등)는 window 에 안 붙어 eval 로 읽는다 */
+const 있나 = (w, sel) => { const d = 문서(w); return !!(d && d.querySelector(sel)); };
+const 시트열림 = w => { const d = 문서(w), s = d && d.getElementById('sheet'); return !!(s && s.classList.contains('open')); };
+const 회원앱바꿀때 = { t: 0 };
+function 회원새로(){ try{ if(fm.contentWindow && fm.getAttribute('src')){ fm.contentWindow.location.replace(앱주소('m')); return; } }catch(e){} fm.src = 앱주소('m'); }      /* replace = 뒤로 기록 안 남김 */
+function 바뀜(w, 표){ if(w !== ftr.contentWindow || $('#phm').hidden) return; clearTimeout(회원앱바꿀때.t); 회원앱바꿀때.t = setTimeout(() => { 회원새로(); }, 500); }
+
+/* ── 장 · 단계 ── 단계 = { t 제목, d 설명, tip, 곳 'tr'|'m', 목표 (눌러야 할 곳 · 반짝), 끝 (다 됐나 — 없으면 「다음」 단추) } */
+const 장들 = [
+ { 제목:'앱 설치하기 — 나 · 회원', 목표:'내 폰에 앱을 깔고, 회원에게 안드로이드 · 아이폰 설치를 안내할 수 있다', 사진:true, 단계:[
+   { t:'링크 보내기', d:'데스크 오른쪽 위 「앱 설치 링크」 → 회원 앱 / 트레이너 데스크 · QR 을 찍게 하거나 「복사」해서 카톡으로 보내요', tip:'카톡 안에서 열려도 사파리 · 크롬으로 저절로 넘어가요', 그림:'링크' },
+   { t:'안드로이드 (삼성 인터넷)', d:'① 주소창 오른쪽 ⬇ (설치) 를 누르고 ② 「앱스 화면에 이 웹페이지를 추가할까요?」 → 「추가」', tip:'크롬이면 오른쪽 위 ⋮ → 「앱 설치」 → 「설치」 · 로그인 화면의 「＋ 이 기기에 앱 설치하기」 도 같아요', 그림:'삼성' },
+   { t:'아이폰 · 아이패드 (사파리)', d:'① 아래 가운데 공유 ⬆ ② 메뉴를 올려 「홈 화면에 추가」 ③ 오른쪽 위 「추가」', tip:'아이패드는 공유 ⬆ 가 오른쪽 위에 있어요 · 사파리로 열어야 해요', 그림:'아이폰' },
+   { t:'첫 로그인', d:'홈 화면의 「GLAD GYM」 아이콘으로 열고 → 전화번호 → 문자로 온 번호 · 한 번만 하면 다음부터 바로 열려요', tip:'설치 뒤에는 꼭 홈 화면 아이콘으로 열어요 (카톡 링크로 열면 다시 로그인할 수 있어요)', 그림:'아이콘' } ] },
+ { 제목:'준비 — 연습 화면 알기', 목표:'오른쪽 앱이 연습용이라는 것과 윗줄을 안다', 단계:[
+   { t:'오른쪽은 진짜 앱이에요', d:'가짜 회원(윤서아)으로 열린 연습용이라 무엇을 눌러도 저장 · 발송이 안 돼요 · 반짝이는 곳을 눌러 따라 하세요', tip:'아래 「자유롭게 눌러 보기」를 켜면 아무 데나 눌러 볼 수 있어요' },
+   { t:'내 이름 동그라미', d:'윗줄 오른쪽 동그라미 — 내 이름 · 로그아웃이 여기 있어요 · 눌러 보세요', 목표:'[data-act="trme"]', 끝:() => 시트열림('tr') },
+   { t:'창 닫기', d:'「닫기」 — 창 바깥(어두운 곳)을 눌러도 닫혀요', 끝:() => !시트열림('tr'), 목표:'#sheet [data-act="close"]' } ] },
+ { 제목:'메뉴 둘러보기 — 아래 탭 다섯', 목표:'탭 다섯이 각각 무엇을 하는 곳인지 안다', 단계:[
+   { t:'「회원」 탭', d:'담당 회원 · ★ 즐겨찾기 · 신규 · 재등록 · 안 본 기록 · 전체 회원 검색', 목표:'[data-act="ttab:t_members"]', 끝:() => 값('tr', 'S.screen') === 't_members' },
+   { t:'「피드백」 탭', d:'회원 피드백 요청 · 이번 주 피드백 남길 수업 · 식단 피드백', 목표:'[data-act="ttab:t_feed"]', 끝:() => 값('tr', 'S.screen') === 't_feed', tip:'빨간 점 = 남길 피드백이 있어요' },
+   { t:'「루틴」 탭', d:'루틴 만들기 · 지정 / 스트레칭 루틴 / 나만의 스트레칭 종목', 목표:'[data-act="ttab:t_routine"]', 끝:() => 값('tr', 'S.screen') === 't_routine' },
+   { t:'「상담」 탭', d:'상담지 열 회원 검색 · 종이 상담지 올리기 · 최근 상담', 목표:'[data-act="ttab:t_consult"]', 끝:() => 값('tr', 'S.screen') === 't_consult' },
+   { t:'「오늘」 탭', d:'회원 검색 · 기록 중인 수업 · 오늘 수업 예약(내 것 · 시간순)', 목표:'[data-act="ttab:t_today"]', 끝:() => 값('tr', 'S.screen') === 't_today', tip:'예약은 10분마다 전산에서 새로 받아요' } ] },
+ { 제목:'회원 화면 읽기', 목표:'회원 한 명의 화면에서 필요한 것을 바로 찾는다', 단계:[
+   { t:'회원 열기', d:'「회원」 탭에서 윤서아 회원 줄을 눌러요', 준비:() => 탭('t_members'), 목표:() => 회원줄(), 끝:() => 값('tr', 'S.screen') === 't_member' },
+   { t:'단추 셋', d:'수업 시작 · 루틴 지정(개인운동 · 다음 수업) · 1RM 측정 — 확인했으면 「다음」', 목표:'.tmb' },
+   { t:'지난 기록 카드', d:'지난 수업 한 장 — 날짜 · 몸 그림 · 무게 표 · 수업 메모', 목표:() => { const d = 문서('tr'), h = d && d.querySelector('.tlh'); return h ? (h.closest('.card, button, [data-act]') || h.parentElement) : null; }, tip:'카드를 누르면 그날 기록 · 피드백을 볼 수 있어요' },
+   { t:'회원 자료 펼치기', d:'상담일지 · 운동계획 · 식단 · 오운완 · 스트레칭 · 인바디 · 체형분석이 이 안에', 목표:'[data-act="tmfold"]', 끝:() => { const d = 문서('tr'), b = d && d.querySelector('[data-act="tmfold"]'); return !!(b && /접기/.test(b.innerText)); } } ] },
+ { 제목:'수업 시작하기', 목표:'상황에 맞는 방법으로 수업을 연다', 단계:[
+   { t:'「수업 시작」', d:'회원 화면 금색 단추 — 무엇으로 시작할지 고르는 창이 떠요', 준비:() => 회원열기(), 목표:'[data-act^="tstartask:"]', 끝:() => 시트열림('tr') && 있나('tr', '#sheet [data-act^="tstartrecs"]') },
+   { t:'시작 갈래 보기', d:'맨 위 = 다음 수업 루틴 · 루틴에서 · 받은 루틴표 · 지난 기록에서 · 빈 운동 · 준비운동 먼저 — 「다음」', 목표:'#sheetbox', tip:'같은 날 기록이 있으면 「이어서 기록 / 새로 기록」을 물어요' },
+   { t:'「지난 기록에서」', d:'지난 수업을 그대로 가져와 시작해요', 목표:'#sheet [data-act^="tstartrecs"]', 끝:() => 있나('tr', '#sheet [data-act^="tstartrec:"]') },
+   { t:'「시작 ›」', d:'그날 종목 · 무게가 그대로 채워져요', 목표:'#sheet [data-act^="tstartrec:"]', 끝:() => 값('tr', 'S.screen') === 'workout' } ] },
+ { 제목:'기록하기 (플래너)', 목표:'무게 · 횟수를 가장 빨리 적는다', 단계:[
+   { t:'숫자 칸 누르기', d:'무게 칸 하나를 눌러요 — 앱 숫자판이 떠요', 준비:() => 운동중(), 목표:'[data-act^="plk:"]', 끝:() => 있나('tr', '#kpad.on, #kpad.open, #kpad [data-act^="kpf:"]') },
+   { t:'빠른 값', d:'자주 쓰는 값(−2.5 · 그대로 · +2.5 · +5 / 8 · 10 · 12 · 15)을 한 번에', 목표:'#kpad .kpq button, #kpad .kpq [data-act]', 누름:true, 끝:null, tip:'바꾼 칸은 흰 테두리 — 지난 값과 다른 곳이 한눈에' },
+   { t:'「다음 칸 ›」', d:'다음 칸으로 넘어가요 — 키보드가 있는 PC 는 엔터도 돼요', 목표:'#kpad [data-act="kpnx"]', 누름:true, 끝:null },
+   { t:'「완료」', d:'다 적었으면 「완료」 — 숫자판이 닫혀요', 목표:'#kpad [data-act="kpok"]', 끝:() => !있나('tr', '#kpad [data-act="kpok"]') },
+   { t:'시간 재기', d:'윗줄 「시간 재기 ▶」 — 일시정지 · 계속', 목표:'[data-act="timego"], [data-act="tmpause"]', 누름:true, tip:'빈 세트는 마칠 때 저절로 빠져요' } ] },
+ { 제목:'종목 더하기', 목표:'어떤 운동이든 기록에 넣는다', 단계:[
+   { t:'「＋ 웨이트 종목 추가」', d:'기록 표 아래 단추 — 종목 고르는 화면으로', 준비:() => 운동중(), 목표:'[data-act="go:pick"]', 끝:() => 값('tr', 'S.screen') === 'pick' },
+   { t:'검색', d:'검색칸에 「스쿼트」처럼 쳐 보세요 — bp · 코어 같은 줄임말도 돼요', 목표:'input[data-k="exq"]', 끝:() => String(값('tr', 'S.exq') || '').trim().length >= 1 },
+   { t:'종목 담기', d:'카드를 누르면 위 「추가한 종목」에 담겨요 · ★ = 즐겨찾기', 목표:'[data-act^="add:"]', 끝:() => 있나('tr', '[data-act^="pkrm:"]') },
+   { t:'「추가하기 ›」', d:'담은 종목을 기록에 넣어요', 목표:'[data-act="askstart"]', 끝:() => 시트열림('tr') && 있나('tr', '#sheet [data-act="startgo"]') },
+   { t:'「추가하기」', d:'기록 화면 맨 아래에 붙어요', 목표:'#sheet [data-act="startgo"]', 끝:() => 값('tr', 'S.screen') === 'workout' },
+   { t:'목록에 없을 때', d:'검색해서 없으면 「＋ ‘검색어’ 바로 추가」 → 맨 위 「웨이트 · 스트레칭」 고르기 → 저장하면 모두가 검색해요 · 한 번만 쓸 거면 「이번만 메모로」', tip:'「종목 간편추가」는 이름만 — 볼륨 · 그래프엔 안 들어가요' },
+   { t:'「🏃 유산소 운동 추가」', d:'기구 · 시간 · 속도를 고르고 지금 하거나 회원 숙제로', 목표:'[data-act="plcardio"]', 끝:() => 있나('tr', '#sheet [data-act^="ctex:"]') },
+   { t:'닫기', d:'오늘은 보기만 — 「닫기」', 목표:'#sheet [data-act="close"]', 끝:() => !시트열림('tr') } ] },
+ { 제목:'피드백 · 몸 색칠', 목표:'회원이 집에서 다시 보는 코칭을 남긴다', 단계:[
+   { t:'종목 이름 누르기', d:'기록 표에서 종목 이름(예: 스쿼트)을 눌러요 — 피드백 창이 떠요', 준비:() => 운동중(), 목표:'[data-act^="plnm:"]', 끝:() => 시트열림('tr') && 있나('tr', '#sheet [data-act^="sendcm:"]') },
+   { t:'피드백 쓰기', d:'칸에 한 줄 써 보세요 — 예) 무릎이 발끝 방향으로 잘 나가요', 목표:'#sheet textarea', 끝:() => { const t = 문서('tr').querySelector('#sheet textarea'); return !!(t && t.value.trim()); } },
+   { t:'「보내기」', d:'회원 앱 그 종목에 바로 붙어요', 목표:'#sheet [data-act^="sendcm:"]', 끝:() => { const t = 문서('tr').querySelector('#sheet textarea'); return !t || !t.value.trim(); } },
+   { t:'사진 · 영상', d:'「📷 사진 올리기」 「🎬 영상 올리기」 → 촬영하기 / 갤러리 · 영상은 저절로 가볍게', 목표:'#sheet [data-act^="attask:"]', tip:'「💬 지난 피드백 인용하기」 — 자주 쓰는 말을 다시 불러와요' },
+   { t:'닫기', d:'「닫기」', 목표:'#sheet [data-act="close"]', 끝:() => !시트열림('tr') },
+   { t:'「몸 색칠하기」', d:'오늘 자극한 곳을 칠해요 — 리포트에 그대로', 목표:'[data-act^="bpopen:"]', 끝:() => 있나('tr', '[data-act="bpclose"]') },
+   { t:'칠하고 「완료」', d:'다섯 색 · 가늘게 · 보통 · 굵게 · 지우개 · 되돌리기 — 손을 떼면 저절로 저장', 목표:'[data-act="bpclose"]', 끝:() => !있나('tr', '[data-act="bpclose"]'), tip:'안 칠하면 오늘 종목으로 저절로 칠해져요' },
+   { t:'「📤 피드백 몰아서 올리기」', d:'수업 중 찍은 사진 · 영상 여러 개를 종목마다 붙여 한 번에', 목표:'[data-act^="bulkopen:"]' } ] },
+ { 제목:'마치기 · 리포트', 목표:'수업을 닫고 리포트가 회원에게 어떻게 가는지 안다', 단계:[
+   { t:'「운동 마치기」', d:'안 한 운동이 있으면 알려 줘요', 준비:() => 운동중(), 목표:'[data-act="askfin"]', 끝:() => 시트열림('tr') && 있나('tr', '#sheet [data-act="dofin"]') },
+   { t:'「운동 종료」', d:'빈 세트는 저절로 빠져요', 목표:'#sheet [data-act="dofin"]', 끝:() => 값('tr', 'S.screen') === 'summary' },
+   { t:'루틴으로 저장?', d:'이 수업을 루틴으로 남기려면 「저장」 · 오늘은 「저장하지 않음」', 목표:'#sheet [data-act="close"]', 끝:() => !시트열림('tr') },
+   { t:'마친 화면', d:'종목 · 세트 · 시간 · 총 kg · 「오운완 찍기」 · 「회원과 같이 찍기」(오늘만)', 목표:'[data-act^="ootd:"]' },
+   { t:'리포트는 저절로', d:'1분 뒤 회원에게 나가요 — 「보내기 취소」로 멈출 수 있고, 실패하면 「다시 보내기」', 목표:'[data-act^="rcancel:"], [data-act^="rsend"]', tip:'밤 10시 ~ 아침 8시에 직접 보내면 한 번 물어요 · 개인운동은 리포트가 안 나가요' },
+   { t:'「오늘 수업 리포트 보기」', d:'회원이 받는 리포트를 그대로 봐요', 목표:'[data-act^="rpt:"]', 끝:() => 값('tr', 'S.screen') === 'report' },
+   { t:'리포트 읽기', d:'오늘 자극 부위 · 사진 · 한 운동 · 세운 기록 🏆 · 코칭 · 피드백 · 몸의 변화 · 이달 누적', tip:'데스크 「리포트 내역」 → 「보낸 리포트 보기」로 보낸 그대로 다시 볼 수 있어요' } ] },
+ { 제목:'루틴 만들기', 목표:'수업 전에 루틴을 준비해 둔다', 단계:[
+   { t:'「루틴」 탭', d:'아래 탭 네 번째', 준비:() => { 값('tr', '(closeSheet && closeSheet(), 1)'); }, 목표:'[data-act="ttab:t_routine"]', 끝:() => 값('tr', 'S.screen') === 't_routine' },
+   { t:'「루틴 만들기 · 지정」', d:'회원 루틴 · 공통 루틴이 모여 있어요', 목표:'[data-act="tromake"]', 끝:() => 값('tr', 'S.screen') === 't_routines' },
+   { t:'「＋ 새 루틴 만들기」', d:'맨 아래 단추', 목표:'[data-act="rblank"]', 끝:() => 값('tr', 'S.screen') === 't_rnew' },
+   { t:'루틴 이름', d:'예) 하체 근력 A', 목표:'#rnnm, input[data-k="rnnm"]', 끝:() => { const t = 문서('tr').querySelector('#rnnm, input[data-k="rnnm"]'); return !!(t && t.value.trim()); } },
+   { t:'운동 목적', d:'근력 · 근비대 · 다이어트 … 하나 눌러요', 목표:'[data-act^="rngoal:"]', 누름:true },
+   { t:'「＋ 종목 추가」', d:'종목 고르는 화면으로', 목표:'[data-act="rnpick"]', 끝:() => 값('tr', 'S.screen') === 't_rpick' },
+   { t:'종목 고르기', d:'카드를 눌러 담아요 — 여러 개 골라도 돼요', 목표:'[data-act^="rntog:"]', 누름:true },
+   { t:'뒤로', d:'담은 종목을 들고 돌아가요', 목표:'[data-act="back"]', 끝:() => 값('tr', 'S.screen') === 't_rnew' },
+   { t:'「저장」', d:'kg · 회 · 세트 · 쉬는 시간은 「모두 같게」로 한 번에', 목표:'[data-act="rnsave"]', 끝:() => 값('tr', 'S.screen') !== 't_rnew', tip:'데스크(PC) 루틴표 — 「사진으로 만들기」(종이 루틴표 읽기) · 「복사해서 내 루틴표로」 · 운동 전 스트레칭 묶기' } ] },
+ { 제목:'회원에게 보내기 — 회원 앱 나란히', 목표:'트레이너가 지정하면 회원 앱에 어떻게 뜨는지 눈으로 본다', 둘:true, 단계:[
+   { t:'「루틴 지정」', d:'회원 화면 가운데 단추 — 개인운동 · 다음 수업', 준비:() => 회원열기(), 목표:'[data-act^="tasgmode:"]', 끝:() => 값('tr', 'S.screen') === 't_routines' },
+   { t:'루틴 하나 누르기', d:'아직 지정 안 된 루틴을 눌러요', 목표:() => { const d = 문서('tr'); return d ? [...d.querySelectorAll('[data-act^="asgpick:"]')].find(e => !/개인운동|다음 수업/.test(e.innerText)) || d.querySelector('[data-act^="asgpick:"]') : null; }, 끝:() => 시트열림('tr') && 있나('tr', '#sheet [data-act^="assigno:"]') },
+   { t:'「개인운동 지정」', d:'회원 앱 홈에 오늘 뜨는 운동 · 「다음 수업 지정」은 트레이너 수업 시작 창 맨 위에', 목표:'#sheet [data-act*=":개인운동:"]', 끝:() => !시트열림('tr') },
+   { t:'회원 앱 확인', d:'오른쪽 회원 홈 「트레이너가 지정한 운동 → 지정 루틴 하러가기 NEW」', 곳:'m', 목표:() => { const d = 문서('m'); return d ? [...d.querySelectorAll('.zmh.zone')].find(z => /지정한 운동/.test(z.innerText)) : null; }, tip:'다음 수업으로 지정한 루틴은 회원이 개인운동 때 피해서 해요' },
+   { t:'「유산소만 지정」', d:'루틴 없이 유산소 숙제만', 목표:'[data-act^="asgcardio:"]', 끝:() => 시트열림('tr') && 있나('tr', '#sheet [data-act="ctsave"]') },
+   { t:'기구 · 시간', d:'런닝머신 · 사이클 · 천국의계단 · 마이마운틴 · − ＋ 로 시간', 목표:'#sheet [data-act^="ctex:"]', 누름:true },
+   { t:'「개인운동 주기」', d:'회원 앱에 오늘 23:59까지 떠요', 목표:'#sheet [data-act="ctsave"]', 끝:() => !시트열림('tr') },
+   { t:'회원 앱 확인', d:'오른쪽 회원 홈 「유산소 n분」', 곳:'m', 목표:() => { const d = 문서('m'); return d ? [...d.querySelectorAll('.zmh.zone')].find(z => /유산소/.test(z.innerText)) : null; } },
+   { t:'「📋 나머지 운동 지정하기」', d:'수업 중 기록 화면 아래 — 오늘 못 한 운동을 회원 숙제로', 준비:() => 운동중(), 목표:'[data-act="rtrest"]', 끝:() => 있나('tr', '#sheet [data-act="rtsave"]') },
+   { t:'「안 한 것 모두」', d:'못 한 종목이 한 번에 골라져요', 목표:'#sheet [data-act="rtall:0"], #sheet [data-act="rtall:1"]', 누름:true },
+   { t:'「지정하기」', d:'회원 숙제로 넘겨요', 목표:'#sheet [data-act="rtsave"]', 끝:() => !시트열림('tr') },
+   { t:'「운동 마치기」', d:'수업 중에는 회원 앱에 「운동 중」으로만 보여요', 목표:'[data-act="askfin"]', 끝:() => 시트열림('tr') && 있나('tr', '#sheet [data-act="dofin"]') },
+   { t:'「운동 종료」', d:'수업을 닫아요', 목표:'#sheet [data-act="dofin"]', 끝:() => 값('tr', 'S.screen') === 'summary' },
+   { t:'회원 앱 확인', d:'오른쪽 회원 홈 「수업 후 마무리 운동 · 마무리 근력운동」', 곳:'m', 목표:() => { const d = 문서('m'); return d ? [...d.querySelectorAll('.zmh.zone')].find(z => /마무리/.test(z.innerText)) : null; }, tip:'회원이 다 하면 트레이너 화면에 「✓ 회원이 함」 · 루틴표 통째로는 회원 화면 「루틴표 지정하기」 / 데스크 「회원에게 주기」(여러 명)' } ] },
+ { 제목:'피드백 탭', 목표:'밀린 피드백 · 식단을 한 곳에서 끝낸다', 단계:[
+   { t:'「피드백」 탭', d:'빨간 점 = 남길 피드백이 있어요', 준비:() => { 값('tr', '(closeSheet && closeSheet(), 1)'); }, 목표:'[data-act="ttab:t_feed"]', 끝:() => 값('tr', 'S.screen') === 't_feed' },
+   { t:'운동 · 식단', d:'위 두 칸 — 운동 피드백 / 식단 피드백', 목표:'[data-act^="tfm:"]', 누름:true },
+   { t:'수업 하나 열기', d:'「피드백을 남겨 주세요」 줄을 눌러요', 목표:'[data-act^="tw:"]', 끝:() => 값('tr', 'S.screen') === 't_write' },
+   { t:'금색 줄 = 아직', d:'피드백 없는 종목이 금색 · 「피드백 쓰기 ›」로 바로', tip:'회원이 요청한 종목은 「요청」 딱지' },
+   { t:'뒤로', d:'피드백 탭으로', 목표:'[data-act="back"]', 끝:() => 값('tr', 'S.screen') !== 't_write' } ] },
+ { 제목:'상담 · 상담지 · 운동계획', 목표:'첫 상담을 앱에 남기고 계획을 세운다', 단계:[
+   { t:'「상담」 탭', d:'최근 상담 · 종이 상담지 올리기', 준비:() => { 값('tr', '(closeSheet && closeSheet(), 1)'); }, 목표:'[data-act="ttab:t_consult"]', 끝:() => 값('tr', 'S.screen') === 't_consult' },
+   { t:'회원 상담지 열기', d:'채운 정도(%)가 보여요', 목표:'[data-act^="csopen:"]', 끝:() => 값('tr', 'S.screen') === 'intake' },
+   { t:'「PT 상담일지 작성 · 수정」', d:'종이 상담지와 같은 칸 · 칼로리 · 탄단지 계산까지', 목표:'[data-act^="editintake:"]', 끝:() => 값('tr', 'S.screen') === 'intake_edit' },
+   { t:'칸 채우고 저장', d:'아는 것만 채워도 돼요 — 「입력 안 한 항목 n개」로 나중에', tip:'종이 상담지는 「찍기 · 앨범」 → 읽어서 채움 → 「종이 값으로」' },
+   { t:'운동계획', d:'회원 화면 「회원 자료 펼치기」 → 「운동계획」 — 목적 · 약속 · 칼로리 · 목표 · 인바디', 준비:() => 펼친회원(), 목표:'[data-act^="tsub:plan"]', 끝:() => 값('tr', 'S.screen') === 'plan', tip:'건강정보 동의가 없으면 「동의 요청하기」' } ] },
+ { 제목:'몸 데이터', 목표:'인바디 · 사진으로 변화를 보여 준다', 단계:[
+   { t:'「인바디 · 비포애프터」', d:'회원 자료 펼치기 안', 준비:() => 펼친회원(), 목표:'[data-act^="tsub:body"]', 끝:() => 값('tr', 'S.screen') === 'body' },
+   { t:'비교', d:'현재 · 이전 날짜를 골라 나란히', 목표:'[data-act^="ibdd:"]' },
+   { t:'「＋ 오늘 인바디 기록」', d:'숫자를 넣고 저장 · 「루킨바디에서 지난 기록 가져오기」도 있어요', 목표:'[data-act^="bladd:"]', 끝:() => 시트열림('tr') && !있나('tr', '#sheet [data-act^="tstartrec"]') },
+   { t:'닫기', d:'오늘은 보기만', 목표:'#sheet [data-act="close"]', 끝:() => !시트열림('tr') },
+   { t:'사진 · 영상', d:'전면 · 후면 · 좌측 · 우측 사진 · 영상 · 「기준선 그리기」', 목표:'[data-act^="bpadd:"]', tip:'동의 전에는 인바디 · 체형이 🔒 로 잠겨 있어요' } ] },
+ { 제목:'데이터 활용 · 기록 관리', 목표:'쌓인 기록을 회원 설명과 다음 수업에 쓴다', 단계:[
+   { t:'「기록 분석」', d:'회원 화면 체중 추이 카드', 준비:() => 회원열기(), 목표:'[data-act^="tana"]', 끝:() => 값('tr', 'S.screen') === 'records' },
+   { t:'「운동분석」', d:'위 칸 두 번째', 목표:() => { const d = 문서('tr'); return d ? [...d.querySelectorAll('[data-act^="anat:"]')].find(e => /운동분석/.test(e.innerText)) : null; }, 끝:() => 있나('tr', '[data-act^="anap:"]') },
+   { t:'기간 · 그래프', d:'1주 · 1달 · 3달 · 전체 / 무게 · 칼로리 · 시간', 목표:'[data-act^="anap:"]', 누름:true },
+   { t:'부위 · 종목별 변화', d:'전체 · 상체 · 하체 … — 기간 처음보다 ▲▼', 목표:'[data-act^="anab:"]', 누름:true, tip:'회원 상담 때 이 화면을 같이 보면 좋아요' },
+   { t:'「지난 기록」', d:'날짜별 수업 · 개인운동', 목표:() => { const d = 문서('tr'); return d ? [...d.querySelectorAll('[data-act^="anat:"]')].find(e => /지난 기록/.test(e.innerText)) : null; }, 끝:() => 있나('tr', '[data-act^="tw:"]') },
+   { t:'하루 열기', d:'그날 기록 · 피드백', 목표:'[data-act^="tw:"]', 끝:() => 값('tr', 'S.screen') === 't_write' },
+   { t:'「기록 수정하기」', d:'세트 수정 · 삭제 · 추가 — 지난 날짜도 고칠 수 있어요', 목표:() => { const d = 문서('tr'); return d ? [...d.querySelectorAll('[data-act]')].find(e => /기록 수정하기/.test(e.innerText) && e.getClientRects().length) : null; }, 끝:() => 값('tr', 'S.screen') === 'record', tip:'메모로 적은 종목은 지난 기록 「종목 만들기 ›」로 정식 종목이 돼요(같은 이름 기록이 같이 바뀜)' } ] },
+ { 제목:'홈 현황판 읽기', 부:2, 목표:'데스크 첫 화면에서 오늘 할 일을 바로 찾는다', 사진:true, 단계:[
+   { t:'숫자 칸', d:'칸마다 지금 할 일의 수 — 위가 붉은 칸 = 급한 일 · 금빛으로 반짝 = 지금 할 것 · 누르면 그 페이지로 바로', 데:'홈', 고리:[0], tip:'좁으면 칸 이름이 두 줄로 보여요' },
+   { t:'0건인 칸', d:'「나머지 n가지는 지금 0건」 — 「펼치기」로 전부 볼 수 있어요', 데:'홈', 고리:[1] },
+   { t:'필수자료', d:'자주 찾는 자료 · 공지 — 검색칸에 낱말을 치면 바로', 데:'홈', 고리:[2] },
+   { t:'윗줄 단추', d:'「앱 설치 링크」(0장) · 오른쪽 위 「PT 매출」(16장)', 데:'홈', 고리:[3] },
+   { t:'아래 칸들', d:'오늘 내 청소 · 비품 · PT 예약률 · 내 PT 회원 현황 · 오늘 수업 기록', 데:'홈아래', 고리:[0, 1, 2], tip:'오른쪽 아래 💬 = 도우미 · 대화 · 요청 · 버그(20장)' } ] },
+ { 제목:'매출 — 결제 확인 · PT 매출', 부:2, 목표:'새 결제의 담당 · 유형을 고르고 내 매출을 확인한다', 사진:true, 단계:[
+   { t:'결제가 들어오면', d:'윗줄에 「PT 매출 · 담당 · 매출 유형을 골라 주세요 n건」이 반짝 — 누르면 그 결제로', 데:'챗요청', 고리:[[39.5, 7.8, 23.9, 4.4]], tip:'락커 · TG 결제는 「확인할 매출」 창에서 지정했나요 → 지정해 주세요 두 단계' },
+   { t:'PT 매출 탭 셋', d:'처음 = 「전체 매출 (확정)」 · 고를 것이 있으면 「담당 선택 필요」 · 관리자가 볼 것 = 「관리자 확정 대기」', 데:'매출', 고리:[0] },
+   { t:'담당 · 카테고리 고르기', d:'「담당 고르기」 · 「카테고리」 → 「저장」 — 관리자가 확정하면 「전체 매출」로', 데:'매출', 고리:[1, 2] },
+   { t:'팀 매출 · 순위', d:'이번 달 팀 목표 · 선생님별 막대 — 막대를 누르면 그 선생님 매출만', 데:'매출확정', 고리:[[42.7, 9.4, 55.3, 18.8]] } ] },
+ { 제목:'공지 · 매뉴얼 · 필수자료', 부:2, 목표:'공지를 읽음으로 표시하고 문서를 찾는다', 사진:true, 단계:[
+   { t:'대표공지', d:'「업무」 → 「대표공지」 칸 — 열어서 읽고 「읽었어요」(완료 칸이 「안 읽음」 → 「읽음」)', 데:'업무', 고리:[[44.4, 18.4, 4.6, 3.2], [72.8, 34.2, 4.2, 2.8]], tip:'공지는 체크 대신 「읽었어요」로만 표시해요' },
+   { t:'매뉴얼', d:'갈래별 문서 · 교육 강의 — 끝까지 보고 「읽었어요」', 데:'매뉴얼', 고리:[] },
+   { t:'필수자료 찾기', d:'홈 맨 위 📌 필수자료 — 검색 · 「전체」', 데:'홈', 고리:[2] } ] },
+ { 제목:'상담 · TG · 체험 배정', 부:2, 목표:'배정받은 고객에게 연락하고 첫 수업을 잡는다', 사진:true, 단계:[
+   { t:'상담 표', d:'이름 · 예약날짜 · 상담유형 · 상담자 · 결과 · 등록여부 — 위 칩으로 보기 바꾸기(월 예약자 · 미방문 · 2차 설문톡 …)', 데:'상담', 고리:[] },
+   { t:'TG · 체험 배정 — 할 일', d:'연락해 주세요 → 「연락했어요」 · 첫 수업 잡기 · 다음 수업 잡기 · 다시 연락', 데:'배정', 고리:[[19, 21.5, 39.2, 4.2]], tip:'배정은 차례대로 돌아가요 — 「배정 정지」는 쉬는 날만' },
+   { t:'체험 예약자 · 설문', d:'「＋ 체험 예약자」 · 「TG 설문보내기」 · 들어온 설문', 데:'배정', 고리:[[67.5, 26.9, 30.5, 5]] },
+   { t:'TG 수업 기록', d:'앱에서 PT 와 같은 방법(1부 4 ~ 8장) — 예약 줄에 TG · 체험 딱지만 달라요' } ] },
+ { 제목:'청소 · 비품', 부:2, 목표:'오늘 내 청소를 하고 모자란 비품을 바로 요청한다', 사진:true, 단계:[
+   { t:'오늘 내 청소', d:'구역 · 담당은 청소 관리자가 정해요 — 하면 체크 · 못 하면 「다른 선생님에게」 인계', 데:'홈아래', 고리:[0], tip:'어제 체크가 빠지면 현황판 「청소 누락」에 떠요' },
+   { t:'비품 구매 요청', d:'「비품 구매 요청」 → 품목 · 수량 · 메모 → 「요청 보내기」 — 대표에게 알림', 데:'비품', 고리:[[42.7, 16.6, 55.3, 22.2]] } ] },
+ { 제목:'버그 신고 · 기능 요청', 부:2, 목표:'불편한 점을 바로 알리고 처리 상황을 본다', 사진:true, 단계:[
+   { t:'오른쪽 아래 💬', d:'도우미 · 대화 · 요청 · 버그 · 설정', 데:'챗', 고리:[] },
+   { t:'「요청 · 버그」 → 「새 요청하기」', d:'무엇이 안 되는지 · 어떻게 바뀌면 좋은지 · 사진을 붙여 보내요', 데:'챗요청', 고리:[[83.2, 81.9, 7.4, 6.2], [78.1, 74, 10.6, 5.3]], tip:'도우미에 먼저 물어보면 매뉴얼에서 답을 찾아 줘요' },
+   { t:'처리 상황', d:'받음 → 확인 중 → 끝남 · 왼쪽 메뉴 「요청함」에서도 봐요', 데:'요청함', 고리:[] } ] },
+ { 제목:'연월차 · 당직', 부:2, 목표:'휴가를 신청하고 달력을 본다', 사진:true, 단계:[
+   { t:'연월차', d:'「＋ 새로 만들기」 → 연차 · 반차 · 날짜 → 승인 대기 → 승인되면 달력에', 데:'연월차', 고리:[[88, 18.5, 8.7, 3.5]], tip:'달력 칸이 좁으면 꼬리표 · 이름이 두 줄로 보여요' },
+   { t:'당직 순서표', d:'달력 위 「당직 순서표」 — 내 당직 날', 데:'연월차', 고리:[[88.8, 30.1, 6.6, 3.8]] } ] },
+];
+
+/* 준비 손잡이 — 앱 화면을 그 단계 시작 자리로 */
+function 탭(t){ 값('tr', `(S.ttab = '${t}', S.stack = [], go('${t}'), 1)`); }
+function 회원줄(){ const d = 문서('tr'); if(!d) return null; const mid = 값('tr', 'window.__샘플mid'); return d.querySelector('[data-act="tm:' + mid + '"]') || d.querySelector('[data-act^="tm:"]'); }
+function 펼친회원(){ 회원열기(); setTimeout(() => { const d = 문서('tr'), b = d && d.querySelector('[data-act="tmfold"]'); if(b && !/접기/.test(b.innerText)) b.click(); }, 400); }
+function 회원열기(){ if(값('tr', 'S.screen') === 't_member') return; 값('tr', "(S.tmid = window.__샘플mid, S.subj = window.__샘플mid, S.stack = [], go('t_member'), 1)"); }
+async function 운동중(){ if(값('tr', 'S.screen') === 'workout') return; if(값('tr', '!!live()')){ 값('tr', "(go('workout'), 1)"); return; }      /* 수업이 없으면 회원 화면 → 수업 시작 → 지난 기록에서 → 시작 을 대신 눌러 연다 */
+  const 잠 = ms => new Promise(r => setTimeout(r, ms)), 눌 = sel => { const d = 문서('tr'), e = d && d.querySelector(sel); if(e) e.click(); return !!e; };
+  회원열기(); await 잠(600); 눌('[data-act^="tstartask:"]'); await 잠(600); if(눌('#sheet [data-act^="samenew"]')) await 잠(600); 눌('#sheet [data-act^="tstartrecs"]'); await 잠(600);
+  const d = 문서('tr'), 칩 = d && [...d.querySelectorAll('#sheet [data-act]')].find(e => /PT 수업/.test(e.innerText) && e.getClientRects().length); if(칩){ 칩.click(); await 잠(500); }      /* 「나머지 운동 지정하기」는 수업 기록에만 — 「PT 수업」 칩으로 거른 뒤 */
+  const 줄 = d ? [...d.querySelectorAll('#sheet [data-act^="tstartrec:"]')] : [], 수업줄 = 줄.find(e => /수업/.test(e.innerText) && !/개인운동/.test(e.innerText)) || 줄[0];
+  if(수업줄) 수업줄.click(); }
+
+/* ── 진도 — 이 기기(localStorage) + 서버(128단계 tut_progress · 직원 증표로) ── 이름 · 증표는 데스크(이 창을 연 부모) 또는 앱 로그인에서 · 주소에 안 싣는다 */
+const SB_URL = 'https://mylzxiahksgloxzabpqk.supabase.co', SB_KEY = 'sb_publishable_AwOEXYRkjO1FASdu7i4Mzg_tw7ewPZ3';
+function 나(){ try{ if(window.parent !== window){ const n = window.parent.eval('typeof ME !== "undefined" && ME ? ME.name : ""'), k = window.parent.eval('typeof 열쇠 === "function" ? 열쇠() : ""'); if(n && k && k !== SB_KEY) return { 이름:n, 열쇠:k }; } }catch(e){}
+  try{ const a = JSON.parse(localStorage.getItem('gg_auth') || 'null'); if(a && a.name && a.who && a.who !== 'member' && a.sb && (a.sbexp || 0) * 1000 > Date.now() + 60000) return { 이름:a.name, 열쇠:a.sb }; }catch(e){}
+  return null; }
+const 서버 = (길, o) => { const 내 = 나(); if(!내) return Promise.resolve(null); o = o || {}; return fetch(SB_URL + '/rest/v1/' + 길, Object.assign({}, o, { headers: Object.assign({ apikey: SB_KEY, Authorization: 'Bearer ' + 내.열쇠, 'Content-Type': 'application/json' }, o.headers || {}) })).then(r => r.ok ? (r.status === 204 || r.status === 201 ? true : r.json()) : null).catch(() => null); };
+function 서버남김(i){ const 내 = 나(), c = 장들[i]; if(!내 || !c) return; 서버('tut_progress', { method:'POST', headers:{ Prefer:'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify([{ trainer: 내.이름, chapter: i, part: c.부 === 2 ? '2부' : '1부', title: c.제목, done_at: new Date().toISOString() }]) }); }
+function 서버읽기(){ const 내 = 나(); if(!내){ $('#who').textContent = '로그인한 기기에서 열면 진도가 대표에게 보여요'; return; } $('#who').textContent = 내.이름 + ' 선생님 · 진도가 저장돼요';
+  서버('tut_progress?select=chapter&trainer=eq.' + encodeURIComponent(내.이름)).then(L => { if(Array.isArray(L)){ L.forEach(r => { 진[r.chapter] = 1; }); 진저장(); 그리기(); } }); }
+const 진도키 = 'gg_tut_1106'; let 진 = {}; try{ 진 = JSON.parse(localStorage.getItem(진도키) || '{}'); }catch(e){}
+const 진저장 = () => { try{ localStorage.setItem(진도키, JSON.stringify(진)); }catch(e){} };
+let 장i = 0, 단i = 0, 자유 = false, 맞음 = false;
+/* 강의 둘로 나눔 — ?part=1 수업 기록(앱) · ?part=2 데스크 업무 · 없으면 전부 (2026-11-06 대표 「수업 기록 / 데스크 업무 두 가지로」) */
+const 부 = (() => { try{ return new URLSearchParams(location.search).get('part') || ''; }catch(e){ return ''; } })();
+const 내장 = i => !부 || (부 === '2' ? 장들[i].부 === 2 : 장들[i].부 !== 2);
+const 장번호들 = () => 장들.map((x, i) => i).filter(내장);
+
+function 그리기(){
+  const c = 장들[장i], s = c.단계[단i]; const 끝장 = 단i >= c.단계.length;
+  const 옵 = (x, i) => `<option value="${i}" ${i === 장i ? 'selected' : ''}>${진[i] ? '✓ ' : ''}${i}장 ${x.제목}</option>`;
+  $('#chsel').innerHTML = (부 !== '2' ? '<optgroup label="수업 기록 · 트레이너 앱">' + 장들.map((x, i) => x.부 === 2 ? '' : 옵(x, i)).join('') + '</optgroup>' : '') + (부 !== '1' ? '<optgroup label="데스크 업무">' + 장들.map((x, i) => x.부 === 2 ? 옵(x, i) : '').join('') + '</optgroup>' : '');
+  const 번 = 장번호들(), n = 번.filter(i => 진[i]).length; $('#progt').textContent = n + ' / ' + 번.length + ' 장'; $('#progb').style.width = (n / 번.length * 100) + '%';
+  $('#steps').innerHTML = `<div class="chh">${장i}장 ${c.제목}<small>🎯 ${c.목표}</small></div>`
+    + c.단계.map((x, i) => i < 단i ? `<div class="st ok">${i + 1} · ${x.t}</div>` : i === 단i ? `<div class="st now"><div class="n">${i + 1}</div><div><b>${x.t}</b><div class="d">${x.d}</div>${x.tip ? `<span class="tip">💡 Tip — ${x.tip}</span>` : ''}<div class="hint" id="hint">반짝이는 곳을 눌러 보세요 ☝</div>
+        <div class="nx">${x.끝 && !자유 ? '' : '<button class="btn g" id="next">다음 ›</button>'}</div></div></div>` : `<div class="st">${i + 1} · ${x.t}</div>`).join('')
+    + (끝장 ? `<div class="done">✓ ${장i}장을 마쳤어요<div class="nx">${장번호들().some(i => i > 장i) ? '<button class="btn g" id="nextch">다음 장 ›</button>' : '<b style="margin-right:auto">🎉 이 강의를 다 마쳤어요</b>'}<button class="btn" id="again">이 장 다시</button></div></div>` : '')
+    + `<div class="nx"><button class="btn s" id="prev">‹ 앞 단계</button><button class="btn s" id="skip">건너뛰기 ›</button><button class="btn s" id="reset">앱 처음으로</button></div>
+       <label class="free"><input type="checkbox" id="free" ${자유 ? 'checked' : ''}> 자유롭게 눌러 보기 (반짝이는 곳 아닌 데도)</label>`;
+  const on = (id, f) => { const e = document.getElementById(id); if(e) e.onclick = f; };
+  on('next', () => 다음()); on('nextch', () => 장열기(장번호들().find(i => i > 장i))); on('again', () => 장열기(장i)); on('prev', () => { if(단i > 0){ 단i--; 단계시작(); } }); on('skip', () => 다음()); on('reset', () => 앱다시());
+  const f = document.getElementById('free'); if(f) f.onchange = () => { 자유 = f.checked; 그리기(); };
+  /* 무대 */
+  $('#phm').hidden = $('#arr').hidden = !c.둘; document.body.classList.toggle('duo', !!c.둘); $('#pics').hidden = !c.사진; $('#phtr').hidden = !!c.사진;
+  if(c.사진) 사진그리기(s);
+  맞음 = false; 크기();
+}
+function 장열기(i){ 장i = i; 단i = 0; 그리기(); if(!장들[i].사진 && !ftr.getAttribute('src')) 앱다시(); else 단계시작(); if(장들[i].둘 && !fm.getAttribute('src')) 회원새로(); }
+function 단계시작(){ const s = 장들[장i].단계[단i]; 그리기(); if(s && s.준비){ try{ s.준비(); }catch(e){} } }
+function 다음(){ 단i++; if(단i >= 장들[장i].단계.length){ if(!진[장i]) 서버남김(장i); 진[장i] = 1; 진저장(); } 단계시작(); }
+function 앱다시(){ window.__연습.P = null; try{ if(ftr.getAttribute('src')) ftr.contentWindow.location.replace(앱주소('tr')); else ftr.src = 앱주소('tr'); }catch(e){ ftr.src = 앱주소('tr'); } if(장들[장i].둘) 회원새로(); 단i = 0; 그리기(); }
+
+/* ── 반짝 · 맞게 눌렀나 ── 앱이 다시 그려도 0.4초마다 다시 칠한다 */
+const 반짝CSS = `.gg-hl{position:relative!important;z-index:2147483000!important;outline:3px solid #f0d3a0!important;outline-offset:2px;border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,.42),0 0 22px 6px rgba(240,211,160,.75)!important;animation:gghl 1.1s ease-in-out infinite}@keyframes gghl{50%{outline-color:#fff6e2}}`;
+function 칠(w){ const d = 문서(w); if(!d || !d.body) return null; if(!d.getElementById('gg-hl-css')){ const st = d.createElement('style'); st.id = 'gg-hl-css'; st.textContent = 반짝CSS; d.head.appendChild(st); }
+  d.querySelectorAll('.gg-hl').forEach(e => e.classList.remove('gg-hl'));
+  const s = 장들[장i].단계[단i]; if(!s || !s.목표 || 자유 || (s.곳 || 'tr') !== w) return null;
+  let el = null; try{ el = typeof s.목표 === 'function' ? s.목표() : [...d.querySelectorAll(s.목표)].find(e => e.getClientRects().length); }catch(e){}
+  if(el){ el.classList.add('gg-hl'); if(!el.__gg보임){ el.__gg보임 = 1; el.scrollIntoView({ block:'center', behavior:'smooth' }); } }
+  return el; }
+setInterval(() => { const c = 장들[장i]; if(!c || c.사진) return; const s = c.단계[단i]; 칠('tr'); if(c.둘) 칠('m');
+  if(s && s.끝 && !자유){ let ok = false; try{ ok = !!s.끝(); }catch(e){} if(ok && !맞음){ 맞음 = true; 토스트('잘했어요 ✓'); setTimeout(다음, 650); } } }, 400);
+function 지키기(w){ const d = 문서(w); if(!d || d.__gg지킴) return; d.__gg지킴 = 1;
+  d.addEventListener('click', e => { const c = 장들[장i]; if(자유 || !c || c.사진) return; const a = e.target.closest && e.target.closest('[data-act]');
+    if(a && /^(switch|logout)/.test(a.dataset.act || '')){ e.preventDefault(); e.stopImmediatePropagation(); 토스트('연습에서는 로그아웃은 안 해요'); return; }
+    const s = c.단계[단i]; if(!s || !s.목표 || (s.곳 || 'tr') !== w) return; const el = d.querySelector('.gg-hl'); if(!el) return;
+    if(!el.contains(e.target)){ e.preventDefault(); e.stopImmediatePropagation(); const h = document.getElementById('hint'); if(h){ h.classList.remove('on'); void h.offsetWidth; h.classList.add('on'); } return; }
+    if(!s.끝 && !맞음){ if(!s.누름){ e.preventDefault(); e.stopImmediatePropagation(); } 맞음 = true; 토스트('잘했어요 ✓'); setTimeout(다음, s.누름 ? 700 : 450); } }, true); }
+ftr.addEventListener('load', () => { 지키기('tr'); setTimeout(() => { const s = 장들[장i].단계[단i]; if(s && s.준비) try{ s.준비(); }catch(e){} }, 1600); });
+fm.addEventListener('load', () => 지키기('m'));
+let 토t = 0; function 토스트(m){ let t = document.getElementById('toast'); if(!t){ t = document.createElement('div'); t.id = 'toast'; t.style.cssText = 'position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#16241a;border:1px solid #3d6b49;color:#8fd19e;font-weight:900;padding:10px 18px;border-radius:12px;z-index:9;transition:opacity .3s'; document.body.appendChild(t); } t.textContent = m; t.style.opacity = 1; clearTimeout(토t); 토t = setTimeout(() => t.style.opacity = 0, 1400); }
+
+/* ── 0장 사진 ── 안드로이드 = 대표님 폰 캡처(회원 이름 가림) · 아이폰 = 사파리 모양 그림(배경 = 우리 앱 화면) */
+let 데자리 = {}; const 데판 = Date.now(); fetch('연습/d_자리.json?t=' + Date.now(), { cache:'no-store' }).then(r => r.json()).then(j => { 데자리 = j; if(장들[장i] && 장들[장i].사진) 사진그리기(장들[장i].단계[단i]); }).catch(() => {});
+function 데스크그림(s){ const 자 = 데자리[s.데] || [], 링 = (s.고리 || []).map(g => Array.isArray(g) ? g : 자[g]).filter(Boolean);
+  return `<div class="dpic"><img src="연습/d_${s.데}.png?t=${데판}" alt="">` + 링.map((r, i) => `<span class="ring" style="left:${r[0]}%;top:${r[1]}%;width:${r[2]}%;height:${r[3]}%"></span><span class="no" style="left:calc(${r[0]}% - 12px);top:calc(${r[1]}% - 12px)">${i + 1}</span>`).join('') + `</div><div class="cap" style="text-align:center">데스크 화면 (가짜 회원 · 트레이너 계정)</div>`; }
+function 사진그리기(s){ const p = $('#pics'); if(s && s.데){ p.innerHTML = 데스크그림(s); return; } if(장들[장i] && 장들[장i].부 === 2 && !(s && s.데)){ p.innerHTML = '<div class="cap" style="max-width:420px;text-align:center;color:var(--sub)">이 단계는 앱에서 — 1부 해당 장을 열어 보세요</div>'; return; } const 배경 = "url('연습/앱화면.png')";
+  const 판 = { 링크: `<div class="pic"><img src="연습/설치링크.png" alt=""><div class="cap">데스크 「앱 설치 링크」 — QR · 복사</div></div>`,
+    삼성: `<div class="pic"><div class="im"><img src="연습/설치_삼성_1_열기.png" alt=""><span class="ring" style="left:79.4%;top:4%;width:6.8%;height:3.3%"></span><span class="no" style="left:calc(79.4% - 34px);top:calc(4% - 2px)">1</span></div><div class="cap">① 주소창 ⬇ (설치)</div></div>
+           <div class="pic"><div class="im"><img src="연습/설치_삼성_2_추가.png" alt=""><span class="ring" style="left:50.8%;top:86.6%;width:46%;height:5.2%"></span><span class="no" style="left:calc(50.8% - 34px);top:calc(86.6% + 2px)">2</span></div><div class="cap">② 「추가」</div></div>`,
+    아이폰: `<div class="pic"><div class="ios" style="background-image:${배경}"><div class="sbar"><div class="url">mofma01-bit.github.io</div><div class="ico"><span>‹</span><span>›</span><span style="box-shadow:0 0 0 3px #f0d3a0;border-radius:6px;padding:0 4px">⬆</span><span>📖</span><span>⧉</span></div></div></div><div class="cap">① 아래 가운데 공유 ⬆</div></div>
+           <div class="pic"><div class="ios" style="background-image:${배경}"><div class="dim"></div><div class="sheet"><b>GLAD GYM</b><div class="row">복사 <span>⧉</span></div><div class="row">읽기 목록에 추가 <span>👓</span></div><div class="row hl">홈 화면에 추가 <span>⊞</span></div><div class="row">책갈피 추가 <span>📖</span></div></div></div><div class="cap">② 메뉴를 올려 「홈 화면에 추가」</div></div>
+           <div class="pic"><div class="ios" style="background-image:${배경}"><div class="dim"></div><div class="dlg"><div class="bar"><span>취소</span><b>홈 화면에 추가</b><span class="add">추가</span></div><div class="app"><i></i><div><b>GLAD GYM</b><br><span style="color:#999">mofma01-bit.github.io</span></div></div></div></div><div class="cap">③ 오른쪽 위 「추가」</div></div>`,
+    아이콘: `<div class="pic"><img src="연습/앱화면.png" alt=""><div class="cap">홈 화면 아이콘으로 열면 → 전화번호 · 문자 번호 한 번</div></div>` };
+  p.innerHTML = 판[s && s.그림] || 판.링크; }
+
+/* 폰 크게 — 화면 높이에 폰 전체(844)를 다 넣으면 너무 작아서(대표 13:39 「PC 로 볼 건데 너무 작아」) 폰 화면 높이를 줄이고(최소 560 · 앱은 안에서 스크롤) 그만큼 키운다 */
+function 크기(){ const st = $('#stage'), 둘 = !$('#phm').hidden, w = st.clientWidth, 높 = Math.max(420, window.innerHeight - 100);
+  const 폭k = 둘 ? (w - 90) / (390 * 2 + 30) : (w - 30) / 396, k = Math.max(.55, Math.min(1.6, 폭k, 높 / 560)), 안높 = Math.max(560, Math.min(844, Math.floor((높 - 28) / k)));
+  document.querySelectorAll('.fr').forEach(f => { const ifr = f.querySelector('iframe'); f.style.height = 안높 + 'px'; if(ifr) ifr.style.height = 안높 + 'px'; f.style.transform = `scale(${k})`; f.style.marginBottom = (-(1 - k) * 안높) + 'px'; f.parentElement.style.width = (390 * k + 6) + 'px'; }); }
+window.addEventListener('resize', 크기);
+$('#chsel').onchange = e => 장열기(+e.target.value);
+장열기(장번호들()[0]); 크기(); 서버읽기(); if(부) document.querySelector('.top b').textContent = 부 === '2' ? '데스크 업무 연습' : '수업 기록 연습';
+</script></body></html>
