@@ -14,7 +14,9 @@ try{ if(/iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="글래드짐">
 <link rel="manifest" href="manifest.json">
+<script>/* 샘플(?sample=1)은 따로 설치 — 홈 화면 「글래드짐 테스트」(브라운 테스트 아이콘) → 샘플로 바로 열림 (2026-11-06 대표 「모바일에 회원 샘플용 다운받아서」) */ if(/[?&]sample=1(&|$)/.test(location.search)){ document.querySelector('link[rel=manifest]').href = 'manifest-sample.json'; document.querySelector('meta[name=apple-mobile-web-app-title]').content = '글래드짐 테스트'; }</script>
 <link rel="apple-touch-icon" href="img/icon-192.png">
+<script>if(/[?&]sample=1(&|$)/.test(location.search)) document.querySelector('link[rel=apple-touch-icon]').href = 'img/icon-test-192.png';      /* 아이폰 홈 화면 테스트 아이콘 */</script>
 <title>글래드짐 운동기록</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@600;700&display=swap"
@@ -614,6 +616,15 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .chips{flex-shrink:0}      /* 칩 줄은 세로로 안 줄어듦 — 피드백 거르개 칩이 높이 0 으로 눌려 안 보였다 (2026-11-06 글 넘침 점검) */
 body{word-break:keep-all;overflow-wrap:break-word}
 @media (max-width:400px){#top:has(.ttl:not(:empty)) .logo{display:none}}      /* 좁은 폰 — 제목이 있으면 로고를 빼 「기록 · 피드백 · 내 정보」가 「기…」로 줄지 않게 (2026-11-06) */      /* 한글 낱말 가운데서 줄이 꺾이지 않게 (2026-11-06 대표 「글자가 멋대로 줄바꿈」) */
+.mx-top{display:flex;justify-content:center;margin:-4px 0 6px}.mx-top img{max-height:150px;max-width:100%;border-radius:14px;background:#fff;object-fit:contain}.mx-noimg{color:var(--sub)}.mx-h{text-align:center;margin-bottom:10px}
+.mx-main{display:grid;grid-template-columns:1fr 1fr;gap:10px}.mx-main button{display:flex;flex-direction:column;align-items:center;gap:2px;min-height:76px;justify-content:center;border-radius:16px;border:1.5px solid var(--gold-2);background:linear-gradient(180deg,#2f281c,#211d16);color:var(--gold);font:inherit}.mx-main b{font-size:17px}.mx-main small{color:var(--sub);font-size:13px}.mx-main button.off{border-color:#3a3731;background:#1d1c1a;color:#6f6a63}
+.seg.mx-tab{margin:14px 0 8px;width:100%}.seg.mx-tab button{flex:1}.mx-pane{min-height:64px;border:1px solid #34322d;border-radius:12px;padding:10px 12px;font-size:14.5px;line-height:1.6}.mx-pane div{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:4px}.mx-pane small{color:var(--sub)}
+.mx-foot{display:flex;justify-content:space-between;gap:8px;margin-top:12px}.mx-med{display:grid;gap:10px}.mx-med figure{margin:0}.mx-med img,.mx-med video{width:100%;border-radius:12px;background:#000}.mx-med figcaption{color:var(--sub);font-size:13px;margin-top:4px}
+.plr.pl3{grid-template-columns:27% 1fr 30px}.pladd{border:0;border-left:1px solid #34302a;background:none;color:var(--gold);font-size:18px;font-weight:900;cursor:pointer}.plh.pl3h{grid-template-columns:27% 1fr 30px}
+.plc.kp-on{outline:2.5px solid var(--gold)!important;outline-offset:-2px;background:rgba(240,211,160,.16)!important;color:var(--gold)!important}
+.plr.pl3{position:relative}.pladd.on{background:rgba(240,211,160,.12)}.plmenu{position:absolute;right:32px;top:50%;transform:translateY(-50%);z-index:5;display:flex;gap:6px;background:#26241f;border:1px solid #5a4d36;border-radius:12px;padding:6px;box-shadow:0 8px 22px rgba(0,0,0,.5)}.plmenu button{border:1px solid #4a463d;background:#1d1c1a;color:var(--cream,#fffcf8);font:inherit;font-size:13.5px;font-weight:700;border-radius:999px;padding:7px 12px;white-space:nowrap;cursor:pointer}.plmenu button.sub{color:var(--sub,#c6bdb2);border-color:#3a372f}.plmenu button[data-act^="pladd"]{border-color:rgba(240,211,160,.55);color:var(--gold)}
+.mx-foot .mx-ask{background:#2f6f9e;color:#f2fafd;border:0;display:inline-flex;align-items:center;gap:6px}.mx-ask em{font-style:normal;font-size:12px;font-weight:800;background:rgba(255,255,255,.2);border-radius:999px;padding:1px 7px}
+.kpdel{border-radius:999px;border:1px solid #4a463d;background:#1d1c1a;color:#c6bdb2;font:inherit;font-size:13px;font-weight:700;padding:3px 12px;cursor:pointer}
 .pill.nxl{background:#e2c184;color:#2a1c14;font-weight:900}
 .zmh.zone .zbtn{background:#1d1c1a!important;border:1px solid #3a3731!important;box-shadow:none!important}.zmh.zone .zbtn>span:nth-child(2){color:var(--cream)!important;font-size:16px;font-weight:900}.zmh.zone .zbtn .go{color:var(--gold)!important;background:rgba(240,211,160,.08)!important}.zmh.zone .lbl small{color:var(--sub);font-weight:600;margin-left:6px;font-size:13px}      /* 한 가지 색 (21:36) */
 .znew{font-style:normal;font-size:11px;font-weight:900;color:#2a1c14;background:#ffb36b;border-radius:6px;padding:0 6px;margin-left:4px;vertical-align:2px}.glrow[data-act]{cursor:pointer}.glfix{font-size:12px;color:var(--gold);font-weight:800;margin-left:4px}.glnew{display:block;width:100%;margin:2px 0 8px;padding:10px;border:1px dashed #5a554c;border-radius:12px;background:none;color:var(--gold);font-weight:800;font-size:14px}.hlast{display:flex;align-items:baseline;justify-content:space-between;margin-top:6px}.hlmore{font-size:13.5px;font-weight:800;color:var(--gold);background:none;border:0;padding:4px 2px}
@@ -3145,7 +3156,13 @@ function 운동글담기(){ const d = S.exn; if(!d) return;
   [['exn','n'],['exe','e'],['exd','d'],['ext','t']].forEach(([k,f]) => { const el = document.querySelector('[data-k="'+k+'"]'); if(el) d[f] = el.value.trim(); }); }
 function sheetExNew(){
   const d = S.exn; if(!d) return;
-  const 스 = () => d.기록 && d.kind === '스트레칭';      /* 수업 기록 중 없는 종목 — 웨이트 · 스트레칭 어디로 보낼지 (2026-11-05 22:33 대표 「스트레칭으로 보낼 수도 · 웨이트로 보낼 수도」) */
+  const 스 = () => d.기록 && d.kind === '스트레칭';
+  if(d.기록 && d.새 && !d.자세히) return openSheet(()=>`<div class="h2">새 종목 <small>목록에 없는 종목 · 이름만 쓰면 바로 추가</small></div>
+    <div class="fld"><span class="fn">종목 이름</span><input class="search" type="text" data-k="exn" maxlength="24" value="${esc(d.n)}" placeholder="예) 케이블 우드찹"></div>
+    <button class="btn main" data-act="exsave">종목에 추가하고 기록</button>
+    <div class="hrow"><button class="btn sub sm" data-act="pknewmemo">이번만 메모로</button><button class="btn sub sm" data-act="exmore">자세히 (선택)</button></div>
+    <div class="note">웨이트 · 스트레칭 · 부위 · 설명은 나중에 지난 수업 기록에서 넣어도 돼요</div>
+    <button class="btn ghost sm" data-act="close">닫기</button>`);      /* 간편 등록 (2026-11-06) */      /* 수업 기록 중 없는 종목 — 웨이트 · 스트레칭 어디로 보낼지 (2026-11-05 22:33 대표 「스트레칭으로 보낼 수도 · 웨이트로 보낼 수도」) */
   openSheet(()=>`<div class="h2">${d.새 ? '새 종목' : '종목 수정'}</div>
     ${d.기록 ? `<div class="seg exkind"><button class="${스() ? '' : 'on'}" data-act="exkind:웨이트">웨이트</button><button class="${스() ? 'on' : ''}" data-act="exkind:스트레칭">스트레칭</button></div>
       <div class="note"><b>목록에 없는 종목이에요 · ${스() ? '스트레칭 동작' : '종목'}에 추가할까요?</b><br>${스() ? '스트레칭 「추가한 동작」에 들어가 모두가 검색해요 · 기록엔 이름만 남아요' : '추가하면 무게 · 횟수를 기록하고 다음부터 모두가 검색해요'}</div>` : ''}
@@ -3431,8 +3448,17 @@ let GOALS = {};
    · 종목 · 동작 · 음식 사전만 진짜 서버에서 읽음 · 저장은 이 창 안에서만 · 서버 · 알림톡 · 진짜 앱 저장소는 안 건드림 */
 const 샘플판 = (() => { try{ return new URLSearchParams(location.search).get('sample') === '1'; }catch(e){ return false; } })();
 if(샘플판){
-  const 메모리 = () => { const m = new Map(); return { getItem: k => m.has(String(k)) ? m.get(String(k)) : null, setItem: (k, v) => { m.set(String(k), String(v)); }, removeItem: k => { m.delete(String(k)); }, clear: () => m.clear(), key: i => [...m.keys()][i] || null, get length(){ return m.size; } }; };
-  try{ Object.defineProperty(window, 'localStorage', { value: 메모리(), configurable: true }); Object.defineProperty(window, 'sessionStorage', { value: 메모리(), configurable: true }); }catch(e){}
+  /* 혼자 연 샘플(연습 프로그램 밖)은 오늘 하루 이 폰에 남긴다 — 새로 고침 · 앱 전환에도 그대로 · 다음 날 열면 처음으로. 서버엔 아무것도 안 감 */
+  const 연습안 = (() => { try{ return window.parent !== window && !!window.parent.__연습; }catch(e){ return false; } })();
+  const 진짜 = (() => { try{ return window.localStorage; }catch(e){ return null; } })(), 남김키 = 'gg_sample_keep' + (/[?&]who=tr(&|$)/.test(location.search) ? '_tr' : '');      /* 회원 · 트레이너 샘플은 따로 남김 */
+  const 오늘 = (d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'))(new Date());
+  const 남은것 = (() => { if(연습안 || !진짜) return null; try{ const v = JSON.parse(진짜.getItem(남김키) || 'null'); if(v && v.날 === 오늘) return v; 진짜.removeItem(남김키); }catch(e){} return null; })();
+  let 남길T = null, 남길때 = 0; const 메모리들 = [];
+  const 남기기 = () => { if(연습안 || !진짜 || !남길T) return; clearTimeout(남길때); 남길때 = setTimeout(() => { 남길때 = 0; try{ 진짜.setItem(남김키, JSON.stringify({ 날: 오늘, mid: window.__샘플mid, T: 남길T, ls: Object.fromEntries(메모리들[0] || []) })); }catch(e){} }, 300); };
+  const 메모리 = 처음 => { const m = new Map(Object.entries(처음 || {})); 메모리들.push(m); const 바뀜 = () => { if(m === 메모리들[0]) 남기기(); };
+    return { getItem: k => m.has(String(k)) ? m.get(String(k)) : null, setItem: (k, v) => { m.set(String(k), String(v)); 바뀜(); }, removeItem: k => { m.delete(String(k)); 바뀜(); }, clear: () => { m.clear(); 바뀜(); }, key: i => [...m.keys()][i] || null, get length(){ return m.size; } }; };
+  try{ Object.defineProperty(window, 'localStorage', { value: 메모리(남은것 && 남은것.ls), configurable: true }); Object.defineProperty(window, 'sessionStorage', { value: 메모리(), configurable: true }); }catch(e){}
+  addEventListener('pagehide', () => { if(남길때){ clearTimeout(남길때); try{ 진짜.setItem(남김키, JSON.stringify({ 날: 오늘, mid: window.__샘플mid, T: 남길T, ls: Object.fromEntries(메모리들[0] || []) })); }catch(e){} } });
   const 원f = window.fetch.bind(window); let 자료P = null;
   const 밀기 = (T, 날) => { const n = Math.round((new Date(new Date().toISOString().slice(0, 10)) - new Date(날)) / 86400000); if(!n) return T;
     const 밀 = s => { if(/^9999-/.test(s)) return s;      /* 날짜 없는 자리(추천 · 다음 수업 예약)는 그대로 (2026-11-05) */ const t = new Date(s.length === 10 ? s + 'T12:00:00' : s); if(isNaN(t)) return s; t.setDate(t.getDate() + n); return s.length === 10 ? t.toISOString().slice(0, 10) : t.toISOString(); };
@@ -3440,15 +3466,17 @@ if(샘플판){
   /* 연습 프로그램(연습.html) 안 — 옆 화면(트레이너 · 회원)과 같은 연습 자료를 같이 쓴다 · 쓰면 옆 화면에 알림 (2026-11-06 대표 「나란히 놓고 직접 눌러 보는」) */
   const 공유 = (() => { try{ return window.parent !== window && window.parent.__연습 ? window.parent.__연습 : null; }catch(e){ return null; } })();
   const 자료 = () => { if(공유){ 공유.P = 공유.P || 원f('sample.json', { cache:'no-store' }).then(r => r.json()).then(j => { 공유.mid = j._mid; return 밀기(j.표, j._날); }); return 공유.P.then(T => { window.__샘플mid = 공유.mid; return T; }); }
-    return 자료P || (자료P = 원f('sample.json', { cache:'no-store' }).then(r => r.json()).then(j => { window.__샘플mid = j._mid; return 밀기(j.표, j._날); })); };
-  const 알림 = (표, m) => { try{ if(공유 && 공유.바뀜) 공유.바뀜(window, 표, m); }catch(e){} };
+    if(!자료P && 남은것 && 남은것.T){ window.__샘플mid = 남은것.mid; 남길T = 남은것.T; 자료P = Promise.resolve(남길T); }      /* 오늘 눌러 본 것 그대로 */
+    return 자료P || (자료P = 원f('sample.json', { cache:'no-store' }).then(r => r.json()).then(j => { window.__샘플mid = j._mid; return (남길T = 밀기(j.표, j._날)); })); };
+  const 알림 = (표, m) => { 남기기(); try{ if(공유 && 공유.바뀜) 공유.바뀜(window, 표, m); }catch(e){} };
   const 거르기 = (rows, q) => { q.forEach((v, k) => { if(['select', 'order', 'limit', 'offset', 'or'].includes(k)) return; const g = r => String(r[k] == null ? '' : r[k]);
       if(v.startsWith('eq.')) rows = rows.filter(r => g(r) === v.slice(3)); else if(v.startsWith('neq.')) rows = rows.filter(r => g(r) !== v.slice(4));
       else if(v.startsWith('in.(')){ const s = new Set(v.slice(4, -1).split(',').map(x => x.replace(/"/g, ''))); rows = rows.filter(r => s.has(g(r))); }
       else if(v.startsWith('gte.')) rows = rows.filter(r => g(r) >= v.slice(4)); else if(v.startsWith('lte.')) rows = rows.filter(r => g(r) <= v.slice(4));
       else if(v.startsWith('gt.')) rows = rows.filter(r => g(r) > v.slice(3)); else if(v.startsWith('lt.')) rows = rows.filter(r => g(r) < v.slice(3));
       else if(v === 'is.null') rows = rows.filter(r => r[k] == null); });
-    const o = q.get('order'); if(o) o.split(',').reverse().forEach(z => { const [c, ...w] = z.split('.'), 내림 = w.includes('desc'); rows = rows.slice().sort((a, b) => { const x = a[c], y = b[c]; const r = x == null ? 1 : y == null ? -1 : (typeof x === 'number' && typeof y === 'number') ? x - y : String(x) < String(y) ? -1 : String(x) > String(y) ? 1 : 0; return 내림 ? -r : r; }); });
+    const o = q.get('order'); if(o && /\.desc/.test(o)) rows = rows.slice().reverse();      /* 내림차순에서 같은 날이면 나중에 만든 줄이 위 — 오늘 해 본 운동이 견본 기록보다 위에 (2026-11-06) */
+    if(o) o.split(',').reverse().forEach(z => { const [c, ...w] = z.split('.'), 내림 = w.includes('desc'); rows = rows.slice().sort((a, b) => { const x = a[c], y = b[c]; const r = x == null ? 1 : y == null ? -1 : (typeof x === 'number' && typeof y === 'number') ? x - y : String(x) < String(y) ? -1 : String(x) > String(y) ? 1 : 0; return 내림 ? -r : r; }); });
     const l = q.get('limit'); return l ? rows.slice(0, +l) : rows; };
   const 답 = (b, st) => new Response(JSON.stringify(b), { status: st || 200, headers: { 'Content-Type': 'application/json' } });
   window.fetch = async (u, o) => { o = o || {}; const s = String((u && u.url) || u), m = String(o.method || 'GET').toUpperCase();
@@ -3459,7 +3487,8 @@ if(샘플판){
     if(m === 'GET' && ['exercises', 'variants', 'foods'].includes(표)) return 원f(u, o);
     const T = await 자료(); let j = null; try{ j = JSON.parse(o.body || 'null'); }catch(e){}
     if(m === 'GET') return 답(거르기(T[표] || [], url.searchParams));
-    if(m === 'POST'){ const rows = Array.isArray(j) ? j : j ? [j] : []; T[표] = T[표] || []; rows.forEach(r => { const 키 = r && r.id != null ? T[표].findIndex(x => x.id === r.id) : -1; if(키 >= 0) Object.assign(T[표][키], r); else T[표].push(r); }); 알림(표, m); return 답(rows, 201); }      /* 같은 id 는 덮어씀(upsert) */
+    if(m === 'POST'){ const rows = Array.isArray(j) ? j : j ? [j] : []; T[표] = T[표] || []; rows.forEach(r => { if(r && r.id == null){ r.id = T[표].reduce((n, x) => typeof x.id === 'number' && x.id > n ? x.id : n, 900000) + 1; if(!r.created_at) r.created_at = new Date().toISOString(); }      /* 진짜 서버처럼 새 줄에 번호 — 없으면 종목 · 세트가 이어지지 않아 마친 운동이 빈 기록이 됐다 (2026-11-06) */
+      const 키 = T[표].findIndex(x => x.id === r.id); if(키 >= 0) Object.assign(T[표][키], r); else T[표].push(r); }); 알림(표, m); return 답(rows, 201); }      /* 같은 id 는 덮어씀(upsert) */
     if(m === 'PATCH'){ const rows = 거르기(T[표] || [], url.searchParams); rows.forEach(r => Object.assign(r, j || {})); 알림(표, m); return 답(rows); }
     if(m === 'DELETE'){ const rows = 거르기(T[표] || [], url.searchParams); T[표] = (T[표] || []).filter(r => !rows.includes(r)); 알림(표, m); return 답(rows); }
     return 답({}); };
@@ -3489,7 +3518,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '554';
+const BUILD = '556';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -4278,7 +4307,7 @@ function drawSheet(){
     if(!초안칸(t)) return; const d=S.draft&&S.draft[t.getAttribute('data-k')]; if(d !== undefined) t.value=d; });      /* 비운 것('')도 초안이다 */
 }
 function closeSheet(){ sheetRender=null; $('#sheet').classList.remove('open'); $('#sheetbox').innerHTML=''; }
-$('#sheet').addEventListener('click', e=>{ if(e.target.id==='sheet' && !(sheetRender && sheetRender.닉)) closeSheet(); });   /* 닉네임 창은 바깥을 눌러도 안 닫힌다 */
+$('#sheet').addEventListener('click', e=>{ if(!e.target.closest('#sheetbox') && !(sheetRender && sheetRender.닉)) closeSheet(); });      /* 빈 곳 = 판 밖 어디든 (노션 11/6 「닫기가 아닌 빈 화면 눌러도 닫히게」) */   /* 닉네임 창은 바깥을 눌러도 안 닫힌다 */
 
 const live = () => D.live;
 const me = () => MEMBERS.find(m=>m.id===S.mid);
@@ -4318,7 +4347,8 @@ function 경사최대(ex){
   return 0;
 }
 function partTimes(w){ const m={}; (w.items||[]).forEach(it=>{ if(!(it.sec>0)) return; const p=exOf(it.ex).p; m[p]=(m[p]||0)+it.sec; }); return m; }
-const byDateDesc = (a,b)=> a.date<b.date?1 : a.date>b.date?-1 : (a.id<b.id?1:-1);
+const 견본뒤 = x => /^w_demo/.test(String(x.id)) ? '' : String(x.id);      /* 샘플 견본 기록(w_demo…)은 같은 날 직접 해 본 기록보다 아래 (2026-11-06) */
+const byDateDesc = (a,b)=> a.date<b.date?1 : a.date>b.date?-1 : (견본뒤(a)<견본뒤(b)?1:-1);
 function myWorkouts(){ return D.workouts.filter(w=>w.mid===S.mid && w.done).slice().sort(byDateDesc); }
 /* 「담기만 하고 한 세트도 안 한 운동」은 지난 기록으로 치지 않는다.
    이걸 걸러 내지 않아 「지난 운동 그대로」가 빈 배열을 받고 터졌다 (2026-09-04). */
@@ -5184,6 +5214,7 @@ async function 붙이기실행(){ const j = S.jb; if(!j || j.중) return; let �
   if(D.cmKeys) D.cmKeys.add(j.mid + '|' + T);
   S.jb = null; closeSheet(); save(); toast(대상.n + ' 종목으로 만들었어요'); render(); }
 document.addEventListener('input', ev => { const f = ev.target.closest && ev.target.closest('[data-bkq]'); if(!f || !S.bulk) return; const j = +f.dataset.bkq, r = S.bulk.rows[j]; if(!r) return; r.nm = f.value;
+  if(String(r.nm).trim() && r.k){ r.k = ''; const 줄 = f.closest('.vu-row'); if(줄) 줄.querySelectorAll('.vu-c button.on').forEach(x => x.classList.remove('on')); }      /* 직접 쓰면 그 이름으로 — 칩 해제 */
   const 쓸 = S.bulk.rows.filter(x => !x.off), 됨 = 쓸.filter(x => x.k || String(x.nm || '').trim()).length, b = document.querySelector('#sheetbox [data-act="bksend"]'); if(b && !S.bulk.중){ b.disabled = !됨; b.textContent = 됨 + '개 올리기'; } });
 function 몰아종목(b){ const w = (live() && live().id === b.wid) ? live() : D.workouts.find(x => x.id === b.wid); return w ? w.items.filter(it => !isMemo(it.ex)).map(it => ({ ex:it.ex, va:it.va, n:exName(it.ex, it.va) })).filter((o, i, a) => a.findIndex(z => z.ex === o.ex && z.va === o.va) === i) : []; }
 function 몰아고르기(찍기){ const b = S.bulk; if(!b) return; const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*,video/*';
@@ -5204,7 +5235,7 @@ function 몰아창(){ const b = S.bulk; if(!b) return; const 종 = 몰아종목(
     ${b.rows.length ? '' : '<div class="empty">아직 선택한 사진 · 영상이 없습니다<br>아래 「＋ 더 선택」을 눌러 주세요</div>'}
     ${b.rows.map((r, j) => { const [ex] = (r.k || '|').split('|'); return `<div class="vu-row${r.off ? ' off' : ''}"><div class="vu-th">${r.kind === 'video' ? `<video src="${r.url}#t=0.1" muted playsinline preload="metadata"></video><b>▶</b>` : `<img src="${r.url}" alt="">`}<small>${r.kind === 'video' ? '영상' : '사진'} ${j + 1}</small></div><div class="vu-b">
       <div class="vu-c">${종.map(o => { const k = o.ex + '|' + o.va; return `<button class="${k === r.k ? 'on' : ''}" data-act="bkk:${j}:${esc(k)}">${esc(o.n)}</button>`; }).join('')}${r.k && !종.some(o => o.ex + '|' + o.va === r.k) ? `<button class="on">✓ ${esc(exName(...r.k.split('|')))}</button>` : ''}</div>
-      ${종.length && r.k ? '' : `<div class="vu-s"><input data-bkq="${j}" value="${esc(r.nm || '')}" placeholder="종목 이름 (필수 · 편하게 써도 돼요)" autocomplete="off"></div>`}
+      <div class="vu-s"><input data-bkq="${j}" value="${esc(r.nm || '')}" placeholder="${종.length ? '다른 종목이면 이름 직접 쓰기' : '종목 이름 (필수 · 편하게 써도 돼요)'}" autocomplete="off"></div>
       <div class="mu-one"><input data-k="bk:${j}" value="${esc(r.tx || '')}" oninput="S.bulk && S.bulk.rows[${j}] && (S.bulk.rows[${j}].tx = this.value)" placeholder="이 종목 피드백 한 줄 (안 써도 돼요)"><button data-act="jfopen:${esc(ex)}:bk:${j}">💬 인용</button></div>
       <div class="vu-a"><button data-act="bkoff:${j}">${r.off ? '다시 올림' : '안 올림'}</button></div></div></div>`; }).join('')}
     <button class="btn sub" data-act="attask:both:bulk">＋ 더 선택</button>
@@ -7308,7 +7339,7 @@ function 플래너화면(w){
     if(o.it.rm || o.it.rmPlan) return 일알엠(o);
     if(isMemo(o.it.ex)) return `<div class="plr">${이름(o)}<button class="plm" data-act="${tr ? 'exd:memo:' + esc(o.it.va) + ':' + wmid : 'plfocus:' + o.i}">${tr ? '메모 · 눌러서 피드백으로 남기기 ›' : '메모 종목 ›'}${o.it.part ? ' <small>' + esc(o.it.part) + '</small>' : ''}</button></div>`;
     const n = Math.max(4, o.it.sets.length), 칸들 = [...Array(n)].map((_, j) => 칸(o, j, 'kg', false)).join('') + [...Array(n)].map((_, j) => 칸(o, j, 'reps', j === 0)).join('');
-    return `<div class="plr">${이름(o)}<div class="plcs${n > 4 ? ' wide' : ''}"><div class="plg" style="--n:${n}">${칸들}</div></div></div>`; };
+    return `<div class="plr pl3">${이름(o)}<div class="plcs${n > 4 ? ' wide' : ''}"><div class="plg" style="--n:${n}">${칸들}</div></div><button class="pladd${S.plMenu === o.i ? ' on' : ''}" data-act="plmenu:${o.i}" aria-label="세트 추가 · 종목 삭제">⋯</button>${S.plMenu === o.i ? `<div class="plmenu"><button class="sub" data-act="pldel:${o.i}">종목 삭제</button><button data-act="pladd:${o.i}">세트 추가</button>${o.it.sets.length > 1 ? `<button class="sub" data-act="plsdel:${o.i}">추가 세트 삭제</button>` : ''}</div>` : ''}</div>`; };      /* 대표 15:46 · 15:47 — 줄 끝 ⋯ → 종목 삭제 · 세트 추가 · 추가 세트 삭제(맨 오른쪽) · 「제거」는 앱 낱말 규칙대로 「삭제」 */
   const 유행 = o => { const x = o.it.sets[0] || {}; return `<button class="plr plca" data-act="plfocus:${o.i}"><span class="pln"><span class="hl" style="background:#b9b1a2">${esc(exName(o.it.ex, o.it.va))}</span></span><span>${x.reps ? x.reps + '분' : '—'}</span><span>${x.spd ? x.spd + 'km/h' : '—'}</span></button>`; };
   const 채움 = w.items.some(it => !(exOf(it.ex) || {}).cardio && it.sets.some(x => x.reps > 0 || x.kg > 0));
   const c0 = 쉼설정(), 도는중 = !!(S.rest && S.rest.until), 혼자 = !수업 && !tr;
@@ -7320,7 +7351,7 @@ function 플래너화면(w){
     ${몸판묶음(w)}
     <div class="pl-tools">${혼자 ? `<button class="wrchip ${c0.on ? 'on' : ''}" data-act="wrestpick">${c0.on ? '휴식 ' + c0.sec + '초' : '휴식 끔'} ▾</button>` : ''}<span class="sp"></span>${채움 ? `<button class="pl-new" data-act="plnew">새로 기록하기</button>` : ''}</div>
     ${도는중 ? `<div class="wrestbar"><b id="restleft2">${mmss(Math.max(0, (S.rest.until - Date.now()) / 1000))}</b><span>쉬는 중</span><button data-act="wrestadd">+15초</button><button data-act="wrestx">건너뛰기</button></div>` : ''}
-    <div class="pltb"><div class="plr plh"><span class="pln">운동 명칭</span><div class="plcs"><div class="plg" style="--n:4"><span class="plhh" style="grid-column:span 4">무게(kg)</span><span class="plhh r1" style="grid-column:span 4">반복수</span></div></div></div>
+    <div class="pltb"><div class="plr plh pl3h"><span class="pln">운동 명칭</span><div class="plcs"><div class="plg" style="--n:4"><span class="plhh" style="grid-column:span 4">무게(kg)</span><span class="plhh r1" style="grid-column:span 4">반복수</span></div></div></div>
       ${근.map(행).join('') || '<div class="pl-empty">아직 종목이 없습니다 · 아래 「＋ 웨이트 종목 추가」</div>'}</div>
     <button class="pl-add" data-act="go:pick">＋ 웨이트 종목 추가</button>
     ${수업 && tr ? `<button class="zbtn zrest" data-act="rtrest"><span class="e">📋</span><span>나머지 운동 지정하기<small>오늘 루틴에서 · 검색해서 추가</small></span></button>` : ''}
@@ -7351,6 +7382,7 @@ function 플래너정리(w){ if(!플래너인가(w)) return;
 function sheetPlName(i){ const w = live(), it = w && w.items[i]; if(!it) return; w.cur = i; save();
   if(S.who === 'tr' && !isMemo(it.ex)){ S.vplay = null; S.editDesc = null; S.cmWid = w.id; S.plIdx = i; sheetExDesc(it.ex, it.va, w.mid || S.mid); return; }      /* 트레이너 = 통일 피드백 창 (2026-11-03) */
   const tr = S.who === 'tr', wmid = w.mid || S.mid, cms = cmOf(wmid, it.ex, it.va), nw = cms.filter(c => !c.read).length;
+  if(!tr && !isMemo(it.ex)){ S.mxTab = '직전'; 회원종목창(i); return; }
   openSheet(() => { const 지 = isMemo(it.ex) ? null : lastRuns(it.ex, it.va, wmid, 1)[0];
     return `<div class="h2">${esc(isMemo(it.ex) ? exName(it.ex, it.va) : (exOf(it.ex) || {}).n || '')}</div>
     ${isMemo(it.ex) ? '' : `<span class="lbl">수업 메모 <small style="font-weight:600">이 날 이 종목에만</small></span><textarea class="pl-imemo" data-k="imemo:${i}" maxlength="300" placeholder="안 써도 돼요 · 언더그립 · 넓게 · 기구 등지고">${esc(it.memo || '')}</textarea>`}
@@ -7361,6 +7393,23 @@ function sheetPlName(i){ const w = live(), it = w && w.items[i]; if(!it) return;
       ${isMemo(it.ex) ? '' : `<button class="btn ghost sm" data-act="plsadd:${i}">＋ 세트 추가</button>`}
       <button class="btn ghost sm" data-act="wdel:${i}">종목 삭제</button></div>
     <button class="btn ghost sm" data-act="close">닫기</button>`; }); }
+/* 회원 종목 창 — 노션 11/6 「회원이 기록할 때 종목을 눌러 뜨는 화면 : 수업 메모 필요 없음 · 그림이 위 · 사진 보기 · 영상 보기를 메인(있을 때만) = 피드백 자료 · 직전 기록까지 · 빈 곳 눌러도 닫힘 · 직전 기록과 설명은 작은 탭」 */
+function 회원종목창(i){ const w = live(), it = w && w.items[i]; if(!it) return; const wmid = w.mid || S.mid, e = exOf(it.ex) || {};
+  openSheet(() => { const cms = cmOf(wmid, it.ex, it.va), nw = cms.filter(c => !c.read).length, 자료 = cms.flatMap(c => (c.media || []).map(m => Object.assign({ c }, m)));
+    const 사진 = 자료.filter(m => m.kind !== 'video'), 영상 = 자료.filter(m => m.kind === 'video'), 지 = lastRuns(it.ex, it.va, wmid, 1)[0], 탭 = S.mxTab === '설명' ? '설명' : '직전';
+    const 설명 = String(((vars(it.ex) || []).find(v => v.k === it.va) || (vars(it.ex) || [])[0] || {}).desc || '').trim(), 그림 = 종목그림주소(e);
+    return `<div class="mx-top">${그림 ? `<img src="${esc(그림)}" alt="">` : `<span class="mx-noimg">${esc(e.p || '')}</span>`}</div>
+      <div class="h2 mx-h">${esc(e.n || exName(it.ex, it.va))}</div>
+      <div class="mx-main"><button class="${사진.length ? '' : 'off'}" ${사진.length ? `data-act="mxmed:p:${i}"` : 'disabled'}><b>📷 사진 보기</b><small>${사진.length ? '트레이너 피드백 ' + 사진.length + '장' : '아직 없어요'}</small></button>
+        <button class="${영상.length ? '' : 'off'}" ${영상.length ? `data-act="mxmed:v:${i}"` : 'disabled'}><b>🎬 영상 보기</b><small>${영상.length ? '트레이너 피드백 ' + 영상.length + '개' : '아직 없어요'}</small></button></div>
+      <div class="seg mx-tab"><button class="${탭 === '직전' ? 'on' : ''}" data-act="mxtab:직전:${i}">직전 기록</button><button class="${탭 === '설명' ? 'on' : ''}" data-act="mxtab:설명:${i}">설명</button></div>
+      <div class="mx-pane">${탭 === '직전' ? (지 ? `<b>${esc(dateTxt(지.date))}</b><div>${지.sets.map((x, n) => `<span>${n + 1}세트 ${x.kg ? kgfmt(x.kg) + 'kg × ' : ''}${x.reps}회</span>`).join('')}</div>${지.memo ? `<small>메모 · ${esc(지.memo)}</small>` : ''}` : '<small>처음 하는 종목이에요</small>')
+        : (설명 ? esc(설명).replace(/\n/g, '<br>') : '<small>설명이 아직 없어요</small>')}</div>
+      <div class="mx-foot"><button class="btn sm mx-ask" data-act="exd:${it.ex}:${it.va}">피드백 요청하기</button><button class="btn ghost sm wn" data-act="wdel:${i}">종목 삭제</button></div>`; }); }
+function 회원자료창(i, 갈){ const w = live(), it = w && w.items[i]; if(!it) return; const wmid = w.mid || S.mid;
+  openSheet(() => { const 자료 = cmOf(wmid, it.ex, it.va).flatMap(c => (c.media || []).map(m => Object.assign({ c }, m))).filter(m => 갈 === 'v' ? m.kind === 'video' : m.kind !== 'video');
+    return `<div class="h2">${갈 === 'v' ? '영상' : '사진'} <small>트레이너 피드백 · ${자료.length}</small></div><div class="mx-med">${자료.map(m => `<figure>${m.kind === 'video' ? `<video src="${esc(phURL(m.path))}" controls playsinline preload="metadata"></video>` : `<img src="${esc(phURL(m.path))}" alt="" loading="lazy">`}<figcaption>${esc(String(m.c.ts || '').slice(5, 10).replace('-', '/'))}${m.c.tx ? ' · ' + esc(String(m.c.tx).slice(0, 40)) : ''}</figcaption></figure>`).join('')}</div>
+      <button class="btn ghost sm" data-act="mxback:${i}">‹ 종목으로</button>`; }); }
 /* ── 설명 + 피드백 ── */
 /* ══ 피드백 회차 넘겨보기 ══ 2026-09-29 대표
    한 번에 하나만 보인다. 좌우 화살표로 넘기고, **가운데를 누르면 회차 목록**이 펼쳐진다.
@@ -7769,15 +7818,22 @@ function 자판그리기(){ let el = document.getElementById('kpad');
   const 키 = (k, 글, 꼴) => `<button class="${꼴 || ''}" data-act="${k}">${글}</button>`;
   const 칸 = f => `<button class="kpc${f === 자판.f ? ' on' : ''}" data-act="kpf:${f}"><small>${자판.i + 1}세트 ${f === 'kg' ? '무게' : '횟수'}</small><b>${esc(String(값(f)))}<em>${f === 'kg' ? 'kg' : '회'}</em></b></button>`;
   const 다음 = 무 ? (자판.i + 1) + '세트 횟수' : (판 ? (자판.i + 2) + '세트 무게' : '닫기');
+  setTimeout(() => { document.querySelectorAll('.plc.kp-on').forEach(b => b.classList.remove('kp-on')); if(자판 && 자판.it != null){ const b = document.querySelector('[data-act="plk:' + 자판.it + ':' + 자판.i + ':' + 자판.f + '"]'); if(b){ b.classList.add('kp-on'); b.textContent = 자판.v; b.scrollIntoView({ block:'nearest', inline:'nearest' }); } } }, 0);      /* 고른 칸에 누르는 숫자가 그대로 (노션 11/6 「계산기에만 뜨지 않고 칸에도」) */
   el.innerHTML = `<div class="kpcs">${칸('kg')}${칸('reps')}</div>
-    <div class="kpl"><span>${지 ? '지난번 ' + (지.kg ? kgfmt(지.kg) + 'kg × ' : '') + (지.reps || 0) + '회' : '지난 기록 없음'}</span><span>다음 칸 › ${다음}</span></div>
+    <div class="kpl"><span>${지 ? '지난번 ' + (지.kg ? kgfmt(지.kg) + 'kg × ' : '') + (지.reps || 0) + '회' : '지난 기록 없음'}</span>${판 && st ? '<button class="kpdel" data-act="kpdel">이 세트 삭제</button>' : ''}<span>다음 칸 › ${다음}</span></div>
     <div class="kpq">${빠.map(v => 키('kpv:' + v, v, 'q')).join('')}</div>
     <div class="kpg">${키('kpk:1','1')}${키('kpk:2','2')}${키('kpk:3','3')}${키('kpbs','⌫','fn')}${키('kpk:4','4')}${키('kpk:5','5')}${키('kpk:6','6')}${키('kpc','C','fn')}${키('kpk:7','7')}${키('kpk:8','8')}${키('kpk:9','9')}${키('kpnx','다음 칸 ›','nx')}${무 ? 키('kpk:.','.','') : '<button class="blank" disabled aria-hidden="true"></button>'}${키('kpk:0','0','w2')}${키('kpok','완료','ok')}</div>`; }
 /* 컴퓨터 자판 = 숫자판 (2026-11-03 대표 노션 「클릭만 되고 숫자 키보드가 안 먹음 · 계산기처럼 · 엔터 완료 · 백스페이스 지우기」)
    숫자 · 숫자패드(NumLock 꺼져도 자리로) → 그 숫자 · . → 점 · Backspace ⌫ · Delete/Esc C · Enter 완료 · Tab/→ 다음 칸 — 판에 있는 단추를 그대로 누른다 */
 document.addEventListener('keydown', e => { if(!자판 || e.ctrlKey || e.metaKey || e.altKey) return; const t = e.target; if(t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
-  const c = e.code || '', k = /^Numpad[0-9]$/.test(c) ? c.slice(-1) : c === 'NumpadDecimal' ? '.' : c === 'NumpadEnter' ? 'Enter' : e.key, 단 = /^[0-9]$/.test(k) ? 'kpk:' + k : (k === '.' || k === ',' || k === 'Decimal') ? 'kpk:.' : k === 'Backspace' ? 'kpbs' : (k === 'Delete' || k === 'Escape') ? 'kpc' : k === 'Enter' ? 'kpok' : (k === 'Tab' || k === 'ArrowRight') ? 'kpnx' : '';
+  const c = e.code || '', k = /^Numpad[0-9]$/.test(c) ? c.slice(-1) : c === 'NumpadDecimal' ? '.' : c === 'NumpadEnter' ? 'Enter' : e.key, 단 = /^[0-9]$/.test(k) ? 'kpk:' + k : (k === '.' || k === ',' || k === 'Decimal') ? 'kpk:.' : k === 'Backspace' ? 'kpbs' : (k === 'Delete' || k === 'Escape') ? 'kpc' : k === 'Enter' ? 'kpok' : (k === 'Tab' && !e.shiftKey && !(자판 && 자판.it != null)) ? 'kpnx' : '';
+  if(!단 && 자판 && 자판.it != null && /^(Tab|ArrowRight|ArrowLeft|ArrowUp|ArrowDown)$/.test(k)){ e.preventDefault(); 칸이동(k === 'Tab' ? (e.shiftKey ? 'ArrowLeft' : 'ArrowRight') : k); return; }      /* 노션 11/6 「데이터베이스와 동일하게 탭키 및 방향키」 — Tab = 오른쪽 · Shift+Tab = 왼쪽 · 방향키 = 옆 · 위아래 */
   if(!단) return; const b = document.querySelector('#kpad [data-act="' + 단 + '"]'); if(!b) return; e.preventDefault(); b.click(); });
+function 칸이동(k){ const 줄들 = [...document.querySelectorAll('.pltb .plr')].map(r => [...r.querySelectorAll('[data-act^="plk:"]')]).filter(x => x.length);
+  let ri = -1, ci = -1; 줄들.forEach((cs, r) => cs.forEach((b, c) => { if(b.dataset.act === 'plk:' + 자판.it + ':' + 자판.i + ':' + 자판.f){ ri = r; ci = c; } })); if(ri < 0) return;
+  let b = null; if(k === 'ArrowRight') b = 줄들[ri][ci + 1] || (줄들[ri + 1] || [])[0]; else if(k === 'ArrowLeft') b = 줄들[ri][ci - 1] || (줄들[ri - 1] || []).slice(-1)[0];
+  else { const 다 = 줄들[ri + (k === 'ArrowDown' ? 1 : -1)]; if(다) b = 다[Math.min(ci, 다.length - 1)]; }
+  if(b) b.click(); }
 function 자판넣기(){ if(!자판) return; const w = live(), 판 = 자판.it != null, cur = w && w.items[판 ? 자판.it : w.cur]; let st = cur && cur.sets[자판.i];
   const n = parseFloat(String(자판.v).replace(/[^0-9.]/g, '')); if(isNaN(n)) return;
   if(!st){ if(!판 || 자판.i !== cur.sets.length) return; const 앞 = cur.sets[cur.sets.length - 1]; st = { kg: 앞 ? 앞.kg : 0, reps: 0, done:false }; cur.sets.push(st); }      /* 플래너 빈 칸 = 다음 세트 */
@@ -8526,7 +8582,7 @@ function vRecord(){
               <span class="go2">＋ 세트 추가</span></button>`
           : `<div class="sm" style="margin-top:5px">${it.sets.map(st=>setTxt(it.ex,st)).join('  ·  ')||'세트 없음'}</div>`}
       </div>`).join('')
-    + (ed ? `<button class="btn sub" data-act="recaddex" style="margin-top:4px">＋ 종목 추가 <small>빠뜨린 종목 넣기</small></button>` : '')      /* 마친 기록 수정에도 종목 추가 (2026-11-06 대표 「수업 기록 완료하고 수정할 때 종목 추가가 안 돼 · 실수로 누락」) */
+    + (ed ? `<button class="btn sub" data-act="recaddex" style="margin-top:4px">＋ 종목 추가 <small>빠뜨린 종목</small></button>` : '')      /* 마친 기록 수정에도 종목 추가 (2026-11-06 대표 「수업 기록 완료하고 수정할 때 종목 추가가 안 돼 · 실수로 누락」) */
     ,
     foot: ed
       ? `<button class="btn ghost" data-act="reccancel">취소</button>
@@ -13985,7 +14041,7 @@ const 지움확인 = {
   bpx:['칠한 것을 모두 삭제할까요?', '모두 삭제'],
   fdelgo:['이 음식을 삭제할까요?', '삭제'], mealdel:['이 식단 사진을 삭제할까요?', '삭제'], rdelitem:['루틴에서 이 종목을 삭제할까요?', '삭제'],
   delcm:['이 피드백을 삭제할까요?<br>회원 화면에서도 사라집니다.', '삭제'], unask:['피드백 요청을 취소할까요?', '요청 취소'], bldel:['이 날의 인바디 기록을 삭제할까요?', '삭제'],
-  wsdel:['이 세트를 삭제할까요?', '삭제'], spdel:['이 종목을 삭제할까요?', '삭제'], clearpick:['추가한 종목을 전부 비울까요?', '전부 비우기'], pcdel:['이 댓글을 삭제할까요?', '삭제'],
+  wsdel:['이 세트를 삭제할까요?', '삭제'], kpdel:['이 세트를 삭제할까요?', '삭제'], pldel:['이 종목을 삭제할까요?', '삭제'], spdel:['이 종목을 삭제할까요?', '삭제'], clearpick:['추가한 종목을 전부 비울까요?', '전부 비우기'], pcdel:['이 댓글을 삭제할까요?', '삭제'],
   rsetdel:['이 세트를 삭제할까요?', '삭제'], psrm:['세트에서 이 종목을 삭제할까요?', '삭제'], mkclear:['표시를 모두 삭제할까요?', '모두 삭제'], rcartclr:['추가한 것을 전부 비울까요?', '비우기'],
   grpdel:['이 그룹을 삭제할까요?<br>안에 있던 루틴은 남습니다.', '삭제'], phdreq:['이 사진의 완전 삭제를 요청할까요?', '삭제 요청'], ootddel:['이 사진을 삭제할까요?<br>되돌릴 수 없습니다.', '삭제'],
   exdel:['이 종목을 삭제할까요?', '삭제'],
@@ -14690,7 +14746,7 @@ document.addEventListener('click', async ev=>{
     case 'attgo': { const o = document.getElementById('ospick'); if(o) o.remove(); if(rest[2] === 'bulk'){ if(S.bulk && !S.bulk.rows.length && !document.getElementById('sheet').classList.contains('on')) 몰아창(); 몰아고르기(rest[1] === 'cam'); return; } else 첨부고르기(rest[0], rest.slice(2).join(':'), rest[1] === 'cam'); return; }
     case 'attx2': { const o = document.getElementById('ospick'); if(o) o.remove(); return; }
     case 'bulkopen': { const wid = rest[0], w = (live() && live().id === wid) ? live() : D.workouts.find(x => x.id === wid); if(!w) return; S.bulk = { wid, mid: w.mid || S.tmid || S.mid, rows:[] }; 올리기고르기('both', 'bulk'); return; }
-    case 'bkk': { const r = S.bulk && S.bulk.rows[+rest[0]]; if(r){ r.k = rest.slice(1).join(':'); r.q = ''; 몰아창(); } return; }
+    case 'bkk': { const r = S.bulk && S.bulk.rows[+rest[0]]; if(r){ r.k = rest.slice(1).join(':'); r.q = ''; r.nm = ''; 몰아창(); } return; }      /* 칩을 누르면 직접 쓴 이름은 비움 */
     case 'bkoff': { const r = S.bulk && S.bulk.rows[+rest[0]]; if(r){ r.off = !r.off; 몰아창(); } return; }
     case 'bksend': { const b = S.bulk; if(!b || b.중) return; b.rows.forEach((r, j) => { const el = document.querySelector('[data-bkq="' + j + '"]'); if(el) r.nm = el.value; });
       if(!b.rows.some(r => !r.off && (r.k || String(r.nm || '').trim()))) return; b.중 = true; 몰아창();
@@ -15059,6 +15115,7 @@ document.addEventListener('click', async ev=>{
     case 'memoadd': sheetMemoAdd(); return;
     case 'pknew': S.nx = null; if(S.who === 'tr'){ 초안지움('exn','exe','exd'); S.exn = { id:'x'+Date.now(), n:(S.exq || '').trim().replace(/:/g, '·').slice(0, 24), p:(S.pickPart && PARTS.includes(S.pickPart)) ? S.pickPart : '기타', e:'', d:'', media:[], files:[], 새:true, 기록:true }; sheetExNew(); return; }      /* 트레이너 = 새 종목 창 그대로 (2026-10-27) */
       sheetNewEx(); return;
+    case 'exmore': { const d = S.exn; if(!d) return; 운동글담기(); d.자세히 = true; sheetExNew(); return; }
     case 'pknewmemo': { const d0 = S.exn; if(!d0) return; 운동글담기(); S.nx = { name:d0.n, part:d0.p }; S.exn = null; closeSheet();      /* 이번만 메모로 — 종목은 안 만듦 */
       const b = document.createElement('button'); b.setAttribute('data-act', 'pknewgo'); b.setAttribute('data-syn', '1'); b.style.display = 'none'; document.body.appendChild(b); b.click(); setTimeout(() => b.remove(), 0); return; }
     case 'pknewp': if(S.nx){ const el = document.querySelector('[data-k="nx:n"]'); if(el) S.nx.name = el.value; S.nx.part = S.nx.part === rest[0] ? '' : rest[0]; drawSheet(); } return;
@@ -15097,13 +15154,14 @@ document.addEventListener('click', async ev=>{
       });
       return; }
 
-    case 'wdel': { const i=+rest[0], it=w&&w.items[i]; if(!it) return;
+    case 'wdel': { S.plMenu = null; const i=+rest[0], it=w&&w.items[i]; if(!it) return;
       openSheet(()=>`<div class="h2">이 종목을 삭제할까요? <small>${esc(exName(it.ex,it.va))}</small></div>
         <div class="note">${it.sets.filter(x=>x.done).length?`입력해 둔 <b>${it.sets.filter(x=>x.done).length}세트</b>도 함께 사라집니다.`:'아직 입력한 것이 없습니다.'}</div>
         <button class="btn main" data-act="wdelgo:${i}" style="background:var(--warn);color:#241310">삭제</button>
         <button class="btn ghost sm" data-act="close">닫기</button>`);
       return; }
-    case 'wdelgo': { const i=+rest[0]; closeSheet();
+    case 'pldel':      /* 표 ⋯ 「종목 삭제」 — 확인 팝업(지움확인) 뒤 바로 (대표 15:48) */
+    case 'wdelgo': { S.plMenu = null; const i=+rest[0]; closeSheet();
       const it = w && w.items[i]; if(!it) return;
       if(it._id) sv(sdel('workout_items','id=eq.'+it._id), '종목 삭제');
       w.items.splice(i,1);
@@ -15145,7 +15203,7 @@ document.addEventListener('click', async ev=>{
     case 'wsdel': { const cur = w.items[w.cur], i2 = +rest[0]; if(cur.locked || cur.sets.length < 2 || !cur.sets[i2]) return;
       cur.sets.splice(i2, 1); S.wsel = null; save(); toast((i2+1) + '세트를 삭제했어요'); render(); return; }
     case 'wspop': { const cur = w.items[w.cur]; if(cur.locked) return; if(cur.sets.length < 2){ toast('세트가 하나뿐이에요'); return; }
-      cur.sets.pop(); S.wsel = null; save(); toast('마지막 세트를 삭제했어요'); render(); return; }
+      cur.sets.pop(); S.wsel = null; save(); toast('추가 세트를 삭제했어요'); render(); return; }
     case 'wrest': { const c = 쉼설정(); try{ localStorage.setItem('gg_rest_on', c.on ? '0' : '1'); }catch(e){} if(c.on) S.rest = null; toast(c.on ? '휴식 타이머를 껐어요' : '휴식 타이머를 켰어요'); render(); return; }
     case 'wrestd': { const c = 쉼설정(), n = Math.max(15, Math.min(600, c.sec + (+rest[0]))); try{ localStorage.setItem('gg_rest_sec', String(n)); }catch(e){} if(S.repeating){ const em = document.querySelector('#main .wrs .pm2 em'); if(em) em.textContent = mmss(n); } else render(); return; }
     case 'wrestadd': if(S.rest && S.rest.until){ S.rest.until += 15000; render(); } return;
@@ -15437,7 +15495,14 @@ document.addEventListener('click', async ev=>{
     case 'wrestpick': sheetRestPick(); return;
     case 'wrestset': { const n = +rest[0]; try{ localStorage.setItem('gg_rest_on', n ? '1' : '0'); if(n) localStorage.setItem('gg_rest_sec', String(n)); }catch(e){} if(!n) S.rest = null; closeSheet(); toast(n ? '휴식 ' + n + '초' : '휴식을 껐습니다'); render(); return; }
     case 'kp': 자판열기(rest[0], +rest[1]); return;
-    case 'plk': 플래너자판(+rest[0], +rest[1], rest[2]); return;
+    case 'plk': if(자판) 자판넣기(); 플래너자판(+rest[0], +rest[1], rest[2]); return;      /* 다른 칸을 누르면 적던 값은 넣고 옮김(표처럼) */
+    case 'mxtab': S.mxTab = rest[0]; drawSheet(); return;
+    case 'mxmed': 회원자료창(+rest[1], rest[0]); return;
+    case 'mxback': 회원종목창(+rest[0]); return;
+    case 'plmenu': S.plMenu = S.plMenu === +rest[0] ? null : +rest[0]; render(); return;      /* 표 줄 끝 ± = 바로 옆에 추가 · 삭제 (2026-11-06 대표 「＋ 는 추가만 같으니 중의적으로」) */
+    case 'pladd': { S.plMenu = null; const z = live(), it = z && z.items[+rest[0]]; if(!it) return; const 앞 = it.sets[it.sets.length - 1] || { kg:0, reps:0 }; it.sets.push({ kg:앞.kg, reps:앞.reps, done:false }); save(); render(); return; }      /* 세트 추가(앞 세트 값) */
+    case 'plsdel': { S.plMenu = null; const z = live(), it = z && z.items[+rest[0]]; if(!it || it.sets.length < 2) return; it.sets.pop(); if(자판 && 자판.it === +rest[0]){ 자판 = null; 자판그리기(); } save(); render(); return; }      /* 바로 (대표 15:48 「세트 추가 · 제거는 바로」) */
+    case 'kpdel': { const z = live(), it = z && 자판 && z.items[자판.it]; if(!it || !it.sets[자판.i]) return; it.sets.splice(자판.i, 1); 자판 = null; save(); 자판그리기(); render(); toast('세트를 삭제했어요'); return; }      /* 숫자판 「이 세트 삭제」 */
     case 'plnm': 자판 = null; 자판그리기(); sheetPlName(+rest[0]); return;
     case 'plfocus': 자판 = null; 자판그리기(); S.wfocus = +rest[0]; S.fold = false; S.wsel = null; render(); return;
     case 'wfback': S.wfocus = null; render(); return;
@@ -16114,7 +16179,7 @@ function 바로가기띠(){
   el.innerHTML = 설치신호
     ? '<span class="t">바로가기를 만들어 두세요<small>다음부터 주소를 찾지 않고 바로 열립니다</small></span>'
       + '<button id="pwago">＋ 바로가기 만들기</button><button class="x" id="pwax">✕</button>'
-    : '<div style="flex:1;min-width:0">' + (아이폰사파리() ? 홈추가안내글('글래드짐') : 안드로이드안내글('글래드짐')) + '</div><button class="x" id="pwax" style="align-self:flex-start">✕</button>';      /* 큰 글씨 3단계 (2026-10-23 대표) */
+    : '<div style="flex:1;min-width:0">' + (아이폰사파리() ? 홈추가안내글(샘플판 ? '글래드짐 테스트' : '글래드짐') : 안드로이드안내글(샘플판 ? '글래드짐 테스트' : '글래드짐')) + '</div><button class="x" id="pwax" style="align-self:flex-start">✕</button>';      /* 큰 글씨 3단계 (2026-10-23 대표) */
   el.classList.add('on');
   const go = document.getElementById('pwago');
   if(go) go.onclick = async () => {
