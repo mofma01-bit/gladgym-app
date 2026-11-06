@@ -122,7 +122,8 @@ const 장들 = [
    { t:'「세트 추가」', d:'앞 세트 무게 · 횟수로 한 세트가 바로 늘어요 · 「추가 세트 삭제」는 마지막 세트를 바로 지우고 · 「종목 삭제」는 한 번 물어봐요', 목표:'.plmenu [data-act^="pladd:"]', 끝:() => !있나('tr', '.plmenu') },
    { t:'시간 재기', d:'윗줄 「시간 재기 ▶」 — 일시정지 · 계속', 목표:'[data-act="timego"], [data-act="tmpause"]', 누름:true, tip:'빈 세트는 마칠 때 저절로 빠져요' } ] },
  { 제목:'종목 더하기', 목표:'어떤 운동이든 기록에 넣는다', 단계:[
-   { t:'「＋ 웨이트 종목 추가」', d:'기록 표 아래 단추 — 종목 고르는 화면으로', 준비:() => 운동중(), 목표:'[data-act="go:pick"]', 끝:() => 값('tr', 'S.screen') === 'pick' },
+   { t:'표 맨 아래 「＋ 종목」 칸', d:'무게 칸 누르듯 눌러서 종목 이름을 쓰고 Enter(완료) — 그 줄이 바로 종목이 돼요 · 예) 벤치프레스', 준비:() => 운동중(), 목표:'.plnewin', 끝:() => !!값('tr', 'S.just'), tip:'있는 종목이면 지난 무게 · 횟수가 채워지고, 없는 이름은 새 종목이 돼요(다음부터 모두 검색)' },
+   { t:'「＋ 웨이트 종목 추가」', d:'검색해서 여러 종목을 한 번에 담을 때 — 종목 고르는 화면으로', 목표:'[data-act="go:pick"]', 끝:() => 값('tr', 'S.screen') === 'pick' },
    { t:'검색', d:'검색칸에 「스쿼트」처럼 쳐 보세요 — bp · 코어 같은 줄임말도 돼요', 목표:'input[data-k="exq"]', 끝:() => String(값('tr', 'S.exq') || '').trim().length >= 1 },
    { t:'종목 담기', d:'카드를 누르면 위 「추가한 종목」에 담겨요 · ★ = 즐겨찾기', 목표:'[data-act^="add:"]', 끝:() => 있나('tr', '[data-act^="pkrm:"]') },
    { t:'「추가하기 ›」', d:'담은 종목이 바로 기록 화면 맨 아래에 붙어요', 목표:'[data-act="askstart"]', 끝:() => 값('tr', 'S.screen') === 'workout' },
@@ -293,10 +294,10 @@ function 칠(w){ const d = 문서(w); if(!d || !d.body) return null; if(!d.getEl
 setInterval(() => { const c = 장들[장i]; if(!c || c.사진) return; const s = c.단계[단i]; 칠('tr'); if(c.둘) 칠('m');
   if(s && s.끝 && !자유){ let ok = false; try{ ok = !!s.끝(); }catch(e){} if(ok && !맞음){ 맞음 = true; 토스트('잘했어요 ✓'); setTimeout(다음, 650); } } }, 400);
 function 지키기(w){ const d = 문서(w); if(!d || d.__gg지킴) return; d.__gg지킴 = 1;
-  d.addEventListener('click', e => { const c = 장들[장i]; if(자유 || !c || c.사진) return; const a = e.target.closest && e.target.closest('[data-act]');
+  d.addEventListener('click', e => { const c = 장들[장i]; if(자유 || !c || c.사진) return;      /* 사람이 누른 것(isTrusted)만 반짝인 곳 밖을 막는다 — 앱이 스스로 누르는 단추는 통과 (2026-11-06 「추가하기 ›」 바로 붙이기가 막혀 멈춤) */ const a = e.target.closest && e.target.closest('[data-act]');
     if(a && /^(switch|logout)/.test(a.dataset.act || '')){ e.preventDefault(); e.stopImmediatePropagation(); 토스트('연습에서는 로그아웃은 안 해요'); return; }
     const s = c.단계[단i]; if(!s || !s.목표 || (s.곳 || 'tr') !== w) return; const el = d.querySelector('.gg-hl'); if(!el) return;
-    if(!el.contains(e.target)){ e.preventDefault(); e.stopImmediatePropagation(); const h = document.getElementById('hint'); if(h){ h.classList.remove('on'); void h.offsetWidth; h.classList.add('on'); } return; }
+    if(!el.contains(e.target) && e.isTrusted){ e.preventDefault(); e.stopImmediatePropagation(); const h = document.getElementById('hint'); if(h){ h.classList.remove('on'); void h.offsetWidth; h.classList.add('on'); } return; }
     if(!s.끝 && !맞음){ if(!s.누름){ e.preventDefault(); e.stopImmediatePropagation(); } 맞음 = true; 토스트('잘했어요 ✓'); setTimeout(다음, s.누름 ? 700 : 450); } }, true); }
 ftr.addEventListener('load', () => { 지키기('tr'); setTimeout(() => { const s = 장들[장i].단계[단i]; if(s && s.준비) try{ s.준비(); }catch(e){} }, 1600); });
 fm.addEventListener('load', () => 지키기('m'));
