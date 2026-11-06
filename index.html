@@ -3437,7 +3437,11 @@ if(샘플판){
   const 밀기 = (T, 날) => { const n = Math.round((new Date(new Date().toISOString().slice(0, 10)) - new Date(날)) / 86400000); if(!n) return T;
     const 밀 = s => { if(/^9999-/.test(s)) return s;      /* 날짜 없는 자리(추천 · 다음 수업 예약)는 그대로 (2026-11-05) */ const t = new Date(s.length === 10 ? s + 'T12:00:00' : s); if(isNaN(t)) return s; t.setDate(t.getDate() + n); return s.length === 10 ? t.toISOString().slice(0, 10) : t.toISOString(); };
     Object.values(T).forEach(rows => rows.forEach(r => Object.keys(r).forEach(k => { if(typeof r[k] === 'string' && !/_version$/.test(k) && /^\d{4}-\d{2}-\d{2}($|T)/.test(r[k])) r[k] = 밀(r[k]); }))); return T; };      /* 약관판(agree_version)은 날짜 꼴이지만 날이 아니다 — 밀면 다음 날부터 샘플이 약관 동의 화면으로 열렸다 (2026-10-30) */
-  const 자료 = () => 자료P || (자료P = 원f('sample.json', { cache:'no-store' }).then(r => r.json()).then(j => { window.__샘플mid = j._mid; return 밀기(j.표, j._날); }));
+  /* 연습 프로그램(연습.html) 안 — 옆 화면(트레이너 · 회원)과 같은 연습 자료를 같이 쓴다 · 쓰면 옆 화면에 알림 (2026-11-06 대표 「나란히 놓고 직접 눌러 보는」) */
+  const 공유 = (() => { try{ return window.parent !== window && window.parent.__연습 ? window.parent.__연습 : null; }catch(e){ return null; } })();
+  const 자료 = () => { if(공유){ 공유.P = 공유.P || 원f('sample.json', { cache:'no-store' }).then(r => r.json()).then(j => { 공유.mid = j._mid; return 밀기(j.표, j._날); }); return 공유.P.then(T => { window.__샘플mid = 공유.mid; return T; }); }
+    return 자료P || (자료P = 원f('sample.json', { cache:'no-store' }).then(r => r.json()).then(j => { window.__샘플mid = j._mid; return 밀기(j.표, j._날); })); };
+  const 알림 = (표, m) => { try{ if(공유 && 공유.바뀜) 공유.바뀜(window, 표, m); }catch(e){} };
   const 거르기 = (rows, q) => { q.forEach((v, k) => { if(['select', 'order', 'limit', 'offset', 'or'].includes(k)) return; const g = r => String(r[k] == null ? '' : r[k]);
       if(v.startsWith('eq.')) rows = rows.filter(r => g(r) === v.slice(3)); else if(v.startsWith('neq.')) rows = rows.filter(r => g(r) !== v.slice(4));
       else if(v.startsWith('in.(')){ const s = new Set(v.slice(4, -1).split(',').map(x => x.replace(/"/g, ''))); rows = rows.filter(r => s.has(g(r))); }
@@ -3455,9 +3459,9 @@ if(샘플판){
     if(m === 'GET' && ['exercises', 'variants', 'foods'].includes(표)) return 원f(u, o);
     const T = await 자료(); let j = null; try{ j = JSON.parse(o.body || 'null'); }catch(e){}
     if(m === 'GET') return 답(거르기(T[표] || [], url.searchParams));
-    if(m === 'POST'){ const rows = Array.isArray(j) ? j : j ? [j] : []; (T[표] = T[표] || []).push(...rows); return 답(rows, 201); }
-    if(m === 'PATCH'){ const rows = 거르기(T[표] || [], url.searchParams); rows.forEach(r => Object.assign(r, j || {})); return 답(rows); }
-    if(m === 'DELETE'){ const rows = 거르기(T[표] || [], url.searchParams); T[표] = (T[표] || []).filter(r => !rows.includes(r)); return 답(rows); }
+    if(m === 'POST'){ const rows = Array.isArray(j) ? j : j ? [j] : []; T[표] = T[표] || []; rows.forEach(r => { const 키 = r && r.id != null ? T[표].findIndex(x => x.id === r.id) : -1; if(키 >= 0) Object.assign(T[표][키], r); else T[표].push(r); }); 알림(표, m); return 답(rows, 201); }      /* 같은 id 는 덮어씀(upsert) */
+    if(m === 'PATCH'){ const rows = 거르기(T[표] || [], url.searchParams); rows.forEach(r => Object.assign(r, j || {})); 알림(표, m); return 답(rows); }
+    if(m === 'DELETE'){ const rows = 거르기(T[표] || [], url.searchParams); T[표] = (T[표] || []).filter(r => !rows.includes(r)); 알림(표, m); return 답(rows); }
     return 답({}); };
   document.documentElement.classList.add('sample');
 }
@@ -3485,7 +3489,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '552';
+const BUILD = '553';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -3494,7 +3498,7 @@ const 안드로이드 = () => /android/i.test(navigator.userAgent || '');
 function 안드로이드안내글(이름){      /* 안드로이드 — 설치 신호가 없을 때 메뉴로 설치 3단계 (2026-11-03) */
   const 삼성 = /SamsungBrowser/i.test(navigator.userAgent || '');
   return '<div class="ga-big"><div class="ga-t">홈 화면에 「' + 이름 + '」 설치하기</div>'
-    + (삼성 ? '<ol><li>화면 맨 아래 <span class="ga-ic">메뉴 <i>≡</i></span> 를 누르세요</li><li><span class="ga-ic">현재 페이지 추가</span> → <span class="ga-ic">홈 화면</span></li><li><span class="ga-ic">추가</span> 를 누르면 끝!</li></ol>'
+    + (삼성 ? '<ol><li>주소창 오른쪽 <span class="ga-ic">설치 <i>⬇</i></span> 를 누르세요<br><small>안 보이면 맨 아래 <i>≡</i> → 현재 페이지 추가 → 홈 화면</small></li><li><span class="ga-ic">앱스 화면에 추가할까요?</span> 가 뜨면</li><li><span class="ga-ic">추가</span> 를 누르면 끝!</li></ol>'      /* 삼성 인터넷 = 주소창 ⬇ → 「추가」 (2026-11-06 대표 폰 캡처) */
       : '<ol><li>크롬 <b>오른쪽 위</b> <span class="ga-ic">더보기 <i>⋮</i></span> 를 누르세요</li><li><span class="ga-ic">앱 설치</span> 또는 <span class="ga-ic">홈 화면에 추가</span></li><li><span class="ga-ic">설치</span> 를 누르면 끝!</li></ol>')
     + '<div class="ga-s">다음부터는 홈 화면의 「' + 이름 + '」 아이콘으로 여세요</div></div>';
 }
@@ -4242,7 +4246,8 @@ function goRoot(sc){
    그래서 앱 안 화면끼리만 오가고, 뿌리 화면에서 한 번 더 누를 때만 밖으로 나갑니다. */
 let histOn = false;
 function histArm(){ if(!histOn) return; try{ history.pushState({ gg:1 }, ''); }catch(e){} }
-function histInit(){ try{ history.replaceState({ gg:0 }, ''); histOn = true; histArm(); }catch(e){} }
+function histInit(){ try{ if(window.parent !== window && window.parent.__연습) return; }catch(e){}      /* 연습 프로그램 안 = 브라우저 「뒤로」 기록을 안 씀 — 화면 둘이 같은 기록을 나눠 써서 트레이너 「뒤로」가 회원 화면을 되돌렸다 (2026-11-06) */
+  try{ history.replaceState({ gg:0 }, ''); histOn = true; histArm(); }catch(e){} }
 window.addEventListener('popstate', ()=>{
   if(!histOn) return;
   if(sheetRender){ closeSheet(); histArm(); return; }              /* 팝업이 열려 있으면 팝업만 닫는다 */
