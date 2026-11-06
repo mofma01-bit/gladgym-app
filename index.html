@@ -158,7 +158,7 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .plr{display:grid;grid-template-columns:27% 1fr;border-top:1px solid #34302a;width:100%}.plr:first-child{border-top:0}
 .plh{background:#2c2924}.plh .pln,.plhh{font-size:13px;color:var(--sub);font-weight:700;justify-content:center;text-align:center;padding:5px 0}
 .pln{display:flex;align-items:center;padding:0 4px;min-height:36px;border:0;border-right:1px solid #34302a;background:none;color:inherit;font:inherit;text-align:left;min-width:0}
-.pln .hl{font-size:13px;font-weight:800;color:#141210;border-radius:4px;padding:1px 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.pln .hl{font-size:13px;font-weight:800;color:#141210;border-radius:4px;padding:1px 5px;white-space:normal;max-width:100%}      /* 종목 이름은 다 보이게(넘치면 두 줄) — 「루마니안 데드…」 (2026-11-06) */
 .plcs{min-width:0}.plcs.wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .plg{display:grid;grid-template-columns:repeat(calc(var(--n) * 2),1fr);height:100%}.plcs.wide .plg{width:calc(var(--n) * 25%)}
 .plc{min-height:36px;border:0;border-left:1px solid #2a2722;background:transparent;color:var(--cream);font:inherit;font-size:13.5px;font-weight:800;letter-spacing:-.5px;padding:0}
@@ -611,6 +611,9 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .prpic{flex:none;width:58px;height:58px;padding:0;border:0;background:none;margin:0 2px 0 0}.prim{display:flex;width:58px;height:58px;border-radius:10px;overflow:hidden;background:#fff;align-items:center;justify-content:center;font-size:26px}.prim img{width:100%;height:100%;object-fit:contain}.prim.ph{background:#24221e}.rvth.ph{background:#24221e;font-size:24px}.rvth.more{background:#24221e;color:var(--sub);font-weight:900}.prbig{display:block;width:100%;max-height:52vh;object-fit:contain;border-radius:14px;background:#fff;margin:6px 0 10px}video.prbig{background:#000}
 .hline.prepfirst{border-color:#3f7281;background:linear-gradient(180deg,#1d3036,#162327)}.hline.prepfirst b{color:#d8f1f7}
 .seg.exkind{margin:0 0 10px;width:100%}.seg.exkind button{flex:1;padding:8px 0;font-size:15px;font-weight:800}
+.chips{flex-shrink:0}      /* 칩 줄은 세로로 안 줄어듦 — 피드백 거르개 칩이 높이 0 으로 눌려 안 보였다 (2026-11-06 글 넘침 점검) */
+body{word-break:keep-all;overflow-wrap:break-word}
+@media (max-width:400px){#top:has(.ttl:not(:empty)) .logo{display:none}}      /* 좁은 폰 — 제목이 있으면 로고를 빼 「기록 · 피드백 · 내 정보」가 「기…」로 줄지 않게 (2026-11-06) */      /* 한글 낱말 가운데서 줄이 꺾이지 않게 (2026-11-06 대표 「글자가 멋대로 줄바꿈」) */
 .pill.nxl{background:#e2c184;color:#2a1c14;font-weight:900}
 .zmh.zone .zbtn{background:#1d1c1a!important;border:1px solid #3a3731!important;box-shadow:none!important}.zmh.zone .zbtn>span:nth-child(2){color:var(--cream)!important;font-size:16px;font-weight:900}.zmh.zone .zbtn .go{color:var(--gold)!important;background:rgba(240,211,160,.08)!important}.zmh.zone .lbl small{color:var(--sub);font-weight:600;margin-left:6px;font-size:13px}      /* 한 가지 색 (21:36) */
 .znew{font-style:normal;font-size:11px;font-weight:900;color:#2a1c14;background:#ffb36b;border-radius:6px;padding:0 6px;margin-left:4px;vertical-align:2px}.glrow[data-act]{cursor:pointer}.glfix{font-size:12px;color:var(--gold);font-weight:800;margin-left:4px}.glnew{display:block;width:100%;margin:2px 0 8px;padding:10px;border:1px dashed #5a554c;border-radius:12px;background:none;color:var(--gold);font-weight:800;font-size:14px}.hlast{display:flex;align-items:baseline;justify-content:space-between;margin-top:6px}.hlmore{font-size:13.5px;font-weight:800;color:var(--gold);background:none;border:0;padding:4px 2px}
@@ -3482,7 +3485,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '551';
+const BUILD = '552';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -5236,7 +5239,7 @@ setInterval(()=>{
         c.pi = 번; if(남el && 지) 남el.textContent = mmss(지.남) + ' 남음'; }
       if(c.on && c.goal){ const 남 = c.goal*60 - 초; if(글) 글.textContent = 남 > 0 ? '목표 ' + c.goal + '분 · ' + Math.ceil(남/60) + '분 남음' : '목표 ' + c.goal + '분 달성';
         if(남 <= 0 && !c.hit){ c.hit = true; save(); toast('목표 ' + c.goal + '분 달성'); try{ navigator.vibrate && navigator.vibrate([200,100,200]); }catch(e){} } } } }
-  if(w && w.startAt && (S.screen==='workout'||S.screen==='t_live')){ const el=$('#tm'); if(el && !w.pausedAt) el.textContent=mmss(끝났나(w) ? 저절로끝난길이(w) : 흐른초(w)); }
+  if(w && w.startAt && (S.screen==='workout'||S.screen==='t_live')){ const el=$('#tm'); if(el && !w.pausedAt) el.textContent=mmss(시계초(w)); }
   if(S.rest && S.rest.until){
     const left=(S.rest.until-Date.now())/1000;
     const 쉼창 = !!document.querySelector('#sheetbox .ring');
@@ -6964,6 +6967,7 @@ const 시계는손으로 = w => !!w && (w.kind === '수업' || w.by === '트레�
    멈춘 채로 마쳐도 된다 — 멈춘 시각까지만 운동 시간으로 남는다. 저장해 둔 D.live 에 같이 실려 앱을 껐다 켜도 멈춘 채다. */
 const 시계지금 = w => (w && w.pausedAt) || Date.now();
 const 흐른초 = w => (w && w.startAt) ? Math.max(0, (시계지금(w) - w.startAt) / 1000) : 0;
+const 시계초 = w => (w && !w.pausedAt && 끝났나(w)) ? 저절로끝난길이(w) : 흐른초(w);      /* 윗줄 시계 — 끝내지 못한 운동은 마지막 세트에서 멈춘 값 (그릴 때도 · 2026-11-06 — 그릴 때는 흐른 시간 2400:02 가 떴다) */
 function 시계멈춤(w){ if(!w || !w.startAt) return;
   if(!w.pausedAt){ w.pausedAt = Date.now(); save(); toast('시간을 멈췄습니다'); render(); return; }
   const 이제 = Date.now(), 쉰 = 이제 - w.pausedAt;
@@ -7076,8 +7080,8 @@ function 윗시계(w){
   if(w.title === '1RM 측정') return `<span class="tmwrap">${쉼칩(w)}</span>`;
   return `<span class="tmwrap">
     ${w.startAt ? (w.pausedAt
-                    ? `<span class="tm off" id="tm">${mmss(흐른초(w))}</span><button class="chip tmgo" data-act="tmpause">계속 ▶</button>`
-                    : `<button class="tm tmbtn" data-act="tmpause" aria-label="운동 시간 일시정지"><span id="tm">${mmss(흐른초(w))}</span><i>일시정지</i></button>`)
+                    ? `<span class="tm off" id="tm">${mmss(시계초(w))}</span><button class="chip tmgo" data-act="tmpause">계속 ▶</button>`
+                    : `<button class="tm tmbtn" data-act="tmpause" aria-label="운동 시간 일시정지"><span id="tm">${mmss(시계초(w))}</span><i>일시정지</i></button>`)
                 : `<button class="chip t" data-act="timego">시간 재기 ▶</button>`}</span>`;   /* 쉬는 시간 칩은 뺐다 — 종목 카드 안 스위치와 겹친다 (2026-10-08 대표). 1RM 측정 모드에만 남는다 */
 }
 
@@ -13337,7 +13341,7 @@ function sheetTWAll(mid){
 function tLive(){
   const lv=liveOf(S.tmid); if(!lv) return tMembers();
   const m=MEMBERS.find(x=>x.id===lv.mid);
-  return { top: bar(m.n+' · 피드백 남기기', (lv.startAt ? `<span class="tm${lv.pausedAt ? ' off' : ''}" id="tm">${mmss(흐른초(lv))}</span>`
+  return { top: bar(m.n+' · 피드백 남기기', (lv.startAt ? `<span class="tm${lv.pausedAt ? ' off' : ''}" id="tm">${mmss(시계초(lv))}</span>`
       : `<button class="chip t" data-act="timego">시간 재기 ▶</button>`), 'tm:'+m.id),
     keepScroll:true, body:
     lv.items.map((it,i)=>{ const sent=D.cm.filter(c=>c.mid===m.id&&c.ex===it.ex&&c.va===it.va&&c.at==='방금');
