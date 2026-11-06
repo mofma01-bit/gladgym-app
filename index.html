@@ -2,6 +2,8 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
+<script>/* 테스트 앱(/gladgym-test/) — 그림 · 자료는 회원 앱 저장소에서(base) · 늘 샘플(?sample=1) · 설치 파일은 테스트 것 (2026-11-06) */
+if(/^\/gladgym-test(\/|$)/.test(location.pathname)){ document.write('<base href="/gladgym-app/">'); if(!/[?&]sample=1(&|$)/.test(location.search)) history.replaceState(null, '', '/gladgym-test/?sample=1' + location.hash); window.__테스트앱 = true; }</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <script>/* 폭 360 보다 좁은 폰(옛 아이폰 SE 320)은 화면을 360 폭으로 줄여 그린다 — 글씨를 하나하나 줄이지 않는다 */
 try{ if(Math.min(screen.width, window.innerWidth || screen.width) < 360) document.querySelector('meta[name="viewport"]').setAttribute('content', 'width=360, viewport-fit=cover'); }catch(e){}
@@ -14,9 +16,9 @@ try{ if(/iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="글래드짐">
 <link rel="manifest" href="manifest.json">
-<script>/* 샘플(?sample=1)은 따로 설치 — 홈 화면 「글래드짐 테스트」(브라운 테스트 아이콘) → 샘플로 바로 열림 (2026-11-06 대표 「모바일에 회원 샘플용 다운받아서」) */ if(/[?&]sample=1(&|$)/.test(location.search)){ document.querySelector('link[rel=manifest]').href = 'manifest-sample.json'; document.querySelector('meta[name=apple-mobile-web-app-title]').content = '글래드짐 테스트'; }</script>
+<script>/* 테스트 앱 주소에서만 따로 설치 — 홈 화면 「글래드짐 테스트」(브라운 테스트 아이콘) · 회원 앱 주소의 ?sample=1(연습 프로그램)은 그대로 (2026-11-06 대표 「모바일에 회원 샘플용 다운받아서」 · 16:58 「단독으로」) */ if(window.__테스트앱){ document.querySelector('link[rel=manifest]').href = '/gladgym-test/manifest.json'; document.querySelector('meta[name=apple-mobile-web-app-title]').content = '글래드짐 테스트'; }</script>
 <link rel="apple-touch-icon" href="img/icon-192.png">
-<script>if(/[?&]sample=1(&|$)/.test(location.search)) document.querySelector('link[rel=apple-touch-icon]').href = 'img/icon-test-192.png';      /* 아이폰 홈 화면 테스트 아이콘 */</script>
+<script>if(window.__테스트앱) document.querySelector('link[rel=apple-touch-icon]').href = 'img/icon-test-192.png';      /* 아이폰 홈 화면 테스트 아이콘 */</script>
 <title>글래드짐 운동기록</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@600;700&display=swap"
@@ -623,6 +625,7 @@ body{word-break:keep-all;overflow-wrap:break-word}
 .plr.pl3{grid-template-columns:27% 1fr 30px}.pladd{border:0;border-left:1px solid #34302a;background:none;color:var(--gold);font-size:18px;font-weight:900;cursor:pointer}.plh.pl3h{grid-template-columns:27% 1fr 30px}
 .plc.kp-on{outline:2.5px solid var(--gold)!important;outline-offset:-2px;background:rgba(240,211,160,.16)!important;color:var(--gold)!important}
 .plr.pl3{position:relative}.pladd.on{background:rgba(240,211,160,.12)}.plmenu{position:absolute;right:32px;top:50%;transform:translateY(-50%);z-index:5;display:flex;gap:6px;background:#26241f;border:1px solid #5a4d36;border-radius:12px;padding:6px;box-shadow:0 8px 22px rgba(0,0,0,.5)}.plmenu button{border:1px solid #4a463d;background:#1d1c1a;color:var(--cream,#fffcf8);font:inherit;font-size:13.5px;font-weight:700;border-radius:999px;padding:7px 12px;white-space:nowrap;cursor:pointer}.plmenu button.sub{color:var(--sub,#c6bdb2);border-color:#3a372f}.plmenu button[data-act^="pladd"]{border-color:rgba(240,211,160,.55);color:var(--gold)}
+.btn.addmore{background:#2f6f9e;color:#f2fafd;border:0}
 .mx-foot .mx-ask{background:#2f6f9e;color:#f2fafd;border:0;display:inline-flex;align-items:center;gap:6px}.mx-ask em{font-style:normal;font-size:12px;font-weight:800;background:rgba(255,255,255,.2);border-radius:999px;padding:1px 7px}
 .kpdel{border-radius:999px;border:1px solid #4a463d;background:#1d1c1a;color:#c6bdb2;font:inherit;font-size:13px;font-weight:700;padding:3px 12px;cursor:pointer}
 .pill.nxl{background:#e2c184;color:#2a1c14;font-weight:900}
@@ -3160,6 +3163,7 @@ function sheetExNew(){
   if(d.기록 && d.새 && !d.자세히) return openSheet(()=>`<div class="h2">새 종목 <small>목록에 없는 종목 · 이름만 쓰면 바로 추가</small></div>
     <div class="fld"><span class="fn">종목 이름</span><input class="search" type="text" data-k="exn" maxlength="24" value="${esc(d.n)}" placeholder="예) 케이블 우드찹"></div>
     <button class="btn main" data-act="exsave">종목에 추가하고 기록</button>
+    <button class="btn addmore" data-act="exsavemore">더 추가하기</button>
     <div class="hrow"><button class="btn sub sm" data-act="pknewmemo">이번만 메모로</button><button class="btn sub sm" data-act="exmore">자세히 (선택)</button></div>
     <div class="note">웨이트 · 스트레칭 · 부위 · 설명은 나중에 지난 수업 기록에서 넣어도 돼요</div>
     <button class="btn ghost sm" data-act="close">닫기</button>`);      /* 간편 등록 (2026-11-06) */      /* 수업 기록 중 없는 종목 — 웨이트 · 스트레칭 어디로 보낼지 (2026-11-05 22:33 대표 「스트레칭으로 보낼 수도 · 웨이트로 보낼 수도」) */
@@ -3175,7 +3179,7 @@ function sheetExNew(){
     ${(d.media.length || d.files.length) ? `<div class="pgrid">${d.media.map((f,i)=>`<button class="pg" data-act="exmrm:${i}">${f.kind==='video' ? `<video src="${esc(phURL(f.path))}" muted playsinline preload="metadata"></video>` : `<img src="${esc(phURL(f.path))}" alt="">`}<span class="pgd">삭제</span></button>`).join('')
       }${d.files.map((f,i)=>`<button class="pg" data-act="exfrm:${i}">${f.kind==='video' ? `<video src="${f.url}" muted playsinline></video>` : `<img src="${f.url}" alt="">`}<span class="pgd">삭제</span></button>`).join('')}</div>` : ''}
     <div class="hrow"><button class="btn sub" data-act="exfile:pic">${svg('h_cam',18)} 사진</button><button class="btn sub" data-act="exfile:vid">${svg('play',18)} 영상</button></div>
-    <button class="btn main" data-act="exsave">${스() ? '스트레칭에 추가하고 기록' : d.기록 ? '종목에 추가하고 기록' : '저장'}</button>
+    <button class="btn main" data-act="exsave">${스() ? '스트레칭에 추가하고 기록' : d.기록 ? '종목에 추가하고 기록' : '저장'}</button>${d.기록 && d.새 && !스() ? '<button class="btn addmore" data-act="exsavemore">더 추가하기</button>' : ''}
     ${d.기록 ? `<button class="btn sub sm" data-act="pknewmemo">이번만 메모로</button>` : ''}
     ${d.새 ? '' : `<button class="dngr" data-act="exdel">이 종목 삭제</button>`}
     <button class="btn ghost sm" data-act="close">닫기</button>`);
@@ -3518,7 +3522,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '556';
+const BUILD = '558';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -14439,7 +14443,9 @@ document.addEventListener('click', async ev=>{
       await sv(spost('variants', [{ id:VID(d.id,'a'), ex_id:d.id, vkey:'a', name:'', descr:d.d, demo:false, sort:0 }], {on:'id'}), '종목 설명 저장');
       await 파일지우기(뺀, 'exmedia/'+d.id+'/');
       S.exn = null; S.pickPart = d.p; closeSheet(); toast(d.새 ? '추가했어요\n다음부터 모두가 검색해요' : '수정했어요');
-      if(d.기록){ S.exq = ''; const b = document.createElement('button'); b.setAttribute('data-act', 'add:' + d.id + ':a'); b.setAttribute('data-syn', '1'); b.style.display = 'none'; document.body.appendChild(b); b.click(); setTimeout(() => b.remove(), 0); return; }      /* 기록 중 없는 종목 → 바로 기록 줄로 */
+      if(d.기록){ S.exq = ''; const 더 = !!d.더; const b = document.createElement('button'); b.setAttribute('data-act', 'add:' + d.id + ':a'); b.setAttribute('data-syn', '1'); b.style.display = 'none'; document.body.appendChild(b); b.click(); setTimeout(() => b.remove(), 0);
+        if(!더) setTimeout(() => { const g = document.createElement('button'); g.setAttribute('data-act', 'startgo'); g.style.display = 'none'; document.body.appendChild(g); g.click(); g.remove(); }, 0);      /* 바로 기록 화면 (대표 16:55) · 「더 추가하기」면 종목 고르기에 남음 */
+        return; }      /* 기록 중 없는 종목 → 바로 기록 줄로 */
       render(); return; }
     case 'exdel': { const d = S.exn; if(!d) return;
       const 쓰는 = D.routines.some(r => (r.items||[]).some(it => it.ex === d.id)) || D.workouts.some(w => (w.items||[]).some(it => it.ex === d.id));
@@ -15115,6 +15121,7 @@ document.addEventListener('click', async ev=>{
     case 'memoadd': sheetMemoAdd(); return;
     case 'pknew': S.nx = null; if(S.who === 'tr'){ 초안지움('exn','exe','exd'); S.exn = { id:'x'+Date.now(), n:(S.exq || '').trim().replace(/:/g, '·').slice(0, 24), p:(S.pickPart && PARTS.includes(S.pickPart)) ? S.pickPart : '기타', e:'', d:'', media:[], files:[], 새:true, 기록:true }; sheetExNew(); return; }      /* 트레이너 = 새 종목 창 그대로 (2026-10-27) */
       sheetNewEx(); return;
+    case 'exsavemore': { const d = S.exn; if(!d) return; d.더 = true; const b = document.createElement('button'); b.setAttribute('data-act', 'exsave'); b.style.display = 'none'; document.body.appendChild(b); b.click(); b.remove(); return; }      /* 파란 「더 추가하기」 */
     case 'exmore': { const d = S.exn; if(!d) return; 운동글담기(); d.자세히 = true; sheetExNew(); return; }
     case 'pknewmemo': { const d0 = S.exn; if(!d0) return; 운동글담기(); S.nx = { name:d0.n, part:d0.p }; S.exn = null; closeSheet();      /* 이번만 메모로 — 종목은 안 만듦 */
       const b = document.createElement('button'); b.setAttribute('data-act', 'pknewgo'); b.setAttribute('data-syn', '1'); b.style.display = 'none'; document.body.appendChild(b); b.click(); setTimeout(() => b.remove(), 0); return; }
@@ -15348,7 +15355,8 @@ document.addEventListener('click', async ev=>{
     case 'partopen': S.pickOpen=!S.pickOpen; render(); setTimeout(칠하기,0); return;
     case 'pkview': { try{ localStorage.setItem('gg_pkview', rest[0]); }catch(e){} document.documentElement.dataset.pkv = 종목보기(); document.querySelectorAll('.pkview button').forEach(b => b.classList.toggle('on', b.dataset.act === 'pkview:' + rest[0])); return; }      /* 다시 그리지 않고 표시만 — 검색어 · 스크롤 그대로 */
     /* 담은 순서 확인 → 시작 */
-    case 'askstart': S.sordIdx=null; sheetStart(); return;
+    case 'askstart': { S.sordIdx=null; const z = live(); if(z && z.begun){ const b = document.createElement('button'); b.setAttribute('data-act', 'startgo'); b.style.display = 'none'; document.body.appendChild(b); b.click(); setTimeout(() => b.remove(), 0); return; }      /* 하던 운동에 추가 = 바로 (2026-11-06) · 처음 시작만 순서 창 */
+      sheetStart(); return; }
     case 'sord': S.sordIdx=+rest[0]; drawSheet(); return;
     case 'sordend': S.sordIdx=null; drawSheet(); return;
     case 'sordmv': { const i=+rest[0], d=+rest[1], j=i+d;
