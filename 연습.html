@@ -109,10 +109,10 @@ const 장들 = [
    { t:'지난 기록 카드', d:'지난 수업 한 장 — 날짜 · 몸 그림 · 무게 표 · 수업 메모', 목표:() => { const d = 문서('tr'), h = d && d.querySelector('.tlh'); return h ? (h.closest('.card, button, [data-act]') || h.parentElement) : null; }, tip:'카드를 누르면 그날 기록 · 피드백을 볼 수 있어요' },
    { t:'회원 자료 펼치기', d:'상담일지 · 운동계획 · 식단 · 오운완 · 스트레칭 · 인바디 · 체형분석이 이 안에', 목표:'[data-act="tmfold"]', 끝:() => { const d = 문서('tr'), b = d && d.querySelector('[data-act="tmfold"]'); return !!(b && /접기/.test(b.innerText)); } } ] },
  { 제목:'수업 시작하기', 목표:'상황에 맞는 방법으로 수업을 연다', 단계:[
-   { t:'「수업 시작」', d:'회원 화면 금색 단추 — 무엇으로 시작할지 고르는 창이 떠요', 준비:() => 회원열기(), 목표:'[data-act^="tstartask:"]', 끝:() => 시트열림('tr') && 있나('tr', '#sheet [data-act^="tstartrecs"]') },
-   { t:'시작 갈래 보기', d:'맨 위 = 다음 수업 루틴 · 루틴에서 · 받은 루틴표 · 지난 기록에서 · 빈 운동 · 준비운동 먼저 — 「다음」', 목표:'#sheetbox', tip:'같은 날 기록이 있으면 「이어서 기록 / 새로 기록」을 물어요' },
-   { t:'「지난 기록에서」', d:'지난 수업을 그대로 가져와 시작해요', 목표:'#sheet [data-act^="tstartrecs"]', 끝:() => 있나('tr', '#sheet [data-act^="tstartrec:"]') },
-   { t:'「시작 ›」', d:'그날 종목 · 무게가 그대로 채워져요', 목표:'#sheet [data-act^="tstartrec:"]', 끝:() => 값('tr', 'S.screen') === 'workout' } ] },
+   { t:'「수업 시작」', d:'회원 화면 금색 단추 — 무엇으로 시작할지 고르는 창이 떠요', 준비:() => 회원열기(), 목표:'[data-act^="tstartask:"]', 끝:() => 시트열림('tr') && 있나('tr', '#sheet [data-act="ssv:기록"]') },
+   { t:'시작 창 보기', d:'지정한 루틴이 있으면 맨 위 「이대로 시작」 · 아래 「📋 루틴 | 🗓 지난 기록」 · 맨 아래 빈 운동 — 「다음」', 목표:'#sheetbox', tip:'같은 날 기록이 있으면 「이어서 기록 / 새로 기록」을 물어요 · 수업 날짜는 맨 위 「수정」' },
+   { t:'「🗓 지난 기록」', d:'지난 수업 카드가 그대로 나와요', 목표:'#sheet [data-act="ssv:기록"]', 끝:() => 있나('tr', '#sheet [data-act^="tstartrec:"]') },
+   { t:'「이 기록으로 시작」', d:'카드 안 맨 아래 단추 — 그날 종목 · 무게가 그대로 채워져요', 목표:'#sheet [data-act^="tstartrec:"]', 끝:() => 값('tr', 'S.screen') === 'workout' } ] },
  { 제목:'기록하기 (플래너)', 목표:'무게 · 횟수를 가장 빨리 적는다', 단계:[
    { t:'숫자 칸 누르기', d:'무게 칸 하나를 눌러요 — 금빛 테두리 · 앱 숫자판이 뜨고 누르는 숫자가 칸에도 바로 보여요', 준비:() => 운동중(), 목표:'[data-act^="plk:"]', 끝:() => 있나('tr', '#kpad.on, #kpad.open, #kpad [data-act^="kpf:"]') },
    { t:'빠른 값', d:'자주 쓰는 값(−2.5 · 그대로 · +2.5 · +5 / 8 · 10 · 12 · 15)을 한 번에', 목표:'#kpad .kpq button, #kpad .kpq [data-act]', 누름:true, 끝:null, tip:'바꾼 칸은 흰 테두리 — 지난 값과 다른 곳이 한눈에' },
@@ -238,9 +238,9 @@ function 펼친회원(){ 회원열기(); setTimeout(() => { const d = 문서('tr
 function 회원열기(){ if(값('tr', 'S.screen') === 't_member') return; 값('tr', "(S.tmid = window.__샘플mid, S.subj = window.__샘플mid, S.stack = [], go('t_member'), 1)"); }
 async function 운동중(){ if(값('tr', 'S.screen') === 'workout') return; if(값('tr', '!!live()')){ 값('tr', "(go('workout'), 1)"); return; }      /* 수업이 없으면 회원 화면 → 수업 시작 → 지난 기록에서 → 시작 을 대신 눌러 연다 */
   const 잠 = ms => new Promise(r => setTimeout(r, ms)), 눌 = sel => { const d = 문서('tr'), e = d && d.querySelector(sel); if(e) e.click(); return !!e; };
-  회원열기(); await 잠(600); 눌('[data-act^="tstartask:"]'); await 잠(600); if(눌('#sheet [data-act^="samenew"]')) await 잠(600); 눌('#sheet [data-act^="tstartrecs"]'); await 잠(600);
-  const d = 문서('tr'), 칩 = d && [...d.querySelectorAll('#sheet [data-act]')].find(e => /PT 수업/.test(e.innerText) && e.getClientRects().length); if(칩){ 칩.click(); await 잠(500); }      /* 「나머지 운동 지정하기」는 수업 기록에만 — 「PT 수업」 칩으로 거른 뒤 */
-  const 줄 = d ? [...d.querySelectorAll('#sheet [data-act^="tstartrec:"]')] : [], 수업줄 = 줄.find(e => /수업/.test(e.innerText) && !/개인운동/.test(e.innerText)) || 줄[0];
+  회원열기(); await 잠(600); 눌('[data-act^="tstartask:"]'); await 잠(600); if(눌('#sheet [data-act^="samenew"]')) await 잠(600); 눌('#sheet [data-act="ssv:기록"]'); await 잠(600);      /* 2026-11-13 새 시작 창 = 「🗓 지난 기록」 탭 · 카드 안 「이 기록으로 시작」 */
+  const d = 문서('tr');
+  const 줄 = d ? [...d.querySelectorAll('#sheet [data-act^="tstartrec:"]')] : [], 수업줄 = 줄.find(e => { const c = e.closest('.tmrc'); return c && !c.classList.contains('self'); }) || 줄[0];      /* 「나머지 운동 지정하기」는 수업 기록에만 */
   if(수업줄) 수업줄.click(); }
 
 /* ── 진도 — 이 기기(localStorage) + 서버(128단계 tut_progress · 직원 증표로) ── 이름 · 증표는 데스크(이 창을 연 부모) 또는 앱 로그인에서 · 주소에 안 싣는다 */
