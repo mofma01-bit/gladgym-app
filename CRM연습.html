@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CRM 회원권 등록 따라하기</title>
+<!-- 2026-11-17 대표 「CRM 회원권등록 방법 · 회원 등록부터 결제까지 담은 영상 · 따라할 수 있는 메뉴얼페이지」
+     근거 영상 : 클로드 로컬 폴더\녹음 2026-11-17 184144.mp4 (3분 29초 · 소리 없음 · 시연 고객 「테스트1」)
+     그림 : 웹앱\CRM연습\s01~s22.jpg (설명) · sNNc.jpg (연습 · 상자 없음)
+     자리 : 2026-11-17 19:2x 교육자료\CRM_회원권등록 에서 옮김 — 데스크 매뉴얼 탭 연습 카드 3번이 /gladgym-app/CRM연습.html 을 연다 — 영상에서 뽑아 누를 곳에 번호 상자 · 회원 목록 · 얼굴 · 카메라 미리보기는 흐림 -->
+<style>
+:root{
+  --bg:#171614; --panel:#201f1c; --card:#26241f; --line:#3a372f; --line2:#4a463f;
+  --text:#ece6da; --sub:#b9b2a4; --gold:#ffb020; --gold-ink:#1a1408;
+  --blue:#9cc8ff; --blue-line:#3a6aa0; --blue-bg:#1d2a3a; --cream:#efe6d2; --done:#7fd19b;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);
+  font-family:"Pretendard","Malgun Gothic","Apple SD Gothic Neo",sans-serif;font-size:15px;line-height:1.6}
+button{font:inherit;cursor:pointer}
+.top{position:sticky;top:0;z-index:10;background:var(--bg);border-bottom:1px solid var(--line);padding:12px 20px}
+.top h1{margin:0;font-size:19px}
+.top .meta{color:var(--sub);font-size:13px}
+.bar{height:6px;background:var(--line);border-radius:3px;margin-top:8px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--done);transition:width .2s}
+.wrap{display:grid;grid-template-columns:270px 1fr;gap:0;min-height:calc(100vh - 80px)}
+nav{border-right:1px solid var(--line);padding:12px 10px;overflow-y:auto;max-height:calc(100vh - 80px);position:sticky;top:80px}
+nav h3{margin:14px 6px 6px;font-size:13px;color:var(--sub);font-weight:700}
+nav h3:first-child{margin-top:2px}
+nav button{display:flex;gap:8px;align-items:center;width:100%;text-align:left;background:var(--card);
+  border:1px solid var(--line2);color:var(--text);border-radius:8px;padding:7px 9px;margin:3px 0;font-size:14px}
+nav button .n{min-width:24px;height:24px;border-radius:12px;background:#2e2d29;border:1px solid var(--line2);
+  display:inline-flex;align-items:center;justify-content:center;font-size:13px}
+nav button.on{border-color:var(--blue-line);color:var(--blue);background:var(--blue-bg)}
+nav button.ok .n{background:var(--done);border-color:var(--done);color:#10210f}
+main{padding:20px 24px 40px;max-width:1240px}
+.part{color:var(--sub);font-size:13px;font-weight:700}
+.step h2{margin:2px 0 10px;font-size:22px}
+.intro{color:var(--sub);margin:0 0 12px}
+ol.do{list-style:none;padding:0;margin:0 0 14px;display:grid;gap:6px}
+ol.do li{display:flex;gap:10px;align-items:flex-start;background:var(--panel);border:1px solid var(--line);
+  border-radius:8px;padding:8px 12px}
+ol.do li b.k{flex:none;min-width:26px;height:26px;border-radius:13px;background:var(--gold);color:var(--gold-ink);
+  display:inline-flex;align-items:center;justify-content:center;font-size:14px}
+ol.do li em{font-style:normal;color:var(--cream);font-weight:700}
+.shot{display:block;width:100%;border:1px solid var(--line2);border-radius:10px;cursor:zoom-in;background:#000}
+.tip{margin:12px 0 0;padding:10px 14px;border:1px solid var(--blue-line);background:var(--blue-bg);border-radius:8px;color:#dce9fb;font-size:14px}
+.warn{margin:12px 0 0;padding:10px 14px;border:1px solid #8a6a2a;background:#2c2416;border-radius:8px;color:#f3dfb4;font-size:14px}
+.foot{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-top:18px;flex-wrap:wrap}
+.btn{border:1px solid var(--line2);background:#2e2d29;color:var(--text);border-radius:8px;padding:9px 16px;font-weight:700;font-size:14px}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:var(--gold-ink)}
+.btn.ed{border-color:#d9d2c3}
+.btn:disabled{opacity:.45;cursor:default}
+.chk{display:flex;gap:8px;align-items:center;font-weight:700}
+.chk input{width:20px;height:20px;accent-color:var(--done)}
+.zoom{position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center;z-index:50;cursor:zoom-out;padding:12px}
+.zoom img{max-width:100%;max-height:100%}
+.zoom.on{display:flex}
+.end{padding:30px 0}
+.end h2{font-size:22px}
+@media (max-width:820px){
+  .wrap{grid-template-columns:1fr}
+  nav{position:static;max-height:none;border-right:0;border-bottom:1px solid var(--line);display:none}
+  nav.open{display:block}
+  .menu{display:inline-block !important}
+  main{padding:14px 16px 30px}
+}
+.menu{display:none;margin-top:8px}
+/* 직접 눌러 보기 (11/17 19:15 대표 「연습프로그램을 메뉴얼에 · 10분컷」) */
+.mode{display:inline-flex;gap:6px;margin-top:8px}
+.mode button{border:1px solid var(--line2);background:#2e2d29;color:var(--text);border-radius:8px;padding:6px 14px;font-weight:700;font-size:14px}
+.mode button.on{border-color:var(--blue-line);color:var(--blue);background:var(--blue-bg)}
+.pr{position:relative;cursor:crosshair}
+.pr .shot{cursor:crosshair}
+.hs{position:absolute;border-radius:8px;pointer-events:none}
+.hs.ok{border:3px solid var(--done);background:rgba(127,209,155,.15)}
+.hs.hint{border:4px solid var(--gold);box-shadow:0 0 0 4px rgba(255,176,32,.35);animation:blink .5s 3}
+@keyframes blink{50%{opacity:.2}}
+ol.do li.now{border-color:var(--gold)}
+ol.do li.done{opacity:.55}
+.say{margin-top:10px;font-weight:700;min-height:24px;color:var(--cream)}
+</style>
+</head>
+<body>
+<div class="top">
+  <h1>CRM 회원권 등록 따라하기</h1>
+  <div class="meta">고객 추가 → 상품 담기 → 할인·결제 → 계약서·서명 → 결제 확인 → 사진 · 2026-11-17 녹화 영상 기준 · 시연 고객 「테스트1」</div>
+  <div class="bar"><i id="bar"></i></div>
+  <div class="mode" id="mode"><button data-m="0">설명 보기</button><button data-m="1">직접 눌러 보기</button></div>
+  <button class="btn menu" id="menu">단계 목록</button>
+</div>
+<div class="wrap">
+  <nav id="nav"></nav>
+  <main id="main"></main>
+</div>
+<div class="zoom" id="zoom"><img id="zimg" alt=""></div>
+<script>
+const 단계 = [
+ {부:'1부 · 고객 등록', 제목:'고객 추가 창 열기', 그림:'s01',
+  할일:['왼쪽 메뉴 <em>고객관리</em> 를 눌러요','오른쪽 위 주황 <em>고객 추가</em> 를 누르면 「신규 등록」 창이 떠요']},
+ {부:'1부 · 고객 등록', 제목:'기본 정보 입력', 그림:'s02',
+  안내:'별표(＊)가 붙은 칸은 꼭 채워야 등록돼요.',
+  할일:['<em>이름</em> 입력','<em>성별</em> 남성 / 여성 선택','<em>전화번호</em> 입력 · 옆 <em>회원번호</em> 는 전화번호 뒤 4자리 (영상 예 : 9999)','<em>생년월일</em> — 칸을 누르면 달력이 열려요','<em>운톡(고객용 APP) 가입</em> 미연동 / 연동 선택'],
+  팁:'방문경로 · 운동목적 · 이메일 · 주소 · 특이사항은 선택 칸이에요. 아는 만큼만 넣어요.'},
+ {부:'1부 · 고객 등록', 제목:'담당 · 약관 동의 · 등록', 그림:'s03',
+  안내:'창을 아래로 내리면 나와요.',
+  할일:['<em>상담 담당자</em> 선택 (영상에서는 「담당자 없음」)','가입약관 <em>전체동의</em> 체크 — 아래 세 줄이 함께 체크돼요','오른쪽 아래 <em>등록하기</em>']},
+
+ {부:'2부 · 상품 담기', 제목:'상품구매 열기', 그림:'s04',
+  안내:'등록하면 그 고객 창이 바로 열려요.',
+  할일:['이름 아래 주황 <em>상품구매</em>']},
+ {부:'2부 · 상품 담기', 제목:'회원권 고르기', 그림:'s05',
+  할일:['오른쪽 위 <em>카테고리뷰</em> 켜기','<em>회원권</em> 탭','등록할 회원권 카드를 눌러요 (영상 예 : 회원권 12개월(운동복 무료))']},
+ {부:'2부 · 상품 담기', 제목:'패키지 상품 담기', 그림:'s06',
+  안내:'회원권에 딸린 필수 상품(운동가이드 · 그룹수업 · 운동복 등)은 위 「필수」 줄에 이미 들어 있어요.',
+  할일:['「옵션」 줄에서 같이 살 상품을 눌러요 (영상 예 : 락커 12개월)','오른쪽 아래 주황 <em>총 ○개의 상품 담기</em>']},
+ {부:'2부 · 상품 담기', 제목:'시작일 · 가격 한 번에 맞추기', 그림:'s07',
+  안내:'오른쪽 장바구니에 담긴 상품의 시작일과 가격 기준을 한 번에 바꿔요.',
+  할일:['장바구니 오른쪽 위 <em>일괄변경</em>','<em>시작일</em> 선택','<em>정가</em> 현금가 / 카드가 선택','<em>변경하기</em> — 「장바구니 상품을 일괄 변경했습니다」가 뜨면 끝']},
+ {부:'2부 · 상품 담기', 제목:'결제 화면으로', 그림:'s08',
+  안내:'장바구니에 상품 · 기간이 맞게 들어갔는지 보고 넘어가요. 하나만 고칠 땐 그 상품의 「옵션 변경」 · 「삭제」.',
+  할일:['장바구니 아래 주황 <em>₩○○○ 결제하기</em>']},
+
+ {부:'3부 · 할인 · 결제', 제목:'할인 · 담당 · 결제수단', 그림:'s09',
+  안내:'왼쪽에 상품마다 카드가 하나씩 있어요. 쿠폰 · 마일리지 · 미수금도 이 카드에서 넣어요.',
+  할일:['<em>할인</em> — 숫자를 넣고 W(원) / %(퍼센트) 선택 (영상 예 : 락커 50%)','<em>결제담당자</em> 선택 → <em>전체 적용</em> 을 누르면 모든 상품에 같은 담당이 들어가요','오른쪽 <em>결제일</em>(현재 시간) · <em>결제수단</em>(현금 / 카드) 선택 — 카드면 아래 할부 · 카드사 · 카드번호 · 승인번호','<em>총 결제금액</em> 이 맞는지 확인','<em>계약서 작성</em>'],
+  팁:'옆의 「계약서 미작성」 단추는 이 영상에서는 쓰지 않았어요.'},
+
+ {부:'4부 · 계약서 · 서명', 제목:'계약서 고르기', 그림:'s10',
+  할일:['<em>구매</em> 탭','<em>1.회원권 및 PT상품 구매계약</em> 선택 (영상 기준)']},
+ {부:'4부 · 계약서 · 서명', 제목:'계약서 화면 알기', 그림:'s11',
+  안내:'고객 정보 · 구매 상품 · 결제 정보는 저절로 들어가 있어요.',
+  할일:['고객 기본 정보가 맞는지 확인','아래 <em>필수 입력란이 ○개 남았습니다</em> — 0개가 될 때까지 채워요','<em>필수값 전체동의</em> — 남은 동의 체크를 한 번에 채워요','<em>다음</em> — 다음 빈 칸으로 옮겨 가요','<em>원격 서명 요청</em> — 고객 폰으로 서명을 보낼 때 (영상에서는 안 씀)']},
+ {부:'4부 · 계약서 · 서명', 제목:'신청 종목 체크', 그림:'s12',
+  할일:['「센터 이용 약관」 신청 종목에서 <em>헬스</em> / <em>PT</em> 체크']},
+ {부:'4부 · 계약서 · 서명', 제목:'약관 동의 체크', 그림:'s13',
+  안내:'약관을 고객과 함께 읽어요. 약관 묶음 끝마다 동의 칸이 있어요.',
+  할일:['<em>(필수) 위의 약관을 확인하였으며 동의합니다</em> 체크']},
+ {부:'4부 · 계약서 · 서명', 제목:'서명 칸 누르기', 그림:'s14',
+  안내:'계약서 맨 아래예요.',
+  할일:['<em>글래드짐</em> 서명 칸 (센터)','<em>고객 이름</em> 서명 칸 (고객)']},
+ {부:'4부 · 계약서 · 서명', 제목:'서명하기', 그림:'s15',
+  할일:['흰 칸 안에 서명 — 다시 쓰려면 「모두 지우기」','<em>서명완료</em>']},
+ {부:'4부 · 계약서 · 서명', 제목:'계약서 저장', 그림:'s16',
+  안내:'필수 칸을 다 채우면 오른쪽 위 단추가 「저장완료」로 바뀌어요.',
+  할일:['<em>저장완료</em>']},
+ {부:'4부 · 계약서 · 서명', 제목:'계약서 확인 · 결제 끝', 그림:'s17',
+  안내:'계약서가 잘 보이는지 마지막으로 확인해요.',
+  할일:['<em>저장하기</em>'],
+  주의:'저장하기를 누르면 결제까지 한 번에 끝나요. 영상에서도 저장 직후 결제내역이 바로 생겼어요. 금액 · 결제수단은 이 단추 전에 확인해요.'},
+
+ {부:'5부 · 확인 · 사진', 제목:'결제 확인', 그림:'s18',
+  안내:'고객 창 「대시보드」로 돌아와요.',
+  할일:['<em>유효상품</em> 개수 (영상 예 : 5)','상품마다 기간 · 횟수가 맞는지','<em>결제내역</em> 에 방금 시각으로 줄이 생겼는지']},
+ {부:'5부 · 확인 · 사진', 제목:'프로필 사진 찍기', 그림:'s22',
+  할일:['프로필 사진 칸 오른쪽 위 <em>카메라</em> 아이콘']},
+ {부:'5부 · 확인 · 사진', 제목:'카메라 허용 (처음 한 번)', 그림:'s19',
+  할일:['브라우저가 묻는 창에서 <em>사이트에 있는 동안 허용</em>']},
+ {부:'5부 · 확인 · 사진', 제목:'촬영 · 저장', 그림:'s20',
+  할일:['얼굴이 가운데 오게 하고 <em>촬영</em> — 다시 찍으려면 「재촬영」'],
+  팁:'이 매뉴얼에서는 얼굴을 흐리게 가렸어요.'},
+ {부:'5부 · 확인 · 사진', 제목:'사진 들어갔는지 확인', 그림:'s21',
+  할일:['프로필에 사진이 보이면 회원권 등록이 모두 끝났어요']},
+];
+/* 11/17 19:07 대표 「따라했어요 버튼 없애는 게 좋겠다」 — 체크 · 진도 저장 걷음. 위 막대 = 지금 몇 번째 단계인지만 */
+let 지금 = 0;
+const $ = id => document.getElementById(id);
+/* 누를 자리 (그림 크기에 대한 % · x y 너비 높이) — 설명 그림의 번호 상자와 같은 자리 · 연습 그림 = img/sNNc.jpg (상자 없음) */
+const 자리 = {"s01":[[0.52,9.23,9.38,4.49],[92.08,14.96,5.94,5.99]],"s02":[[4.31,14.13,28.45,8.27],[32.93,14.13,14.31,8.27],[4.31,28.8,42.93,8.27],[4.31,42.93,42.93,8.27],[51.21,12.8,15.52,6.4]],"s03":[[4.31,70.13,42.93,7.47],[50.86,61.33,10.0,5.33],[83.97,86.67,11.72,8.27]],"s04":[[2.07,41.95,6.74,5.37]],"s05":[[63.8,5.61,7.17,4.63],[8.37,11.22,3.91,4.39],[53.8,17.32,16.3,33.41]],"s06":[[2.4,63.33,18.68,23.33],[84.67,88.97,12.46,7.95]],"s07":[[86.74,20.98,4.78,3.9],[43.37,38.54,18.91,7.32],[43.7,48.29,18.59,7.8],[37.72,61.22,24.57,8.05]],"s08":[[72.5,85.12,23.7,7.56]],"s09":[[25.54,68.78,10.33,4.88],[7.07,78.78,13.7,4.63],[74.89,31.22,18.91,4.63],[53.48,56.83,19.35,7.56],[84.13,86.83,10.11,6.34]],"s10":[[10.0,9.46,7.02,5.41],[5.26,17.03,17.54,28.65]],"s11":[[27.86,30.59,43.33,21.96],[2.02,85.75,13.21,5.23],[70.48,84.18,12.26,13.33],[83.21,84.18,15.0,13.33],[87.14,1.83,11.07,7.32]],"s12":[[27.74,33.46,12.14,10.2]],"s13":[[23.57,38.95,21.9,6.8]],"s14":[[67.86,25.62,7.5,12.55],[67.86,38.95,7.5,13.59]],"s15":[[29.64,16.73,40.71,59.08],[49.76,77.12,20.6,6.27]],"s16":[[87.38,3.4,12.98,7.84]],"s17":[[50.91,88.21,48.3,8.72]],"s18":[[23.59,12.68,6.09,4.88],[23.59,19.02,55.0,23.17],[23.04,62.68,35.98,35.61]],"s22":[[17.17,1.22,3.26,6.34]],"s19":[[13.85,45.79,27.54,6.15]],"s20":[[57.28,83.41,5.76,7.07]],"s21":[[1.2,1.46,19.67,31.95]]};
+let 연습 = /^#(연습|practice)$/.test(decodeURIComponent(location.hash)), 맞춘 = 0;
+const 상자 = (r, c) => `<i class="hs ${c}" style="left:${r[0]}%;top:${r[1]}%;width:${r[2]}%;height:${r[3]}%"></i>`;
+
+function 목록(){
+  let h = '', 부 = '';
+  단계.forEach((s, i) => {
+    if(s.부 !== 부){ 부 = s.부; h += `<h3>${부}</h3>`; }
+    h += `<button class="${i === 지금 ? 'on' : ''}" data-i="${i}"><span class="n">${i + 1}</span>${s.제목}</button>`;
+  });
+  $('nav').innerHTML = h;
+  $('bar').style.width = ((지금 + 1) / 단계.length * 100) + '%';
+}
+function 그리기(){
+  목록();
+  const s = 단계[지금];
+  $('main').innerHTML = `<div class="step">
+    <div class="part">${s.부} · ${지금 + 1} / ${단계.length}</div>
+    <h2>${s.제목}</h2>
+    ${s.안내 ? `<p class="intro">${s.안내}</p>` : ''}
+    <ol class="do">${s.할일.map((t, k) => `<li class="${연습 ? (k < 맞춘 ? 'done' : k === 맞춘 ? 'now' : '') : ''}"><b class="k">${k + 1}</b><span>${t}</span></li>`).join('')}</ol>
+    ${연습 ? `<div class="pr" id="pr"><img class="shot" src="CRM연습/${s.그림}c.jpg" alt="${s.제목} 화면 — 누를 곳을 직접 눌러요">${(자리[s.그림] || []).slice(0, 맞춘).map(r => 상자(r, 'ok')).join('')}</div>
+      <div class="say" id="say">${맞춘 >= s.할일.length ? '잘했어요 · 다음 단계로 넘어가요' : (맞춘 + 1) + '번 — 화면에서 그 자리를 눌러요'}</div>`
+    : `<img class="shot" src="CRM연습/${s.그림}.jpg" alt="${s.제목} 화면 — 번호 상자가 누를 곳">`}
+    ${s.팁 ? `<div class="tip">${s.팁}</div>` : ''}
+    ${s.주의 ? `<div class="warn">⚠ ${s.주의}</div>` : ''}
+    <div class="foot">
+      <button class="btn" id="prev" ${지금 === 0 ? 'disabled' : ''}>‹ 이전</button>
+      ${지금 < 단계.length - 1 ? '<button class="btn gold" id="next">다음 ›</button>' : '<button class="btn ed" id="next">처음으로</button>'}
+    </div></div>`;
+  $('prev').onclick = () => { if(지금 > 0){ 지금--; 맞춘 = 0; 그리기(); 위로(); } };
+  $('next').onclick = () => { 지금 = 지금 < 단계.length - 1 ? 지금 + 1 : 0; 맞춘 = 0; 그리기(); 위로(); };
+  if(!연습){ document.querySelector('.shot').onclick = e => { $('zimg').src = e.target.src; $('zoom').classList.add('on'); }; return; }
+  const 자 = 자리[s.그림] || [];
+  $('pr').onclick = e => {
+    if(맞춘 >= 자.length) return;
+    const b = $('pr').getBoundingClientRect(), x = (e.clientX - b.left) / b.width * 100, y = (e.clientY - b.top) / b.height * 100;
+    const r = 자[맞춘], 여 = 1.5;
+    if(x >= r[0] - 여 && x <= r[0] + r[2] + 여 && y >= r[1] - 여 && y <= r[1] + r[3] + 여){
+      맞춘++; 그리기();
+      if(맞춘 >= 자.length && 지금 < 단계.length - 1) setTimeout(() => { 지금++; 맞춘 = 0; 그리기(); 위로(); }, 900);
+    } else {
+      $('pr').insertAdjacentHTML('beforeend', 상자(r, 'hint'));
+      $('say').textContent = '여기를 눌러요 — 반짝이는 자리';
+      setTimeout(() => { const h = document.querySelector('.hs.hint'); if(h) h.remove(); }, 1600);
+    }
+  };
+}
+const 위로 = () => window.scrollTo(0, 0);
+$('nav').onclick = e => { const b = e.target.closest('button'); if(!b) return; 지금 = +b.dataset.i; 그리기(); 위로(); $('nav').classList.remove('open'); };
+$('zoom').onclick = () => $('zoom').classList.remove('on');
+$('menu').onclick = () => $('nav').classList.toggle('open');
+const 모드표시 = () => document.querySelectorAll('#mode button').forEach(b => b.classList.toggle('on', +b.dataset.m === +연습));
+$('mode').onclick = e => { const b = e.target.closest('button'); if(!b) return; 연습 = b.dataset.m === '1'; 맞춘 = 0; 모드표시(); 그리기(); };
+모드표시();
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape'){ $('zoom').classList.remove('on'); return; }
+  if($('zoom').classList.contains('on')) return;
+  if(e.key === 'ArrowRight' && 지금 < 단계.length - 1){ 지금++; 그리기(); }
+  if(e.key === 'ArrowLeft' && 지금 > 0){ 지금--; 그리기(); }
+});
+그리기();
+</script>
+</body>
+</html>
