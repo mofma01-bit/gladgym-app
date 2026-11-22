@@ -2452,6 +2452,8 @@ html[data-pkv="list"] .megrp.pkg .pkms{position:static;margin-right:8px}
 .agchk b{font-weight:600}
 .agchk .rq{margin-left:auto;font-size:11px;color:var(--gold-2,var(--gold))}
 .agmore{margin-top:7px;padding:0;border:0;background:none;color:var(--sub);font-size:12px;cursor:pointer}
+.unfc{display:flex;align-items:center;gap:10px;text-align:left;border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:12px;background:var(--dark-3)}.unfc>div:first-child{min-width:0;margin-right:auto}.unfc b{display:block;font-size:15px}.unfc small{font-size:13px;color:var(--sub)}
+.unfs{display:flex;align-items:center;gap:10px;flex:none}.unfs button{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--dark-2);color:var(--cream);font-size:20px;font-weight:700}.unfs b{font-size:22px;font-weight:900;min-width:58px;text-align:center}.unfs b small{font-size:13px;margin-left:2px}
 .agbody{margin-top:8px;padding:10px 11px;background:var(--dark);border-radius:10px;
   font-size:12px;line-height:1.75;color:var(--sub)}
 .agnote{font-size:12px;line-height:1.7;color:var(--sub);padding:2px 2px 4px}
@@ -3702,7 +3704,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '595';
+const BUILD = '596';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -4288,14 +4290,28 @@ function 오래됐나(){
    끝낸 세트가 하나도 없으면 묻지 않고 지운다. */
 const 끝낸세트 = w => (w.items||[]).reduce((a,it) => a + (it.sets||[]).filter(x => x.done).length, 0);
 function 미완나가기(){ if(S.who==='tr'){ S.stack=[]; S.screen='t_today'; S.ttab='t_today'; render(); } else { S.stack=[]; S.screen='home'; S.tab='home'; render(); } }
+/* 종료를 안 누른 유산소 (2026-11-20 요청함 조O철 「운동기록 하다가 유산소 · 종료를 깜빡 · 다음 날 어제 기록이 사라짐」 · 21:37 대표 「유산소 시간을 눌렀는데 없어졌다는데」)
+   유산소는 시작 → 종료 → 저장을 눌러야 세트가 생긴다. 시작만 누르고 두면 세트 0개 → 「시작만 한 운동」으로 보고 묻지 않고 지웠다(서버 자동 종료도 체크 0 이면 지움).
+   → 시간을 재기 시작한 유산소가 있으면 지우지 않고 「몇 분 했나요」를 묻는다 · 저장하면 그 분으로 세트를 만들고, 서버가 이미 지웠으면 운동 · 종목 줄을 다시 만든다 */
+const 유안끝 = w => (w && w.items || []).filter(it => !it.locked && it.cs && (it.cs.ph === 'go' || (it.cs.acc || 0) >= 1) && !(it.sets || []).some(x => x.done));
+const 유미완기본 = it => { const c = it.cs, 분 = Math.round(유초(c) / 60); return c.on && 분 > 180 ? (c.goal || 유목표()) : Math.max(1, 분 || c.goal || 유목표()); };      /* 켜 둔 채 3시간이 넘었으면 잰 값은 못 믿는다 → 목표 시간부터 */
+const 유미완분 = (w, it) => { const i = w.items.indexOf(it), v = (S.미완분 || {})[w.id + ':' + i]; return v || 유미완기본(it); };
+function 유미완맺기(w, it){ const c = it.cs, e = exOf(it.ex), 종 = 유종(e); c.acc = 유미완분(w, it) * 60; c.on = null; c.ph = 'in';
+  const 거 = 종 === '강도' ? null : 유거리(c), 속 = 종 === '야외' ? +(c.acc ? c.dist / (c.acc / 3600) : 0).toFixed(2) : 종 === '속경' ? 유속도(c) : c.spd;
+  it.sets = [{ kg: 종 === '속경' ? c.inc : 0, reps: Math.max(1, Math.round(c.acc / 60)), spd: 속, dist: 거 == null ? undefined : 거, feel: c.feel, src:'직접', done:true }]; it.locked = true; it.sec = c.acc; }
+async function 미완서버맞춤(w){ let 있나 = true;
+  try{ const r = await sget('workouts?select=id&id=eq.' + encodeURIComponent(w.id)); 있나 = !!(r && r.length); }catch(e){}
+  if(!있나){ await sv(spost('workouts', [{ id:w.id, member_id:w.mid, on_date:w.date || TODAY, kind:w.kind, routine_id:w.rid || null, title:w.title, dur:0, done:false }]), '지워진 운동 다시 만들기'); w.items.forEach(it => { it._id = null; }); }
+  for(let i = 0; i < w.items.length; i++) await svItem(i); }
 function 미완묻기(w){
-  if(!끝낸세트(w)){ const id = w.id; D.live = null; D.workouts = D.workouts.filter(x => x.id !== id); save(); sv(sdel('workouts','id=eq.'+id), '시작만 한 운동 삭제'); S.미완 = null;
+  if(!끝낸세트(w) && !유안끝(w).length){ const id = w.id; D.live = null; D.workouts = D.workouts.filter(x => x.id !== id); save(); sv(sdel('workouts','id=eq.'+id), '시작만 한 운동 삭제'); S.미완 = null;
     if(S.screen==='workout' || S.screen==='t_live') 미완나가기(); else render(); return; }
   if(S.미완 === w.id && $('#sheet').classList.contains('open')) return;
   S.미완 = w.id;
   openSheet(() => { const x = live(); if(!x) return ''; const 오늘것 = !x.date || x.date >= 오늘날();
     return `<div class="h2" style="text-align:center;padding:6px 0 2px">끝내지 못한 운동이 있어요</div>
-    <div class="agbody" style="text-align:center;margin-bottom:12px"><b>${x.date ? dateTxt(x.date) + ' · ' : ''}${esc(x.title||'운동')}</b><br>끝낸 세트 ${끝낸세트(x)}개 · ${durTxt(저절로끝난길이(x))}</div>
+    <div class="agbody" style="text-align:center;margin-bottom:12px"><b>${x.date ? dateTxt(x.date) + ' · ' : ''}${esc(x.title||'운동')}</b><br>끝낸 세트 ${끝낸세트(x)}개${끝낸세트(x) ? ' · ' + durTxt(저절로끝난길이(x)) : ''}</div>
+    ${유안끝(x).map(it => { const i = x.items.indexOf(it); return `<div class="unfc"><div><b>${esc(exName(it.ex, it.va))}</b><small>종료를 안 눌렀어요 · 몇 분 했나요?</small></div><div class="unfs"><button data-act="unfm:${i}:-5" aria-label="5분 줄이기">−</button><b>${유미완분(x, it)}<small>분</small></b><button data-act="unfm:${i}:5" aria-label="5분 늘리기">＋</button></div></div>`; }).join('')}
     <button class="btn main" data-act="unfsave">기록으로 저장</button>
     ${오늘것 ? '<button class="btn sub" data-act="unfgo">이어서 기록</button>' : ''}
     <button class="btn ghost" style="color:var(--warn);border-color:#5a3830" data-act="unfdel">삭제</button>`; });
@@ -4603,7 +4619,8 @@ const 세트있나 = w => !!(w.items && w.items.some(i => i.sets && i.sets.lengt
 function lastRealWorkouts(){ return myWorkouts().filter(세트있나); }
 const 직원화면 = () => !!(직원줄 || S.who === 'tr' || S.self);      /* 트레이너 · 대표 폰 — 남의 안 끝난 기록을 「기록 중」으로 보지 않는다 (2026-10-23) */
 /* 서버의 오늘 안 끝난 기록 — 직원 화면은 개인운동(회원이 자기 폰으로 하던 것)을 빼고 · 여럿이면 가장 최근 것 (2026-11-04) */
-function 진행기록(mid){ return D.workouts.filter(x => !x.done && x.mid === mid && x.date === TODAY && !(직원화면() && x.kind === '개인운동') && x.items && x.items.length).sort((a, b) => String(b.id).localeCompare(String(a.id)))[0] || null; }
+/* 2026-11-20 21:26 대표 「수업 받은 날 개인운동이 기록이 안 된다고 한다」 — 회원 화면이 선생님이 아직 안 마친 수업 기록을 「기록 중」으로 보고 「운동하기」 대신 「이어서 기록」만 띄웠다(마칠 때까지 · 안 마치면 3시간) → 회원 화면은 수업 기록을 이어받지 않는다(직원 화면이 개인운동을 안 받는 것과 같은 규칙의 반대쪽) */
+function 진행기록(mid){ return D.workouts.filter(x => !x.done && x.mid === mid && x.date === TODAY && !(직원화면() ? x.kind === '개인운동' : x.kind === '수업') && x.items && x.items.length).sort((a, b) => String(b.id).localeCompare(String(a.id)))[0] || null; }
 function liveOf(mid){
   if(D.live && D.live.mid===mid) return D.live;
   /* 2026-11-04 대표 「앱으로 기록하다 데스크로 · 태블릿 데스크 → PC 데스크 이어서 하면 수업 기록이 여러 개 남는다」 → 직원 화면도 **수업 기록은** 서버의 진행 중 기록을 이어받는다 · 회원 개인운동은 그대로 막음(아래) */
@@ -16330,7 +16347,10 @@ document.addEventListener('click', async ev=>{
       rec.done=false; D.workouts.unshift(rec);
       sv(spatch('workouts','id=eq.'+rec.id,{ done:false }), '이어서 하기');
       save(); toast('이어서 하실 수 있어요'); go('workout'); return; }
-    case 'unfsave': { const w=live(); if(!w) { closeSheet(); return; } const dur = 접기(w, '끝내지 못한 운동 저장');
+    case 'unfm': { const w = live(), it = w && w.items[+rest[0]]; if(!it || !it.cs) return; S.미완분 = S.미완분 || {}; S.미완분[w.id + ':' + rest[0]] = Math.max(1, Math.min(300, 유미완분(w, it) + Number(rest[1]))); drawSheet(); return; }
+    case 'unfsave': { const w=live(); if(!w) { closeSheet(); return; }
+      { const 유 = 유안끝(w); if(유.length){ 유.forEach(it => 유미완맺기(w, it)); await 미완서버맞춤(w); } }      /* 종료를 안 누른 유산소 = 고른 분으로 세트를 만들어 저장 (11/20) */
+      const dur = 접기(w, '끝내지 못한 운동 저장');
       { const i = D.workouts.findIndex(x => x.id === w.id); if(i < 0) D.workouts.unshift(w); else if(D.workouts[i] !== w) D.workouts[i] = w; }   /* 목록의 사본이 따로 있으면 접은 것으로 바꿔 끼운다 — 안 그러면 시간이 비었다 */
       D.live = null; S.미완 = null; save(); closeSheet(); toast('기록으로 저장했어요\n운동 시간 ' + durTxt(dur)); 미완나가기(); return; }
     case 'unfgo': { const w=live(); if(w){ w.touch = Date.now(); save(); } S.미완 = null; closeSheet(); if(w) go('workout'); return; }
