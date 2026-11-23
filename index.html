@@ -3704,7 +3704,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '596';
+const BUILD = '598';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -16683,6 +16683,21 @@ document.addEventListener('click', ev => { const im = ev.target && ev.target.clo
   const o = document.createElement('div'); o.id = 'imgzoom'; o.innerHTML = '<img alt="">'; o.querySelector('img').src = im.dataset.zoom; o.addEventListener('click', () => o.remove()); document.body.appendChild(o); }, true);
 document.addEventListener('keydown', ev => { if(ev.key === 'Escape'){ const o = document.getElementById('imgzoom'); if(o){ o.remove(); ev.stopPropagation(); } } }, true);
 const isTyping = () => { const a=document.activeElement; return a && (a.tagName==='TEXTAREA'||a.tagName==='INPUT'); };
+/* 다른 기기에서 막 만든 「추가한 종목」 — 종목 사전(EX)은 켤 때 한 번만 받는다. 뒤에서 받은 기록에 모르는 종목이 있으면 그 종목만 바로 받아 이름을 채운다
+   (2026-11-23 조O철 요청 「종목을 입력했는데 회원 · 나 모두 ? 로 보임」 — 자료는 정상 · 열려 있던 화면이 새 종목을 몰랐음) */
+let 모르는종목받는중 = false;
+async function 모르는종목받기(vids){
+  const 모름 = [...new Set((vids || []).map(v => splitV(v)[0]).filter(x => x && x !== 'memo' && x !== '?' && !EX.some(e => e.id === x)))];
+  if(!모름.length || 모르는종목받는중) return 0; 모르는종목받는중 = true;
+  try{ const q = 모름.map(x => '"' + x + '"').join(',');
+    const [exs, vrs] = await Promise.all([sget('exercises?select=*&id=in.(' + q + ')'), sget('variants?select=*&ex_id=in.(' + q + ')&order=sort')]);
+    const 새 = (exs || []).filter(e => !EX.some(x => x.id === e.id));
+    새.forEach(e => EX.push({ id:e.id, n:e.name, p:e.part, e:e.equip, aliases: Array.isArray(e.aliases) ? e.aliases : [], cardio: e.cardio ? 1 : 0, owner:e.owner||'', media: Array.isArray(e.media) ? e.media : [],
+      vars: (vrs || []).filter(v => v.ex_id === e.id).map(v => ({ k:v.vkey, n:v.name||'', desc:v.descr||'', demo: v.demo?1:0, du: v.demo_url||'' })) }));
+    if(새.length && !isTyping()) render();
+    return 새.length; }
+  catch(e){ console.warn('모르는 종목 못 받음 —', e.message); return 0; }
+  finally{ 모르는종목받는중 = false; } }
 let pollSig='', 폴번 = 0;
 setInterval(async ()=>{
   if(document.hidden || S.screen==='boot' || S.screen==='err' || !MEMBERS.length) return;
@@ -16730,6 +16745,7 @@ setInterval(async ()=>{
        → 받은 범위(가장 옛 날짜 이후)만 새것으로 · 그보다 옛 기록은 그대로 둔다 · 경계 날은 새것에 없는 것만 남김 */
     const 새 = mapWorkouts(wks, witems, wsets), 새id = new Set(새.map(w => w.id)), 경계 = wks.length >= 80 ? 새.reduce((m, w) => (!m || w.date < m) ? w.date : m, '') : '';
     D.workouts = 새.concat(경계 ? (D.workouts || []).filter(w => !새id.has(w.id) && (w.date < 경계 || (w.date === 경계 && !새id.has(w.id)))) : []);
+    모르는종목받기(witems.map(i => i.variant_id));      /* 새 기록에 모르는 종목 = 그 종목만 바로 받기 (2026-11-23) */
     if(D.live){
       const mine = D.workouts.find(w=>w.id===D.live.id);
       /* ⛔ 「서버에 없으니 지운다」는 **두 번 연달아** 없고, 이 물음보다 먼저 시작한 운동일 때만.
