@@ -3704,7 +3704,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '602';
+const BUILD = '603';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -9272,7 +9272,7 @@ function 피드백몸(){ const F = S.fx, tr = S.who === 'tr', mid = tr ? subj() 
   return { tabs, body:[...묶.entries()].map(([k, L]) => { const e = exOf(L[0].ex) || {}, 트 = L.filter(o => o.k === 't'), 요 = L.filter(o => o.k === 'm' && !o.a.done);
     const 열 = F.열[k] !== undefined ? F.열[k] : !!q, n새 = tr ? 트.filter(o => !o.c.read).length : 트.filter(o => 새.has(o.c.id)).length;
     const 첫 = (q && L.map(o => 피문장(o.tx).find(x => 정규(x).includes(정규(q)))).find(Boolean)) || 피문장(L[0].tx)[0] || '';
-    return `<div class="fx-card${열 ? ' open' : ''}"><button class="fx-hd" data-act="fxo:${열 ? 1 : 0}:${esc(k)}"><span class="pic">${카드그림(e)}</span><span class="mt"><b>${피칠(exName(L[0].ex, L[0].va), q)}${n새 ? `<u>${tr ? '안 읽음' : '새'} ${n새}</u>` : ''}${요.length ? `<u>요청 ${요.length}</u>` : ''}</b><small>${esc(e.p || '')} · 피드백 ${트.length} · 최근 ${날(L[0])}</small>${열 ? '' : `<span class="pv">${피칠(첫, q)}</span>`}</span><em>⌄</em></button>
+    return `<div class="fx-card${열 ? ' open' : ''}"><button class="fx-hd" data-act="fxo:${열 ? 1 : 0}:${esc(k)}"><span class="pic">${카드그림(e)}</span><span class="mt"><b>${피칠(exName(L[0].ex, L[0].va), q)}${n새 ? `<u>${tr ? '안 읽음' : 'new'} ${n새}</u>` : ''}${요.length ? `<u>요청 ${요.length}</u>` : ''}</b><small>${esc(e.p || '')} · 피드백 ${트.length} · 최근 ${날(L[0])}</small>${열 ? '' : `<span class="pv">${피칠(첫, q)}</span>`}</span><em>⌄</em></button>
       ${열 ? `<div class="fx-list">${L.map(o => { const 줄 = 피문장(o.tx), 갈 = o.k === 't' && o.c.wid ? 'rec:' + o.c.wid : 'exd:' + o.ex + ':' + o.va;
         return `<div class="fx-it${o.k === 'm' ? ' ask' : ''}"><div class="when">${날(o)} · ${o.k === 't' ? esc((o.c.tr || '').trim()) + ' 트레이너' : '회원 요청'}${o.k === 't' && (tr ? !o.c.read : 새.has(o.c.id)) ? ` · <span class="nw">${tr ? '안 읽음' : '새 글'}</span>` : ''}</div><p class="k1">${피칠(줄[0] || (o.k === 'm' ? '이 종목 봐 주세요' : ''), q)}</p>${줄.slice(1).map(x => `<p class="k2">${피칠(x, q)}</p>`).join('')}${o.k === 't' && (o.c.pics || o.c.vids) ? `<p class="k2 md">${o.c.vids ? '영상' : '사진'} 있음</p>` : ''}<button class="go" data-act="${갈}">${o.k === 't' && o.c.wid ? '그 날 기록 보기 ›' : '종목 보기 ›'}</button></div>`; }).join('')}</div><button class="fx-fold" data-act="fxo:1:${esc(k)}">접기 ⌃</button>` : ''}</div>`; }).join('') }; }
 function 피드백톡(mid, L, q){ const 나트 = S.who === 'tr', 회원명 = 나트 ? (subjName() || '회원') : '회원'; let 앞 = '', 앞쪽 = '';
