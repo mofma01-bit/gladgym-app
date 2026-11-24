@@ -1945,7 +1945,7 @@ html[data-pkv="list"] .megrp.pkg .pkms{position:static;margin-right:8px}
 .ikdays{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;width:100%;flex:none}
 .ikdays span{aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#6f6a63;border:1.2px solid #34332d}
 .ikdays span.on{color:#2a1c14;border-color:transparent;background:linear-gradient(180deg,#f3d9a8,#e2c184)}
-.sstat3.ib4.plg>div{grid-template-columns:1fr}
+.sstat3.ib4.plgoal>div{grid-template-columns:1fr}      /* 2026-11-23 목표 칸 이름 plg → plgoal — 플래너 표 .plg(height:100% · 11/06)와 겹쳐 칸이 화면 높이만큼 늘어났다 */
 .kcv{width:100%;flex:none;display:flex;flex-direction:column;align-items:center;gap:2px;padding:18px 14px 16px;border-radius:20px;border:1px solid #5a4c33;text-align:center;
   background:radial-gradient(90% 110% at 50% 0%,rgba(240,211,160,.2),transparent 65%),linear-gradient(180deg,#221e17,#161513)}
 .kcv .kl{font-size:12px;font-weight:700;color:var(--sub)}
@@ -3704,7 +3704,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '599';
+const BUILD = '602';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -4004,7 +4004,7 @@ async function boot(){
     뒤(sget('trainer_favs?select=trainer,member_id'), []), 뒤(sget('cardio_tips?select=*&order=created_at.desc&limit=600'), null),
     뒤(sget('rest_tips?select=*&order=created_at.desc&limit=600'), null), 뒤(sget('ex_favs?select=trainer,ex_id'), []),
     뒤(sget('routine_sheets?select=id,kind,title,owner,note,hidden,cover,tags'), []), 뒤(sget('sheet_gives?select=*'), []),
-    뒤(전부받기('comments?select=member_id,variant_id&order=id'), null)]);
+    뒤(전부받기('comments?select=member_id,variant_id&order=id'), null), 뒤(sget('members?select=id,fb_ask&fb_ask=not.is.null'), [])]);
   const [exs, vrs, mems, rts, ritems, asg, wks, witems, wsets, cms, mdesc, intk, plns, bdy, cyc, mls, mits, aks, bphs, blgs, brds, psts, pcms, plks, rms, bdgs] = await Promise.all([
     sget('exercises?select=*&order=sort'),
     sget('variants?select=*&order=sort'),
@@ -4044,6 +4044,7 @@ async function boot(){
   D.ctips = 뒤것[3].v;
   D.rtips = 뒤것[4].v;      /* 나머지 운동 지정 (122단계 · 2026-11-03) */
   D.exfb = null; D.exfbOwner = '';      /* 종목별 추천 피드백 — 아래 TRAINER 가 정해진 뒤 그 선생님 것만 받는다(11/09 · 전부 받으면 첫 화면 577KB) */
+  D.fbask = new Map((뒤것[9].v || []).map(x => [x.id, x.fb_ask]));      /* 회원 피드백 요청 켜기 · 끄기 (141단계 · 2026-11-24) */
   D.exfavs = 뒤것[5].v || [];      /* 종목 즐겨찾기 (107단계) */
   D.sheets = 뒤것[6].v || []; D.gives = 뒤것[7].v || [];      /* 받은 루틴표 (84단계) */      /* 유산소 넣어주기 (59단계) — 표가 없으면 null = 기능 숨김 */
   /* 트레이너가 올린 스트레칭·운동 종목 사진/영상도 주소를 미리 받아 둔다 — 버킷을 잠가도 보이게 (2026-10-07) */
@@ -5804,11 +5805,14 @@ function unseen(w){
 function noCmItems(w){ return w.items.filter(it => it.sets.length && !피드백있나(w.mid, it.ex, it.va)); }
 function askOf(mid, ex, va){ return (D.asks||[]).filter(a => a.mid===mid && a.ex===ex && a.va===va && !a.done); }
 /* 트레이너 피드백 탭 = 내 담당 회원만 (2026-11-03 대표 노션 「양인혁으로 들어갔는데 다른 트레이너들의 모든 피드백 요청이 떠 · 각자 본인 것만」 · 담당 = 중앙 정본 members.trainer) */
+/* 회원 피드백 요청 (2026-11-24 대표) — 선생님이 켠 회원 · 끈 회원 · 정한 적 없으면 최근 30일 안 PT 수업 기록이 있을 때만 켜짐 (PT 가 끝났거나 일반 회원 = 꺼짐) */
+const 최근PT = mid => (D.workouts || []).some(w => w.mid === mid && w.kind === '수업' && w.done && w.date >= addDays(TODAY, -30));
+function 요청켬(mid){ const v = D.fbask && D.fbask.get(mid); return v === 'on' ? true : v === 'off' ? false : 최근PT(mid); }
 const 내회원 = mid => !!TRAINER && ((MEMBERS.find(x => x.id === mid) || {}).tr || '') === TRAINER;
 function openAsks(){ return (D.asks||[]).filter(a => !a.done && 내회원(a.mid)); }
 /* 숫자는 이번 주만 (2026-10-21 대표 「매번 피드백 자료를 올리는 게 아닌데 매번 불이 들어오고 숫자가 쌓이게 될 거야 · 데스크에서 확인 · 앱은 주간 데이터 위주」) — 주 = 주간 달력과 같은 일~토 */
 const 이번주에 = d => weekOf(TODAY).indexOf(d) >= 0;
-function todoCount(){ return D.workouts.filter(w=>w.done && unseen(w) && 이번주에(w.date) && 내회원(w.mid)).length; }
+function todoCount(){ return D.workouts.filter(w=>w.done && unseen(w) && 이번주에(w.date) && 내회원(w.mid) && !피드백끔(w.mid) && (w.kind === '수업' || 요청켬(w.mid))).length; }      /* 피드백 안내 끈 회원 · 요청 꺼진 회원의 개인운동 빼기 (2026-11-24 조O철 요청 · 대표) */
 function mealTodo(){ return (D.meals||[]).filter(m=>!m.note && 이번주에(m.date) && 내회원(m.mid)); }
 /* 새로 올라온 식단 — 이 기기에서 아직 안 연 이번 주 식단 (회원 식단을 열면 그 회원 것은 「봄」) */
 const 식단본 = (() => { try{ return new Set(JSON.parse(localStorage.getItem('gg_mseen') || '[]')); }catch(e){ return new Set(); } })();
@@ -6062,11 +6066,11 @@ function vLogin(){
    서버는 중앙 몫(`앱회원.py`). 앱은 전화번호 로그인으로 받은 직원 토큰을 몸의 `token` 칸에 실어 보낸다(데스크는 `desk` 칸에 구글 증표 — 서버가 둘 다 받는다). 서버가 매번 서명 + 직원 명단(퇴사 아님)을 다시 본다.
    「권한이 없어요」가 오면 토큰이 틀렸거나 퇴사 처리된 것 — 다시 로그인하라고 알린다.
    브로제이에 닿지 않을 때만 수기 추가(이름 + 뒷 4자리 · id 가 `mh…` 로 시작 → 데스크에 「수기」 표시)가 열린다 — 데스크와 같다 */
-async function 앱crm(길, 몸){ if(샘플판 && 길 === 'booking'){ const m = MEMBERS.find(x => x.id === window.__샘플mid) || {}; return { '나': TRAINER, '오늘예약': { [TRAINER]: [{ name: m.n || '', phone4: m.p4 || '', '시각':'15:00', '종목':'PT', '상태':'예약' }] } }; }      /* 샘플 트레이너 화면 — 가짜 오늘 예약 한 줄 (2026-11-05) */
+async function 앱crm(길, 몸, 한도){ if(샘플판 && 길 === 'booking'){ const m = MEMBERS.find(x => x.id === window.__샘플mid) || {}; return { '나': TRAINER, '오늘예약': { [TRAINER]: [{ name: m.n || '', phone4: m.p4 || '', '시각':'15:00', '종목':'PT', '상태':'예약' }] } }; }      /* 샘플 트레이너 화면 — 가짜 오늘 예약 한 줄 (2026-11-05) */
   const au = 로그인기억.읽() || {}; if(!au.token || au.mid) throw new Error('직원으로 로그인해야 검색할 수 있어요');
   /* 앱은 늘 트레이너 본인 범위 — 대신 = 로그인한 직원 이름(서버가 자기 이름이면 등급과 상관없이 트레이너 범위로 답한다) · 2026-10-23 대표 「앱은 관리자로 볼 필요가 없으니 조민철 트레이너로만」 */
   const 몸글 = JSON.stringify(Object.assign({ token: au.token }, 몸 || {}, au.name && 길 !== 'lessons' ? { 대신: au.name } : {}));      /* 연결 지킴 (2026-11-18) — 앱이 부르는 4개(booking · lessons · search · states)는 모두 읽기: 같은 부름 묶기 · 끊기면 기다렸다 다시 */
-  let r; try{ r = await 연결묶기('crm:' + 몸글 + 길, () => 연결fetch(GG_API + '/app/crm/' + 길, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: 몸글 }, 길 !== 'search')).then(x => x && x.clone ? x.clone() : x); }      /* 지난 예약은 대신을 안 붙인다 — 붙이면 관리자도 본인 수업만 와서 다른 선생님 회원을 기록할 때 비었다 (2026-11-01 대표) · 트레이너 토큰은 서버가 본인 수업만 준다 */
+  let r; try{ r = await 연결묶기('crm:' + 몸글 + 길, () => 연결fetch(GG_API + '/app/crm/' + 길, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: 몸글 }, 길 !== 'search' && !한도, 한도)).then(x => x && x.clone ? x.clone() : x); }      /* 지난 예약은 대신을 안 붙인다 — 붙이면 관리자도 본인 수업만 와서 다른 선생님 회원을 기록할 때 비었다 (2026-11-01 대표) · 트레이너 토큰은 서버가 본인 수업만 준다 */
   catch(e){ const x = new Error('서버에 닿지 못했어요'); x.막힘 = true; throw x; }
   if(!r.ok){ const x = new Error('서버에 닿지 못했어요 (' + r.status + ')'); x.막힘 = r.status >= 500; throw x; }
   const j = await r.json(); if(!j.ok){ const x = new Error(/권한이 없/.test(j.why || '') ? '「내 정보 → 로그아웃」 뒤 다시 로그인해 주세요' : (j.why || '검색하지 못했어요')); x.막힘 = !!j['막힘']; throw x; } return j; }
@@ -7863,7 +7867,7 @@ function 회원종목창(i){ const w = live(), it = w && w.items[i]; if(!it) ret
       <div class="seg mx-tab"><button class="${탭 === '직전' ? 'on' : ''}" data-act="mxtab:직전:${i}">직전 기록</button><button class="${탭 === '설명' ? 'on' : ''}" data-act="mxtab:설명:${i}">설명</button></div>
       <div class="mx-pane">${탭 === '직전' ? (지 ? `<b>${esc(dateTxt(지.date))}</b><div>${지.sets.map((x, n) => `<span>${n + 1}세트 ${x.kg ? kgfmt(x.kg) + 'kg × ' : ''}${x.reps}회</span>`).join('')}</div>${지.memo ? `<small>메모 · ${esc(지.memo)}</small>` : ''}` : '<small>처음 하는 종목이에요</small>')
         : (설명 ? esc(설명).replace(/\n/g, '<br>') : '<small>설명이 아직 없어요</small>')}</div>
-      <div class="mx-foot"><button class="btn sm mx-ask" data-act="exd:${it.ex}:${it.va}">피드백 요청하기</button><button class="btn ghost sm wn" data-act="wdel:${i}">종목 삭제</button></div>`; }); }
+      <div class="mx-foot">${요청켬(S.mid) ? `<button class="btn sm mx-ask" data-act="exd:${it.ex}:${it.va}">피드백 요청하기</button>` : ''}<button class="btn ghost sm wn" data-act="wdel:${i}">종목 삭제</button></div>`; }); }
 function 회원자료창(i, 갈){ const w = live(), it = w && w.items[i]; if(!it) return; const wmid = w.mid || S.mid;
   openSheet(() => { const 자료 = cmOf(wmid, it.ex, it.va).flatMap(c => (c.media || []).map(m => Object.assign({ c }, m))).filter(m => 갈 === 'v' ? m.kind === 'video' : m.kind !== 'video');
     return `<div class="h2">${갈 === 'v' ? '영상' : '사진'} <small>트레이너 피드백 · ${자료.length}</small></div><div class="mx-med">${자료.map(m => `<figure>${m.kind === 'video' ? `<video src="${esc(phURL(m.path))}" controls playsinline preload="metadata"></video>` : `<img src="${esc(phURL(m.path))}" alt="" loading="lazy">`}<figcaption>${esc(String(m.c.ts || '').slice(5, 10).replace('-', '/'))}${m.c.tx ? ' · ' + esc(String(m.c.tx).slice(0, 40)) : ''}</figcaption></figure>`).join('')}</div>
@@ -8026,8 +8030,8 @@ function sheetExDesc(exid, vk, mid){
     return head + `
       <span class="lbl">피드백 ${cms.length?`${cms.length}개`:''}</span>
       ${cms.length ? 피드백회차(cms, K, tr)
-        : 빔('chat','아직 받은 피드백이 없습니다', tr ? '아래에서 피드백을 남겨 주세요' : '아래 「피드백 요청하기」에서 요청해 주세요')}
-      ${!tr?(()=>{ const mine = askOf(mid, exid, vk);
+        : 빔('chat','아직 받은 피드백이 없습니다', tr ? '아래에서 피드백을 남겨 주세요' : 요청켬(mid) ? '아래 「피드백 요청하기」에서 요청해 주세요' : '')}
+      ${!tr && (요청켬(mid) || askOf(mid, exid, vk).length)?(()=>{ const mine = askOf(mid, exid, vk);
         return mine.length
           ? `<div class="note" style="border-color:var(--gold-2)">
               <b style="color:var(--gold)">피드백을 요청했습니다</b>
@@ -9286,7 +9290,7 @@ function vFeedback(){
   const F = S.fx, m = 피드백몸();
   setTimeout(() => { const el = document.getElementById('main'); if(!el) return; el.classList.toggle('tkbg', !!m.톡); if(m.톡 && !S.fbKeep) el.scrollTop = el.scrollHeight; S.fbKeep = false; }, 0);      /* 톡 = 카톡처럼 최근 말이 아래 */
   return { top: bar('피드백', `<span class="sub">${tr ? esc(subjName()) + ' · ' : ''}${cms.length}개</span>`, tr ? 'tm:' + mid : null), tabs: tr ? 0 : 1, keepScroll: !!S.fbKeep,
-    foot: tr ? (F.보기 === '톡' ? '<button class="tk-inp" data-act="fxw"><span>💬 피드백 남기기…</span><b>↑</b></button>' : '') : `<button class="btn blue go" data-act="askpick">피드백 요청하기</button>`,
+    foot: tr ? (F.보기 === '톡' ? '<button class="tk-inp" data-act="fxw"><span>💬 피드백 남기기…</span><b>↑</b></button>' : '') : 요청켬(S.mid) ? `<button class="btn blue go" data-act="askpick">피드백 요청하기</button>` : '',
     body: `<div class="fx-stick"><div class="fx-r1"><div class="fx-seg">${tr ? `<button class="${F.보기 === '지난' ? 'on' : ''}" data-act="fxv:지난"><i>🗓</i>지난 수업</button>` : ''}<button class="${F.보기 === '톡' || F.보기 === '지난' ? '' : 'on'}" data-act="fxv:종목"><i>▦</i>종목별</button><button class="${F.보기 === '톡' ? 'on' : ''}" data-act="fxv:톡"><i>💬</i>톡</button></div><input class="fx-q" type="search" data-k="fxq" placeholder="🔍 종목 · 내용 검색" value="${esc(F.q || '')}" autocomplete="off"></div><div class="fx-tabs" id="fxtabs">${m.tabs}</div></div><div id="fxbody">${m.body}</div>` };
 }
 document.addEventListener('input', ev => { const t = ev.target; if(!t || !t.dataset || t.dataset.k !== 'fxq' || !S.fx) return; S.fx.q = t.value; S.fx.열 = {};      /* 칸은 그대로 · 탭 · 목록만 갈아 끼움 */
@@ -12529,7 +12533,7 @@ function vPlan(){
     <span class="lbl">나의 운동 목적</span>
     ${목적.length ? `<div class="chips">${목적.map(x=>`<span class="chip on">${esc(x)}</span>`).join('')}</div>` : `<div class="cyfoot"><span>아직 정하지 않았습니다<br>${tr ? '위 「계획 수정 · 칼로리 계산」에서 선택해 주세요' : '트레이너에게 작성을 요청해 주세요'}</span></div>`}
     <span class="lbl">목표${(g.now.date||g.to.date) ? ` <small style="font-weight:600;color:var(--sub)">${esc(g.now.date||'—')} → ${esc(g.to.date||'—')}${남!=null&&남>=0 ? ' · '+남+'일 남음' : ''}</small>` : ''}</span>
-    ${칸들 ? `<div class="sstat3 ib4 plg">${칸들}</div>` : `<div class="cyfoot"><span>아직 목표 몸무게가 없습니다<br>${tr ? '위 「계획 수정 · 칼로리 계산」에서 입력해 주세요' : '트레이너에게 작성을 요청해 주세요'}</span></div>`}
+    ${칸들 ? `<div class="sstat3 ib4 plgoal">${칸들}</div>` : `<div class="cyfoot"><span>아직 목표 몸무게가 없습니다<br>${tr ? '위 「계획 수정 · 칼로리 계산」에서 입력해 주세요' : '트레이너에게 작성을 요청해 주세요'}</span></div>`}
     <span class="lbl">맞춤 칼로리 · 얼마나 빠질까</span>
     ${(g.calc && (g.now.w||g.calc.bmr)) ? calcView(g) : '<div class="cyfoot"><span>몸무게와 활동량을 입력해 주세요</span></div>'}
     ${(g.kcal||g.ratio||g.wk||g.mo) ? `<span class="lbl">직접 입력해 둔 값</span>
@@ -13667,11 +13671,22 @@ function 얼굴갈래(mid, 대신){
   if(!a) return 갈래원(mid, 대신);
   return `<span class="av2"><img src="${esc(phURL(a))}" alt="" onerror="picFail(this)">${g ? `<em class="gb ${g[1]}">${g[0]}</em>` : ''}</span>`; }
 /* 오늘 예약 수업 — 데스크와 같은 서버 자료(/app/crm/booking 「오늘예약」 · 트레이너 토큰은 본인 것만) · 10분마다 · 무료 그룹수업은 뺀다 */
-const 예약 = { 줄:null, 중:false, 때:0, 말:'' };
-async function 예약받기(){ if(예약.중 || (예약.줄 && Date.now() - 예약.때 < 10 * 60 * 1000)) return; 예약.중 = true;
-  try{ const j = await 앱crm('booking', {}); const 나 = j['나'] || TRAINER, 다 = j['오늘예약'] || {}; 예약.줄 = [].concat(...Object.entries(다).filter(([t]) => t === 나).map(([, v]) => v || []));      /* 관리자 권한(대표 · 지점장)은 서버가 전체를 준다(「나」 없음) — 앱은 로그인한 선생님 것만 (2026-10-23 대표 「조민철은 전체 회원이 보임 · 모두 본인 수업만」) */ 예약.말 = ''; }
-  catch(e){ 예약.줄 = 예약.줄 || []; 예약.말 = e.message || ''; }
+const 예약 = { 줄:null, 중:false, 때:0, 말:'', 시작:0, 번:0 };
+async function 예약받기(다시){      /* 2026-11-24 「3분 넘게 안 열림 · 새로고침하면 바로」 — 한 번 12초 · 최대 3번 · 실패 20초 뒤 다시 · 멈춘 부름 15초 뒤 새로 · 신선 5분 */
+  const 지금 = Date.now();
+  if(예약.중 && 지금 - 예약.시작 < 15000) return;
+  if(!다시 && 예약.줄 && !예약.말 && 지금 - 예약.때 < 5 * 60 * 1000) return;
+  if(!다시 && 예약.말 && 지금 - 예약.때 < 20000) return;
+  const 번 = ++예약.번; 예약.중 = true; 예약.시작 = 지금;
+  if(S.screen === 't_today' && 예약.말){ 예약.말 = ''; render(); }
+  let j = null, 오류 = null;
+  for(let n = 0; n < 3 && !j; n++){ try{ j = await 앱crm('booking', {}, 12000); }catch(e){ 오류 = e; if(번 !== 예약.번) return; if(n < 2) await new Promise(z => setTimeout(z, 1500)); } }
+  if(번 !== 예약.번) return;      /* 그새 새 부름이 시작됨 — 늦게 온 옛 답은 버린다 */
+  if(j){ const 나 = j['나'] || TRAINER, 다 = j['오늘예약'] || {}; 예약.줄 = [].concat(...Object.entries(다).filter(([t]) => t === 나).map(([, v]) => v || [])); 예약.말 = ''; }      /* 관리자 권한(대표 · 지점장)은 서버가 전체를 준다(「나」 없음) — 앱은 로그인한 선생님 것만 (2026-10-23) */
+  else { 예약.줄 = 예약.줄 || []; 예약.말 = 오류 && 오류.name === 'AbortError' ? '서버 답이 늦어요' : 오류 ? 오류말(오류) : '불러오지 못했어요'; setTimeout(() => { if(예약.말 && (S.screen === 't_today' || S.screen === 't_feed')) 예약받기(); }, 20000); }
   예약.중 = false; 예약.때 = Date.now(); if(S.screen === 't_feed' || S.screen === 't_today') render(); }
+document.addEventListener('visibilitychange', () => { if(document.hidden || S.who !== 'tr' || !예약.때) return;      /* 앱으로 돌아오면 — 3분 지났거나 실패였으면 새로 (폰 잠금 · 다른 앱 다녀옴) */
+  if(예약.말 || Date.now() - 예약.때 > 3 * 60 * 1000) 예약받기(true); });
 function 오늘예약줄(){ return (예약.줄 || []).filter(x => x && x['상태'] !== '취소' && x['종목'] !== '그룹').map(x => ({ x, m: MEMBERS.find(m => m.n === String(x.name || '').trim() && (!x.phone4 || m.p4 === x.phone4)) }))
   .sort((a, b) => String(a.x['시각'] || '').localeCompare(String(b.x['시각'] || ''))); }
 const 오늘기록함 = m => !!m && D.workouts.some(w => w.mid === m.id && w.date === TODAY && w.done && w.items.some(i => i.sets.length));
@@ -13691,7 +13706,7 @@ function 지정갈래창(rid){ const r = rOf(rid); if(!r) return; const 지 = (D
 function 오늘예약줄들(예){ return 예.length ? 예.map(o => { const 됨 = 오늘기록함(o.m), 노 = o.x['상태'] === '노쇼';
     const 갈 = { PT:['PT','pt'], 서비스:['PT','pt'], 가이드:['TG','tg'], 체험:['체험','ex'] }[o.x['종목']];      /* 회원 갈래를 모르면 예약 종목으로 (2026-11-03) */
     return `<button class="mrow2" ${o.m ? `data-act="tm:${o.m.id}"` : ''}>${o.m ? 얼굴갈래(o.m.id, 갈) : 갈 ? `<span class="mi gl gl-${갈[1]}">${갈[0]}</span>` : `<span class="mi nm1 tx">회원</span>`}<span class="mt"><b>${esc(o.x.name || '')} 회원</b><small>${esc(o.x['시각'] || '')} · ${예약종류(o.x)}${o.m ? '' : ' · 앱 미가입'}${o.m && rOf((수업예약(o.m.id) || {}).rid) ? ` · <u class="asgu">다음 수업 루틴 ${rOf(수업예약(o.m.id).rid).no}</u>` : ''}</small></span><span class="stp ${노 ? 'ns' : 됨 ? 'ok' : 'no'}">${노 ? '노쇼' : 됨 ? '기록함' : '수업하기'}</span></button>`; }).join('')
-  : `<div class="fe">${예약.줄 === null ? '불러오는 중이에요' : 예약.말 ? '오늘 예약을 불러오지 못했어요 · 잠시 뒤 다시 열어 주세요' : '오늘 예약된 수업이 없습니다'}</div>`; }
+  : `<div class="fe">${예약.줄 === null || (예약.중 && !예약.줄.length) ? '불러오는 중이에요' : 예약.말 ? `오늘 예약을 불러오지 못했어요 · ${esc(예약.말)}<br><button class="btn sub sm" style="margin-top:8px" data-act="bkre">다시 받기</button>` : '오늘 예약된 수업이 없습니다'}</div>`; }
 function tFeed(){
   const nm = id => (MEMBERS.find(x=>x.id===id)||{}).n || '?';
   const mode = S.tfeed || 'ex';
@@ -13818,7 +13833,7 @@ const 별 = on => `<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="
 function 회원줄들(){
   const 별들 = 즐찾().filter(id => MEMBERS.some(m=>m.id===id));
   return MEMBERS.map(m => { const ws=D.workouts.filter(w=>w.mid===m.id&&w.done).slice().sort(byDateDesc), last=ws[0];
-    const lv=liveOf(m.id), nofb=last && !D.cm.some(c=>c.mid===m.id && c.at==='방금');
+    const lv=liveOf(m.id), nofb=last && !피드백끔(m.id) && (last.kind === '수업' || 요청켬(m.id)) && !D.cm.some(c=>c.mid===m.id && c.at==='방금');      /* 피드백 안내 끈 회원은 「안 본 기록」 아님 (2026-11-24) */
     return { m, last, lv, nofb, fav: 별들.includes(m.id), 담: (m.tr || '') === TRAINER }; });
 }
 function 회원목록글(){
@@ -13881,6 +13896,9 @@ function tMember(){
         <div class="tmf">${lv ? `지금 운동 중 · ${esc(lv.title||'')}` : 지정두줄(m.id)}</div>
       </div>`; })()}
     ${지난기록카드(m, ws.concat(D.workouts.filter(w => w.mid === m.id && !w.done && w.date < TODAY && !세트있나(w))).sort(byDateDesc))}
+    ${(() => { const 켬 = 요청켬(m.id), v = D.fbask && D.fbask.get(m.id);      /* 회원 피드백 요청 켜기 · 끄기 (2026-11-24 대표 「선택적으로 켜는 것으로」 · 141단계 members.fb_ask) */
+      const 글 = 켬 ? (v === 'on' ? '켜짐 · 선생님이 켬' : '켜짐 · 최근 PT 수업이 있어요') : (v === 'off' ? '꺼짐 · 선생님이 끔' : '꺼짐 · PT 가 끝났거나 일반 회원');
+      return `<button class="mrow2 fboffrow" data-act="tfbask:${m.id}"><span class="mi">${svg('pen',19)}</span><span class="mt"><b>회원 피드백 요청</b><small>${글}</small></span>${스위치(켬)}</button>`; })()}
 
     ${(()=>{ /* 체중 추이 — 인바디 기록이 둘 이상일 때만 곡선 */
       const { logs, ds } = 체중점들(((D.blog||{})[m.id]||[]).map(x => ({ w: x.w, d: x.date })));      /* 최근 3개월 · 20개 · 날짜 · 목표 없음 (2026-11-02 대표) */
@@ -15110,7 +15128,7 @@ document.addEventListener('click', async ev=>{
       S.tfMon = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
       drawSheet(); return; }
     case 'fbd': S.fbDay = rest[0]; S.fbMode='day'; closeSheet(); render(); return;
-    case 'askpick': S.askMon = (S.fbDay||TODAY).slice(0,7); sheetAskCal(); return;
+    case 'askpick': if(!요청켬(S.mid)) return; S.askMon = (S.fbDay||TODAY).slice(0,7); sheetAskCal(); return;
     case 'askmon': {
       const b0 = S.askMon || (S.fbDay||TODAY).slice(0,7);
       const d = new Date(+b0.slice(0,4), +b0.slice(5,7)-1 + Number(rest[0]), 1);
@@ -15419,7 +15437,7 @@ document.addEventListener('click', async ev=>{
       D.cm.splice(i,1);
       sv(sdel('comments','id=eq.'+cid), '피드백 삭제');
       save(); toast('삭제했어요'); drawSheet(); render(); return; }
-    case 'ask': {
+    case 'ask': { if(!요청켬(S.mid)) return;
       const [ex,va]=rest, K=ex+'|'+va;
       const ta=document.querySelector('textarea[data-k="ask:'+K+'"]');
       const note=(ta&&ta.value||'').trim();
@@ -16222,6 +16240,12 @@ document.addEventListener('click', async ev=>{
     case 'rks': S.rks=rest[0]; render(); return;
     case 'rkmine': sheetRkMine(); return;
     case 'tmreg': S.tmreg = rest[0] || '담별'; S.tmPg = 10; S.tmq = ''; render(); return;      /* 칩을 누르면 검색은 비우고 10명부터 */
+    case 'bkre': 예약받기(true); render(); return;      /* 오늘 예약 「다시 받기」 (2026-11-24) */
+    case 'tfbask': { const m = MEMBERS.find(x => x.id === rest[0]); if(!m) return; const 켠다 = !요청켬(m.id);      /* 회원 피드백 요청 켜기 · 끄기 (2026-11-24 대표) */
+      if(!await 물어(m.n + ' 회원' + String.fromCharCode(10) + (켠다 ? '피드백 요청을 켤까요?' + String.fromCharCode(10) + '회원 앱에 「피드백 요청하기」가 나와요' : '피드백 요청을 끌까요?' + String.fromCharCode(10) + '회원 앱에서 요청 단추가 사라지고 개인운동은 피드백 숫자에 안 떠요 · 피드백은 그대로 남길 수 있어요'), 켠다 ? '켜기' : '끄기')) return;
+      try{ await spatch('members', 'id=eq.' + encodeURIComponent(m.id), { fb_ask: 켠다 ? 'on' : 'off' });
+        (D.fbask = D.fbask || new Map()).set(m.id, 켠다 ? 'on' : 'off'); toast(켠다 ? '피드백 요청을 켰어요' : '피드백 요청을 껐어요'); render(); }
+      catch(e){ toast('저장하지 못했어요' + String.fromCharCode(10) + 오류말(e)); } return; }
     case 'tmfav': { 즐찾옮김(); const 켬 = 즐찾바꿈(rest[0]); toast(켬 ? '즐겨찾기에 추가했어요' : '즐겨찾기에서 삭제했어요'); render(); return; }
     case 'tdlive': sheetTdLive(); return;
     case 'tdtodo': sheetTdTodo(); return;
