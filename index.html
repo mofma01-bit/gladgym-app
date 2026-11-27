@@ -172,6 +172,7 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .rmh{align-items:center}.rmgl{margin-left:auto;margin-right:8px;height:34px;padding:0 12px;border-radius:999px;border:1px solid #6a5a3a;background:#231e16;color:var(--gold);font:inherit;font-size:13.5px;font-weight:800;white-space:nowrap}
 .rmr .rmst{flex-direction:column;align-items:flex-start;justify-content:center;font-size:14px;font-weight:800;color:var(--cream);padding-left:14px}.rmr .rmst small{font-size:13px;font-weight:600;color:var(--sub)}
 .rm3{display:grid;grid-template-columns:1fr 1fr 74px;height:100%}.rm3 .plc{display:flex;align-items:center;justify-content:center}
+.rmhd .pln{justify-content:center;padding-left:0}.rmhd .rm3 .plhh{display:flex;align-items:center;justify-content:center}.rmhd .rm3 .plhh:last-child{border-left:1px solid #3a352c}
 .rmck{border:0;border-left:1px solid #2a2722;background:#2c2924;color:var(--cream);font:inherit;font-size:14px;font-weight:800}
 .rmr.ok{opacity:.6}.rmr.ok .rmck{background:#1d3a2c;color:#8fe0b0}.rmr.now .rmck{background:linear-gradient(180deg,#f3d9a8,#e2c184);color:#2a1c14}.rmr.now .rmst{color:var(--gold)}
 .rmtm{display:flex;align-items:center;gap:8px;white-space:nowrap;padding:8px 12px;background:#14302a;border-top:1px solid #2a2722}.rmtm span{font-size:14px;font-weight:800;color:#8fe0b0}.rmtm b{font-size:20px;font-weight:900;color:var(--cream);font-variant-numeric:tabular-nums}.rmtm small{font-size:13px;color:var(--sub)}.rmtm button{margin-left:auto;height:32px;padding:0 9px;white-space:nowrap;flex:none;border-radius:9px;border:1px solid #4a453b;background:#1a1917;color:var(--cream);font:inherit;font-size:13px;font-weight:800}.rmtm button+button{margin-left:0}
@@ -642,7 +643,7 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 body{word-break:keep-all;overflow-wrap:break-word}
 @media (max-width:400px){#top:has(.ttl:not(:empty)) .logo{display:none}}      /* 좁은 폰 — 제목이 있으면 로고를 빼 「기록 · 피드백 · 내 정보」가 「기…」로 줄지 않게 (2026-11-06) */      /* 한글 낱말 가운데서 줄이 꺾이지 않게 (2026-11-06 대표 「글자가 멋대로 줄바꿈」) */
 .plall{background:none;border:0;border-right:1px solid #34302a;color:inherit;font:inherit;cursor:pointer;text-align:left;white-space:nowrap;flex-direction:row!important;align-items:center!important;gap:3px}.plall i{font-style:normal;color:var(--gold);font-size:12px}
-.tpk-top{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;margin:0 0 12px;align-items:stretch}.tpk-top .search{min-width:0}.tpk-top button{white-space:nowrap;padding:12px 14px!important}.tpk-top.one{grid-template-columns:1fr}.tpk-top button{padding:12px 6px;border-radius:12px;border:1px solid #34332d;background:#191816;font:inherit;font-size:14.5px;font-weight:800;color:var(--cream);cursor:pointer}.tpk-top button.b{color:#9cc8ff;border-color:#3a6aa0;background:rgba(80,140,220,.14)}.tpk-top button.off{opacity:.4}
+.tpk-top{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;margin:0 0 12px;align-items:stretch}.tpk-top .search{min-width:0}.tpk-top button{white-space:nowrap;padding:12px 14px!important}.tpk-top.one{grid-template-columns:1fr}.tpk-top button{padding:12px 6px;border-radius:12px;border:1px solid #34332d;background:#191816;font:inherit;font-size:14.5px;font-weight:800;color:var(--cream);cursor:pointer}.tpk-top button.b{color:#9cc8ff;border-color:#3a6aa0;background:rgba(80,140,220,.14)}.tpk-top button.off{opacity:1}      /* 꺼진 단추도 단추로 — 흐리게 하지 않음 · 누르면 「같은 이름 종목이 있어요」 안내 (2026-11-25 대표 「이름만 추가도 버튼인데 왜 흐리냐」) */
 .tpk-hint{color:var(--sub);font-size:13.5px;margin:0 0 4px}.tpk-list{display:grid;margin:0 0 12px;border-bottom:1px solid #2c2b27}.tpk-r{width:100%;text-align:left;background:none;border-left:0;border-right:0;border-bottom:0;color:inherit;font:inherit;cursor:pointer;display:flex;align-items:center;padding:8px 2px}.tpk-r .mt{flex:1;min-width:0;display:flex;flex-direction:column}.tpk-r .mt small{color:var(--sub);font-size:13px}
 .tpk-tag{font-style:normal;color:var(--gold);font-weight:800}
 /* 식단 (2026-11-07) — 끼니 네 칸 · 한 끼 창 · 피드백 톡 */
@@ -1708,6 +1709,16 @@ body .cm2 .tx{font-size:14px;line-height:1.6;color:var(--cream)}
 #jfw .bx{width:100%;max-width:520px;max-height:86vh;display:flex;flex-direction:column;background:#1b1a18;border:1px solid #45413a;border-bottom:0;border-radius:20px 20px 0 0;padding:16px 14px calc(14px + env(safe-area-inset-bottom,0px));color:var(--cream)}
 svg.pfi{width:60%;height:60%;display:block}
 /* 2026-10-20 대표 「7번 A」 — 원 안 성 대신 갈래 · 채도 낮춘 셋(급하다로 안 읽히게) · 골드 · 빨강 안 씀 · 시안 회원갈래표시_1020 */
+.dcir{width:46px;height:46px;border-radius:50%;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(240,211,160,.08);border:1.2px solid rgba(240,211,160,.4);color:var(--gold);line-height:1.05}.dcir b{font-size:13px;font-weight:900;font-variant-numeric:tabular-nums}.dcir small{font-size:13px;font-weight:600;opacity:.8}
+.tlh.dch{display:flex;align-items:center;gap:11px}.tlh.dch .tlm{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.tlh.dch .tlm b{font-size:15px;font-weight:800}.tlh.dch .tlm small{font-size:13px;color:var(--sub)}
+.tlrp.tlfx{margin-left:auto;margin-right:6px}.tlrp.tlfx + .tlrp{margin-left:0}
+.rebox{background:#1d1c19;border:1px solid #2c2b27;border-radius:14px;padding:10px 12px;margin:0 0 8px}.reh{display:flex;align-items:center;gap:8px}.reh b{font-size:15px;font-weight:800}.rek{font-size:13px;font-weight:700;color:var(--teal);border:1px solid rgba(169,216,230,.4);border-radius:999px;padding:0 8px}
+.rerow{display:flex;gap:6px;align-items:center;margin-top:6px}.ren{width:44px;flex:none;font-size:13px;color:var(--sub);font-weight:700}.rein{flex:1;min-width:0;display:flex;align-items:center;gap:4px;background:#26241f;border:1px solid #34332d;border-radius:10px;padding:0 10px;height:42px}
+.rein input{width:100%;min-width:0;border:0;background:transparent;color:inherit;font:inherit;font-size:17px;font-weight:800;text-align:right;outline:0;font-variant-numeric:tabular-nums}.rein small{font-size:13px;color:var(--sub);white-space:nowrap}
+.readd{display:block;width:100%;margin-top:8px;height:38px;border-radius:10px;border:1px dashed #4a463e;background:transparent;color:var(--sub);font:inherit;font-size:14px;font-weight:700}
+.endfix{display:flex;flex-direction:column;align-items:center;gap:1px}.endfix small{font-size:13px;font-weight:600;opacity:.75}
+.mring .mrtk{stroke:#34332d}.mring .mrfg{stroke:var(--gold)}
+.pkmems{display:flex;flex-direction:column;border:1px solid #34332d;border-radius:16px;overflow:hidden}.pkmems .mrow2{border-top:1px solid #2c2b27;padding:12px 14px}.pkmems .mrow2:first-child{border-top:0}.pkmems .go{font-style:normal;font-size:14px;font-weight:800;color:var(--gold);white-space:nowrap}
 .mrow2 .mi.gl{font-size:13px;font-weight:900;letter-spacing:-.02em}
 .mrow2 .mi.gl-pt{color:#7fc9d6;background:rgba(127,201,214,.14);border-color:rgba(127,201,214,.45)}
 .mrow2 .mi.gl-tg{color:#e9e1d1;background:rgba(233,225,209,.12);border-color:rgba(233,225,209,.42)}
@@ -3211,6 +3222,9 @@ body.kpon #main{padding-bottom:380px}
 #ggconn{position:fixed;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:9999;display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:#1a1917;color:#e6c487;border:1px solid #34332d;font-size:13px;font-weight:600;box-shadow:0 4px 14px rgba(0,0,0,.35);pointer-events:none}
 #ggconn i{width:12px;height:12px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:ggconnspin .9s linear infinite}
 @keyframes ggconnspin{to{transform:rotate(360deg)}}
+.dreq.go{width:100%;margin-top:12px}.dreq.again{display:block;margin:10px auto 0;border:0;background:none;color:var(--gold);font:inherit;font-weight:800;font-size:14px;cursor:pointer}
+.dreq.on{display:flex;align-items:center;gap:10px;margin-top:12px;padding:12px 14px;border-radius:14px;background:var(--teal-dim);border:1px solid #3f7281}.dreq.on .d{width:9px;height:9px;border-radius:50%;background:var(--teal);flex:none}
+.dreq.on .t{flex:1;min-width:0}.dreq.on b{display:block;font-size:14px;color:var(--teal)}.dreq.on small{font-size:13px;color:var(--sub)}.dreq.on button{border:0;background:none;color:var(--sub);font:inherit;font-size:13px;font-weight:700;text-decoration:underline;cursor:pointer}
 </style>
 
 </head>
@@ -3658,6 +3672,7 @@ if(샘플판){
   const 거르기 = (rows, q) => { q.forEach((v, k) => { if(['select', 'order', 'limit', 'offset', 'or'].includes(k)) return; const g = r => String(r[k] == null ? '' : r[k]);
       if(v.startsWith('eq.')) rows = rows.filter(r => g(r) === v.slice(3)); else if(v.startsWith('neq.')) rows = rows.filter(r => g(r) !== v.slice(4));
       else if(v.startsWith('in.(')){ const s = new Set(v.slice(4, -1).split(',').map(x => x.replace(/"/g, ''))); rows = rows.filter(r => s.has(g(r))); }
+      else if(v.startsWith('not.in.(')){ const s = new Set(v.slice(8, -1).split(',').map(x => x.replace(/"/g, ''))); rows = rows.filter(r => !s.has(g(r))); }      /* 진짜 서버처럼 — 세트 저장 「새로 넣고 → 나머지 지움」 (2026-11-27) · 없으면 새 세트까지 지웠다 */
       else if(v.startsWith('gte.')) rows = rows.filter(r => g(r) >= v.slice(4)); else if(v.startsWith('lte.')) rows = rows.filter(r => g(r) <= v.slice(4));
       else if(v.startsWith('gt.')) rows = rows.filter(r => g(r) > v.slice(3)); else if(v.startsWith('lt.')) rows = rows.filter(r => g(r) < v.slice(3));
       else if(v === 'is.null') rows = rows.filter(r => r[k] == null); });
@@ -3704,7 +3719,7 @@ async function 수파fetch(u, o){ const 실은 = String((o && o.headers && o.hea
 
 const TODAY = (d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'))(new Date());
 
-const BUILD = '603';
+const BUILD = '608';
 /* ══ 앱 안 브라우저 → 바깥 브라우저 · 아이폰 홈 화면 추가 큰 안내 ══ 2026-10-23 대표 「사파리로 열리게 · 데스크 · 회원앱 둘 다 · 글씨 크게 알아보기 쉽게」
    카톡 안 = 카톡 기능(openExternal)으로 사파리 · 크롬에서 다시 연다 · 라인 = openExternalBrowser · 그 밖 앱 안: 안드로이드 = 크롬으로 · 아이폰 = 크게 안내 */
 const 큰안내아이폰 = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -6290,9 +6305,17 @@ function 계획기록(g, src, memo, 옛){
   if(같(h[0], 새) && !memo) return g;
   g.hist = [새].concat(h).slice(0, 30); return g; }
 const 기록곳 = { calc: '대시보드 · 칼로리 계산기', desk: '대시보드 · 정보 탭', app: '회원 앱 · 운동계획', back: '되돌림', old: '전부터 있던 계획' };
+/* 칼로리 · 식단표 요청 (2026-11-24 대표 「그렇게 가」 · 142단계 diet_reqs) — 열린 요청 하나만 본다 · 식단 계획 탭을 열 때 받는다 */
+const 식단요청 = { 줄:{}, 받는:{} };
+async function 식단요청받기(mid){ if(!mid || 식단요청.받는[mid]) return; 식단요청.받는[mid] = 1;
+  try{ const r = await sget('diet_reqs?select=id,created_at&member_id=eq.' + encodeURIComponent(mid) + '&done_at=is.null&canceled_at=is.null&order=created_at.desc&limit=1'); 식단요청.줄[mid] = (r || [])[0] || null; }catch(e){ 식단요청.줄[mid] = null; }
+  식단요청.받는[mid] = 2; if(S.screen === 'diet' && S.dietTab === 'plan') render(); }
+function 식단요청칸(mid, 다시){ if(S.who === 'tr') return ''; const r = 식단요청.줄[mid];
+  if(r) return `<div class="dreq on"><span class="d"></span><span class="t"><b>칼로리 · 식단표 요청함</b><small>${esc(dateTxt(String(r.created_at || '').slice(0, 10)) || '')} · 트레이너가 계산해 보내 드려요</small></span><button data-act="dreq:cancel">요청 취소</button></div>`;
+  return 다시 ? `<button class="dreq again" data-act="dreq:ask">다시 계산 요청 ›</button>` : `<button class="btn main dreq go" data-act="dreq:ask">트레이너에게 칼로리 · 식단표 요청</button>`; }
 function 식단계획보기(mid){
-  const g = GOALS[mid] || {}, mp = g.mp;
-  if(!mp || !mp.meals) return `<div class="empty">아직 받은 식단 계획이 없습니다<br><small style="font-weight:500;opacity:.8">트레이너에게 작성을 요청해 주세요</small></div>`;
+  const g = GOALS[mid] || {}, mp = g.mp; 식단요청받기(mid);
+  if(!mp || !mp.meals) return `<div class="empty">아직 받은 식단 계획이 없습니다<br><small style="font-weight:500;opacity:.8">트레이너가 하루 칼로리와 식단표를 계산해 보내 드려요</small></div>${식단요청칸(mid)}`;
   return `<div class="card gold mpk">${mp.goal ? `<span class="mpgoal">${esc(mp.goal)}</span>` : ''}<span class="lbl" style="margin:0">하루에 이만큼 드세요</span><div class="k">${(+mp.kcal||0).toLocaleString()}<i>kcal</i></div>
       ${(f => !f ? '' : f.창 ? `<div class="mpfast">간헐적 단식 ${esc(String(f.형).replace('-', ':').replace('한끼', '하루 한 끼'))} · ${+f.창[0]}시 ~ ${+f.창[1]}시에 먹어요</div>`
         : `<div class="mpfast">간헐적 단식 ${f.형 === '격일' ? '격일' : '5:2'} · <b>${(f.날 || []).join(' · ')}</b>은 한 끼 ${(+f.단k || 0).toLocaleString()}kcal · 나머지 날은 아래 식단</div>`)(mp.fast)}
@@ -6300,7 +6323,7 @@ function 식단계획보기(mid){
       <div class="mpf"><span><b>${esc(mp.by||'')}</b> 트레이너 · ${esc(dateTxt(mp.at)||'')}${mp.style ? ' · ' + esc(mp.style) : ''}</span>${(g.hist||[]).length ? `<button data-act="phist:${mid}">바뀐 기록 ›</button>` : ''}</div></div>
     ${mp.meals.map(x => `<div class="card mpc"><div class="rowc"><div class="nm">${esc(x.n)}${x.t ? ` <small style="font-weight:500;opacity:.7">${esc(x.t)}</small>` : ''}</div><div class="sm" style="color:var(--gold);font-weight:700">${+x.k||0}kcal</div></div>
       ${(x.li||[]).map(y => `<div class="mpr"><span class="fe">${y[4] || 음식그림(y[0])}</span><span class="fn2">${esc(String(y[0]).replace(/ \(.*/, ''))}</span><span class="fq">${kgfmt(+y[2]||0)} × ${esc(y[1])}</span></div>`).join('')}</div>`).join('')}
-    <div class="cyfoot"><span>내용이 다르면 트레이너에게 말씀해 주세요</span></div>`;
+    <div class="cyfoot"><span>내용이 다르면 트레이너에게 말씀해 주세요</span></div>${식단요청칸(mid, true)}`;
 }
 function sheetPlanHist(mid){
   openSheet(()=>{ const h = (GOALS[mid]||{}).hist || [], 때 = s => { const t = s ? new Date(s) : null; return t && !isNaN(t) ? (t.getMonth()+1) + '월 ' + t.getDate() + '일' : '날짜 모름'; };
@@ -7416,23 +7439,42 @@ async function svNewItem(i){
   if(back && back[0]) it._id = back[0].id;
   save();
 }
-async function svItem(i){
-  const w=D.live; if(!w) return; const it=w.items[i]; if(!it) return;
+/* 2026-11-27 데스크 버그 e9565b1f(「운동 마치기 눌렀는데 나중에 기록이 없음」) — 저장이 되었는지 알 수 있게 (sv 는 돌려주는 값을 쓰는 곳이 있어 그대로 둠) */
+function sv되나(promise, what){
+  return Promise.resolve(promise).then(() => true, e => { netBad++; console.error(what, e); toast('반영하지 못했어요\n「' + 을를(what) + '」 다시 해 주세요'); return false; });
+}
+/* 한 종목 저장은 한 줄로 — 세트 체크 때 저장과 「마치기」 저장이 겹치면 서로의 세트를 지울 수 있어 차례로만 */
+const 종목저장줄 = new WeakMap();
+function svItem(i){
+  const w = D.live, it = w && w.items[i]; if(!it) return Promise.resolve(false);
+  const 앞 = 종목저장줄.get(it) || Promise.resolve();
+  const 이번 = 앞.then(() => svItem하나(it), () => svItem하나(it));
+  종목저장줄.set(it, 이번.catch(() => {}));
+  return 이번;
+}
+async function svItem하나(it){      /* 돌려줌 : 서버에 다 들어갔으면 true */
+  const w=D.live; if(!w) return false; const i = w.items.indexOf(it); if(i < 0) return true;
   /* 서버 자동 종료(중앙 운동_자동종료.py · 10분마다)는 max(시작, workouts.updated_at) + 3시간으로 닫는다 — 저장할 때 「마지막 활동」을 남겨 긴 운동이 도중에 닫히지 않게 (2026-10-20 · 1분에 한 번만) */
   if(!w.done && Date.now() - (w.활동보냄 || 0) > 60000){ w.활동보냄 = Date.now(); spatch('workouts','id=eq.'+w.id, { updated_at:new Date().toISOString() }).catch(() => {}); }
   if(!it._id) await svNewItem(i);
-  if(!it._id) return;
-  await sv(spatch('workout_items','id=eq.'+it._id,
-    Object.assign({ sec:Math.round(it.sec||0), locked:!!it.locked, sort:i }, it.memo != null ? { memo: String(it.memo || '').slice(0, 300) || null } : {})), '종목 저장');      /* 수업 메모 = workout_items.memo (2026-10-23) */
-  await sv(sdel('workout_sets','item_id=eq.'+it._id), '세트 정리');
+  if(!it._id) return false;
+  let 됨 = true;
+  if(!await sv되나(spatch('workout_items','id=eq.'+it._id,
+    Object.assign({ sec:Math.round(it.sec||0), locked:!!it.locked, sort:i }, it.memo != null ? { memo: String(it.memo || '').slice(0, 300) || null } : {})), '종목 저장')) 됨 = false;      /* 수업 메모 = workout_items.memo (2026-10-23) */
   const rows = it.sets.filter(x=>x.done).map((x,k)=>Object.assign({ item_id:it._id, sort:k,
     kg:x.kg, reps:x.reps, spd: x.spd==null ? null : x.spd, done:true }, 유산소칸있나 && x.dist != null ? { dist:x.dist } : {}, 유산소칸있나 && x.feel ? { feel:x.feel, src:x.src||'직접' } : {}));
-  if(rows.length) await sv(spost('workout_sets', rows), '세트 저장');
+  /* 새 세트를 먼저 넣고 → 옛 세트를 지운다 (옛 : 지우고 → 넣기 — 넣기가 끊기면 그 종목 세트가 통째로 사라졌다 · 2026-11-27 e9565b1f) */
+  if(rows.length){ let 새 = null, 넣음 = false;
+    try{ 새 = await spost('workout_sets', rows, { ret:true }); 넣음 = true; }catch(e){ netBad++; console.error('세트 저장', e); toast('반영하지 못했어요\n「세트 저장」 다시 해 주세요'); 됨 = false; }
+    const ids = Array.isArray(새) ? 새.map(r => r && r.id).filter(x => x != null) : [];
+    if(넣음 && ids.length === rows.length){ if(!await sv되나(sdel('workout_sets','item_id=eq.'+it._id+'&id=not.in.('+ids.join(',')+')'), '세트 정리')) 됨 = false; } }      /* 번호를 못 받으면(시험용 가짜 저장 등) 옛 세트는 그대로 둔다 — 지우지 않는 쪽이 안전 */
+  else if(!await sv되나(sdel('workout_sets','item_id=eq.'+it._id), '세트 정리')) 됨 = false;
   const sw = D.workouts.find(x=>x.id===w.id);
   if(sw){ const si = sw.items.find(x=>x._id===it._id);
     if(si){ si.sec=Math.round(it.sec||0); si.locked=!!it.locked;
       si.sets = it.sets.filter(x=>x.done).map(x=>({kg:x.kg,reps:x.reps,spd:x.spd,dist:x.dist,feel:x.feel,done:true})); } }
   save();
+  return 됨;
 }
 /* 지난 기록으로 시작 — 종목·순서는 그대로, 세트는 그날 마지막 세트의 무게·횟수를 첫 세트 목표로 (2026-10-02 대표
    「정해진 루틴 선택 외에도 지난 수업기록에서 바로 선택할 수 있게 · 최근 5~8개 · 수업이든 개인운동이든」) */
@@ -7741,7 +7783,7 @@ function 지정판그림(){ const o = S.rj; if(!o || !o.판) return 루틴주기
   } else { const 표 = 받은표A(o.mid);
     if(!표.length) h += `<div class="fe">받은 루틴표가 없습니다<br>데스크 회원 루틴 탭에서 「📋 루틴표 주기」를 먼저 해 주세요</div>`;
     else { if(!표.some(x => x.id === o.sid)) o.sid = 표[0].id;
-      h += `<span class="lbl">루틴표 — ★ 메인이 먼저 · 다른 루틴표는 눌러서 바꿔 보기</span><div class="zjsh">${표.map((x, i) => `<button class="${x.id === o.sid ? 'on' : ''}" data-act="zjsid:${x.id}">${지정표지(x)}${i === 0 ? '<span class="st">★ 메인</span>' : ''}<small>${esc(x.title || '루틴표')}</small></button>`).join('')}</div>
+      h += `<span class="lbl">루틴표 <small>눌러서 바꿔 보기</small></span><div class="zjsh">${표.map((x, i) => `<button class="${x.id === o.sid ? 'on' : ''}" data-act="zjsid:${x.id}">${지정표지(x)}${i === 0 ? '<span class="st">★ 메인</span>' : ''}<small>${esc(x.title || '루틴표')}</small></button>`).join('')}</div>
         <span class="lbl">운동 — 누르면 바로 ${수 ? '수업' : '개인운동'}으로 지정</span>
         ${표루틴(o.sid).map(r => { const a = (D.asgAll || []).find(z => z.mid === o.mid && String(z.rid) === String(r.id) && (z.on >= TODAY || !지정했나A(z))), 못 = a && a.on < TODAY;
           return `<button class="rjex${a ? (a.kind === '수업' ? ' cl' : ' pe') : ''}" data-act="zjpick:${r.id}">${a ? `<span class="bar ${a.kind === '수업' ? 'cl' : 'pe'}${못 ? ' ms' : ''}">📅 ${짧은날(a.on)} ${esc(a.kind)}${못 ? ' · 못함' : '으로 지정'}</span>` : '<span class="bar no">지정 안 함</span>'}<span class="bd"><b><em>운동 ${r.no}</em>${esc(r.n)}</b>${그림(r)}</span></button>`; }).join('')}`; } }
@@ -7775,10 +7817,12 @@ function 플래너화면(w){
   const wmid = w.mid || S.mid, tr = S.who === 'tr', 수업 = w.kind === '수업', 색 = 플래너색(w);
   const 줄들 = w.items.map((it, i) => ({ it, i, e: exOf(it.ex) || {} }));
   const 근 = 줄들.filter(o => !o.e.cardio), 유 = 줄들.filter(o => o.e.cardio);
+  const 알엠만 = 근.length > 0 && 근.every(o => o.it.rm || o.it.rmPlan);      /* 1RM 만 잴 때 = 머리 칸도 1RM 꼴 */
   const 칸 = (o, j, f, 첫) => { const x = o.it.sets[j], 값 = !x ? '' : f === 'kg' ? (x.kg ? kgfmt(x.kg) : (x.reps ? '–' : '')) : (x.reps || '');
     const 바뀜 = !!(x && o.it.base && o.it.base[j] && o.it.base[j][f] !== x[f]), 지금 = !!(자판 && 자판.it === o.i && 자판.i === j && 자판.f === f);
     return `<button class="plc${첫 ? ' r1' : ''}${지금 ? ' now' : ''}${바뀜 ? ' ch' : ''}" data-act="plk:${o.i}:${j}:${f}" aria-label="${esc(exName(o.it.ex, o.it.va))} ${j + 1}세트 ${f === 'kg' ? '무게' : '횟수'}">${값}</button>`; };
   const 이름 = o => `<button class="pln" data-act="plnm:${o.i}"><span class="hl" style="background:${색[o.i] || '#b9b1a2'}">${esc(isMemo(o.it.ex) ? exName(o.it.ex, o.it.va) : ((exOf(o.it.ex) || {}).n || exName(o.it.ex, o.it.va)))}</span>${줄아래(o.it)}</button>`;
+  const 알엠머리 = '<div class="plr plh rmhd"><span class="pln">단계</span><div class="rm3"><span class="plhh">무게(kg)</span><span class="plhh r1">반복수</span><span class="plhh">완료</span></div></div>';      /* 1RM 줄과 같은 칸(무게 · 반복수 · 완료) — 머리 칸이 어긋나던 것 (2026-11-24 대표) */
   const 일알엠 = o => { const it = o.it, 끝 = it.sets.filter(x => x.done).length, p = it.rmPlan || [];
     const 위 = `<div class="plr rmh">${이름(o)}<button class="rmgl" data-act="rmgoalat:${o.i}">${it.rmGoal ? '목표 1RM ' + kg표(it.rmGoal) + 'kg ✎' : '목표 1RM 입력 ›'}</button></div>`;
     if(!p.length) return 위;
@@ -7787,7 +7831,7 @@ function 플래너화면(w){
       return 쉼줄 + `<div class="plr rmr${됨 ? ' ok' : j === 끝 ? ' now' : ''}"><span class="pln rmst">${esc(q.단계)}<small>${Math.round((q.pct || 1) * 100)}%${q.쉼 ? ' · ' + q.쉼 : ''}</small></span>
         <div class="rm3">${칸(o, j, 'kg', false)}${칸(o, j, 'reps', true)}<button class="rmck" data-act="rmck:${o.i}:${j}">${됨 ? '✓' : '완료'}</button></div></div>`; }).join('');
     const 다 = 끝 && 끝 === it.sets.length, 남 = it.sets.length - 끝;
-    return 위 + 줄 + (남 >= 2 ? `<button class="pl-add rmall" data-act="rmall:${o.i}">✓ 남은 ${남}단계 모두 완료</button>` : '') + (it.rmDone ? `<div class="rmdone">✓ 1RM 실측 ${kg표(it.rmDone)}kg 남겼어요</div>` : '') + (다 ? `<button class="pl-add rmmore" data-act="rmmore2:${o.i}">＋ 한 번 더 시도</button>` : ''); };
+    return 위 + (알엠만 ? '' : 알엠머리) + 줄 + (남 >= 2 ? `<button class="pl-add rmall" data-act="rmall:${o.i}">✓ 남은 ${남}단계 모두 완료</button>` : '') + (it.rmDone ? `<div class="rmdone">✓ 1RM 실측 ${kg표(it.rmDone)}kg 남겼어요</div>` : '') + (다 ? `<button class="pl-add rmmore" data-act="rmmore2:${o.i}">＋ 한 번 더 시도</button>` : ''); };
   const 행 = o => {
     if(o.it.rm || o.it.rmPlan) return 일알엠(o);
     if(isMemo(o.it.ex)) return `<div class="plr">${이름(o)}<button class="plm" data-act="${tr ? 'exd:memo:' + esc(o.it.va) + ':' + wmid : 'plfocus:' + o.i}">${tr ? '메모 · 눌러서 피드백으로 남기기 ›' : '메모 종목 ›'}${o.it.part ? ' <small>' + esc(o.it.part) + '</small>' : ''}</button></div>`;
@@ -7804,9 +7848,9 @@ function 플래너화면(w){
     ${몸판묶음(w)}
     <div class="pl-tools">${혼자 ? `<button class="wrchip ${c0.on ? 'on' : ''}" data-act="wrestpick">${c0.on ? '휴식 ' + c0.sec + '초' : '휴식 끔'} ▾</button>` : ''}<span class="sp"></span>${채움 ? `<button class="pl-new" data-act="plnew">새로 기록하기</button>` : ''}</div>
     ${도는중 ? `<div class="wrestbar"><b id="restleft2">${mmss(Math.max(0, (S.rest.until - Date.now()) / 1000))}</b><span>쉬는 중</span><button data-act="wrestadd">+15초</button><button data-act="wrestx">건너뛰기</button></div>` : ''}
-    <div class="pltb"><div class="plr plh pl3h"><button class="pln plall" data-act="plall" title="오늘 루틴 한눈에">운동 명칭 <i>▾</i></button><div class="plcs"><div class="plg" style="--n:4"><span class="plhh" style="grid-column:span 4">무게(kg)</span><span class="plhh r1" style="grid-column:span 4">반복수</span></div></div></div>
+    <div class="pltb">${알엠만 ? 알엠머리 : `<div class="plr plh pl3h"><button class="pln plall" data-act="plall" title="오늘 루틴 한눈에">운동 명칭 <i>▾</i></button><div class="plcs"><div class="plg" style="--n:4"><span class="plhh" style="grid-column:span 4">무게(kg)</span><span class="plhh r1" style="grid-column:span 4">반복수</span></div></div></div>`}
       ${근.map(행).join('')}
-      ${true ? `<div class="plr pl3 plnew"><span class="pln"><input class="plnewin" data-k="plnewin" enterkeyhint="done" autocomplete="off" placeholder="＋ 종목" aria-label="종목 이름 쓰고 Enter"></span><div class="plcs"><div class="plg" style="--n:4">${'<span class="plc nil"></span>'.repeat(8)}</div></div><span></span></div>` : ''}</div>
+      ${!알엠만 ? `<div class="plr pl3 plnew"><span class="pln"><input class="plnewin" data-k="plnewin" enterkeyhint="done" autocomplete="off" placeholder="＋ 종목" aria-label="종목 이름 쓰고 Enter"></span><div class="plcs"><div class="plg" style="--n:4">${'<span class="plc nil"></span>'.repeat(8)}</div></div><span></span></div>` : ''}</div>
     <button class="pl-add" data-act="go:pick">＋ 웨이트 종목 추가</button>
     ${수업 && tr ? `<button class="zbtn zrest" data-act="rtrest"><span class="e">📋</span><span>나머지 운동 지정하기<small>오늘 루틴에서 · 검색해서 추가</small></span></button>` : ''}
     ${유.length ? `<div class="pltb plcard"><div class="plr plca plh"><span class="pln">유산소</span><span>시간</span><span>속도</span></div>${유.map(유행).join('')}</div>` : ''}
@@ -8411,7 +8455,8 @@ function vSummary(){
             ((D.bph||[]).filter(x => x.kind==='ootd' && x.mid===w.mid && (x.memo===w.id || x.date===w.date)).slice(-1)[0])}
          <button class="btn ${ootd찍었나(w) ? 'sub' : 'gold'}" data-act="ootd:${w.id}">${svg('h_cam',19)} ${ootd찍었나(w) ? '오운완 다시 찍기' : '오운완 찍기'}</button>
          ${ootd찍었나(w) ? '' : `<div class="cyfoot" style="justify-content:center"><span>사진에 오늘 한 종목 · 세트 · 총 무게가 얹힌 한 장이 만들어집니다</span></div>`}
-         ${수업 ? `<button class="btn sub" data-act="pair:${w.id}">${svg('h_hands',19)} 회원과 같이 찍기</button>` : ''}`
+         ${수업 ? `<button class="btn sub" data-act="pair:${w.id}">${svg('h_hands',19)} 회원과 같이 찍기</button>` : ''}
+         ${S.who !== 'tr' && 회원수정가능(w) ? `<button class="btn sub endfix" data-act="myfix:${w.id}">기록 수정<small>${w.items.some(it => (exOf(it.ex) || {}).cardio && it.sets.some(x => !x.spd)) ? '속도 · 경사가 비어 있어요' : '무게 · 횟수 · 시간 · 속도 · 경사'}</small></button>` : ''}`      /* 운동 끝 화면에서 바로 수정 — 웨이트 · 유산소 같이 (2026-11-24 23:34 대표 「유산소 마치고 여기서도 수정이 바로 · 유산소든 웨이트든」) */
       : `<div class="note">오운완은 <b>기록한 날에만</b> 찍을 수 있습니다</div>`}
     ${수업 && S.who === 'tr' ? `<button class="btn sub nxgo" data-act="tasgmode:${w.mid}">다음 수업 루틴 지정하기${rOf((수업예약(w.mid) || {}).rid) ? ` <small>· 지금 루틴 ${rOf(수업예약(w.mid).rid).no}</small>` : ''}</button>` : ''}
     ${수업 && S.who === 'tr' ? 리포트발(w) : ''}
@@ -13599,6 +13644,7 @@ function tToday(){
 ` };
 }
 /* 날짜 머리 — 같은 날 줄을 묶고 머리에 오늘 · 어제 · 11/2 (월) + 건수 (2026-11-04 대표 시안2 A) */
+const 날원 = d => { const t = new Date(String(d).slice(0, 10) + 'T00:00:00'), 오 = String(d).slice(0, 10) === TODAY; return `<span class="dcir${오 ? ' now' : ''}"><b>${t.getMonth() + 1}/${t.getDate()}</b><small>${오 ? '오늘' : '일월화수목금토'[t.getDay()]}</small></span>`; };      /* 날짜 원 — 날짜부터 (2026-11-24 대표 「좌측에 11/00 날짜를 원 안에 넣어서 날짜부터 표기」) */
 function 날짜머리묶음(ws, 한줄){ const 날 = [...new Set(ws.map(w => w.date))], 요 = d => '일월화수목금토'[new Date(d + 'T00:00:00').getDay()];
   return 날.map(d => { const xs = ws.filter(w => w.date === d), 이름 = d === TODAY ? '오늘' : d === addDays(TODAY, -1) ? '어제' : dateTxt(d);
     return `<div class="fdh"><b>${이름}</b><small>${이름 === dateTxt(d) ? '(' + 요(d) + ')' : dateTxt(d) + ' (' + 요(d) + ')'}</small><i>${xs.length}</i></div>` + xs.map(한줄).join(''); }).join(''); }
@@ -13664,7 +13710,7 @@ let 구분꾸밈예약 = 0;
 new MutationObserver(() => { if(구분꾸밈예약) return; 구분꾸밈예약 = requestAnimationFrame(() => { 구분꾸밈예약 = 0; 구분꾸밈(); }); }).observe(document.documentElement, { childList:true, subtree:true });
 function 접칸(k, 꼴, 제목, 부제, n, 속, 불){
   const 접 = 칸접힘[k] === true, 산 = (불 === undefined ? n : 불) > 0;
-  return `<div class="fsec ${꼴}${꼴 === 'day' ? '' : 산 ? ' live' : ' zero'}${접 ? ' shut' : ''}" data-k="${k}"><button class="fh" data-act="fsec:${k}">${산 && 꼴 !== 'day' ? '<span class="pd"></span>' : ''}<span class="gi" aria-hidden="true" style="--ic:${esc(네모주소(String(제목)))}"></span><span class="ft"><b>${제목}</b>${부제 ? `<small>${부제}</small>` : ''}</span><span class="fc">${n}</span><i>⌄</i></button><div class="fb">${속}</div></div>`; }
+  return `<div class="fsec ${꼴}${꼴 === 'day' ? '' : 산 ? ' live' : ' zero'}${접 ? ' shut' : ''}${+n === 0 ? ' n0' : ''}" data-k="${k}"><button class="fh" data-act="fsec:${k}">${산 && 꼴 !== 'day' ? '<span class="pd"></span>' : ''}<span class="gi" aria-hidden="true" style="--ic:${esc(네모주소(String(제목)))}"></span><span class="ft"><b>${제목}</b>${부제 ? `<small>${부제}</small>` : ''}</span><span class="fc">${n}</span><i>⌄</i></button><div class="fb">${속}</div></div>`; }
 /* 프로필 원 — 회원이 넣은 사진 + PT · TG · 체험 딱지 · 사진이 없으면 갈래 원 */
 function 얼굴갈래(mid, 대신){
   const a = profOf(mid).avatar, m = MEMBERS.find(x => x.id === mid) || {}, x = m.p4 ? 갈래표[m.n + '|' + m.p4] : null, g = x && 갈래짧게[x['갈래']];
@@ -13886,10 +13932,10 @@ function tMember(){
       return `<div class="tmhead">
         <span class="tmt"><small>우리의 목표</small><b>${esc(g.goal||'아직 없어요')}</b><i>${esc(g.work||'')}</i></span>
         <span class="mring"><svg viewBox="0 0 76 76" aria-hidden="true">
-          <circle cx="38" cy="38" r="${R}" fill="none" stroke="#34332d" stroke-width="5"/>
-          ${p > 0 ? `<circle cx="38" cy="38" r="${R}" fill="none" stroke="var(--gold)" stroke-width="5" stroke-linecap="round"
+          <circle class="mrtk" cx="38" cy="38" r="${R}" fill="none" stroke-width="5"/>
+          ${p > 0 ? `<circle class="mrfg" cx="38" cy="38" r="${R}" fill="none" stroke-width="5" stroke-linecap="round"
             stroke-dasharray="${(C*p).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 38 38)"/>` : ''}</svg>
-          <i><b>${이번주}${목 ? `<u>/${목}</u>` : ''}</b><small>이번 주</small></i></span>
+          <i><b>${이번주}${목 ? `<u>/${목}회</u>` : ''}</b><small>이번 주 운동</small></i></span>      <!-- 2026-11-24 대표 「이 도넛은 무슨 의미」 — 이번 주 운동한 날 / 목표 주 n회 -->
         <div class="tmb${lv ? '' : ' z4'}">${lv
           ? `<button class="g" data-act="tgo:${m.id}">이어서 기록하기</button><button class="t" data-act="tlive:${m.id}">종목별 피드백</button>`
           : `<button class="g" data-act="tstartask:${m.id}">수업 시작</button><button class="r" data-act="rmstart:${m.id}">1RM 측정</button><button class="t tasg2" data-act="zjopen:${m.id}:개인운동">개인운동 지정<small>혼자 할 운동</small></button><button class="t tasg2 lsn" data-act="zjopen:${m.id}:수업">다음 수업 루틴<small>미리 지정하기</small></button>`}</div>
@@ -13927,13 +13973,12 @@ function tMember(){
    날짜(요일) · 수업/개인운동 · 제목 머리 → 자극 부위 그림(트레이너가 칠했으면 그 그림 · 아니면 종목으로 자동) → 운동 명칭 · 무게 · 반복수 표 → 수업 메모
    트레이너 = 누르면 피드백 쓰기 · 「몰아서 올리기」 / 회원 = 리포트 › · 「이 기록으로 시작」(⑧) */
 function 지난기록한장(w, o){ o = o || {}; const 요 = '일월화수목금토'[new Date(w.date + 'T00:00:00').getDay()], 메 = (D.cm || []).filter(c => c.wid === w.id && c.ex === 'memo').map(c => c.tx).filter(Boolean);
-  if(o.tr && !세트있나(w)) return `<div class="tmrc none${w.kind === '개인운동' ? ' self' : ''}"><div class="tlh"><b>${dateTxt(w.date)} <u>(${요})</u></b><span class="k">${esc(w.kind || '')}</span>${w.title ? `<small>${esc(w.title)}</small>` : ''}<span class="tlno">기록 없음</span></div>
+  if(o.tr && !세트있나(w)) return `<div class="tmrc none${w.kind === '개인운동' ? ' self' : ''}"><div class="tlh"><b>${dateTxt(w.date)} <u>(${요})</u></b><span class="k${w.kind === '수업' ? ' su' : ' pe'}">${esc(w.kind || '')}</span>${w.title ? `<small>${esc(w.title)}</small>` : ''}<span class="tlno">기록 없음</span></div>
     <div class="tlnone"><b>종목을 입력하지 않은 수업이에요</b><small>수업을 시작만 하고 저장 전에 나갔어요</small></div><div class="tlnb">${회원기록인가(w) ? '' : `<button class="btn main sm" data-act="recfix:${w.id}">기록하기</button>`}<button class="btn ghost sm" data-act="recdrop:${w.id}">삭제</button></div></div>`;      /* 빈 기록도 보이게 (2026-11-16 대표 「기록이 없는지도 표시가 아예 안 나와」) */
-  return `<div class="tmrc${w.kind === '개인운동' ? ' self' : ''}"${o.tr ? ` data-act="tw:${w.id}"` : ''}><div class="tlh"><b>${dateTxt(w.date)} <u>(${요})</u></b><span class="k">${esc(w.kind || '')}</span>${w.title ? `<small>${esc(w.title)}</small>` : ''}${o.tr ? (회원기록인가(w) ? `<span class="tlwho2">회원 기록</span>` : `<button class="btn sub sm tlfix" data-act="recfix:${w.id}">기록 수정</button>`) : o.pick ? '' : `<button class="tlrp" data-act="rpt:${w.id}">리포트 ›</button>`}</div>
+  return `<div class="tmrc${w.kind === '개인운동' ? ' self' : ''}"${o.tr ? ` data-act="tw:${w.id}"` : ''}><div class="tlh"><b>${dateTxt(w.date)} <u>(${요})</u></b><span class="k${w.kind === '수업' ? ' su' : ' pe'}">${esc(w.kind || '')}</span>${w.title ? `<small>${esc(w.title)}</small>` : ''}${o.tr ? (회원기록인가(w) ? '' : `<button class="btn sub sm tlfix" data-act="recfix:${w.id}">기록 수정</button>`) : o.pick ? '' : `${S.who !== 'tr' && 회원수정가능(w) ? `<button class="tlrp tlfx" data-act="myfix:${w.id}">수정</button>` : ''}<button class="tlrp" data-act="rpt:${w.id}">리포트 ›</button>`}</div>
     <div class="tmfig tmfig2">${오늘부위판(w, false)}</div><div class="tlt">${플래너표(w)}</div>${o.tr || o.pick ? '' : 팁줄들(w.id)}${메.length ? `<div class="tmmemo"><b>수업 메모</b>${메.map(t => esc(t)).join(' · ')}</div>` : ''}`
     + (o.tr ? `<button class="mu-go sm" data-act="bulkopen:${w.id}"><span class="e">📤</span><span>이 수업 피드백 몰아서 올리기</span></button>` : '')
-    + (o.start ? (회원수정가능(w) ? `<div class="tlbar"><button class="btn sub sm tlfix2" data-act="myfix:${w.id}">기록 수정</button><button class="btn main sm tlgo" data-act="again:${w.id}">이 기록으로 시작</button></div>`
-        : `<button class="btn main sm tlgo" data-act="again:${w.id}">이 기록으로 시작</button><div class="tlwho">${회원수정막힘(w)}</div>`) : '')
+    + (o.start ? `<button class="btn main sm tlgo" data-act="again:${w.id}">이 기록으로 시작</button>${회원수정가능(w) ? '' : `<div class="tlwho">${회원수정막힘(w)}</div>`}` : '')      /* 「기록 수정」은 카드 머리 「리포트 ›」 옆으로 올림 — 펼치자마자 보이게 (2026-11-24 23:3x 대표) */
     + (o.pick ? `<button class="btn main tlgo zjgo" data-act="${o.pick[0]}">${o.pick[1]}</button>` : '') + `</div>`; }
 function 지난기록카드(m, ws){ const 다 = ws.filter(x => 세트있나(x) || (x.date < TODAY && !(D.live && D.live.id === x.id))),      /* 빈 기록도 「기록 없음」 카드로 (2026-11-16) */ n = S.tmN && S.tmN.mid === m.id ? S.tmN.n : 5, 보 = 다.slice(0, n);
   if(!다.length) return `<div class="tmlast none"><small>지난 기록</small><span>아직 기록이 없어요 · 수업을 기록하면 여기에 나와요</span></div>`;
@@ -14230,12 +14275,11 @@ function sheetPickMember(){
   openSheet(()=>`
     <div class="h2">오늘 수업 <small>누구와 하시나요</small></div>
     <input class="search" type="text" data-filter="1" placeholder="회원 이름으로 검색">
-    ${MEMBERS.map(m=>{ const lv=liveOf(m.id);
-      return `<button class="card rowc ${lv?'teal':''}" data-nm="${esc(m.n)}" data-act="${lv?'tgo:'+m.id:'tstartask:'+m.id}">
-        <div><div class="nm ${lv?'t':''}">${esc(m.n)}</div>
-        <div class="sm">${lv?'진행 중 · 이어서 기록':(D.today[m.id]&&rOf(D.today[m.id].rid)?`${지정이름(D.today[m.id].kind)} · 루틴 ${rOf(D.today[m.id].rid).no}`:'지정된 루틴 없음')}</div></div>
-        <span class="rt">${lv?'이어서 ›':'시작 ›'}</span></button>`; }).join('')
-      || '<div class="empty">담당 회원이 없습니다<small class="e2">대시보드 「회원」에서 추가해 주세요</small></div>'}
+    <div class="pkmems">${MEMBERS.map(m=>{ const lv=liveOf(m.id);
+      return `<button class="mrow2 pkmem ${lv?'lvrow':''}" data-nm="${esc(m.n)}" data-act="${lv?'tgo:'+m.id:'tstartask:'+m.id}">${얼굴갈래(m.id)}      <!-- 갈래 원(PT · TG · 체험 · FC) — 오늘 화면 줄과 같은 꼴 (2026-11-24 대표 「원래 TG · PT 딱지 붙지 않았나」) -->
+        <span class="mt"><b>${esc(m.n)}</b><small>${lv?'진행 중 · 이어서 기록':(D.today[m.id]&&rOf(D.today[m.id].rid)?`${지정이름(D.today[m.id].kind)} · 루틴 ${rOf(D.today[m.id].rid).no}`:'지정된 루틴 없음')}</small></span>
+        <em class="go">${lv?'이어서 ›':'시작 ›'}</em></button>`; }).join('')
+      || '<div class="empty">담당 회원이 없습니다<small class="e2">대시보드 「회원」에서 추가해 주세요</small></div>'}</div>
     <button class="btn ghost sm" data-act="close">닫기</button>`);
 }
 
@@ -14277,6 +14321,37 @@ async function 고침준비(mid){ const 고 = 고침기록(mid); if(!고) return
     if(!await 물어(dateTxt(고.date) + ' 수업을 다시 기록할까요?' + String.fromCharCode(10) + '지금 기록된 ' + 이름 + ' 은(는) 삭제돼요', '다시 기록')) return false; }
   S.ss.고침 = null; D.workouts = D.workouts.filter(x => x.id !== 고.id); await sv(sdel('workouts', 'id=eq.' + 고.id), '지난 기록 다시 기록'); return 고; }
 const 빈기록지움 = (mid, 날) => { if(!날) return; D.workouts.filter(w => w.mid === mid && w.date === 날 && !세트있나(w) && !(D.live && D.live.id === w.id)).forEach(w => { D.workouts = D.workouts.filter(x => x.id !== w.id); sv(sdel('workouts', 'id=eq.' + w.id), '빈 기록 지움'); }); };      /* 그날 빈 기록만 있던 날에 새로 적으면 빈 것은 지운다 */
+/* ══ 끝난 기록 수정 — 아래 창에서 그 자리에서 (2026-11-25 대표) ══
+   시계 · 「기록 중」 없이 숫자만 · 웨이트 = 세트마다 kg · 회 · 유산소 = 분 · 속도 · 경사(경사 있는 기구만 · 유산소의 kg 칸 = 경사)
+   저장 = 확인 창 → 바뀐 종목만 workout_sets 를 지우고 다시 적음(svItem 과 같은 꼴) · 운동 시간 · 날짜는 그대로 */
+let 고침창 = null;      /* { wid, its:[{ sets:[{ kg, reps, spd, dist, feel }] }] } */
+function sheetRecEdit(wid){ const w = D.workouts.find(x => x.id === wid); if(!w) return;
+  if(!고침창 || 고침창.wid !== wid) 고침창 = { wid, its: w.items.map(it => ({ sets: (it.sets || []).length ? it.sets.map(x => Object.assign({}, x)) : [{}] })) };      /* 세트가 없던 종목 = 빈 줄 하나 (11/25) */
+  const 칸 = (i, j, f, v, 단, mode) => `<label class="rein"><input type="text" inputmode="${mode || 'decimal'}" data-re="${i}:${j}:${f}" value="${v == null || v === '' ? '' : (f === 'kg' ? kgfmt(v) : v)}" placeholder="–" autocomplete="off" enterkeyhint="next"><small>${단}</small></label>`;
+  openSheet(() => `<div class="h2">기록 수정 <small>${esc(dateTxt(w.date))}</small></div>
+    ${w.items.map((it, i) => { const e = exOf(it.ex) || {}, ss = (고침창.its[i] || { sets:[] }).sets; if(!ss.length || isMemo(it.ex) || !exOf(it.ex)) return '';
+      const 유 = !!e.cardio, 경 = 유 && 경사최대(it.ex);
+      return `<div class="rebox"><div class="reh"><b>${esc(exName(it.ex, it.va))}</b>${유 ? '<span class="rek">유산소</span>' : ''}</div>`
+        + ss.map((x, j) => `<div class="rerow">${유 ? '' : `<span class="ren">${j + 1}세트</span>`}${유 ? 칸(i, j, 'reps', x.reps, '분', 'numeric') + 칸(i, j, 'spd', x.spd, 'km/h') + (경 ? 칸(i, j, 'kg', x.kg, '경사') : '') : 칸(i, j, 'kg', x.kg, 'kg') + 칸(i, j, 'reps', x.reps, '회', 'numeric')}</div>`).join('') + (유 ? '' : `<button class="readd" data-act="readd:${i}">＋ 세트 추가</button>`) + '</div>'; }).join('')}
+    <button class="btn main" data-act="resave:${wid}">저장</button><button class="btn ghost sm" data-act="reclose">닫기</button>`); }
+document.addEventListener('input', ev => { const t = ev.target; if(!고침창 || !t || !t.dataset || !t.dataset.re) return; const [i, j, f] = t.dataset.re.split(':'), it = 고침창.its[+i], x = it && it.sets[+j]; if(!x) return;
+  const v = t.value.trim().replace(',', '.'); x[f] = v === '' ? null : (isFinite(+v) ? +v : x[f]); });
+async function 고침저장(wid){ const w = D.workouts.find(x => x.id === wid), o = 고침창; if(!w || !o || o.wid !== wid){ closeSheet(); return; }
+  const 꼴 = ss => JSON.stringify((ss || []).map(x => [x.kg == null ? null : +x.kg, x.reps == null ? null : +x.reps, x.spd == null ? null : +x.spd]));
+  o.its.forEach(x => { x.sets = x.sets.filter(y => (y.reps || 0) > 0); });      /* 횟수(유산소 = 분)가 빈 줄은 버린다 */
+  const 바뀐 = w.items.map((it, i) => i).filter(i => o.its[i] && 꼴(w.items[i].sets) !== 꼴(o.its[i].sets));
+  if(!바뀐.length){ 고침창 = null; closeSheet(); toast('바뀐 것이 없어요'); return; }
+  if(!await 물어('이대로 수정할까요?' + String.fromCharCode(10) + 바뀐.map(i => exName(w.items[i].ex, w.items[i].va)).join(' · '), '수정')) return;
+  try{ for(const i of 바뀐){ const it = w.items[i], ss = o.its[i].sets;
+      if(!it._id && ss.length){ const back = await sv(spost('workout_items', [{ workout_id:w.id, sort:i, variant_id:VID(it.ex, it.va), sec:Math.round(it.sec || 0), locked:false }], { ret:true }), '종목 추가'); if(back && back[0]) it._id = back[0].id; }
+      if(!it._id){ it.sets = []; continue; }
+      await sv(sdel('workout_sets', 'item_id=eq.' + it._id), '세트 정리');
+      const rows = ss.map((x, k) => Object.assign({ item_id:it._id, sort:k, kg:x.kg == null ? null : x.kg, reps:x.reps == null ? null : x.reps, spd:x.spd == null ? null : x.spd, done:true },
+        유산소칸있나 && x.dist != null ? { dist:x.dist } : {}, 유산소칸있나 && x.feel ? { feel:x.feel, src:x.src || '직접' } : {}));
+      if(rows.length) await sv(spost('workout_sets', rows), '세트 저장');
+      it.sets = ss.map(x => Object.assign({}, x, { done:true })); }
+    save(); 고침창 = null; closeSheet(); toast('수정했어요'); render(); }
+  catch(e){ toast('저장하지 못했어요'); } }
 async function 고침열기(wid){ const w = D.workouts.find(x => x.id === wid); if(!w) return;
   const L = D.live, 찬 = x => !!x && (x.items || []).some(it => (it.sets || []).length);
   if(L){ if(찬(L)){ for(let i = 0; i < (L.items || []).length; i++){ try{ await svItem(i); }catch(e){} }      /* 하던 수업 = 세트까지 서버에 저장하고 「기록 중」으로 남김 · 그 회원 「이어서 기록하기」로 돌아감 */
@@ -14725,6 +14800,10 @@ document.addEventListener('click', async ev=>{
       drawSheet(); return; }
     case 'fput': { if(S.fpMode==='g') readGram(); putFood(); return; }
     case 'dtab': S.dietTab = rest[0]; render(); return;
+    case 'dreq': { const mid = S.mid; if(rest[0] === 'ask'){ if(식단요청.줄[mid]) return; const 줄 = { id:'dr_' + Date.now(), member_id:mid }; 식단요청.줄[mid] = { id:줄.id, created_at:new Date().toISOString() }; render();
+        try{ await spost('diet_reqs', [줄]); toast('요청했어요\n트레이너가 계산해 보내 드려요'); }catch(e){ 식단요청.줄[mid] = null; render(); toast('요청하지 못했어요\n' + 오류말(e)); } return; }
+      const r = 식단요청.줄[mid]; if(!r || !await 물어('칼로리 · 식단표 요청을 취소할까요?', '요청 취소')) return;
+      try{ await spatch('diet_reqs', 'id=eq.' + encodeURIComponent(r.id), { canceled_at:new Date().toISOString() }); 식단요청.줄[mid] = null; render(); toast('요청을 취소했어요'); }catch(e){ toast('취소하지 못했어요\n' + 오류말(e)); } return; }
     case 'phist': S.phm = {}; sheetPlanHist(rest[0] || S.mid); return;
     case 'phm': S.phm = S.phm || {}; S.phm[rest[0]] = !S.phm[rest[0]]; drawSheet(); return;
     case 'wgoal': S.wg = null; sheetWgoal(rest[0] || S.mid); return;
@@ -14963,6 +15042,9 @@ document.addEventListener('click', async ev=>{
       D.routines.push(Object.assign({ id, mid, no, n:이름, purpose:'', grp:g0, items:[] }, 루틴덧꼴()));
       sv(spost('routines',[Object.assign({ id, member_id:mid, no, name:이름, purpose:'', grp:g0 }, 루틴덧())]), '루틴 만들기');
       S.redit=id; toast('새 루틴을 만들었어요'); go('t_redit'); return; }
+    case 'resave': await 고침저장(rest[0]); return;
+    case 'reclose': 고침창 = null; closeSheet(); return;
+    case 'readd': { const o = 고침창 && 고침창.its[+rest[0]]; if(!o) return; const 앞 = o.sets[o.sets.length - 1] || {}; o.sets.push({ kg:앞.kg == null ? null : 앞.kg, reps:null }); sheetRecEdit(고침창.wid); return; }
     case 'rsavename': { const r=rOf(rest[0]); if(!r) return;
       const nEl=document.querySelector('[data-k="rn:'+r.id+'"]'), pEl=document.querySelector('[data-k="rp:'+r.id+'"]');
       const oEl=document.querySelector('[data-k="rno:'+r.id+'"]');
@@ -15646,6 +15728,7 @@ document.addEventListener('click', async ev=>{
       return; }
 
     case 'startr': { const r=rOf(rest[0]), t=D.today[r.mid];
+      if(liveOf(r ? r.mid : S.mid)){ toast('하던 운동이 있어요\n마치고 시작해 주세요'); go('workout'); return; }      /* 2026-11-24 대표 「기록 삭제해도 계속 이어서 기록」 — 하던 운동 위에 루틴을 시작하면 newLive 가 D.live 를 덮어 옛 기록이 「끝 안 난 채」 남고, 새것을 지우면 옛것이 다시 「이어서 기록」으로 잡혔다 · 「지난 기록으로 시작(again)」과 같은 막음 */
       if(S.who !== 'tr' && r && (수업예약(r.mid) || {}).rid === r.id && !await 물어('다음 수업 때 트레이너와 할 루틴이에요\n그래도 개인운동으로 할까요?', '개인운동으로 시작')) return;
       newLive(`루틴 ${r.no} · ${r.n}`, itemsFromRoutine(r), (t&&t.rid===r.id)?t.kind:'개인운동', r.id); return; }
     case 'myrecs': S.myrI = 0; sheetMyRecs(); return;
@@ -16359,6 +16442,7 @@ document.addEventListener('click', async ev=>{
       const w = D.workouts.find(x => x.id === rest[0]);
       if(!w){ toast('그 기록을 찾지 못했어요'); return; }
       if(S.who === 'tr' || !회원수정가능(w)){ toast(회원수정막힘(w)); return; }
+      if(w.done){ 고침창 = null; sheetRecEdit(w.id); return; }      /* 끝난 기록 = 아래 창에서 숫자만 (2026-11-25 대표 「경사 · 속도를 넣으려는 건데 재기록이 되고 · 시간 초가 다시 돌아」) */
       const L = D.live;
       if(L && L.id === w.id){ go('workout'); return; }
       if(L){ if((L.items || []).some(it => (it.sets || []).length)){ for(let i = 0; i < L.items.length; i++){ try{ await svItem(i); }catch(e){} } toast('하던 운동은 기록 중으로 두었어요'); }      /* 하던 것 = 세트까지 저장 · 「이어서 기록하기」로 남김 */
@@ -16586,8 +16670,14 @@ async function finish(){
   /* 직접 누른 「마치기」는 누른 그 시각이 끝이다. 다만 8시간은 못 넘는다 */
   const dur=capSec(w.startAt ? 흐른초(w)
     : w.items.reduce((a,it)=>a+(Number(it.sec)||0), 0), CAP_W);
-  for(let i=0;i<w.items.length;i++) await svItem(i);
-  await sv(spatch('workouts','id=eq.'+w.id, Object.assign({ done:true, dur, kind:w.kind }, w.기록날 ? { on_date:w.기록날 } : {})), '운동 저장');
+  /* 서버에 다 들어갔을 때만 마친다 — 하나라도 안 들어가면 기록 화면 그대로 + 「다시 저장」 (2026-11-27 데스크 버그 e9565b1f 장O훈 트레이너
+     「운동 마치기 눌렀는데 나중에 기록이 없음」 · 옛 : 저장이 끊겨도 알림만 띄우고 마쳐서 폰에서만 보이고 서버엔 없었다 → 3시간 뒤 서버 자동 종료가 빈 운동으로 지움) */
+  let 다됨 = true;
+  for(let i=0;i<w.items.length;i++){ let r = false; try{ r = await svItem(i); }catch(e){ console.error('종목 저장', e); } if(r === false) 다됨 = false; }      /* 뜻밖의 오류도 「못 올림」 으로 — 멈춘 채 두지 않는다 */
+  if(다됨 && !await sv되나(spatch('workouts','id=eq.'+w.id, Object.assign({ done:true, dur, kind:w.kind }, w.기록날 ? { on_date:w.기록날 } : {})), '운동 저장')) 다됨 = false;
+  if(!다됨){ save();
+    if(await 물어('기록을 서버에 올리지 못했어요' + String.fromCharCode(10) + '인터넷을 확인하고 다시 저장해 주세요 · 기록은 이 폰에 그대로 있어요', '다시 저장')) return finish();
+    render(); return; }
   const rec={ id:w.id, mid:w.mid, date:w.기록날||w.date||TODAY, kind:w.kind, rid:w.rid, title:w.title, dur, done:true,
     items: w.items.filter(it=>it.sets.some(s=>s.done)).map(it=>({ _id:it._id, ex:it.ex, va:it.va, locked:true, memo: it.memo || '',
       sec:Math.round(it.sec), sets: it.sets.filter(s=>s.done).map(s=>({kg:s.kg, reps:s.reps, spd:s.spd})) })) };
